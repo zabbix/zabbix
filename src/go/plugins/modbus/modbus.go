@@ -20,8 +20,12 @@
 package modbus
 
 import (
-	"zabbix.com/pkg/conf"
+	"time"
 
+	named "github.com/BurntSushi/locker"
+	"github.com/goburrow/modbus"
+	mblib "github.com/goburrow/modbus"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 )
 
@@ -137,8 +141,81 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 }
 
-func mbRead(p *MBParams, timeout int) ([]byte, error) {
-	return []byte{0}, nil
+func mbRead(p *MBParams, timeout int) (results []byte, err error) {
+	handler := newHandler(p, timeout)
+	var lockName string
+	if p.ReqType == Tcp {
+		lockName = p.NetAddr
+	} else {
+		lockName = p.Serial.PortName
+	}
+
+	named.Lock(lockName)
+
+	switch p.ReqType {
+	case Tcp:
+		err = handler.(*mblib.TCPClientHandler).Connect()
+		defer handler.(*mblib.TCPClientHandler).Close()
+	case Rtu:
+		err = handler.(*mblib.RTUClientHandler).Connect()
+		defer handler.(*mblib.RTUClientHandler).Close()
+	case Ascii:
+		err = handler.(*mblib.ASCIIClientHandler).Connect()
+		defer handler.(*mblib.ASCIIClientHandler).Close()
+	}
+
+	if err != nil {
+		named.Unlock(lockName)
+		return nil, err
+	}
+
+	client := modbus.NewClient(handler)
+	switch p.FuncId {
+	case ReadCoil:
+		results, err = client.ReadCoils(p.MemAddr, p.Count)
+	case ReadDiscrete:
+		results, err = client.ReadDiscreteInputs(p.MemAddr, p.Count)
+	case ReadHolding:
+		results, err = client.ReadHoldingRegisters(p.MemAddr, p.Count)
+	case ReadInput:
+		results, err = client.ReadInputRegisters(p.MemAddr, p.Count)
+	}
+
+	named.Unlock(lockName)
+
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func newHandler(p *MBParams, timeout int) (handler mblib.ClientHandler) {
+	switch p.ReqType {
+	case Tcp:
+		h := mblib.NewTCPClientHandler(p.NetAddr)
+		h.SlaveId = p.SlaveId
+		h.Timeout = time.Duration(timeout) * time.Second
+		handler = h
+	case Rtu:
+		h := modbus.NewRTUClientHandler(p.Serial.PortName)
+		h.BaudRate = int(p.Serial.Speed)
+		h.DataBits = int(p.Serial.DataBits)
+		h.Parity = p.Serial.Parity
+		h.StopBits = int(p.Serial.StopBit)
+		h.SlaveId = p.SlaveId
+		h.Timeout = time.Duration(timeout) * time.Second
+		handler = h
+	case Ascii:
+		h := modbus.NewASCIIClientHandler(p.Serial.PortName)
+		h.BaudRate = int(p.Serial.Speed)
+		h.DataBits = int(p.Serial.DataBits)
+		h.Parity = p.Serial.Parity
+		h.StopBits = int(p.Serial.StopBit)
+		h.SlaveId = p.SlaveId
+		h.Timeout = time.Duration(timeout) * time.Second
+		handler = h
+	}
+	return handler
 }
 
 func pack2Json(val []byte, p *MBParams) interface{} {

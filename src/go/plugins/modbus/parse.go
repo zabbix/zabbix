@@ -29,7 +29,7 @@ import (
 
 func parseParams(params *[]string) (*MBParams, error) {
 	if len(*params) == 0 || len(*params) > 7 {
-		return nil, fmt.Errorf("Invalid number of parameters.")
+		return nil, fmt.Errorf("Invalid number of parameters:%d", len(*params))
 	}
 
 	var p MBParams
@@ -61,7 +61,6 @@ func parseParams(params *[]string) (*MBParams, error) {
 	if p.MemAddr, p.FuncId, err = getMemAddr(params, 3, p.FuncId); err != nil {
 		return nil, err
 	}
-	return nil, fmt.Errorf("Invalid number of parameters:%d", len(*params))
 
 	if p.RetType, err = getRetType(params, 5, p.FuncId); err != nil {
 		return nil, err
@@ -71,7 +70,7 @@ func parseParams(params *[]string) (*MBParams, error) {
 		return nil, err
 	}
 
-	if p.Endianess, err = getEndianness(params, 6); err != nil {
+	if p.Endianness, err = getEndianness(params, 6); err != nil {
 		return nil, err
 	}
 
@@ -356,7 +355,7 @@ func getCount(p *[]string, n int, retType Bits16) (count uint16, retCount uint, 
 	return count, retCount, nil
 }
 
-func getEndianness(p *[]string, n int, retType Bits16) (endianness Bits8, err error) {
+func getEndianness(p *[]string, n int) (endianness Bits8, err error) {
 	v := "be"
 
 	if len(*p) > n {
