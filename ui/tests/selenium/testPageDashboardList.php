@@ -51,9 +51,8 @@ class testPageDashboardList extends CWebTest {
 		}
 
 		// Check filter fields.
-		$filter_fields = ['Name', 'Show'];
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals($filter_fields, $filter_form->getLabels()->asText());
+		$this->assertEquals(['Name', 'Show'], $filter_form->getLabels()->asText());
 		foreach (['All', 'Created by me'] as $show_tag) {
 			$this->assertTrue($filter_form->query('xpath://ul[@id="filter_show"]/li/label[text()="'.$show_tag.'"]')->exists());
 		};
@@ -198,8 +197,7 @@ class testPageDashboardList extends CWebTest {
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard deleted');
-		$after_rows_count = $before_rows_count - 1;
-		$this->assertRowCount($after_rows_count);
+		$this->assertRowCount($before_rows_count - 1);
 
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE name='.zbx_dbstr($dashboard_name)));
