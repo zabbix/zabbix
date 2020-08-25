@@ -1066,7 +1066,6 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 	{
 		keys_path_t		*keys_path;
 		char			*error = NULL, **ptr;
-
 		zbx_hashset_iter_t	iter;
 
 		keys_path = (keys_path_t *)keys_paths->values[i];
