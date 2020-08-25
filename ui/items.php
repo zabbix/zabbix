@@ -54,8 +54,10 @@ $fields = [
 									],
 	'delay' =>						[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
-											' && {type} != '.ITEM_TYPE_DEPENDENT,
+											' && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
+											' && {type} != '.ITEM_TYPE_DEPENDENT.
+											' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
+												' && isset({key}) && strncmp({key}, "mqtt.get", 8) == 0))',
 										_('Update interval')
 									],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -1784,7 +1786,7 @@ else {
 	if (hasRequest('filter_delay')) {
 		$filter_delay = getRequest('filter_delay');
 		$filter_type = getRequest('filter_type');
-
+		$filter_key = getRequest('filter_key');
 		if ($filter_delay !== '') {
 			if ($filter_type == -1 && $filter_delay == 0) {
 				$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,  ITEM_TYPE_INTERNAL,
@@ -1795,7 +1797,8 @@ else {
 				$options['filter']['delay'] = $filter_delay;
 			}
 			elseif ($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP
-					|| $filter_type == ITEM_TYPE_DEPENDENT) {
+					|| $filter_type == ITEM_TYPE_DEPENDENT
+					|| ($filter_type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter_key, 'mqtt.get', 8) === 0)) {
 				$options['filter']['delay'] = -1;
 			}
 			else {
@@ -1866,7 +1869,8 @@ else {
 			$delay = $item['delay'];
 
 			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-					|| $item['type'] == ITEM_TYPE_DEPENDENT) {
+					|| $item['type'] == ITEM_TYPE_DEPENDENT
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 				$delay = '';
 			}
 			else {

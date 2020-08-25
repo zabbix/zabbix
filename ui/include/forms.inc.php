@@ -132,6 +132,7 @@ function getItemFilterForm(&$items) {
 	$fTypeVisibility = [];
 	$cmbType = new CComboBox('filter_type', $filter_type, null, [-1 => _('all')]);
 	zbx_subarray_push($fTypeVisibility, -1, 'filter_delay_row');
+	zbx_subarray_push($fTypeVisibility, -1, 'filter_delay');
 
 	$item_types = item_type2str();
 	unset($item_types[ITEM_TYPE_HTTPTEST]); // httptest items are only for internal zabbix logic
@@ -141,6 +142,7 @@ function getItemFilterForm(&$items) {
 	foreach ($item_types as $type => $name) {
 		if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
 			zbx_subarray_push($fTypeVisibility, $type, 'filter_delay_row');
+			zbx_subarray_push($fTypeVisibility, $type, 'filter_delay');
 		}
 		if ($type == ITEM_TYPE_SNMP) {
 			zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
@@ -598,7 +600,8 @@ function getItemFilterForm(&$items) {
 
 		// interval
 		if ($filter_delay === '' && $filter_type != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_TRAPPER
-				&& $item['type'] != ITEM_TYPE_SNMPTRAP && $item['type'] != ITEM_TYPE_DEPENDENT) {
+				&& $item['type'] != ITEM_TYPE_SNMPTRAP && $item['type'] != ITEM_TYPE_DEPENDENT
+				&& !($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 			$value = $delay;
@@ -1034,7 +1037,8 @@ function getItemFormData(array $item = [], array $options = []) {
 					$delay = timeUnitToSeconds($data['delay']);
 
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
-							|| $data['type'] == ITEM_TYPE_DEPENDENT)) {
+							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+								&& strncmp($data['key'], 'mqtt.get', 8) === 0))) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}

@@ -218,7 +218,8 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		}
 	}
 
-	function updateItemTestBtn() {
+	function updateItemFormElements() {
+		// test button
 		var testable_item_types = <?= json_encode(CControllerPopupItemTest::getTestableItemTypes($this->data['hostid'])) ?>,
 			type = parseInt(jQuery('#type').val()),
 			key = jQuery('#key').val();
@@ -228,6 +229,18 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		}
 		else {
 			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
+		}
+
+		// delay field
+		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
+			if (key.substr(0, 8) === 'mqtt.get') {
+				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'delay']) ?>);
+				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'row_delay']) ?>);
+			}
+			else {
+				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'delay']) ?>);
+				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'row_delay']) ?>);
+			}
 		}
 	}
 
@@ -256,14 +269,14 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			], true) ?>);
 		}
 
-		$("#key").on('keyup change', updateItemTestBtn);
+		$("#key").on('keyup change', updateItemFormElements);
 
 		$('#type')
 			.change(function() {
 				// update the interface select with each item type change
 				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
 
-				updateItemTestBtn();
+				updateItemFormElements();
 				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())] || null);
 
 				setAuthTypeLabel();
