@@ -19,11 +19,47 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
  * @backup hosts
  */
 class testPageHostPrototypes extends CLegacyWebTest {
+
+	use TableTrait;
+
+	const DICROVERY_RULE_ID = 90001;
+	const HOST_PROTOTYPES_COUNT = 10;
+
+	public function testPageHostPrototypes_CheckLayout() {
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
+		$this->zbxTestCheckTitle('Configuration of host prototypes');
+		$this->zbxTestCheckHeader('Host prototypes');
+
+		$table = $this->query('class:list-table')->asTable()->one();
+		$headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
+		$this->assertSame($headers, $table->getHeadersText());
+
+		foreach (['Create enabled', 'Create disabled', 'Delete'] as $button) {
+			$element = $this->query('button', $button)->one();
+			$this->assertTrue($element->isPresent());
+			$this->assertFalse($element->isEnabled());
+		}
+
+		$this->assertRowCount(self::HOST_PROTOTYPES_COUNT);
+
+		// Check tags on the specific host prototype.
+		$tags = $table->findRow('Name', 'Host prototype {#1}')->getColumn('Tags')->query('class:tag')->all();
+		$this->assertEquals(['host_proto_tag_1: value1', 'host_proto_tag_2: value2'], $tags->asText());
+
+		foreach ($tags as $tag) {
+			$tag->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')
+					->asOverlayDialog()->waitUntilPresent()->all()->last();
+			$this->assertEquals($tag->getText(), $hint->getText());
+			$hint->close();
+		}
+	}
 
 	public static function getSelectedData() {
 		return [

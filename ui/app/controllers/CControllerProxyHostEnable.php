@@ -74,10 +74,10 @@ class CControllerProxyHostEnable extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Host enabled', 'Hosts enabled', $updated));
+			CMessageHelper::setSuccessTitle(_n('Host enabled', 'Hosts enabled', $updated));
 		}
 		else {
-			$response->setMessageError(_n('Cannot enable host', 'Cannot enable hosts', $updated));
+			CMessageHelper::setErrorTitle(_n('Cannot enable host', 'Cannot enable hosts', $updated));
 		}
 		$this->setResponse($response);
 	}

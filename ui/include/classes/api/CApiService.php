@@ -448,11 +448,9 @@ class CApiService {
 			$l_table = DB::getSchema($sqlParts['left_table']['table']);
 
 			foreach ($sqlParts['left_join'] as $left_join) {
-				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'];
-				$sql_left_join .= ($l_table['key'] === $left_join['using'])
-					? ' USING ('.$left_join['using'].')'
-					: ' ON '.$sqlParts['left_table']['alias'].'.'.$l_table['key'].
-						'='.$left_join['alias'].'.'.$left_join['using'];
+				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].
+					' ON '.$sqlParts['left_table']['alias'].'.'.$l_table['key'].
+					'='.$left_join['alias'].'.'.$left_join['using'];
 			}
 
 			// Moving a left table to the end.

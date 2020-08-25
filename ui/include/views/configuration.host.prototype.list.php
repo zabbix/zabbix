@@ -57,7 +57,8 @@ $hostTable = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Templates'),
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
+		_('Tags')
 	]);
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
@@ -159,7 +160,8 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		$name,
 		$hostTemplates,
 		$status,
-		$discover
+		$discover,
+		$data['tags'][$hostPrototype['hostid']]
 	]);
 }
 

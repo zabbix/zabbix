@@ -811,4 +811,59 @@ void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int fiel
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 int	zbx_db_check_instanceid(void);
+
+/* tags */
+typedef struct
+{
+	zbx_uint64_t	tagid;
+	char		*tag;
+	char		*value;
+#define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
+#define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
+#define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
+#define ZBX_FLAG_DB_TAG_UPDATE			(ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE)
+	zbx_uint64_t	flags;
+}
+zbx_db_tag_t;
+
+void	zbx_db_tag_free(zbx_db_tag_t *tag);
+int	zbx_db_tag_compare_func(const void *d1, const void *d2);
+
+ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *);
+
+typedef enum
+{
+	ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM = 0,
+	ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER,
+	ZBX_LLD_OVERRIDE_OP_OBJECT_GRAPH,
+	ZBX_LLD_OVERRIDE_OP_OBJECT_HOST
+}
+zbx_lld_override_op_object_t;
+
+typedef struct
+{
+	zbx_uint64_t		override_operationid;
+	zbx_uint64_t		overrideid;
+	char			*value;
+	char			*delay;
+	char			*history;
+	char			*trends;
+	zbx_vector_db_tag_ptr_t	tags;
+	zbx_vector_uint64_t	templateids;
+	unsigned char		operationtype;
+	unsigned char		operator;
+	unsigned char		status;
+	unsigned char		severity;
+	unsigned char		inventory_mode;
+	unsigned char		discover;
+}
+zbx_lld_override_operation_t;
+
+void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation);
+
+void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
+		zbx_vector_ptr_t *ops);
+
+
+
 #endif
