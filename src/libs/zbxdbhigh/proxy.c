@@ -1048,7 +1048,11 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 
 static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j)
 {
-	int	i;
+	int		i;
+	zbx_hashset_t	kvs;
+
+	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_json_addobject(j, "macro.secrets");
 
@@ -1056,11 +1060,11 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 	{
 		keys_path_t		*keys_path;
 		char			*error = NULL, **ptr;
-		zbx_hashset_t		kvs;
+
 		zbx_hashset_iter_t	iter;
 
 		keys_path = (keys_path_t *)keys_paths->values[i];
-		if (FAIL == zbx_vault_kvs_create(keys_path->path, &kvs, &error))
+		if (FAIL == zbx_vault_kvs_get(keys_path->path, &kvs, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
 			zbx_free(error);
@@ -1081,9 +1085,11 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 		}
 		zbx_json_close(j);
 
-		zbx_vault_kvs_destroy(&kvs);
+		zbx_hashset_clear(&kvs);
 	}
+
 	zbx_json_close(j);
+	zbx_hashset_destroy(&kvs);
 }
 
 /******************************************************************************

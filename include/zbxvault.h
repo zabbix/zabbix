@@ -30,10 +30,14 @@ typedef struct
 }
 zbx_kv_t;
 
+zbx_hash_t	zbx_vault_kv_hash(const void *data);
+int		zbx_vault_kv_compare(const void *d1, const void *d2);
+void		zbx_vault_kv_clean(void *data);
+
 int	zbx_vault_init_token_from_env(char **error);
 int	zbx_vault_init_db_credentials(char **error);
-int	zbx_vault_kvs_create(const char *path, zbx_hashset_t *kvs, char **error);
-int	zbx_vault_json_kvs_create(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
+int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
 		char **error);
 void	zbx_vault_kvs_destroy(zbx_hashset_t *kvs);
 

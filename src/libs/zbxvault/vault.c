@@ -32,19 +32,19 @@ extern char	*CONFIG_VAULTDBPATH;
 extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 
-static zbx_hash_t	kv_hash(const void *data)
+zbx_hash_t	zbx_vault_kv_hash(const void *data)
 {
 	zbx_kv_t	*kv = (zbx_kv_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(kv->key, strlen(kv->key), ZBX_DEFAULT_HASH_SEED);
 }
 
-static int	kv_compare(const void *d1, const void *d2)
+int	zbx_vault_kv_compare(const void *d1, const void *d2)
 {
 	return strcmp(((zbx_kv_t *)d1)->key, ((zbx_kv_t *)d2)->key);
 }
 
-static void	kv_clean(void *data)
+void	zbx_vault_kv_clean(void *data)
 {
 	zbx_kv_t	*kv = (zbx_kv_t *)data;
 
@@ -82,7 +82,7 @@ static void	get_kvs_from_json(const struct zbx_json_parse *jp_kvs, zbx_hashset_t
 	}
 }
 
-int	zbx_vault_json_kvs_create(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
 		char **error)
 {
 	const char		*p;
@@ -96,8 +96,6 @@ int	zbx_vault_json_kvs_create(const char *path, const struct zbx_json_parse *jp_
 			return FAIL;
 		}
 
-		zbx_hashset_create_ext(kvs, 100, kv_hash, kv_compare, kv_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-				ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 		get_kvs_from_json(&jp_kvs, kvs);
 		return SUCCEED;
 	}
@@ -108,7 +106,7 @@ int	zbx_vault_json_kvs_create(const char *path, const struct zbx_json_parse *jp_
 	}
 }
 
-int	zbx_vault_kvs_create(const char *path, zbx_hashset_t *kvs, char **error)
+int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 {
 	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *left, *right;
 	struct zbx_json_parse	jp, jp_data, jp_data_data;
@@ -153,8 +151,6 @@ int	zbx_vault_kvs_create(const char *path, zbx_hashset_t *kvs, char **error)
 		goto fail;
 	}
 
-	zbx_hashset_create_ext(kvs, 100, kv_hash, kv_compare, kv_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-				ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	get_kvs_from_json(&jp_data_data, kvs);
 
 	ret = SUCCEED;
@@ -164,11 +160,6 @@ fail:
 	zbx_free(out);
 
 	return ret;
-}
-
-void	zbx_vault_kvs_destroy(zbx_hashset_t *kvs)
-{
-	zbx_hashset_destroy(kvs);
 }
 
 int	zbx_vault_init_token_from_env(char **error)
@@ -215,8 +206,11 @@ int	zbx_vault_init_db_credentials(char **error)
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_vault_kvs_create(CONFIG_VAULTDBPATH, &kvs, error))
-		return FAIL;
+	zbx_hashset_create_ext(&kvs, 2, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	if (SUCCEED != zbx_vault_kvs_get(CONFIG_VAULTDBPATH, &kvs, error))
+		goto fail;
 
 	kv_local.key = ZBX_PROTO_TAG_USERNAME;
 
@@ -239,7 +233,7 @@ int	zbx_vault_init_db_credentials(char **error)
 
 	ret = SUCCEED;
 fail:
-	zbx_vault_kvs_destroy(&kvs);
+	zbx_hashset_destroy(&kvs);
 
 	return ret;
 }
