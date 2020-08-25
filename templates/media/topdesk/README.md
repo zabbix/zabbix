@@ -31,7 +31,7 @@ To utilize the media type, we recommend creating a dedicated [Zabbix user](https
 When configuring alert action, add this user in the _Send to users_ field (in Operation details) - this will tell Zabbix to use TOPdesk webhook when sending notifications from this action. Use the TOPdesk User in any action of your choice. Text from "Action Operations" will be sent to "TOPdesk First Line Call Request" field when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "TOPdesk First Line Call Action" field when the problem is resolved or updated.
 
 ## Internal alerts
-To receive notifications about internal problem and recovery events in TOPdesk: in the internal action configuration mark the Custom message checkbox and specify custom message templates for problem and recovery operations. 
+To receive notifications about internal problem events in TOPdesk: in the internal action configuration mark the Custom message checkbox and specify custom message templates for problem operations. Internal event recovery actions are not supported.
 If an internal action operation is configured without a custom message, the notification will not be sent. 
 Note, that this step is required only for notifications about internal events; for other event types specifying a custom message is optional. 
 

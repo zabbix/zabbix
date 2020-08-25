@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-17T20:15:00Z</date>
+    <date>2020-08-25T20:03:42Z</date>
     <media_types>
         <media_type>
             <name>TOPdesk</name>
@@ -308,6 +308,10 @@ try {&#13;
     }&#13;
     // Update a created issue.&#13;
     else {&#13;
+        if (params.event_source == 3 &amp;&amp; params.event_value == 0) {&#13;
+            throw 'Internal event recovery actions are not supported.';&#13;
+        }&#13;
+&#13;
         Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');&#13;
         fields.action = params.alert_message.replace(/\n/g, '&lt;br&gt;');&#13;
 &#13;
