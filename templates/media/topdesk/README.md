@@ -15,9 +15,15 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 
 1\. Create a [global macro](https://www.zabbix.com/documentation/current/manual/config/macros/user_macros) {$ZABBIX.URL} with Zabbix frontend URL (for example http://192.168.7.123:8081)
 
+[![](images/tn_1.png?raw=true)](images/1.png)
+
 2\. [Import](https://www.zabbix.com/documentation/current/manual/web_interface/frontend_sections/administration/mediatypes) the TOPdesk media type from file [media_topdesk.xml](media_topdesk.xml).
 
+[![](images/tn_2.png?raw=true)](images/2.png)
+
 3\. Change in the imported media the values of the variables topdesk_api (URL), topdesk_password, topdesk_user. The topdesk_status is the default status for creating a new TOPdesk ticket.
+
+[![](images/tn_3.png?raw=true)](images/3.png)
 
 For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook).
 
