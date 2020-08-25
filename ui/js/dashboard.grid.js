@@ -4126,6 +4126,11 @@
 						showDialogMessageExhausted(data);
 						$('.dialogue-widget-save', footer).prop('disabled', true);
 					}
+
+					// Activate tab indicator for graph widget form.
+					if (data.dialogue['widget_type'] === 'svggraph') {
+						new TabIndicators();
+					}
 				});
 			});
 		},

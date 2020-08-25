@@ -44,6 +44,7 @@ else {
 	$this->addJsFile('class.mapWidget.js');
 	$this->addJsFile('class.svg.canvas.js');
 	$this->addJsFile('class.svg.map.js');
+	$this->addJsFile('class.tab-indicators.js');
 
 	$this->includeJsFile('monitoring.dashboard.view.js.php');
 

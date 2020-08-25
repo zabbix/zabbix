@@ -20,26 +20,6 @@
 
 'use strict';
 
-// templatesForm
-// hostsForm
-// hostPrototypeForm
-// itemForm
-// itemPrototypeForm
-// triggersForm
-// triggersPrototypeForm
-// hostDiscoveryForm
-// httpForm
-// action.edit
-// servicesForm
-// proxyForm
-// authenticationForm
-// userGroupForm
-// userForm ???
-// media_type_form
-// widget_dialogue_form ???
-// mapEditForm
-// userForm
-
 class TabIndicators {
 
 	constructor() {
@@ -69,6 +49,7 @@ class TabIndicators {
 		const USER = document.querySelector('#userForm');
 		const MEDIA_TYPE = document.querySelector('#media_type_form');
 		const MAP = document.querySelector('#mapEditForm');
+		const GRAPH = document.querySelector('#widget_dialogue_form');
 
 		switch (true) {
 			case !!TEMPLATE:
@@ -105,6 +86,8 @@ class TabIndicators {
 				return MEDIA_TYPE;
 			case !!MAP:
 				return MAP;
+			case !!GRAPH:
+				return GRAPH;
 			default:
 				throw 'Form not found.';
 		}
@@ -195,6 +178,20 @@ class TabIndicatorFactory {
 				return new FrontendMessageTabIndicator;
 			case 'Sharing':
 				return new SharingTabIndicator;
+			case 'GraphDataset':
+				return new GraphDatasetTabIndicator;
+			case 'GraphOptions':
+				return new GraphOptionsTabIndicator;
+			case 'GraphTime':
+				return new GraphTimeTabIndicator;
+			case 'GraphAxes':
+				return new GraphAxesTabIndicator;
+			case 'GraphLegend':
+				return new GraphLegendTabIndicator;
+			case 'GraphProblems':
+				return new GraphProblemsTabIndicator;
+			case 'GraphOverrides':
+				return new GraphOverridesTabIndicator;
 		}
 
 		return null;
@@ -1109,6 +1106,196 @@ class SharingTabIndicator extends TabIndicatorCallback {
 		if (target_node_user) {
 			const observer = new MutationObserver(observer_callback);
 			observer.observe(target_node_user, observer_options);
+		}
+	}
+}
+
+class GraphDatasetTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#data_sets .list-accordion-item')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('#data_sets');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class GraphOptionsTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document
+			.querySelector("[name='source']:checked")
+			?.value > 0;
+	}
+
+	initObserver(elem) {
+		[...document.querySelectorAll("[name='source']")].map((value) => {
+			value.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+		});
+	}
+}
+
+
+class GraphTimeTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document
+			.querySelector('#graph_time')
+			?.checked;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#graph_time')
+			?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+	}
+}
+
+class GraphAxesTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		if (document.querySelector('#lefty:checked') || document.querySelector('#righty:checked')
+				|| document.querySelector('#axisx:checked')) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver(elem) {
+		[document.querySelector('#lefty:checked'), document.querySelector('#righty:checked'),
+			document.querySelector('#axisx:checked')
+		].map((value) => {
+			value.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+		});
+	}
+}
+
+class GraphLegendTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document
+			.querySelector('#legend')
+			?.checked;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#legend')
+			?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+	}
+}
+
+class GraphProblemsTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document
+			.querySelector('#show_problems')
+			?.checked;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#show_problems')
+			?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+	}
+}
+
+class GraphOverridesTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('.overrides-list .overrides-list-item')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('.overrides-list');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
 		}
 	}
 }

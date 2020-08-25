@@ -285,13 +285,13 @@ $jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields
 
 // Create CTabView.
 $form_tabs = (new CTabView())
-	->addTab('data_set',  _('Data set'), $tab_data_set)
-	->addTab('displaying_options',  _('Displaying options'), $tab_displaying_opt)
-	->addTab('time_period',  _('Time period'), $tab_time_period)
-	->addTab('axes',  _('Axes'), $tab_axes)
-	->addTab('legendtab',  _('Legend'), $tab_legend)
-	->addTab('problems',  _('Problems'), $tab_problems)
-	->addTab('overrides',  _('Overrides'), $tab_overrides)
+	->addTab('data_set',  _('Data set'), $tab_data_set, TAB_INDICATOR_GRAPH_DATASET)
+	->addTab('displaying_options',  _('Displaying options'), $tab_displaying_opt, TAB_INDICATOR_GRAPH_OPTIONS)
+	->addTab('time_period',  _('Time period'), $tab_time_period, TAB_INDICATOR_GRAPH_TIME)
+	->addTab('axes',  _('Axes'), $tab_axes, TAB_INDICATOR_GRAPH_AXES)
+	->addTab('legendtab',  _('Legend'), $tab_legend, TAB_INDICATOR_GRAPH_LEGEND)
+	->addTab('problems',  _('Problems'), $tab_problems, TAB_INDICATOR_GRAPH_PROBLEMS)
+	->addTab('overrides',  _('Overrides'), $tab_overrides, TAB_INDICATOR_GRAPH_OVERRIDES)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
 	->onTabChange('jQuery.colorpicker("hide");jQuery(window).trigger("resize");')
 	->setSelected(0);
