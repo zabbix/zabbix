@@ -18,7 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+
+use Facebook\WebDriver\Interactions\WebDriverActions;
 
 /**
  * Trait for preprocessing related tests.
@@ -107,8 +110,11 @@ trait PreprocessingTrait {
 		$rows = $this->query('class:preprocessing-list-item')->count() + 1;
 		$add = $this->query('id:param_add')->one();
 		$fields = self::getPreprocessingFieldDescriptors();
+		$action = new WebDriverActions(CElementQuery::getDriver());
 
 		foreach ($steps as $options) {
+			$action->moveToElement($add);
+			$action->perform();
 			$add->click();
 			$container = $this->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
 					->waitUntilPresent()->one();
