@@ -125,7 +125,7 @@ class testPageDashboardList extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Dashboard for Share testing',
+						'Name' => 'Testing share dashboard',
 						'Show' => 'Created by me'
 					],
 					'result_count' => 0
@@ -186,7 +186,7 @@ class testPageDashboardList extends CWebTest {
 
 	public function testPageDashboardList_DeleteSingleDashboard() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
-		$dashboard_name = 'Dashboard for Share testing';
+		$dashboard_name = 'Testing share dashboard';
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Delete single Dashboard.
