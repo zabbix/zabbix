@@ -1074,16 +1074,6 @@ class CHttpTestManager {
 	protected function updateStepsReal($httpTest, $websteps) {
 		$item_key_parser = new CItemKey();
 
-		// get all used keys
-		$webstepids = zbx_objectValues($websteps, 'httpstepid');
-		$dbKeys = DBfetchArrayAssoc(DBselect(
-			'SELECT i.key_'.
-			' FROM items i,httpstepitem hi'.
-			' WHERE '.dbConditionInt('hi.httpstepid', $webstepids).
-				' AND hi.itemid=i.itemid')
-			, 'key_'
-		);
-
 		foreach ($websteps as &$webstep) {
 			if (array_key_exists('posts', $webstep)) {
 				if (is_array($webstep['posts'])) {
@@ -1134,7 +1124,7 @@ class CHttpTestManager {
 					}
 
 					$updateFields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
-					if (isset($dbKeys[$updateFields['key_']])) {
+					if ($updateFields['key_'] === $stepitem['key_']) {
 						unset($updateFields['key_']);
 					}
 				}
