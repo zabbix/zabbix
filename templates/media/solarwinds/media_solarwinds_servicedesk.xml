@@ -4,7 +4,7 @@
     <date>2020-07-21T11:32:08Z</date>
     <media_types>
         <media_type>
-            <name>SolarWinds</name>
+            <name>SolarWinds Service Desk</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
@@ -133,7 +133,7 @@
             data = JSON.stringify(data);&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ SolarWinds Webhook ] Sending request: ' + url + ((typeof data === 'string')&#13;
+        Zabbix.Log(4, '[ SolarWinds SD Webhook ] Sending request: ' + url + ((typeof data === 'string')&#13;
             ? ('\n' + data)&#13;
             : ''));&#13;
 &#13;
@@ -154,7 +154,7 @@
                 throw 'Unsupported HTTP request method: ' + method;&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ SolarWinds Webhook ] Received response with status code ' + request.Status() +&#13;
+        Zabbix.Log(4, '[ SolarWinds SD Webhook ] Received response with status code ' + request.Status() +&#13;
             '\n' + response);&#13;
 &#13;
         if (response !== null) {&#13;
@@ -162,7 +162,7 @@
                 response = JSON.parse(response);&#13;
             }&#13;
             catch (error) {&#13;
-                Zabbix.Log(4, '[ SolarWinds Webhook ] Failed to parse response received from SolarWinds');&#13;
+                Zabbix.Log(4, '[ SolarWinds SD Webhook ] Failed to parse response received from SolarWinds');&#13;
                 response = null;&#13;
             }&#13;
         }&#13;
@@ -337,7 +337,7 @@ try {&#13;
     }&#13;
 }&#13;
 catch (error) {&#13;
-    Zabbix.Log(3, '[ SolarWinds Webhook ] ERROR: ' + error);&#13;
+    Zabbix.Log(3, '[ SolarWinds SD Webhook ] ERROR: ' + error);&#13;
     throw 'Sending failed: ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>
