@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:14Z</date>
+   <date>2020-08-24T15:27:11Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -26,7 +26,7 @@ Known Issues:&#13;
   Version: RouterOS 6.38.5&#13;
   Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.37</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -56,66 +56,11 @@ Template tooling version used: 0.36</description>
             <application>
                <name>Temperature</name>
             </application>
+            <application>
+               <name>Wireless</name>
+            </application>
          </applications>
          <items>
-            <item>
-               <name>Device: Temperature</name>
-               <type>SNMP_AGENT</type>
-               <snmp_oid>1.3.6.1.4.1.14988.1.1.3.10.0</snmp_oid>
-               <key>sensor.temp.value[mtxrHlTemperature]</key>
-               <delay>3m</delay>
-               <value_type>FLOAT</value_type>
-               <units>°C</units>
-               <description>MIB: MIKROTIK-MIB&#13;
-(mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)&#13;
-Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
-               <applications>
-                  <application>
-                     <name>Temperature</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>MULTIPLIER</type>
-                     <params>0.1</params>
-                  </step>
-               </preprocessing>
-               <triggers>
-                  <trigger>
-                     <expression>{avg(5m)}&gt;{$TEMP_WARN:"Device"}</expression>
-                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Device"}-3</recovery_expression>
-                     <name>Device: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Device"}</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>WARNING</priority>
-                     <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                     <dependencies>
-                        <dependency>
-                           <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
-                           <expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
-                           <recovery_expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-                  <trigger>
-                     <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
-                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
-                     <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>HIGH</priority>
-                     <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                  </trigger>
-                  <trigger>
-                     <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Device"}</expression>
-                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Device"}+3</recovery_expression>
-                     <name>Device: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Device"}</name>
-                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                     <priority>AVERAGE</priority>
-                  </trigger>
-               </triggers>
-            </item>
             <item>
                <name>Firmware version</name>
                <type>SNMP_AGENT</type>
@@ -347,6 +292,7 @@ The average, over the last minute, of the percentage of time that this processor
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -432,6 +378,298 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature sensor discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.14988.1.1.3.10]</snmp_oid>
+               <key>mtxrHlTemperature.discovery</key>
+               <delay>1h</delay>
+               <description>MIKROTIK-MIB::mtxrHlTemperature&#13;
+Since temperature sensor is not available on all Mikrotik hardware,&#13;
+this is done to avoid unsupported items.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Device: Temperature</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.3.10.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <value_type>FLOAT</value_type>
+                     <units>°C</units>
+                     <description>MIB: MIKROTIK-MIB&#13;
+(mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)&#13;
+Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.1</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_WARN:"Device"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Device"}-3</recovery_expression>
+                           <name>Device: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Device"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
+                                 <expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+                                 <recovery_expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+                           <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Device"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Device"}+3</recovery_expression>
+                           <name>Device: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Device"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>AP channel discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7]</snmp_oid>
+               <key>mtxrWlAp.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#IFTYPE}</macro>
+                        <value>^71$</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFADMINSTATUS}</macro>
+                        <value>^1$</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>MIKROTIK-MIB::mtxrWlAp</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP authenticated clients</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.3.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: MIKROTIK-MIB&#13;
+(mtxrWlApAuthClientCount) Number of authentication clients</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP band</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.3.1.8.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.band[mtxrWlApBand.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrWlApBand</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): SSID</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.3.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.name[mtxrWlApSsid.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrWlApSsid</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP noise floor</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.3.1.9.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrWlApNoiseFloor</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>15m</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP registered clients</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.3.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: MIKROTIK-MIB&#13;
+(mtxrWlApClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>CAPsMAN AP channel discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]</snmp_oid>
+               <key>mtxrWlCMChannel.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#IFTYPE}</macro>
+                        <value>^1$</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>MIKROTIK-MIB::mtxrWlCMChannel</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP authenticated clients</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.7.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: MIKROTIK-MIB&#13;
+(mtxrWlCMAuthClientCount) Number of authentication clients</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP channel</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.7.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.channel[mtxrWlCMChannel.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrWlCMChannel</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP registered clients</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.7.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <description>MIB: MIKROTIK-MIB&#13;
+(mtxrWlCMRegClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): AP state</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.1.7.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>ssid.state[mtxrWlCMState.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>MIB: MIKROTIK-MIB&#13;
+(mtxrWlCMState) Wireless interface state</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;&gt;"running-ap"</expression>
+                           <name>Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running</name>
+                           <priority>WARNING</priority>
+                           <description>Access point interface can be not running by different reasons - disabled interface, power off, network link down.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Storage discovery</name>
@@ -522,6 +760,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and&#13;
