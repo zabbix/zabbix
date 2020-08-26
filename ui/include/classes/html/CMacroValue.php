@@ -53,6 +53,13 @@ class CMacroValue extends CInput {
 	protected $revert_button = null;
 
 	/**
+	 * Maxlength of macro value input field.
+	 *
+	 * @var int
+	 */
+	protected $maxlength = 2048;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param int    $type         Macro type one of ZBX_MACRO_TYPE_SECRET or ZBX_MACRO_TYPE_TEXT value.
@@ -118,6 +125,7 @@ class CMacroValue extends CInput {
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
 			$class = ZBX_STYLE_ICON_TEXT;
 			$node->addItem((new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
+				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->setReadonly($readonly)
 			);
@@ -125,6 +133,7 @@ class CMacroValue extends CInput {
 		else {
 			$class = ZBX_STYLE_ICON_SECRET_TEXT;
 			$node->addItem((new CInputSecret($name.'[value]', $value, $this->add_post_js))
+				->setAttribute('maxlength', $this->maxlength)
 				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
 				->setAttribute('placeholder', _('value'))
 			);

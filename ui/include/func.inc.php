@@ -94,25 +94,6 @@ function countRequest($str = null) {
 	}
 }
 
-/************ COOKIES ************/
-function get_cookie($name, $default_value = null) {
-	if (isset($_COOKIE[$name])) {
-		return $_COOKIE[$name];
-	}
-
-	return $default_value;
-}
-
-function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, CSession::getDefaultCookiePath(), null, HTTPS, true);
-	$_COOKIE[$name] = $value;
-}
-
-function zbx_unsetcookie($name) {
-	zbx_setcookie($name, null, -99999);
-	unset($_COOKIE[$name]);
-}
-
 /************* DATE *************/
 function getMonthCaption($num) {
 	switch ($num) {
@@ -604,8 +585,8 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$result = [];
 
-	foreach (array_filter($parts) as $unit => $value) {
-		$result[] = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
+	foreach (array_filter($parts) as $part_unit => $part_value) {
+		$result[] = formatFloat($part_value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$part_unit];
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
@@ -1520,8 +1501,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
 			$redirect_to = (new CUrl('index_http.php'))->setArgument('request', $url->toString());
 			redirect($redirect_to->toString());
-
-			exit;
 		}
 
 		$url = urlencode($url->toString());
@@ -1567,7 +1546,8 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		else {
 			echo (new CView('general.warning', $data))->getOutput();
 		}
-		exit;
+		session_write_close();
+		exit();
 	}
 }
 
@@ -1594,8 +1574,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
-function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
-{
+function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false) {
 	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
 	$msg_details = null;
 	$link_details = null;
@@ -1626,12 +1605,16 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 				$list->setAttribute('style', 'display: none;');
 			}
 		}
+
 		foreach ($messages as $message) {
 			foreach (explode("\n", $message['message']) as $message_part) {
 				$list->addItem($message_part);
 			}
 		}
-		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
+
+		$msg_details = (new CDiv())
+			->addClass(ZBX_STYLE_MSG_DETAILS)
+			->addItem($list);
 	}
 
 	if ($title !== null) {
@@ -1657,33 +1640,30 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 /**
  * Filters messages that can be displayed to user based on CSettingsHelper::SHOW_TECHNICAL_ERRORS and user settings.
  *
- * @param array $messages	List of messages to filter.
- *
  * @return array
  */
-function filter_messages(array $messages = []) {
+function filter_messages(): array {
 	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
-			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN
-			&& !CWebUser::getDebugMode()) {
-		$filtered_messages = [];
-		$generic_exists = false;
+			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+		$messages = CMessageHelper::getMessages();
+		CMessageHelper::clear();
 
+		$generic_exists = false;
 		foreach ($messages as $message) {
-			if (array_key_exists('src', $message) && ($message['src'] === 'sql' || $message['src'] === 'php')) {
+			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR
+					&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
 				if (!$generic_exists) {
-					$message['message'] = _('System error occurred. Please contact Zabbix administrator.');
-					$filtered_messages[] = $message;
+					CMessageHelper::addError(_('System error occurred. Please contact Zabbix administrator.'));
 					$generic_exists = true;
 				}
 			}
 			else {
-				$filtered_messages[] = $message;
+				CMessageHelper::addSuccess($message['message']);
 			}
 		}
-		$messages = $filtered_messages;
 	}
 
-	return $messages;
+	return CMessageHelper::getMessages();
 }
 
 /**
@@ -1692,35 +1672,28 @@ function filter_messages(array $messages = []) {
  * @param  bool    $good            Parameter passed to makeMessageBox to specify message box style.
  * @param  string  $title           Message box title.
  * @param  bool    $show_close_box  Show or hide close button in error message box.
- * @global array   $ZBX_MESSAGES
  *
- * @return CDiv|null
+ * @return CTag|null
  */
-function getMessages($good = false, $title = null, $show_close_box = true) {
-	global $ZBX_MESSAGES;
-
-	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+function getMessages(bool $good = false, string $title = null, bool $show_close_box = true): ?CTag {
+	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
 		? makeMessageBox($good, $messages, $title, $show_close_box)
 		: null;
 
-	$ZBX_MESSAGES = [];
-
 	return $message_box;
 }
 
 function show_messages($good = false, $okmsg = null, $errmsg = null) {
-	global $page, $ZBX_MESSAGES, $ZBX_MESSAGES_PREPARED;
+	global $page, $ZBX_MESSAGES_PREPARED;
 
 	if (defined('ZBX_API_REQUEST')) {
 		return null;
 	}
 
 	$title = $good ? $okmsg : $errmsg;
-	$messages = isset($ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
-
-	$ZBX_MESSAGES = [];
+	$messages = get_and_clear_messages();
 
 	if ($title === null && !$messages) {
 		return;
@@ -1785,7 +1758,6 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 
 			imageOut($canvas);
 			imagedestroy($canvas);
-
 			break;
 
 		default:
@@ -1816,7 +1788,7 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
  * @return string|null  One or several HTML message boxes.
  */
 function get_prepared_messages(array $options = []): ?string {
-	global $ZBX_MESSAGES, $ZBX_MESSAGES_PREPARED;
+	global $ZBX_MESSAGES_PREPARED;
 
 	if (!is_array($ZBX_MESSAGES_PREPARED)) {
 		$ZBX_MESSAGES_PREPARED = [];
@@ -1839,11 +1811,11 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 	else {
 		$messages_current = [];
-		$restore_messages = $ZBX_MESSAGES;
+		$restore_messages = CMessageHelper::getMessages();
 		$restore_messages_prepared = $ZBX_MESSAGES_PREPARED;
+		CMessageHelper::clear();
 	}
 
-	$ZBX_MESSAGES = [];
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process authentication warning if user had unsuccessful authentication attempts.
@@ -1866,27 +1838,21 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 
 	$messages_authentication = $ZBX_MESSAGES_PREPARED;
-	$ZBX_MESSAGES = [];
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process messages passed by the previous request.
 
-	if ($options['with_session_messages']
-			&& (CSession::keyExists('messageOk') || CSession::keyExists('messageError'))) {
-		if (CSession::keyExists('messages')) {
-			$ZBX_MESSAGES = CSession::getValue('messages');
-		}
+	if ($options['with_session_messages']) {
+		CMessageHelper::restoreScheduleMessages($messages_current);
 
-		if (CSession::keyExists('messageOk')) {
-			show_messages(true, CSession::getValue('messageOk'), null);
+		if (CMessageHelper::getTitle() !== null) {
+			show_messages(
+				CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
+				CMessageHelper::getTitle(),
+				CMessageHelper::getTitle()
+			);
 		}
-		else {
-			show_messages(false, null, CSession::getValue('messageError'));
-		}
-
-		CSession::unsetValue(['messages', 'messageOk', 'messageError']);
 	}
-
 	$messages_session = $ZBX_MESSAGES_PREPARED;
 
 	// Create message boxes for all requested messages types in the correct order.
@@ -1898,31 +1864,28 @@ function get_prepared_messages(array $options = []): ?string {
 		)->toString();
 	}
 
-	$ZBX_MESSAGES = $restore_messages;
+	foreach ($restore_messages as $message) {
+		CMessageHelper::addMessage($message);
+	}
+
 	$ZBX_MESSAGES_PREPARED = $restore_messages_prepared;
 
 	return ($html === '') ? null : $html;
 }
 
-function show_message($msg) {
+function show_message(string $msg): void {
 	show_messages(true, $msg, '');
 }
 
-function show_error_message($msg) {
+function show_error_message(string $msg): void {
 	show_messages(false, '', $msg);
 }
 
-function info($msgs) {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
+function info($msgs): void {
 	zbx_value2array($msgs);
 
 	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = ['type' => 'info', 'message' => $msg];
+		CMessageHelper::addSuccess($msg);
 	}
 }
 
@@ -1932,21 +1895,11 @@ function info($msgs) {
  * @param string | array $msg	Error message text.
  * @param string		 $src	The source of error message.
  */
-function error($msgs, $src = '') {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
+function error($msgs, string $src = ''): void {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = [
-			'type' => 'error',
-			'message' => $msg,
-			'src' => $src
-		];
+		CMessageHelper::addError($msg, $src);
 	}
 }
 
@@ -1963,22 +1916,11 @@ function error_group($data) {
 	}
 }
 
-function clear_messages($count = null) {
-	global $ZBX_MESSAGES;
+function get_and_clear_messages(): array {
+	$messages = filter_messages();
+	CMessageHelper::clear();
 
-	if ($count != null) {
-		$result = [];
-
-		while ($count-- > 0) {
-			array_unshift($result, array_pop($ZBX_MESSAGES));
-		}
-	}
-	else {
-		$result = $ZBX_MESSAGES;
-		$ZBX_MESSAGES = [];
-	}
-
-	return $result ? filter_messages($result) : $result;
+	return $messages;
 }
 
 function fatal_error($msg) {
@@ -2025,16 +1967,19 @@ function get_status() {
 	];
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 	);
-	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
+	$status['is_running'] = $server->isRunning(CSessionHelper::getId());
 
 	if ($status['is_running'] === false) {
 		return $status;
 	}
 
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)), 15, ZBX_SOCKET_BYTES_LIMIT
+	);
+	$server_status = $server->getStatus(CSessionHelper::getId());
 	$status['has_status'] = (bool) $server_status;
 
 	if ($server_status === false) {
@@ -2205,7 +2150,7 @@ function imageOut(&$image, $format = null) {
 
 	if ($page['type'] != PAGE_TYPE_IMAGE) {
 		$imageId = md5(strlen($imageSource));
-		CSession::setValue('image_id', [$imageId => $imageSource]);
+		CSessionHelper::set('image_id', [$imageId => $imageSource]);
 	}
 
 	switch ($page['type']) {
@@ -2224,22 +2169,10 @@ function imageOut(&$image, $format = null) {
 /**
  * Check if we have error messages to display.
  *
- * @global array $ZBX_MESSAGES
- *
  * @return bool
  */
 function hasErrorMesssages() {
-	global $ZBX_MESSAGES;
-
-	if (isset($ZBX_MESSAGES)) {
-		foreach ($ZBX_MESSAGES as $message) {
-			if ($message['type'] === 'error') {
-				return true;
-			}
-		}
-	}
-
-	return false;
+	return CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_ERROR;
 }
 
 /**

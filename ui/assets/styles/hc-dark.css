@@ -4138,12 +4138,19 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
+  .tag.green-bg {
+    color: #0e4123; }
+  .tag.yellow-bg {
+    color: #734d00; }
 
 .green-bg {
   background-color: #59db8f; }
 
 .red-bg {
   background-color: #e45959; }
+
+.yellow-bg {
+  background-color: #ffc859; }
 
 .na-bg {
   color: #2a353a;
@@ -5923,6 +5930,9 @@ a.link-action {
 
 .tag {
   color: #000000; }
+  .tag.green-bg, .tag.yellow-bg {
+    background-color: #dddddd;
+    color: #000000 !important; }
 
 .disabled {
   opacity: .6; }

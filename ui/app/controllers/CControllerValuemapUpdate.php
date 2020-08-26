@@ -41,7 +41,7 @@ class CControllerValuemapUpdate extends CController {
 
 					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update value map'));
+					CMessageHelper::setErrorTitle(_('Cannot update value map'));
 
 					$this->setResponse($response);
 					break;
@@ -92,14 +92,14 @@ class CControllerValuemapUpdate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Value map updated'));
+			CMessageHelper::setSuccessTitle(_('Value map updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.edit')
 				->setArgument('valuemapid', $this->getInput('valuemapid'))
 			);
-			$response->setMessageError(_('Cannot update value map'));
+			CMessageHelper::setErrorTitle(_('Cannot update value map'));
 			$response->setFormData($this->getInputAll());
 		}
 

@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CMessageHelper.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
@@ -460,7 +461,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 			}
 
 			$behavior->setTest($this);
-			$this->behaviors[$name] = $behavior;
+			if ($name !== null) {
+				$this->behaviors[$name] = $behavior;
+			}
+			else {
+				$this->behaviors[] = $behavior;
+			}
 		}
 		else {
 			throw new Exception('Cannot attach behavior that is not an instance of CBehavior class');

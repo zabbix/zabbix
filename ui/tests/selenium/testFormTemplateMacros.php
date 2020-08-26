@@ -415,4 +415,137 @@ class testFormTemplateMacros extends testFormMacros {
 	public function testFormTemplateMacros_ChangeRemoveInheritedMacro() {
 		$this->checkChangeRemoveInheritedMacro('templates', 'template');
 	}
+
+	public function getCreateSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => 0,
+						'macro' => '{$SECRET_MACRO}',
+						'value' => [
+							'text' => 'template secret value',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret description'
+					],
+					'check_default_type' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$TEXT_MACRO}',
+						'value' => [
+							'text' => 'template plain text value',
+							'type' => 'Secret text'
+						],
+						'description' => 'plain text description'
+					],
+					'back_to_text' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_EMPTY_MACRO}',
+						'value' => [
+							'text' => '',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret empty value'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateSecretMacrosData
+	 */
+	public function testFormTemplateMacros_CreateSecretMacros($data) {
+		$this->createSecretMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
+	}
+
+	public function getRevertSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_TEMPLATE_MACRO_REVERT}',
+						'value' => 'Secret template value'
+					]
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}',
+						'value' => 'Secret template value 2'
+					],
+					'set_to_text' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getRevertSecretMacrosData
+	 */
+	public function testFormTemplateMacros_RevertSecretMacroChanges($data) {
+		$this->revertSecretMacroChanges($data, 'templates.php?form=update&templateid=99137', 'templates');
+	}
+
+	public function getUpdateSecretMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 2,
+					'macro' => '{$SECRET_TEMPLATE_MACRO_UPDATE}',
+					'value' => [
+						'text' => 'Updated secret value'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 3,
+					'macro' => '{$SECRET_TEMPLATE_MACRO_UPDATE_2_TEXT}',
+					'value' => [
+						'text' => 'New text value',
+						'type' => 'Text'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 4,
+					'macro' => '{$TEXT_TEMPLATE_MACRO_2_SECRET}',
+					'value' => [
+						'text' => 'New secret value',
+						'type' => 'Secret text'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateSecretMacrosData
+	 */
+	public function testFormTemplateMacros_UpdateSecretMacros($data) {
+		$this->updateSecretMacros($data, 'templates.php?form=update&templateid=99137', 'templates');
+	}
+
+	public function testFormHostMacros_SecretMacroResolution() {
+		$macro = [
+			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
+			'value' => 'Value 2 B resolved'
+		];
+		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+	}
 }

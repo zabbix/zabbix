@@ -1,197 +1,58 @@
+Changes for 5.2.0alpha2
+
+New features:
+A.F....PS. [ZBXNEXT-6085] added host prototype tag support (agriscenko, wiper)
+..F.....S. [ZBXNEXT-2603] increased user macros values maximum size from 255 to 2048 (agriscenko, arimdjonoks)
+
+Bug fixes:
+..F....... [ZBXNEXT-6052] fixed "Shared" tag being displayed for users that are not the dashboard owners (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-5965] reworked session to cookie (ashubin, MVekslers, rlataria)
+..F.....S. [ZBXNEXT-6073] added item log macros support in trigger names, operational data, descriptions, event tags, event values and trigger URL (rlataria, vso)
 A.F.I..... [ZBXNEXT-82] reworked part of parameters from definitions file to configurable parameters using frontend; added new API for settings, authentication, housekeepeing (vmaksimovs)
 A.F....... [ZBXNEXT-2156] implemented ability to create hosts without interfaces (miks, talbergs)
 A.F....... [ZBXNEXT-2754] added YAML as default import/export format (Ivo)
-...G...... [ZBXNEXT-6100] add native linux vfs.fs.size[fs,<mode>] metric support to agent2 (esneiders)
-.........T [ZBXNEXT-6010] added template "Template DB Oracle by ODBC" (ychukina)
 A.F.I...S. [ZBXNEXT-250] added support of global and per-user time zones for frontend, notifications and for time limit when notifications are sent (agriscenko, vso)
-...G...... [ZBXNEXT-6080] add telnet support for net.tcp.service/.perf key and enable it on linux/darwin (esneiders)
-.........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
-.......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
-.......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
-........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 A.F.....S. [ZBXNEXT-3362] added ability to set the default system language (agriscenko)
-...G...... [ZBXNEXT-6044] added native support in agent2 for https key for net.tcp.service/.perf (esneiders)
-...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
-...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
-........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
-A.F....PS. [ZBXNEXT-3205] added regex context matching support to user macros (rlataria, wiper)
-.........T [ZBXNEXT-5966] updated SNMP templates for version 5.0 (afayantsev)
-A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit log (rlataria, wiper)
-........S. [ZBXNEXT-3588] improved Zabbix server performance when evaluating trigger, discovery, autoregistration and internal actions (vso)
-...G...... [ZBXNEXT-1867] added file type include and exclude parameters to item 'vfs.file.exist' (Andris, viktors)
-.........T [ZBXNEXT-5921] added IIS template (tuskov)
-.........T [ZBXNEXT-5895] added Template DB MSSQL by ODBC (mchudinov)
-..F.....S. [ZBXNEXT-3209,ZBXNEXT-5932] added support of user related macros {USER.ALIAS}, {USER.FULLNAME}, {USER.NAME} and {USER.SURNAME} for global scripts (agriscenko, Andris)
-.........T [ZBXNEXT-5955] added support of custom fields and custom buttons in message card (tuskov)
-.........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
-.........T [ZBXNEXT-5902] added Spiceworks integration guide (tuskov)
-.......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
-...G...... [ZBXNEXT-1839] added LLD for perf_counter; thanks to Ryan Armstrong for the patch (asestakovs)
-...G...... [ZBXNEXT-5838] added win perf_instance.discovery and perf_instance_en.discovery to agent2 (esneiders)
-...G...... [ZBXCTR-2] added agent2 PostgreSQL plugin and template (Daria_V)
-.........T [ZBXNEXT-5657] added media "OTRS" (afayantsev)
-.........T [ZBXCTR-6] added two way functionality for acknowledgement, close and annotation with SIGNL4 (rons4)
-.........T [ZBXNEXT-5880] added component version item to server and proxy remote monitoring templates (vjaceslavs)
 
 Bug fixes:
-...G...... [ZBX-18214] added collecting of physical CPU utilization data on IBM AIX and modified system.cpu.util[] (Andris)
-...G...... [ZBX-17974] implement timeouts for WMI queries (arimdjonoks)
-..F....... [ZBX-18149] fixed discovered hosts showing links to host prototypes which should not possible (Ivo)
-..F....... [ZBX-18132] added OpenSSL extension check in frontend setup and SAML authentication form (Ivo)
-........S. [ZBX-18169] fixed housekeeper not deleting history and trends for deleted items if storage period is not overridden (vso)
-A.F....... [ZBX-17468] fixed excess audit log record being added on host status update (talbergs)
-...G...... [ZBX-16998] improved agent binary compatibility by removing __thread attribute when not building agent2 (wiper)
-...G...... [ZBX-17815] fixed connection timeout when persistent buffer enabled (asestakovs)
-..F....... [ZBX-18106] fixed map navigation tree widget copying (miks)
-A.F....... [ZBX-18012] fixed undefined index error in history manager and added error message in charts when Elasticsearch requests fails (miks)
-A......... [ZBX-18076] fixed PHP notice in hostinterface API (miks)
-..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)
-..F....... [ZBX-17996] fixed ip/dns field width in host interface (rlataria)
-A......... [ZBX-18075] fixed runtime error when creating a host via API (agriscenko)
-...G...... [ZBX-17814] fixed memory leaks in the agent persistent buffer (arimdjonoks)
-..F....... [ZBX-17973] fixed saving widget refresh rate in user profile (kustalovs)
-..F....... [ZBX-15927] removed problem calculation for dependent triggers when master trigger is in problem state (kustalovs)
-..F....... [ZBX-18063] fixed usage of unsupported parameter in API call (miks)
-..F....... [ZBX-17933] fixed runtime error in maps (agriscenko)
-..F....... [ZBX-18126] fixed incorrect labels in action operations dialog (miks)
-..F....... [ZBX-18060] fixed inaccessible user be displayed as accessible in slide show properties screen (miks)
-.......PS. [ZBX-17252] fixed building of Zabbix daemons with link time optimization (vso)
-.........T [ZBX-18115] added {$MSSQL.INSTANCE} macro and changed queries and item preprocessing for support MS SQL instance name (mchudinov)
-..F....PS. [ZBX-18147] fixed wrong character set detection logic for Oracle DB (yurii)
-..F....... [ZBX-17653] fixed new widget placeholder behavior and dashboard height calculation in edit mode (averza, kustalovs)
+.........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
+..F....... [ZBXNEXT-6052] added filter and showing additional details in the list of dashboards (Ivo, kustalovs)
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
-..F....... [ZBX-16819] added link to hosts linked to each template in templates list (miks)
-...G...... [ZBX-18023] fixed format of agent2 version number (MVekslers)
-A......... [ZBX-18071] fixed slow SQL query when filtering items with latest data available (averza)
-..F....... [ZBX-17898] fixed JavaScript errors on pasting widgets (averza)
-........S. [ZBX-17569] fixed calculating items not allowing negative values be corrected in the preprocessing (arimdjonoks)
-..F....... [ZBX-18036] fixed endpoint URL for Elasticsearch API requests (miks)
-..F....... [ZBX-18068] fixed incorrect function call and redundant code (miks)
-...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
-........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
-..F....... [ZBX-15117] fixed graph configuration with large amount of items (talbergs)
-..F....... [ZBX-17820] fixed classic graph widget default header (talbergs)
-........S. [ZBX-18069] fixed server exit when trying to execute IPMI script without IPMI pollers (wiper)
-..F....... [ZBX-18025] fixed availability report link (talbergs)
-..F....... [ZBX-17977] fixed port filter not preserved in Monitoring -> Hosts across refresh (talbergs)
-A......... [ZBX-17960] fixed undefined index in trends API (talbergs)
-..F....... [ZBX-18032] fixed host address and port values are not preserved in item test form (talbergs)
-..F....... [ZBX-18031] fixed missing "loading" state in Monitoring → Latest data and Monitoring → Hosts (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
-..F....... [ZBX-17925] fixed graph image flicker during update in screens (talbergs)
-.........T [ZBX-18054] changed preprocessing for nginx.version (mchudinov)
-A.F....... [ZBX-17825] fixed dynamic item switching for graph prototype widget (talbergs)
-.........T [ZBX-17903] fixed the trigger condition for net.if.status in "Template Module Windows network", changed the wmi query in the master item, filters and preprocessing of LLD rule (mchudinov)
-.........T [ZBX-17994] fixed the configuration example in documentation of Template App Nginx (mchudinov)
-..F....... [ZBX-17682] fixed button disable state in template item list and discovery list (rlataria)
-..F....... [ZBX-17821] fixed default header for inaccessible iterator widget content (talbergs)
-..F....... [ZBX-17858] fixed host group filter in templates general popup (miks)
-..F....... [ZBX-18001] fixed graph prototype widget paging (miks)
-..F....... [ZBX-17924] fixed php errors in "System information" window for MySQL (talbergs)
-..F....... [ZBX-17997] fixed user media passwords appearing in plain text in audit log (kustalovs)
-..F....... [ZBX-17968] fixed z-index issue in floating widget header (rlataria)
-..F....... [ZBX-17827] fixed broken layout of the notification popup window (kustalovs)
-A.F....... [ZBX-18009] fixed non-masked secret macros in audit log (kustalovs)
-..F....... [ZBX-17908] fixed too wide popup error messages (kustalovs)
-..F....... [ZBX-17782] fixed PHP errors occurring during history search using Elasticsearch (Ivo)
-...G...... [ZBX-17917] changed vm.memory.size keys on Solaris to get memory usage statistics from kstat (wiper)
-...G...... [ZBX-18029] fixed cpu counter wraparound handling on Solaris (wiper)
-A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
-.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
-A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
-..F....... [ZBX-17802] fixed runtime errors in trigger list (talbergs)
-...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
-A.F....... [ZBX-17860] fixed host prototype import (rlataria)
-..F....... [ZBX-17920] fixed browser error when user tries to access properties without permissions (kustalovs)
-..F....... [ZBX-17693] fixed headers and query fields in HTTP item test form; thanks to Mikhail Okhotin for the patch (Ivo, talbergs)
-.......PS. [ZBX-17837] fixed memory leaks when handling CurlHttpRequest errors (Andris, wiper)
-..F....... [ZBX-17878] fixed low-level discovery rule override operation object label not selecting the related field when clicked on (Ivo)
-..F....... [ZBX-17663] fixed user not being redirected back to an URL he was coming from before signing in using SAML SSO (agriscenko)
-.........T [ZBX-17900] fixed the template description - the config file naming is in lowercase (mchudinov)
-.........T [ZBX-17905] changed type of physical disk performance items from wmi to perf_counter_en and perf_instance_en in Template Module Windows physical disks by Zabbix agent (mchudinov)
-...G...... [ZBXCTR-9] removed username and password from 1st level configuration parameters and change connection; removed unused tests and handler (Daria_V)
-..F....... [ZBX-17811] fixed runtime error messages on database connection error (kustalovs)
-..F....... [ZBX-17721] fixed message on updating module (kustalovs)
-..F....... [ZBX-17809] fixed dashboard save button becomes disabled after widget paste (vmaksimovs)
-..F....... [ZBX-17804] fixed preservation of "No refresh" interval for new widget copy (vmaksimovs)
-..F....... [ZBX-17781] fixed runtime error in maintenance period popup window (vmaksimovs)
-.......PS. [ZBX-17720] exclude disabled items from preprocessing configuration sync (wiper)
-.........T [ZBX-16940] added "Number of cores" item and changed trigger for "CPU queue length" item (mchudinov)
-........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
-.........T [ZBX-16945] changed type of items "Free swap space" to calculated, "Free swap space in %" to dependent, added item "Used swap space in %" (mchudinov)
-..F....... [ZBX-17853] fixed graph filter to be reset when linked from graph screen and host inventory page (talbergs)
-..F....... [ZBX-17697] fixed strict DFSG compliance issue in using minified jQuery sources (talbergs)
-...G...... [ZBX-17673] removed redundant shared memory destruction (viktors)
-..F....... [ZBX-17735] made changes in System information widget to show number of templates on a separate line and number of hosts show only enabled and disabled hosts (Ivo)
-.....J.... [ZBX-17406] fixed null value for a field of CompositeData in JMX discovery (arimdjonoks)
-..F....... [ZBX-17823] fixed displaying zero for history values less than one millisecond (averza)
-..F....... [ZBXNEXT-5763] fixed resolving of macros in the item test form for formulas of the calculated items (Sasha)
-...G...... [ZBX-17245] fixed agent2 not logging to system log code (esneiders)
-...G...... [ZBX-17759] aliased EnableRemoteCommands to Allow/DenyKey=system.run[*], added default DenyKey=system.run[*] rule for backwards compatibility (wiper)
-...G...... [ZBX-17891] changed log, log.count monitoring to ignore file modification time (wiper)
-..F....... [ZBX-17729] fixed user is always redirected back to login form when using SAML SSO if guest mode is enabled (agriscenko)
-.........T [ZBX-16461] fixed recovery expression for "link down" trigger (tuskov)
-.........T [ZBX-17480] fixed context of {$TEMP_CRIT} macro in Temperature trigger prototype (tuskov)
-........S. [ZBX-17702] fixed escalation cancellation message not being sent when action is disabled (wiper)
-..F....... [ZBX-17751] fixed host group multiselect in popups remembering selected groups when it should not (Ivo)
-........S. [ZBX-17816] fixed wrong query fields when linking template with host prototype (MVekslers)
-.........T [ZBX-17741] changed setup description for Template DB MySQL by Zabbix agent 2 (mchudinov)
-..F....... [ZBX-17644] fixed host address field not being editable and macros not showing for username and password fields in item test popup form for SSH and TELNET item types (Ivo)
-A.F....... [ZBX-14539] added validation of the calculated item formula in item.create, item.update, itemprototype.create and itemprototype.update methods (Sasha)
-.........T [ZBX-17776] fixed typo in "Recovery time" field for Discord and MS Teams media (tuskov)
-..F....... [ZBX-17374] fixed radio button state if mass update fails (vmaksimovs)
-.........T [ZBX-17744] changed width of graphs in screens from 750x100 to 500x100 (mchudinov)
-A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
-.........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
-........S. [ZBX-17792] fixed zabbix sending invalid delete elastic search scroll request (arimdjonoks)
-.........T [ZBX-17141] fixed discovery of block devices by using vfs.dev.discovery key instead of reading /proc/diskstats (tuskov)
-.........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)
-...G...... [ZBX-17780] fixed memory leak (viktors)
-.......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
-..F....... [ZBX-17577] fixed remove of selected items in multiselect (rlataria)
-..F....... [ZBX-17561] fixed inherited macro becoming editable after remove (vmaksimovs)
-..F....... [ZBX-17226] fixed confusing error message being displayed if dbversion table cannot be found (agriscenko)
-........S. [ZBX-17737] fixed value mappings not working for text based simple macros (arimdjonoks)
-..F....... [ZBX-17625] fixed javascript message box formatting (vasilijs)
-.........T [ZBX-17599] fixed "ServerVersion" metric for older versions of Apache (afayantsev)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
-.........T [ZBXCTR-7] fixed typo in method usage for Telegram media type (ableev)
-.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
-.........T [ZBX-17771] fixed Zabbix event url in mattermost (afayantsev)
-A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed discover control in prototype edit forms (Ivo, Sasha, vmurzins)
-....I..... [ZBX-17711] added double.sql file to source distribution tarball (yurii)
-..F....... [ZBX-16162] reverted fix graph line interruptions when discarding values with heartbeat (talbergs)
-.......PS. [ZBX-17227] fixed 4-byte utf-8 sequence handling in embedded scripts (wiper)
-.........T [ZBX-17689] fixed issue with trigger for service status (ychukina)
-.......PS. [ZBX-17607] fixed unreachable poller being too busy due to SNMP checks being attempted twice at a time (mabele)
-..F....... [ZBX-17595] fixed latest data all applications expansion with every refresh (vasilijs)
-........S. [ZBX-17662] fixed a failing query when updating existing host prototypes (viktors, vso)
-..F....... [ZBX-17482] fixed selected menu item appearance upon opening screens of any host (vmaksimovs)
-..F....... [ZBX-17555] fixed error message box position (vmaksimovs)
-..F....... [ZBX-17629] fixed markup in User Media popup (vmaksimovs)
-....I..... [ZBX-16347] increased TimescaleDB chunk interval for trends and trends_uint to 1 month (arimdjonoks)
-.......PS. [ZBX-17747] fixed javascript preprocessing output variable initialization to not trigger false positive memory allocation warning (wiper)
-..F....... [ZBX-17684] implemented host preselection in filter graph fields in Monitoring -> Hosts -> Graphs section (miks)
-..F....... [ZBX-17553] fixed notification window location (vmaksimovs)
-........S. [ZBX-17728] fix invalid memory size in evaluate_macro_function() (arimdjonoks)
-........S. [ZBX-17109] fixed agent request parameter type parsing (atumilovics)
-.......... [ZBX-17733] fixed web.page.get,web.page,web.page.regexp keys on Zabbix agent2 not to verify server's certificate chain and host name (vso)
-..F....... [ZBX-17470] fixed element of filters is not focused on several pages (agriscenko)
-..F....... [ZBX-17267] fixed start time data loading in Maintenance edit form (vmaksimovs)
-..F....... [ZBX-17643] fixed acknowledge option in context menu on Problems page (agriscenko)
-...G...... [ZBX-17550] fixed log level check in case of DebugLevel=0 (asestakovs)
-...G...PS. [ZBX-17678] removed unused code left from mbedTLS support (Andris)
-........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
-..F....... [ZBX-17280] fixed runtime error in action operations (talbergs)
-.......PS. [ZBX-15484] shadow global auto_increment variables for MySQL (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.4rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.3
+
+5.0.3rc2 was released as 5.0.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.3rc2
+
+Bug fixes:
+..F....... [ZBX-18261] fixed Latest data performance by allowing to filter items with data only if hosts are selected as well (averza)
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.3rc1
 
 New features:
+...G...... [ZBXNEXT-6080] add telnet support for net.tcp.service/.perf key and enable it on linux/darwin (esneiders)
+...G...... [ZBXNEXT-6101] add native linux vfs.fs.inode[fs,<mode>] metric support to agent2 (esneiders)
+...G...... [ZBXNEXT-6102] add native linux vfs.fs.get metric support to agent2 (esneiders)
+...G...... [ZBXNEXT-6103] add native linux vfs.fs.discovery metric support to agent2 (esneiders)
 ...G...... [ZBXNEXT-6100] add native linux vfs.fs.size[fs,<mode>] metric support to agent2 (esneiders)
 .........T [ZBXNEXT-6010] added template "Template DB Oracle by ODBC" (ychukina)
 .........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
@@ -200,6 +61,15 @@ New features:
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+.........T [ZBX-17785] fixed dbstat query for postgresql v12 (afayantsev)
+..F....... [ZBX-18204] fixed lost password in ssh remote command operation form data (talbergs)
+A......... [ZBX-18046] improved error message generation performance of user macro and item key parser (vmurzins)
+........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
+........S. [ZBX-18014] added ODBC empty query check (viktors)
+..F....... [ZBX-18160] fixed fatal error in items.php and host_discovery.php (rlataria)
+A......... [ZBX-13383] improved performance of the trigger and trigger prototype inheritance (Sasha)
+..F....... [ZBX-18092] reimplemented item folding based on application names and improved summary for each application in latest data view (averza, miks)
+A......... [ZBX-13789] improved performance of "Problems" widget with MySQL backend by removing DISTINCT modifier from SQL statements with tables joined by primary keys (Sasha)
 ...G...... [ZBX-18214] added collecting of physical CPU utilization data on IBM AIX and modified system.cpu.util[] (Andris)
 ...G...... [ZBX-17974] implement timeouts for WMI queries (arimdjonoks)
 ..F....... [ZBX-18149] fixed discovered hosts showing links to host prototypes which should not possible (Ivo)
@@ -1841,11 +1711,34 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.24rc1
+Changes for 4.0.25rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24
+
+4.0.24rc2 was released as 4.0.24 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24rc2
+
+Bug fixes:
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24rc1
+
+Bug fixes:
+A......... [ZBX-18046] improved error message generation performance of user macro and item key parser (vmurzins)
+........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
+........S. [ZBX-18014] added ODBC empty query check (viktors)
+..F....... [ZBX-18160] fixed fatal error in items.php and host_discovery.php (rlataria)
+A......... [ZBX-13383] improved performance of the trigger and trigger prototype inheritance (Sasha)
+...G...... [ZBX-17974] implement timeouts for WMI queries (arimdjonoks)
+A......... [ZBX-13789] improved performance of "Problems" widget with MySQL backend by removing DISTINCT modifier from SQL statements with tables joined by primary keys (Sasha)
 A.F....... [ZBX-17468] fixed excess audit log record being added on host status update (talbergs)
 A......... [ZBX-18076] fixed PHP notice and multiple undefined index errors in hostinterface API (miks)
 ..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)

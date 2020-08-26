@@ -1068,7 +1068,7 @@ insert_javascript_for_visibilitybox();
 			'<?= OPERATION_OBJECT_ITEM_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends'],
 			'<?= OPERATION_OBJECT_TRIGGER_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opseverity', 'optag'],
 			'<?= OPERATION_OBJECT_GRAPH_PROTOTYPE ?>': ['opdiscover'],
-			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'opinventory']
+			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'optag', 'opinventory']
 		};
 
 		jQuery('#operationobject', this.$form)

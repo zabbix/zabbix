@@ -23,8 +23,8 @@ require_once __DIR__.'/include/config.inc.php';
 
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
-$request = CSession::getValue('request');
-CSession::unsetValue(['request']);
+$request = CSessionHelper::get('request');
+CSessionHelper::unset(['request']);
 
 if (hasRequest('request')) {
 	$request = getRequest('request');
@@ -37,12 +37,12 @@ if (hasRequest('request')) {
 
 	if ($request !== '') {
 		$redirect_to->setArgument('request', $request);
-		CSession::setValue('request', $request);
+		CSessionHelper::set('request', $request);
 	}
 }
 
 if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
-	CSession::unsetValue(['request']);
+	CSessionHelper::unset(['request']);
 
 	redirect($redirect_to->toString());
 }
@@ -167,7 +167,7 @@ if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
 try {
 	$auth = new Auth($settings);
 
-	if (hasRequest('acs') && !CSession::keyExists('saml_data')) {
+	if (hasRequest('acs') && !CSessionHelper::has('saml_data')) {
 		$auth->processResponse();
 
 		if (!$auth->isAuthenticated()) {
@@ -184,7 +184,7 @@ try {
 			);
 		}
 
-		CSession::setValue('saml_data', [
+		CSessionHelper::set('saml_data', [
 			'username_attribute' => reset(
 				$user_attributes[CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)]
 			),
@@ -201,8 +201,8 @@ try {
 	}
 
 	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== '') {
-		if (hasRequest('slo') && CSession::keyExists('saml_data')) {
-			$saml_data = CSession::getValue('saml_data');
+		if (hasRequest('slo') && CSessionHelper::has('saml_data')) {
+			$saml_data = CSessionHelper::get('saml_data');
 
 			CWebUser::logout();
 
@@ -222,20 +222,18 @@ try {
 		redirect($redirect_to->toString());
 	}
 
-	if (CSession::keyExists('saml_data')) {
-		$saml_data = CSession::getValue('saml_data');
+	if (CSessionHelper::has('saml_data')) {
+		$saml_data = CSessionHelper::get('saml_data');
 		$user = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
 		if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-			CSession::unsetValue(['saml_data']);
+			CSessionHelper::unset(['saml_data']);
 
 			throw new Exception(_('GUI access disabled.'));
 		}
-
-		CWebUser::setSessionCookie($user['sessionid']);
 
 		$redirect = array_filter([$request, $user['url'], $relay_state, ZBX_DEFAULT_URL]);
 		redirect(reset($redirect));
@@ -249,7 +247,7 @@ catch (Exception $e) {
 
 echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
-	'messages' => array_column(clear_messages(), 'message'),
+	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
 		(new CButton('login', _('Login')))->onClick(
 			'document.location = '.json_encode(
@@ -261,3 +259,5 @@ echo (new CView('general.warning', [
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();
+
+session_write_close();

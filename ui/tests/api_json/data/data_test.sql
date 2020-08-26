@@ -990,6 +990,8 @@ INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (103,
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (105,1);
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (101,103,'tag1','value1');
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (102,103,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (103,105,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (104,105,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (101,105,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (102,105,10265);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (103,105,50010);
@@ -1023,6 +1025,8 @@ INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (109,
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (111,1);
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (3,109,'tag1','value1');
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (4,109,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,111,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,111,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (4,111,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (5,111,10265);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (6,111,50010);
@@ -1054,8 +1058,10 @@ INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (113,
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (114,0);
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (115,1);
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (117,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,115,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,115,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (7,115,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (8,115,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (9,117,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10,117,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (7,117,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (8,117,10265);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (9,117,50010);
@@ -1085,9 +1091,9 @@ INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,st
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133768,2,'',131003,'prototype','a[{#A}]','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133769,2,'',131002,'item','a','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (138003,133768,133767,'',0,0);
-INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags,discover) VALUES (1237,'graph_prototype',900,200,0,100,NULL,1,1,0,1,0,0,0,0,0,NULL,NULL,2,0);
-INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (29404,1237,133769,0,1,'F63100',0,2,0);
-INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (29403,1237,133768,0,0,'1A7C11',0,2,0);
+INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags,discover) VALUES (1300,'graph_prototype',900,200,0,100,NULL,1,1,0,1,0,0,0,0,0,NULL,NULL,2,0);
+INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (29450,1300,133769,0,1,'F63100',0,2,0);
+INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (29451,1300,133768,0,0,'1A7C11',0,2,0);
 
 -- trigger permissions: BEGIN
 
@@ -1395,3 +1401,22 @@ INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (5
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50231, 50171, 50115, 'last', '');
 
 -- trigger permissions: END
+
+-- test discovered host groups after import parent host
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50025, 'Master group', 0);
+INSERT INTO hstgrp (groupid, name, internal, flags) VALUES (50026, 'host group discovered', 0, 4);
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99010, 'Host having discovered hosts', 'Host having discovered hosts', 0, 0, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99012, 'discovered', 'discovered', 0, 4, '');
+INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params, description, posts, headers) VALUES (28735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '', '', '', '');
+INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (10, 99011, 'host group {#VALUE}');
+INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (11, 99011, 50025);
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50026, 10, 'host group {#VALUE}');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50020, 99010, 50025);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50021, 99012, 50025);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50022, 99012, 50026);
+INSERT INTO host_discovery (hostid, parent_itemid, host) VALUES (99011, 28735, '');
+INSERT INTO host_discovery (hostid, parent_hostid, host) VALUES (99012, 99011, '{#VALUE}');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50026, 99010, 1, 1, 1, '127.0.0.1', '10050');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50027, 99012, 1, 1, 1, '127.0.0.1', '10050');
+INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027, 50026);

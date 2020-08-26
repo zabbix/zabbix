@@ -4121,26 +4121,6 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
 			],
-			'Test /1/overrides/1/operations/1/optag is is not supported for host prototype object.' => [
-				'discoveryrules' => [
-					$new_lld_overrides([
-						[
-							'name' => 'override',
-							'step' => 1,
-							'operations' => [
-								[
-									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
-									'optag' => [
-										['tag' => 'www']
-									]
-								]
-							]
-						]
-					])
-				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
-			],
 			// LLD rule override operation template
 			'Test /1/overrides/1/operations/1/optemplate cannot be empty.' => [
 				'discoveryrules' => [
@@ -4852,6 +4832,16 @@ class testDiscoveryRule extends CAPITest {
 											'templateid' => '50010'
 										]
 									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									],
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 									]
@@ -4927,6 +4917,16 @@ class testDiscoveryRule extends CAPITest {
 											'templateid' => '50010'
 										]
 									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									],
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 									]
@@ -4979,7 +4979,7 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array $request_lld_override['filter']      (optional)
 	 * @param array $request_lld_override['operations']  (optional)
 	 */
-	private function assertLLDOverride(array $db_lld_override, array $request_lld_override, bool $debug = false) {
+	private function assertLLDOverride(array $db_lld_override, array $request_lld_override) {
 		$this->assertEquals($db_lld_override['name'], $request_lld_override['name']);
 		$this->assertEquals($db_lld_override['step'], $request_lld_override['step'], 'Override step value.');
 
@@ -4989,7 +4989,7 @@ class testDiscoveryRule extends CAPITest {
 		$this->assertEquals($db_lld_override['stop'], $stop, 'Override stop value.');
 
 		if (array_key_exists('filter', $request_lld_override)) {
-			$this->assertLLDOverrideFilter($db_lld_override, $request_lld_override['filter'], $debug);
+			$this->assertLLDOverrideFilter($db_lld_override, $request_lld_override['filter']);
 		}
 		else {
 			$this->assertEmpty($db_lld_override['formula']);
@@ -5033,7 +5033,7 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array $filter['conditions'][]['formulaid']        (optional) if evaltype is CONDITION_EVAL_TYPE_EXPRESSION
 	 * @param array $filter['conditions'][]['operator']         (optional)
 	 */
-	private function assertLLDOverrideFilter(array $db_lld_override, array $filter, bool $debug = false) {
+	private function assertLLDOverrideFilter(array $db_lld_override, array $filter) {
 		$db_lld_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
 			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
 		);
@@ -5050,9 +5050,6 @@ class testDiscoveryRule extends CAPITest {
 				array_column($db_lld_conditions, 'lld_override_conditionid')
 			);
 			$formula = CConditionHelper::replaceLetterIds($filter['formula'], $conditionid_by_formulaid);
-if ($debug) {
-	file_put_contents('/tmp/testDiscoveryRuleOverrides.txt', var_export(['time' => (new DateTime())->format('r'), 'db_lld_conditions' => $db_lld_conditions, 'formula1' => $filter['formula'], 'formula' => $formula], true), FILE_APPEND);
-}
 			$this->assertEquals($db_lld_override['formula'], $formula);
 		}
 
@@ -5378,117 +5375,48 @@ if ($debug) {
 
 		$this->assertTrue($result['result']);
 
-		$request_lld_overrides = [
-			[
-				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
-				'name' => 'override',
-				'step' => 1,
-				'filter' => [
-					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-					'formula' => 'A or B or C',
-					'conditions' => [
-						[
-							'macro' => '{#MACRO1}',
-							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => 'd{3}$',
-							'formulaid' => 'A'
-						],
-						[
-							'macro' => '{#MACRO2}',
-							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => 'd{2}$',
-							'formulaid' => 'B'
-						],
-						[
-							'macro' => '{#MACRO3}',
-							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => 'd{1}$',
-							'formulaid' => 'C'
-						]
-					]
-				],
-				'operations' => [
-					[
-						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_NOT_LIKE,
-						'value' => '8',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED]
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-						'value' => 'wW',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_ENABLED],
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
-						'ophistory' => ['history' => '92d'],
-						'opperiod' => ['delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'],
-						'optrends' => ['trends' => '36d']
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_REGEXP,
-						'value' => '^c+$',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED],
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
-						'opseverity' => ['severity' => TRIGGER_SEVERITY_AVERAGE],
-						'optag' => [
-							['tag' => 'tag1', 'value' => 'value1'],
-							['tag' => 'tag2', 'value' => 'value2']
-						]
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_LIKE,
-						'value' => '123',
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER]
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => '',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED],
-						'optemplate' => [
-							['templateid' => '10264'],
-							['templateid' => '10265'],
-							['templateid' => '50010']
-						],
-						'opinventory' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC],
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER]
-					]
-				]
-			],
-			[
-				'name' => 'override 2',
-				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
-				'step' => 2,
-				'operations' => [
-					[
-						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => '',
-						'optrends' => ['trends' => '5d']
-					]
-				]
-			]
-		];
+		$result = $this->call('discoveryrule.get', [
+			'output' => [],
+			'selectOverrides' => 'extend',
+			'itemids' => $itemid
+		]);
 
-		$db_lld_ruleids = array_column(CDBHelper::getAll('SELECT itemid from items WHERE '.
-				dbConditionId('hostid', (array) $hostids)), 'itemid');
-		sort($db_lld_ruleids);
+		$expected_overrides = $result['result'][0]['overrides'];
+		usort($expected_overrides, function ($a, $b) {
+			return $a['step'] <=> $b['step'];
+		});
 
-		foreach ($db_lld_ruleids as $db_lld_ruleid) {
-			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
-				dbConditionId('itemid', (array) $db_lld_ruleid)
-			);
+		foreach ($expected_overrides as &$override) {
+			usort($override['filter']['conditions'], function ($a, $b) {
+				return $a['formulaid'] <=> $b['formulaid'];
+			});;
+		}
+		unset($override);
 
-			usort($db_lld_overrides, function ($a, $b) {
-				return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+		$db_lld_ruleids = array_column(CDBHelper::getAll(
+			'SELECT itemid FROM items WHERE flags=1 AND '.dbConditionId('hostid', $hostids).' ORDER BY itemid'
+		), 'itemid');
+		$this->assertSame(count($db_lld_ruleids), count($hostids));
+
+		$result = $this->call('discoveryrule.get', [
+			'output' => [],
+			'selectOverrides' => 'extend',
+			'itemids' => $db_lld_ruleids
+		]);
+
+		foreach ($result['result'] as $lld_rule) {
+			usort($lld_rule['overrides'], function ($a, $b) {
+				return $a['step'] <=> $b['step'];
 			});
 
-file_put_contents('/tmp/testDiscoveryRuleOverrides.txt', var_export(['time' => (new DateTime())->format('r'), 'request_lld_overrides' => $request_lld_overrides, 'db_lld_overrides' => $db_lld_overrides], true), FILE_APPEND);
-			foreach ($request_lld_overrides as $override_num => $request_lld_override) {
-				$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override, true);
+			foreach ($lld_rule['overrides'] as &$override) {
+				usort($override['filter']['conditions'], function ($a, $b) {
+					return $a['formulaid'] <=> $b['formulaid'];
+				});;
 			}
+			unset($override);
+
+			$this->assertSame($expected_overrides, $lld_rule['overrides']);
 		}
 	}
 
@@ -5616,6 +5544,16 @@ file_put_contents('/tmp/testDiscoveryRuleOverrides.txt', var_export(['time' => (
 											'templateid' => '50010'
 										]
 									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									],
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 									]
@@ -5738,6 +5676,16 @@ file_put_contents('/tmp/testDiscoveryRuleOverrides.txt', var_export(['time' => (
 										],
 										[
 											'templateid' => '50010'
+										]
+									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
 										]
 									],
 									'opinventory' => [
@@ -5898,6 +5846,16 @@ file_put_contents('/tmp/testDiscoveryRuleOverrides.txt', var_export(['time' => (
 							],
 							[
 								'templateid' => '50010'
+							]
+						],
+						'optag' => [
+							[
+								'tag' => 'tag1',
+								'value' => 'value1'
+							],
+							[
+								'tag' => 'tag2',
+								'value' => 'value2'
 							]
 						],
 						'opinventory' => [

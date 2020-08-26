@@ -76,6 +76,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const VALIDATE_URI_SCHEMES = 'validate_uri_schemes';
 	public const WORK_PERIOD = 'work_period';
 	public const X_FRAME_OPTIONS = 'x_frame_options';
+	public const SESSION_KEY = 'session_key';
 
 	/**
 	 * Settings API object parameters array.

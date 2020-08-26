@@ -33,7 +33,7 @@ catch (Exception $e) {
 		'theme' => ZBX_DEFAULT_THEME
 	]))->getOutput();
 
-	exit;
+	exit();
 }
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -66,37 +66,34 @@ $fields = [
 	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 ];
 
-CSession::start();
-CSession::setValue('check_fields_result', check_fields($fields, false));
-if (!CSession::keyExists('step')) {
-	CSession::setValue('step', 0);
+CSessionHelper::set('check_fields_result', check_fields($fields, false));
+if (!CSessionHelper::has('step')) {
+	CSessionHelper::set('step', 0);
 }
 
 // if a guest or a non-super admin user is logged in
 if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 	// on the last step of the setup we always have a guest user logged in;
 	// when he presses the "Finish" button he must be redirected to the login screen
-	if (CWebUser::isGuest() && CSession::getValue('step') == 6 && hasRequest('finish')) {
-		CSession::clear();
+	if (CWebUser::isGuest() && hasRequest('finish')) {
 		redirect('index.php');
 	}
 	// the guest user can also view the last step of the setup
 	// all other user types must not have access to the setup
-	elseif (!(CWebUser::isGuest() && CSession::getValue('step') == 6)) {
+	elseif (!(CWebUser::isGuest() && CSessionHelper::get('step') == 6)) {
 		access_deny(ACCESS_DENY_PAGE);
 	}
 }
 // if a super admin or a non-logged in user presses the "Finish" or "Login" button - redirect him to the login screen
 elseif (hasRequest('cancel') || hasRequest('finish')) {
-	CSession::clear();
 	redirect('index.php');
 }
 
 // Set default language.
 $default_lang = ZBX_DEFAULT_LANG;
 
-if (CSession::keyExists('default_lang')) {
-	$default_lang = CSession::getValue('default_lang');
+if (CSessionHelper::has('default_lang')) {
+	$default_lang = CSessionHelper::get('default_lang');
 }
 elseif (CWebUser::$data) {
 	$default_lang = CWebUser::$data['lang'];
@@ -119,14 +116,14 @@ if (!in_array($default_lang, $available_locales)) {
 	$default_lang = ZBX_DEFAULT_LANG;
 }
 
-CSession::setValue('default_lang', $default_lang);
+CSessionHelper::set('default_lang', $default_lang);
 APP::getInstance()->initLocales($default_lang);
 
 // Set default time zone.
 $default_timezone = ZBX_DEFAULT_TIMEZONE;
 
-if (CSession::keyExists('default_timezone')) {
-	$default_timezone = CSession::getValue('default_timezone');
+if (CSessionHelper::has('default_timezone')) {
+	$default_timezone = CSessionHelper::get('default_timezone');
 }
 elseif (CWebUser::$data) {
 	$default_timezone = CWebUser::$data['timezone'];
@@ -138,13 +135,13 @@ if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !in_array($default_timezone, D
 	$default_timezone = ZBX_DEFAULT_TIMEZONE;
 }
 
-CSession::setValue('default_timezone', $default_timezone);
+CSessionHelper::set('default_timezone', $default_timezone);
 
 // Set default theme.
 $default_theme = ZBX_DEFAULT_THEME;
 
-if (CSession::keyExists('default_theme')) {
-	$default_theme = CSession::getValue('default_theme');
+if (CSessionHelper::has('default_theme')) {
+	$default_theme = CSessionHelper::get('default_theme');
 }
 elseif (CWebUser::$data) {
 	$default_theme = getUserTheme(CWebUser::$data);
@@ -156,7 +153,7 @@ if (!in_array($default_theme, array_keys(APP::getThemes()))) {
 	$default_theme = ZBX_DEFAULT_THEME;
 }
 
-CSession::setValue('default_theme', $default_theme);
+CSessionHelper::set('default_theme', $default_theme);
 
 DBclose();
 
@@ -194,3 +191,6 @@ $sub_footer = (new CDiv([_('Licensed under'), ' ', $link]))->addClass(ZBX_STYLE_
 	->show();
 ?>
 </html>
+
+<?php
+session_write_close();

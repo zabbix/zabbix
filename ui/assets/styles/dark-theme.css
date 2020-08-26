@@ -4185,12 +4185,19 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
+  .tag.green-bg {
+    color: #0e4123; }
+  .tag.yellow-bg {
+    color: #734d00; }
 
 .green-bg {
   background-color: #59db8f; }
 
 .red-bg {
   background-color: #e45959; }
+
+.yellow-bg {
+  background-color: #ffc859; }
 
 td[class] + td.na-bg,
 td[class] + td.normal-bg,

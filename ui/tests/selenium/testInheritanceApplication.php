@@ -114,6 +114,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application added');
 
 			// Check created application on host.
+			$this->page->waitUntilReady();
 			$filter = $this->query('name:zbx_filter')->asForm()->one();
 			$filter->getField('Hosts')->fill($data['host']);
 			$filter->submit();
@@ -257,6 +258,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//tbody//td[text()=": '.$data['application'].'"]');
 
 			// Check application on host.
+			$this->page->waitUntilReady();
 			$filter = $this->query('name:zbx_filter')->asForm()->one();
 			$filter->getField('Hosts')->clear()->fill($data['host']);
 			$filter->submit();
