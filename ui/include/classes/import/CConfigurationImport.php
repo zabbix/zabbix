@@ -1073,8 +1073,9 @@ class CConfigurationImport {
 		// process prototypes
 		$prototypes_to_update = [];
 		$prototypes_to_create = [];
-		$hostPrototypesToUpdate = [];
+		$host_prototypes_to_update = [];
 		$hostPrototypesToCreate = [];
+		$ex_group_prototypes_where = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -1233,8 +1234,16 @@ class CConfigurationImport {
 					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $itemId, $hostPrototype['host']);
 
 					if ($hostPrototypeId) {
+						if ($hostPrototype['groupPrototypes']) {
+							$ex_group_prototypes_where[] = '('.dbConditionInt('hostid', [$hostPrototypeId]).
+								' AND '.dbConditionString('name',
+									zbx_objectValues($hostPrototype['groupPrototypes'], 'name')
+								).
+							')';
+						}
+
 						$hostPrototype['hostid'] = $hostPrototypeId;
-						$hostPrototypesToUpdate[] = $hostPrototype;
+						$host_prototypes_to_update[] = $hostPrototype;
 					}
 					else {
 						$hostPrototype['ruleid'] = $itemId;
@@ -1262,6 +1271,37 @@ class CConfigurationImport {
 			}
 		}
 
+		// Attach existing host group prototype ids.
+		if ($ex_group_prototypes_where) {
+			$db_group_prototypes = DBFetchArray(DBselect(
+				'SELECT group_prototypeid,name,hostid'.
+					' FROM group_prototype'.
+					' WHERE '.implode(' OR ', $ex_group_prototypes_where)
+			));
+
+			if ($db_group_prototypes) {
+				$groups_hash = [];
+				foreach ($db_group_prototypes as $group) {
+					$groups_hash[$group['hostid']][$group['name']] = $group['group_prototypeid'];
+				}
+
+				foreach ($host_prototypes_to_update as &$host_prototype) {
+					if (!array_key_exists($host_prototype['hostid'], $groups_hash)) {
+						continue;
+					}
+
+					$hash = $groups_hash[$host_prototype['hostid']];
+					foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+						if (array_key_exists($group_prototype['name'], $hash)) {
+							$group_prototype['group_prototypeid'] = $hash[$group_prototype['name']];
+						}
+					}
+					unset($group_prototype, $hash);
+				}
+				unset($host_prototype, $groups_hash);
+			}
+		}
+
 		if ($prototypes_to_create) {
 			ksort($prototypes_to_create);
 			$this->createEntitiesWithDependency($xml_item_key, $prototypes_to_create, API::ItemPrototype());
@@ -1275,8 +1315,8 @@ class CConfigurationImport {
 		if ($hostPrototypesToCreate) {
 			API::HostPrototype()->create($hostPrototypesToCreate);
 		}
-		if ($hostPrototypesToUpdate) {
-			API::HostPrototype()->update($hostPrototypesToUpdate);
+		if ($host_prototypes_to_update) {
+			API::HostPrototype()->update($host_prototypes_to_update);
 		}
 
 		// refresh prototypes because templated ones can be inherited to host and used in triggers prototypes or graph prototypes
