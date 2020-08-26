@@ -1,4 +1,4 @@
-customElements.define('z-select', class extends HTMLElement {
+class ZSelectElement extends HTMLElement {
 
 	// TODO: check if disconnectedCallback() needed ? is cleanup needed?
 
@@ -610,6 +610,8 @@ customElements.define('z-select', class extends HTMLElement {
 	}
 
 	set value(val) {
-		this.setAttribute("value", val);
+		this.setAttribute('value', val);
 	}
-});
+}
+
+customElements.define('z-select', ZSelectElement);
