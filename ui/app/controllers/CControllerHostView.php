@@ -94,6 +94,10 @@ class CControllerHostView extends CControllerHost {
 
 		foreach ($filter_tabs as &$filter_tab) {
 			$filter_tab += $this->getAdditionalData($filter_tab);
+
+			if (!$filter_tab['tags']) {
+				$filter_tab['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+			}
 		}
 		unset($filter_tab);
 
@@ -107,12 +111,6 @@ class CControllerHostView extends CControllerHost {
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
-			'timerange' => [
-				'idx' => '',
-				'idx2' => '',
-				'from' => ZBX_PERIOD_DEFAULT_FROM,
-				'to' => ZBX_PERIOD_DEFAULT_TO,
-			],
 			'filter_tabs' => $filter_tabs,
 			'tab_selected' => $profile->selected,
 			'tab_expanded' => $profile->expanded

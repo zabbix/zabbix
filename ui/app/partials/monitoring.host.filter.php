@@ -31,13 +31,8 @@ $filter_tags_table = (new CTable())
 				->setModern(true)
 		))->setColSpan(4)
 );
-$tags = array_values($data['tags']);
 
-if (!$tags) {
-	$tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-}
-
-foreach ($tags as $i => $tag) {
+foreach (array_values($data['tags']) as $i => $tag) {
 	$filter_tags_table->addRow([
 		(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
 			->setAttribute('placeholder', _('tag'))
