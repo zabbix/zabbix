@@ -36,11 +36,18 @@ if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
 
+$check_type_select = (new CSelect('type'))
+	->setValue($data['params']['type'])
+	->setButtonId('type')
+	->setId('type-select');
+
+foreach ($discovery_ckeck_types as $typeid => $type_name) {
+	$check_type_select->addOption(new CSelectOption($type_name, (string) $typeid));
+}
+
 $form_list = (new CFormList())
 	->cleanItems()
-	->addRow(new CLabel(_('Check type'), 'type'),
-		(new CComboBox('type', $data['params']['type'], '', $discovery_ckeck_types))
-	)
+	->addRow(new CLabel(_('Check type'), 'type'), $check_type_select)
 	->addRow((new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 		(new CTextBox('ports', $data['params']['ports']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -78,11 +85,13 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_securityname'
 	)
 	->addRow(new CLabel(_('Security level'), 'snmpv3_securitylevel'),
-		new CComboBox('snmpv3_securitylevel', $data['params']['snmpv3_securitylevel'], null, [
-			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-		]),
+		(new CSelect('snmpv3_securitylevel'))
+			->setValue($data['params']['snmpv3_securitylevel'])
+			->setButtonId('snmpv3_securitylevel')
+			->setId('snmpv3-securitylevel')
+			->addOption(new CSelectOption('noAuthNoPriv', (string) ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV))
+			->addOption(new CSelectOption('authNoPriv', (string) ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV))
+			->addOption(new CSelectOption('authPriv', (string) ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)),
 		'row_dcheck_snmpv3_securitylevel'
 	)
 	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),
