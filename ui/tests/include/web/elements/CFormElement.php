@@ -298,7 +298,18 @@ class CFormElement extends CElement {
 			$submit->click();
 		}
 		else {
-			parent::submit();
+			/**
+			 * if the form is in overlay-dialogue, we would not find any submit button in it,
+			 * the submit button is in overlay-dialogue-footer. As the submit button may not
+			 * have the submit type, so we should find the submit button and click it directly.
+			 */
+			$submit = $this->query('xpath://div[@class="overlay-dialogue-footer"]//button[text()!="Cancel"]')
+				->one(false);
+			if ($submit->isValid()) {
+				$submit->click();
+			} else {
+				parent::submit();
+			}
 		}
 
 		return $this;
