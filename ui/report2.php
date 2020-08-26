@@ -193,10 +193,12 @@ else {
 			->addItem([
 				new CLabel(_('Mode'), 'mode'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('mode', $report_mode, 'submit()', [
-					AVAILABILITY_REPORT_BY_HOST => _('By host'),
-					AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
-				])
+				(new CSelect('mode'))
+					->setValue($report_mode)
+					->setButtonId('mode')
+					->onChange('$(this).closest("form").submit()')
+					->addOption(new CSelectOption(_('By host'), (string) AVAILABILITY_REPORT_BY_HOST))
+					->addOption(new CSelectOption(_('By trigger template'), (string) AVAILABILITY_REPORT_BY_TEMPLATE))
 			])
 	));
 
@@ -239,12 +241,15 @@ else {
 			$data['filter']['hostids'] = 0;
 		}
 
-		$filter_hostid_combobox = (new CComboBox('filter_templateid', $data['filter']['hostids'],
-			'javascript: submit();'
-		))->addItem(0, _('all'));
+		$filter_hostid_combobox = (new CSelect('filter_templateid'))
+			->setValue($data['filter']['hostids'])
+			->setButtonId('filter_templateid')
+			->onChange('$(this).closest("form").submit()');
+
+		$filter_hostid_combobox->addOption(new CSelectOption(_('all'), '0'));
 
 		foreach ($templates as $templateid => $template) {
-			$filter_hostid_combobox->addItem($templateid, $template['name']);
+			$filter_hostid_combobox->addOption(new CSelectOption($template['name'], (string) $templateid));
 		}
 
 		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" combo box.
@@ -281,15 +286,19 @@ else {
 			$data['filter']['tpl_triggerid'] = 0;
 		}
 
-		$tpl_triggerid_combobox = (new CComboBox('tpl_triggerid', $data['filter']['tpl_triggerid'], 'javascript: submit()'))
-			->addItem(0, _('all'));
+
+		$tpl_triggerid_combobox = (new CSelect('tpl_triggerid'))
+			->setValue($data['filter']['tpl_triggerid'])
+			->setButtonId('tpl_triggerid')
+			->onChange('$(this).closest("form").submit()');
+
+		$tpl_triggerid_combobox->addOption(new CSelectOption(_('all'), '0'));
 
 		$tpl_triggerids = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
-			$tpl_triggerid_combobox->addItem($triggerid,
-				(($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description']
-			);
+			$title = (($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description'];
+			$tpl_triggerid_combobox->addOption(new CSelectOption($title, (string) $triggerid));
 
 			$tpl_triggerids[$triggerid] = true;
 		}
@@ -307,11 +316,15 @@ else {
 			$data['filter']['hostgroupid'] = 0;
 		}
 
-		$hostgroupid_combobox = (new CComboBox('hostgroupid', $data['filter']['hostgroupid'], 'javascript: submit()'))
-			->addItem(0, _('all'));
+		$hostgroupid_combobox = (new CSelect('hostgroupid'))
+			->setValue($data['filter']['hostgroupid'])
+			->setButtonId('hostgroupid')
+			->onChange('$(this).closest("form").submit()');
+
+		$hostgroupid_combobox->addOption(new CSelectOption(_('all'), '0'));
 
 		foreach ($host_groups as $groupid => $group) {
-			$hostgroupid_combobox->addItem($groupid, $group['name']);
+			$hostgroupid_combobox->addOption(new CSelectOption($group['name'], (string) $groupid));
 		}
 
 		$hostgroupids = [];
@@ -361,19 +374,22 @@ else {
 			$triggers = [];
 		}
 
-		$filter_groupid_combobox = (new CComboBox('filter_groups', $data['filter']['groups'], 'javascript: submit();'))
-			->setAttribute('autofocus', 'autofocus')
-			->addItem(0, _('all'));
+		$filter_groupid_combobox = (new CSelect('filter_groups'))
+			->setValue($data['filter']['groups'])
+			->setButtonId('filter_groups')
+			->onChange('$(this).closest("form").submit()');
+
+		$filter_groupid_combobox->addOption(new CSelectOption(_('all'), '0'));
 
 		foreach ($groups as $groupid => $group) {
-			$filter_groupid_combobox->addItem($groupid, $group['name']);
+			$filter_groupid_combobox->addOption(new CSelectOption($group['name'], (string) $groupid));
 		}
 
 		$filter_column
-			->addRow(_('Template group'), $filter_groupid_combobox)
-			->addRow(_('Template'), $filter_hostid_combobox)
-			->addRow(_('Template trigger'), $tpl_triggerid_combobox)
-			->addRow(_('Host group'), $hostgroupid_combobox)
+			->addRow(new CLabel(_('Template group'), 'filter_groups'), $filter_groupid_combobox)
+			->addRow(new CLabel(_('Template'), 'filter_templateid'), $filter_hostid_combobox)
+			->addRow(new CLabel(_('Template trigger'), 'tpl_triggerid'), $tpl_triggerid_combobox)
+			->addRow(new CLabel(_('Host group'), 'hostgroupid'), $hostgroupid_combobox)
 			->addVar('filter_set', '1');
 	}
 	// Report by host.
