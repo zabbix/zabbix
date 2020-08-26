@@ -87,11 +87,15 @@ else {
 
 	$controls = new CList();
 
-	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
-	$cmbMedia->addItem(0, _('all'));
+	$cmb_media = (new CSelect('media_type'))
+			->setButtonId('media_type')
+			->setValue($media_type)
+			->onChange('$(this).closest("form").submit()');
+
+	$cmb_media->addOption(new CSelectOption(_('all'), '0'));
 
 	foreach ($media_types as $media_type_id => $name) {
-		$cmbMedia->addItem($media_type_id, $name);
+		$cmb_media->addOption(new CSelectOption($name, $media_type_id));
 
 		// we won't need other media types in the future, if only one was selected
 		if ($media_type > 0 && $media_type != $media_type_id) {
@@ -102,28 +106,35 @@ else {
 		->addItem([
 			new CLabel(_('Media type'), 'media_type'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmbMedia
+			$cmb_media
 		])
 		->addItem([
 			new CLabel(_('Period'), 'period'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			new CComboBox('period', $period, 'submit()', [
-				'daily' => _('Daily'),
-				'weekly' => _('Weekly'),
-				'monthly' => _('Monthly'),
-				'yearly' => _('Yearly')
-			])
+			(new CSelect('period'))
+				->setValue($period)
+				->setButtonId('period')
+				->addOption(new CSelectOption(_('Daily'), 'daily'))
+				->addOption(new CSelectOption(_('Weekly'), 'weekly'))
+				->addOption(new CSelectOption(_('Monthly'), 'monthly'))
+				->addOption(new CSelectOption(_('Yearly'), 'yearly'))
+				->onChange('$(this).closest("form").submit()')
 		]);
 
 	if ($period != 'yearly') {
-		$cmbYear = new CComboBox('year', $year, 'submit();');
+		$cmb_year = (new CSelect('year'))
+			->setValue($year)
+			->setButtonId('year')
+			->onChange('$(this).closest("form").submit()');
+
 		for ($y = $minYear; $y <= date('Y'); $y++) {
-			$cmbYear->addItem($y, $y);
+			$cmb_year->addOption(new CSelectOption($y, $y));
 		}
+
 		$controls->addItem([
 			new CLabel(_('Year'), 'year'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmbYear
+			$cmb_year
 		]);
 	}
 
