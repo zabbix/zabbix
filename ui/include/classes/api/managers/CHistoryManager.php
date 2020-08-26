@@ -1123,9 +1123,7 @@ class CHistoryManager {
 			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
 		}
 
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL
-				&& CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) == ZBX_DB_EXTENSION_TIMESCALEDB
-				&& PostgresqlDbBackend::isCompressed($item_tables)) {
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && PostgresqlDbBackend::isCompressed($item_tables)) {
 			error(_('Some of the history for this item may be compressed, deletion is not available.'));
 
 			return false;
