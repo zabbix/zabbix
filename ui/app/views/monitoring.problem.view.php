@@ -66,7 +66,7 @@ switch ($data['filter']['show']) {
 
 	case TRIGGERS_OPTION_ALL:
 		$options['profileIdx'] = $data['tabfilter_idx'];
-		$options['profileIdx2'] = $data['profileIdx2'];
+		$options['profileIdx2'] = 0;
 		$options['from'] = $data['filter']['from'];
 		$options['to'] = $data['filter']['to'];
 		break;

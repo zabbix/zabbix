@@ -28,60 +28,23 @@
 		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>);
 
 		filter.on(TABFILTER_EVENT_URLSET, (ev) => {
+			let url = new Curl(),
+				data = $.extend(<?= json_encode($data['filter_defaults'])?>, url.getArgumentsObject());
+
+			if (data.inventory.length == 1 && data.inventory[0].value === '') {
+				data.inventory = [];
+			}
+
+			if (data.tags.length == 1 && data.tags[0].tag === '' && data.tags[0].value === '') {
+				data.tags = [];
+			}
+
+			console.log('data', data);
 			// Modify filter data of flickerfreeScreen object with id 'problem'.
-			var form = filter._active_item._content_container.querySelector('form'),
-				filter_data = window.flickerfreeScreen.screens.problem.data.filter;
-
-			// Show
-			filter_data.show = form.elements.show.value;
-
-			// Host groups
-			filter_data.groupids = [];
-
-			if (form.elements['groupids[]'] instanceof HTMLElement) {
-				filter_data.groupids = [form.elements['groupids[]'].value];
-			}
-			else if (form.elements['groupids[]']) {
-				filter_data.groupids = [].map.call(form.elements['groupids[]'], host => host.value);
-			}
-
-			// Hosts
-			filter_data.hostids = [];
-
-			if (form.elements['hostids[]'] instanceof HTMLElement) {
-				filter_data.hostids = [form.elements['hostids[]'].value];
-			}
-			else if (form.elements['hostids[]']) {
-				filter_data.hostids = [].map.call(form.elements['hostids[]'], host => host.value);
-			}
-
-			// Application
-			// Triggers
-			// Problem
-			// Severity
-			// Host inventory
-			filter_data.inventory = [];
-
-			for (const elm in form.querySelectorAll('[name^="inventory["')) {
-				// Uff fill data from multidimensional inputs manually.
-			}
-
-			// Tags
-			// Show tags
-			// Tag display priority
-			// Show operation data
-			// Show suppressed problems
-			// Show unacknowledged only
-			// Compact view
-			// Show timeline
-			// Show details
-			// Highlight whole row
-
-			console.log('filter set data', window.flickerfreeScreen.screens.problem.data.filter);
-
+			window.flickerfreeScreen.screens['problem'].data.filter = data;
 			$.publish('timeselector.rangeupdate', {
 				from: 'now-1y',
-				to: 'now'
+				to: data.to
 			});
 		});
 
