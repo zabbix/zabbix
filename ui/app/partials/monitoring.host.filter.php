@@ -169,9 +169,29 @@ if (array_key_exists('render_html', $data)) {
 	->addItem($template)
 	->show();
 
+(new CScriptTemplate('filter-tag-row-tmpl'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row'))
+	->show();
 ?>
 <script type="text/javascript">
-$(function($) {
 	let template = document.querySelector('[data-template="monitoring.host.filter"]');
 
 	function render(data, container) {
@@ -205,24 +225,11 @@ $(function($) {
 		});
 
 		// Tags table
-		var tag_row = new Template($('#filter-tag-row-tmpl').html()),
-			i = 0;
-		$('#tags_' + data.uniqid + ' tr.form_row', container).remove();
-
-		if (!data.tags.length) {
-			data.tags.push({tag: '', value: '', operator: <?= TAG_OPERATOR_LIKE ?>});
-		}
-
-		data.tags.forEach(tag => {
-			var $row = $(tag_row.evaluate({rowNum: i++}));
-
-			$row.find('[name$="[tag]"]').val(tag.tag);
-			$row.find('[name$="[value]"]').val(tag.value);
-			$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
-
-			$row.insertBefore($('#tags_' + data.uniqid + ' tr', container).last());
+		$('#tags_' + data.uniqid, container).dynamicRows({
+			template: '#filter-tag-row-tmpl',
+			rows: data.tags,
+			counter: 0
 		});
-		$('#tags_' + data.uniqid, container).dynamicRows({template: '#filter-tag-row-tmpl'});
 
 		// Input, radio and single checkboxes.
 		['name', 'ip', 'dns', 'port', 'status', 'evaltype', 'maintenance_status', 'show_suppressed'].forEach((key) => {
@@ -255,5 +262,4 @@ $(function($) {
 	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
 		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
-});
 </script>
