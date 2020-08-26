@@ -487,16 +487,7 @@
 	}
 
 	function initSortable() {
-		var itemsTable = jQuery('#itemsTable'),
-			itemsTableWidth = itemsTable.width(),
-			itemsTableColumns = jQuery('#itemsTable .header td'),
-			itemsTableColumnWidths = [];
-
-		itemsTableColumns.each(function() {
-			itemsTableColumnWidths[itemsTableColumnWidths.length] = jQuery(this).width();
-		});
-
-		itemsTable.sortable({
+		$('#itemsTable').sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
@@ -506,16 +497,11 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function() {
-				// force not to change table width
-				itemsTable.width(itemsTableWidth);
-			},
 			helper: function(e, ui) {
-				ui.children().each(function(i) {
-					var td = jQuery(this);
-
-					td.width(itemsTableColumnWidths[i]);
-				});
+				for (let td of ui.find('>td')) {
+					let $td = $(td);
+					$td.attr('width', $td.width())
+				}
 
 				// when dragging element on safari, it jumps out of the table
 				if (SF) {
@@ -523,11 +509,10 @@
 					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
-				itemsTableColumns.each(function(i) {
-					jQuery(this).width(itemsTableColumnWidths[i]);
-				});
-
 				return ui;
+			},
+			stop: function(e, ui) {
+				ui.item.find('>td').removeAttr('width');
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());

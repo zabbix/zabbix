@@ -21,6 +21,7 @@
 
 class CTable extends CTag {
 
+	protected $colgroup;
 	protected $header;
 	protected $footer;
 	protected $colnum;
@@ -30,6 +31,7 @@ class CTable extends CTag {
 	public function __construct() {
 		parent::__construct('table', true);
 		$this->rownum = 0;
+		$this->colgroup = '';
 		$this->header = '';
 		$this->footer = '';
 		$this->colnum = 1;
@@ -71,14 +73,49 @@ class CTable extends CTag {
 		return $item;
 	}
 
+	/**
+	 * Setup table column styles by colgroup and setup table headers.
+	 * Note: should not be used together with setHeader() function.
+	 *
+	 * @param array $columns  Array with CTableColumn elements.
+	 *
+	 * @return CTable
+	 */
+	public function setColumns(array $columns = []): self {
+		$headers = [];
+		$cols = [];
+
+		foreach ($columns as $col) {
+			if ($col instanceof CTableColumn) {
+				$headers[] = $col->getHeader();
+				$cols[] = $col;
+			}
+		}
+
+		$this->colgroup = new CTag('colgroup', true, $cols);
+		$this->setHeader($headers);
+
+		return $this;
+	}
+
+	/**
+	 * Setup table header row.
+	 * Note: should not be used together with setColumns() function.
+	 *
+	 * @param mixed $value  Table header row or array with table header cells.
+	 *
+	 * @return CTable
+	 */
 	public function setHeader($value = null) {
 		if (!($value instanceof CRow)) {
 			$value = new CRowHeader($value);
 		}
+
 		$this->colnum = $value->itemsCount();
 
 		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
+
 		return $this;
 	}
 
@@ -117,6 +154,7 @@ class CTable extends CTag {
 
 	protected function startToString() {
 		$ret = parent::startToString();
+		$ret .= $this->colgroup;
 		$ret .= $this->header;
 		$ret .= '<tbody>';
 		return $ret;
