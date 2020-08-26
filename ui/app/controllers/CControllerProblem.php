@@ -50,7 +50,9 @@ abstract class CControllerProblem extends CController {
 		'tag_priority' => '',
 		'page' => null,
 		'sort' => 'name',
-		'sortorder' => ZBX_SORT_UP
+		'sortorder' => ZBX_SORT_UP,
+		'from' => ZBX_PERIOD_DEFAULT_FROM,
+		'to' => ZBX_PERIOD_DEFAULT_TO
 	];
 
 	protected function getCount(array $filter) {
@@ -63,7 +65,10 @@ abstract class CControllerProblem extends CController {
 
 	protected function getAdditionalData(array $filter): array {
 		$host_groups = [];
+		$triggers = [];
+		$hosts = [];
 
+		// Host groups multiselect.
 		if ($filter['groupids']) {
 			$host_groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
@@ -73,11 +78,38 @@ abstract class CControllerProblem extends CController {
 			$host_groups = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
 		}
 
+		// Triggers multiselect.
+		if ($filter['triggerids']) {
+			$triggers = CArrayHelper::renameObjectsKeys(API::Trigger()->get([
+				'output' => ['triggerid', 'description'],
+				'selectHosts' => ['name'],
+				'expandDescription' => true,
+				'triggerids' => $filter['triggerids'],
+				'monitored' => true
+			]), ['triggerid' => 'id', 'description' => 'name']);
+
+			CArrayHelper::sort($triggers, [
+				['field' => 'name', 'order' => ZBX_SORT_UP]
+			]);
+
+			foreach ($triggers as &$trigger) {
+				$trigger['prefix'] = $trigger['hosts'][0]['name'].NAME_DELIMITER;
+				unset($trigger['hosts']);
+			}
+		}
+
+		// Hosts multiselect.
+		if ($filter['hostids']) {
+			$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter['hostids']
+			]), ['hostid' => 'id']);
+		}
+
 		$data = [
 			'groups' => $host_groups,
-			'hosts' => [],
-			'triggers' => [],
-			'inventories' => [],
+			'hosts' => $hosts,
+			'triggers' => $triggers
 		];
 
 		return $data;

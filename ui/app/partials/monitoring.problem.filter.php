@@ -24,8 +24,8 @@ $left_column = (new CFormList())
 	->addRow(_('Show'),
 		(new CRadioButtonList('show', (int) $data['show']))
 			->addValue(_('Recent problems'), TRIGGERS_OPTION_RECENT_PROBLEM, 'show_1#{uniqid}')
-			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM, 'show_2#{uniqid}')
-			->addValue(_('History'), TRIGGERS_OPTION_ALL, 'show_3#{uniqid}')
+			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM, 'show_3#{uniqid}')
+			->addValue(_('History'), TRIGGERS_OPTION_ALL, 'show_2#{uniqid}')
 			->setId('show_#{uniqid}')
 			->setModern(true)
 	)
@@ -65,8 +65,7 @@ $left_column = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('hostids_#{uniqid}')
 	)
 	->addRow(_('Application'), [
-		(new CTextBox('application', $data['application']))
-			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+		(new CTextBox('application', $data['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 	])
@@ -115,16 +114,11 @@ $left_column
 		_('days')
 	]);
 
-$filter_inventory = $data['inventory'];
-if (!$filter_inventory) {
-	$filter_inventory = [['field' => '', 'value' => '']];
-}
-
 $filter_inventory_table = new CTable();
 $filter_inventory_table->setId('filter-inventory_#{uniqid}');
 $inventories = array_column(getHostInventories(), 'title', 'db_field');
 $i = 0;
-foreach ($filter_inventory as $field) {
+foreach ($data['inventory'] as $field) {
 	$filter_inventory_table->addRow([
 		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventories),
 		(new CTextBox('inventory['.$i.'][value]', $field['value']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
@@ -145,11 +139,6 @@ $filter_inventory_table->addRow(
 	))->setColSpan(3)
 );
 
-$filter_tags = $data['tags'];
-if (!$filter_tags) {
-	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-}
-
 $filter_tags_table = new CTable();
 $filter_tags_table->setId('filter-tags_#{uniqid}');
 
@@ -163,7 +152,7 @@ $filter_tags_table->addRow(
 );
 
 $i = 0;
-foreach ($filter_tags as $tag) {
+foreach ($data['tags'] as $tag) {
 	$filter_tags_table->addRow([
 		(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
 			->setAttribute('placeholder', _('tag'))
@@ -194,21 +183,21 @@ $filter_tags_table->addRow(
 
 $tag_format_line = (new CHorList())
 	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
-			->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
-			->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
-			->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
-			->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
-			->setModern(true)
-			->setId('show_tags_#{uniqid}')
+		->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
+		->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
+		->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
+		->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
+		->setModern(true)
+		->setId('show_tags_#{uniqid}')
 	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
 	->addItem(new CLabel(_('Tag name')))
 	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
-			->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL)
-			->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED)
-			->addValue(_('None'), PROBLEMS_TAG_NAME_NONE)
-			->setModern(true)
-			->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
+		->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL)
+		->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED)
+		->addValue(_('None'), PROBLEMS_TAG_NAME_NONE)
+		->setModern(true)
+		->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
 	);
 
 $right_column = (new CFormList())
@@ -265,15 +254,6 @@ $right_column = (new CFormList())
 			->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	]);
 
-// $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
-// 	->setProfile($data['profileIdx'])
-// 	->setActiveTab($data['active_tab'])
-// 	->addFormItem((new CVar('action', 'problem.view'))->removeId());
-
-// if ($data['show'] == TRIGGERS_OPTION_ALL) {
-// 	$filter->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
-// }
-
 $template = (new CDiv())
 	->addClass(ZBX_STYLE_TABLE)
 	->addClass(ZBX_STYLE_FILTER_FORMS)
@@ -304,127 +284,202 @@ if (array_key_exists('render_html', $data)) {
 	->addItem($template)
 	->show();
 
+(new CScriptTemplate('filter-inventory-row'))
+	->addItem(
+		(new CRow([
+			new CComboBox('inventory[#{rowNum}][field]', null, null, $inventories),
+			(new CTextBox('inventory[#{rowNum}][value]', '#{value}'))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('inventory[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->addClass('form_row')
+	)
+	->show();
+
+(new CScriptTemplate('filter-tag-row-tmpl'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->addClass('form_row')
+	)
+	->show();
+
 ?>
 <script type="text/javascript">
-let template = document.querySelector('[data-template="monitoring.problem.filter"]');
+	let template = document.querySelector('[data-template="monitoring.problem.filter"]');
 
-function render(data, container) {
-	// Host groups multiselect.
-	$('#groupids_' + data.uniqid, container).multiSelectHelper({
-		id: 'groupids_' + data.uniqid,
-		object_name: 'hostGroup',
-		name: 'groupids[]',
-		data: data.groups||[],
-		popup: {
-			parameters: {
-				srctbl: 'host_groups',
-				srcfld1: 'groupid',
-				dstfrm: 'zbx_filter',
-				dstfld1: 'groupids_' + data.uniqid,
-				multiselect: 1,
-				noempty: 1,
-				real_hosts: 1,
-				enrich_parent_groups: 1
+	function render(data, container) {
+		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
+		$('[name="filter_new"],[name="filter_update"]').hide()
+			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+
+		let fields = ['show', 'application', 'name', 'tag_priority', 'show_opdata', 'show_suppressed',
+			'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row'
+		];
+
+		// Input, radio and single checkboxes.
+		fields.forEach((key) => {
+			var elm = $('[name="' + key + '"]', container);
+
+			if (elm.is(':radio,:checkbox')) {
+				elm.filter('[value="' + data[key] + '"]').attr('checked', true);
 			}
-		}
-	});
-
-	// Hosts multiselect.
-	$('#hostids_' + data.uniqid, container).multiSelectHelper({
-		id: 'hostids_' + data.uniqid,
-		object_name: 'hosts',
-		name: 'hostids_[]',
-		data: data.groups_multiselect||[],
-		popup: {
-			filter_preselect_fields: {
-				hostgroups: 'groupids_' + data.uniqid
-			},
-			parameters: {
-				srctbl: 'hosts',
-				srcfld1: 'hostid',
-				dstfrm: 'zbx_filter',
-				dstfld1: 'hostids_' + data.uniqid,
+			else {
+				elm.val(data[key]);
 			}
-		}
-	});
+		});
 
-	// Application
-	$('[name="application_select"]').on('click', function() {
-		let options = {
-				srctbl: 'applications',
-				srcfld1: 'name',
-				dstfrm: 'zbx_filter',
-				dstfld1: 'application',
-				with_applications: '1',
-				real_hosts: '1'
-			};
+		// Severities checkboxes.
+		Object.keys(data.severities).forEach((value) => {
+			$('[name="severities[' + value + ']"]', container).attr('checked', true);
+		});
 
-		PopUp("popup.generic", $.extend(options, getFirstMultiselectValue("hostids_" + data.uniqid)), null, this);
-	});
+		// Inventory table.
+		$('#filter-inventory_' + data.uniqid, container).dynamicRows({
+			template: '#filter-inventory-row',
+			rows: data.inventory,
+			counter: 0
+		});
 
-	// Triggers multiselect.
-	$('#triggerids_' + data.uniqid, container).multiSelectHelper({
-		id: 'triggerids_' + data.uniqid,
-		object_name: 'triggers',
-		name: 'triggerids[]',
-		data: data.triggers||[],
-		popup: {
-			filter_preselect_fields: {
-				hosts: 'hostids_' + data.uniqid
-			},
-			parameters: {
-				srctbl: 'triggers',
-				srcfld1: 'triggerid',
-				dstfrm: 'zbx_filter',
-				dstfld1: 'triggerids_' + data.uniqid,
-				multiselect: 1,
-				noempty: 1,
-				monitored_hosts: 1,
-				with_monitored_triggers: 1
+		// Tags table.
+		$('#filter-tags_' + data.uniqid, container).dynamicRows({
+			template: '#filter-tag-row-tmpl',
+			rows: data.tags,
+			counter: 0
+		});
+
+		// Host groups multiselect.
+		$('#groupids_' + data.uniqid, container).multiSelectHelper({
+			id: 'groupids_' + data.uniqid,
+			object_name: 'hostGroup',
+			name: 'groupids[]',
+			data: data.groups||[],
+			popup: {
+				parameters: {
+					srctbl: 'host_groups',
+					srcfld1: 'groupid',
+					dstfrm: 'zbx_filter',
+					dstfld1: 'groupids_' + data.uniqid,
+					multiselect: 1,
+					noempty: 1,
+					real_hosts: 1,
+					enrich_parent_groups: 1
+				}
 			}
-		}
+		});
+
+		// Hosts multiselect.
+		$('#hostids_' + data.uniqid, container).multiSelectHelper({
+			id: 'hostids_' + data.uniqid,
+			object_name: 'hosts',
+			name: 'hostids[]',
+			data: data.hosts||[],
+			popup: {
+				filter_preselect_fields: {
+					hostgroups: 'groupids_' + data.uniqid
+				},
+				parameters: {
+					srctbl: 'hosts',
+					srcfld1: 'hostid',
+					dstfrm: 'zbx_filter',
+					dstfld1: 'hostids_' + data.uniqid,
+				}
+			}
+		});
+
+		// Application
+		$('[name="application_select"]').on('click', function() {
+			let options = {
+					srctbl: 'applications',
+					srcfld1: 'name',
+					dstfrm: 'zbx_filter',
+					dstfld1: 'application',
+					with_applications: '1',
+					real_hosts: '1'
+				};
+
+			PopUp("popup.generic", $.extend(options, getFirstMultiselectValue("hostids_" + data.uniqid)), null, this);
+		});
+
+		// Triggers multiselect.
+		$('#triggerids_' + data.uniqid, container).multiSelectHelper({
+			id: 'triggerids_' + data.uniqid,
+			object_name: 'triggers',
+			name: 'triggerids[]',
+			data: data.triggers||[],
+			popup: {
+				filter_preselect_fields: {
+					hosts: 'hostids_' + data.uniqid
+				},
+				parameters: {
+					srctbl: 'triggers',
+					srcfld1: 'triggerid',
+					dstfrm: 'zbx_filter',
+					dstfld1: 'triggerids_' + data.uniqid,
+					multiselect: 1,
+					noempty: 1,
+					monitored_hosts: 1,
+					with_monitored_triggers: 1
+				}
+			}
+		});
+
+		$('#show_' + data.uniqid, container).change(() => {
+			var	filter_show = $('input[name="show"]:checked', container).val();
+
+			$('[name="age"]', container).closest('li').toggle(filter_show != <?= TRIGGERS_OPTION_ALL ?>);
+
+			if (this._parent) {
+				this._parent.updateTimeselector();
+			}
+		}).trigger('change');
+
+		$('[name="age_state"]').change(function() {
+			$('[name="age"]').prop('disabled', !$(this).is(':checked'));
+		});
+
+		$('[name="compact_view"]', container).change(function() {
+			let checked = $(this).is(':checked');
+
+			$('[name="show_timeline"],[name="details"],[name="show_opdata"]', container).prop('disabled', checked);
+			$('[name="highlight_row"]', container).prop('disabled', !checked);
+		});
+
+		$('[name="show_tags"]').change(function () {
+			let disabled = (this.value == <?= PROBLEMS_SHOW_TAGS_NONE ?>);
+
+			$('[name="tag_priority"]', container).prop('disabled', disabled);
+			$('[name="tag_name_format"]', container).prop('disabled', disabled);
+		});
+	}
+
+	function expand(data, container) {
+		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
+		$('[name="filter_new"],[name="filter_update"]').hide()
+			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+	}
+
+	// Tab filter item events handlers.
+	template.addEventListener(TABFILTERITEM_EVENT_RENDER, function (ev) {
+		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
-
-	$('#filter-inventory_' + data.uniqid, container).dynamicRows({template: '#filter-inventory-row'});
-	$('#filter-tags_' + data.uniqid, container).dynamicRows({template: '#filter-tag-row-tmpl'});
-
-	$('#show_' + data.uniqid, container).change(function() {
-		var	filter_show = $('input[name="show"]:checked', container).val();
-
-		$('[name="age"]', container).closest('li').toggle(filter_show == <?= TRIGGERS_OPTION_RECENT_PROBLEM ?>
-			|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>);
-	}).trigger('change');
-
-	$('[name="age_state"]').change(function() {
-		$('[name="age"]').prop('disabled', !$(this).is(':checked'));
+	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
+		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
-
-	$('[name="compact_view"]', container).change(function() {
-		let checked = $(this).is(':checked');
-
-		$('[name="show_timeline"],[name="details"],[name="show_opdata"]', container).prop('disabled', checked);
-		$('[name="highlight_row"]', container).prop('disabled', !checked);
-	});
-
-	$('[name="show_tags"]').change(function () {
-		let disabled = (this.value == <?= PROBLEMS_SHOW_TAGS_NONE ?>);
-
-		$('[name="tag_priority"]', container).prop('disabled', disabled);
-		$('[name="tag_name_format"]', container).prop('disabled', disabled);
-	});
-}
-
-function expand(data, container) {
-
-}
-
-template.onRender = render;
-
-// Tab filter item events handlers.
-template.addEventListener(TABFILTERITEM_EVENT_RENDER, function (ev) {
-	render.call(ev.detail, ev.detail._data, ev.detail._content_container);
-});
-template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
-	expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
-});
 </script>

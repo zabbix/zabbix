@@ -65,19 +65,17 @@ switch ($data['filter']['show']) {
 		break;
 
 	case TRIGGERS_OPTION_ALL:
-		$options['profileIdx'] = $data['profileIdx'];
+		$options['profileIdx'] = $data['tabfilter_idx'];
 		$options['profileIdx2'] = $data['profileIdx2'];
-		$options['from'] = $data['from'];
-		$options['to'] = $data['to'];
+		$options['from'] = $data['filter']['from'];
+		$options['to'] = $data['filter']['to'];
 		break;
 }
 
 $screen = CScreenBuilder::getScreen($options);
 
 if ($data['action'] === 'problem.view') {
-	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$this->addJsFile('class.calendar.js');
-	}
+	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
@@ -106,12 +104,16 @@ if ($data['action'] === 'problem.view') {
 		);
 
 	if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
+		$defaults = [
+			'tags' => [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]],
+			'inventory' => [['field' => 'type', 'value' => '']]
+		];
 		$filter = (new CTabFilter())
-			->setId('monitoringproblemfilter')
+			->setId('monitoring_problem_filter')
 			->setIdx($data['tabfilter_idx'])
 			->setSelected((int) $data['tab_selected'])
 			->setExpanded((bool) $data['tab_expanded'])
-			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults'] + $defaults));
 
 		foreach ($data['filter_tabs'] as $tab) {
 			$tab['tab_view'] = $data['filter_view'];
@@ -119,7 +121,7 @@ if ($data['action'] === 'problem.view') {
 		}
 
 		$filter->addTimeselector($data['timerange']);
-		// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
+		// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
 		$data['filter_options'] = $filter->options;
 		$widget->addItem($filter);
 

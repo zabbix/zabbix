@@ -160,6 +160,7 @@ class CRouter {
 		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',					'layout.json',			'popup.triggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
 		'problem.view'					=> ['CControllerProblemView',						'layout.htmlpage',		'monitoring.problem.view'],
+		'problem.view.refresh'			=> ['CControllerProblemViewRefresh',				'layout.json',			'monitoring.problem.view.refresh'],
 		'problem.view.csv'				=> ['CControllerProblemView',						'layout.csv',			'monitoring.problem.view'],
 		'profile.update'				=> ['CControllerProfileUpdate',						'layout.json',			null],
 		'tabfilter.profile.update'		=> ['CControllerTabFilterProfileUpdate',			'layout.json',			null],

@@ -23,78 +23,66 @@
  * @var CView $this
  */
 ?>
-
-<script type="text/x-jquery-tmpl" id="filter-inventory-row">
-	<?= (new CRow([
-			new CComboBox('filter_inventory[#{rowNum}][field]', null, null, $data['inventories']),
-			(new CTextBox('filter_inventory[#{rowNum}][value]'))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_inventory[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
-
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= (new CRow([
-			(new CTextBox('filter_tags[#{rowNum}][tag]'))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('filter_tags[#{rowNum}][value]'))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
-
 <script type="text/javascript">
 	jQuery(function($) {
-		$(function() {
-			$('#filter-inventory').dynamicRows({template: '#filter-inventory-row'});
-			$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
-		});
+		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>);
 
-		$('#filter_show').change(function() {
-			var	filter_show = jQuery('input[name=filter_show]:checked').val();
+		filter.on(TABFILTER_EVENT_URLSET, (ev) => {
+			// Modify filter data of flickerfreeScreen object with id 'problem'.
+			var form = filter._active_item._content_container.querySelector('form'),
+				filter_data = window.flickerfreeScreen.screens.problem.data.filter;
 
-			$('#filter_age').closest('li').toggle(filter_show == <?= TRIGGERS_OPTION_RECENT_PROBLEM ?>
-				|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>);
-		});
+			// Show
+			filter_data.show = form.elements.show.value;
 
-		$('#filter_show').trigger('change');
+			// Host groups
+			filter_data.groupids = [];
 
-		$('#filter_compact_view').change(function() {
-			if ($(this).is(':checked')) {
-				$('#filter_show_timeline, #filter_details').prop('disabled', true);
-				$('input[name=filter_show_opdata]').prop('disabled', true);
-				$('#filter_highlight_row').prop('disabled', false);
+			if (form.elements['groupids[]'] instanceof HTMLElement) {
+				filter_data.groupids = [form.elements['groupids[]'].value];
 			}
-			else {
-				$('#filter_show_timeline, #filter_details').prop('disabled', false);
-				$('input[name=filter_show_opdata]').prop('disabled', false);
-				$('#filter_highlight_row').prop('disabled', true);
+			else if (form.elements['groupids[]']) {
+				filter_data.groupids = [].map.call(form.elements['groupids[]'], host => host.value);
 			}
-		});
 
-		$('#filter_show_tags').change(function() {
-			var disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
-			$('#filter_tag_priority').prop('disabled', disabled);
-			$('#filter_tag_name_format input').prop('disabled', disabled);
+			// Hosts
+			filter_data.hostids = [];
+
+			if (form.elements['hostids[]'] instanceof HTMLElement) {
+				filter_data.hostids = [form.elements['hostids[]'].value];
+			}
+			else if (form.elements['hostids[]']) {
+				filter_data.hostids = [].map.call(form.elements['hostids[]'], host => host.value);
+			}
+
+			// Application
+			// Triggers
+			// Problem
+			// Severity
+			// Host inventory
+			filter_data.inventory = [];
+
+			for (const elm in form.querySelectorAll('[name^="inventory["')) {
+				// Uff fill data from multidimensional inputs manually.
+			}
+
+			// Tags
+			// Show tags
+			// Tag display priority
+			// Show operation data
+			// Show suppressed problems
+			// Show unacknowledged only
+			// Compact view
+			// Show timeline
+			// Show details
+			// Highlight whole row
+
+			console.log('filter set data', window.flickerfreeScreen.screens.problem.data.filter);
+
+			$.publish('timeselector.rangeupdate', {
+				from: 'now-1y',
+				to: 'now'
+			});
 		});
 
 		$(document).on({
