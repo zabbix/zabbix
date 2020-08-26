@@ -604,8 +604,8 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$result = [];
 
-	foreach (array_filter($parts) as $unit => $value) {
-		$result[] = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
+	foreach (array_filter($parts) as $part_unit => $part_value) {
+		$result[] = formatFloat($part_value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$part_unit];
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
