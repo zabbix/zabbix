@@ -126,7 +126,7 @@ class CControllerProxyList extends CController {
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 			);
-			$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
+			$server_status = $server->getStatus(CSessionHelper::getId());
 
 			if ($server_status !== false) {
 				$defaults = [

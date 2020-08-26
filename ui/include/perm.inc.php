@@ -95,8 +95,8 @@ function check_perm2login($userId) {
  *
  * @return int
  */
-function getUserGuiAccess($userid) {
-	if (bccomp($userid, CWebUser::$data['userid']) == 0 && isset(CWebUser::$data['gui_access'])) {
+function getUserGuiAccess(string $userid): int {
+	if (isset(CWebUser::$data['gui_access'])) {
 		return CWebUser::$data['gui_access'];
 	}
 

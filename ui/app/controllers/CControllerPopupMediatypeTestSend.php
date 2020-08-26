@@ -134,7 +134,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $server->testMediaType($params, CWebUser::getSessionCookie());
+		$result = $server->testMediaType($params, CSessionHelper::getId());
 		$debug = $server->getDebug();
 
 		if ($result) {

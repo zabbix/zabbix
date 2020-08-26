@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T00:00:00Z</date>
+    <date>2020-08-11T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Slack</name>
@@ -76,8 +76,8 @@
                     <value>{EVENT.VALUE}</value>
                 </parameter>
                 <parameter>
-                    <name>host_ip</name>
-                    <value>{HOST.IP}</value>
+                    <name>host_conn</name>
+                    <value>{HOST.CONN}</value>
                 </parameter>
                 <parameter>
                     <name>host_name</name>
@@ -352,7 +352,7 @@ function createMessage(&#13;
         fields: [&#13;
             {&#13;
                 title: 'Host',&#13;
-                value: '{0} [{1}]'.format(params.host_name, params.host_ip),&#13;
+                value: '{0} [{1}]'.format(params.host_name, params.host_conn),&#13;
                 short: true&#13;
             },&#13;
             {&#13;
@@ -428,8 +428,8 @@ function validateParams(params) {&#13;
         throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
-    if (typeof params.host_ip !== 'string' || params.host_ip.trim() === '') {&#13;
-        throw 'Field &quot;host_ip&quot; cannot be empty';&#13;
+    if (typeof params.host_conn !== 'string' || params.host_conn.trim() === '') {&#13;
+        throw 'Field &quot;host_conn&quot; cannot be empty';&#13;
     }&#13;
 &#13;
     if (typeof params.host_name !== 'string' || params.host_name.trim() === '') {&#13;

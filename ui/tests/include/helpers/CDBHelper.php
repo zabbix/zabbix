@@ -237,15 +237,14 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 
 		foreach ($tables as $table) {
-			DBexecute('drop table if exists '.$table.$suffix);
+			DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
 
 			switch ($DB['TYPE']) {
 				case ZBX_DB_MYSQL:
-					DBexecute('create table '.$table.$suffix.' like '.$table);
-					DBexecute('insert into '.$table.$suffix.' select * from '.$table);
+					DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
 					break;
 				default:
-					DBexecute('select * into table '.$table.$suffix.' from '.$table);
+					DBexecute('SELECT * INTO TABLE '.$table.$suffix.' FROM '.$table);
 			}
 		}
 	}
@@ -265,24 +264,22 @@ class CDBHelper {
 		$tables = array_pop(self::$backups);
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			$result = DBselect('select @@unique_checks,@@foreign_key_checks');
+			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');
 			$row = DBfetch($result);
-			DBexecute('set unique_checks=0');
-			DBexecute('set foreign_key_checks=0');
+			DBexecute('SET unique_checks=0,foreign_key_checks=0');
 		}
 
 		foreach (array_reverse($tables) as $table) {
-			DBexecute('delete from '.$table);
+			DBexecute('DELETE FROM '.$table);
 		}
 
 		foreach ($tables as $table) {
-			DBexecute('insert into '.$table.' select * from '.$table.$suffix);
-			DBexecute('drop table '.$table.$suffix);
+			DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
+			DBexecute('DROP TABLE '.$table.$suffix);
 		}
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			DBexecute('set foreign_key_checks='.$row['@@foreign_key_checks']);
-			DBexecute('set unique_checks='.$row['@@unique_checks']);
+			DBexecute('SET foreign_key_checks='.$row['@@foreign_key_checks'].',unique_checks='.$row['@@unique_checks']);
 		}
 	}
 

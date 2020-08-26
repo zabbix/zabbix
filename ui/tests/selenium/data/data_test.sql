@@ -400,6 +400,12 @@ INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (10,'{
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (11,'{$1}','Numeric macro','Test description 1');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (12,'{$_}','Underscore','');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$WORKING_HOURS}','1-5,09:00-18:00','Test description 3');
+INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (14,'{$X_SECRET_2_SECRET}','This text should stay secret','This text should stay secret', 1);
+INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (15,'{$X_TEXT_2_SECRET}','This text should become secret','This text should become secret', 0);
+INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (16,'{$X_SECRET_2_TEXT}','This text should become visible','This text should become visible', 1);
+INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (17,'{$Y_SECRET_MACRO_REVERT}','Changes value and revert','' , 1);
+INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (18,'{$Y_SECRET_MACRO_2_TEXT_REVERT}','Change value and type and revert','' , 1);
+INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (19,'{$Z_GLOBAL_MACRO_2_RESOLVE}','Value 2 B resolved','' , 0);
 
 -- Adding records into Auditlog
 
@@ -1376,7 +1382,7 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (513,
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,posts,headers) VALUES ('Item-proto-layout-test-002', 'item-proto-layout-test002', 50007, 3, 40061, 2, 5, '', '','','');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (514, 40061, 40059);
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40062,0,50006,'Item-layout-test-001','item-layout-test-001','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50020,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40063,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'',0,'30','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40063,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'{{$A}}',0,'30','','');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100022,'{100022}=0','Trigger-proto-layout-test-001','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100022,40060,100022,'last','0');
 INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (100023, '{100023}=0', 'Trigger-proto-layout-test-001', '', 2);
@@ -1762,9 +1768,9 @@ INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastchec
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'Host for different item types', 'Host for different items types', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90281, 50010, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50023,50010,1,1,1,'127.0.0.1','','10050');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99004, 19, 50010, 'Http agent item form', '', 'http-item-form', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99005, 19, 50010, 'Http agent item for update', '', 'http-item-update', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '', 'http-item-delete', 30, 50023, '', '', 'zabbix.com', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99004, 19, 50010, 'Http agent item form', '{$_} {$NONEXISTING}', 'http-item-form', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99005, 19, 50010, 'Http agent item for update', '{$LOCALIP} {$A}', 'http-item-update', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '{$A} and IP number {$LOCALIP}', 'http-item-delete', 30, 50023, '', '', 'zabbix.com', '', '');
 
 -- testInheritanceApplication
 INSERT INTO applications (applicationid, hostid, name) VALUES (99001, 15000, 'Inheritance application');
@@ -1959,7 +1965,7 @@ INSERT INTO hstgrp (groupid,name,internal) VALUES (50009,'Copy graph to several 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99027, 'Host 1 from first group', 'Host 1 from first group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99025, 99027, 50009);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50037,99027,1,1,1,'127.0.0.1','','10050');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99020, 2, 99027, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99020, 2, 99027, 'Item to check graph', '{$A}', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50010,'Copy graph to several groups 2',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Host 1 from second group', 'Host 1 from second group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99026, 99028, 50010);
@@ -2359,6 +2365,19 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99502, 99201, '{$DELETE_MACRO_1}', 'Delete macro value 1', 'Delete macro description 1');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99503, 99201, '{$DELETE_MACRO_2}', 'Delete macro value 2', 'Delete macro description 2');
 
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99205, 'Host prototype for Secret macros {#CREATE}', 'Host prototype for Secret macros {#CREATE}', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99205, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222092, 99205, '', 5, NULL);
+
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99206, 'Host prototype for Secret macros {#UPDATE}', 'Host prototype for Secret macros {#UPDATE}', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99206, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222093, 99206, '', 5, NULL);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99504, 99206, '{$PROTOTYPE_SECRET_2_SECRET}', 'This text should stay secret', 'Secret macro to me updated', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99505, 99206, '{$PROTOTYPE_SECRET_2_TEXT}', 'This text should become visible', 'Secret macro to become visible', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99506, 99206, '{$PROTOTYPE_TEXT_2_SECRET}', 'This text should become secret', 'Text macro to become secret', 0);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99507, 99206, '{$Z_HOST_PROTOTYPE_MACRO_REVERT}', 'Secret host value', 'Value change Revert', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99508, 99206, '{$Z_HOST_PROTOTYPE_MACRO_2_TEXT_REVERT}', 'Secret host value 2', 'Value and type change revert', 1);
+
 -- testFormAdministrationMediaTypeWebhook
 INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (101, 4, 'Reference webhook', 0, 'return 0;', 'Reference webhook media type');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1000, 101, 'URL', '');
@@ -2412,7 +2431,7 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700044, 7
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700045, 700033, 99104, 2);
 INSERT INTO graphs (graphid, name, flags) VALUES (700034, 'Dynamic widgets H1 GP3 (H1IP1)', 2);
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700046, 700034, 99108, 0);
-INSERT INTO graphs (graphid, name, flags) VALUES (700035, 'Dynamic widgets H1 GP4 (H1IP1 and H2I2)', 2);
+INSERT INTO graphs (graphid, name, flags) VALUES (700035, 'Dynamic widgets H1 GP4 (H1IP1 and H2I1)', 2);
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700047, 700035, 99108, 0);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99203, 'Dynamic widgets H2', 'Dynamic widgets H2', 0, '');
@@ -2432,7 +2451,7 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700049, 7
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700050, 700037, 99111, 1);
 INSERT INTO graphs (graphid, name, flags) VALUES (700038, 'Dynamic widgets H2 GP3 (H2IP1)', 2);
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700051, 700038, 99111, 0);
-INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700052, 700035, 99105, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700052, 700035, 99105, 1);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99204, 'Dynamic widgets H3', 'Dynamic widgets H3', 0, '');
 INSERT INTO hstgrp (groupid, name, internal) VALUES (50018, 'Dynamic widgets HG2 (H3)', 0);
@@ -2614,11 +2633,9 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904030, 164, 0, 'ext_ack', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904031, 164, 0, 'hide_empty_groups', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904032, 164, 0, 'rf_rate', 30);
--- delete this line and add three following after ZBX-17812 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904033, 164, 0, 'severities', 4);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904034, 164, 0, 'severities', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904035, 164, 0, 'severities', 3);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904036, 164, 0, 'severities', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904034, 164, 0, 'severities', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904035, 164, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904036, 164, 0, 'severities', 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904037, 164, 0, 'show_suppressed', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904038, 164, 0, 'tags.operator.0', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904039, 164, 1, 'problem', 0, 'Test');
@@ -2631,11 +2648,9 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (165, 130, 'problems', 'Test copy Problems', 0, 12, 8, 6);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904045, 165, 0, 'evaltype', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904046, 165, 0, 'rf_rate', 900);
--- delete this line and add three following after ZBX-17812 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904047, 165, 0, 'severities', 5);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90321, 165, 0, 'severities', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90415, 165, 0, 'severities', 4);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90416, 165, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90321, 165, 0, 'severities', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90415, 165, 0, 'severities', 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90416, 165, 0, 'severities', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904048, 165, 0, 'show', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904049, 165, 0, 'show_lines', 12);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904050, 165, 0, 'show_opdata', 1);
@@ -2690,10 +2705,8 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904092, 167, 0, 'ext_ack', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904093, 167, 0, 'layout', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904094, 167, 0, 'rf_rate', 30);
--- delete this line and add following after ZBX-17812 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904095, 167, 0, 'severities', 5);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904096, 167, 0, 'severities', 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904097, 167, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904096, 167, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904097, 167, 0, 'severities', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904098, 167, 0, 'show_opdata', 2);
 -- change show_timeline to 0 after ZBX-17813 is fixed:
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904099, 167, 0, 'show_timeline', 1);
@@ -2734,12 +2747,11 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (172, 130, 'problems', 'Test copy Problems 3', 10, 21, 14, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905024, 172, 0, 'evaltype', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905025, 172, 0, 'rf_rate', 60);
--- add following lines after ZBX-17812 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905026, 172, 0, 'severities', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905027, 172, 0, 'severities', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905028, 172, 0, 'severities', 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905029, 172, 0, 'severities', 3);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905030, 172, 0, 'severities', 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905026, 172, 0, 'severities', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905027, 172, 0, 'severities', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905028, 172, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905029, 172, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905030, 172, 0, 'severities', 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905031, 172, 0, 'severities', 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905032, 172, 0, 'show', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905033, 172, 0, 'show_lines', 5);
@@ -2804,7 +2816,50 @@ INSERT INTO lld_override_opseverity (lld_override_operationid, severity) values 
 INSERT INTO lld_override_opstatus (lld_override_operationid, status) values (400, 0);
 
 INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (300, 401, 'tag1', 'value1');
+INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (301, 403, 'name1', 'value1');
+INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (302, 403, 'name2', 'value2');
 
 INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_operationid, templateid) values (300, 403, 99137);
 
 INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (400, 0);
+
+UPDATE config SET session_key='caf1c06dcf802728c4cfc24d645e1e73' WHERE configid = 1;
+
+-- testFormHostMacros
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99509, 99135, '{$SECRET_HOST_MACRO_REVERT}', 'Secret host value', 'Secret host macro description', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99510, 99135, '{$SECRET_HOST_MACRO_2_TEXT_REVERT}', 'Secret host value 2 text', 'Secret host macro that will be changed to text', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99511, 99135, '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}', 'Secret host value 2 B updated', 'Secret host macro that is going to be updated', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99512, 99135, '{$TEXT_HOST_MACRO_2_SECRET}', 'Text host macro value', 'Text host macro that is going to become secret', 0);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99513, 99135, '{$SECRET_HOST_MACRO_UPDATE}', 'Secret host macro value', 'Secret host macro that is going to stay secret', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99514, 99135, '{$X_SECRET_HOST_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Host macro to be resolved', 0);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99515, 99011, '{$SECRET_HOST_MACRO}', 'some secret value', '', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99516, 99011, '{$TEXT_HOST_MACRO}', 'some text value', '', 0);
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99112, 2, 99135, 'Macro value: {$X_SECRET_HOST_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+
+-- testFormTemplateMacros
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99517, 99137, '{$SECRET_TEMPLATE_MACRO_REVERT}', 'Secret template value', 'Secret template macro description', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99518, 99137, '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}', 'Secret template value 2 text', 'Secret template macro that will be changed to text', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99519, 99137, '{$SECRET_TEMPLATE_MACRO_UPDATE_2_TEXT}', 'Secret template value 2 B updated', 'Secret template macro that is going to be updated', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99520, 99137, '{$TEXT_TEMPLATE_MACRO_2_SECRET}', 'Text template macro value', 'Text template macro that is going to become secret', 0);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99521, 99137, '{$SECRET_TEMPLATE_MACRO_UPDATE}', 'Secret template macro value', 'Secret template macro that is going to stay secret', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99522, 99137, '{$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Template macro to be resolved', 0);
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99113, 2, 99137, 'Macro value: {$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+
+-- testFormAdministrationGeneralMacros
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+
+-- tags in host prototypes
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (450, 90002, 'host_proto_tag_1', 'value1');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (451, 90002, 'host_proto_tag_2', 'value2');
+
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99450, '{#HOST} prototype with tags for cloning', '{#HOST} prototype with tags for cloning', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99450, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223000, 99450, '', 4, NULL);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (452, 99450, 'action', 'clone');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (453, 99450, 'tag', 'host_prototype');
+
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99451, '{#HOST} prototype with tags for updating', '{#HOST} prototype with tags for updating', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99451, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223001, 99451, '', 4, NULL);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (454, 99451, 'action', 'update');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (455, 99451, 'tag', 'host_prototype');

@@ -102,4 +102,12 @@ class COverlayDialogElement extends CElement {
 		$this->query('class:overlay-close-btn')->one()->click();
 		return $this->waitUntilNotPresent();
 	}
+
+	/**
+	 * Wait until overlay dialogue and overlay dialogue background is not visible one page.
+	 */
+	public static function ensureNotPresent() {
+		(new CElementQuery('xpath', '//*['.CXPathHelper::fromClass('overlay-dialogue-body').' or '.
+				CXPathHelper::fromClass('overlay-bg').']'))->waitUntilNotVisible();
+	}
 }

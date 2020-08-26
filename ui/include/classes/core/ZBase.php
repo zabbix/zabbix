@@ -167,10 +167,14 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
+
 				$this->loadConfigFile();
 				$this->initDB();
 
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
+
+				// Start sesion only after DB initilized.
+				new CEncryptedCookieSession();
 
 				$this->authenticateUser();
 
@@ -198,12 +202,14 @@ class ZBase {
 				CProfiler::getInstance()->start();
 
 				$this->processRequest($router);
-
 				break;
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
+
+				new CEncryptedCookieSession();
+
 				$this->initLocales('en_gb');
 				break;
 
@@ -212,10 +218,16 @@ class ZBase {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
+
+					new CEncryptedCookieSession();
+
 					$this->authenticateUser();
+					$this->initComponents();
 					$this->initLocales(CWebUser::$data['lang']);
 				}
-				catch (ConfigFileException $e) {}
+				catch (ConfigFileException $e) {
+					new CCookieSession();
+				}
 				break;
 		}
 	}
@@ -420,26 +432,26 @@ class ZBase {
 	 * Set messages received in cookies.
 	 */
 	private function initMessages(): void {
-		foreach (['messageOk', 'messageError'] as $message_type) {
-			if (array_key_exists($message_type, $_COOKIE)) {
-				CSession::setValue($message_type, $_COOKIE[$message_type]);
-				zbx_setcookie($message_type, null, 1);
-			}
+		if (CCookieHelper::has('system-message-ok')) {
+			CMessageHelper::setSuccessTitle(CCookieHelper::get('system-message-ok'));
+			CCookieHelper::unset('system-message-ok');
+		}
+		if (CCookieHelper::has('system-message-error')) {
+			CMessageHelper::setErrorTitle(CCookieHelper::get('system-message-error'));
+			CCookieHelper::unset('system-message-error');
 		}
 	}
 
 	/**
 	 * Authenticate user.
 	 */
-	protected function authenticateUser() {
-		$sessionid = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
-
-		if (!$sessionid) {
+	protected function authenticateUser(): void {
+		if (!CWebUser::checkAuthentication(CSessionHelper::getId())) {
 			CWebUser::setDefault();
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = $sessionid;
+		API::getWrapper()->auth = CSessionHelper::getId();
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();
@@ -450,7 +462,7 @@ class ZBase {
 	 *
 	 * @param CRouter $router  CRouter class instance.
 	 */
-	private function processRequest(CRouter $router) {
+	private function processRequest(CRouter $router): void {
 		$action_name = $router->getAction();
 		$action_class = $router->getController();
 
@@ -501,52 +513,37 @@ class ZBase {
 				'theme' => ZBX_DEFAULT_THEME
 			]))->getOutput();
 
-			exit;
+			session_write_close();
+			exit();
 		}
 	}
 
-	private function processResponseFinal(CRouter $router, CAction $action) {
+	private function processResponseFinal(CRouter $router, CAction $action): void {
 		$response = $action->getResponse();
 
 		// Controller returned redirect to another page?
 		if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
-			if ($response->getMessageOk() !== null) {
-				CSession::setValue('messageOk', $response->getMessageOk());
-			}
-			if ($response->getMessageError() !== null) {
-				CSession::setValue('messageError', $response->getMessageError());
-			}
-			global $ZBX_MESSAGES;
-			if (isset($ZBX_MESSAGES)) {
-				CSession::setValue('messages', $ZBX_MESSAGES);
-			}
-			if ($response->getFormData() !== null) {
-				CSession::setValue('formData', $response->getFormData());
-			}
 
-			redirect($response->getLocation());
+			filter_messages();
+
+			$response->redirect();
 		}
 		// Controller returned fatal error?
 		elseif ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
 
-			global $ZBX_MESSAGES;
-			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
-			foreach ($messages as $message) {
-				$response->addMessage($message['message']);
-			}
+			filter_messages();
 
-			$response->addMessage('Controller: '.$router->getAction());
+			CMessageHelper::addError('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
 				if ($key !== 'sid') {
-					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
+					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
-			CSession::setValue('messages', $response->getMessages());
 
-			redirect('zabbix.php?action=system.warning');
+			$response->redirect();
 		}
 		// Action has layout?
 		if ($router->getLayout() !== null) {
@@ -591,7 +588,8 @@ class ZBase {
 			echo (new CView($router->getLayout(), $layout_data))->getOutput();
 		}
 
-		exit;
+		session_write_close();
+		exit();
 	}
 
 	/**

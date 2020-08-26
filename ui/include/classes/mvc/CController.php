@@ -61,7 +61,6 @@ abstract class CController {
 	private $validateSID = true;
 
 	public function __construct() {
-		CSession::start();
 		$this->init();
 	}
 
@@ -131,13 +130,39 @@ abstract class CController {
 	 * @return string
 	 */
 	public function getUserSID() {
-		$sessionid = CWebUser::getSessionCookie();
+		$sessionid = CSessionHelper::getId();
 
 		if ($sessionid === null || strlen($sessionid) < 16) {
 			return null;
 		}
 
 		return substr($sessionid, 16, 16);
+	}
+
+	/**
+	 * Parse form data.
+	 *
+	 * @return boolean
+	 */
+	protected function parseFormData(): bool {
+		$data = base64_decode(getRequest('data'));
+		$sign = base64_decode(getRequest('sign'));
+		$request_sign = CEncryptHelper::sign($data);
+
+		if (!CEncryptHelper::checkSign($sign, $request_sign)) {
+			info(_('Operation cannot be performed due to unauthorized request.'));
+			return false;
+		}
+
+		$data = json_decode($data, true);
+
+		$_REQUEST = array_merge($_REQUEST, $data['form']);
+
+		if ($data['messages']) {
+			CMessageHelper::setScheduleMessages($data['messages']);
+		}
+
+		return true;
 	}
 
 	/**
@@ -148,15 +173,14 @@ abstract class CController {
 	 * @return bool
 	 */
 	public function validateInput($validationRules) {
-		if (CSession::keyExists('formData')) {
-			$input = array_merge($_REQUEST, CSession::getValue('formData'));
-			CSession::unsetValue(['formData']);
-		}
-		else {
-			$input = $_REQUEST;
+		if (hasRequest('formdata')) {
+			$this->parseFormData();
+
+			// Replace window.history to avoid resubmission warning dialog.
+			zbx_add_post_js("history.replaceState({}, '');");
 		}
 
-		$validator = new CNewValidator($input, $validationRules);
+		$validator = new CNewValidator($_REQUEST, $validationRules);
 
 		foreach ($validator->getAllErrors() as $error) {
 			info($error);
@@ -313,7 +337,7 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function checkSID() {
-		$sessionid = CWebUser::getSessionCookie();
+		$sessionid = CSessionHelper::getId();
 
 		if ($sessionid === null || !isset($_REQUEST['sid'])) {
 			return false;

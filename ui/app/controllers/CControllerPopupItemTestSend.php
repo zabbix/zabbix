@@ -296,7 +296,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 			);
-			$result = $server->testItem($item_test_data, get_cookie('zbx_sessionid'));
+			$result = $server->testItem($item_test_data, CSessionHelper::getId());
 
 			// Handle the response.
 			if ($result === false) {
@@ -342,7 +342,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 			);
-			$result = $server->testPreprocessingSteps($preproc_test_data, get_cookie('zbx_sessionid'));
+			$result = $server->testPreprocessingSteps($preproc_test_data, CSessionHelper::getId());
 
 			if ($result === false) {
 				error($server->getError());

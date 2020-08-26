@@ -56,7 +56,7 @@ class CControllerApplicationCreate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('application.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Application added'));
+			CMessageHelper::setSuccessTitle(_('Application added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -64,7 +64,7 @@ class CControllerApplicationCreate extends CController {
 				->setArgument('hostid', $this->getInput('hostid'))
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot add application'));
+			CMessageHelper::setErrorTitle(_('Cannot add application'));
 		}
 
 		$this->setResponse($response);

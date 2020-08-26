@@ -114,7 +114,7 @@ class CPage {
 		$this->resetViewport();
 
 		if (self::$cookie !== null) {
-			$session_id = $this->driver->manage()->getCookieNamed('zbx_sessionid');
+			$session_id = $this->driver->manage()->getCookieNamed('zbx_session');
 
 			if ($session_id === null || !array_key_exists('value', $session_id)
 					|| $session_id['value'] !== self::$cookie['value']) {
@@ -177,12 +177,24 @@ class CPage {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
-		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
+		$cookie_sessionid = '';
+		if (self::$cookie !== null) {
+			$cookie = unserialize(base64_decode(self::$cookie['value']));
+			$cookie_sessionid = $cookie['sessionid'];
+		}
+
+		if (self::$cookie === null || $sessionid !== $cookie_sessionid) {
+			$data = ['sessionid' => $sessionid];
+
+			$config = CDBHelper::getRow('select session_key from config where configid=1');
+			$data['sign'] = openssl_encrypt(serialize($data), 'aes-256-ecb', $config['session_key']);
+
+			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
-				'name' => 'zbx_sessionid',
-				'value' => $sessionid,
+				'name' => 'zbx_session',
+				'value' => base64_encode(serialize($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
-				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
+				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
 			$this->driver->get(PHPUNIT_URL);
@@ -199,7 +211,7 @@ class CPage {
 	public function logout() {
 		try {
 			$session = (self::$cookie === null)
-					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_sessionid'), 'value')
+					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_session'), 'value')
 					: self::$cookie['value'];
 
 			if ($session !== null) {

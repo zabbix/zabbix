@@ -61,10 +61,10 @@ class CControllerApplicationDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Application deleted', 'Applications deleted', $deleted));
+			CMessageHelper::setSuccessTitle(_n('Application deleted', 'Applications deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete application', 'Cannot delete applications', $deleted));
+			CMessageHelper::setErrorTitle(_n('Cannot delete application', 'Cannot delete applications', $deleted));
 		}
 
 		$this->setResponse($response);
