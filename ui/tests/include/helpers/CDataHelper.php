@@ -62,7 +62,7 @@ class CDataHelper extends CAPIHelper {
 			throw new Exception('API call failed: result is not present');
 		}
 
-		static::$request = $params;
+		static::$request = (CTestArrayHelper::isAssociative($params)) ? [$params] : $params;
 		static::$response = $response['result'];
 
 		return static::$response;
