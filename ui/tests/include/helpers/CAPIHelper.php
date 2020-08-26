@@ -128,10 +128,26 @@ class CAPIHelper {
 
 	/**
 	 * Set session id.
+	 *
 	 * @param string $session    session id to be used.
 	 */
 	public static function setSessionId($session) {
 		static::$session = $session;
+	}
+
+	/**
+	 * Create session id.
+	 *
+	 * @param string $userid       user id to be used.
+	 * @param string $sessionid    session id to be used.
+	 */
+	public static function createSessionId($userid = 1, $sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a') {
+		if (!CDBHelper::getRow('select null from sessions where status=0 and userid='.zbx_dbstr($userid).
+				' and sessionid='.zbx_dbstr($sessionid))) {
+			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$userid.')');
+		}
+
+		static::$session = $sessionid;
 	}
 
 	/**
