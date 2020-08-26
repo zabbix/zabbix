@@ -22,7 +22,7 @@ package oracle
 import (
 	"context"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const keyProc = "oracle.proc.stats"

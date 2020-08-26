@@ -23,7 +23,7 @@ import (
 	"context"
 	"strings"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const keyTablespaces = "oracle.ts.stats"

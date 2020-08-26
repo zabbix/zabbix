@@ -23,7 +23,7 @@ import (
 	"context"
 	"database/sql"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const keyUser = "oracle.user.info"

@@ -23,7 +23,7 @@ import (
 	"context"
 	"strconv"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const keySessions = "oracle.sessions.stats"

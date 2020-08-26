@@ -23,7 +23,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const keySysMetrics = "oracle.sys.metrics"

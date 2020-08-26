@@ -23,7 +23,7 @@ import (
 	"context"
 	"fmt"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (

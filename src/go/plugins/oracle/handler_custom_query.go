@@ -25,7 +25,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const keyCustomQuery = "oracle.custom.query"

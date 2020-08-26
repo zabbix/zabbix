@@ -30,7 +30,7 @@ import (
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/log"
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 )
 
 type OraClient interface {

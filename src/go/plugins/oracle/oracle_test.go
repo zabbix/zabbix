@@ -31,7 +31,7 @@ import (
 	"strings"
 	"testing"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 
 	"github.com/omeid/go-yarn"
 

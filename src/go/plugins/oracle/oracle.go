@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"time"
 
-	"zabbix.com/plugins/oracle/zbxerr"
+	"zabbix.com/pkg/zbxerr"
 
 	"github.com/omeid/go-yarn"
 
