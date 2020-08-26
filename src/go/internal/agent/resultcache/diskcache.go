@@ -410,6 +410,7 @@ func (c *DiskCache) run() {
 
 func (c *DiskCache) updateOptions(options *agent.AgentOptions) {
 	c.storagePeriod = int64(options.PersistentBufferPeriod)
+	c.timeout = options.Timeout
 }
 
 func (c *DiskCache) insertResultTable(table string) string {

@@ -36,7 +36,7 @@ class COverlayDialogElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://div[contains(@class, "overlay-dialogue modal modal-popup")]'))->asOverlayDialog();
+		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'))->asOverlayDialog();
 	}
 
 	/**
@@ -101,5 +101,13 @@ class COverlayDialogElement extends CElement {
 	public function close() {
 		$this->query('class:overlay-close-btn')->one()->click();
 		return $this->waitUntilNotPresent();
+	}
+
+	/**
+	 * Wait until overlay dialogue and overlay dialogue background is not visible one page.
+	 */
+	public static function ensureNotPresent() {
+		(new CElementQuery('xpath', '//*['.CXPathHelper::fromClass('overlay-dialogue-body').' or '.
+				CXPathHelper::fromClass('overlay-bg').']'))->waitUntilNotVisible();
 	}
 }

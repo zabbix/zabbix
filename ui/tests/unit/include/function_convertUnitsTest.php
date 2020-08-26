@@ -306,6 +306,7 @@ class function_convertUnits extends PHPUnit_Framework_TestCase {
 			[ 'in' => ['value' => '0', 'units' => 's'],				'out'  => '0' ],
 			[ 'in' => ['value' => '1', 'units' => 's'],				'out'  => '1s' ],
 			[ 'in' => ['value' => '61', 'units' => 's'],			'out'  => '1m 1s' ],
+			[ 'in' => ['value' => '-61', 'units' => 's'],			'out'  => '-1m 1s' ],
 			[ 'in' => ['value' => '3601', 'units' => 's'],			'out'  => '1h 1s' ],
 			[ 'in' => ['value' => '1000000000', 'units' => 's'],	'out'  => '31y 8m 19d' ],
 			[ 'in' => ['value' => '1000000000', 'units' => '!s'],	'out'  => '1000000000 s' ],

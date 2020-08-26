@@ -371,7 +371,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($triggerPrototype = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -431,10 +431,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$this->validateCreate($trigger_prototypes);
 		$this->createReal($trigger_prototypes);
-
-		foreach ($trigger_prototypes as $trigger_prototype) {
-			$this->inherit($trigger_prototype);
-		}
+		$this->inherit($trigger_prototypes);
 
 		$addDependencies = false;
 
@@ -462,14 +459,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	public function update(array $trigger_prototypes) {
 		$trigger_prototypes = zbx_toArray($trigger_prototypes);
-		$db_triggers = [];
 
 		$this->validateUpdate($trigger_prototypes, $db_triggers);
 		$this->updateReal($trigger_prototypes, $db_triggers);
-
-		foreach ($trigger_prototypes as $trigger_prototype) {
-			$this->inherit($trigger_prototype);
-		}
+		$this->inherit($trigger_prototypes);
 
 		$updateDependencies = false;
 

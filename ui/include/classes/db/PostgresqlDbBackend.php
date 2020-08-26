@@ -265,7 +265,13 @@ class PostgresqlDbBackend extends DbBackend {
 	 *
 	 * @return bool
 	 */
-	public static function isCompressed(array $tables) :bool {
+	public static function isCompressed(array $tables): bool {
+		// Compression is available for TimescaleDB 1.5 and greater.
+		$config = select_config();
+		if ($config['db_extension'] != ZBX_DB_EXTENSION_TIMESCALEDB || $config['compression_availability'] != 1) {
+			return false;
+		}
+
 		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
 			' FROM timescaledb_information.compressed_hypertable_stats'.
 			' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
