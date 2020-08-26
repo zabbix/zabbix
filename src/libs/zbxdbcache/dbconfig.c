@@ -896,24 +896,22 @@ static zbx_dc_kv_t	*config_kvs_path_add(const char *path, const char *key)
 
 		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
 				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func);
-		DCstrpool_replace(0, &kv_local.key, key);
-		kv_local.value = NULL;
-		kv_local.refcount = 0;
-		kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
+		kv = NULL;
 	}
 	else
 	{
 		kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
 		kv_local.key = key;
+		kv = (zbx_dc_kv_t *)zbx_hashset_search(&kvs_path->kvs, &kv_local);
+	}
 
-		if (NULL == (kv = (zbx_dc_kv_t *)zbx_hashset_search(&kvs_path->kvs, &kv_local)))
-		{
-			DCstrpool_replace(0, &kv_local.key, key);
-			kv_local.value = NULL;
-			kv_local.refcount = 0;
+	if (NULL == kv)
+	{
+		DCstrpool_replace(0, &kv_local.key, key);
+		kv_local.value = NULL;
+		kv_local.refcount = 0;
 
-			kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
-		}
+		kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
 	}
 
 	kv->refcount++;
