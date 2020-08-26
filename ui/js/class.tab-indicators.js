@@ -1270,13 +1270,13 @@ class GraphAxesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(elem) {
-		[document.querySelector('#lefty:checked'), document.querySelector('#righty:checked'),
-			document.querySelector('#axisx:checked')
-		].map((value) => {
-			value.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
-			});
-		});
+		[document.querySelector('#lefty'), document.querySelector('#righty'), document.querySelector('#axisx')].map(
+			(value) => {
+				value.addEventListener('click', () => {
+					elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				});
+			}
+		);
 	}
 }
 
