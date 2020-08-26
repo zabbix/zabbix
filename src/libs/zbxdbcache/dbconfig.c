@@ -1941,7 +1941,8 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			zbx_strsplit(row[2], ':', &path, &key);
 			if (NULL == key)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" value \"%s\"", row[1], row[2]);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" Vault location \"%s\":"
+						" missing separator \":\"", row[1], row[2]);
 				continue;
 			}
 
@@ -2096,8 +2097,8 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 			zbx_strsplit(row[3], ':', &path, &key);
 			if (NULL == key)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" value \"%s\"",
-						row[1], row[2], row[3]);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
+						" \"%s\": missing separator \":\"", row[1], row[2], row[3]);
 				continue;
 			}
 
