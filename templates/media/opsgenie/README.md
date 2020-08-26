@@ -17,7 +17,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 
 [![](images/tn_1.png?raw=true)](images/1.png)
 
-2\. [Import](https://www.zabbix.com/documentation/current/manual/web_interface/frontend_sections/administration/mediatypes) the TOPdesk media type from file [media_topdesk.xml](media_topdesk.xml).
+2\. [Import](https://www.zabbix.com/documentation/current/manual/web_interface/frontend_sections/administration/mediatypes) the Opsgenie media type from file [media_opsgenie.xml](media_opsgenie.xml).
 
 [![](images/tn_2.png?raw=true)](images/2.png)
 
