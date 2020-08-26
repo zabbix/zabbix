@@ -257,8 +257,6 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Save as' button press, open properties popup.
 			 */
 			buttonSaveasAction: (ev) => {
-				let params = this._active_item.getFilterParams();
-
 				this._active_item.openPropertiesForm(ev.target, {
 					'idx': this._active_item._idx_namespace,
 					'idx2': this._items.length
@@ -385,14 +383,16 @@ class CTabFilter extends CBaseComponent {
 		let disabled = !this._options.support_custom_time || this._active_item.hasCustomTime(),
 			buttons = this._target.querySelectorAll('button.btn-time-left,button.btn-time-out,button.btn-time-right');
 
-		this._timeselector.setDisabled(disabled);
+		if (this._timeselector) {
+			this._timeselector.setDisabled(disabled);
 
-		for (const button of buttons) {
-			if (disabled) {
-				button.setAttribute('disabled', 'disabled');
-			}
-			else {
-				button.removeAttribute('disabled');
+			for (const button of buttons) {
+				if (disabled) {
+					button.setAttribute('disabled', 'disabled');
+				}
+				else {
+					button.removeAttribute('disabled');
+				}
 			}
 		}
 	}

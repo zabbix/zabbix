@@ -37,7 +37,7 @@ class CCheckBoxList extends CList {
 	protected $enabled = true;
 
 	/**
-	 * Checboxes id unique suffix.
+	 * Checkboxes id unique suffix.
 	 */
 	protected $uniqid = '';
 
