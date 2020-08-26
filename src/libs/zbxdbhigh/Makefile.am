@@ -21,7 +21,9 @@ libzbxdbhigh_a_SOURCES = \
 	proxy.c \
 	template_item.c \
 	template.h \
-	trigger.c
+	trigger.c \
+	tag.c \
+	lld_override.c
 
 libzbxdbhigh_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/

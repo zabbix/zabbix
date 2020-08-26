@@ -602,6 +602,12 @@ class CImportDataAdapter {
 									$operation['optemplate'][] = $template;
 								}
 							}
+							if (array_key_exists('tags', $operation) && $operation['tags']) {
+								$operation['optag'] = [];
+								foreach ($operation['tags'] as $tag) {
+									$operation['optag'][] = $tag;
+								}
+							}
 							if (array_key_exists('inventory_mode', $operation) && $operation['inventory_mode'] !== '') {
 								$operation['opinventory']['inventory_mode'] = $operation['inventory_mode'];
 							}

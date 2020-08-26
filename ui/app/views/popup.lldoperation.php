@@ -230,20 +230,6 @@ $operations_popup_form_list
 		'opseverity_row'
 	)
 	->addRow(
-		(new CVisibilityBox('visible[optag]', 'optag_div', _('Original')))
-			->setLabel(_('Tags'))
-			->setChecked(array_key_exists('optag', $options))
-			->setReadonly($options['templated']),
-		(new CDiv(
-			renderTagTable($field_values['optag'], $options['templated'],
-					['field_name' => 'optag', 'add_post_js' => false])
-				->setHeader([_('Name'), _('Value'), _('Action')])
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('tags-table')
-		))->setId('optag_div'),
-		'optag_row'
-	)
-	->addRow(
 		(new CVisibilityBox('visible[optemplate]', 'optemplate_div', _('Original')))
 			->setLabel(_('Link templates'))
 			->setChecked(array_key_exists('optemplate', $options))
@@ -266,6 +252,20 @@ $operations_popup_form_list
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		]))->setId('optemplate_div'),
 		'optemplate_row'
+	)
+	->addRow(
+		(new CVisibilityBox('visible[optag]', 'optag_div', _('Original')))
+			->setLabel(_('Tags'))
+			->setChecked(array_key_exists('optag', $options))
+			->setReadonly($options['templated']),
+		(new CDiv(
+			renderTagTable($field_values['optag'], $options['templated'],
+					['field_name' => 'optag', 'add_post_js' => false])
+				->setHeader([_('Name'), _('Value'), _('Action')])
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setId('tags-table')
+		))->setId('optag_div'),
+		'optag_row'
 	)
 	->addRow(
 		(new CVisibilityBox('visible[opinventory]', 'opinventory_inventory_mode', _('Original')))

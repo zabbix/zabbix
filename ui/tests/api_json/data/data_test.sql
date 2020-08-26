@@ -990,6 +990,8 @@ INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (103,
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (105,1);
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (101,103,'tag1','value1');
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (102,103,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (103,105,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (104,105,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (101,105,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (102,105,10265);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (103,105,50010);
@@ -1023,6 +1025,8 @@ INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (109,
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (111,1);
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (3,109,'tag1','value1');
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (4,109,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,111,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,111,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (4,111,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (5,111,10265);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (6,111,50010);
@@ -1054,8 +1058,10 @@ INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (113,
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (114,0);
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (115,1);
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (117,1);
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (5,115,'tag1','value1');
-INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (6,115,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (7,115,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (8,115,'tag2','value2');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (9,117,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10,117,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (7,117,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (8,117,10265);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (9,117,50010);

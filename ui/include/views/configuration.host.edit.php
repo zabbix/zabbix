@@ -607,14 +607,12 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 );
 
 // tags
-if (!$data['readonly']) {
-	$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-			'source' => 'host',
-			'tags' => $data['tags'],
-			'readonly' => false
-		]), TAB_INDICATOR_TAGS
-	);
-}
+$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+		'source' => 'host',
+		'tags' => $data['tags'],
+		'readonly' => false
+	]), TAB_INDICATOR_TAGS
+);
 
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';

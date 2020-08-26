@@ -669,7 +669,7 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  * @param bool   $html
  * @param string $key                        Name of tag source ID. Possible values:
  *                                            - 'eventid' - for events and problems (default);
- *                                            - 'hostid' - for hosts;
+ *                                            - 'hostid' - for hosts and host prototypes;
  *                                            - 'templateid' - for templates;
  *                                            - 'triggerid' - for triggers.
  * @param int    $list_tag_count             Maximum number of tags to display.
@@ -685,8 +685,8 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  *
  * @return array
  */
-function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count = ZBX_TAG_COUNT_DEFAULT,
-		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
+function makeTags(array $list, bool $html = true, string $key = 'eventid', int $list_tag_count = ZBX_TAG_COUNT_DEFAULT,
+		array $filter_tags = [], int $tag_name_format = PROBLEMS_TAG_NAME_FULL, string $tag_priority = ''): array {
 	$tags = [];
 
 	if ($html) {

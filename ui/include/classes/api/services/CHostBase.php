@@ -273,4 +273,80 @@ abstract class CHostBase extends CApiService {
 
 		return false;
 	}
+
+	/**
+	 * Creates new tags.
+	 *
+	 * @param array  $create_tags
+	 * @param int    $create_tags[<hostid>]
+	 * @param string $create_tags[<hostid>][]['tag']
+	 * @param string $create_tags[<hostid>][]['value']
+	 */
+	protected function createTags(array $create_tags): void {
+		$create = [];
+
+		foreach ($create_tags as $hostid => $tags) {
+			foreach ($tags as $tag) {
+				$create[] = ['hostid' => $hostid] + $tag;
+			}
+		}
+
+		if ($create) {
+			DB::insert('host_tag', $create);
+		}
+	}
+
+	/**
+	 * Updates tags by deleting existing tags if they are not among the input tags, and adding missing ones.
+	 *
+	 * @param array  $host_tags
+	 * @param int    $host_tags[<hostid>]
+	 * @param string $host_tags[<hostid>][]['tag']
+	 * @param string $host_tags[<hostid>][]['value']
+	 */
+	protected function updateTags(array $host_tags): void {
+		if (!$host_tags) {
+			return;
+		}
+
+		$insert = [];
+		$db_tags = DB::select('host_tag', [
+			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
+			'filter' => ['hostid' => array_keys($host_tags)],
+			'preservekeys' => true
+		]);
+
+		$db_host_tags = [];
+		foreach ($db_tags as $db_tag) {
+			$db_host_tags[$db_tag['hostid']][] = $db_tag;
+		}
+
+		foreach ($host_tags as $hostid => $tags) {
+			foreach (zbx_toArray($tags) as $tag) {
+				if (array_key_exists($hostid, $db_host_tags)) {
+					$tag += ['value' => ''];
+
+					foreach ($db_host_tags[$hostid] as $db_tag) {
+						if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
+							unset($db_tags[$db_tag['hosttagid']]);
+							$tag = null;
+							break;
+						}
+					}
+				}
+
+				if ($tag !== null) {
+					$insert[] = ['hostid' => $hostid] + $tag;
+				}
+			}
+		}
+
+		if ($db_tags) {
+			DB::delete('host_tag', ['hosttagid' => array_keys($db_tags)]);
+		}
+
+		if ($insert) {
+			DB::insert('host_tag', $insert);
+		}
+	}
 }
