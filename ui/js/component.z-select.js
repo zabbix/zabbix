@@ -66,7 +66,7 @@ class ZSelectElement extends HTMLElement {
 		this._bindListNodeEvents(this.root.list);
 
 		if (width === null) {
-			this.setAttribute('width', this._measureListWidth() + 15);
+			this.setAttribute('width', this._measureListWidth() + 13);
 		}
 		else {
 			this.setAttribute('width', width);
@@ -605,12 +605,50 @@ class ZSelectElement extends HTMLElement {
 		container.appendChild(node);
 	}
 
+	getOptions() {
+		const opts = [];
+
+		this.state.option_idx.forEach(value => {
+			const opt = this.state.option_map[value];
+			opts.push({
+				get disabled() {
+					return opt.disabled === true;
+				},
+				set disabled(val) {
+					if (val) {
+						opt._node.setAttribute('disabled', 'disabled');
+						opt.disabled = true;
+					}
+					else {
+						opt._node.removeAttribute('disabled');
+						opt.disabled = false;
+					}
+				},
+				get value() {
+					return opt.value;
+				}
+			});
+		});
+
+		return opts;
+	}
+
 	get value() {
 		return this.root.input.value;
 	}
 
 	set value(val) {
 		this.setAttribute('value', val);
+	}
+
+	get selectedIndex() {
+		return this.state.idx_commited;
+	}
+
+	set selectedIndex(val) {
+		this._stageIdx(val);
+		this._commit();
+		this._push();
 	}
 }
 

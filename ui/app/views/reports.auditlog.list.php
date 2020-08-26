@@ -31,6 +31,24 @@ $this->includeJsFile('reports.auditlog.list.js.php');
 
 $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action'])));
 
+$resources_select = (new CSelect('filter_resourcetype'))
+	->setValue($data['resourcetype'])
+	->setButtonId('filter_resourcetype')
+	->setId('resourcetype-select');
+
+foreach ($data['resources'] as $resourceid => $resource_name) {
+	$resources_select->addOption(new CSelectOption($resource_name, (string) $resourceid));
+}
+
+$action_select = (new CSelect('filter_action'))
+	->setValue($data['auditlog_action'])
+	->setButtonId('filter_action')
+	->setId('action-select');
+
+foreach ($data['actions'] as $actionid => $action_name) {
+	$action_select->addOption(new CSelectOption($action_name, (string) $actionid));
+}
+
 $filter_form = (new CFormList())
 	->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
 		(new CMultiSelect([
@@ -49,11 +67,11 @@ $filter_form = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	])
-	->addRow(_('Resource'), new CComboBox('filter_resourcetype', $data['resourcetype'], null, $data['resources']))
+	->addRow(new CLabel(_('Resource'), 'filter_resourcetype'), $resources_select)
 	->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
 		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Action'), new CComboBox('filter_action', $data['auditlog_action'], null, $data['actions']));
+	->addRow(new CLabel(_('Action'), 'filter_action'), $action_select);
 
 $widget = (new CWidget())
 	->setTitle(_('Audit log'))

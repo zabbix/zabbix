@@ -28,9 +28,9 @@
 
 	class resourceInputManage {
 		constructor() {
-			this.action_elem = document.getElementById('filter_action');
-			this.action_options = this.action_elem.querySelectorAll('option');
-			this.resource_elem = document.getElementById('filter_resourcetype');
+			this.action_elem = document.getElementById('action-select');
+			this.action_options = this.action_elem.getOptions();
+			this.resource_elem = document.getElementById('resourcetype-select');
 
 			this
 				.resource_elem
