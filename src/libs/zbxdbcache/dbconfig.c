@@ -870,9 +870,7 @@ static int	dc_compare_kvs_path(const void *d1, const void *d2)
 
 static zbx_hash_t	dc_kv_hash(const void *data)
 {
-	zbx_dc_kv_t	*kv = (zbx_dc_kv_t *)data;
-
-	return ZBX_DEFAULT_STRING_HASH_ALGO(kv->key, strlen(kv->key), ZBX_DEFAULT_HASH_SEED);
+	return ZBX_DEFAULT_STRING_HASH_FUNC(((zbx_dc_kv_t *)data)->key);
 }
 
 static int	dc_kv_compare(const void *d1, const void *d2)
