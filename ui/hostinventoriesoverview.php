@@ -137,7 +137,16 @@ if ($filter['groupby'] !== '') {
 	}
 }
 
-$grouping_options = array_merge(['' => _('not selected')], $inventories);
+$select = (new CSelect('filter_groupby'))
+	->setValue($filter['groupby'])
+	->setButtonId('groupby')
+	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+
+$select->addOption(new CSelectOption(_('not selected'), ''));
+
+foreach ($inventories as $value => $title) {
+	$select->addOption(new CSelectOption($title, $value));
+}
 
 (new CWidget())
 	->setTitle(_('Host inventory overview'))
@@ -165,11 +174,7 @@ $grouping_options = array_merge(['' => _('not selected')], $inventories);
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
-					->addRow(
-						new CLabel(_('Grouping by'), 'groupby'),
-						(new CComboBox('filter_groupby', $filter['groupby'], null, $grouping_options))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					)
+					->addRow(new CLabel(_('Grouping by'), 'groupby'), $select)
 			])
 	)
 	->addItem($table)
