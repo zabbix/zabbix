@@ -135,7 +135,7 @@ try {&#13;
         throw 'Cannot get discord_endpoint';&#13;
     }&#13;
     else {&#13;
-        params.discord_endpoint = params.discord_endpoint.replace('/api/', '/api/v1000/') + '?wait=True';&#13;
+        params.discord_endpoint = params.discord_endpoint.replace('/api/', '/api/v7/') + '?wait=True';&#13;
     }&#13;
 &#13;
     params.zabbix_url = (params.zabbix_url.endsWith('/'))&#13;
