@@ -138,7 +138,7 @@ typedef struct
 	char		*path;
 	zbx_hashset_t	keys;
 }
-keys_path_t;
+zbx_keys_path_t;
 
 /******************************************************************************
  *                                                                            *
@@ -742,8 +742,8 @@ skip_data:
 
 static int	keys_path_compare(const void *d1, const void *d2)
 {
-	const keys_path_t	*ptr1 = *((const keys_path_t **)d1);
-	const keys_path_t	*ptr2 = *((const keys_path_t **)d2);
+	const zbx_keys_path_t	*ptr1 = *((const zbx_keys_path_t **)d1);
+	const zbx_keys_path_t	*ptr2 = *((const zbx_keys_path_t **)d2);
 
 	return strcmp(ptr1->path, ptr2->path);
 }
@@ -762,7 +762,7 @@ static void	key_path_free(void *data)
 {
 	zbx_hashset_iter_t	iter;
 	char			**ptr;
-	keys_path_t		*keys_path = (keys_path_t *)data;
+	zbx_keys_path_t		*keys_path = (zbx_keys_path_t *)data;
 
 	zbx_hashset_iter_reset(&keys_path->keys, &iter);
 	while (NULL != (ptr = (char **)zbx_hashset_iter_next(&iter)))
@@ -902,7 +902,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		zbx_json_close(j);
 		if (1 == is_macro)
 		{
-			keys_path_t	*keys_path, keys_path_local;
+			zbx_keys_path_t	*keys_path, keys_path_local;
 			unsigned char	type;
 			char		*path, *key;
 
@@ -934,7 +934,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 
 			if (FAIL == (i = zbx_vector_ptr_search(keys_paths, &keys_path_local, keys_path_compare)))
 			{
-				keys_path = zbx_malloc(NULL, sizeof(keys_path_t));
+				keys_path = zbx_malloc(NULL, sizeof(zbx_keys_path_t));
 				keys_path->path = path;
 
 				zbx_hashset_create(&keys_path->keys, 0, keys_hash, keys_compare);
@@ -945,7 +945,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			}
 			else
 			{
-				keys_path = (keys_path_t *)keys_paths->values[i];
+				keys_path = (zbx_keys_path_t *)keys_paths->values[i];
 				if (NULL == zbx_hashset_search(&keys_path->keys, &key))
 				{
 					zbx_hashset_insert(&keys_path->keys, &key, sizeof(char **));
@@ -1064,11 +1064,11 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 
 	for (i = 0; i < keys_paths->values_num; i++)
 	{
-		keys_path_t		*keys_path;
+		zbx_keys_path_t		*keys_path;
 		char			*error = NULL, **ptr;
 		zbx_hashset_iter_t	iter;
 
-		keys_path = (keys_path_t *)keys_paths->values[i];
+		keys_path = (zbx_keys_path_t *)keys_paths->values[i];
 		if (FAIL == zbx_vault_kvs_get(keys_path->path, &kvs, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
