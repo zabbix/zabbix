@@ -225,12 +225,14 @@ class CTabFilterItem extends CBaseComponent {
 				filter_show_counter: form.querySelector('[name="filter_show_counter"]'),
 				filter_custom_time: form.querySelector('[name="filter_custom_time"]')
 			},
-			search_params = this.getFilterParams();
+			search_params;
 
 		if (data.filter_custom_time) {
 			this._data.from = data.from;
 			this._data.to = data.to;
 		}
+
+		search_params = this.getFilterParams();
 
 		Object.keys(fields).forEach((key) => {
 			if (fields[key] instanceof HTMLElement) {
@@ -270,6 +272,11 @@ class CTabFilterItem extends CBaseComponent {
 					params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'))
 				}
 			}
+		}
+
+		if (this._data.filter_custom_time) {
+			params.set('from', this._data.from);
+			params.set('to', this._data.to);
 		}
 
 		return params;

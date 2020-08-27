@@ -25,11 +25,15 @@
 ?>
 <script type="text/javascript">
 	jQuery(function($) {
-		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>);
+		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>),
+			global_timerange = {
+				from: filter._timeselector._data.from,
+				to: filter._timeselector._data.to
+			};
 
 		filter.on(TABFILTER_EVENT_URLSET, (ev) => {
 			let url = new Curl(),
-				data = $.extend(<?= json_encode($data['filter_defaults'])?>, url.getArgumentsObject());
+				data = $.extend(<?= json_encode($data['filter_defaults'])?>, global_timerange, url.getArgumentsObject());
 
 			if (data.inventory.length == 1 && data.inventory[0].value === '') {
 				data.inventory = [];
@@ -45,6 +49,14 @@
 				from: data.from,
 				to: data.to
 			});
+		});
+
+		// Keep timeselector changes in global_timerange.
+		$.subscribe('timeselector.rangeupdate', (e, data) => {
+			if (data.idx === '<?= CControllerProblem::FILTER_IDX ?>') {
+				global_timerange.from = data.from;
+				global_timerange.to = data.to;
+			}
 		});
 
 		$(document).on({

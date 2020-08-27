@@ -91,10 +91,6 @@ class CTabFilter extends CBaseComponent {
 							value_int: this._active_item._index
 						});
 					}
-
-					if (this._active_item != this._timeselector) {
-						this.updateTimeselector(this._active_item);
-					}
 				}
 			},
 
@@ -166,7 +162,7 @@ class CTabFilter extends CBaseComponent {
 			 * Event handler for 'Save as' button
 			 */
 			popupUpdateAction: (ev) => {
-				var item = this.create(this._active_item._target.cloneNode(), {});
+				var item = ev.detail.create ? this.create(this._active_item._target.cloneNode(), {}) : this._active_item;
 
 				if (ev.detail.form_action === 'update') {
 					item.update(Object.assign(ev.detail, {
@@ -175,13 +171,16 @@ class CTabFilter extends CBaseComponent {
 					}));
 					var params = item.getFilterParams();
 
-					this.profileUpdate('properties', {
-						'idx2': ev.detail.idx2,
-						'value_str': params.toString()
-					}).then(() => {
-						item.setBrowserLocation(params);
-						window.location.reload(true);
-					});
+					if (ev.detail.create) {
+						// Popup were created by 'Save as' button, reload page for simplicity.
+						this.profileUpdate('properties', {
+							'idx2': ev.detail.idx2,
+							'value_str': params.toString()
+						}).then(() => {
+							item.setBrowserLocation(params);
+							window.location.reload(true);
+						});
+					}
 				}
 			},
 
