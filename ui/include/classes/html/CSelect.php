@@ -32,37 +32,6 @@ class CSelect extends CTag {
 	protected $options = [];
 
 	/**
-	 * If no value is set, first available option will be preselected.
-	 *
-	 * @var ?string $value
-	 */
-	protected $value = null;
-
-	/**
-	 * If width is not set, option list contents will determine select element width.
-	 *
-	 * @var ?int $value
-	 */
-	protected $width = null;
-
-	/**
-	 * ID to be used on button in conjunction with label's "for" attribute that binds delegates focus.
-	 *
-	 * @var ?string $buttonid
-	 */
-	protected $buttonid = null;
-
-	/**
-	 * @var ?string $onchange
-	 */
-	protected $onchange = null;
-
-	/**
-	 * @var bool $disabled
-	 */
-	protected $disabled = false;
-
-	/**
 	 * @param string $name    Input field name.
 	 * @param array $options  (optional) Array of options or option groups.
 	 */
@@ -113,27 +82,27 @@ class CSelect extends CTag {
 	}
 
 	/**
-	 * Selected option value.
+	 * Selected option value. If no value is set, first available option will be preselected client at side.
 	 *
 	 * @param string $value
 	 *
 	 * @return self
 	 */
 	public function setValue(string $value): self {
-		$this->value = $value;
+		$this->setAttribute('value', $value);
 
 		return $this;
 	}
 
 	/**
-	 * Selected option value.
+	 * ID to be used on button in conjunction with label's "for" attribute that binds delegates focus.
 	 *
-	 * @param string $value
+	 * @param string $buttonid
 	 *
 	 * @return self
 	 */
 	public function setButtonId(string $buttonid): self {
-		$this->buttonid = $buttonid;
+		$this->setAttribute('data-buttonid', $buttonid);
 
 		return $this;
 	}
@@ -144,7 +113,7 @@ class CSelect extends CTag {
 	 * @return self
 	 */
 	public function setWidth(int $width): self {
-		$this->width = $width;
+		$this->setAttribute('width', $width);
 
 		return $this;
 	}
@@ -155,7 +124,7 @@ class CSelect extends CTag {
 	 * @return self
 	 */
 	public function onChange($onchange): self {
-		$this->onchange = $onchange;
+		$this->setAttribute('onchange', $onchange);
 
 		return $this;
 	}
@@ -177,7 +146,7 @@ class CSelect extends CTag {
 	 * @return self
 	 */
 	public function setDisabled(): self {
-		$this->disabled = true;
+		$this->setAttribute('disabled', 'disabled');
 
 		return $this;
 	}
@@ -186,18 +155,18 @@ class CSelect extends CTag {
 	 * @return array
 	 */
 	public function toArray(): array {
-		$result = ['options' => [], 'name' => $this->name, 'value' => $this->value, 'disabled' => $this->disabled,
-			'buttonid' => $this->buttonid, 'width' => $this->width, 'onchange' => $this->onchange];
+		$options = [];
 
 		foreach ($this->options as $option) {
-			$result['options'][] = $option->toArray();
+			$options[] = $option->toArray();
 		}
 
-		return $result;
+		return $options;
 	}
 
 	public function toString($destroy = true) {
-		$this->setAttribute('data-select', json_encode($this->toArray()));
+		$this->setAttribute('name', $this->name);
+		$this->setAttribute('data-options', json_encode($this->toArray()));
 
 		return parent::toString($destroy);
 	}

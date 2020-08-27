@@ -1,6 +1,5 @@
-class ZSelectElement extends HTMLElement {
-
-	// TODO: check if disconnectedCallback() needed ? is cleanup needed?
+class ZSelect {
+	onchange = () => {}
 
 	state = {
 		is_open: false,
@@ -9,7 +8,8 @@ class ZSelectElement extends HTMLElement {
 		option_idx: [],
 		option_map: {},
 		focused: false,
-		list_hover: false
+		list_hover: false,
+		value: null
 	}
 
 	root = {
@@ -18,12 +18,7 @@ class ZSelectElement extends HTMLElement {
 		input: null
 	}
 
-	// TODO: Previous change event is not unbinded if this attribte is changed.
-	onchange = () => {}
-
 	constructor() {
-		super();
-
 		this.root.button = document.createElement('button');
 		this.root.button.setAttribute('type', 'button');
 
@@ -32,92 +27,6 @@ class ZSelectElement extends HTMLElement {
 
 		this.root.list = document.createElement('ul');
 		this.root.list.classList.add('list');
-
-		window.DEV = this;
-	}
-
-	connectedCallback() {
-		const {options, name, value, disabled, buttonid, width, onchange} = JSON.parse(this.getAttribute('data-select'));
-		this.removeAttribute('data-select');
-
-		for (const option of options) {
-			option.value instanceof Array
-				? this.addOptionGroup(option.title, option.value)
-				: this.addOption(option);
-		}
-
-		if (value !== null) {
-			this.setAttribute('value', value);
-		}
-		else {
-			const auto_select = this._nextEnabledIdx(-1);
-			if (auto_select !== -1) {
-				this.setAttribute('value', this._getOptionByIdx(auto_select).value);
-			}
-		}
-
-		onchange && this.setAttribute('onchange', onchange);
-		disabled && this.setAttribute('disabled', 'disabled');
-		buttonid && this.root.button.setAttribute('id', buttonid);
-
-		this.root.input.setAttribute('name', name);
-
-		this._bindButtonNodeEvents(this.root.button);
-		this._bindListNodeEvents(this.root.list);
-
-		if (width === null) {
-			this.setAttribute('width', this._measureListWidth() + 13);
-		}
-		else {
-			this.setAttribute('width', width);
-		}
-
-		this.appendChild(this.root.button);
-		this.appendChild(this.root.list);
-		this.appendChild(this.root.input);
-	}
-
-	/**
-	 * attributeChangedCallback
-	 *
-	 * @return {array}
-	 */
-	static get observedAttributes() {
-		return ['disabled', 'value', 'name', 'onchange', 'width'];
-	}
-
-	attributeChangedCallback(name, _old_value, new_value) {
-		switch (name) {
-			case 'name':
-				this.root.input.setAttribute('name', new_value);
-				break;
-			case 'value':
-				const option = this.state.option_map[new_value];
-				if (!option) {
-					throw new Error(`Option of value "${new_value}" does not exist.`);
-				}
-
-				if (option.disabled) {
-					throw new Error(`Disabled option "${new_value}" connot be used as value.`);
-				}
-
-				this._stageIdx(option._data_idx);
-				this._commit();
-				this._push();
-				break;
-			case 'disabled':
-				(new_value === null)
-					? this.root.button.removeAttribute('disabled')
-					: this.root.button.setAttribute('disabled', 'disabled');
-				break;
-			case 'width':
-				this.root.button.style.width = `${new_value}px`;
-				this.root.list.style.width = `${new_value}px`;
-				break;
-			case 'onchange':
-				this.onchange = new Function('event', new_value);
-				break;
-		}
 	}
 
 	_collapseList() {
@@ -234,11 +143,11 @@ class ZSelectElement extends HTMLElement {
 	_push() {
 		const {value} = this._getOptionByIdx(this.state.idx_commited);
 
-		if (this.value !== value) {
+		if (this.getValue() != value) {
 			const evt = new Event('change');
 
 			this.root.input.setAttribute('value', value);
-			this.dispatchEvent(evt);
+			this.onchange(evt);
 		}
 	}
 
@@ -272,6 +181,11 @@ class ZSelectElement extends HTMLElement {
 
 	_getOptionByIdx(idx) {
 			return this.state.option_map[this.state.option_idx[idx]];
+	}
+
+	bindEvents() {
+		this._bindListNodeEvents(this.root.list);
+		this._bindButtonNodeEvents(this.root.button);
 	}
 
 	_bindListNodeEvents(node) {
@@ -331,7 +245,7 @@ class ZSelectElement extends HTMLElement {
 
 			// TODO: PAGE_UP and PAGE_DOWN handlers are unreadable!!!!! Must be codefixed
 			switch (e.which) {
-				case 33: // PAGE_UP
+				case KEY_PAGE_UP:
 					/*
 					 * NOTE: If open - Native select scrolls currently active option to bottom of visible list, and stages the
 					 * first visible option in list, if that is disabled, previous enabled option is chosen.
@@ -377,7 +291,7 @@ class ZSelectElement extends HTMLElement {
 						this._push();
 					}
 					break;
-				case 34: // PAGE_DOWN
+				case KEY_PAGE_DOWN:
 					/*
 					 * NOTE: If open - Native select scrolls currently active option to top of visible list, and stages the last
 					 * visible option in list, if that is disabled, then next enabled option is chosen.
@@ -426,21 +340,21 @@ class ZSelectElement extends HTMLElement {
 						this._push();
 					}
 					break;
-				case 35: // END
+				case KEY_END:
 					e.preventDefault();
 					e.stopPropagation();
 					this._stageIdx(this._lastIdx());
 					this._commit();
 					!this.state.is_open && this._push();
 					break;
-				case 36: // HOME
+				case KEY_HOME:
 					e.preventDefault();
 					e.stopPropagation();
 					this._stageIdx(this._firstIdx());
 					this._commit();
 					!this.state.is_open && this._push();
 					break;
-				case 40: // down
+				case KEY_ARROW_DOWN:
 					/*
 					 * NOTE: In native select when an arrow key cannot select any next option because all of them are disabled,
 					 * and dropdown is opened, then scroll down happens.
@@ -457,7 +371,7 @@ class ZSelectElement extends HTMLElement {
 						!this.state.is_open && this._push();
 					}
 					break
-				case 38: // up
+				case KEY_ARROW_UP:
 					/*
 					 * NOTE: In native select when an arrow key cannot select any previous option because all of them are
 					 * disabled and dropdown is opened, then scroll up happens.
@@ -474,7 +388,7 @@ class ZSelectElement extends HTMLElement {
 						!this.state.is_open && this._push();
 					}
 					break;
-				case 13: // enter
+				case KEY_ENTER:
 					if (!this.state.is_open) {
 						this._expandList();
 					}
@@ -484,7 +398,7 @@ class ZSelectElement extends HTMLElement {
 						this._collapseList();
 					}
 					break;
-				case 9: // tab
+				case KEY_TAB:
 					// NOTE: Native select element if opened, on "tab" submits hovered option and remains focused.
 					if (this.state.is_open) {
 						e.preventDefault();
@@ -493,11 +407,11 @@ class ZSelectElement extends HTMLElement {
 						this._collapseList();
 					}
 					break;
-				case 32: // space
+				case KEY_SPACE:
 					// NOTE: Native select element does not closes or chooses option on "space" key, only opens dropdown.
 					!this.state.is_open && this._expandList();
 					break;
-				case 27: // escape
+				case KEY_ESCAPE:
 					this.state.is_open && e.stopPropagation();
 					this._push();
 					this._collapseList();
@@ -529,11 +443,16 @@ class ZSelectElement extends HTMLElement {
 		return node;
 	}
 
-	_createOptionNode({title, value, desc, disabled}) {
+	_createOptionNode({title, value, desc, disabled, class_name}) {
 		const li = document.createElement('li');
 
 		li.innerText = title;
 		li.setAttribute('value', value);
+
+		if (class_name) {
+			li.classList.add(class_name);
+		}
+
 		desc && li.setAttribute('description', desc);
 		disabled && li.setAttribute('disabled', 'disabled');
 
@@ -558,6 +477,11 @@ class ZSelectElement extends HTMLElement {
 		});
 
 		this.state.option_idx.push(value);
+
+		// It is possible to set value of an option before option is registered.
+		if (this.state.value === value) {
+			this.setIdx(node.data_idx);
+		}
 	}
 
 	_measureListWidth() {
@@ -592,14 +516,13 @@ class ZSelectElement extends HTMLElement {
 		this.root.list.appendChild(li);
 	}
 
-	// TODO: I do not like that optional container parameter for public API.
-	addOption({title, value, desc, disabled}, container) {
+	addOption({title, value, desc, disabled, class_name}, container) {
 		title = title.trim();
 		if (!container) {
 			container = this.root.list;
 		}
 
-		const node = this._createOptionNode({title, value, desc, disabled});
+		const node = this._createOptionNode({title, value, desc, disabled, class_name});
 		this._registerOption({title, value, desc, disabled}, node);
 
 		container.appendChild(node);
@@ -633,8 +556,140 @@ class ZSelectElement extends HTMLElement {
 		return opts;
 	}
 
-	get value() {
+	setName(name) {
+		this.root.input.setAttribute('name', name);
+	}
+
+	setReadonly(value) {
+		if (value) {
+			this.root.button.removeAttribute('readonly');
+			this.root.input.removeAttribute('readonly');
+		}
+		else {
+			this.root.button.setAttribute('readonly', 'readonly');
+			this.root.input.setAttribute('readonly', 'readonly');
+		}
+	}
+
+	setDisabled(value) {
+		if (value) {
+			this.root.button.removeAttribute('readonly');
+			this.root.input.removeAttribute('readonly');
+		}
+		else {
+			this.root.button.setAttribute('readonly', 'readonly');
+			this.root.input.setAttribute('readonly', 'readonly');
+		}
+	}
+
+	setIdx(idx) {
+		this._stageIdx(idx);
+		this._commit();
+		this._push();
+	}
+
+	getIdx() {
+		return this.state.idx_commited;
+	}
+
+	setButtonId(id) {
+		this.root.button.setAttribute('id', id);
+	}
+
+	setWidth(width) {
+		this.root.button.style.width = `${width}px`;
+		this.root.list.style.width = `${width}px`;
+	}
+
+	getValue() {
 		return this.root.input.value;
+	}
+
+	setValue(value) {
+		const option = this.state.option_map[value];
+
+		if (option) {
+			this._stageIdx(option._data_idx);
+			this._commit();
+			this._push();
+		}
+
+		this.state.value = value;
+	}
+
+	focus() {
+		this.root.button.focus();
+	}
+}
+
+class ZSelectElement extends HTMLElement {
+	constructor() {
+		super()
+		this._select = new ZSelect();
+		this._select.onchange = event => this.dispatchEvent(event);
+	}
+
+	connectedCallback() {
+		this.appendChild(this._select.root.button);
+		this.appendChild(this._select.root.list);
+		this.appendChild(this._select.root.input);
+
+		if (!this.hasAttribute('width')) {
+			this.setAttribute('width', this._select._measureListWidth() + 13);
+		}
+
+		this._select.bindEvents();
+	}
+
+	/**
+	 * @return {array}
+	 */
+	static get observedAttributes() {
+		return ['disabled', 'value', 'name', 'onchange', 'width', 'data-options', 'data-buttonid'];
+	}
+
+	attributeChangedCallback(name, _old_value, new_value) {
+		switch (name) {
+			case 'data-buttonid': this._select.setButtonId(new_value); break;
+			case 'name': this._select.setName(new_value); break;
+			case 'value': this._select.setValue(new_value); break;
+			case 'width': this._select.setWidth(new_value); break;
+			case 'disabled': this._select.setDisabled(new_value !== null); break;
+			case 'data-options':
+				if (new_value === null) {
+					return;
+				}
+
+				const options = JSON.parse(new_value);
+
+				for (const option of options) {
+					option.value instanceof Array
+						? this._select.addOptionGroup(option.title, option.value)
+						: this._select.addOption(option);
+				}
+
+				this.removeAttribute('data-options');
+				break;
+			case 'onchange':
+				this.onchange = new Function('event', new_value);
+				break;
+		}
+	}
+
+	addOption({title, value, desc, disabled, class_name}) {
+		this._select.addOption({title, value, desc, disabled, class_name});
+	}
+
+	getOptions() {
+		return this._select.getOptions();
+	}
+
+	focus() {
+		this._select.focus();
+	}
+
+	get value() {
+		return this._select.getValue();
 	}
 
 	set value(val) {
@@ -642,13 +697,11 @@ class ZSelectElement extends HTMLElement {
 	}
 
 	get selectedIndex() {
-		return this.state.idx_commited;
+		return this._select.getIdx();
 	}
 
 	set selectedIndex(val) {
-		this._stageIdx(val);
-		this._commit();
-		this._push();
+		this._select.setIdx(val);
 	}
 }
 
