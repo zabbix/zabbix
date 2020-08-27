@@ -78,14 +78,23 @@ $user_groups = [0 => _('All')];
 foreach ($data['usergroups'] as $user_group) {
 	$user_groups[$user_group['usrgrpid']] = $user_group['name'];
 }
+
+$user_group_select = (new CSelect('usrgrpid'))
+		->setValue($data['usrgrpid'])
+		->setButtonId('usrgrpid');
+
+foreach ($user_groups as $user_groupid => $user_group_name) {
+	$user_group_select->addOption(new CSelectOption($user_group_name, (string) $user_groupid));
+}
+
 $scriptFormList
-	->addRow(_('User group'),
-		new CComboBox('usrgrpid', $data['usrgrpid'], null, $user_groups))
-	->addRow(_('Host group'),
-		new CComboBox('hgstype', $data['hgstype'], null, [
-			0 => _('All'),
-			1 => _('Selected')
-		])
+	->addRow(new CLabel(_('User group'), 'usrgrpid'), $user_group_select)
+	->addRow(new CLabel(_('Host group'), 'hgstype'), (new CSelect('hgstype'))
+		->addOption(new CSelectOption(_('All'), '0'))
+		->addOption(new CSelectOption(_('Selected'), '1'))
+		->setValue($data['hgstype'])
+		->setButtonId('hgstype')
+		->setId('hgstype-select')
 	)
 	->addRow(null, (new CMultiSelect([
 		'name' => 'groupid',
