@@ -18,9 +18,11 @@
 **/
 
 #include "common.h"
-#include "modbus.h"
+#include "mdbus.h"
 #include "mutexs.h"
 #include "comms.h"
+
+#include "log.h"
 
 #ifdef HAVE_LIBMODBUS
 
@@ -29,6 +31,10 @@ zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 #define UNLOCK_MODBUS	zbx_mutex_unlock(modbus_lock)
 
 #define ZBX_MODBUS_DATATYPE_STRLEN_MAX	6
+
+#ifdef _WINDOWS
+#pragma comment(lib, "modbus")
+#endif
 
 static struct modbus_datatype_ref
 {
@@ -152,23 +158,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		if (SUCCEED == (ret = parse_serveractive_element(
 				endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP), &tmp,
 				&endpoint->conn_info.tcp.port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
-		{
-			if (SUCCEED == is_ip4(tmp) || SUCCEED == is_ip6(tmp))
-			{
-				endpoint->conn_info.tcp.ip = tmp;
-			}
-			else
-			{
-				endpoint->conn_info.tcp.ip = zbx_malloc(NULL, ZBX_MODBUS_IP_LEN_MAX);
-				zbx_getip_by_host(tmp, endpoint->conn_info.tcp.ip, ZBX_MODBUS_IP_LEN_MAX);
-				if ('\0' == *endpoint->conn_info.tcp.ip)
-				{
-					zbx_free(endpoint->conn_info.tcp.ip);
-					ret = FAIL;
-				}
-				zbx_free(tmp);
-			}
-		}
+			endpoint->conn_info.tcp.ip = tmp;
 	}
 	else if (0 == zbx_strncasecmp(endpoint_str, ZBX_MODBUS_PROTOCOL_PREFIX_RTU,
 			ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_RTU)))
@@ -259,11 +249,13 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	int		ret = FAIL;
 	unsigned int	count_w_offset, i;
 	char		*list;
+	char 		port[ZBX_MODBUS_PORT_LEN_MAX];
 
 	switch (endpoint->protocol)
 	{
 		case ZBX_MODBUS_PROTOCOL_TCP:
-			mdb_ctx = modbus_new_tcp(endpoint->conn_info.tcp.ip, (int)endpoint->conn_info.tcp.port);
+			zbx_snprintf(port, sizeof(port) - offset, "%d", (int)endpoint->conn_info.tcp.port);
+			mdb_ctx = modbus_new_tcp_pi(endpoint->conn_info.tcp.ip, port);
 			break;
 		case ZBX_MODBUS_PROTOCOL_RTU:
 			mdb_ctx = modbus_new_rtu(endpoint->conn_info.serial.port, endpoint->conn_info.serial.baudrate,
@@ -375,7 +367,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 
 	if (-1 == ret)
 	{
-		*error = zbx_dsprintf(*error, "modbus_read failed: %s", modbus_strerror(errno));
+		*error = zbx_dsprintf(*error, "modbus_read failed: %s errno %d", modbus_strerror(errno), errno);
 		goto out;
 	}
 
@@ -474,6 +466,7 @@ out:
 }
 #endif /* HAVE_LIBMODBUS */
 
+extern unsigned char	process_type;
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBMODBUS
@@ -697,7 +690,11 @@ err:
 int zbx_init_modbus(char **error)
 {
 #ifdef HAVE_LIBMODBUS
-	return zbx_mutex_create(&modbus_lock, ZBX_MUTEX_MODBUS, error);
+#	ifdef _WINDOWS
+		return zbx_mutex_create(&modbus_lock, NULL, error);
+#	else
+		return zbx_mutex_create(&modbus_lock, ZBX_MUTEX_MODBUS, error);
+#	endif
 #else
 	ZBX_UNUSED(error);
 	return SUCCEED;
