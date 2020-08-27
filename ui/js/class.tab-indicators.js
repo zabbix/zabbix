@@ -486,7 +486,7 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 			.querySelector('#saml_auth_enabled')
 			?.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-					!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
 	}
