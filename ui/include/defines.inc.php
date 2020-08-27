@@ -20,13 +20,8 @@
 
 define('ZABBIX_VERSION',		'5.2.0alpha2');
 define('ZABBIX_API_VERSION',	'5.2.0');
-<<<<<<< HEAD
-define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		5010005);
-=======
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010026);
->>>>>>> 49a222e9701ef4978231257fa3d50938aece428f
+define('ZABBIX_DB_VERSION',		5010027);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');

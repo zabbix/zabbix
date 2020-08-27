@@ -706,12 +706,8 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
-<<<<<<< HEAD
-		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros, unsigned char custom_iface)
-=======
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros,
-		char **info)
->>>>>>> 49a222e9701ef4978231257fa3d50938aece428f
+		char **info, unsigned char custom_iface)
 {
 	char			*buffer = NULL;
 	int			i;
@@ -796,19 +792,14 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		host->inventory_mode = inventory_mode_proto;
 
-<<<<<<< HEAD
 		if (host->custom_interfaces != custom_iface)
 		{
 			host->custom_interfaces = custom_iface;
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES;
 		}
 
-		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, NULL,
-				&discover_proto);
-=======
 		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, &tmp_tags,
 				NULL, &discover_proto);
->>>>>>> 49a222e9701ef4978231257fa3d50938aece428f
 
 		/* host visible name */
 		buffer = zbx_strdup(buffer, name_proto);
@@ -4102,11 +4093,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-<<<<<<< HEAD
-					status, discover, lld_row, lld_macro_paths, use_custom_interfaces)))
-=======
-					status, discover, &tags, lld_row, lld_macro_paths, error)))
->>>>>>> 49a222e9701ef4978231257fa3d50938aece428f
+					status, discover, &tags, lld_row, lld_macro_paths, error, use_custom_interfaces)))
 			{
 				continue;
 			}

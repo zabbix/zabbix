@@ -91,11 +91,6 @@ static int	DBpatch_5010004(void)
 
 static int	DBpatch_5010005(void)
 {
-<<<<<<< HEAD
-	const ZBX_FIELD	field = {"custom_interfaces", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("hosts", &field);
-=======
 	const ZBX_FIELD	field = {"default_timezone", "system", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
@@ -246,7 +241,13 @@ static int	DBpatch_5010026(void)
 	const ZBX_FIELD field = {"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("globalmacro", &field, NULL);
->>>>>>> 49a222e9701ef4978231257fa3d50938aece428f
+}
+
+static int	DBpatch_5010027(void)
+{
+	const ZBX_FIELD	field = {"custom_interfaces", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
 }
 
 #endif
@@ -261,8 +262,6 @@ DBPATCH_ADD(5010002, 0, 1)
 DBPATCH_ADD(5010003, 0, 1)
 DBPATCH_ADD(5010004, 0, 1)
 DBPATCH_ADD(5010005, 0, 1)
-<<<<<<< HEAD
-=======
 DBPATCH_ADD(5010006, 0, 1)
 DBPATCH_ADD(5010007, 0, 1)
 DBPATCH_ADD(5010008, 0, 1)
@@ -284,6 +283,6 @@ DBPATCH_ADD(5010023, 0, 1)
 DBPATCH_ADD(5010024, 0, 1)
 DBPATCH_ADD(5010025, 0, 1)
 DBPATCH_ADD(5010026, 0, 1)
->>>>>>> 49a222e9701ef4978231257fa3d50938aece428f
+DBPATCH_ADD(5010027, 0, 1)
 
 DBPATCH_END()
