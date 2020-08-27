@@ -94,7 +94,6 @@ z-select, z-select-clone {
 			}
 		}
 
-
 		li {
 			user-select: none;
 			display: block;
@@ -106,8 +105,11 @@ z-select, z-select-clone {
 			word-break: break-all;
 			white-space: pre-wrap;
 
+			&.red {
+				color: $red;
+			}
+
 			&.hover {
-				transition: background-color .2s ease-out;
 				background-color: $action-hover-color;
 			}
 

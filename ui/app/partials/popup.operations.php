@@ -34,7 +34,9 @@ $form_list = new CFormList();
 /*
  * Operation type row.
  */
-$form_list->addRow(_('Operation type'), new CComboBox('operationtype'), 'operation-type');
+$form_list->addRow(new CLabel(_('Operation type'), 'operationtype'),
+	(new CSelect('operationtype'))->setButtonId('operationtype'), 'operation-type'
+);
 
 /*
  * Operation escalation steps row.
@@ -112,16 +114,20 @@ $form_list->addRow(_('Send to users'), (new CDiv(
 /*
  * Operation message media type row.
  */
-$form_list->addRow(_('Default media type'),
-	new CComboBox('operation[opmessage][mediatypeid]', 0, null, [0 => '- '._('All').' -']),
+$form_list->addRow(new CLabel(_('Default media type'), 'operation_opmessage_mediatypeid'),
+	(new CSelect('operation[opmessage][mediatypeid]'))
+		->setButtonId('operation_opmessage_mediatypeid')
+		->addOption(new CSelectOption('- '._('All').' -', '0')),
 	'operation-message-mediatype-default'
 );
 
 /*
  * Operation message media type row (explicit).
  */
-$form_list->addRow(_('Send only to'),
-	new CComboBox('operation[opmessage][mediatypeid]', 0, null, [0 => '- '._('All').' -']),
+$form_list->addRow(new CLabel(_('Send only to'), 'operation_opmessage_mediatypeid'),
+	(new CSelect('operation[opmessage][mediatypeid]'))
+		->setButtonId('operation_opmessage_mediatypeid')
+		->addOption(new CSelectOption('- '._('All').' -', '0')),
 	'operation-message-mediatype-only'
 );
 
@@ -182,14 +188,16 @@ $form_list->addRow((new CLabel(_('Target list')))->setAsteriskMark(),
 /*
  * Command type row.
  */
-$form_list->addRow(_('Type'),
-	(new CComboBox('operation[opcommand][type]', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, null, [
-		ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
-		ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
-		ZBX_SCRIPT_TYPE_SSH => _('SSH'),
-		ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
-		ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-	]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+$form_list->addRow(new CLabel(_('Type'), 'operation-opcommand-type'),
+	(new CSelect('operation[opcommand][type]'))
+		->setValue((string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+		->addOption(new CSelectOption(_('IPMI'), (string) ZBX_SCRIPT_TYPE_IPMI))
+		->addOption(new CSelectOption(_('Custom script'), (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT))
+		->addOption(new CSelectOption(_('SSH'), (string) ZBX_SCRIPT_TYPE_SSH))
+		->addOption(new CSelectOption(_('Telnet'), (string) ZBX_SCRIPT_TYPE_TELNET))
+		->addOption(new CSelectOption(_('Global script'), (string) ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT))
+		->setButtonId('operation-opcommand-type')
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'operation-command-type'
 );
 
@@ -222,10 +230,12 @@ $form_list->addRow((new CLabel(_('Execute on'), 'operation_opcommand_execute_on'
 /*
  * Command authentication method row.
  */
-$form_list->addRow(_('Authentication method'), (new CComboBox('operation[opcommand][authtype]', null, null, [
-		ITEM_AUTHTYPE_PASSWORD => _('Password'),
-		ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-	]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+$form_list->addRow(new CLabel(_('Authentication method'), 'operation-opcommand-authtype'),
+	(new CSelect('operation[opcommand][authtype]'))
+		->setButtonId('operation-opcommand-authtype')
+		->addOption(new CSelectOption(_('Password'), (string) ITEM_AUTHTYPE_PASSWORD))
+		->addOption(new CSelectOption(_('Public key'), (string) ITEM_AUTHTYPE_PUBLICKEY))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'operation-command-authtype'
 );
 
@@ -346,12 +356,13 @@ $form_list->addRow(new CLabel(_('Inventory mode'), 'operation_opinventory_invent
 /*
  * Conditions type of calculation row.
  */
-$form_list->addRow(_('Type of calculation'), [
-		new CComboBox('operation[evaltype]', CONDITION_EVAL_TYPE_AND_OR, '', [
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or')
-		]),
+$form_list->addRow(new CLabel(_('Type of calculation'), 'operation-evaltype'), [
+		(new CSelect('operation[evaltype]'))
+			->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
+			->addOption(new CSelectOption(_('And/Or'), (string) CONDITION_EVAL_TYPE_AND_OR))
+			->addOption(new CSelectOption(_('And'), (string) CONDITION_EVAL_TYPE_AND))
+			->addOption(new CSelectOption(_('Or'), (string) CONDITION_EVAL_TYPE_OR))
+			->setButtonId('operation-evaltype'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('operation-condition-evaltype-formula')
 	],

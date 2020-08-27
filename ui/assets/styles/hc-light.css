@@ -915,8 +915,9 @@ z-select, z-select-clone {
       text-overflow: ellipsis;
       word-break: break-all;
       white-space: pre-wrap; }
+      z-select > ul.list li.red, z-select-clone > ul.list li.red {
+        color: #990000; }
       z-select > ul.list li.hover, z-select-clone > ul.list li.hover {
-        transition: background-color .2s ease-out;
         background-color: #f4f4f4; }
       z-select > ul.list li[disabled], z-select-clone > ul.list li[disabled] {
         color: #ffffff; }
