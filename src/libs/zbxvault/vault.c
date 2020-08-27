@@ -113,6 +113,12 @@ int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs
 
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 {
+#ifndef HAVE_LIBCURL
+	ZBX_UNUSED(path);
+	ZBX_UNUSED(kvs);
+	*error = zbx_dsprintf(*error, "missing cURL library");
+	return FAIL;
+#else
 	char			*out = NULL, *url, header[MAX_STRING_LEN], *left, *right;
 	struct zbx_json_parse	jp, jp_data, jp_data_data;
 	int			ret = FAIL;
@@ -175,6 +181,7 @@ fail:
 	zbx_free(out);
 
 	return ret;
+#endif
 }
 
 int	zbx_vault_init_token_from_env(char **error)
@@ -209,7 +216,7 @@ int	zbx_vault_init_db_credentials(char **error)
 
 	if (NULL != CONFIG_DBUSER)
 	{
-		*error = zbx_dsprintf(*error, "\"DBName\" configuration parameter cannot be used when \"VaultDBPath\""
+		*error = zbx_dsprintf(*error, "\"DBUser\" configuration parameter cannot be used when \"VaultDBPath\""
 				" is defined");
 		return FAIL;
 	}
