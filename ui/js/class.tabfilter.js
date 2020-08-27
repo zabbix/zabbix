@@ -131,25 +131,6 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
-			 * Delete tab filter item. Removed HTML elements and CTabFilterItem object. Update index of tabfilter items.
-			 */
-			deleteItem: (ev) => {
-				let item = ev.detail.target,
-					index = this._items.indexOf(item);
-
-				if (index > -1) {
-					this._active_item = this._items[index - 1];
-					this._active_item.select();
-					item._target.parentNode.remove();
-					delete this._items[index];
-					this._items.splice(index, 1);
-					this._items.forEach((item, index) => {
-						item._index = index;
-					});
-				}
-			},
-
-			/**
 			 * Item properties updated event handler, is called when tab properties popup were closed pressing 'Update'.
 			 */
 			updateItem: (ev) => {
@@ -181,6 +162,9 @@ class CTabFilter extends CBaseComponent {
 							window.location.reload(true);
 						});
 					}
+				}
+				else if (ev.detail.form_action === 'delete') {
+					this.delete(this._active_item);
 				}
 			},
 
@@ -297,7 +281,6 @@ class CTabFilter extends CBaseComponent {
 		for (const item of this._items) {
 			item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
-			item.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteItem);
 			item.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
 			item.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateItem);
 		}
@@ -319,6 +302,24 @@ class CTabFilter extends CBaseComponent {
 
 		this.on('keydown', this._events.keydown);
 		this.on('popup.tabfilter', this._events.popupUpdateAction);
+	}
+
+	/**
+	 * Delete item from items collection.
+	 */
+	delete(item) {
+		let index = this._items.indexOf(item);
+
+		if (index > -1) {
+			this._active_item = this._items[index - 1];
+			this._active_item.select();
+			item.delete();
+			delete this._items[index];
+			this._items.splice(index, 1);
+			this._items.forEach((item, index) => {
+				item._index = index;
+			});
+		}
 	}
 
 	/**

@@ -23,7 +23,6 @@ const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.tabfilter';
 const TABFILTERITEM_EVENT_EXPAND   = 'expand.tabfilter';
 const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore.tabfilter';
 const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
-const TABFILTERITEM_EVENT_DELETE = 'delete.tabfilter';
 const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
 const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter';
 
@@ -191,8 +190,8 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	delete() {
+		this._target.parentNode.remove();
 		this._content_container.remove();
-		this.fire(TABFILTERITEM_EVENT_DELETE);
 	}
 
 	/**
