@@ -39,11 +39,10 @@
 				data.tags = [];
 			}
 
-			console.log('data', data);
 			// Modify filter data of flickerfreeScreen object with id 'problem'.
 			window.flickerfreeScreen.screens['problem'].data.filter = data;
 			$.publish('timeselector.rangeupdate', {
-				from: 'now-1y',
+				from: data.from,
 				to: data.to
 			});
 		});

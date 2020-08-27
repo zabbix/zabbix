@@ -129,8 +129,8 @@ class CControllerProblemView extends CControllerProblem {
 			'timerange' => [
 				'idx' => static::FILTER_IDX,
 				'idx2' => 0,
-				'from' => ZBX_PERIOD_DEFAULT_FROM,
-				'to' => ZBX_PERIOD_DEFAULT_TO,
+				'from' => $filter['from'],
+				'to' => $filter['to']
 			],
 			'filter_tabs' => $filter_tabs,
 			'tab_selected' => $profile->selected,

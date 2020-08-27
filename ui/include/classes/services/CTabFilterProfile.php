@@ -44,6 +44,16 @@ class CTabFilterProfile {
 	public $expanded;
 
 	/**
+	 * Global time range start.
+	 */
+	public $from;
+
+	/**
+	 * Global time range end.
+	 */
+	public $to;
+
+	/**
 	 * Array of tabs filter arrays.
 	 * Tab filter properties:
 	 * @property string []['filter_name']          Tab label.
@@ -106,9 +116,16 @@ class CTabFilterProfile {
 	 * @return array
 	 */
 	public function getTabFilter($index): array {
-		return array_key_exists($index, $this->tabfilters)
+		$data = array_key_exists($index, $this->tabfilters)
 			? $this->tabfilters[$index] + $this->filter_defaults
 			: $this->filter_defaults;
+
+		if (!$data['filter_custom_time']) {
+			$data['from'] = $this->from;
+			$data['to'] = $this->to;
+		}
+
+		return $data;
 	}
 
 	/**
@@ -150,7 +167,10 @@ class CTabFilterProfile {
 					$this->update();
 				}
 
-				$this->tabfilters[$name_index] = $input + $this->filter_defaults;
+				$input += $this->filter_defaults;
+				$input['filter_show_counter'] = (int) $input['filter_show_counter'];
+				$input['filter_custom_time'] = (int) $input['filter_custom_time'];
+				$this->tabfilters[$name_index] = $input;
 			}
 		}
 
@@ -205,6 +225,8 @@ class CTabFilterProfile {
 	 * Read profile from database.
 	 */
 	public function read() {
+		$this->from = CProfile::get($this->namespace.'.from', ZBX_PERIOD_DEFAULT_FROM);
+		$this->to = CProfile::get($this->namespace.'.to', ZBX_PERIOD_DEFAULT_TO);
 		$this->selected = (int) CProfile::get($this->namespace.'.selected', 0);
 		$this->expanded = (bool) CProfile::get($this->namespace.'.expanded', true);
 		// CProfile::updateArray assign new idx2 values do not need to store order in profile
