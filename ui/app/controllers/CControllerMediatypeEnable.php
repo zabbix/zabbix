@@ -69,10 +69,10 @@ class CControllerMediatypeEnable extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Media type enabled', 'Media types enabled', $updated));
+			CMessageHelper::setSuccessTitle(_n('Media type enabled', 'Media types enabled', $updated));
 		}
 		else {
-			$response->setMessageError(_n('Cannot enable media type', 'Cannot enable media types', $updated));
+			CMessageHelper::setErrorTitle(_n('Cannot enable media type', 'Cannot enable media types', $updated));
 		}
 		$this->setResponse($response);
 	}

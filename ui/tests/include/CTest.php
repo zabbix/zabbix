@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CMessageHelper.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
@@ -323,6 +324,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
+
 		if ($this->case_backup !== null) {
 			CDBHelper::restoreTables();
 		}
@@ -339,7 +342,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
 		}
 
-		if (($errors = @file_get_contents(PHPUNIT_ERROR_LOG))) {
+		if ($errors !== '' && $errors !== false) {
 			$this->fail("Runtime errors:\n".$errors);
 		}
 	}
@@ -460,7 +463,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 			}
 
 			$behavior->setTest($this);
-			$this->behaviors[$name] = $behavior;
+			if ($name !== null) {
+				$this->behaviors[$name] = $behavior;
+			}
+			else {
+				$this->behaviors[] = $behavior;
+			}
 		}
 		else {
 			throw new Exception('Cannot attach behavior that is not an instance of CBehavior class');

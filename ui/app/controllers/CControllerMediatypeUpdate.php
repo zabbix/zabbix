@@ -74,7 +74,7 @@ class CControllerMediatypeUpdate extends CController {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update media type'));
+					CMessageHelper::setErrorTitle(_('Cannot update media type'));
 					$this->setResponse($response);
 					break;
 
@@ -170,14 +170,14 @@ class CControllerMediatypeUpdate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Media type updated'));
+			CMessageHelper::setSuccessTitle(_('Media type updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'mediatype.edit')
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update media type'));
+			CMessageHelper::setErrorTitle(_('Cannot update media type'));
 		}
 		$this->setResponse($response);
 	}

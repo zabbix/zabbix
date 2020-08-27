@@ -61,8 +61,9 @@ const (
 type ResultCache interface {
 	Start()
 	Stop()
-	UpdateOptions(options *agent.AgentOptions)
 	Upload(u Uploader)
+	// TODO: will be used once the runtime configuration reload is implemented
+	UpdateOptions(options *agent.AgentOptions)
 }
 
 type AgentData struct {
@@ -116,6 +117,7 @@ func (c *cacheData) Write(result *plugin.Result) {
 	c.input <- result
 }
 
+// TODO: will be used once the runtime configuration reload is implemented
 func (c *cacheData) UpdateOptions(options *agent.AgentOptions) {
 	c.input <- options
 }
@@ -210,6 +212,9 @@ func prepareDiskCache(options *agent.AgentOptions, addresses []string) (err erro
 	if err != nil {
 		return err
 	}
+
+	defer stmt.Close()
+
 	if _, err = stmt.Exec(); err != nil {
 		return err
 	}
@@ -222,6 +227,7 @@ func prepareDiskCache(options *agent.AgentOptions, addresses []string) (err erro
 	if err != nil {
 		return err
 	}
+
 	for rows.Next() {
 		if err = rows.Scan(&id, &address); err != nil {
 			rows.Close()
@@ -256,6 +262,9 @@ addressCheck:
 		if err != nil {
 			return err
 		}
+
+		defer stmt.Close()
+
 		if _, err = stmt.Exec(addr); err != nil {
 			return err
 		}
@@ -275,6 +284,9 @@ addressCheck:
 		if err != nil {
 			return err
 		}
+
+		defer stmt.Close()
+
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}
@@ -286,6 +298,9 @@ addressCheck:
 		if err != nil {
 			return err
 		}
+
+		defer stmt.Close()
+
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}

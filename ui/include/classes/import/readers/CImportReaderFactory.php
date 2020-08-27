@@ -21,6 +21,7 @@
 
 class CImportReaderFactory {
 
+	const YAML = 'yaml';
 	const XML = 'xml';
 	const JSON = 'json';
 
@@ -36,10 +37,15 @@ class CImportReaderFactory {
 	 */
 	public static function getReader($format) {
 		switch ($format) {
-			case 'xml':
+			case self::YAML:
+				return new CYamlImportReader();
+
+			case self::XML:
 				return new CXmlImportReader();
-			case 'json':
+
+			case self::JSON:
 				return new CJsonImportReader();
+
 			default:
 				throw new Exception(_s('Unsupported import format "%1$s".', $format));
 		}
@@ -57,13 +63,18 @@ class CImportReaderFactory {
 	 */
 	public static function fileExt2ImportFormat($ext) {
 		switch ($ext) {
+			case 'yaml':
+			case 'yml':
+				return CImportReaderFactory::YAML;
+
 			case 'xml':
 				return CImportReaderFactory::XML;
+
 			case 'json':
 				return CImportReaderFactory::JSON;
+
 			default:
 				throw new Exception(_s('Unsupported import file extension "%1$s".', $ext));
 		}
-
 	}
 }

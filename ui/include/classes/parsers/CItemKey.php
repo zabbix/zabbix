@@ -36,7 +36,6 @@ class CItemKey extends CParser {
 
 	private $key = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
 	private $parameters = [];
-	private $error = '';
 
 	/**
 	 * An options array
@@ -52,32 +51,12 @@ class CItemKey extends CParser {
 	 * @param array $options
 	 */
 	public function __construct($options = []) {
+		$this->error_msgs['empty'] = _('key is empty');
+		$this->error_msgs['unexpected_end'] = _('unexpected end of key');
+
 		if (array_key_exists('18_simple_checks', $options)) {
 			$this->options['18_simple_checks'] = $options['18_simple_checks'];
 		}
-	}
-
-	/**
-	 * Returns an error message depending on input parameters.
-	 *
-	 * @param string $key
-	 * @param int $pos
-	 *
-	 * @return string
-	 */
-	private function errorMessage($key, $pos) {
-		for ($i = $pos, $chunk = '', $maxChunkSize = 50; isset($key[$i]); $i++) {
-			if (0x80 != (0xc0 & ord($key[$i])) && $maxChunkSize-- == 0) {
-				break;
-			}
-			$chunk .= $key[$i];
-		}
-
-		if (isset($key[$i])) {
-			$chunk .= ' ...';
-		}
-
-		return _s('incorrect syntax near "%1$s"', $chunk);
 	}
 
 	/**
@@ -108,6 +87,7 @@ class CItemKey extends CParser {
 		$this->match = '';
 		$this->key = '';
 		$this->parameters = [];
+		$this->errorClear();
 
 		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
 			// Code is not missing here.
@@ -115,9 +95,7 @@ class CItemKey extends CParser {
 
 		// is key empty?
 		if ($p == $offset) {
-			$this->error = isset($data[$p])
-				? $this->errorMessage(substr($data, $offset), 0)
-				: _('key is empty');
+			$this->errorPos(substr($data, $offset), 0);
 
 			return self::PARSE_FAIL;
 		}
@@ -164,13 +142,10 @@ class CItemKey extends CParser {
 		$this->match = substr($data, $offset, $this->length);
 
 		if (!isset($data[$p])) {
-			$this->error = '';
 			return self::PARSE_SUCCESS;
 		}
 
-		$this->error = !isset($data[$p2])
-			? _('unexpected end of key')
-			: $this->errorMessage(substr($data, $offset), $p2 - $offset);
+		$this->errorPos(substr($data, $offset), $p2 - $offset);
 
 		return self::PARSE_SUCCESS_CONT;
 	}
@@ -304,15 +279,6 @@ class CItemKey extends CParser {
 		$pos = $p;
 
 		return ($state == self::STATE_END_OF_PARAMS);
-	}
-
-	/**
-	 * Returns the error message if key is invalid.
-	 *
-	 * @return string
-	 */
-	public function getError() {
-		return $this->error;
 	}
 
 	/**

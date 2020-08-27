@@ -1267,6 +1267,14 @@ jQuery(function($) {
 					});
 				},
 
+				// onWidgetCopy trigger method
+				onWidgetCopy: function() {
+					var $this = $(this);
+					return this.each(function() {
+						updateWidgetFields($this);
+					});
+				},
+
 				// onEditStart trigger method
 				onEditStart: function() {
 					var $this = $(this);
@@ -1314,7 +1322,9 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var	triggers = ['onEditStart', 'beforeDashboardSave','beforeConfigLoad', 'onDashboardReady'];
+						var	triggers = ['onEditStart', 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
+							'onDashboardReady'
+						];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-container").dashboardGrid("addAction", trigger,

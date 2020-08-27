@@ -46,12 +46,16 @@ class CSetupWizard extends CForm {
 				'fnc' => 'stage3'
 			],
 			4 => [
-				'title' => _('Pre-installation summary'),
+				'title' => _('GUI settings'),
 				'fnc' => 'stage4'
 			],
 			5 => [
-				'title' => _('Install'),
+				'title' => _('Pre-installation summary'),
 				'fnc' => 'stage5'
+			],
+			6 => [
+				'title' => _('Install'),
+				'fnc' => 'stage6'
 			]
 		];
 
@@ -61,11 +65,11 @@ class CSetupWizard extends CForm {
 	}
 
 	function getConfig($name, $default = null) {
-		return CSession::keyExists($name) ? CSession::getValue($name) : $default;
+		return CSessionHelper::has($name) ? CSessionHelper::get($name) : $default;
 	}
 
 	function setConfig($name, $value) {
-		CSession::setValue($name, $value);
+		CSessionHelper::set($name, $value);
 	}
 
 	function getStep() {
@@ -93,12 +97,12 @@ class CSetupWizard extends CForm {
 	}
 
 	protected function bodyToString($destroy = true) {
+		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
+
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
 			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
 			->addItem($this->getList());
-
-		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
 
 		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$cancel_button = (new CSubmit('cancel', _('Cancel')))
@@ -346,9 +350,8 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($this->STEP_FAILED) {
-			global $ZBX_MESSAGES;
-
-			$message_box = makeMessageBox(false, $ZBX_MESSAGES, _('Cannot connect to the database.'), false, true);
+			$message_box = makeMessageBox(false, CMessageHelper::getMessages(), _('Cannot connect to the database.'),
+				false, true);
 		}
 		else {
 			$message_box = null;
@@ -392,7 +395,26 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage4() {
+	protected function stage4(): array {
+		$timezones = DateTimeZone::listIdentifiers();
+
+		$table = (new CFormList())
+			->addRow(_('Default time zone'),
+				new CComboBox('default_timezone', $this->getConfig('default_timezone'), null,
+					[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
+				)
+			)
+			->addRow(_('Default theme'),
+				new CComboBox('default_theme', $this->getConfig('default_theme'), 'submit()', APP::getThemes())
+			);
+
+		return [
+			new CTag('h1', true, _('GUI settings')),
+			(new CDiv($table))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
+		];
+	}
+
+	protected function stage5(): array {
 		$db_type = $this->getConfig('DB_TYPE');
 		$databases = CFrontendSetup::getSupportedDatabases();
 
@@ -443,9 +465,13 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage5() {
+	protected function stage6(): array {
 		$this->dbConnect();
-		DBexecute('UPDATE config SET default_lang='.zbx_dbstr($this->getConfig('default_lang')));
+		$update = [];
+		foreach (['default_lang', 'default_timezone', 'default_theme'] as $key) {
+			$update[] = $key.'='.zbx_dbstr($this->getConfig($key));
+		}
+		DBexecute('UPDATE config SET '.implode(',', $update));
 		$this->dbClose();
 
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
@@ -475,6 +501,14 @@ class CSetupWizard extends CForm {
 		];
 
 		$error = false;
+
+		// Create session secret key.
+		if (!$this->dbConnect() || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
+			$this->STEP_FAILED = true;
+			$this->setConfig('step', 2);
+			return $this->stage2();
+		}
+		$this->dbClose();
 
 		if (!$config->save()) {
 			$error = true;
@@ -663,12 +697,7 @@ class CSetupWizard extends CForm {
 				$this->doNext();
 			}
 		}
-		elseif ($this->getStep() == 4) {
-			if (hasRequest('next') && array_key_exists(4, getRequest('next'))) {
-				$this->doNext();
-			}
-		}
-		elseif ($this->getStep() == 5) {
+		elseif ($this->getStep() == 6) {
 			if (hasRequest('save_config')) {
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');

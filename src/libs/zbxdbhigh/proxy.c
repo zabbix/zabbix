@@ -3626,7 +3626,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 		int	ret;
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL,
 				&allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
@@ -3922,7 +3922,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
 				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu status:%d value:'%s'",
 				__func__, drule.druleid, service->dcheckid, drule.unique_dcheckid,
-				zbx_date2str(service->itemtime), zbx_time2str(service->itemtime), ip, service->dns,
+				zbx_date2str(service->itemtime, NULL), zbx_time2str(service->itemtime, NULL), ip, service->dns,
 				service->port, service->status, service->value);
 
 		if (0 == service->dcheckid)

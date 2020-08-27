@@ -371,6 +371,7 @@ typedef struct
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
+	char		*default_timezone;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -388,6 +389,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_HOUSEKEEPER			__UINT64_C(0x0000000000000020)
 #define ZBX_CONFIG_FLAGS_DB_EXTENSION			__UINT64_C(0x0000000000000040)
 #define ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT		__UINT64_C(0x0000000000000080)
+#define ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE		__UINT64_C(0x0000000000000100)
 
 /* possible values for database extensions (if flag ZBX_CONFIG_FLAGS_DB_EXTENSION set) */
 #define ZBX_CONFIG_DB_EXTENSION_TIMESCALE		"timescaledb"
@@ -980,6 +982,7 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env);
 
 const char	*zbx_dc_get_instanceid(void);
 
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 
 #endif

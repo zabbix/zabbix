@@ -806,14 +806,12 @@ else {
 		$data['showInfoColumn'] = true;
 	}
 
-	$config = select_config();
-
 	$options = [
 		'output' => ['httptestid', $sortField],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 		'groupids' => $filter_groupids,
 		'editable' => true,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	if ($data['filter']['status'] != -1) {
 		$options['filter']['status'] = $data['filter']['status'];

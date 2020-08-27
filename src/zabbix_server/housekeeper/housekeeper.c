@@ -427,7 +427,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
 			tmp = zbx_strdup(tmp, row[2]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, &tmp,
 					MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
@@ -458,7 +458,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				continue;
 
 			tmp = zbx_strdup(tmp, row[3]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, &tmp,
 					MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
@@ -909,7 +909,7 @@ static int	housekeeping_cleanup(void)
 	/* assemble list of tables included in the housekeeping procedure */
 	for (table = hk_cleanup_tables; NULL != table->name; table++)
 	{
-		if (ZBX_HK_MODE_REGULAR != *table->poption_mode || ZBX_HK_OPTION_ENABLED == *table->poption_global)
+		if (ZBX_HK_MODE_REGULAR != *table->poption_mode)
 			continue;
 
 		table_name_esc = DBdyn_escape_string(table->name);

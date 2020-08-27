@@ -91,8 +91,6 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=regex.list',	'Configuration of regular expressions'],
 			['zabbix.php?action=macros.edit',	'Configuration of macros'],
 			['zabbix.php?action=valuemap.list',	'Configuration of value mapping'],
-			['zabbix.php?action=workingtime.edit',	'Configuration of working time'],
-			['zabbix.php?action=trigseverity.edit',	'Configuration of trigger severities'],
 			['zabbix.php?action=trigdisplay.edit',	'Configuration of trigger displaying options'],
 			['zabbix.php?action=miscconfig.edit',	'Other configuration parameters'],
 

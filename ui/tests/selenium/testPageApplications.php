@@ -110,7 +110,7 @@ class testPageApplications extends CLegacyWebTest {
 			foreach ($host_app as $appid => $app_name) {
 				$sql_count_item = CDBHelper::getCount('SELECT NULL FROM items WHERE flags<>2 AND itemid IN'
 						.'(SELECT itemid FROM items_applications WHERE applicationid='.$appid.')');
-				$xpath = '//input[@id="applications_'.$appid.'"]/../..//sup';
+				$xpath = '//input[@id="applicationids_'.$appid.'"]/../..//sup';
 
 				if ($sql_count_item === 0) {
 					$this->zbxTestAssertElementNotPresentXpath($xpath);
@@ -147,7 +147,7 @@ class testPageApplications extends CLegacyWebTest {
 	public function selectApplications($app_names, $host, $hostgroup) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
-		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_set=1');
 		$this->zbxTestWaitForPageToLoad();
 		// Filter applications by host
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
@@ -179,7 +179,7 @@ class testPageApplications extends CLegacyWebTest {
 			$this->assertEquals([], array_diff($result['apps'], $app_names));
 
 			foreach (array_keys($result['apps']) as $appid) {
-				$this->zbxTestCheckboxSelect('applications_'.$appid);
+				$this->zbxTestCheckboxSelect('applicationids_'.$appid);
 			}
 		}
 

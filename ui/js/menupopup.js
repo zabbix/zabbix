@@ -405,6 +405,7 @@ function getMenuPopupMapElementImage(options) {
 /**
  * Get menu popup refresh section data.
  *
+ * @param {integer}  options['widgetid']	 Widget ID.
  * @param {string}   options['widgetName']   Widget name.
  * @param {string}   options['currentRate']  Current rate value.
  * @param {bool}     options['multiplier']   Multiplier or time mode.
@@ -488,10 +489,11 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							'widgetid': options.widgetName,
+							'widgetid': options.widgetid,
 							'rf_rate': currentRate
-						},
-						success: function() {
+						}
+					})
+						.then(function() {
 							jQuery('a', $obj.closest('.menu-popup')).each(function() {
 								var link = jQuery(this);
 
@@ -513,13 +515,12 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 
 							jQuery('.dashbrd-grid-container')
-								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
-						},
-						error: function() {
+								.dashboardGrid('setWidgetRefreshRate', options.widgetid, parseInt(currentRate));
+						})
+						.fail(function() {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 							// TODO: gentle message about failed saving of widget refresh rate
-						}
-					});
+						});
 				}
 			}
 		};
@@ -554,8 +555,10 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
-		menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
 		widget_actions = [];
+
+	options.widgetid = widgetid;
+	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
 
 	widget_actions.push({
 		label: t('S_COPY'),
@@ -915,20 +918,41 @@ function getMenuPopupDropdown(options, trigger_elem) {
 	var items = [];
 
 	jQuery.each(options.items, function(i, item) {
-		items.push({
+		var row = {
 			label: item.label,
-			url: item.url || 'javascript:void(0);',
-			class: item.class,
-			clickCallback: () => {
+			url: item.url || 'javascript:void(0);'
+		};
+
+		if (item.class) {
+			row.class = item.class;
+		}
+
+		if (options.toggle_class) {
+			row.clickCallback = () => {
 				jQuery(trigger_elem)
 					.removeClass()
-					.addClass(['btn-alt', 'btn-dropdown-toggle', item.class].join(' '));
+					.addClass(['btn-alt', options.toggle_class, item.class].join(' '));
 
 				jQuery('input[type=hidden]', jQuery(trigger_elem).parent())
 					.val(item.value)
 					.trigger('change');
 			}
-		});
+		}
+		else if (options.submit_form) {
+			row.url = 'javascript:void(0);';
+			row.clickCallback = () => {
+				var $_form = trigger_elem.closest('form');
+
+				if (!$_form.data("action")) {
+					$_form.data("action", $_form.attr("action"));
+				}
+
+				$_form.attr("action", item.url);
+				$_form.submit();
+			}
+		}
+
+		items.push(row);
 	});
 
 	return [{

@@ -147,11 +147,12 @@ class CXmlValidatorGeneral {
 				}
 
 				switch ($this->format) {
-					case 'xml':
+					case CImportReaderFactory::XML:
 						$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
 						break;
 
-					case 'json':
+					case CImportReaderFactory::YAML:
+					case CImportReaderFactory::JSON:
 						$is_valid_tag = ctype_digit(strval($tag));
 						break;
 

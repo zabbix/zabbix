@@ -25,9 +25,8 @@ class CControllerPopupMedia extends CController {
 	protected function init() {
 		$this->disableSIDvalidation();
 
-		$config = select_config();
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$this->severities[$severity] = getSeverityName($severity, $config);
+			$this->severities[$severity] = getSeverityName($severity);
 		}
 	}
 
@@ -154,17 +153,15 @@ class CControllerPopupMedia extends CController {
 			}
 
 			$db_mediatypes = API::MediaType()->get([
-				'output' => ['name', 'type'],
+				'output' => ['name', 'type', 'status'],
 				'preservekeys' => true
 			]);
 			CArrayHelper::sort($db_mediatypes, ['name']);
 
 			$mediatypes = [];
-			foreach ($db_mediatypes as $mediatypeid => &$db_mediatype) {
+			foreach ($db_mediatypes as $mediatypeid => $db_mediatype) {
 				$mediatypes[$mediatypeid] = $db_mediatype['type'];
-				$db_mediatype = $db_mediatype['name'];
 			}
-			unset($db_mediatype);
 
 			$data = [
 				'title' => _('Media'),

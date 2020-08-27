@@ -201,7 +201,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$msg = [
 			'type' => 'error',
 			'message' => _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
-			'src' => ''
+			'source' => ''
 		];
 
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
@@ -1032,8 +1032,6 @@ else {
 		];
 	}
 
-	$config = select_config();
-
 	$filter['templates'] = $filter['templates']
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
@@ -1058,6 +1056,7 @@ else {
 	}
 
 	// Select templates.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$templates = API::Template()->get([
 		'output' => ['templateid', $sortField],
 		'evaltype' => $filter['evaltype'],
@@ -1069,7 +1068,7 @@ else {
 		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $limit
 	]);
 
 	order_result($templates, $sortField, $sortOrder);
@@ -1137,7 +1136,7 @@ else {
 	if ($linked_hostids) {
 		$editable_hosts = API::Host()->get([
 			'output' => ['hostid'],
-			'hostsids' => array_keys($linked_hostids),
+			'hostids' => array_keys($linked_hostids),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -1150,14 +1149,14 @@ else {
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
-		'config' => [
-			'max_in_table' => $config['max_in_table']
-		],
 		'editable_templates' => $editable_templates,
 		'editable_hosts' => $editable_hosts,
 		'profileIdx' => 'web.templates.filter',
 		'active_tab' => CProfile::get('web.templates.filter.active', 1),
-		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		]
 	];
 
 	$view = new CView('configuration.template.list', $data);

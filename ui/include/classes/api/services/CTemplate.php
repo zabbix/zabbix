@@ -263,7 +263,7 @@ class CTemplate extends CHostGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($template = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -316,7 +316,6 @@ class CTemplate extends CHostGeneral {
 			$templates[$key]['groups'] = zbx_toArray($template['groups']);
 		}
 
-		$ins_tags = [];
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
@@ -334,12 +333,6 @@ class CTemplate extends CHostGeneral {
 
 			$templateIds[] = $templateId;
 
-			if (array_key_exists('tags', $template)) {
-				foreach ($template['tags'] as $tag) {
-					$ins_tags[] = ['hostid' => $templateId] + $tag;
-				}
-			}
-
 			foreach ($template['groups'] as $group) {
 				$hostGroupId = get_dbid('hosts_groups', 'hostgroupid');
 
@@ -351,6 +344,10 @@ class CTemplate extends CHostGeneral {
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add group.'));
 				}
+			}
+
+			if (array_key_exists('tags', $template) && $template['tags']) {
+				$this->createTags([$templateId => zbx_toArray($template['tags'])]);
 			}
 
 			$template['templateid'] = $templateId;
@@ -367,10 +364,6 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
-		}
-
 		return ['templateids' => $templateIds];
 	}
 
@@ -384,7 +377,7 @@ class CTemplate extends CHostGeneral {
 	protected function validateCreate(array $templates) {
 		$groupIds = [];
 
-		foreach ($templates as $template) {
+		foreach ($templates as &$template) {
 			// check if hosts have at least 1 group
 			if (!isset($template['groups']) || !$template['groups']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -395,9 +388,18 @@ class CTemplate extends CHostGeneral {
 			$template['groups'] = zbx_toArray($template['groups']);
 
 			foreach ($template['groups'] as $group) {
+				if (!is_array($group) || (is_array($group) && !array_key_exists('groupid', $group))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'groups',
+							_s('the parameter "%1$s" is missing', 'groupid')
+						)
+					);
+				}
+
 				$groupIds[$group['groupid']] = $group['groupid'];
 			}
 		}
+		unset($template);
 
 		$dbHostGroups = API::HostGroup()->get([
 			'output' => ['groupid'],
@@ -509,7 +511,7 @@ class CTemplate extends CHostGeneral {
 		$macros = [];
 		foreach ($templates as &$template) {
 			if (isset($template['macros'])) {
-				$macros[$template['templateid']] = $template['macros'];
+				$macros[$template['templateid']] = zbx_toArray($template['macros']);
 
 				unset($template['macros']);
 			}
@@ -538,7 +540,7 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		$this->updateTags($templates, 'templateid');
+		$this->updateTags(array_column($templates, 'tags', 'templateid'));
 
 		return ['templateids' => zbx_objectValues($templates, 'templateid')];
 	}

@@ -1011,7 +1011,9 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	$history = Manager::History()->getLastValues($visible_items, 1, ZBX_HISTORY_PERIOD);
+	$history = Manager::History()->getLastValues($visible_items, 1,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+	);
 
 	$db_triggers = getTriggersWithActualSeverity([
 		'output' => ['triggerid', 'priority', 'value'],
@@ -1072,8 +1074,7 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
  * @return array
  */
 function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
-	$config = select_config();
-
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1088,7 +1089,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 	}
@@ -1099,7 +1100,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'groupids' => $groupids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 	}
@@ -1123,7 +1124,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
-	$config = select_config();
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1140,7 +1141,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => $limit
 		]);
 	}
 	else {
@@ -1152,7 +1153,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'groupids' => $groupids,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => $limit
 		]);
 	}
 
@@ -1180,7 +1181,9 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
 	}
 
-	$hidden_items_cnt = count(array_splice($items_by_name, ZBX_MAX_TABLE_COLUMNS));
+	$hidden_items_cnt = count(array_splice($items_by_name, (int) CSettingsHelper::get(
+		CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE
+	)));
 
 	$itemids = [];
 	foreach ($items_by_name as $hostid_to_itemid) {
@@ -1192,7 +1195,7 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 
 	$db_hosts = getDataOverviewHosts(null, null, $itemids);
 	$db_hosts_ctn = count($db_hosts);
-	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
+	$db_hosts = array_slice($db_hosts, 0, (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE), true);
 
 	$has_hidden_data = ($hidden_items_cnt || ($db_hosts_ctn > count($db_hosts)));
 
@@ -1209,7 +1212,9 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 function getDataOverviewTop(?array $groupids, ?array $hostids, string $application = ''): array {
 	$db_hosts = getDataOverviewHosts($groupids, $hostids, null, $application);
 	$hostids = array_keys($db_hosts);
-	$hidden_db_hosts_cnt = count(array_splice($hostids, ZBX_MAX_TABLE_COLUMNS));
+	$hidden_db_hosts_cnt = count(array_splice($hostids, (int) CSettingsHelper::get(
+		CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE
+	)));
 	$db_hosts = array_intersect_key($db_hosts, array_flip($hostids));
 
 	$db_items = getDataOverviewItems(null, $hostids, $application);
@@ -1222,7 +1227,9 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	}
 
 	$items_by_name_ctn = count($items_by_name);
-	$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
+	$items_by_name = array_slice($items_by_name, 0,
+		(int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE), true
+	);
 
 	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name)));
 

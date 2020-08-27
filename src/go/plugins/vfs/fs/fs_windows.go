@@ -23,6 +23,7 @@ import (
 	"syscall"
 
 	"golang.org/x/sys/windows"
+	"zabbix.com/pkg/plugin"
 )
 
 func getMountPaths() (paths []string, err error) {
@@ -145,14 +146,14 @@ func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
 	return
 }
 
-func (p *Plugin) getFsInfoStats() (data []*FsInfo, err error) {
+func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 	var paths []string
 	if paths, err = getMountPaths(); err != nil {
 		return
 	}
-	fsmap := make(map[string]*FsInfo)
+	fsmap := make(map[string]*FsInfoNew)
 	for _, path := range paths {
-		var info FsInfo
+		var info FsInfoNew
 		if fsname, fstype, drivetype, fserr := getFsInfo(path); fserr == nil {
 			info.FsName = &fsname
 			info.FsType = &fstype
@@ -178,4 +179,16 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfo, err error) {
 		}
 	}
 	return
+}
+
+func getFsInode(string) (*FsStats, error) {
+	return nil, plugin.UnsupportedMetricError
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "VfsFs",
+		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
+		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
+	)
 }

@@ -191,7 +191,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				)
 			)
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
-				$problem['name'], getSeverityName($problem['severity'], $data['config'])
+				$problem['name'], getSeverityName($problem['severity'])
 			))
 	];
 
@@ -207,14 +207,17 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$description->addClass($description_style);
 	}
 
-	if (!$show_recovery_data && $data['config'][$is_acknowledged ? 'problem_ack_style' : 'problem_unack_style']) {
+	if (!$show_recovery_data
+			&& (($is_acknowledged && $data['config']['problem_ack_style'])
+				|| (!$is_acknowledged && $data['config']['problem_unack_style']))) {
 		// blinking
 		$duration = time() - $problem['clock'];
+		$blink_period = timeUnitToSeconds($data['config']['blink_period']);
 
-		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
+		if ($blink_period != 0 && $duration < $blink_period) {
 			$description
 				->addClass('blink')
-				->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration)
+				->setAttribute('data-time-to-blink', $blink_period - $duration)
 				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
@@ -258,7 +261,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
 		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
-			$data['data']['users'], $data['config']
+			$data['data']['users']
 		),
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));

@@ -105,7 +105,7 @@ function getMainMenu(): CMenu {
 						->setAliases(['conf.import.php?rules_preset=template']),
 					(new CMenuItem(_('Hosts')))
 						->setUrl(new CUrl('hosts.php'), 'hosts.php')
-						->setAliases(['items.php', 'triggers.php', 'graphs.php', 'applications.php',
+						->setAliases(['items.php', 'triggers.php', 'graphs.php', 'application.list', 'application.edit',
 							'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
 							'host_prototypes.php', 'httpconf.php', 'conf.import.php?rules_preset=host'
 						]),

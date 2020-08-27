@@ -53,6 +53,7 @@ typedef struct
 #endif
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;
+	ZBX_CPUS_UTIL_DATA_AIX	cpus_phys_util;
 #endif
 #ifdef HAVE_KSTAT_H
 	zbx_kstat_t		kstat;

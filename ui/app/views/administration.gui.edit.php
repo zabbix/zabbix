@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.gui.edit.js.php');
+
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
@@ -60,17 +62,31 @@ elseif ($all_locales_available == 0) {
 	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 
+$timezones = DateTimeZone::listIdentifiers();
+
 $gui_tab = (new CFormList())
 	->addRow(_('Default language'),
 		($language_error !== '')
 			? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
 			: $lang_combobox
 	)
+	->addRow(_('Default time zone'),
+		new CComboBox('default_timezone', $data['default_timezone'], null,
+			[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
+		)
+	)
 	->addRow(_('Default theme'),
 		new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes())
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(
+		(new CLabel(_('Max number of columns and rows in overview tables'), 'max_overview_table_size'))
+			->setAsteriskMark(),
+		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 6))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
@@ -83,11 +99,42 @@ $gui_tab = (new CFormList())
 		(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))
 			->setUncheckedValue('0')
 			->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)
+	)
+	->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
+		(new CTextBox('work_period', $data['work_period']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(_('Show technical errors'),
+		(new CCheckBox('show_technical_errors'))
+			->setUncheckedValue('0')
+			->setChecked($data['show_technical_errors'] == 1)
+	)
+	->addRow(
+		(new CLabel(_('Max history display period'), 'history_period'))->setAsteriskMark(),
+		(new CTextBox('history_period', $data['history_period'], false, DB::getFieldLength('config', 'history_period')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Time filter default period'), 'period_default'))->setAsteriskMark(),
+		(new CTextBox('period_default', $data['period_default'], false, DB::getFieldLength('config', 'period_default')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Max period'), 'max_period'))->setAsteriskMark(),
+		(new CTextBox('max_period', $data['max_period'], false, DB::getFieldLength('config', 'max_period')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	);
 
 $gui_view = (new CTabView())
 	->addTab('gui', _('GUI'), $gui_tab)
-	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+	->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		[new CButton('resetDefaults', _('Reset defaults'))]
+	));
 
 $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
