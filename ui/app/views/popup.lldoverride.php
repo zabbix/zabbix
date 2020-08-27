@@ -60,17 +60,23 @@ $overrides_popup_form_list = (new CFormList())
 	);
 
 // filters
+$override_evaltype_select = (new CSelect('overrides_evaltype'))
+	->setValue($options['overrides_evaltype'])
+	->addOption(new CSelectOption(_('And/Or'), (string) CONDITION_EVAL_TYPE_AND_OR))
+	->addOption(new CSelectOption(_('And'), (string) CONDITION_EVAL_TYPE_AND))
+	->addOption(new CSelectOption(_('Or'), (string) CONDITION_EVAL_TYPE_OR))
+	->addOption(new CSelectOption(_('Custom expression'), (string) CONDITION_EVAL_TYPE_EXPRESSION))
+	->setId('overrides-evaltype');
+
+if ($options['templated']) {
+	$override_evaltype_select->setReadonly();
+}
+
 $override_evaltype = (new CDiv([
 	(new CDiv([
 		_('Type of calculation'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('overrides_evaltype', $options['overrides_evaltype'], null, [
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or'),
-			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-		]))
-			->setReadonly($options['templated']),
+		$override_evaltype_select,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 	]))->addClass(ZBX_STYLE_CELL),
 	(new CDiv([
@@ -136,13 +142,18 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 			->setEnabled(!$options['templated'])
 	];
 
-	$row = [$formulaid, $macro,
-		(new CComboBox('overrides_filters['.$i.'][operator]', $overrides_filter['operator'], null, $operators))
-			->addClass('operator')
-			->setReadonly($options['templated']),
-		$value,
-		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
-	];
+	$operator_select = (new CSelect('overrides_filters['.$i.'][operator]'))
+		->setValue($overrides_filter['operator']);
+
+	if ($options['templated']) {
+		$operator_select->setReadonly();
+	}
+
+	foreach ($operators as $operatorid => $operator_name) {
+		$operator_select->addOption(new CSelectOption($operator_name, (string) $operatorid));
+	}
+
+	$row = [$formulaid, $macro, $operator_select, $value, (new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)];
 	$filter_table->addRow($row, 'form_row');
 }
 

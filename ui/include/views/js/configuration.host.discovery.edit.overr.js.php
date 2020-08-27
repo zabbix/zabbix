@@ -73,10 +73,10 @@ insert_javascript_for_visibilitybox();
 				->addClass('macro')
 				->setAttribute('placeholder', '{#MACRO}')
 				->setAttribute('data-formulaid', '#{formulaId}'),
-			(new CComboBox('overrides_filters[#{rowNum}][operator]', CONDITION_OPERATOR_REGEXP, null, [
-				CONDITION_OPERATOR_REGEXP => _('matches'),
-				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-			]))->addClass('operator'),
+			(new CSelect('overrides_filters[#{rowNum}][operator]'))
+				->setValue((string) CONDITION_OPERATOR_REGEXP)
+				->addOption(new CSelectOption(_('matches'), (string) CONDITION_OPERATOR_REGEXP))
+				->addOption(new CSelectOption(_('does not match'), (string) CONDITION_OPERATOR_NOT_REGEXP)),
 			(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
 					DB::getFieldLength('lld_override_condition', 'value')))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -748,7 +748,7 @@ insert_javascript_for_visibilitybox();
 			});
 		});
 
-		jQuery('#overrides_expression').html(getConditionFormula(filters, +jQuery('#overrides_evaltype').val()));
+		jQuery('#overrides_expression').html(getConditionFormula(filters, +jQuery('#overrides-evaltype').val()));
 	};
 
 	OverrideEditForm.prototype.filterDynamicRows = function() {
@@ -768,12 +768,12 @@ insert_javascript_for_visibilitybox();
 			.bind('tableupdate.dynamicRows', function(event, options) {
 				jQuery('#overrideRow').toggle(jQuery(options.row, jQuery(this)).length > 1);
 
-				if (jQuery('#overrides_evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+				if (jQuery('#overrides-evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 					that.updateExpression();
 				}
 			})
 			.on('change', '.macro', function() {
-				if (jQuery('#overrides_evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+				if (jQuery('#overrides-evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 					that.updateExpression();
 				}
 			})
@@ -781,7 +781,7 @@ insert_javascript_for_visibilitybox();
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
 			});
 
-		jQuery('#overrides_evaltype').change(function() {
+		jQuery('#overrides-evaltype').change(function() {
 			var show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
 			jQuery('#overrides_expression').toggle(!show_formula);
@@ -793,7 +793,7 @@ insert_javascript_for_visibilitybox();
 			overlays_stack.end().centerDialog();
 		});
 
-		jQuery('#overrides_evaltype').trigger('change');
+		jQuery('#overrides-evaltype').trigger('change');
 	};
 
 	/**
