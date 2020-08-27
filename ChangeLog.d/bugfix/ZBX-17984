@@ -1,1 +1,1 @@
-...G...... [ZBX-17984] added support of unix sockets for memcached plugin (vadimipatov)
+...G...... [ZBX-17984] added support of ipv6 and unix sockets for memcached plugin (vadimipatov)
