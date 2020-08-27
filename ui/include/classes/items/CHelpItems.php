@@ -400,7 +400,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'mqtt.get[<broker_url>,topic]',
-					'description' => _('Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON.')
+					'description' => _('Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON')
 				],
 				[
 					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',

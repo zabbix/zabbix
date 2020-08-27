@@ -58,7 +58,7 @@ $fields = [
 										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
 										' && {type} != '.ITEM_TYPE_DEPENDENT.
 										' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
-											' && isset({key}) && strncmp({key}, "mqtt.get", 8) == 0)',
+											' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 									_('Update interval')
 								],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
