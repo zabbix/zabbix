@@ -202,7 +202,10 @@ class CTabFilter extends CDiv {
 			->setAttribute('data-profile-idx', $timerange['idx'])
 			->setAttribute('data-profile-idx2', $timerange['idx2']);
 
-		return $this->addTab($data['label'], $content);
+		return $this->addTab($data['label'], $content, [
+			'filter_sortable' => false,
+			'filter_configurable' => false
+		]);
 	}
 
 	/**
