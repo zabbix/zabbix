@@ -243,6 +243,25 @@ static int	DBpatch_5010026(void)
 	return DBmodify_field_type("globalmacro", &field, NULL);
 }
 
+static int	DBpatch_5010027(void)
+{
+	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("dashboard", &field);
+}
+
+static int	DBpatch_5010028(void)
+{
+	const ZBX_FIELD	field = {"templateid", 0, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dashboard", 2, &field);
+}
+
+static int	DBpatch_5010029(void)
+{
+	return DBcreate_index("dashboard", "c_dashboard_2", "templateid", 0);
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -276,5 +295,8 @@ DBPATCH_ADD(5010023, 0, 1)
 DBPATCH_ADD(5010024, 0, 1)
 DBPATCH_ADD(5010025, 0, 1)
 DBPATCH_ADD(5010026, 0, 1)
+DBPATCH_ADD(5010027, 0, 1)
+DBPATCH_ADD(5010028, 0, 1)
+DBPATCH_ADD(5010029, 0, 1)
 
 DBPATCH_END()

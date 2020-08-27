@@ -7718,6 +7718,13 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'templateid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			],
 		],
 	],
 	'dashboard_user' => [
