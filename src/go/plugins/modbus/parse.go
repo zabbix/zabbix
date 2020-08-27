@@ -20,6 +20,7 @@
 package modbus
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"net/url"
@@ -355,7 +356,7 @@ func getCount(p *[]string, n int, retType Bits16) (count uint16, retCount uint, 
 	return count, retCount, nil
 }
 
-func getEndianness(p *[]string, n int) (endianness Bits8, err error) {
+func getEndianness(p *[]string, n int) (endianness Endianness, err error) {
 	v := "be"
 
 	if len(*p) > n {
@@ -366,15 +367,19 @@ func getEndianness(p *[]string, n int) (endianness Bits8, err error) {
 	}
 	switch v {
 	case "be":
-		endianness = Be
+		endianness.order = binary.BigEndian
+		endianness.middle = 0
 	case "le":
-		endianness = Le
+		endianness.order = binary.LittleEndian
+		endianness.middle = 0
 	case "mbe":
-		endianness = Mbe
+		endianness.order = binary.BigEndian
+		endianness.middle = Mbe
 	case "mle":
-		endianness = Mle
+		endianness.order = binary.LittleEndian
+		endianness.middle = Mle
 	default:
-		return 0, fmt.Errorf("Unsupported endianness of data:%s", v)
+		return endianness, fmt.Errorf("Unsupported endianness of data:%s", v)
 	}
 	return endianness, nil
 }
