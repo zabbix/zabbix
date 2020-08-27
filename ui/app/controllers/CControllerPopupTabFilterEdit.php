@@ -73,6 +73,14 @@ class CControllerPopupTabFilterEdit extends CController {
 			foreach ($validator->getAllErrors() as $error) {
 				info($error);
 			}
+
+			if ($ret) {
+				$this->input += [
+					'from' => $this->input['tabfilter_from'],
+					'to' => $this->input['tabfilter_to']
+				];
+				$ret = $this->validateTimeSelectorPeriod();
+			}
 		}
 
 		return $ret;
