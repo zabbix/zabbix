@@ -92,7 +92,6 @@ var ctx, cancel = context.WithCancel(context.Background())
 
 // Start deleting unused connections
 func (p *Plugin) Start() {
-	p.Debugf("func Start")
 
 	p.connMgr = newConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
@@ -108,7 +107,6 @@ func (p *Plugin) Start() {
 				ticker.Stop()
 				return
 			case <-ticker.C:
-				p.Debugf("func Start, closeUnused()")
 				if err := p.connMgr.closeUnused(); err != nil {
 					p.Errf("Error occurred while closing connection: %s", err.Error())
 				}
@@ -119,7 +117,6 @@ func (p *Plugin) Start() {
 
 // Stop deleting unused connections
 func (p *Plugin) Stop() {
-	p.Debugf("func Stop")
 
 	cancel()
 	p.connMgr.closeAllConn()
@@ -128,7 +125,6 @@ func (p *Plugin) Stop() {
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	p.Debugf("func Export")
 
 	paramsSize := len(params)
 	username := ""
@@ -156,17 +152,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if !ok {
-		url := params[0]
-		if len(url) == 0 {
-			url = p.options.Uri
+		uri := params[0]
+		if len(uri) == 0 {
+			uri = "tcp://localhost:3306"
 		}
 		if len(username) == 0 {
-			username = p.options.User
+			username = "root"
 		}
-		if len(password) == 0 {
-			password = p.options.Password
-		}
-		session = &Session{Uri: url, User: username, Password: password}
+		session = &Session{Uri: uri, User: username, Password: password}
 	}
 
 	mysqlConf, err := p.getConfigDSN(session)
