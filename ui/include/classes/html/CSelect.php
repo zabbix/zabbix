@@ -32,31 +32,12 @@ class CSelect extends CTag {
 	protected $options = [];
 
 	/**
-	 * @param string $name    Input field name.
-	 * @param array $options  (optional) Array of options or option groups.
+	 * @param string $name  Input field name.
 	 */
-	public function __construct(string $name, array $options = []) {
+	public function __construct(string $name) {
 		parent::__construct('z-select', true);
 
 		$this->name = $name;
-
-		foreach ($options as $key => $option) {
-			if (is_string($option)) {
-				$this->addOption(new CSelectOption($option, (string) $key));
-			}
-			elseif (is_array($option)) {
-				$this->addOptionGroup(new CSelectOptionGroup($key, $option));
-			}
-			elseif ($option instanceof CSelectOption) {
-				$this->addOption($option);
-			}
-			elseif ($option instanceof CSelectOptionGroup) {
-				$this->addOptionGroup($option);
-			}
-			else {
-				throw new RuntimeException('Incorrect structure used for option.');
-			}
-		}
 	}
 
 	/**

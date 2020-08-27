@@ -36,22 +36,9 @@ class CSelectOptionGroup {
 
 	/**
 	 * @param string $title   Option group title.
-	 * @param array $options  (optional) Array of options.
 	 */
-	public function __construct(string $title, array $options = []) {
+	public function __construct(string $title) {
 		$this->title = $title;
-
-		foreach ($options as $key => $option) {
-			if (is_string($option)) {
-				$this->addOption(new CSelectOption($option, (string) $key));
-			}
-			elseif ($option instanceof CSelectOption) {
-				$this->addOption($option);
-			}
-			else {
-				throw new RuntimeException('Incorrect structure used for option.');
-			}
-		}
 	}
 
 	/**
