@@ -330,7 +330,7 @@ if (array_key_exists('render_html', $data)) {
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
 		let fields = ['show', 'application', 'name', 'tag_priority', 'show_opdata', 'show_suppressed',
-			'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row'
+			'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age'
 		];
 
 		// Input, radio and single checkboxes.
@@ -414,7 +414,7 @@ if (array_key_exists('render_html', $data)) {
 					real_hosts: '1'
 				};
 
-			PopUp("popup.generic", $.extend(options, getFirstMultiselectValue("hostids_" + data.uniqid)), null, this);
+			PopUp('popup.generic', $.extend(options, getFirstMultiselectValue('hostids_' + data.uniqid)), null, this);
 		});
 
 		// Triggers multiselect.
@@ -441,38 +441,41 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		$('#show_' + data.uniqid, container).change(() => {
-			var	filter_show = $('input[name="show"]:checked', container).val();
+			var	filter_show = $('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>;
 
-			$('[name="age"]', container).closest('li').toggle(filter_show != <?= TRIGGERS_OPTION_ALL ?>);
+			$('[name="age"]', container).closest('li').toggle(filter_show);
 
 			if (this._parent) {
-				this._parent.updateTimeselector();
+				this._parent.updateTimeselector(this, filter_show);
 			}
 		}).trigger('change');
 
 		$('[name="age_state"]').change(function() {
 			$('[name="age"]').prop('disabled', !$(this).is(':checked'));
-		});
+		}).trigger('change');
 
 		$('[name="compact_view"]', container).change(function() {
 			let checked = $(this).is(':checked');
 
 			$('[name="show_timeline"],[name="details"],[name="show_opdata"]', container).prop('disabled', checked);
 			$('[name="highlight_row"]', container).prop('disabled', !checked);
-		});
+		}).trigger('change');
 
 		$('[name="show_tags"]').change(function () {
 			let disabled = (this.value == <?= PROBLEMS_SHOW_TAGS_NONE ?>);
 
 			$('[name="tag_priority"]', container).prop('disabled', disabled);
 			$('[name="tag_name_format"]', container).prop('disabled', disabled);
-		});
+		}).trigger('change');
 	}
 
 	function expand(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+
+		// Trigger change to update timeselector ui disabled state.
+		$('#show_' + data.uniqid, container).trigger('change');
 	}
 
 	// Tab filter item events handlers.
