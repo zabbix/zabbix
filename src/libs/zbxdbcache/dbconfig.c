@@ -1951,8 +1951,9 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
 							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse macro \"%s\" value \"%s\": database"
-						" credentials should not be used with Vault macros", row[1], row[2]);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse macro \"%s\" Vault location \"%s\":"
+						" database credentials should not be used with Vault macros",
+						row[1], row[2]);
 				continue;
 			}
 		}
@@ -2107,9 +2108,9 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
 							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" value \"%s\":"
-						" database credentials should not be used with Vault macros", row[1],
-						row[2], row[3]);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
+						" \"%s\": database credentials should not be used with Vault macros",
+						row[1], row[2], row[3]);
 				continue;
 			}
 		}
