@@ -31,7 +31,8 @@ class CConfiguration extends CApiService {
 	 */
 	public function export(array $params) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::XML, CExportWriterFactory::JSON])],
+			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON])],
+			'prettyprint' => ['type' => API_BOOLEAN, 'default' => false],
 			'options' =>	['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'groups' =>		['type' => API_IDS],
 				'hosts' =>		['type' => API_IDS],
@@ -47,10 +48,34 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		switch ($params['format']) {
+			case CExportWriterFactory::YAML:
+				$lib_yaml = (new CFrontendSetup())->checkPhpLibYAML();
+
+				if ($lib_yaml['result'] == CFrontendSetup::CHECK_FATAL) {
+					self::exception(ZBX_API_ERROR_INTERNAL, $lib_yaml['error']);
+				}
+				break;
+
+			case CExportWriterFactory::XML:
+				$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
+
+				if ($lib_xml['result'] == CFrontendSetup::CHECK_FATAL) {
+					self::exception(ZBX_API_ERROR_INTERNAL, $lib_xml['error']);
+				}
+
+				$xml_writer = (new CFrontendSetup())->checkPhpXmlWriter();
+
+				if ($xml_writer['result'] == CFrontendSetup::CHECK_FATAL) {
+					self::exception(ZBX_API_ERROR_INTERNAL, $xml_writer['error']);
+				}
+				break;
+		}
+
 		$export = new CConfigurationExport($params['options']);
 		$export->setBuilder(new CConfigurationExportBuilder());
 		$writer = CExportWriterFactory::getWriter($params['format']);
-		$writer->formatOutput(false);
+		$writer->formatOutput($params['prettyprint']);
 		$export->setWriter($writer);
 
 		$export_data = $export->export();
@@ -69,7 +94,7 @@ class CConfiguration extends CApiService {
 	 */
 	public function import($params) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::XML, CImportReaderFactory::JSON])],
+			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
 			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'applications' =>		['type' => API_OBJECT, 'fields' => [
@@ -147,6 +172,30 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		switch ($params['format']) {
+			case CImportReaderFactory::YAML:
+				$lib_yaml = (new CFrontendSetup())->checkPhpLibYAML();
+
+				if ($lib_yaml['result'] == CFrontendSetup::CHECK_FATAL) {
+					self::exception(ZBX_API_ERROR_INTERNAL, $lib_yaml['error']);
+				}
+				break;
+
+			case CImportReaderFactory::XML:
+				$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
+
+				if ($lib_xml['result'] == CFrontendSetup::CHECK_FATAL) {
+					self::exception(ZBX_API_ERROR_INTERNAL, $lib_xml['error']);
+				}
+
+				$xml_reader = (new CFrontendSetup())->checkPhpXmlReader();
+
+				if ($xml_reader['result'] == CFrontendSetup::CHECK_FATAL) {
+					self::exception(ZBX_API_ERROR_INTERNAL, $xml_reader['error']);
+				}
+				break;
+		}
+
 		$importReader = CImportReaderFactory::getReader($params['format']);
 		$data = $importReader->read($params['source']);
 
@@ -155,7 +204,7 @@ class CConfiguration extends CApiService {
 
 		$data = (new CXmlValidator)->validate($data, $params['format']);
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0'] as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -177,8 +226,8 @@ class CConfiguration extends CApiService {
 		// Add default values in place of missed tags.
 		$data = (new CDefaultImportConverter($schema))->convert($data);
 
-		// Normalize array keys.
-		$data = (new CArrayKeysImportConverter($schema))->convert($data);
+		// Normalize array keys and strings.
+		$data = (new CImportDataNormalizer($schema))->normalize($data);
 
 		// Transform converter.
 		$data = (new CTransformImportConverter($schema))->convert($data);

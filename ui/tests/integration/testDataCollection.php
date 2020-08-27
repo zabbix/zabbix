@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * Test suite for data collection using both active and passive agents.
@@ -35,14 +36,12 @@ class testDataCollection extends CIntegrationTest {
 	 */
 	public function prepareData() {
 		// Create proxy "proxy".
-		$response = $this->call('proxy.create', [
+		CDataHelper::call('proxy.create', [
 			'host' => 'proxy',
 			'status' => HOST_STATUS_PROXY_ACTIVE
 		]);
 
-		$this->assertArrayHasKey('proxyids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['proxyids']);
-		$proxyid = $response['result']['proxyids'][0];
+		$proxyids = CDataHelper::getIds('host');
 
 		// Create host "agent", "custom_agent" and "proxy agent".
 		$interfaces = [
@@ -62,121 +61,78 @@ class testDataCollection extends CIntegrationTest {
 			]
 		];
 
-		$response = $this->call('host.create', [
+		$result = CDataHelper::createHosts([
 			[
 				'host' => 'agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'status' => HOST_STATUS_NOT_MONITORED
+				'status' => HOST_STATUS_NOT_MONITORED,
+				'items' => [
+					[
+						'name' => 'Agent ping',
+						'key_' => 'agent.ping',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => '1s'
+					],
+					[
+						'name' => 'Agent hostname',
+						'key_' => 'agent.hostname',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'delay' => '1s'
+					]
+				]
 			],
 			[
 				'host' => 'custom_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'status' => HOST_STATUS_NOT_MONITORED
+				'status' => HOST_STATUS_NOT_MONITORED,
+				'items' => [
+					[
+						'name' => 'Custom metric 1',
+						'key_' => 'custom.metric',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'delay' => '5s'
+					],
+					[
+						'name' => 'Custom metric 2',
+						'key_' => 'custom.metric[custom]',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'delay' => '10s'
+					]
+				]
 			],
 			[
 				'host' => 'proxy_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => $proxyid,
-				'status' => HOST_STATUS_NOT_MONITORED
+				'proxy_hostid' => $proxyids['proxy'],
+				'status' => HOST_STATUS_NOT_MONITORED,
+				'items' => [
+					[
+						'name' => 'Agent ping',
+						'key_' => 'agent.ping',
+						'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => '1s'
+					],
+					[
+						'name' => 'Agent hostname',
+						'key_' => 'agent.hostname',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'delay' => '1s'
+					]
+				]
 			]
 		]);
 
-		$this->assertArrayHasKey('hostids', $response['result']);
-		foreach (['agent', 'custom_agent', 'proxy_agent'] as $i => $name) {
-			$this->assertArrayHasKey($i, $response['result']['hostids']);
-			self::$hostids[$name] = $response['result']['hostids'][$i];
-		}
-
-		// Get host interface ids.
-		$response = $this->call('host.get', [
-			'output' => ['host'],
-			'hostids' => array_values(self::$hostids),
-			'selectInterfaces' => ['interfaceid']
-		]);
-
-		$interfaceids = [];
-		foreach ($response['result'] as $host) {
-			$interfaceids[$host['host']] = $host['interfaces'][0]['interfaceid'];
-		}
-
-		// Create items.
-		$response = $this->call('item.create', [
-			[
-				'hostid' => self::$hostids['agent'],
-				'name' => 'Agent ping',
-				'key_' => 'agent.ping',
-				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => '1s',
-				'interfaceid' => $interfaceids['agent']
-			],
-			[
-				'hostid' => self::$hostids['agent'],
-				'name' => 'Agent hostname',
-				'key_' => 'agent.hostname',
-				'type' => ITEM_TYPE_ZABBIX,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'delay' => '1s',
-				'interfaceid' => $interfaceids['agent']
-
-			],
-			[
-				'hostid' => self::$hostids['custom_agent'],
-				'name' => 'Custom metric 1',
-				'key_' => 'custom.metric',
-				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'delay' => '5s',
-				'interfaceid' => $interfaceids['custom_agent']
-			],
-			[
-				'hostid' => self::$hostids['custom_agent'],
-				'name' => 'Custom metric 2',
-				'key_' => 'custom.metric[custom]',
-				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'delay' => '10s',
-				'interfaceid' => $interfaceids['custom_agent']
-			],
-			[
-				'hostid' => self::$hostids['proxy_agent'],
-				'name' => 'Agent ping',
-				'key_' => 'agent.ping',
-				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => '1s',
-				'interfaceid' => $interfaceids['proxy_agent']
-			],
-			[
-				'hostid' => self::$hostids['proxy_agent'],
-				'name' => 'Agent hostname',
-				'key_' => 'agent.hostname',
-				'type' => ITEM_TYPE_ZABBIX,
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'delay' => '1s',
-				'interfaceid' => $interfaceids['proxy_agent']
-			]
-		]);
-
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(6, count($response['result']['itemids']));
-
-		$items = [
-			'agent:agent.ping',
-			'agent:agent.hostname',
-			'custom_agent:custom.metric',
-			'custom_agent:custom.metric[custom]',
-			'proxy_agent:agent.ping',
-			'proxy_agent:agent.hostname'
-		];
-
-		self::$itemids = [];
-		foreach ($items as $i => $name) {
-			self::$itemids[$name] = $response['result']['itemids'][$i];
-		}
+		self::$hostids = $result['hostids'];
+		self::$itemids = $result['itemids'];
 
 		return true;
 	}

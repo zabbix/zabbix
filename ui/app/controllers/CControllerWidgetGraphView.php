@@ -54,7 +54,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$profileIdx = 'web.dashbrd.filter';
 		$profileIdx2 = $this->getInput('dashboardid', 0);
 		$unavailable_object = false;
-		$header_label = '';
+		$header_label = $this->getDefaultHeader();
 
 		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $fields['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;

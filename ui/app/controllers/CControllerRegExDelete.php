@@ -75,12 +75,12 @@ class CControllerRegExDelete extends CController {
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Regular expression deleted', 'Regular expressions deleted',
+			CMessageHelper::setSuccessTitle(_n('Regular expression deleted', 'Regular expressions deleted',
 				count($this->db_regexes)
 			));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete regular expression', 'Cannot delete regular expressions',
+			CMessageHelper::setErrorTitle(_n('Cannot delete regular expression', 'Cannot delete regular expressions',
 				count($this->db_regexes)
 			));
 		}

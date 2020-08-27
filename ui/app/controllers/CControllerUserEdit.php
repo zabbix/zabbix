@@ -26,6 +26,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
+		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -39,13 +42,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
+			'timezone' =>			'db users.timezone|in '.implode(',', $timezones),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
 			'refresh' =>			'db users.refresh',
 			'rows_per_page' =>		'db users.rows_per_page',
 			'url' =>				'db users.url',
-			'user_medias' =>		'array',
+			'medias' =>				'array',
 			'new_media' =>			'array',
 			'enable_media' =>		'int32',
 			'disable_media' =>		'int32',
@@ -70,7 +74,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'type'
+					'rows_per_page', 'url', 'type', 'timezone'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 				'selectUsrgrps' => ['usrgrpid'],
@@ -90,7 +94,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 	protected function doAction() {
 		$db_defaults = DB::getDefaults('users');
-		$config = select_config();
 
 		$data = [
 			'userid' => 0,
@@ -100,23 +103,16 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password1' => '',
 			'password2' => '',
 			'lang' => $db_defaults['lang'],
+			'timezone' => $db_defaults['timezone'],
 			'theme' => $db_defaults['theme'],
 			'autologin' => $db_defaults['autologin'],
 			'autologout' => '0',
 			'refresh' => $db_defaults['refresh'],
 			'rows_per_page' => $db_defaults['rows_per_page'],
 			'url' => '',
-			'user_medias' => [],
+			'medias' => [],
 			'new_media' => [],
 			'type' => $db_defaults['type'],
-			'config' => [
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			],
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
@@ -134,13 +130,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['password1'] = '';
 			$data['password2'] = '';
 			$data['lang'] = $this->user['lang'];
+			$data['timezone'] = $this->user['timezone'];
 			$data['theme'] = $this->user['theme'];
 			$data['autologin'] = $this->user['autologin'];
 			$data['autologout'] = $this->user['autologout'];
 			$data['refresh'] = $this->user['refresh'];
 			$data['rows_per_page'] = $this->user['rows_per_page'];
 			$data['url'] = $this->user['url'];
-			$data['user_medias'] = $this->user['medias'];
+			$data['medias'] = $this->user['medias'];
 			$data['type'] = $this->user['type'];
 			$data['db_user']['alias'] = $this->user['alias'];
 		}
@@ -149,12 +146,12 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 
 		// Overwrite with input variables.
-		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'theme', 'autologin',
-			'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'type'
+		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'timezone', 'theme',
+			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'type'
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
-			$data['user_medias'] = $this->getInput('user_medias', []);
+			$data['medias'] = $this->getInput('medias', []);
 		}
 
 		$data = $this->setUserMedias($data);

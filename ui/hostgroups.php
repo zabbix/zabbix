@@ -160,7 +160,6 @@ elseif (hasRequest('action')) {
 	elseif (getRequest('action') == 'hostgroup.massenable' || getRequest('action') == 'hostgroup.massdisable') {
 		$enable = (getRequest('action') == 'hostgroup.massenable');
 		$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-		$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 
 		$groupIds = getRequest('groups', []);
 
@@ -180,14 +179,6 @@ elseif (hasRequest('action')) {
 					'hosts' => $hosts,
 					'status' => $status
 				]);
-
-				if ($result) {
-					foreach ($hosts as $host) {
-						add_audit_ext($auditAction, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts',
-							['status' => $host['status']], ['status' => $status]
-						);
-					}
-				}
 			}
 
 			$result = DBend($result);
@@ -275,17 +266,18 @@ else {
 		'name' => CProfile::get('web.groups.filter_name', '')
 	];
 
-	$config = select_config();
-
 	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config,
 		'profileIdx' => 'web.groups.filter',
-		'active_tab' => CProfile::get('web.groups.filter.active', 1)
+		'active_tab' => CProfile::get('web.groups.filter.active', 1),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		]
 	];
 
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$groups = API::HostGroup()->get([
 		'output' => ['groupid', $sortField],
 		'search' => [
@@ -293,7 +285,7 @@ else {
 		],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $limit
 	]);
 	order_result($groups, $sortField, $sortOrder);
 
@@ -324,6 +316,7 @@ else {
 	]);
 
 	// get host groups
+	$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
 	$data['groups'] = API::HostGroup()->get([
 		'output' => ['groupid', 'name', 'flags'],
 		'groupids' => $groupIds,
@@ -331,7 +324,7 @@ else {
 		'selectTemplates' => ['templateid', 'name'],
 		'selectGroupDiscovery' => ['ts_delete'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'limitSelects' => $config['max_in_table'] + 1
+		'limitSelects' => $limit
 	]);
 	order_result($data['groups'], $sortField, $sortOrder);
 

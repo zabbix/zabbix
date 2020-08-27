@@ -262,7 +262,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!$options['countOutput']) {
 				$result[$item['itemid']] = $item;
@@ -511,98 +511,50 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
-	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $ruleids, $nopermissions = false) {
-		if (empty($ruleids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	public function delete(array $ruleids) {
+		$this->validateDelete($ruleids);
+
+		CDiscoveryRuleManager::delete($ruleids);
+
+		return ['ruleids' => $ruleids];
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $ruleids   [IN/OUT]
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array &$ruleids) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $ruleids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$ruleids = array_keys(array_flip($ruleids));
-
-		$delRules = $this->get([
-			'output' => API_OUTPUT_EXTEND,
+		$db_rules = $this->get([
+			'output' => ['templateid'],
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		// TODO: remove $nopermissions hack
-		if (!$nopermissions) {
-			foreach ($ruleids as $ruleid) {
-				if (!isset($delRules[$ruleid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
-				if ($delRules[$ruleid]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
-				}
-			}
-		}
-
-		// get child discovery rules
-		$parentItemids = $ruleids;
-		$childTuleids = [];
-		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = [];
-			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
-				$childTuleids[$dbItem['itemid']] = $dbItem['itemid'];
-			}
-		} while (!empty($parentItemids));
-
-		$delRulesChildren = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'itemids' => $childTuleids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
-		$delRules = array_merge($delRules, $delRulesChildren);
-		$ruleids = array_merge($ruleids, $childTuleids);
-
-		$iprototypeids = [];
-		$dbItems = DBselect(
-			'SELECT i.itemid'.
-			' FROM item_discovery id,items i'.
-			' WHERE i.itemid=id.itemid'.
-				' AND '.dbConditionInt('parent_itemid', $ruleids)
-		);
-		while ($item = DBfetch($dbItems)) {
-			$iprototypeids[$item['itemid']] = $item['itemid'];
-		}
-		if ($iprototypeids) {
-			CItemPrototypeManager::delete($iprototypeids);
-		}
-
-		// delete host prototypes
-		$hostPrototypeIds = DBfetchColumn(DBselect(
-			'SELECT hd.hostid'.
-			' FROM host_discovery hd'.
-			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
-		), 'hostid');
-		if ($hostPrototypeIds) {
-			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
-			}
-		}
-
-		// delete LLD rules
-		DB::delete('items', ['itemid' => $ruleids]);
-
-		$insert = [];
 		foreach ($ruleids as $ruleid) {
-			$insert[] = [
-				'tablename' => 'events',
-				'field' => 'lldruleid',
-				'value' => $ruleid
-			];
-		}
-		DB::insertBatch('housekeeper', $insert);
+			if (!array_key_exists($ruleid, $db_rules)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
-		return ['ruleids' => $ruleids];
+			$db_rule = $db_rules[$ruleid];
+
+			if ($db_rule['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
+			}
+		}
 	}
 
 	/**
@@ -1221,6 +1173,17 @@ class CDiscoveryRule extends CItemGeneral {
 											}
 										}
 
+										if (array_key_exists('optag', $operation)) {
+											foreach ($operation['optag'] as $tag) {
+												$optag[] = [
+													'lld_override_operationid' =>
+														$operation['lld_override_operationid'],
+													'tag' => $tag['tag'],
+													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
+												];
+											}
+										}
+
 										if (array_key_exists('opinventory', $operation)) {
 											$opinventory[] = [
 												'lld_override_operationid' => $operation['lld_override_operationid'],
@@ -1726,7 +1689,7 @@ class CDiscoveryRule extends CItemGeneral {
 									break;
 
 								case OPERATION_OBJECT_HOST_PROTOTYPE:
-									foreach (['opperiod', 'ophistory', 'optrends', 'opseverity', 'optag'] as $field) {
+									foreach (['opperiod', 'ophistory', 'optrends', 'opseverity'] as $field) {
 										if (array_key_exists($field, $operation)) {
 											self::exception(ZBX_API_ERROR_PARAMETERS,
 												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
@@ -1738,11 +1701,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 									if (!array_key_exists('opstatus', $operation)
 											&& !array_key_exists('optemplate', $operation)
+											&& !array_key_exists('optag', $operation)
 											&& !array_key_exists('opinventory', $operation)
 											&& !array_key_exists('opdiscover', $operation)) {
 										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 											$opr_path, _s('value must be one of %1$s',
-												'opstatus, opdiscover, optemplate, opinventory'
+												'opstatus, opdiscover, optemplate, optag, opinventory'
 											)
 										));
 									}
@@ -2542,12 +2506,12 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($this->outputIsRequested('state', $options['output'])
-				|| $this->outputIsRequested('error', $options['output'])
+		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
+				|| $this->outputIsRequested('error', $options['output'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
-			$sqlParts['left_table'] = $tableName;
+			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		if (!$options['countOutput']) {
@@ -2969,9 +2933,14 @@ class CDiscoveryRule extends CItemGeneral {
 						'output' => ['lld_override_operationid', 'severity'],
 						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
 					]);
+				}
+
+				if ($trigger_prototype_objectids || $host_prototype_objectids) {
 					$optag = DB::select('lld_override_optag', [
 						'output' => ['lld_override_operationid', 'tag', 'value'],
-						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
+						'filter' => ['lld_override_operationid' => array_keys(
+							$trigger_prototype_objectids + $host_prototype_objectids
+						)]
 					]);
 				}
 
@@ -3027,7 +2996,9 @@ class CDiscoveryRule extends CItemGeneral {
 								$operation['opseverity']['severity'] = $row['severity'];
 							}
 						}
+					}
 
+					if ($trigger_prototype_objectids || $host_prototype_objectids) {
 						foreach ($optag as $row) {
 							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
 								$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];

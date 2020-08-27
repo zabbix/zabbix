@@ -299,7 +299,21 @@ class testUserMacro extends CAPITest {
 			[
 				'globalmacro' => [
 					'macro' => '{$LONG_VALUE}',
-					'value' => 'Aliquam erat volutpat. Suspendisse lorem libero, efficitur a ornare non, interdum et nulla. Maecenas at massa at lacus aliquam pretium sit amet vel ligula. In ultricies dignissim sapien sit amet eleifend. Nullam consectetur sem eget arcu interdum, at so256'
+					'value' => str_repeat('a', 2049)
+				],
+				'expected_error' => 'Invalid parameter "/1/value": value is too long.'
+			],
+			[
+				'globalmacro' => [
+					'macro' => '{$GLOBALMACRO_WITH_LONG_2_BYTE_CHARACTER_VALUE}',
+					'value' => str_repeat('ö', 2049)
+				],
+				'expected_error' => 'Invalid parameter "/1/value": value is too long.'
+			],
+			[
+				'globalmacro' => [
+					'macro' => '{$GLOBALMACRO_WITH_LONG_3_BYTE_CHARACTER_VALUE}',
+					'value' => str_repeat('坏', 2049)
 				],
 				'expected_error' => 'Invalid parameter "/1/value": value is too long.'
 			]

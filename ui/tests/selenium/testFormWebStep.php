@@ -993,14 +993,14 @@ class testFormWebStep extends CLegacyWebTest {
 
 		if (array_key_exists('error_webform', $data)) {
 			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay-bg']"));
+			COverlayDialogElement::ensureNotPresent();
 			$this->zbxTestClickWait('add');
 		}
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestWaitForPageToLoad();
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay-bg']"));
+				COverlayDialogElement::ensureNotPresent();
 				$this->zbxTestClickWait('add');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
 				break;

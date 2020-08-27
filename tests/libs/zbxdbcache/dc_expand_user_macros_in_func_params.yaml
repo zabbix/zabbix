@@ -1,0 +1,147 @@
+---
+test case: Expand '{$A}' with {$A}=1
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: 1
+  params: '{$A}'
+out:
+  params: '1'
+---
+test case: Expand '{$A}' with {$A}=(1)
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: (1)
+  params: '{$A}'
+out:
+  params: '"(1)"'
+---
+test case: Expand '' 
+in:
+  macros: []
+  params: ''
+out:
+  params: ''
+---
+test case: Expand ' '
+in:
+  macros: []
+  params: ' '
+out:
+  params: ''
+---
+test case: Expand '{$A}'
+in:
+  macros: []
+  params: '{$A}'
+out:
+  params: '{$A}'
+---
+test case: Expand ',' 
+in:
+  macros: []
+  params: ','
+out:
+  params: ','
+---
+test case: Expand '{$A}' with {$A}="1"
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: '"1"'
+  params: '{$A}'
+out:
+  params: '"\"1\""'
+---
+test case: Expand '"{$A}"' with {$A}=1
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: 1
+  params: '"{$A}"'
+out:
+  params: '"1"'
+---
+test case: Expand '1 ,2 ,3 ' 
+in:
+  macros: []
+  params: '1 ,2 ,3 '
+out:
+  params: '1 ,2 ,3 '
+---
+test case: Expand '1 , ,3 ' 
+in:
+  macros: []
+  params: '1 , ,3 '
+out:
+  params: '1 ,,3 '
+---
+test case: Expand ',2 ,3 ' 
+in:
+  macros: []
+  params: ',2 ,3 '
+out:
+  params: ',2 ,3 '
+---
+test case: Expand '{$A} ,{$B} ,{$C} with {$A}=1, {$B}="2", {$C}=(3)' 
+in:
+  macros: 
+    - hostid: 1
+      name: '{$A}'
+      value: 1
+    - hostid: 1
+      name: '{$B}'
+      value: '"2"'
+    - hostid: 1
+      name: '{$C}'
+      value: (3)
+  params: '{$A} ,{$B} ,{$C} '
+out:
+  params: '1 ,"\"2\" ","(3) "'
+---
+test case: Expand '{$A}{$B}{$C} with {$A}=1, {$B}="2", {$C}=(3)' 
+in:
+  macros: 
+    - hostid: 1
+      name: '{$A}'
+      value: 1
+    - hostid: 1
+      name: '{$B}'
+      value: '"2"'
+    - hostid: 1
+      name: '{$C}'
+      value: (3)
+  params: '{$A}{$B}{$C}'
+out:
+  params: '"1\"2\"(3)"'
+---
+test case: Expand '{$A}' with {$A}=1,2,3
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: 1,2,3
+  params: '{$A}'
+out:
+  params: '"1,2,3"'
+---
+test case: Expand '{$A},{$B}' with {$A}='', {$B}=''
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: ''
+    - hostid: 1
+      name: '{$B}'
+      value: ''
+  params: '{$A},{$B}'
+out:
+  params: ','
+...
+
+

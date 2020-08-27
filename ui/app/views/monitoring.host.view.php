@@ -88,7 +88,7 @@ $filter_tags_table->addRow(
 $severities = [];
 foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
 	$severities[] = [
-		'name' => getSeverityName($severity, $data['config']),
+		'name' => getSeverityName($severity),
 		'value' => $severity
 	];
 }
@@ -136,15 +136,12 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					(new CSeverityCheckBoxList('filter_severities'))->setChecked($data['filter']['severities'])
 				),
 			(new CFormList())
-				->addRow(
-					_('Status'),
-					(new CHorList())
-						->addItem((new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-							->addValue(_('Any'), -1)
-							->addValue(_('Enabled'), HOST_STATUS_MONITORED)
-							->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
-							->setModern(true)
-						)
+				->addRow(_('Status'),
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), -1)
+						->addValue(_('Enabled'), HOST_STATUS_MONITORED)
+						->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
+						->setModern(true)
 				)
 				->addRow(_('Tags'), $filter_tags_table)
 				->addRow(_('Show hosts in maintenance'), [
@@ -165,7 +162,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 }
 
 $widget->addItem(new CPartial('monitoring.host.view.html', array_intersect_key($data, array_flip([
-	'filter', 'sort', 'sortorder', 'view_curl', 'hosts', 'config', 'maintenances', 'paging'
+	'filter', 'sort', 'sortorder', 'view_curl', 'hosts', 'maintenances', 'paging'
 ]))));
 
 $widget->show();

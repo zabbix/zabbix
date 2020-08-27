@@ -82,13 +82,8 @@ class CControllerUserList extends CController {
 			'type' => CProfile::get('web.user.filter_type', -1)
 		];
 
-		$config = select_config();
-
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
-			'config' => [
-				'max_in_table' => $config['max_in_table']
-			],
 			'sort' => $sortfield,
 			'sortorder' => $sortorder,
 			'filter' => $filter,
@@ -109,6 +104,7 @@ class CControllerUserList extends CController {
 		}
 		$data['user_groups'] = [0 => _('All')] + $data['user_groups'];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['users'] = API::User()->get([
 			'output' => ['userid', 'alias', 'name', 'surname', 'type', 'autologout', 'attempt_failed'],
 			'selectUsrgrps' => ['name', 'gui_access', 'users_status'],
@@ -122,7 +118,7 @@ class CControllerUserList extends CController {
 			],
 			'usrgrpids' => ($filter_usrgrpid == 0) ? null : $filter_usrgrpid,
 			'getAccess' => true,
-			'limit' => $config['search_limit'] + 1
+			'limit' => $limit
 		]);
 
 		// data sort and pager
@@ -150,6 +146,11 @@ class CControllerUserList extends CController {
 				$data['sessions'][$db_session['userid']] = $db_session;
 			}
 		}
+
+		$data['config'] = [
+			'login_attempts' => CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS),
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

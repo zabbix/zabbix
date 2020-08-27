@@ -37,8 +37,6 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$config = select_config();
-
 		$filter = [
 			'groupids' => getSubGroups($fields['groupids']),
 			'exclude_groupids' => getSubGroups($fields['exclude_groupids']),
@@ -66,14 +64,6 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'data' => $data,
-			'severity_names' => [
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			],
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

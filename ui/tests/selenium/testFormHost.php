@@ -306,7 +306,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('applications.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=application.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 	}
 
@@ -368,7 +368,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('applications.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=application.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 	}
 }

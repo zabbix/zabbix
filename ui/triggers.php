@@ -615,8 +615,6 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
 }
 
-$config = select_config();
-
 /*
  * Display
  */
@@ -629,7 +627,6 @@ if ((getRequest('action') === 'trigger.massupdateform' || hasRequest('massupdate
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
-		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => null,
@@ -777,7 +774,7 @@ else {
 		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null,
 		'preservekeys' => true,
 		'sortfield' => $sort,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	if ($sort === 'status') {
@@ -1010,7 +1007,6 @@ else {
 	$checkbox_hash = crc32(implode('', $filter_hostids));
 
 	$data = [
-		'config' => $config,
 		'triggers' => $triggers,
 		'profileIdx' => 'web.triggers.filter',
 		'active_tab' => $active_tab,

@@ -217,35 +217,38 @@
 	};
 
 	var showEditMode = function showEditMode() {
-		jQuery('#dashbrd-control > li').hide().last().show();
+		$('#dashbrd-control > li').hide().last().show();
 
-		var ul = jQuery('#dashbrd-config').closest('ul');
-		jQuery('#dashbrd-config', ul).click(dashbrd_config),
-		jQuery('#dashbrd-add-widget', ul).click(dashbrd_add_widget),
-		jQuery('#dashbrd-paste-widget').click(dashbrd_paste_widget),
-		jQuery('#dashbrd-save', ul).click(dashbrd_save_changes),
-		jQuery('#dashbrd-cancel', ul).click(dashbrd_cancel),
+		$('#dashbrd-config').on('click', dashbrd_config);
+		$('#dashbrd-add-widget').on('click', dashbrd_add_widget);
+		$('#dashbrd-paste-widget').on('click', dashbrd_paste_widget);
+		$('#dashbrd-save').on('click', dashbrd_save_changes);
+		$('#dashbrd-cancel').on('click', dashbrd_cancel);
 
 		// Hide filter with timeline.
-		jQuery('.filter-btn-container, .filter-space').hide();
+		$('.filter-btn-container, .filter-space').hide();
 		timeControl.disableAllSBox();
 
 		// Enable 'Paste widget' button.
-		if (jQuery('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
-			jQuery('#dashbrd-paste-widget').attr('disabled', false);
+		if ($('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
+			$('#dashbrd-paste-widget').attr('disabled', false);
 		}
 		else {
 			// Listen for local storage 'dashboard.copied_widget' update and enable 'Paste widget' button.
-			var dashboard = jQuery('.dashbrd-grid-container').data('dashboardGrid');
+			var dashboard = $('.dashbrd-grid-container').data('dashboardGrid');
 			dashboard['storage'].onKeyUpdate('dashboard.copied_widget', function() {
-				if (jQuery('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
-					jQuery('#dashbrd-paste-widget').attr('disabled', false);
+				if ($('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
+					$('#dashbrd-paste-widget').attr('disabled', false);
 				}
 			});
 		}
 
-		// Update buttons on existing widgets to edit mode.
-		jQuery('.dashbrd-grid-container').dashboardGrid('setModeEditDashboard');
+		$('.dashbrd-grid-container').dashboardGrid('setModeEditDashboard');
+
+		// Listen to dashboard busy state and update "Save changes" button accordingly.
+		$.subscribe('dashboard.grid.busy', (event, data) => {
+			$('#dashbrd-save').prop('disabled', data.state);
+		});
 	};
 
 	// Method to fill data in dashboard sharing form.

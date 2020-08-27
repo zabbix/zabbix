@@ -41,20 +41,20 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter->getField('Host groups')->select('Templates');
 		$filter->submit();
 		$this->zbxTestTextPresent($this->templateName);
-		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Applications')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Items')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Triggers')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Graphs')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Screens')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Discovery')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Web')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Linked templates')]");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Linked to')]");
+
+		$table = $this->query('class:list-table')->asTable()->one();
+		$headers = ['', 'Name', 'Hosts', 'Applications', 'Items', 'Triggers', 'Graphs',
+				'Screens', 'Discovery', 'Web', 'Linked templates', 'Linked to templates', 'Tags'];
+		$this->assertSame($headers, $table->getHeadersText());
+
+		foreach (['Export', 'Mass update', 'Delete', 'Delete and clear'] as $button) {
+			$element = $this->query('button', $button)->one();
+			$this->assertTrue($element->isPresent());
+			$this->assertFalse($element->isEnabled());
+		}
+
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
-		$this->zbxTestAssertElementPresentXpath("//button[text()='Export'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete and clear'][@disabled]");
+
 	}
 
 	/**
@@ -247,5 +247,35 @@ class testPageTemplates extends CLegacyWebTest {
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();
+	}
+
+	/**
+	 * Test opening Hosts filtered by corresponding Template.
+	 */
+	public function testPageTemplates_CheckHostsColumn() {
+		$template = 'Form test template';
+		$hosts = ['Simple form test host'];
+
+		$this->page->login()->open('templates.php?groupid=0');
+		// Reset Templates filter from possible previous scenario.
+		$this->resetFilter();
+		// Click on Hosts link in Temlate row.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
+		// Check that Hosts page is opened.
+		$this->assertPageHeader('Hosts');
+		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table->invalidate();
+		// Check that correct Hosts are filtered.
+		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
+		$this->assertTableDataColumn($hosts);
+		$this->assertRowCount(count($hosts));
+		// Reset Hosts filter after scenario.
+		$this->resetFilter();
+	}
+
+	private function resetFilter() {
+		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
 	}
 }

@@ -475,7 +475,7 @@ class CEvent extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -900,31 +900,26 @@ class CEvent extends CApiService {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput']) {
+			// Select fields from event_recovery table using LEFT JOIN.
 			if ($this->outputIsRequested('r_eventid', $options['output'])) {
-				// Select fields from event_recovery table using LEFT JOIN.
-
 				$sqlParts['select']['r_eventid'] = 'er1.r_eventid';
-				$sqlParts['left_join'][] = ['from' => 'event_recovery er1', 'on' => 'er1.eventid=e.eventid'];
-				$sqlParts['left_table'] = 'e';
+				$sqlParts['left_join'][] = ['alias' => 'er1', 'table' => 'event_recovery', 'using' => 'eventid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 
-			if ($this->outputIsRequested('c_eventid', $options['output'])
-					|| $this->outputIsRequested('correlationid', $options['output'])
-					|| $this->outputIsRequested('userid', $options['output'])) {
-				// Select fields from event_recovery table using LEFT JOIN.
+			// Select fields from event_recovery table using LEFT JOIN.
+			$left_join = false;
 
-				if ($this->outputIsRequested('c_eventid', $options['output'])) {
-					$sqlParts['select']['c_eventid'] = 'er2.c_eventid';
+			foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
+				if ($this->outputIsRequested($field, $options['output'])) {
+					$sqlParts['select'][$field] = 'er2.'.$field;
+					$left_join = true;
 				}
-				if ($this->outputIsRequested('correlationid', $options['output'])) {
-					$sqlParts['select']['correlationid'] = 'er2.correlationid';
-				}
-				if ($this->outputIsRequested('userid', $options['output'])) {
-					$sqlParts['select']['userid'] = 'er2.userid';
-				}
+			}
 
-				$sqlParts['left_join'][] = ['from' => 'event_recovery er2', 'on' => 'er2.r_eventid=e.eventid'];
-				$sqlParts['left_table'] = 'e';
+			if ($left_join) {
+				$sqlParts['left_join'][] = ['alias' => 'er2', 'table' => 'event_recovery', 'using' => 'r_eventid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 
 			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
@@ -1061,7 +1056,7 @@ class CEvent extends CApiService {
 				]);
 				$sqlParts['order'][] = 'a.clock DESC';
 
-				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
+				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 
 				// if the user data is requested via extended output or specified fields, join the users table
 				$userFields = ['alias', 'name', 'surname'];

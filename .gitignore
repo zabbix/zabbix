@@ -149,10 +149,12 @@ tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib
 tests/libs/zbxcommshigh/zbx_tcp_recv_raw_ext
 tests/libs/zbxconf/parse_cfg_file
 tests/libs/zbxdbcache/dc_check_maintenance_period
+tests/libs/zbxdbcache/dc_expand_user_macros_in_calcitem
+tests/libs/zbxdbcache/dc_expand_user_macros_in_expression
+tests/libs/zbxdbcache/dc_expand_user_macros_in_func_params
 tests/libs/zbxdbcache/dc_item_poller_type_update
 tests/libs/zbxdbcache/dc_maintenance_match_tags
 tests/libs/zbxdbcache/is_item_processed_by_server
-tests/libs/zbxdbcache/zbx_dc_expand_user_macros_in_expression
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values

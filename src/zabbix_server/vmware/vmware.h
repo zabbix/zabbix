@@ -50,7 +50,8 @@ typedef struct
 }
 zbx_str_uint64_pair_t;
 
-ZBX_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
+ZBX_PTR_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
+int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2);
 
 /* performance counter data */
 typedef struct
@@ -94,20 +95,39 @@ typedef struct
 }
 zbx_vmware_perf_entity_t;
 
+#define ZBX_VMWARE_DS_NONE		0
+#define ZBX_VMWARE_DS_MOUNTED		1
+#define ZBX_VMWARE_DS_ACCESSIBLE	2
+#define ZBX_VMWARE_DS_READ		4
+#define ZBX_VMWARE_DS_WRITE		8
+#define ZBX_VMWARE_DS_READWRITE		(ZBX_VMWARE_DS_READ | ZBX_VMWARE_DS_WRITE)
+#define ZBX_VMWARE_DS_READ_FILTER	(ZBX_VMWARE_DS_MOUNTED | ZBX_VMWARE_DS_ACCESSIBLE | ZBX_VMWARE_DS_READ)
+#define ZBX_VMWARE_DS_WRITE_FILTER	(ZBX_VMWARE_DS_MOUNTED | ZBX_VMWARE_DS_ACCESSIBLE | ZBX_VMWARE_DS_READWRITE)
+
 typedef struct
 {
-	char			*name;
-	char			*uuid;
-	char			*id;
-	zbx_uint64_t		capacity;
-	zbx_uint64_t		free_space;
-	zbx_uint64_t		uncommitted;
-	zbx_vector_str_t	hv_uuids;
+	char				*name;
+	char				*uuid;
+	char				*id;
+	zbx_uint64_t			capacity;
+	zbx_uint64_t			free_space;
+	zbx_uint64_t			uncommitted;
+	zbx_vector_str_uint64_pair_t	hv_uuids_access;
 }
 zbx_vmware_datastore_t;
 
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
+
+typedef struct
+{
+	char			*name;
+	char			*id;
+}
+zbx_vmware_datacenter_t;
+
+int	vmware_dc_name_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(vmware_datacenter, zbx_vmware_datacenter_t *)
 
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
@@ -200,6 +220,7 @@ typedef struct
 	zbx_vector_ptr_t		events;			/* vector of pointers to zbx_vmware_event_t structures */
 	int				max_query_metrics;	/* max count of Datastore perfCounters in one request */
 	zbx_vector_vmware_datastore_t	datastores;
+	zbx_vector_vmware_datacenter_t	datacenters;
 }
 zbx_vmware_data_t;
 

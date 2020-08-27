@@ -89,8 +89,8 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
 					->removeId(),
 				(new CRadioButtonList('useip['.$interface['interfaceid'].']', (int) $interface['useip']))
-					->addValue(_('IP'), INTERFACE_USE_IP)
-					->addValue(_('DNS'), INTERFACE_USE_DNS)
+					->addValue('IP', INTERFACE_USE_IP)
+					->addValue('DNS', INTERFACE_USE_DNS)
 					->setModern(true)
 					->setEnabled(false),
 				(new CTextBox('port', $interface['port'], true, 64))
@@ -168,7 +168,8 @@ if ($data['rwHost']) {
 		->setArgument('hostid', $data['host']['hostid'])
 	);
 	$applicationsLink = new CLink(_('Applications'),
-		(new CUrl('applications.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'application.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);

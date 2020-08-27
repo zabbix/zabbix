@@ -77,8 +77,6 @@ class CControllerWebView extends CController {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['name', 'groupid'],
 				'groupids' => $data['filter']['groupids'],
-				'with_httptests' => true,
-				'real_hosts' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];

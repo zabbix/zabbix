@@ -346,9 +346,6 @@ if (hasRequest('form')) {
 	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh');
 
-	// config
-	$data['config'] = select_config();
-
 	// advanced labels
 	$data['labelTypes'] = sysmapElementLabel();
 	$data['labelTypesLimited'] = $data['labelTypes'];
@@ -391,8 +388,6 @@ else {
 		DBend();
 	}
 
-	$config = select_config();
-
 	$data = [
 		'filter' => [
 			'name' => CProfile::get('web.sysmapconf.filter_name', '')
@@ -404,10 +399,11 @@ else {
 	];
 
 	// get maps
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['maps'] = API::Map()->get([
 		'output' => ['sysmapid', 'name', 'width', 'height'],
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1,
+		'limit' => $limit,
 		'search' => [
 			'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
 		],

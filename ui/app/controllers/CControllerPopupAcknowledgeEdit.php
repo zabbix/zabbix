@@ -93,15 +93,6 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 		// Show action list if only one event is requested.
 		if (count($events) == 1) {
-			$config = select_config();
-			$data['config'] = [
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			];
 			$history = getEventUpdates(reset($events));
 			$data['history'] = $history['data'];
 			$data['users'] = API::User()->get([

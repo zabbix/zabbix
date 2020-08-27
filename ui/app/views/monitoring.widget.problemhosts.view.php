@@ -100,7 +100,7 @@ foreach ($data['groups'] as $group) {
 		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))
 			->setHint(makeProblemHostsHintBox($group['hosts_problematic_list'], $data, $url_host))
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
-				$group['hosts_problematic_count'], getSeverityName($group['highest_severity'], $data['config'])
+				$group['hosts_problematic_count'], getSeverityName($group['highest_severity'])
 			));
 	}
 

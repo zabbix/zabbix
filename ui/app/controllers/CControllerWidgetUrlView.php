@@ -64,6 +64,10 @@ class CControllerWidgetUrlView extends CControllerWidget {
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
+			],
+			'config' => [
+				'iframe_sandboxing_enabled' => CSettingsHelper::get(CSettingsHelper::IFRAME_SANDBOXING_ENABLED),
+				'iframe_sandboxing_exceptions' => CSettingsHelper::get(CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS)
 			]
 		]));
 	}

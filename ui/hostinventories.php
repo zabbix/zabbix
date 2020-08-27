@@ -131,7 +131,6 @@ if ($hostId > 0) {
 }
 else {
 	$data = [
-		'config' => select_config(),
 		'hosts' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
@@ -169,7 +168,6 @@ else {
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $data['filter']['groups'],
-			'real_hosts' => true,
 			'preservekeys' => true
 		]), ['groupid' => 'id'])
 		: [];
@@ -245,7 +243,7 @@ else {
 			unset($host);
 		}
 
-		$limit = $data['config']['search_limit'] + 1;
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		order_result($data['hosts'], $sortField, $sortOrder);
 

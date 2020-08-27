@@ -22,7 +22,7 @@
 class CHtmlUrlValidator {
 
 	/**
-	 * URL is validated if schema validation is enabled (see VALIDATE_URI_SCHEMES).
+	 * URL is validated if schema validation is enabled by CSettingsHelper::VALIDATE_URI_SCHEMES parameter.
 	 *
 	 * Relative URL should start with .php file name.
 	 * Absolute URL schema must match schemes mentioned in ZBX_URL_VALID_SCHEMES comma separated list.
@@ -40,8 +40,8 @@ class CHtmlUrlValidator {
 	 *                                                    set to INVENTORY_URL_MACRO_HOST;
 	 * @param bool   $options[allow_event_tags_macro]  If set to be true, URLs containing {EVENT.TAGS.<ref>} macros will
 	 *                                                 be considered as valid.
-	 * @param bool   $options[validate_uri_schemes]    Parameter allows to overwrite global switch VALIDATE_URI_SCHEMES
-	 *                                                 for specific uses.
+	 * @param bool   $options[validate_uri_schemes]    Parameter allows to overwrite global switch
+	 *                                                 CSettingsHelper::VALIDATE_URI_SCHEMES for specific uses.
 	 *
 	 * @return bool
 	 */
@@ -50,7 +50,7 @@ class CHtmlUrlValidator {
 			'allow_user_macro' => true,
 			'allow_event_tags_macro' => false,
 			'allow_inventory_macro' => INVENTORY_URL_MACRO_NONE,
-			'validate_uri_schemes' => VALIDATE_URI_SCHEMES
+			'validate_uri_schemes' => (bool) CSettingsHelper::get(CSettingsHelper::VALIDATE_URI_SCHEMES)
 		];
 
 		if ($options['validate_uri_schemes'] === false) {
@@ -96,7 +96,9 @@ class CHtmlUrlValidator {
 		}
 
 		if (array_key_exists('scheme', $url_parts)) {
-			if (!in_array(strtolower($url_parts['scheme']), explode(',', strtolower(ZBX_URI_VALID_SCHEMES)))) {
+			if (!in_array(strtolower($url_parts['scheme']), explode(',', strtolower(CSettingsHelper::get(
+					CSettingsHelper::URI_VALID_SCHEMES
+			))))) {
 				return false;
 			}
 

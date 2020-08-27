@@ -911,6 +911,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
+		$data['interfaceid'] = $item['interfaceid'];
 
 		// discovery rule
 		if ($data['is_discovery_rule']) {
@@ -1522,7 +1523,6 @@ function getTriggerMassupdateFormData() {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'g_triggerid' => getRequest('g_triggerid', []),
 		'priority' => getRequest('priority', 0),
-		'config' => select_config(),
 		'hostid' => getRequest('hostid', 0)
 	];
 

@@ -141,15 +141,6 @@ else {
 	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
 }
 
-$config = select_config();
-$severity_config = [
-	'severity_name_0' => $config['severity_name_0'],
-	'severity_name_1' => $config['severity_name_1'],
-	'severity_name_2' => $config['severity_name_2'],
-	'severity_name_3' => $config['severity_name_3'],
-	'severity_name_4' => $config['severity_name_4'],
-	'severity_name_5' => $config['severity_name_5']
-];
 $actions = getEventDetailsActions($event);
 $users = API::User()->get([
 	'output' => ['alias', 'name', 'surname'],
@@ -174,7 +165,7 @@ $event_tab = (new CDiv([
 	]),
 	new CDiv([
 		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONS,
-			makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
+			makeEventDetailsActionsTable($actions, $users, $mediatypes)
 		))
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
 			->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state')

@@ -31,7 +31,7 @@ $filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 
 $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severityNames[] = getSeverityName($severity, $data['config']);
+	$severityNames[] = getSeverityName($severity);
 }
 
 $column1 = (new CFormList())
@@ -54,7 +54,8 @@ $column1 = (new CFormList())
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_groupids_',
-					'with_monitored_triggers' => true
+					'with_monitored_triggers' => true,
+					'enrich_parent_groups' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

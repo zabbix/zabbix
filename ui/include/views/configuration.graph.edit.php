@@ -99,7 +99,9 @@ $graphFormList
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Graph type'), 'graphtype')),
-		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))->setEnabled(!$readonly)
+		(new CComboBox('graphtype', $this->data['graphtype'], 'jQuery(\'form[name="graphForm"]\').submit()',
+			graphType())
+		)->setEnabled(!$readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -333,26 +335,31 @@ else {
 // Append items to form list.
 $items_table = (new CTable())
 	->setId('itemsTable')
-	->setHeader([
-		(new CColHeader())->setWidth(15),
-		(new CColHeader())->setWidth(15),
-		(new CColHeader(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
-		($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
-			? (new CColHeader(_('Type')))->setWidth(80)
+	->setColumns([
+		(new CTableColumn())->addClass('table-col-handle'),
+		(new CTableColumn())->addClass('table-col-no'),
+		(new CTableColumn(_('Name')))->addClass(($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
+			? 'table-col-name-normal'
+			: 'table-col-name'
+		),
+		in_array($this->data['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED])
+			? (new CTableColumn(_('Type')))->addClass('table-col-type')
 			: null,
-		(new CColHeader(_('Function')))->setWidth(80),
+		(new CTableColumn(_('Function')))->addClass('table-col-function'),
 		($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
-			? (new CColHeader(_('Draw style')))
-				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth(80)
+			? (new CTableColumn(
+				(new CColHeader(_('Draw style')))->addClass(ZBX_STYLE_NOWRAP)
+			))
+				->addClass('table-col-draw-style')
 			: null,
-		($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
-			? (new CColHeader(_('Y axis side')))
-				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth(80)
+		in_array($this->data['graphtype'], [GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED])
+			? (new CTableColumn(
+				(new CColHeader(_('Y axis side')))->addClass(ZBX_STYLE_NOWRAP)
+			))
+				->addClass('table-col-y-axis-side')
 			: null,
-		(new CColHeader(_('Colour')))->setWidth(100),
-		$readonly ? null : (new CColHeader(_('Action')))->setWidth(50)
+		(new CTableColumn(_('Colour')))->addClass('table-col-colour'),
+		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 
 $popup_options_add = [
@@ -423,7 +430,11 @@ foreach ($this->data['items'] as $n => $item) {
 		$item['yaxisside'] = 0;
 	}
 
-	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$this->data['graphid'].', '.$item['itemid'].', '.
+	if (!array_key_exists('gitemid', $item)) {
+		$item['gitemid'] = '';
+	}
+
+	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$item['itemid'].', '.
 		json_encode($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
 		$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
 		true

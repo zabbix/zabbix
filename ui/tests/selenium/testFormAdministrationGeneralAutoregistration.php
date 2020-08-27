@@ -88,8 +88,8 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'ID' => 1,
 						'Details' => [
 							'config.tls_accept: 1 => 2',
-							'config.tls_psk_identity: ******** => ********',
-							'config.tls_psk: ******** => ********'
+							'config.tls_psk_identity: ****** => ******',
+							'config.tls_psk: ****** => ******'
 						]
 					]
 				]
@@ -122,8 +122,8 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'ID' => 1,
 						'Details' => [
 							'config.tls_accept: 3 => 1',
-							'config.tls_psk_identity: ******** => ********',
-							'config.tls_psk: ******** => ********'
+							'config.tls_psk_identity: ****** => ******',
+							'config.tls_psk: ****** => ******'
 						]
 					]
 				]

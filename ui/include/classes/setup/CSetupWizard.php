@@ -46,12 +46,16 @@ class CSetupWizard extends CForm {
 				'fnc' => 'stage3'
 			],
 			4 => [
-				'title' => _('Pre-installation summary'),
+				'title' => _('GUI settings'),
 				'fnc' => 'stage4'
 			],
 			5 => [
-				'title' => _('Install'),
+				'title' => _('Pre-installation summary'),
 				'fnc' => 'stage5'
+			],
+			6 => [
+				'title' => _('Install'),
+				'fnc' => 'stage6'
 			]
 		];
 
@@ -61,11 +65,11 @@ class CSetupWizard extends CForm {
 	}
 
 	function getConfig($name, $default = null) {
-		return CSession::keyExists($name) ? CSession::getValue($name) : $default;
+		return CSessionHelper::has($name) ? CSessionHelper::get($name) : $default;
 	}
 
 	function setConfig($name, $value) {
-		CSession::setValue($name, $value);
+		CSessionHelper::set($name, $value);
 	}
 
 	function getStep() {
@@ -93,12 +97,12 @@ class CSetupWizard extends CForm {
 	}
 
 	protected function bodyToString($destroy = true) {
+		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
+
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
 			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
 			->addItem($this->getList());
-
-		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
 
 		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$cancel_button = (new CSubmit('cancel', _('Cancel')))
@@ -154,7 +158,50 @@ class CSetupWizard extends CForm {
 		preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version);
 		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix '.$version[0]]))->addClass(ZBX_STYLE_SETUP_TITLE);
 
-		return (new CDiv($setup_title))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY);
+		$default_lang = $this->getConfig('default_lang');
+		$lang_combobox = (new CComboBox('default_lang', $default_lang, 'submit();'))
+			->setAttribute('autofocus', 'autofocus');
+
+		$all_locales_available = 1;
+
+		foreach (getLocales() as $localeid => $locale) {
+			if (!$locale['display']) {
+				continue;
+			}
+
+			/*
+			 * Checking if this locale exists in the system. The only way of doing it is to try and set one
+			 * trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC.
+			 */
+			$locale_available = ($localeid === ZBX_DEFAULT_LANG
+					|| setlocale(LC_MONETARY, zbx_locale_variants($localeid))
+			);
+
+			$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
+
+			$all_locales_available &= (int) $locale_available;
+		}
+
+		// Restoring original locale.
+		setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
+
+		$language_error = '';
+		if (!function_exists('bindtextdomain')) {
+			$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+			$lang_combobox->setEnabled(false);
+		}
+		elseif ($all_locales_available == 0) {
+			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+		}
+
+		$language_select = (new CFormList())
+			->addRow(_('Default language'),
+				($language_error !== '')
+					? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
+					: $lang_combobox
+			);
+
+		return (new CDiv([$setup_title, $language_select]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY);
 	}
 
 	function stage1() {
@@ -303,9 +350,8 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($this->STEP_FAILED) {
-			global $ZBX_MESSAGES;
-
-			$message_box = makeMessageBox(false, $ZBX_MESSAGES, _('Cannot connect to the database.'), false, true);
+			$message_box = makeMessageBox(false, CMessageHelper::getMessages(), _('Cannot connect to the database.'),
+				false, true);
 		}
 		else {
 			$message_box = null;
@@ -349,7 +395,26 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage4() {
+	protected function stage4(): array {
+		$timezones = DateTimeZone::listIdentifiers();
+
+		$table = (new CFormList())
+			->addRow(_('Default time zone'),
+				new CComboBox('default_timezone', $this->getConfig('default_timezone'), null,
+					[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
+				)
+			)
+			->addRow(_('Default theme'),
+				new CComboBox('default_theme', $this->getConfig('default_theme'), 'submit()', APP::getThemes())
+			);
+
+		return [
+			new CTag('h1', true, _('GUI settings')),
+			(new CDiv($table))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
+		];
+	}
+
+	protected function stage5(): array {
 		$db_type = $this->getConfig('DB_TYPE');
 		$databases = CFrontendSetup::getSupportedDatabases();
 
@@ -400,7 +465,15 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage5() {
+	protected function stage6(): array {
+		$this->dbConnect();
+		$update = [];
+		foreach (['default_lang', 'default_timezone', 'default_theme'] as $key) {
+			$update[] = $key.'='.zbx_dbstr($this->getConfig($key));
+		}
+		DBexecute('UPDATE config SET '.implode(',', $update));
+		$this->dbClose();
+
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
 		$config_file_name = APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
@@ -428,6 +501,14 @@ class CSetupWizard extends CForm {
 		];
 
 		$error = false;
+
+		// Create session secret key.
+		if (!$this->dbConnect() || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
+			$this->STEP_FAILED = true;
+			$this->setConfig('step', 2);
+			return $this->stage2();
+		}
+		$this->dbClose();
 
 		if (!$config->save()) {
 			$error = true;
@@ -616,12 +697,7 @@ class CSetupWizard extends CForm {
 				$this->doNext();
 			}
 		}
-		elseif ($this->getStep() == 4) {
-			if (hasRequest('next') && array_key_exists(4, getRequest('next'))) {
-				$this->doNext();
-			}
-		}
-		elseif ($this->getStep() == 5) {
+		elseif ($this->getStep() == 6) {
 			if (hasRequest('save_config')) {
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');

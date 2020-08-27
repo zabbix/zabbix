@@ -298,6 +298,13 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 }
 
+// tags
+$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+	'source' => 'host_prototype',
+	'tags' => $data['tags'],
+	'readonly' => $data['readonly']
+]));
+
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 $divTabs->addTab('macroTab', _('Macros'),

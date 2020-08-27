@@ -161,14 +161,13 @@ $mediaTypeForm->addItem([
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?')],
 		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?')],
-		'mediatype.export' => ['name' => _('Export'), 'redirect' =>
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'export.mediatypes.xml')
-				->setArgument('backurl', (new CUrl('zabbix.php'))
+		'mediatype.export' => [
+			'content' => new CButtonExport('export.mediatypes',
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'mediatype.list')
-					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-					->getUrl())
-				->getUrl()
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
 		],
 		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?')]
 	], 'mediatype')

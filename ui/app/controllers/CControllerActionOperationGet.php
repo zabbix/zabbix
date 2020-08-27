@@ -245,7 +245,7 @@ class CControllerActionOperationGet extends CController {
 				}
 			}
 
-			$mediatypes = API::MediaType()->get(['output' => ['mediatypeid', 'name']]);
+			$mediatypes = API::MediaType()->get(['output' => ['mediatypeid', 'name', 'status']]);
 			CArrayHelper::sort($mediatypes, ['name']);
 			$mediatypes = array_values($mediatypes);
 

@@ -432,23 +432,30 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	private static function validateTimeSelectorPeriod($from, $to) {
 		$errors = [];
 		$ts = [];
+		$ts['now'] = time();
 		$range_time_parser = new CRangeTimeParser();
 
 		foreach (['from' => $from, 'to' => $to] as $field => $value) {
 			$range_time_parser->parse($value);
-			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			$ts[$field] = $range_time_parser
+				->getDateTime($field === 'from')
+				->getTimestamp();
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
+		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+		$max_period = 1 + $ts['now'] - $range_time_parser
+			->getDateTime(true)
+			->getTimestamp();
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$errors[] = _n('Minimum time period to display is %1$s minute.',
 				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			);
 		}
-		elseif ($period > ZBX_MAX_PERIOD) {
+		elseif ($period > $max_period) {
 			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
+				'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
 			);
 		}
 

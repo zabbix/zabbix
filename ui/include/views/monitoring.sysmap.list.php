@@ -94,13 +94,12 @@ $sysmapForm->addItem([
 	$sysmapTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'maps', [
-		'map.export' => ['name' => _('Export'), 'redirect' =>
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'export.sysmaps.xml')
-				->setArgument('backurl', (new CUrl('sysmaps.php'))
-					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-					->getUrl())
-				->getUrl()
+		'map.export' => [
+			'content' => new CButtonExport('export.sysmaps',
+				(new CUrl('sysmaps.php'))
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
 		],
 		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?')]
 	])

@@ -37,8 +37,12 @@ typedef struct
 
 	char		*name;
 
+	/* process name extracted from the first argument (usually executable path) */
+	char		*name_arg0;
+
 	/* process command line in format <arg0> <arg1> ... <argN>\0 */
 	char		*cmdline;
+
 
 #ifdef HAVE_ZONE_H
 	zoneid_t	zoneid;
@@ -134,6 +138,13 @@ static int	zbx_detect_zone_support(void)
 }
 #endif
 
+static void	zbx_sysinfo_proc_clear(zbx_sysinfo_proc_t *proc)
+{
+	zbx_free(proc->name);
+	zbx_free(proc->cmdline);
+	zbx_free(proc->name_arg0);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sysinfo_proc_free                                            *
@@ -143,9 +154,7 @@ static int	zbx_detect_zone_support(void)
  ******************************************************************************/
 static void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 {
-	zbx_free(proc->name);
-	zbx_free(proc->cmdline);
-
+	zbx_sysinfo_proc_clear(proc);
 	zbx_free(proc);
 }
 
@@ -167,325 +176,130 @@ static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 	return FAIL;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 {
-	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *memtype = NULL;
-	DIR		*dir;
-	struct dirent	*entries;
-	struct passwd	*usrinfo;
-	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int		fd = -1, do_task, proccount = 0, invalid_user = 0;
-	zbx_uint64_t	mem_size = 0, byte_value = 0;
-	double		pct_size = 0.0, pct_value = 0.0;
-	size_t		*p_value;
+	size_t	line_alloc = ZBX_KIBIBYTE, n;
 
-	if (5 < request->nparam)
+	rewind(f_cmd);
+
+	*line = (char *)zbx_malloc(*line, line_alloc + 2);
+	*line_offset = 0;
+
+	while (0 != (n = fread(*line + *line_offset, 1, line_alloc - *line_offset, f_cmd)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		*line_offset += n;
+
+		if (0 != feof(f_cmd))
+			break;
+
+		line_alloc *= 2;
+		*line = (char *)zbx_realloc(*line, line_alloc + 2);
 	}
 
-	procname = get_rparam(request, 0);
-	param = get_rparam(request, 1);
-
-	if (NULL != param && '\0' != *param)
+	if (0 == ferror(f_cmd))
 	{
-		errno = 0;
+		if (0 == *line_offset || '\0' != (*line)[*line_offset - 1])
+			(*line)[(*line_offset)++] = '\0';
+		if (1 == *line_offset || '\0' != (*line)[*line_offset - 2])
+			(*line)[(*line_offset)++] = '\0';
 
-		if (NULL == (usrinfo = getpwnam(param)))
-		{
-			if (0 != errno)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
-			}
-
-			invalid_user = 1;
-		}
-	}
-	else
-		usrinfo = NULL;
-
-	param = get_rparam(request, 2);
-
-	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))
-		do_task = ZBX_DO_SUM;
-	else if (0 == strcmp(param, "avg"))
-		do_task = ZBX_DO_AVG;
-	else if (0 == strcmp(param, "max"))
-		do_task = ZBX_DO_MAX;
-	else if (0 == strcmp(param, "min"))
-		do_task = ZBX_DO_MIN;
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		return SUCCEED;
 	}
 
-	proccomm = get_rparam(request, 3);
-	memtype = get_rparam(request, 4);
+	zbx_free(*line);
 
-	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vsize"))
-	{
-		p_value = &psinfo.pr_size;	/* size of process image in Kbytes */
-	}
-	else if (0 == strcmp(memtype, "rss"))
-	{
-		p_value = &psinfo.pr_rssize;	/* resident set size in Kbytes */
-	}
-	else if (0 == strcmp(memtype, "pmem"))
-	{
-		p_value = NULL;			/* for % of system memory used by process */
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
-		goto out;
-
-	if (NULL == (dir = opendir("/proc")))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
-	}
-
-	while (NULL != (entries = readdir(dir)))
-	{
-		if (-1 != fd)
-		{
-			close(fd);
-			fd = -1;
-		}
-
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
-
-		if (-1 == (fd = open(tmp, O_RDONLY)))
-			continue;
-
-		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
-			continue;
-
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
-			continue;
-
-		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
-			continue;
-
-		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
-			continue;
-
-		if (NULL != p_value)
-		{
-			/* pr_size or pr_rssize in Kbytes */
-			byte_value = *p_value << 10;	/* kB to Byte */
-
-			if (0 != proccount++)
-			{
-				if (ZBX_DO_MAX == do_task)
-					mem_size = MAX(mem_size, byte_value);
-				else if (ZBX_DO_MIN == do_task)
-					mem_size = MIN(mem_size, byte_value);
-				else
-					mem_size += byte_value;
-			}
-			else
-				mem_size = byte_value;
-		}
-		else
-		{
-			/* % of system memory used by process, measured in 16-bit binary fractions in the range */
-			/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
-			pct_value = (double)((int)psinfo.pr_pctmem * 100) / 32768.0;
-
-			if (0 != proccount++)
-			{
-				if (ZBX_DO_MAX == do_task)
-					pct_size = MAX(pct_size, pct_value);
-				else if (ZBX_DO_MIN == do_task)
-					pct_size = MIN(pct_size, pct_value);
-				else
-					pct_size += pct_value;
-			}
-			else
-				pct_size = pct_value;
-		}
-	}
-
-	closedir(dir);
-	if (-1 != fd)
-		close(fd);
-out:
-	if (NULL != p_value)
-	{
-		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : (double)mem_size / (double)proccount);
-		else
-			SET_UI64_RESULT(result, mem_size);
-	}
-	else
-	{
-		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : pct_size / (double)proccount);
-		else
-			SET_DBL_RESULT(result, pct_size);
-	}
-
-	return SYSINFO_RET_OK;
+	return FAIL;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+/******************************************************************************
+ *                                                                            *
+ * Function: proc_get_process_info                                            *
+ *                                                                            *
+ * Purpose: get single process information                                    *
+ *                                                                            *
+ * Parameters: pid    - [IN] the process pid                                  *
+ *             flags  - [IN] the flags specifying the process properties      *
+ *                          that must be returned                             *
+ *             proc   - [OUT] the process data                                *
+ *             psinfo - [OUT] the raw process information data                *
+ * Return value: SUCCEED - the process information was retrieved successfully *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinfo_proc_t *proc, psinfo_t *psinfo)
 {
-	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *zone_parameter;
-	DIR		*dir;
-	struct dirent	*entries;
-	zbx_stat_t	buf;
-	struct passwd	*usrinfo;
-	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int		fd = -1, proccount = 0, invalid_user = 0, zbx_proc_stat;
+	int		fd, n;
+	char		path[MAX_STRING_LEN];
+	FILE		*fp;
+	psinfo_t	psinfo_local;
+
+	/* skip entries not containing pids */
+	memset(proc, 0, sizeof(zbx_sysinfo_proc_t));
+	if (FAIL == is_uint32(pid, &proc->pid))
+		return FAIL;
+
+	zbx_snprintf(path, sizeof(path), "/proc/%s/psinfo", pid);
+
+	if (-1 == (fd = open(path, O_RDONLY)))
+		return FAIL;
+
+	if (NULL == psinfo)
+		psinfo = &psinfo_local;
+
+	n = read(fd, psinfo, sizeof(*psinfo));
+	close(fd);
+
+	if (-1 == n)
+		return FAIL;
+
 #ifdef HAVE_ZONE_H
-	zoneid_t	zoneid;
-	int		zoneflag;
+	proc->zoneid = psinfo->pr_zoneid;
 #endif
 
-	if (5 < request->nparam)
+	if (0 != (flags & ZBX_SYSINFO_PROC_USER))
+		proc->uid = psinfo->pr_uid;
+
+	if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
+		proc->name = zbx_strdup(NULL, psinfo->pr_fname);
+
+	if (0 != (flags & ZBX_SYSINFO_PROC_NAME) || 0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	procname = get_rparam(request, 0);
-	param = get_rparam(request, 1);
-
-	if (NULL != param && '\0' != *param)
-	{
-		errno = 0;
-
-		if (NULL == (usrinfo = getpwnam(param)))
+		zbx_snprintf(path, sizeof(path), "/proc/%s/cmdline", pid);
+		if (NULL != (fp = fopen(path, "r")))
 		{
-			if (0 != errno)
+			char	*line = NULL, *ptr;
+			size_t	l;
+
+			if (SUCCEED == get_cmdline(fp, &line, &l))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
+				{
+					if (NULL == (ptr = strrchr(line, '/')))
+						proc->name_arg0 = zbx_strdup(NULL, line);
+					else
+						proc->name_arg0 = zbx_strdup(NULL, ptr + 1);
+				}
+
+				if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
+				{
+					int	i;
+
+					for (i = 0, l -= 2; i < l; i++)
+						if ('\0' == line[i])
+							line[i] = ' ';
+
+					proc->cmdline = zbx_strdup(NULL, line);
+				}
+				zbx_free(line);
 			}
-
-			invalid_user = 1;
-		}
-	}
-	else
-		usrinfo = NULL;
-
-	param = get_rparam(request, 2);
-
-	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
-		zbx_proc_stat = ZBX_PROC_STAT_ALL;
-	else if (0 == strcmp(param, "run"))
-		zbx_proc_stat = ZBX_PROC_STAT_RUN;
-	else if (0 == strcmp(param, "sleep"))
-		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
-	else if (0 == strcmp(param, "zomb"))
-		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	proccomm = get_rparam(request, 3);
-
-	if (NULL == (zone_parameter = get_rparam(request, 4)) || '\0' == *zone_parameter
-			|| 0 == strcmp(zone_parameter, "current"))
-	{
-#ifdef HAVE_ZONE_H
-		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_CURRENT;
-#else
-		if (SUCCEED == zbx_detect_zone_support())
-		{
-			/* Agent has been compiled on Solaris 9 or earlier where zones are not supported */
-			/* but now it is running on a system with zone support. This agent cannot limit */
-			/* results to only current zone. */
-
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "The fifth parameter value \"current\" cannot be used"
-					" with agent running on a Solaris version with zone support, but compiled on"
-					" a Solaris version without zone support. Consider using \"all\" or install"
-					" agent with Solaris zone support."));
-			return SYSINFO_RET_FAIL;
-		}
-#endif
-	}
-	else if (0 == strcmp(zone_parameter, "all"))
-	{
-#ifdef HAVE_ZONE_H
-		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_ALL;
-#endif
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-#ifdef HAVE_ZONE_H
-	zoneid = getzoneid();
-#endif
-
-	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
-		goto out;
-
-	if (NULL == (dir = opendir("/proc")))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
-	}
-
-	while (NULL != (entries = readdir(dir)))
-	{
-		if (-1 != fd)
-		{
-			close(fd);
-			fd = -1;
+			fclose(fp);
 		}
 
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
-
-		if (0 != zbx_stat(tmp, &buf))
-			continue;
-
-		if (-1 == (fd = open(tmp, O_RDONLY)))
-			continue;
-
-		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
-			continue;
-
-		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
-			continue;
-
-		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
-			continue;
-
-		if (FAIL == check_procstate(&psinfo, zbx_proc_stat))
-			continue;
-
-		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
-			continue;
-
-#ifdef HAVE_ZONE_H
-		if (ZBX_PROCSTAT_FLAGS_ZONE_CURRENT == zoneflag && zoneid != psinfo.pr_zoneid)
-			continue;
-#endif
-		proccount++;
+		if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE) && NULL == proc->cmdline)
+			proc->cmdline = zbx_strdup(NULL, psinfo->pr_psargs);
 	}
 
-	closedir(dir);
-	if (-1 != fd)
-		close(fd);
-out:
-	SET_UI64_RESULT(result, proccount);
-
-	return SYSINFO_RET_OK;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -501,6 +315,9 @@ static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
 		return SUCCEED;
 
 	if (NULL != proc->name && 0 == strcmp(procname, proc->name))
+		return SUCCEED;
+
+	if (NULL != proc->name_arg0 && 0 == strcmp(procname, proc->name_arg0))
 		return SUCCEED;
 
 	return FAIL;
@@ -561,6 +378,335 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
 	return FAIL;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proc_match_props                                                 *
+ *                                                                            *
+ * Purpose: checks if the process properties (except zone) matches filter     *
+ *                                                                            *
+ ******************************************************************************/
+static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo, const char *procname,
+		const char *cmdline)
+{
+	if (SUCCEED != proc_match_user(proc, usrinfo))
+		return FAIL;
+
+	if (SUCCEED != proc_match_name(proc, procname))
+		return FAIL;
+
+	if (SUCCEED != proc_match_cmdline(proc, cmdline))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *memtype = NULL;
+	DIR			*dir;
+	struct dirent		*entries;
+	struct passwd		*usrinfo;
+	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
+	int			do_task, proccount = 0, invalid_user = 0, proc_props = 0;
+	zbx_uint64_t		mem_size = 0, byte_value = 0;
+	double			pct_size = 0.0, pct_value = 0.0;
+	size_t			*p_value;
+
+	if (5 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
+		proc_props |= ZBX_SYSINFO_PROC_NAME;
+	else
+		procname = NULL;
+
+	param = get_rparam(request, 1);
+
+	if (NULL != param && '\0' != *param)
+	{
+		proc_props |= ZBX_SYSINFO_PROC_USER;
+		errno = 0;
+
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			if (0 != errno)
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
+
+			invalid_user = 1;
+		}
+	}
+	else
+		usrinfo = NULL;
+
+	param = get_rparam(request, 2);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))
+		do_task = ZBX_DO_SUM;
+	else if (0 == strcmp(param, "avg"))
+		do_task = ZBX_DO_AVG;
+	else if (0 == strcmp(param, "max"))
+		do_task = ZBX_DO_MAX;
+	else if (0 == strcmp(param, "min"))
+		do_task = ZBX_DO_MIN;
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+	else
+		proccomm = NULL;
+
+	memtype = get_rparam(request, 4);
+
+	if (NULL == memtype || '\0' == *memtype || 0 == strcmp(memtype, "vsize"))
+	{
+		p_value = &psinfo.pr_size;	/* size of process image in Kbytes */
+	}
+	else if (0 == strcmp(memtype, "rss"))
+	{
+		p_value = &psinfo.pr_rssize;	/* resident set size in Kbytes */
+	}
+	else if (0 == strcmp(memtype, "pmem"))
+	{
+		p_value = NULL;			/* for % of system memory used by process */
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
+
+	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	while (NULL != (entries = readdir(dir)))
+	{
+		zbx_sysinfo_proc_t	proc;
+
+		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
+			continue;
+
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		{
+			if (NULL != p_value)
+			{
+				/* pr_size or pr_rssize in Kbytes */
+				byte_value = *p_value << 10;	/* kB to Byte */
+
+				if (0 != proccount++)
+				{
+					if (ZBX_DO_MAX == do_task)
+						mem_size = MAX(mem_size, byte_value);
+					else if (ZBX_DO_MIN == do_task)
+						mem_size = MIN(mem_size, byte_value);
+					else
+						mem_size += byte_value;
+				}
+				else
+					mem_size = byte_value;
+			}
+			else
+			{
+				/* % of system memory used by process, measured in 16-bit binary fractions in the range */
+				/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
+				pct_value = (double)((int)psinfo.pr_pctmem * 100) / 32768.0;
+
+				if (0 != proccount++)
+				{
+					if (ZBX_DO_MAX == do_task)
+						pct_size = MAX(pct_size, pct_value);
+					else if (ZBX_DO_MIN == do_task)
+						pct_size = MIN(pct_size, pct_value);
+					else
+						pct_size += pct_value;
+				}
+				else
+					pct_size = pct_value;
+			}
+		}
+
+		zbx_sysinfo_proc_clear(&proc);
+	}
+
+	closedir(dir);
+out:
+	if (NULL != p_value)
+	{
+		if (ZBX_DO_AVG == do_task)
+			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : (double)mem_size / (double)proccount);
+		else
+			SET_UI64_RESULT(result, mem_size);
+	}
+	else
+	{
+		if (ZBX_DO_AVG == do_task)
+			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : pct_size / (double)proccount);
+		else
+			SET_DBL_RESULT(result, pct_size);
+	}
+
+	return SYSINFO_RET_OK;
+}
+
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *zone_parameter;
+	DIR			*dir;
+	struct dirent		*entries;
+	zbx_stat_t		buf;
+	struct passwd		*usrinfo;
+	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
+	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
+#ifdef HAVE_ZONE_H
+	zoneid_t		zoneid;
+	int			zoneflag;
+#endif
+
+	if (5 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
+		proc_props |= ZBX_SYSINFO_PROC_NAME;
+	else
+		procname = NULL;
+
+	param = get_rparam(request, 1);
+
+	if (NULL != param && '\0' != *param)
+	{
+		proc_props |= ZBX_SYSINFO_PROC_USER;
+		errno = 0;
+
+		if (NULL == (usrinfo = getpwnam(param)))
+		{
+			if (0 != errno)
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
+
+			invalid_user = 1;
+		}
+	}
+	else
+		usrinfo = NULL;
+
+	param = get_rparam(request, 2);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
+		zbx_proc_stat = ZBX_PROC_STAT_ALL;
+	else if (0 == strcmp(param, "run"))
+		zbx_proc_stat = ZBX_PROC_STAT_RUN;
+	else if (0 == strcmp(param, "sleep"))
+		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
+	else if (0 == strcmp(param, "zomb"))
+		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+	else
+		proccomm = NULL;
+
+	if (NULL == (zone_parameter = get_rparam(request, 4)) || '\0' == *zone_parameter
+			|| 0 == strcmp(zone_parameter, "current"))
+	{
+#ifdef HAVE_ZONE_H
+		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_CURRENT;
+#else
+		if (SUCCEED == zbx_detect_zone_support())
+		{
+			/* Agent has been compiled on Solaris 9 or earlier where zones are not supported */
+			/* but now it is running on a system with zone support. This agent cannot limit */
+			/* results to only current zone. */
+
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "The fifth parameter value \"current\" cannot be used"
+					" with agent running on a Solaris version with zone support, but compiled on"
+					" a Solaris version without zone support. Consider using \"all\" or install"
+					" agent with Solaris zone support."));
+			return SYSINFO_RET_FAIL;
+		}
+#endif
+	}
+	else if (0 == strcmp(zone_parameter, "all"))
+	{
+#ifdef HAVE_ZONE_H
+		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_ALL;
+#endif
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+#ifdef HAVE_ZONE_H
+	zoneid = getzoneid();
+#endif
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
+
+	if (NULL == (dir = opendir("/proc")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	while (NULL != (entries = readdir(dir)))
+	{
+		zbx_sysinfo_proc_t	proc;
+
+		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
+			continue;
+
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		{
+#ifdef HAVE_ZONE_H
+			if (SUCCEED != proc_match_zone(&proc, zoneflag, zoneid))
+			{
+				zbx_sysinfo_proc_clear(&proc);
+				continue;
+			}
+
+#endif
+			proccount++;
+		}
+
+		zbx_sysinfo_proc_clear(&proc);
+	}
+
+	closedir(dir);
+out:
+	SET_UI64_RESULT(result, proccount);
+
+	return SYSINFO_RET_OK;
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -669,8 +815,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 	struct dirent		*entries;
 	char			tmp[MAX_STRING_LEN];
 	int			pid, ret = FAIL, fd = -1, n;
-	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	zbx_sysinfo_proc_t	*proc;
+	zbx_sysinfo_proc_t	*proc = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -679,43 +824,21 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 
 	while (NULL != (entries = readdir(dir)))
 	{
-		/* skip entries not containing pids */
-		if (FAIL == is_uint32(entries->d_name, &pid))
-			continue;
+		if (NULL == proc)
+		{
+			proc = (zbx_sysinfo_proc_t *)zbx_malloc(NULL, sizeof(zbx_sysinfo_proc_t));
+			memset(proc, 0, sizeof(zbx_sysinfo_proc_t));
+		}
 
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
-
-		if (-1 == (fd = open(tmp, O_RDONLY)))
-			continue;
-
-		n = read(fd, &psinfo, sizeof(psinfo));
-		close(fd);
-
-		if (-1 == n)
-			continue;
-
-		proc = (zbx_sysinfo_proc_t *)zbx_malloc(NULL, sizeof(zbx_sysinfo_proc_t));
-		memset(proc, 0, sizeof(zbx_sysinfo_proc_t));
-
-		proc->pid = pid;
-
-		if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
-			proc->name = zbx_strdup(NULL, psinfo.pr_fname);
-
-		if (0 != (flags & ZBX_SYSINFO_PROC_USER))
-			proc->uid = psinfo.pr_uid;
-
-		if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
-			proc->cmdline = zbx_strdup(NULL, psinfo.pr_psargs);
-
-#ifdef HAVE_ZONE_H
-		proc->zoneid = psinfo.pr_zoneid;
-#endif
-
-		zbx_vector_ptr_append(processes, proc);
+		if (SUCCEED == proc_get_process_info(entries->d_name, flags, proc, NULL))
+		{
+			zbx_vector_ptr_append(processes, proc);
+			proc = NULL;
+		}
 	}
-
 	closedir(dir);
+
+	zbx_free(proc);
 
 	ret = SUCCEED;
 out:
@@ -784,13 +907,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	{
 		proc = (zbx_sysinfo_proc_t *)processes->values[i];
 
-		if (SUCCEED != proc_match_user(proc, usrinfo))
-			continue;
-
-		if (SUCCEED != proc_match_name(proc, procname))
-			continue;
-
-		if (SUCCEED != proc_match_cmdline(proc, cmdline))
+		if (SUCCEED != proc_match_props(proc, usrinfo, procname, cmdline))
 			continue;
 
 #ifdef HAVE_ZONE_H

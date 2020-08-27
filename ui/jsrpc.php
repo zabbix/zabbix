@@ -52,6 +52,7 @@ if (!is_array($data) || !isset($data['method'])
 }
 
 $result = [];
+$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 switch ($data['method']) {
 	case 'search':
@@ -65,17 +66,19 @@ switch ($data['method']) {
 		break;
 
 	case 'zabbix.status':
-		CSession::start();
-		if (!CSession::keyExists('serverCheckResult')
-				|| (CSession::getValue('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
-			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
-			CSession::setValue('serverCheckResult', $zabbixServer->isRunning(CWebUser::getSessionCookie()));
-			CSession::setValue('serverCheckTime', time());
+		if (!CSessionHelper::has('serverCheckResult')
+				|| (CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
+			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
+			);
+			CSessionHelper::set('serverCheckResult', $zabbixServer->isRunning(CSessionHelper::getId()));
+			CSessionHelper::set('serverCheckTime', time());
 		}
 
 		$result = [
-			'result' => (bool) CSession::getValue('serverCheckResult'),
-			'message' => CSession::getValue('serverCheckResult')
+			'result' => (bool) CSessionHelper::get('serverCheckResult'),
+			'message' => CSessionHelper::get('serverCheckResult')
 				? ''
 				: _('Zabbix server is not running: the information displayed may not be current.')
 		];
@@ -97,13 +100,12 @@ switch ($data['method']) {
 		break;
 
 	case 'trigger.get':
-		$config = select_config();
 		$result = [];
 
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'priority'],
 			'triggerids' => $data['triggerids'],
-			'limit' => $config['search_limit']
+			'limit' => $limit
 		]);
 
 		if ($triggers) {
@@ -129,8 +131,6 @@ switch ($data['method']) {
 	 * @return array(int => array('value' => int, 'text' => string))
 	 */
 	case 'multiselect.get':
-		$config = select_config();
-
 		switch ($data['object_name']) {
 			case 'hostGroup':
 				$options = [
@@ -149,15 +149,14 @@ switch ($data['method']) {
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
+					'preservekeys' => true
 				];
 				$hostGroups = API::HostGroup()->get($options);
 
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = enrichParentGroups($hostGroups, [
-							'real_hosts' => null
-						] + $options);
+						$hostGroups = enrichParentGroups($hostGroups);
 					}
 
 					CArrayHelper::sort($hostGroups, [
@@ -182,7 +181,7 @@ switch ($data['method']) {
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
-					'limit' => $config['search_limit']
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				];
 
 				if ($data['object_name'] === 'host_templates') {
@@ -226,7 +225,7 @@ switch ($data['method']) {
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => $config['search_limit']
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				];
 
 				if ($data['object_name'] === 'item_prototypes') {
@@ -267,7 +266,7 @@ switch ($data['method']) {
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => $config['search_limit']
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				];
 
 				if ($data['object_name'] === 'graph_prototypes') {
@@ -297,7 +296,7 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['templateid', 'name'],
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
-					'limit' => $config['search_limit']
+					'limit' => $limit
 				]);
 
 				if ($templates) {
@@ -317,7 +316,7 @@ switch ($data['method']) {
 				$proxies = API::Proxy()->get([
 					'output' => ['proxyid', 'host'],
 					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
-					'limit' => $config['search_limit']
+					'limit' => $limit
 				]);
 
 				if ($proxies) {
@@ -336,7 +335,7 @@ switch ($data['method']) {
 					'output' => ['applicationid', 'name'],
 					'hostids' => zbx_toArray($data['hostid']),
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
-					'limit' => $config['search_limit']
+					'limit' => $limit
 				]);
 
 				if ($applications) {
@@ -357,7 +356,7 @@ switch ($data['method']) {
 					'output' => [],
 					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
 					'itemids' => [$data['parent_discoveryid']],
-					'limitSelects' => $config['search_limit']
+					'limitSelects' => $limit
 				]);
 
 				if ($discovery_rules) {
@@ -395,7 +394,7 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'monitored' => isset($data['monitored']) ? $data['monitored'] : null,
 					'search' => isset($data['search']) ? ['description' => $data['search']] : null,
-					'limit' => $config['search_limit']
+					'limit' => $limit
 				]);
 
 				if ($triggers) {
@@ -448,7 +447,7 @@ switch ($data['method']) {
 						]
 						: null,
 					'searchByAny' => true,
-					'limit' => $config['search_limit']
+					'limit' => $limit
 				]);
 
 				if ($users) {
@@ -473,7 +472,7 @@ switch ($data['method']) {
 				$groups = API::UserGroup()->get([
 					'output' => ['usrgrpid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
-					'limit' => $config['search_limit']
+					'limit' => $limit
 				]);
 
 				if ($groups) {
@@ -494,7 +493,7 @@ switch ($data['method']) {
 					'output' => ['druleid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => ['status' => DRULE_STATUS_ACTIVE],
-					'limit' => $config['search_limit']
+					'limit' => $limit
 				]);
 
 				if ($drules) {
@@ -514,7 +513,6 @@ switch ($data['method']) {
 		break;
 
 	case 'patternselect.get':
-		$config = select_config();
 		$search = (array_key_exists('search', $data) && $data['search'] !== '') ? $data['search'] : null;
 		$wildcard_enabled = (strpos($search, '*') !== false);
 		$result = [];
@@ -526,7 +524,7 @@ switch ($data['method']) {
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'preservekeys' => true,
-					'limit' => $config['search_limit']
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				];
 
 				$db_result = API::Host()->get($options);
@@ -543,30 +541,20 @@ switch ($data['method']) {
 					],
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
-					'limit' => $config['search_limit']
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				];
 
 				$db_result = API::Item()->get($options);
 				break;
 
 			case 'graphs':
-				if (!array_key_exists('monitored_hosts', $data) && array_key_exists('real_hosts', $data)) {
-					$templated = false;
-				}
-				elseif (array_key_exists('templated_hosts')) {
-					$templated = true;
-				}
-				else {
-					$templated = null;
-				}
-
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
-					'templated' => $templated,
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'searchWildcardsEnabled' => $wildcard_enabled,
-					'limit' => $config['search_limit']
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				];
 
 				$db_result = API::Graph()->get($options);
