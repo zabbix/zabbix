@@ -35,7 +35,7 @@ if (!$data['form_refresh']) {
 
 // Create sysmap form.
 $form = (new CForm())
-	->setId('mapEditForm')
+	->setId('sysmap-form')
 	->setName('map.edit.php')
 	->addVar('form', getRequest('form', 1))
 	->addVar('current_user_userid', $data['current_user_userid'])

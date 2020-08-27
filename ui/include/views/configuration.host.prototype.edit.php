@@ -42,7 +42,7 @@ if (!hasRequest('form_refresh')) {
 }
 
 $frmHost = (new CForm())
-	->setId('hostPrototypeForm')
+	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))

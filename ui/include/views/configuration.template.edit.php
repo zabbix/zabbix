@@ -49,7 +49,7 @@ if ($data['templateid'] != 0) {
 	$frm_title .= SPACE.' ['.$data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
-	->setId('templatesForm')
+	->setId('templates-form')
 	->setName('templatesForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);

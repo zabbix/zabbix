@@ -35,7 +35,7 @@ if ($data['form_refresh'] == 0) {
 }
 
 $proxyForm = (new CForm())
-	->setId('proxyForm')
+	->setId('proxy-form')
 	->addVar('proxyid', $data['proxyid'])
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);

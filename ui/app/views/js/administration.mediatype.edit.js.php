@@ -237,7 +237,7 @@
 		});
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
-		$('#media_type_form').submit(function() {
+		$('#media-type-form').submit(function() {
 			var maxattempts = $('#maxattempts'),
 				maxsessions_type = $('#maxsessions_type :radio:checked').val(),
 				maxsessions = $('#maxsessions');

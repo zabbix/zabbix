@@ -32,8 +32,8 @@ if (!empty($this->data['hostid'])) {
 
 // create form
 $http_form = (new CForm())
+	->setId('http-form')
 	->setName('httpForm')
-	->setId('httpForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])

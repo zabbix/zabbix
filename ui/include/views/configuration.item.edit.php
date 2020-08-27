@@ -33,7 +33,7 @@ if (!empty($data['hostid'])) {
 
 // Create form.
 $form = (new CForm())
-	->setId('itemForm')
+	->setId('item-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])

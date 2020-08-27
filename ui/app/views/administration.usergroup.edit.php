@@ -29,7 +29,7 @@ $this->addJsFile('class.tab-indicators.js');
 $widget = (new CWidget())->setTitle(_('User groups'));
 
 $form = (new CForm())
-	->setId('userGroupForm')
+	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 

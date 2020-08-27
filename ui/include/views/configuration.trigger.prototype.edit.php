@@ -31,7 +31,7 @@ $triggersWidget = (new CWidget())
 
 // create form
 $triggersForm = (new CForm())
-	->setId('triggersPrototypeForm')
+	->setId('triggers-prototype-form')
 	->setName('triggersForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])

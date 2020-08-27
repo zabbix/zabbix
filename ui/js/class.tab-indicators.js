@@ -20,6 +20,12 @@
 
 'use strict';
 
+const TAB_INDICATOR_ATTR_COUNT      = 'data-indicator-count';
+const TAB_INDICATOR_ATTR_STATUS     = 'data-indicator-status';
+
+const TAB_INDICATOR_STATUS_ENABLED  = 'enabled';
+const TAB_INDICATOR_STATUS_DISABLED = 'disabled';
+
 /**
  * Main class to initialize tab indicator.
  */
@@ -35,29 +41,29 @@ class TabIndicators {
 	}
 
 	/**
-	 * Get main form
+	 * Get main form.
 	 *
 	 * @return {HTMLElement} Main form
 	 */
 	getForm() {
-		const TEMPLATE = document.querySelector('#templatesForm');
-		const HOST = document.querySelector('#hostsForm');
-		const AUTHENTICATION = document.querySelector('#authenticationForm');
-		const HOST_PROTOTYPE = document.querySelector('#hostPrototypeForm');
-		const ITEM = document.querySelector('#itemForm');
-		const ITEM_PROTOTYPE = document.querySelector('#itemPrototypeForm');
-		const TRIGGER = document.querySelector('#triggersForm');
-		const TRIGGER_PROTOTYPE = document.querySelector('#triggersPrototypeForm');
-		const HOST_DISCOVERY = document.querySelector('#hostDiscoveryForm');
-		const WEB_SCENARIO = document.querySelector('#httpForm');
-		const ACTION = document.querySelector("[id='action.edit']");
-		const SERVICE = document.querySelector('#servicesForm');
-		const PROXY = document.querySelector('#proxyForm');
-		const USER_GROUP = document.querySelector('#userGroupForm');
-		const USER = document.querySelector('#userForm');
-		const MEDIA_TYPE = document.querySelector('#media_type_form');
-		const MAP = document.querySelector('#mapEditForm');
-		const GRAPH = document.querySelector('#widget_dialogue_form');
+		const TEMPLATE = document.querySelector('#templates-form');
+		const HOST = document.querySelector('#hosts-form');
+		const AUTHENTICATION = document.querySelector('#authentication-form');
+		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
+		const ITEM = document.querySelector('#item-form');
+		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
+		const TRIGGER = document.querySelector('#triggers-form');
+		const TRIGGER_PROTOTYPE = document.querySelector('#triggers-prototype-form');
+		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
+		const WEB_SCENARIO = document.querySelector('#http-form');
+		const ACTION = document.querySelector('#action-form');
+		const SERVICE = document.querySelector('#services-form');
+		const PROXY = document.querySelector('#proxy-form');
+		const USER_GROUP = document.querySelector('#user-group-form');
+		const USER = document.querySelector('#user-form');
+		const MEDIA_TYPE = document.querySelector('#media-type-form');
+		const MAP = document.querySelector('#sysmap-form');
+		const GRAPH = document.querySelector('#widget-dialogue-form');
 
 		switch (true) {
 			case !!TEMPLATE:
@@ -110,9 +116,10 @@ class TabIndicators {
 		Object.values(tabs).map((elem) => {
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(elem));
 
-			this.addAttribute(elem, indicator_item?.getType(), indicator_item?.getValue());
-
-			indicator_item?.initObserver(elem);
+			if (indicator_item !== null) {
+				this.addAttribute(elem, indicator_item.getType(), indicator_item.getValue());
+				indicator_item.initObserver(elem);
+			}
 		});
 	}
 
@@ -125,11 +132,13 @@ class TabIndicators {
 	 */
 	addAttribute(elem, type, value) {
 		if (type instanceof TabIndicatorStatusType) {
-			elem.setAttribute('data-indicator-status', value ? 'enabled' : 'disabled');
+			elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+				value ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+			);
 		}
 
 		if (type instanceof TabIndicatorNumberType) {
-			elem.setAttribute('data-indicator-count', value);
+			elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, value);
 		}
 	}
 
@@ -312,7 +321,7 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -360,7 +369,7 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -400,7 +409,7 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -428,7 +437,9 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#http_auth_enabled')
 			?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 	}
 }
@@ -450,7 +461,9 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#ldap_configured')
 			?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 	}
 }
@@ -472,7 +485,9 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#saml_auth_enabled')
 			?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 	}
 }
@@ -495,7 +510,9 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	initObserver(elem) {
 		[...document.querySelectorAll('[name=inventory_mode]')]?.map((value) => {
 			value.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 		});
 	}
@@ -525,21 +542,21 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(elem) {
 		[...document.querySelectorAll('[name=tls_connect]')]?.map((value) =>
-			value.addEventListener('click', () => elem.setAttribute('data-indicator-status',
-				!!this.getValue() ? 'enabled' : 'disabled'
+			value.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 			))
 		);
 
 		document
 			.querySelector('[name=tls_in_psk]')
-			?.addEventListener('click', () => elem.setAttribute('data-indicator-status',
-				!!this.getValue() ? 'enabled' : 'disabled'
+			?.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 			));
 
 		document
 			.querySelector('[name=tls_in_cert]')
-			?.addEventListener('click', () => elem.setAttribute('data-indicator-status',
-				!!this.getValue() ? 'enabled' : 'disabled'
+			?.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 			));
 	}
 }
@@ -569,7 +586,7 @@ class GroupsTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -606,7 +623,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -643,7 +660,7 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -683,7 +700,7 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -723,7 +740,7 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 				switch (mutation.type) {
 					case 'childList':
 					case 'attributes':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -760,7 +777,7 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -797,7 +814,7 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -839,18 +856,24 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#authentication')
 			?.addEventListener('change', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 
 		[...document.querySelectorAll('#verify_peer, #verify_host')].map((value) => {
 			value.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 		});
 
 		[...document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')].map((value) => {
 			value.addEventListener('change', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 		});
 	}
@@ -885,7 +908,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -932,7 +955,7 @@ class ServiceDependencyTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -969,7 +992,7 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -1006,7 +1029,9 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+						elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+							!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+						);
 						break;
 				}
 			});
@@ -1043,7 +1068,7 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -1080,7 +1105,7 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -1110,7 +1135,9 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#messages_enabled')
 			?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 	}
 }
@@ -1138,7 +1165,9 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	initObserver(elem) {
 		[...document.querySelectorAll('[name=private]')].map((value) => {
 			value?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 		});
 
@@ -1153,7 +1182,9 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+						elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+							!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+						);
 						break;
 				}
 			});
@@ -1195,7 +1226,7 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
@@ -1224,12 +1255,13 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 	initObserver(elem) {
 		[...document.querySelectorAll("[name='source']")].map((value) => {
 			value.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 		});
 	}
 }
-
 
 class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 
@@ -1248,7 +1280,9 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#graph_time')
 			?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 	}
 }
@@ -1273,7 +1307,9 @@ class GraphAxesTabIndicatorItem extends TabIndicatorItem {
 		[document.querySelector('#lefty'), document.querySelector('#righty'), document.querySelector('#axisx')].map(
 			(value) => {
 				value.addEventListener('click', () => {
-					elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+					elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+						!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+					);
 				});
 			}
 		);
@@ -1297,7 +1333,9 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#legend')
 			?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 	}
 }
@@ -1319,7 +1357,9 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 		document
 			.querySelector('#show_problems')
 			?.addEventListener('click', () => {
-				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+				);
 			});
 	}
 }
@@ -1348,7 +1388,7 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						elem.setAttribute('data-indicator-count', this.getValue());
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
 						break;
 				}
 			});
