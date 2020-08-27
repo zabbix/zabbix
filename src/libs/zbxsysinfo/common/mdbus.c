@@ -22,8 +22,6 @@
 #include "mutexs.h"
 #include "comms.h"
 
-#include "log.h"
-
 #ifdef HAVE_LIBMODBUS
 
 zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
@@ -367,7 +365,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 
 	if (-1 == ret)
 	{
-		*error = zbx_dsprintf(*error, "modbus_read failed: %s errno %d", modbus_strerror(errno), errno);
+		*error = zbx_dsprintf(*error, "modbus_read failed: %s", modbus_strerror(errno));
 		goto out;
 	}
 
@@ -466,7 +464,6 @@ out:
 }
 #endif /* HAVE_LIBMODBUS */
 
-extern unsigned char	process_type;
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBMODBUS
