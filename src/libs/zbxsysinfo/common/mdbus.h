@@ -44,6 +44,7 @@ extern int	CONFIG_TIMEOUT;
 #define ZBX_MODBUS_ENDIANNESS_MLE		4
 
 #define ZBX_MODBUS_IP_LEN_MAX			(64+1)
+#define ZBX_MODBUS_PORT_LEN_MAX			(5+1)
 
 #define ZBX_MODBUS_BYTE_SWAP_16(t_int16)	((t_int16 >> 8) | (t_int16 << 8))
 

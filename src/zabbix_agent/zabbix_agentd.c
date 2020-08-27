@@ -25,7 +25,7 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "comms.h"
-#include "modbus.h"
+#include "mdbus.h"
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;

@@ -17,8 +17,8 @@ libcommonsysinfo_a_SOURCES = \
 	file.h \
 	http.c \
 	http.h \
-	modbus.c \
-	modbus.h \
+	mdbus.c \
+	mdbus.h \
 	net.c \
 	net.h \
 	system.c \
