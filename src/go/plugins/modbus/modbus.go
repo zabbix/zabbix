@@ -20,7 +20,10 @@
 package modbus
 
 import (
+	"fmt"
 	"time"
+
+	"encoding/binary"
 
 	named "github.com/BurntSushi/locker"
 	"github.com/goburrow/modbus"
@@ -62,6 +65,10 @@ type Net struct {
 	Port    uint32
 }
 
+type Endianness struct {
+	order  binary.ByteOrder
+	middle Bits8
+}
 type MBParams struct {
 	ReqType    Bits8
 	NetAddr    string
@@ -72,7 +79,7 @@ type MBParams struct {
 	RetType    Bits16
 	RetCount   uint
 	Count      uint16
-	Endianness Bits8
+	Endianness Endianness
 	Offset     uint16
 }
 
@@ -126,7 +133,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, err
 	}
 
-	return pack2Json(raw_val, mbparams), nil
+	if result, err = pack2Json(raw_val, mbparams); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // Configure implements the Configurator interface.
@@ -139,6 +150,25 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
+}
+
+// Validate implements the Configurator interface.
+// Returns an error if validation of a plugin's configuration is failed.
+func (p *Plugin) Validate(options interface{}) error {
+	var (
+		opts PluginOptions
+		err  error
+	)
+
+	if err = conf.Unmarshal(options, &opts); err != nil {
+		return err
+	}
+
+	if opts.Timeout > 3600 || opts.Timeout < 0 {
+		return fmt.Errorf("Unacceptable Timeout value:%d", opts.Timeout)
+	}
+
+	return nil
 }
 
 func mbRead(p *MBParams, timeout int) (results []byte, err error) {
@@ -166,7 +196,7 @@ func mbRead(p *MBParams, timeout int) (results []byte, err error) {
 
 	if err != nil {
 		named.Unlock(lockName)
-		return nil, err
+		return nil, fmt.Errorf("Unable to connect: %s", err)
 	}
 
 	client := modbus.NewClient(handler)
@@ -184,8 +214,11 @@ func mbRead(p *MBParams, timeout int) (results []byte, err error) {
 	named.Unlock(lockName)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Unable to read: %s", err)
+	} else if len(results) == 0 {
+		return nil, fmt.Errorf("Unable to read data")
 	}
+
 	return results, nil
 }
 
@@ -216,8 +249,4 @@ func newHandler(p *MBParams, timeout int) (handler mblib.ClientHandler) {
 		handler = h
 	}
 	return handler
-}
-
-func pack2Json(val []byte, p *MBParams) interface{} {
-	return nil
 }

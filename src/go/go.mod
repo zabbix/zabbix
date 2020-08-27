@@ -3,7 +3,7 @@ module zabbix.com
 go 1.13
 
 require (
-	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 // indirect
+	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/alimy/mc/v2 v2.0.3
 	github.com/docker/go-connections v0.4.0
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
@@ -11,7 +11,7 @@ require (
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/go-ole/go-ole v1.2.4
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/goburrow/modbus v0.1.0 // indirect
+	github.com/goburrow/modbus v0.1.0
 	github.com/goburrow/serial v0.1.0 // indirect
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/jackc/pgx/v4 v4.6.0
