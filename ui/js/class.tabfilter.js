@@ -93,7 +93,7 @@ class CTabFilter extends CBaseComponent {
 					}
 
 					if (this._active_item != this._timeselector) {
-						this.updateTimeselector();
+						this.updateTimeselector(this._active_item);
 					}
 				}
 			},
@@ -158,7 +158,7 @@ class CTabFilter extends CBaseComponent {
 			 */
 			updateItem: (ev) => {
 				if (this._active_item != this._timeselector) {
-					this.updateTimeselector();
+					this.updateTimeselector(this._active_item);
 				}
 			},
 
@@ -343,6 +343,7 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		item = new CTabFilterItem(title, {
+			parent: this,
 			idx_namespace: this._idx_namespace,
 			index: this._items.length,
 			expanded: data.expanded||false,
@@ -353,7 +354,6 @@ class CTabFilter extends CBaseComponent {
 			support_custom_time: this._options.support_custom_time
 		});
 
-		item._parent = this;
 		this._items.push(item);
 
 		if (title.getAttribute('data-target') === 'tabfilter_timeselector') {
@@ -377,10 +377,13 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Update timeselector tab and timeselector buttons accessibility according active item.
+	 * Update timeselector tab and timeselector buttons accessibility according passed item.
+	 *
+	 * @param {CTabFilterItem} item     Tab item object.
+	 * @param {bool}           disable  Additional status to determine should the timeselector to be disabled or not.
 	 */
-	updateTimeselector() {
-		let disabled = !this._options.support_custom_time || this._active_item.hasCustomTime(),
+	updateTimeselector(item, disable) {
+		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
 			buttons = this._target.querySelectorAll('button.btn-time-left,button.btn-time-out,button.btn-time-right');
 
 		if (this._timeselector) {

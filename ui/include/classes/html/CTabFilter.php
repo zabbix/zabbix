@@ -184,14 +184,16 @@ class CTabFilter extends CDiv {
 	 * Add time range selector tab. Time range selcetor have static [data-target] equal 'tabfilter_timeselector'.
 	 *
 	 * @param array  $timerange    Time range data array, array keys: from, to, idx, idx2
-	 * @param string $date_format  Date selector format.
 	 */
-	public function addTimeselector(array $timerange, $date_format = ZBX_FULL_DATE_TIME) {
-		$data = [
-			'format' => $date_format,
-			'label' => relativeDateToText($timerange['from'], $timerange['to']),
-			'from' => $timerange['from'],
-			'to' => $timerange['to']
+	public function addTimeselector(array $timerange) {
+		$timerange += [
+			'format' => ZBX_FULL_DATE_TIME,
+			'from' => ZBX_PERIOD_DEFAULT_FROM,
+			'to' => ZBX_PERIOD_DEFAULT_TO,
+			'disabled' => false
+		];
+		$data = $timerange + [
+			'label' => relativeDateToText($timerange['from'], $timerange['to'])
 		];
 
 		$content = (new CDiv(new CPartial('timeselector.filter', $data)))->setId(static::CSS_ID_PREFIX.'timeselector');
@@ -202,7 +204,7 @@ class CTabFilter extends CDiv {
 			->setAttribute('data-profile-idx', $timerange['idx'])
 			->setAttribute('data-profile-idx2', $timerange['idx2']);
 
-		return $this->addTab($data['label'], $content, [
+		return $this->addTab($data['label'], $content, $data + [
 			'filter_sortable' => false,
 			'filter_configurable' => false
 		]);
@@ -268,8 +270,9 @@ class CTabFilter extends CDiv {
 		];
 
 		if ($timeselector) {
+			$timeselector_data = end($this->options['data']);
 			$tab = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
-			$enabled = ($this->options['support_custom_time'] && !$tab['filter_custom_time']);
+			$enabled = !$tab['filter_custom_time'] && !$timeselector_data['disabled'];
 			$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
 
 			$nav = array_merge($nav, [

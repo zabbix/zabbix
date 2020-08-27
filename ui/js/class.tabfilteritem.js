@@ -32,7 +32,7 @@ class CTabFilterItem extends CBaseComponent {
 	constructor(target, options) {
 		super(target);
 
-		this._parent = null;
+		this._parent = options.parent||null;
 		this._idx_namespace = options.idx_namespace;
 		this._index = options.index;
 		this._content_container = options.container;

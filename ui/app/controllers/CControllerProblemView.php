@@ -129,8 +129,9 @@ class CControllerProblemView extends CControllerProblem {
 			'timerange' => [
 				'idx' => static::FILTER_IDX,
 				'idx2' => 0,
-				'from' => $filter['from'],
-				'to' => $filter['to']
+				'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time']),
+				'from' => $filter['filter_custom_time'] ? $filter['from'] : $profile->from,
+				'to' => $filter['filter_custom_time'] ? $filter['to'] : $profile->to
 			],
 			'filter_tabs' => $filter_tabs,
 			'tab_selected' => $profile->selected,
