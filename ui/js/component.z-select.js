@@ -8,6 +8,10 @@ class ZSelect {
 		button_mousedown: this._onButtonMousedown.bind(this),
 		button_keydown: this._onButtonKeydown.bind(this),
 		button_keydown: this._onButtonKeydown.bind(this),
+		list_mouseenter: () => this.state.list_hover = true,
+		list_mouseleave: () => this.state.list_hover = false,
+		list_mousedown: this._onListMousedown.bind(this),
+		list_mousemove: this._onListMousemove.bind(this)
 	}
 
 	state = {
@@ -210,15 +214,10 @@ class ZSelect {
 		document.removeEventListener('wheel', this._event_handlers.document_wheel);
 	}
 
+	// NOTE: Native select element collapses on document wheel event if list is not hovered and on window resize event.
 	_onWindowResize() {
 		this._push();
 		this._collapseList();
-	}
-
-	_bindListNodeEvents(node) {
-		// NOTE: Native select element collapses on document wheel event while list is not hovered and on resize event.
-		node.onmouseenter = () => this.state.list_hover = true;
-		node.onmouseleave = () => this.state.list_hover = false;
 	}
 
 	_onButtonMousedown() {
@@ -424,27 +423,36 @@ class ZSelect {
 		}
 	}
 
-	_bindOptionNodeEvents(node) {
-		/**
-		 * NOTE: Native select element option responds to mouse move, also if mouseenter event is used, it is triggered when
-		 * node has to be scrolled in view, and pointer happens to be over another node after scroll.
-		 */
-		node.onmousemove = () => {
-			if (this.state.idx_staged != node.data_idx) {
-				const {disabled} = this._getOptionByIdx(node.data_idx);
-				!disabled && this._stageIdx(node.data_idx);
-			}
-		};
+	/**
+	 * NOTE: Native select element option responds to mouse move, also if mouseenter event is used, it is triggered when
+	 * node has to be scrolled in view, and pointer happens to be over another node after scroll.
+	 */
 
-		node.onmousedown = (e) => {
-			e.preventDefault();
-			this._stageIdx(node.data_idx);
-			this._commit();
-			this._push();
-			this._collapseList();
-		};
+	_onListMousemove(e) {
+		const idx = e.target.data_idx;
 
-		return node;
+		if (idx === undefined) {
+			return;
+		}
+
+		if (this.state.idx_staged != idx) {
+			const {disabled} = this._getOptionByIdx(idx);
+			!disabled && this._stageIdx(idx);
+		}
+	}
+
+	_onListMousedown(e) {
+		const idx = e.target.data_idx;
+
+		if (idx === undefined) {
+			return;
+		}
+
+		e.preventDefault();
+		this._stageIdx(idx);
+		this._commit();
+		this._push();
+		this._collapseList();
 	}
 
 	_createOptionNode({title, value, desc, disabled, class_name}) {
@@ -460,7 +468,7 @@ class ZSelect {
 		desc && li.setAttribute('description', desc);
 		disabled && li.setAttribute('disabled', 'disabled');
 
-		return this._bindOptionNodeEvents(li);
+		return li;
 	}
 
 	_registerOption({title, value, desc, disabled}, node) {
@@ -561,16 +569,24 @@ class ZSelect {
 	}
 
 	unbindEvents() {
+		this.root.list.removeEventListener('mouseenter', this._event_handlers.list_mouseenter);
+		this.root.list.removeEventListener('mouseleave', this._event_handlers.list_mouseleave);
+		this.root.list.removeEventListener('mousedown', this._event_handlers.list_mousedown);
+		this.root.list.removeEventListener('mousemove', this._event_handlers.list_mousemove);
+
 		this.root.button.removeEventListener('blur', this._event_handlers.button_blur);
 		this.root.button.removeEventListener('mousedown', this._event_handlers.button_mousedown);
 		this.root.button.removeEventListener('keydown', this._event_handlers.button_keydown);
 
 		window.removeEventListener('resize', this._event_handlers.window_resize);
-		// TODO: list item node events
 	}
 
 	bindEvents() {
-		this._bindListNodeEvents(this.root.list);
+		this.root.list.addEventListener('mouseenter', this._event_handlers.list_mouseenter);
+		this.root.list.addEventListener('mouseleave', this._event_handlers.list_mouseleave);
+		this.root.list.addEventListener('mousedown', this._event_handlers.list_mousedown);
+		this.root.list.addEventListener('mousemove', this._event_handlers.list_mousemove);
+
 		this.root.button.addEventListener('blur', this._event_handlers.button_blur);
 		this.root.button.addEventListener('mousedown', this._event_handlers.button_mousedown);
 		this.root.button.addEventListener('keydown', this._event_handlers.button_keydown);
