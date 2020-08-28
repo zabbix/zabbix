@@ -1,8 +1,37 @@
 Changes for 5.0.4rc1
 
 New features:
+........S. [ZBXNEXT-6139] added GetHeaders method to CurlHttpRequest javascript object (wiper)
+.........T [ZBXNEXT-6116] added SysAid media type (afayantsev)
+.......PS. [ZBXNEXT-6167] added diaginfo runtime command to log internal diagnostic information (wiper)
+..F....... [ZBXNEXT-6106] added Host context menu to hosts listed on 'Web monitoring' page (kustalovs)
+.........T [ZBXNEXT-6117] added media "TOPdesk" (mchudinov)
+.........T [ZBXNEXT-5540] added LLD rules for stand-alone and CAPsMAN APs (mchudinov)
+.........T [ZBXCTR-10] added iLert media type (roman-ilert)
 
 Bug fixes:
+.........T [ZBX-18122] fixed russian character in setup section (afayantsev)
+..F....... [ZBX-18074] fixed unresolved macros in item names in data overview table (talbergs)
+...G...... [ZBX-18195] changed log level increase command for Agent 2 to match Agent 1 (esneiders)
+...G...... [ZBX-17984] added support of ipv6 and unix sockets for memcached plugin (vadimipatov)
+........S. [ZBX-18189] fixed crash when performing housekeeping with disabled value cache (viktors)
+A......... [ZBX-18181] fixed undefined index when importing host with non-existing interface (Ivo)
+.........T [ZBXNEXT-6065] added SolarWinds Service Desk webhook (tuskov)
+.........T [ZBX-14503] updated JMX template to follow guidelines (tuskov)
+.........T [ZBX-18196] added overriding of triggers for IPMI Threshold sensors discovery (mchudinov)
+.........T [ZBX-18021] changed Opsgenie media to handle extra options Tags and Teams (mchudinov)
+..F....... [ZBX-18050] removed proxy name from host breadcrumbs (rlataria)
+..F....... [ZBX-18202] added new default item keys for item type "Zabbix aggregate" (agriscenko)
+..F....... [ZBX-18124] fixed discovered host group prototype saving during import (miks)
+..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
+..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
+..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+.........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
+.........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
+.........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
+A......... [ZBX-17952] fixed compression availability not being checked when deleting history (talbergs)
+.........T [ZBX-17981] fixed Discord endpoint validation (vjaceslavs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.3
