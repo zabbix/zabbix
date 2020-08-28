@@ -1,13 +1,21 @@
 class ZSelect {
 	onchange = () => {}
 
+	_event_handlers = {
+		document_wheel: this._onDocumentWheel.bind(this),
+		window_resize: this._onWindowResize.bind(this),
+		button_blur: this._onButtonBlur.bind(this),
+		button_mousedown: this._onButtonMousedown.bind(this),
+		button_keydown: this._onButtonKeydown.bind(this),
+		button_keydown: this._onButtonKeydown.bind(this),
+	}
+
 	state = {
 		is_open: false,
 		idx_commited: 0,
 		idx_staged: 0,
 		option_idx: [],
 		option_map: {},
-		focused: false,
 		list_hover: false,
 		value: null
 	}
@@ -32,6 +40,8 @@ class ZSelect {
 	_collapseList() {
 		this.state.is_open = false;
 		this.root.list.classList.remove('is-expanded');
+
+		this._unbindDocumentWheelEvent();
 	}
 
 	_expandList() {
@@ -57,6 +67,8 @@ class ZSelect {
 
 		this.root.list.classList.add('is-expanded');
 		this._stageIdx(this.state.idx_commited);
+
+		this._bindDocumentWheelEvent();
 	}
 
 	_scrollIntoBottomOfView(node) {
@@ -180,244 +192,236 @@ class ZSelect {
 	}
 
 	_getOptionByIdx(idx) {
-			return this.state.option_map[this.state.option_idx[idx]];
+		return this.state.option_map[this.state.option_idx[idx]];
 	}
 
-	bindEvents() {
-		this._bindListNodeEvents(this.root.list);
-		this._bindButtonNodeEvents(this.root.button);
+	_onDocumentWheel() {
+		if (!this.state.list_hover) {
+			this._push();
+			this._collapseList();
+		}
+	}
+
+	_bindDocumentWheelEvent() {
+		document.addEventListener('wheel', this._event_handlers.document_wheel);
+	}
+
+	_unbindDocumentWheelEvent() {
+		document.removeEventListener('wheel', this._event_handlers.document_wheel);
+	}
+
+	_onWindowResize() {
+		this._push();
+		this._collapseList();
 	}
 
 	_bindListNodeEvents(node) {
 		// NOTE: Native select element collapses on document wheel event while list is not hovered and on resize event.
 		node.onmouseenter = () => this.state.list_hover = true;
 		node.onmouseleave = () => this.state.list_hover = false;
-
-		window.addEventListener('resize', () => {
-			this._push();
-			this._collapseList();
-		});
-
-		// TODO: These events should be bound and unbound during list collapse and list expand
-		// and then "this.state.focused" could be removed.
-		document.addEventListener('wheel', () => {
-			if (!this.state.focused) {
-				return;
-			}
-
-			if (!this.state.list_hover) {
-				this._push();
-				this._collapseList();
-			}
-		});
 	}
 
-	_bindButtonNodeEvents(node) {
-		node.onfocus = () => {
-			this.state.focused = true;
-		};
-
-		node.onblur = () => {
-			this.state.focused = false;
+	_onButtonMousedown() {
+		if (this.state.is_open) {
 			this._push();
 			this._collapseList();
-		};
-		node.onmousedown = () => {
-			if (this.state.is_open) {
-				this._push();
-				this._collapseList();
+		}
+		else {
+			this._expandList();
+		}
+	}
+
+	_onButtonBlur() {
+		this._push();
+		this._collapseList();
+	}
+
+	_onButtonKeydown(e) {
+		if (e.which != KEY_SPACE && !e.metaKey && !e.ctrlKey && e.key.length == 1) {
+			const idx = this._nextIdxByChar(e.key);
+			if (idx !== null) {
+				this._stageIdx(idx);
+				this._commit();
+				!this.state.is_open && this._push();
 			}
-			else {
-				this._expandList();
-			}
-		};
-		node.onkeydown = (e) => {
-			if (e.which != 32 && !e.metaKey && !e.ctrlKey && e.key.length == 1) {
-				const idx = this._nextIdxByChar(e.key);
-				if (idx !== null) {
-					this._stageIdx(idx);
+
+			return;
+		}
+
+		// TODO: PAGE_UP and PAGE_DOWN handlers are unreadable!!!!! Must be codefixed
+		switch (e.which) {
+			case KEY_PAGE_UP:
+				/*
+				 * NOTE: If open - Native select scrolls currently active option to bottom of visible list, and stages the
+				 * first visible option in list, if that is disabled, previous enabled option is chosen.
+				 */
+				e.preventDefault();
+				e.stopPropagation();
+				let curr_option = this._getOptionByIdx(this.state.idx_staged);
+				if (this.state.is_open) {
+					let {_node: node} = curr_option;
+					this._scrollIntoBottomOfView(node);
+
+					for (let prev_idx = this.state.idx_staged - 1; prev_idx > -1; prev_idx--) {
+						let option = this._getOptionByIdx(prev_idx);
+						let is_visible = option._node.offsetTop - option._node.offsetParent.scrollTop > -1;
+						if (!is_visible) {
+							break;
+						}
+						curr_option = option;
+					}
+
+					if (curr_option.disabled) {
+						const prev_enabled = this._prevEnabledIdx(curr_option._data_idx);
+						if (prev_enabled === curr_option._data_idx) {
+							this._stageIdx(this._nextEnabledIdx(curr_option._data_idx));
+						}
+						else {
+							this._stageIdx(prev_enabled);
+						}
+					}
+					else {
+						this._stageIdx(curr_option._data_idx);
+					}
+
+					this._commit();
+				}
+				else {
+					let seek_to_idx = this.state.idx_staged;
+					for (let i = 0; i < 3; i++) {
+						seek_to_idx = this._prevEnabledIdx(seek_to_idx);
+					}
+					this._stageIdx(seek_to_idx);
+					this._commit();
+					this._push();
+				}
+				break;
+			case KEY_PAGE_DOWN:
+				/*
+				 * NOTE: If open - Native select scrolls currently active option to top of visible list, and stages the last
+				 * visible option in list, if that is disabled, then next enabled option is chosen.
+				 */
+				e.preventDefault();
+				e.stopPropagation();
+				let urr_option = this._getOptionByIdx(this.state.idx_staged);
+				if (this.state.is_open) {
+					let {_node: node} = urr_option;
+					this._scrollIntoTopOfView(node);
+
+					const parent_offset = node.offsetParent.clientHeight + node.offsetParent.scrollTop;
+					const idx_len = this.state.option_idx.length;
+
+					for (let next_idx = this.state.idx_staged + 1; next_idx < idx_len; next_idx++) {
+						let option = this._getOptionByIdx(next_idx);
+						let is_visible = parent_offset - option._node.offsetTop - option._node.offsetHeight > -1;
+						if (!is_visible) {
+							break;
+						}
+						urr_option = option;
+					}
+
+					if (urr_option.disabled) {
+						const next_enabled = this._nextEnabledIdx(urr_option._data_idx);
+						if (next_enabled === urr_option._data_idx) {
+							this._stageIdx(this._prevEnabledIdx(urr_option._data_idx));
+						}
+						else {
+							this._stageIdx(next_enabled);
+						}
+					}
+					else {
+						this._stageIdx(urr_option._data_idx);
+					}
+
+					this._commit();
+				}
+				else {
+					let seek_to_idx = this.state.idx_staged;
+					for (let i = 0; i < 3; i++) {
+						seek_to_idx = this._nextEnabledIdx(seek_to_idx);
+					}
+					this._stageIdx(seek_to_idx);
+					this._commit();
+					this._push();
+				}
+				break;
+			case KEY_END:
+				e.preventDefault();
+				e.stopPropagation();
+				this._stageIdx(this._lastIdx());
+				this._commit();
+				!this.state.is_open && this._push();
+				break;
+			case KEY_HOME:
+				e.preventDefault();
+				e.stopPropagation();
+				this._stageIdx(this._firstIdx());
+				this._commit();
+				!this.state.is_open && this._push();
+				break;
+			case KEY_ARROW_DOWN:
+				/*
+				 * NOTE: In native select when an arrow key cannot select any next option because all of them are disabled,
+				 * and dropdown is opened, then scroll down happens.
+				 */
+				e.preventDefault();
+				e.stopPropagation();
+				let next_enabled_idx = this._nextEnabledIdx(this.state.idx_staged);
+				if (next_enabled_idx == this.state.idx_staged) {
+					this.state.is_open && (this.root.list.scrollTop += 50);
+				}
+				else {
+					this._stageIdx(next_enabled_idx);
 					this._commit();
 					!this.state.is_open && this._push();
 				}
-
-				return;
-			}
-
-			// TODO: PAGE_UP and PAGE_DOWN handlers are unreadable!!!!! Must be codefixed
-			switch (e.which) {
-				case KEY_PAGE_UP:
-					/*
-					 * NOTE: If open - Native select scrolls currently active option to bottom of visible list, and stages the
-					 * first visible option in list, if that is disabled, previous enabled option is chosen.
-					 */
-					e.preventDefault();
-					e.stopPropagation();
-					let curr_option = this._getOptionByIdx(this.state.idx_staged);
-					if (this.state.is_open) {
-						let {_node: node} = curr_option;
-						this._scrollIntoBottomOfView(node);
-
-						for (let prev_idx = this.state.idx_staged - 1; prev_idx > -1; prev_idx--) {
-							let option = this._getOptionByIdx(prev_idx);
-							let is_visible = option._node.offsetTop - option._node.offsetParent.scrollTop > -1;
-							if (!is_visible) {
-								break;
-							}
-							curr_option = option;
-						}
-
-						if (curr_option.disabled) {
-							const prev_enabled = this._prevEnabledIdx(curr_option._data_idx);
-							if (prev_enabled === curr_option._data_idx) {
-								this._stageIdx(this._nextEnabledIdx(curr_option._data_idx));
-							}
-							else {
-								this._stageIdx(prev_enabled);
-							}
-						}
-						else {
-							this._stageIdx(curr_option._data_idx);
-						}
-
-						this._commit();
-					}
-					else {
-						let seek_to_idx = this.state.idx_staged;
-						for (let i = 0; i < 3; i++) {
-							seek_to_idx = this._prevEnabledIdx(seek_to_idx);
-						}
-						this._stageIdx(seek_to_idx);
-						this._commit();
-						this._push();
-					}
-					break;
-				case KEY_PAGE_DOWN:
-					/*
-					 * NOTE: If open - Native select scrolls currently active option to top of visible list, and stages the last
-					 * visible option in list, if that is disabled, then next enabled option is chosen.
-					 */
-					e.preventDefault();
-					e.stopPropagation();
-					let urr_option = this._getOptionByIdx(this.state.idx_staged);
-					if (this.state.is_open) {
-						let {_node: node} = urr_option;
-						this._scrollIntoTopOfView(node);
-
-						const parent_offset = node.offsetParent.clientHeight + node.offsetParent.scrollTop;
-						const idx_len = this.state.option_idx.length;
-
-						for (let next_idx = this.state.idx_staged + 1; next_idx < idx_len; next_idx++) {
-							let option = this._getOptionByIdx(next_idx);
-							let is_visible = parent_offset - option._node.offsetTop - option._node.offsetHeight > -1;
-							if (!is_visible) {
-								break;
-							}
-							urr_option = option;
-						}
-
-						if (urr_option.disabled) {
-							const next_enabled = this._nextEnabledIdx(urr_option._data_idx);
-							if (next_enabled === urr_option._data_idx) {
-								this._stageIdx(this._prevEnabledIdx(urr_option._data_idx));
-							}
-							else {
-								this._stageIdx(next_enabled);
-							}
-						}
-						else {
-							this._stageIdx(urr_option._data_idx);
-						}
-
-						this._commit();
-					}
-					else {
-						let seek_to_idx = this.state.idx_staged;
-						for (let i = 0; i < 3; i++) {
-							seek_to_idx = this._nextEnabledIdx(seek_to_idx);
-						}
-						this._stageIdx(seek_to_idx);
-						this._commit();
-						this._push();
-					}
-					break;
-				case KEY_END:
-					e.preventDefault();
-					e.stopPropagation();
-					this._stageIdx(this._lastIdx());
+				break
+			case KEY_ARROW_UP:
+				/*
+				 * NOTE: In native select when an arrow key cannot select any previous option because all of them are
+				 * disabled and dropdown is opened, then scroll up happens.
+				 */
+				e.preventDefault();
+				e.stopPropagation();
+				let prev_enabled_idx = this._prevEnabledIdx(this.state.idx_staged);
+				if (prev_enabled_idx == this.state.idx_staged) {
+					this.state.is_open && (this.root.list.scrollTop -= 50);
+				}
+				else {
+					this._stageIdx(prev_enabled_idx);
 					this._commit();
 					!this.state.is_open && this._push();
-					break;
-				case KEY_HOME:
-					e.preventDefault();
-					e.stopPropagation();
-					this._stageIdx(this._firstIdx());
+				}
+				break;
+			case KEY_ENTER:
+				if (!this.state.is_open) {
+					this._expandList();
+				}
+				else {
 					this._commit();
-					!this.state.is_open && this._push();
-					break;
-				case KEY_ARROW_DOWN:
-					/*
-					 * NOTE: In native select when an arrow key cannot select any next option because all of them are disabled,
-					 * and dropdown is opened, then scroll down happens.
-					 */
-					e.preventDefault();
-					e.stopPropagation();
-					let next_enabled_idx = this._nextEnabledIdx(this.state.idx_staged);
-					if (next_enabled_idx == this.state.idx_staged) {
-						this.state.is_open && (this.root.list.scrollTop += 50);
-					}
-					else {
-						this._stageIdx(next_enabled_idx);
-						this._commit();
-						!this.state.is_open && this._push();
-					}
-					break
-				case KEY_ARROW_UP:
-					/*
-					 * NOTE: In native select when an arrow key cannot select any previous option because all of them are
-					 * disabled and dropdown is opened, then scroll up happens.
-					 */
-					e.preventDefault();
-					e.stopPropagation();
-					let prev_enabled_idx = this._prevEnabledIdx(this.state.idx_staged);
-					if (prev_enabled_idx == this.state.idx_staged) {
-						this.state.is_open && (this.root.list.scrollTop -= 50);
-					}
-					else {
-						this._stageIdx(prev_enabled_idx);
-						this._commit();
-						!this.state.is_open && this._push();
-					}
-					break;
-				case KEY_ENTER:
-					if (!this.state.is_open) {
-						this._expandList();
-					}
-					else {
-						this._commit();
-						this._push();
-						this._collapseList();
-					}
-					break;
-				case KEY_TAB:
-					// NOTE: Native select element if opened, on "tab" submits hovered option and remains focused.
-					if (this.state.is_open) {
-						e.preventDefault();
-						this._commit();
-						this._push();
-						this._collapseList();
-					}
-					break;
-				case KEY_SPACE:
-					// NOTE: Native select element does not closes or chooses option on "space" key, only opens dropdown.
-					!this.state.is_open && this._expandList();
-					break;
-				case KEY_ESCAPE:
-					this.state.is_open && e.stopPropagation();
 					this._push();
 					this._collapseList();
-					break;
-			}
-		};
+				}
+				break;
+			case KEY_TAB:
+				// NOTE: Native select element if opened, on "tab" submits hovered option and remains focused.
+				if (this.state.is_open) {
+					e.preventDefault();
+					this._commit();
+					this._push();
+					this._collapseList();
+				}
+				break;
+			case KEY_SPACE:
+				// NOTE: Native select element does not closes or chooses option on "space" key, only opens dropdown.
+				!this.state.is_open && this._expandList();
+				break;
+			case KEY_ESCAPE:
+				this.state.is_open && e.stopPropagation();
+				this._push();
+				this._collapseList();
+				break;
+		}
 	}
 
 	_bindOptionNodeEvents(node) {
@@ -556,6 +560,24 @@ class ZSelect {
 		return opts;
 	}
 
+	unbindEvents() {
+		this.root.button.removeEventListener('blur', this._event_handlers.button_blur);
+		this.root.button.removeEventListener('mousedown', this._event_handlers.button_mousedown);
+		this.root.button.removeEventListener('keydown', this._event_handlers.button_keydown);
+
+		window.removeEventListener('resize', this._event_handlers.window_resize);
+		// TODO: list item node events
+	}
+
+	bindEvents() {
+		this._bindListNodeEvents(this.root.list);
+		this.root.button.addEventListener('blur', this._event_handlers.button_blur);
+		this.root.button.addEventListener('mousedown', this._event_handlers.button_mousedown);
+		this.root.button.addEventListener('keydown', this._event_handlers.button_keydown);
+
+		window.addEventListener('resize', this._event_handlers.window_resize);
+	}
+
 	setName(name) {
 		this.root.input.setAttribute('name', name);
 	}
@@ -623,10 +645,15 @@ class ZSelect {
 }
 
 class ZSelectElement extends HTMLElement {
+
 	constructor() {
 		super()
 		this._select = new ZSelect();
 		this._select.onchange = event => this.dispatchEvent(event);
+	}
+
+	disconnectedCallback() {
+		this._select.unbindEvents();
 	}
 
 	connectedCallback() {
