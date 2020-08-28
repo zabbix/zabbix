@@ -465,11 +465,13 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	char			*ptr, *line = NULL, *header = NULL;
 	size_t			line_alloc = 0, line_offset = 0;
 
-
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	idx = duk_push_object(ctx);
+
+	if (0 == request->headers_in_offset)
+		return 1;
 
 	/* skip status response */
 	header = strchr(request->headers_in, '\r') + 2;
