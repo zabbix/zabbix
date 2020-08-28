@@ -302,10 +302,11 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 
 // tags
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-	'source' => 'host_prototype',
-	'tags' => $data['tags'],
-	'readonly' => $data['readonly']
-]));
+		'source' => 'host_prototype',
+		'tags' => $data['tags'],
+		'readonly' => $data['readonly']
+	]), TAB_INDICATOR_TAGS
+);
 
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
