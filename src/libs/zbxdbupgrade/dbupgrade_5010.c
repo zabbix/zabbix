@@ -262,6 +262,13 @@ static int	DBpatch_5010029(void)
 	return DBcreate_index("dashboard", "c_dashboard_2", "templateid", 0);
 }
 
+static int	DBpatch_5010030(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBmodify_field_type("dashboard", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -298,5 +305,6 @@ DBPATCH_ADD(5010026, 0, 1)
 DBPATCH_ADD(5010027, 0, 1)
 DBPATCH_ADD(5010028, 0, 1)
 DBPATCH_ADD(5010029, 0, 1)
+DBPATCH_ADD(5010030, 0, 1)
 
 DBPATCH_END()
