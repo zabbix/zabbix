@@ -1501,4 +1501,132 @@ class testWebScenario extends CAPITest {
 		$this->authorize($login['user'], $login['password']);
 		$this->call($method, $user, $expected_error);
 	}
+
+	public static function httptest_update_name_key() {
+		return [
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'name' => 'Webtest key_name_new',
+					'status' => '1',
+					'applicationid' => '15016',
+					'steps' => [
+						[
+							'httpstepid' => '15015',
+							'name' => 'Webstep name 1_new'
+						],
+						[
+							'httpstepid' => '15016',
+							'name' => 'Webstep name 2_new'
+						]
+					]
+				]],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	* @dataProvider httptest_update_name_key
+	*/
+	public function testWebScenario_Update_Name_Key($httptests, $expected_error) {
+		$result = $this->call('httptest.update', $httptests, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['httptestids'] as $key => $httptestid) {
+				$db_httptest = CDBHelper::getRow('SELECT httptestid, name, applicationid FROM httptest WHERE httptestid='.zbx_dbstr($httptestid));
+
+				if (array_key_exists('name', $httptests[$key])) {
+					$this->assertEquals($httptests[$key]['name'], $db_httptest['name']);
+				}
+				if (array_key_exists('applicationid', $httptests[$key])) {
+					$this->assertEquals($httptests[$key]['applicationid'], $db_httptest['applicationid']);
+				}
+
+				$db_httptest_items = CDBHelper::getAll(
+					'SELECT i.itemid, i.`name`, i.key_, i.`status`'.
+					' FROM items i JOIN httptestitem hti ON hti.itemid = i.itemid'.
+					' WHERE '.dbConditionInt('hti.httptestid', [$httptestid])
+				);
+				$this->assertCount(3, $db_httptest_items,
+					'Incorrect item count for web scenario [httpstepid='.$httptestid.'].');
+
+				$application_itemids = array_flip(zbx_objectValues($db_httptest_items, 'itemid'));
+
+				foreach ($db_httptest_items as $db_httptest_item) {
+					$this->assertContains('"'.$httptests[$key]['name'].'"', $db_httptest_item['name']);
+					$this->assertRegExp('/\['.preg_quote($httptests[$key]['name'],'/').'[,\]]/',
+						$db_httptest_item['key_']);
+
+					if (array_key_exists('status', $httptests[$key])) {
+						$this->assertEquals($httptests[$key]['status'], $db_httptest_item['status'],
+							'Status for testitem [itemid='.$db_httptest_item['itemid'].'] not updated.');
+					}
+				}
+
+				$db_httpsteps = CDBHelper::getAll(
+					'SELECT hs.httpstepid, hs.`name`'.
+					' FROM httpstep hs'.
+					' WHERE '.dbConditionInt('hs.httptestid', [$httptestid])
+				);
+
+				$db_httpsteps = zbx_toHash($db_httpsteps, 'httpstepid');
+				$db_httpstepids = array_keys($db_httpsteps);
+
+				if (array_key_exists('steps', $httptests[$key])) {
+					$this->assertCount(count($httptests[$key]['steps']), $db_httpsteps,
+						'New webstep count don\'t match count in database.');
+
+					foreach ($httptests[$key]['steps'] as $httpstep) {
+						if (array_key_exists('httpstepid', $httpstep)) {
+							$this->assertEquals($httpstep['name'], $db_httpsteps[$httpstep['httpstepid']]['name']);
+						}
+					}
+				}
+
+				$db_httpstep_items = CDBHelper::getAll(
+					'SELECT i.itemid, i.`name`, i.key_, i.`status`, hsi.httpstepid'.
+					' FROM items i JOIN httpstepitem hsi ON hsi.itemid = i.itemid'.
+					' WHERE '.dbConditionInt('hsi.httpstepid', $db_httpstepids)
+				);
+
+				$application_itemids += array_flip(zbx_objectValues($db_httpstep_items, 'itemid'));
+
+				foreach ($db_httpstep_items as $db_httpstep_item) {
+					$db_httpsteps[$db_httpstep_item['httpstepid']]['db_items'][] = $db_httpstep_item;
+				}
+
+				foreach ($db_httpsteps as $db_httpstep) {
+					$this->assertCount(3, $db_httpstep['db_items'],
+						'Incorrect item count for webstep [httpstepid='.$db_httpstep['httpstepid'].'].');
+
+					foreach ($db_httpstep['db_items'] as $db_httpstep_item) {
+						$this->assertContains('"'.$httptests[$key]['name'].'"', $db_httpstep_item['name']);
+						$this->assertContains('"'.$db_httpstep['name'].'"', $db_httpstep_item['name']);
+
+						$this->assertContains('['.$httptests[$key]['name'].',', $db_httpstep_item['key_']);
+						$this->assertRegExp('/,'.preg_quote($db_httpstep['name'],'/').'[,\]]/',
+							$db_httpstep_item['key_']);
+
+						if (array_key_exists('status', $httptests[$key])) {
+							$this->assertEquals($httptests[$key]['status'], $db_httpstep_item['status'],
+								'Status for stepitem [itemid='.$db_httpstep_item['itemid'].'] not updated.');
+						}
+					}
+				}
+
+				if (array_key_exists('applicationid', $httptests[$key])) {
+					$db_applicationids_count = CDBHelper::getCount(
+						'SELECT NULL'.
+						' FROM items_applications ia'.
+						' WHERE '.dbConditionInt('ia.itemid', array_keys($application_itemids)).
+							' AND '.dbConditionInt('ia.applicationid', [$httptests[$key]['applicationid']])
+					);
+
+					$this->assertCount($db_applicationids_count, $application_itemids,
+						'Application not updated for some items.');
+				}
+			}
+		}
+	}
 }
