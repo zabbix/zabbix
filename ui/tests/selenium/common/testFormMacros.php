@@ -52,7 +52,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=create'
 		);
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->fill([ucfirst($host_type).' name' => $data['Name']]);
 
 		if ($is_prototype) {

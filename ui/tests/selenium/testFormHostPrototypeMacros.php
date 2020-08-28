@@ -186,7 +186,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 * @dataProvider getCreateHostPrototypeMacrosData
 	 */
 	public function testFormHostPrototypeMacros_Create($data) {
-		$this->checkCreate($data, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkCreate($data, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public static function getUpdateHostPrototypeMacrosData() {
