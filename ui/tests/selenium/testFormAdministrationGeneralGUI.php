@@ -18,13 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup config
  */
 class testFormAdministrationGeneralGUI extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class
+		];
+	}
 
 	private $default = [
 		'Default language' => 'English (en_GB)',
@@ -70,17 +81,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		'Max period' => '2y'
 	];
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
-
 	public function testFormAdministrationGeneralGUI_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$this->assertPageTitle('Configuration of GUI');
@@ -105,18 +105,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 				' because locales for them are not installed on the web server.',
 			$this->query('class:red')->one()->getText()
 		);
-	}
-
-	public function testFormAdministrationGeneralGUI_SimpleUpdate() {
-		$sqlHash = 'SELECT * FROM config ORDER BY configid';
-		$oldHash = CDBHelper::getHash($sqlHash);
-
-		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
-		$form->submit();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		$this->assertEquals($oldHash, CDBHelper::getHash($sqlHash));
 	}
 
 	/**
@@ -380,7 +368,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
-			// Zero values.
+			// Zero values without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -398,6 +386,22 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
 						'Incorrect value for field "max_in_table": value must be no less than "1".',
 						'Incorrect value for field "work_period": a time period is expected.',
+						'Incorrect value for field "history_period": value must be one of 86400-604800.',
+						'Incorrect value for field "period_default": value must be one of 60-315360000.',
+						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					]
+				]
+			],
+			// Zero values with 's'.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Max history display period' => '0s',
+						'Time filter default period' => '0s',
+						'Max period' => '0s'
+					],
+					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800.',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
 						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
@@ -849,6 +853,30 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					],
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
+			],
+			// Negative values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Limit for search and filter results' => '-1',
+						'Max number of columns and rows in overview tables' => '-1',
+						'Max count of elements to show inside table cell' => '-1',
+						'Working time' => '-1',
+						'Max history display period' => '-1',
+						'Time filter default period' => '-1',
+						'Max period' => '-1'
+					],
+					'details' => [
+						'Incorrect value for field "search_limit": value must be no less than "1".',
+						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
+						'Incorrect value for field "max_in_table": value must be no less than "1".',
+						'Incorrect value for field "work_period": a time period is expected.',
+						'Incorrect value for field "history_period": a time unit is expected.',
+						'Incorrect value for field "period_default": a time unit is expected.',
+						'Incorrect value for field "max_period": a time unit is expected.'
+					]
+				]
 			]
 		];
 	}
@@ -1014,6 +1042,27 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		}
 	}
 
+	/**
+	 * Test for checking form update without changing any data.
+	 */
+	public function testFormAdministrationGeneralGUI_SimpleUpdate() {
+		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
+		$this->page->login()->open('zabbix.php?action=gui.edit');
+		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
+		$values = $form->getFields()->asValues();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
+		$this->page->refresh();
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		// Check that DBdata is not changed.
+		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
+		// Check that Frontend form is not changed.
+		$this->assertEquals($values, $form->getFields()->asValues());
+	}
+
 	public function getResetButtonData() {
 		return [
 			[
@@ -1055,7 +1104,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	}
 
 	/**
-	 * FUnction for configuration resetting.
+	 * Function for configuration resetting.
 	 *
 	 * @param element  $form      Settings configuration form
 	 * @param array    $default   Default form values
