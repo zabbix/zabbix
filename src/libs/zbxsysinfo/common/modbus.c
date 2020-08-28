@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "mdbus.h"
+#include "mbustype.h"
 #include "mutexs.h"
 #include "comms.h"
 
