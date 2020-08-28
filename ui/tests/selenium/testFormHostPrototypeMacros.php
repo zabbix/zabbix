@@ -409,15 +409,15 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 * @dataProvider getUpdateHostPrototypeMacrosData
 	 */
 	public function testFormHostPrototypeMacros_Update($data) {
-		$this->checkUpdate($data, $this->host_name_update, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkUpdate($data, $this->host_name_update, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public function testFormHostPrototypeMacros_Remove() {
-		$this->checkRemove($this->host_name_remove, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkRemove($this->host_name_remove, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public function testFormHostPrototypeMacros_ChangeRemoveInheritedMacro() {
-		$this->checkChangeRemoveInheritedMacro('hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+		$this->checkChangeRemoveInheritedMacro('host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
 	public function getCreateSecretMacrosData() {
