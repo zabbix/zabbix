@@ -300,6 +300,7 @@ abstract class CControllerLatest extends CController {
 
 		$items = CMacrosResolverHelper::resolveItemKeys($items);
 		$items = CMacrosResolverHelper::resolveItemNames($items);
+		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 		// Choosing max history period for already filtered items having data.
