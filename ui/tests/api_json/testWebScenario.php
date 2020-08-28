@@ -1594,6 +1594,36 @@ class testWebScenario extends CAPITest {
 					]
 				]],
 				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'status' => '1',
+					'steps' => [
+						[
+							'httpstepid' => '15015'
+						],
+						[
+							'httpstepid' => '15016'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'applicationid' => '15016',
+					'steps' => [
+						[
+							'httpstepid' => '15015'
+						],
+						[
+							'httpstepid' => '15016'
+						]
+					]
+				]],
+				'expected_error' => null
 			]
 		];
 	}
