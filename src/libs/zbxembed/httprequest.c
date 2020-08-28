@@ -20,6 +20,7 @@
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxhttp.h"
 #include "zbxembed.h"
 #include "httprequest.h"
 #include "embed.h"
@@ -463,8 +464,7 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 	duk_idx_t		idx;
-	char			*ptr, *line = NULL, *header = NULL;
-	size_t			line_alloc = 0, line_offset = 0;
+	char			*ptr, *header;
 
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
@@ -474,31 +474,11 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	if (0 == request->headers_in_offset)
 		return 1;
 
-	/* skip status response */
-	header = strchr(request->headers_in, '\r') + 2;
-
-	/* iterate header fields */
-	while (NULL != (ptr = strchr(header, '\r')) && '\0' != *ptr)
+	for (ptr = request->headers_in; NULL != (header = zbx_http_get_header(&ptr)); )
 	{
-		if (' ' == *header || '\t' == *header)
-		{
-			zbx_strncpy_alloc(&line, &line_alloc, &line_offset, header + 1, ptr - header);
-		}
-		else
-		{
-			if (0 != line_offset)
-				es_put_header(ctx, idx, line);
-
-			line_offset = 0;
-			zbx_strncpy_alloc(&line, &line_alloc, &line_offset, header, ptr - header);
-		}
-		header = ptr + 2;
+		es_put_header(ctx, idx, header);
+		zbx_free(header);
 	}
-
-	if (0 != line_offset)
-		es_put_header(ctx, idx, line);
-
-	zbx_free(line);
 
 	return 1;
 }
