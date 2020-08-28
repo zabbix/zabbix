@@ -26,6 +26,7 @@
 $form_list = (new CFormList())
 	->addVar('idx', $data['idx'])
 	->addVar('idx2', $data['idx2'])
+	->addVar('create', $data['create'])
 	->addVar('support_custom_time', $data['support_custom_time'])
 	->addRow((new CLabel(_('Name'), 'filter_name'))->setAsteriskMark(),
 		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -67,6 +68,7 @@ $output = [
 			'title' => _('Delete'),
 			'isSubmit' => true,
 			'keepOpen' => true,
+			'enabled' => !$data['create'],
 			'action' => 'return tabFilterFormAction("delete", overlay)'
 		],
 		[

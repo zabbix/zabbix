@@ -229,8 +229,8 @@ class CTabFilter extends CBaseComponent {
 				var params = this._active_item.getFilterParams();
 
 				this.profileUpdate('properties', {
-					'idx2': this._active_item._index,
-					'value_str': params.toString()
+					idx2: this._active_item._index,
+					value_str: params.toString()
 				}).then(() => {
 					this._active_item.setBrowserLocation(params);
 				});
@@ -241,8 +241,9 @@ class CTabFilter extends CBaseComponent {
 			 */
 			buttonSaveasAction: (ev) => {
 				this._active_item.openPropertiesForm(ev.target, {
-					'idx': this._active_item._idx_namespace,
-					'idx2': this._items.length
+					create: 1,
+					idx: this._active_item._idx_namespace,
+					idx2: this._items.length
 				});
 			},
 
