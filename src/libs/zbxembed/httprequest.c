@@ -495,6 +495,8 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	if (0 != line_offset)
 		es_put_header(ctx, idx, line);
 
+	zbx_free(line);
+
 	return 1;
 }
 
