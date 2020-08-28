@@ -69,7 +69,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\dir.o \
 	..\..\..\src\libs\zbxsysinfo\common\file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
-	..\..\..\src\libs\zbxsysinfo\common\mdbus.o \
+	..\..\..\src\libs\zbxsysinfo\common\modbus.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
 	..\..\..\src\libs\zbxsysinfo\common\dns.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
