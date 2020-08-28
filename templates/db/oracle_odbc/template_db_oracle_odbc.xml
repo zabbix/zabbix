@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-<<<<<<< HEAD
    <date>2020-08-13T11:04:30Z</date>
-=======
-   <date>2020-08-11T18:28:56Z</date>
->>>>>>> 3eaf1e6eda... .........T [ZBX-18122] fixed russian character in setup section
    <groups>
       <group>
          <name>Templates/Databases</name>
