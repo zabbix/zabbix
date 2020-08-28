@@ -1522,12 +1522,112 @@ class testWebScenario extends CAPITest {
 					]
 				]],
 				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015'
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'name' => 'Webtest key_name_new'
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'status' => '1',
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'applicationid' => '15016',
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'steps' => [
+						[
+							'httpstepid' => '15015',
+							'name' => 'Webstep name 1_new'
+						],
+						[
+							'httpstepid' => '15016',
+							'name' => 'Webstep name 2_new'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'steps' => [
+						[
+							'httpstepid' => '15015'
+						],
+						[
+							'httpstepid' => '15016'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [[
+					'httptestid' => '15015',
+					'name' => 'Webtest key_name_new',
+					'steps' => [
+						[
+							'httpstepid' => '15015'
+						],
+						[
+							'httpstepid' => '15016'
+						]
+					]
+				]],
+				'expected_error' => null
 			]
 		];
 	}
 
+	public function after_update_name_key() {
+		$this->call('httptest.update', [
+			[
+				'httptestid' => '15015',
+				'name' => 'Webtest key_name',
+				'status' => '0',
+				'applicationid' => '15015',
+				'steps' => [
+					[
+						'httpstepid' => '15015',
+						'name' => 'Webstep name 1'
+					],
+					[
+						'httpstepid' => '15016',
+						'name' => 'Webstep name 2'
+					]
+				]
+			]
+		], null);
+
+		$itemids = array_keys(array_fill(150151, 9, 0));
+
+		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webtest key_name"').', '.zbx_dbstr('"$1"').') WHERE '.dbConditionInt('itemid', $itemids));
+		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webstep name 1"').', '.zbx_dbstr('"$2"').') WHERE '.dbConditionInt('itemid', $itemids));
+		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webstep name 2"').', '.zbx_dbstr('"$2"').') WHERE '.dbConditionInt('itemid', $itemids));
+	}
+
 	/**
 	* @dataProvider httptest_update_name_key
+	* @on-after after_update_name_key
 	*/
 	public function testWebScenario_Update_Name_Key($httptests, $expected_error) {
 		$result = $this->call('httptest.update', $httptests, $expected_error);
@@ -1554,8 +1654,8 @@ class testWebScenario extends CAPITest {
 				$application_itemids = array_flip(zbx_objectValues($db_httptest_items, 'itemid'));
 
 				foreach ($db_httptest_items as $db_httptest_item) {
-					$this->assertContains('"'.$httptests[$key]['name'].'"', $db_httptest_item['name']);
-					$this->assertRegExp('/\['.preg_quote($httptests[$key]['name'],'/').'[,\]]/',
+					$this->assertContains('"'.$db_httptest['name'].'"', $db_httptest_item['name']);
+					$this->assertRegExp('/\['.preg_quote($db_httptest['name'],'/').'[,\]]/',
 						$db_httptest_item['key_']);
 
 					if (array_key_exists('status', $httptests[$key])) {
@@ -1578,7 +1678,7 @@ class testWebScenario extends CAPITest {
 						'New webstep count don\'t match count in database.');
 
 					foreach ($httptests[$key]['steps'] as $httpstep) {
-						if (array_key_exists('httpstepid', $httpstep)) {
+						if (array_key_exists('httpstepid', $httpstep) && array_key_exists('name', $httpstep)) {
 							$this->assertEquals($httpstep['name'], $db_httpsteps[$httpstep['httpstepid']]['name']);
 						}
 					}
@@ -1601,10 +1701,12 @@ class testWebScenario extends CAPITest {
 						'Incorrect item count for webstep [httpstepid='.$db_httpstep['httpstepid'].'].');
 
 					foreach ($db_httpstep['db_items'] as $db_httpstep_item) {
-						$this->assertContains('"'.$httptests[$key]['name'].'"', $db_httpstep_item['name']);
-						$this->assertContains('"'.$db_httpstep['name'].'"', $db_httpstep_item['name']);
+						if (array_key_exists('name', $httptests[$key]) || array_key_exists('steps', $httptests[$key])) {
+							$this->assertContains('"'.$db_httptest['name'].'"', $db_httpstep_item['name']);
+							$this->assertContains('"'.$db_httpstep['name'].'"', $db_httpstep_item['name']);
+						}
 
-						$this->assertContains('['.$httptests[$key]['name'].',', $db_httpstep_item['key_']);
+						$this->assertContains('['.$db_httptest['name'].',', $db_httpstep_item['key_']);
 						$this->assertRegExp('/,'.preg_quote($db_httpstep['name'],'/').'[,\]]/',
 							$db_httpstep_item['key_']);
 
