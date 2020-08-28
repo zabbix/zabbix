@@ -593,6 +593,6 @@ abstract class testFormMacros extends CWebTest {
 			$this->page->login();
 		}
 		$this->page->open($url)->waitUntilReady();
-		$this->query('id:'.$source.'Form')->asForm()->one()->selectTab('Macros');
+		$this->query('id:'.$source.'-form')->asForm()->one()->selectTab('Macros');
 	}
 }
