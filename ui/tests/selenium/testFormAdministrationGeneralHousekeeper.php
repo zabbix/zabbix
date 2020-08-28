@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 /**
  * @backup config
  */
-
 class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 	/**
@@ -110,27 +109,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		'id:hk_trends' => '365d'	// This should be changed to another custom value after ZBX-18206 is fixed.
 	];
 
-	public function getCheckLayoutData() {
-		return [
-			[
-				[
-					'status' => true
-				]
-			],
-			[
-				[
-					'status' => false
-				]
-			]
-		];
-	}
-
 	/**
 	 * Test for checking form layout.
-	 *
-	 * @dataProvider getCheckLayoutData
 	 */
-	public function testFormAdministrationGeneralHousekeeper_CheckLayout($data) {
+	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
 		$this->assertPageTitle('Configuration of housekeeping');
 		$this->assertPageHeader('Housekeeping');
@@ -141,80 +123,70 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
 		}
 
-		$checkboxes = [
-			'hk_events_mode',
-			'hk_services_mode',
-			'hk_audit_mode',
-			'hk_sessions_mode',
-			'hk_history_mode',
-			'hk_history_global',
-			'hk_trends_mode',
-			'hk_trends_global'
-		];
-		foreach ($checkboxes as $checkbox) {
-			$this->assertTrue($this->query('id', $checkbox)->one()->isEnabled());
-			$form->getField('id:'.$checkbox)->fill($data['status']);
-		}
+		foreach ([true, false] as $status) {
+			$checkboxes = [
+				'hk_events_mode',
+				'hk_services_mode',
+				'hk_audit_mode',
+				'hk_sessions_mode',
+				'hk_history_mode',
+				'hk_history_global',
+				'hk_trends_mode',
+				'hk_trends_global'
+			];
+			foreach ($checkboxes as $checkbox) {
+				$this->assertTrue($this->query('id', $checkbox)->one()->isEnabled());
+				$form->getField('id:'.$checkbox)->fill($status);
+			}
 
-		$inputs = [
-			'hk_events_trigger',
-			'hk_events_internal',
-			'hk_events_discovery',
-			'hk_events_autoreg',
-			'hk_services',
-			'hk_audit',
-			'hk_sessions',
-			'hk_history',
-			'hk_trends'
-		];
-		foreach ($inputs as $input) {
-			$this->assertEquals(32, $this->query('id', $input)->one()->getAttribute('maxlength'));
+			$inputs = [
+				'hk_events_trigger',
+				'hk_events_internal',
+				'hk_events_discovery',
+				'hk_events_autoreg',
+				'hk_services',
+				'hk_audit',
+				'hk_sessions',
+				'hk_history',
+				'hk_trends'
+			];
+			foreach ($inputs as $input) {
+				$this->assertEquals(32, $this->query('id', $input)->one()->getAttribute('maxlength'));
+				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
+			}
 		}
 
 		foreach (['Update', 'Reset defaults'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
-			$this->assertTrue($this->query('id', $input)->one()->isEnabled($data['status']));
 		}
 	}
 
-	public function getResetButtonData() {
-		return [
-			[
-				[
-					'action' => 'Reset defaults',
-				]
-			],
-			[
-				[
-					'action' => 'Cancel',
-				]
-			]
-		];
-	}
-
 	/**
-	 * @dataProvider getResetButtonData
+	 * Test for checking 'Reset defaults' button.
 	 */
-	public function testFormAdministrationGeneralHousekeeper_ResetButton($data) {
+	public function testFormAdministrationGeneralHousekeeper_ResetButton() {
 		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
 		$form = $this->query('id:housekeeping')->waitUntilPresent()->asForm()->one();
 		// Reset form in case of some previous scenario.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults');
 		$default_sql = CDBHelper::getRow('SELECT * FROM config');
-		// Fill form with custom data.
-		$form->fill($this->custom);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		$custom_sql = CDBHelper::getRow('SELECT * FROM config');
-		// Check custom data in form.
-		$this->page->refresh();
-		$this->page->waitUntilReady();
-		$form->invalidate();
-		$form->checkValue($this->custom);
+
 		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		$this->resetConfiguration($form, $this->default, $data['action'],  $this->custom);
-		$sql = ($data['action'] === 'Reset defaults') ? $default_sql : $custom_sql;
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
+		foreach (['Reset defaults', 'Cancel'] as $action) {
+			// Fill form with custom data.
+			$form->fill($this->custom);
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
+			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
+			// Check custom data in form.
+			$this->page->refresh();
+			$this->page->waitUntilReady();
+			$form->invalidate();
+			$form->checkValue($this->custom);
+			$this->resetConfiguration($form, $this->default, $action, $this->custom);
+			$sql = ($action === 'Reset defaults') ? $default_sql : $custom_sql;
+			$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
+		}
 	}
 
 	/**

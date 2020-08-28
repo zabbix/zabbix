@@ -1063,44 +1063,32 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals($values, $form->getFields()->asValues());
 	}
 
-	public function getResetButtonData() {
-		return [
-			[
-				[
-					'action' => 'Reset defaults',
-				]
-			],
-			[
-				[
-					'action' => 'Cancel',
-				]
-			]
-		];
-	}
-
 	/**
-	 * @dataProvider getResetButtonData
+	 * Test for checking 'Reset defaults' button.
 	 */
-	public function testFormAdministrationGeneralGUI_ResetButton($data) {
+	public function testFormAdministrationGeneralGUI_ResetButton() {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
 		// Reset form in case of some previous scenario.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults');
 		$default_sql = CDBHelper::getRow('SELECT * FROM config');
-		// Fill form with custom data.
-		$form->fill($this->custom);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		$custom_sql = CDBHelper::getRow('SELECT * FROM config');
-		// Check custom data in form.
-		$this->page->refresh();
-		$this->page->waitUntilReady();
-		$form->invalidate();
-		$form->checkValue($this->custom);
+
 		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		$this->resetConfiguration($form, $this->default, $data['action'],  $this->custom);
-		$sql = ($data['action'] === 'Reset defaults') ? $default_sql : $custom_sql;
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
+		foreach (['Reset defaults', 'Cancel'] as $action) {
+			// Fill form with custom data.
+			$form->fill($this->custom);
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
+			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
+			// Check custom data in form.
+			$this->page->refresh();
+			$this->page->waitUntilReady();
+			$form->invalidate();
+			$form->checkValue($this->custom);
+			$this->resetConfiguration($form, $this->default, $action, $this->custom);
+			$sql = ($action === 'Reset defaults') ? $default_sql : $custom_sql;
+			$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
+		}
 	}
 
 	/**
