@@ -31,109 +31,131 @@ class testDiagnosticDataTask extends CIntegrationTest {
 			// Invalid format cases.
 			[
 				'request' => null,
-				'expected_error' => 'Invalid parameter "/": the parameter "request" is missing.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "request" is missing.'
 			],
 			[
 				'request' => [],
-				'expected_error' => 'Invalid parameter "/request": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/request": cannot be empty.'
 			],
 			[
 				'request' => [
 					'unsupported_key' => null
 				],
-				'expected_error' => 'Invalid parameter "/request": unexpected parameter "unsupported_key".'
+				'expected_error' => 'Invalid parameter "/1/request": unexpected parameter "unsupported_key".'
 			],
 			[
 				'request' => [
-					'historycache' => []
-				],
-				'expected_error' => 'Invalid parameter "/request/historycache": cannot be empty.'
-			],
-			[
-				'request' => [
-					'historycache' => [
-						'stats' => ''
+					'data' => [
+						'historycache' => []
 					]
 				],
-				'expected_error' => 'Invalid parameter "/request/historycache/stats": an array is expected.'
+				'expected_error' => 'Invalid parameter "/1/request/data/historycache": cannot be empty.'
 			],
 			[
 				'request' => [
-					'historycache' => [
-						'top' => [
-							'all' => 10
+					'data' => [
+						'historycache' => [
+							'stats' => ''
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/request/historycache/top": unexpected parameter "all".'
+				'expected_error' => 'Invalid parameter "/1/request/data/historycache/stats": an array is expected.'
+			],
+			[
+				'request' => [
+					'data' => [
+						'historycache' => [
+							'top' => [
+								'all' => 10
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/request/data/historycache/top": unexpected parameter "all".'
 			],
 
 			// Valid cases.
 			[
 				'request' => [
-					'historycache' => [
-						'stats' => ['items', 'values', 'memory', 'memory.data', 'memory.index'],
-						'top' => ['values' => 2]
+					'data' => [
+						'historycache' => [
+							'stats' => ['items', 'values', 'memory', 'memory.data', 'memory.index'],
+							'top' => ['values' => 2]
+						]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'valuecache' => [
-						'stats' => ['items', 'values', 'memory', 'mode'],
-						'top' => ['values' => 2, 'request.values' => 2]
+					'data' => [
+						'valuecache' => [
+							'stats' => ['items', 'values', 'memory', 'mode'],
+							'top' => ['values' => 2, 'request.values' => 2]
+						]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'preprocessing' => [
-						'stats' => ['values', 'preproc.values'],
-						'top' => ['values' => 2]
+					'data' => [
+						'preprocessing' => [
+							'stats' => ['values', 'preproc.values'],
+							'top' => ['values' => 2]
+						]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'alerting' => [
-						'stats' => ['alerts'],
-						'top' => ['media.alerts' => 2, 'source.alerts' => 2]
+					'data' => [
+						'alerting' => [
+							'stats' => ['alerts'],
+							'top' => ['media.alerts' => 2, 'source.alerts' => 2]
+						]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'lld' => [
-						'stats' => ['rules', 'values'],
-						'top' => ['values' => 2]
+					'data' => [
+						'lld' => [
+							'stats' => ['rules', 'values'],
+							'top' => ['values' => 2]
+						]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'lld' => [
-						'stats' => ['rules', 'values']
+					'data' => [
+						'lld' => [
+							'stats' => ['rules', 'values']
+						]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'lld' => [
-						'top' => ['values' => 2]
+					'data' => [
+						'lld' => [
+							'top' => ['values' => 2]
+						]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'valuecache' => [
-						'stats' => ['all']
+					'data' => [
+						'valuecache' => [
+							'stats' => ['all']
+						]
 					]
 				],
 				'expected_error' => null
@@ -145,22 +167,26 @@ class testDiagnosticDataTask extends CIntegrationTest {
 	 * @dataProvider dataTask_dataProvider
 	 */
 	public function testDataTask($request, $expected_error) {
-		$api_request = ['type' => ZBX_TM_TASK_DATA];
+		$api_request = ['type' => ZBX_TM_DATA_TYPE_DIAGINFO];
 		if ($request !== null) {
 			$api_request['request'] = $request;
 		}
 
 		$result = $this->call('task.create', $api_request, $expected_error);
 
-		if ($expected_error === null && isset($result['result']['taskids'])) {
-			foreach ($result['result']['taskids'] as $taskid) {
+		if ($expected_error === null && isset($result['result']['data']['taskids'])) {
+			foreach ($result['result']['data']['taskids'] as $taskid) {
 				$this->waitUntilTaskIsDone($taskid, 3);
 
-				$response = $this->call('task.get', ['taskids' => $taskid], null);
+				$response = $this->call('task.get', [
+					'output' => ['status'],
+					'taskids' => $taskid
+				], null);
 
 				$this->assertTrue((bool) $response['result'], 'Task '.$taskid.' not found.');
-				$this->assertTrue((isset($response['result'][0]['data']) && $response['result'][0]['data']),
-					'Task '.$taskid.' has no data.'
+				$this->assertTrue((isset($response['result'][0]['status'])
+						&& $response['result'][0]['status'] > ZBX_TM_STATUS_INPROGRESS),
+					'Task '.$taskid.' is not completed.'
 				);
 			}
 		}

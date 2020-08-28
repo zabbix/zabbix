@@ -375,9 +375,11 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 		'request' => [
-			'itemids' => getRequest('itemid')
+			'data' => [
+				'itemids' => getRequest('itemid')
+			]
 		]
 	]);
 
@@ -698,9 +700,11 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 		'request' => [
-			'itemids' => getRequest('g_hostdruleid')
+			'data' => [
+				'itemids' => getRequest('g_hostdruleid')
+			]
 		]
 	]);
 

@@ -977,7 +977,8 @@ define('ZBX_TM_TASK_DATA',			7);
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
 
-define('ZBX_TM_DATA_TYPE_DIAGINFO',	1);
+define('ZBX_TM_DATA_TYPE_DIAGINFO',		1);
+define('ZBX_TM_DATA_TYPE_CHECK_NOW',	6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
