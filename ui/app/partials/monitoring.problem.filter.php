@@ -441,9 +441,12 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		$('#show_' + data.uniqid, container).change(() => {
-			var	filter_show = $('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>;
+			// Dynamically disable hidden input elements to allow correct detection of unsaved changes.
+			var	filter_show = $('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>,
+				disabled = !filter_show || !$('[name="age_state"]:checked', container).length;
 
-			$('[name="age"]', container).closest('li').toggle(filter_show);
+			$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
+			$('[name="age_state"]', container).attr('disabled', !filter_show);
 
 			if (this._parent) {
 				this._parent.updateTimeselector(this, filter_show);

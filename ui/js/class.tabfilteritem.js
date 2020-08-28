@@ -42,6 +42,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._support_custom_time = options.support_custom_time;
 		this._template_rendered = false;
 		this._unsaved = false;
+		this._src_url = options.src_url||null;
 
 		this.init();
 		this.registerEvents();
@@ -56,6 +57,9 @@ class CTabFilterItem extends CBaseComponent {
 			}
 
 			this.setBrowserLocation(this.getFilterParams());
+
+			// devcode: php will return src_url for selected tab, (all tabs(?)).
+			this.resetUnsavedState();
 		}
 
 		if (this._data.filter_show_counter) {
@@ -82,17 +86,21 @@ class CTabFilterItem extends CBaseComponent {
 			},
 
 			expand: () => {
-				let event_consumer = this._template||this._content_container.querySelector('[data-template]');
+				let item_template = this._template||this._content_container.querySelector('[data-template]');
 
 				this._expanded = true;
-				this.addClass('active');
+				this._target.parentNode.classList.add('active');
 
 				if (!this._template_rendered) {
 					this.renderContentTemplate();
 					this._template_rendered = true;
+
+					if (this._src_url === null) {
+						this.resetUnsavedState();
+					}
 				}
-				else if (event_consumer instanceof HTMLElement) {
-					event_consumer.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
+				else if (item_template instanceof HTMLElement) {
+					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
 				}
 
 				let search_params = this.getFilterParams();
@@ -109,14 +117,14 @@ class CTabFilterItem extends CBaseComponent {
 			},
 
 			collapse: () => {
-				let event_consumer = (this._template||this._content_container.querySelector('[data-template]'));
+				let item_template = (this._template||this._content_container.querySelector('[data-template]'));
 
 				this._expanded = false;
-				this.removeClass('active');
+				this._target.parentNode.classList.remove('active');
 				this._content_container.classList.add('display-none');
 
-				if (event_consumer instanceof HTMLElement) {
-					event_consumer.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_COLLAPSE, {detail: this}));
+				if (item_template instanceof HTMLElement) {
+					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_COLLAPSE, {detail: this}));
 				}
 
 				this.removeActionIcons();
@@ -303,20 +311,43 @@ class CTabFilterItem extends CBaseComponent {
 	 *
 	 * @param {URLSearchParams} search_params  Filter field values to compare against.
 	 */
-	setUnsavedState() {
+	updateUnsavedState() {
 		let search_params = this.getFilterParams(),
-			src_query = new URLSearchParams(this._src_url),
-			unmodified = true;
+			src_query = new URLSearchParams(this._src_url);
 
+		if (src_query.get('filter_custom_time') !== '1') {
+			src_query.delete('from');
+			src_query.delete('to');
+		}
+
+		src_query.delete('action');
 		src_query.sort();
 		search_params.sort();
-		// TODO: check and remove method
 
-		src_query.forEach((value, key) => {
-			unmodified = unmodified && (search_params.get(key) == value);
-		});
+		this._unsaved = (src_query.toString() !== search_params.toString());
+		this._target.parentNode.classList.toggle('unsaved', this._unsaved);
+	}
 
-		this._unsaved = !unmodified;
-		this.toggleClass('unsaved', this._unsaved);
+	/**
+	 * Reset item unsaved state. Set this._src_url to filter parameters.
+	 */
+	resetUnsavedState() {
+		let src_query = this.getFilterParams();
+
+		if (src_query ===  null) {
+			this._src_url = '';
+
+			return;
+		}
+
+		if (src_query.get('filter_custom_time') !== '1') {
+			src_query.delete('from');
+			src_query.delete('to');
+		}
+
+		src_query.delete('action');
+		src_query.sort();
+
+		this._src_url = src_query.toString();
 	}
 }

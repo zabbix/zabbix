@@ -153,16 +153,14 @@ class CTabFilter extends CDiv {
 
 		if (!is_a($label, CTag::class)) {
 			if ($tab_index == 0) {
-				$label = (new CLink('&nbsp;'))
-					->setAttribute('data-target', $targetid)
-					->addClass('icon-home');
+				$label = (new CLink('&nbsp;'))->addClass('icon-home');
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false
 				];
 			}
 			else {
-				$label = (new CLink($label))->setAttribute('data-target', $targetid);
+				$label = new CLink($label);
 			}
 		}
 
@@ -170,7 +168,9 @@ class CTabFilter extends CDiv {
 			$content->setId($targetid);
 		}
 
-		$this->labels[] = $label;
+		$this->labels[] = (new CListItem($label->addClass('tabfilter-item-link')))
+			->setAttribute('data-target', $targetid)
+			->addClass('tabfilter-item-label');
 		$this->contents[] = $content;
 		$this->options['data'][] = $data + [
 			'filter_sortable' => true,
@@ -204,7 +204,7 @@ class CTabFilter extends CDiv {
 			->setAttribute('data-profile-idx', $timerange['idx'])
 			->setAttribute('data-profile-idx2', $timerange['idx2']);
 
-		return $this->addTab($data['label'], $content, $data + [
+		return $this->addTab((new CLink($data['label']))->addClass(ZBX_STYLE_BTN_TIME), $content, $data + [
 			'filter_sortable' => false,
 			'filter_configurable' => false
 		]);
@@ -276,7 +276,7 @@ class CTabFilter extends CDiv {
 			$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
 
 			$nav = array_merge($nav, [
-				$timeselector->addClass(ZBX_STYLE_BTN_TIME),
+				$timeselector,
 				(new CSimpleButton())
 					->setEnabled($enabled)
 					->addClass(ZBX_STYLE_BTN_TIME_LEFT),
@@ -320,8 +320,12 @@ class CTabFilter extends CDiv {
 
 		return implode('', [
 			$nav,
-			(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
-			$this->buttons,
+			(new CDiv([
+				(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
+				$this->buttons,
+			]))
+				->addClass('tabfilter-content-container')
+				->addClass($this->options['expanded'] ? null : 'display-none'),
 			$templates,
 		]);
 	}

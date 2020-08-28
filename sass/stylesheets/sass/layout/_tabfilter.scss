@@ -1,6 +1,12 @@
 .filter-container.tabfilter-container {
-	padding-top: 0;
-	border-top: 0 none;
+	padding: 0;
+	border: 0 none;
+
+	/* All tab filters content container */
+	.tabfilter-content-container {
+		border: 1px solid #353535;	//	TODO: change to scss variable
+		padding: 10px 0;
+	}
 
 	/* Top navigation labels */
 	nav > ul {
@@ -10,74 +16,75 @@
 	& > nav li {
 		display: inline-block;
 		vertical-align: middle;
+		margin: 0;
+	}
 
-		&.active {
-			background-color: $header-bg-color;
+	/* tab filter label li element */
+	.tabfilter-item-label {
+		// @extend button;
 
-			a[data-target],
-			a[data-target]:hover {
-				border-color: $header-bg-color;
-				color: $btn-form-font-color;
-				margin-top: 0;
-				margin-bottom: 0;
-				line-height: 28px;
+		display: inline-block;
+		background-color: $btn-bg-color;
+		border: 1px solid $btn-bg-color;
+		border-radius: 2px;
+		color: $btn-font-color;
+		margin-right: 1px;
+
+		&.active,
+		&.active:hover,
+		&.active:focus {
+			background-color: $ui-bg-color;
+			border: 0 none;
+
+			.icon-edit {
+				opacity: 0.5;
+
+				&:hover,
+				&:focus {
+					opacity: 1;
+				}
+			}
+
+			.tabfilter-item-link[data-counter]::after {
+				display: none;
 			}
 		}
 
-		a[data-target] {
-			@extend button;
+		&.unsaved .tabfilter-item-link {
+			font-style: italic;
 
-			display: inline-block;
-			line-height: 24px;
-			margin: 6px 5px 4px 0;
-
-			/* temp, remove when .active will be set to _target.parentNode */
-			&.active,
-			&.active:hover {
-				background-color: $header-bg-color;
-				border-color: $header-bg-color;
-				color: $btn-form-font-color;
-				margin-top: 0;
-				margin-bottom: 0;
-				line-height: 28px;
+			&:before {
+				content: '*';
 			}
-			/* temp, remove when .active will be set to _target.parentNode */
 		}
 
-		/* development solution, replace with styles from ZBXNEXT-4803 */
-		a.active[data-counter]::after {
-			display: none;
-		}
-
-		a[data-counter]::after {
-			display: inline-block;
-			min-width: 15px;
-			height: 15px;
-			color: black;
-			background: silver;
-			margin-left: 5px;
-			line-height: 15px;
-			vertical-align: middle;
-			text-align: center;
+		.tabfilter-item-link[data-counter]::after {
+			margin-left: .4em;
+			padding: 0.1em 0.4em;
+			font-size: $font-h3-size;
+			background-color: $form-bg-color;
+			color: $btn-alt-font-color;
 			content: attr(data-counter);
-		}
-		/* development solution, replace with styles from ZBXNEXT-4803 */
-
-		.icon-edit {
-			@extend .btn-widget-edit;
-
-			cursor: pointer;
-			vertical-align: middle;
-			display: inline-block;
-			opacity: 0;
-		}
-
-		&:hover .icon-edit {
-			opacity: 1;
 		}
 	}
 
-	.tabfilter-tabs-container > div {
-		padding-top: 10px;
+	/* tab filter label li clickable a element */
+	.tabfilter-item-link,
+	.tabfilter-item-link:focus,
+	.tabfilter-item-link:hover {
+		display: inline-block;
+		color: $btn-font-color;
+		border-bottom: 0 none;
+		line-height: 24px;
+		padding: 0 11px;
+	}
+
+	.icon-edit {
+		@extend .btn-widget-edit;
+
+		cursor: pointer;
+		vertical-align: middle;
+		display: inline-block;
+		opacity: 0;
 	}
 }

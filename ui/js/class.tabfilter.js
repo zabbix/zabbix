@@ -59,7 +59,7 @@ class CTabFilter extends CBaseComponent {
 				this._active_item = item;
 			}
 
-			if (item.hasClass('active')) {
+			if (item._target.parentNode.classList.contains('active')) {
 				item._target.focus();
 			}
 
@@ -82,6 +82,8 @@ class CTabFilter extends CBaseComponent {
 				this.collapseAllItemsExcept(this._active_item);
 
 				if (!this._active_item || !this._active_item._expanded) {
+					this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
+
 					if (this._active_item == this._timeselector) {
 						this._shared_domnode.classList.add('display-none');
 					}
@@ -98,11 +100,17 @@ class CTabFilter extends CBaseComponent {
 			 * Event handler on tab content collapse.
 			 */
 			collapse: (ev) => {
-				if (ev.detail.target === this._active_item) {
-					this._shared_domnode.classList.add('display-none');
+				let item = ev.detail.target;
+
+				if (item === this._active_item) {
+					this._target.querySelector('.tabfilter-content-container').classList.add('display-none');
 					this.profileUpdate('expanded', {
 						value_int: 0
 					});
+				}
+				else {
+					// Active tab switch.
+					item.updateUnsavedState();
 				}
 			},
 
@@ -233,6 +241,7 @@ class CTabFilter extends CBaseComponent {
 					value_str: params.toString()
 				}).then(() => {
 					this._active_item.setBrowserLocation(params);
+					this._active_item.resetUnsavedState();
 				});
 			},
 
@@ -251,7 +260,7 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Apply' button press.
 			 */
 			buttonApplyAction: () => {
-				this._active_item.setUnsavedState();
+				this._active_item.updateUnsavedState();
 				this._active_item.setBrowserLocation(this._active_item.getFilterParams());
 			},
 
@@ -343,7 +352,7 @@ class CTabFilter extends CBaseComponent {
 			containers.appendChild(container);
 		}
 
-		item = new CTabFilterItem(title, {
+		item = new CTabFilterItem(title.querySelector('a'), {
 			parent: this,
 			idx_namespace: this._idx_namespace,
 			index: this._items.length,
