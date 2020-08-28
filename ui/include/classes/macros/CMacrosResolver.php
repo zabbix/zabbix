@@ -1671,6 +1671,41 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolve macros in item description.
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['description']
+	 *
+	 * @return array
+	 */
+	public function resolveItemDescriptions(array $items): array {
+		$types = ['usermacros' => true];
+		$macro_values = [];
+		$usermacros = [];
+
+		foreach ($items as $key => $item) {
+			$matched_macros = self::extractMacros([$item['description']], $types);
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		foreach ($macro_values as $key => $macro_value) {
+			$items[$key]['description'] = strtr($items[$key]['description'], $macro_value);
+		}
+
+		return $items;
+	}
+
+	/**
 	 * Resolve item delay macros, item history and item trend macros.
 	 *
 	 * @param array  $data

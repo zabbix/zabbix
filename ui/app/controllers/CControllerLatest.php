@@ -157,7 +157,6 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if ($select_items) {
-			// Select items, requesting extended data.
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
@@ -301,6 +300,7 @@ abstract class CControllerLatest extends CController {
 
 		$items = CMacrosResolverHelper::resolveItemKeys($items);
 		$items = CMacrosResolverHelper::resolveItemNames($items);
+		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 		// Choosing max history period for already filtered items having data.

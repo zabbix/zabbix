@@ -1,3 +1,13 @@
+Changes for 5.2.0alpha2
+
+New features:
+A.F....PS. [ZBXNEXT-6085] added host prototype tag support (agriscenko, wiper)
+..F.....S. [ZBXNEXT-2603] increased user macros values maximum size from 255 to 2048 (agriscenko, arimdjonoks)
+
+Bug fixes:
+..F....... [ZBXNEXT-6052] fixed "Shared" tag being displayed for users that are not the dashboard owners (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.0alpha1
 
 New features:
@@ -17,11 +27,22 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.3rc2
+Changes for 5.0.4rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.3
+
+5.0.3rc2 was released as 5.0.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.3rc2
+
+Bug fixes:
+..F....... [ZBX-18261] fixed Latest data performance by allowing to filter items with data only if hosts are selected as well (averza)
 A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
 
 --------------------------------------------------------------------------------
@@ -1690,9 +1711,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.24rc2
+Changes for 4.0.25rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24
+
+4.0.24rc2 was released as 4.0.24 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24rc2
 
 Bug fixes:
 A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
