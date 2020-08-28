@@ -261,7 +261,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
-		$form = $this->query('id:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
 		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
