@@ -29,61 +29,25 @@ class testPageMonitoringHosts extends CWebTest {
 
 	public function testPageMonitoringHosts_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=host.view');
-		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
-				'Graphs', 'Screens', 'Web'];
-		$buttons = ['Apply', 'Reset'];
-		$tags_buttons = ['Add', 'Remove'];
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$fields = ['Name', 'Host groups', 'IP', 'DNS', 'Port', 'Severity', 'Status', 'Tags',
-				'Show hosts in maintenance'];
-		$severity_elements = ['Not classified', 'Warning', 'High', 'Information', 'Average', 'Disaster'];
-		$status_elements = ['Any', 'Enabled', 'Disabled'];
-		$tags_elements = ['And/Or', 'Or', 'Contains', 'Equals'];
+		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
+			'Graphs', 'Screens', 'Web'];
 
 		// Checking Title, Header and Column names.
 		$this->assertPageTitle('Hosts');
 		$this->assertPageHeader('Hosts');
 		$this->assertSame($headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
 
-		// Check filter buttons.
-		foreach ($buttons as $button) {
-			$this->assertTrue($form->query('button', $button)->exists());
-		}
-
-		// Check all field names.
-		$this->assertEquals($fields, $form->getLabels()->asText());
-
-		// Check elements for existing fields.
-		foreach ($fields as $field) {
-			switch ($field) {
-				case 'Severity':
-					$this->assertEquals($form->getField($field)->getLabels()->asText(), $severity_elements);
-					break;
-				case 'Status':
-					$this->assertEquals($form->getField($field)->getLabels()->asText(), $status_elements);
-					break;
-				case 'Tags':
-					$tags_container = $form->getFieldContainer($field);
-					foreach ($tags_elements as $tag) {
-						$this->assertTrue(($tags_container->query('xpath://li/label[text() = "'.$tag.'"]'))->
-						exists());
-					}
-					foreach ($tags_buttons as $button) {
-						$this->assertTrue($tags_container->query('button', $button)->exists());
-					}
-					break;
-				case 'Show hosts in maintenance':
-					$this->assertTrue($form->getField($field)->getLabel('Show suppressed problems')->isPresent());
-					$this->assertTrue($form->query('class:second-column-label')->exists());
-					break;
-			}
-		}
-
 		// Check filter collapse/expand.
-		$filter_expanded = ['true', 'false'];
-		foreach ($filter_expanded as $status) {
+		foreach (['true', 'false'] as $status) {
 			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
 			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+		}
+
+		// Check fields maximum length.
+		foreach(['Name', 'IP', 'DNS', 'Port', 'tags_0_tag', 'tags_0_value'] as $field) {
+			$this->assertEquals(255, $form->query('xpath:.//input[@id="filter_'.strtolower($field).'"]')
+				->one()->getAttribute('maxlength'));
 		}
 	}
 
@@ -229,8 +193,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'filter' => [
 						'Status' => 'Disabled'
 					],
-					'expected' => [
-					]
+					'expected' => []
 				]
 			],
 			[
@@ -327,7 +290,7 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'filter' => [
 						'Name' => 'maintenance',
-						'Show hosts in maintenance' => ''
+						'Show hosts in maintenance' => false
 					],
 					'expected' => []
 				]
@@ -448,7 +411,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
-			// wrote 'template' in lowercase.
+			// Wrote 'template' in lowercase.
 			[
 				[
 					'tag_options' => [
@@ -460,7 +423,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => []
 				]
 			],
-			// non existing tag
+			// Won existing tag.
 			[
 				[
 					'tag_options' => [
@@ -500,7 +463,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertRowCount($start_rows_count);
 		$start_contents = $this->getTableResult($start_rows_count);
 
-		// Filter hosts
+		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -527,11 +490,11 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$before_show_count = $table->getRows()->count();
+		$this->assertFalse($table->findRow('Name', 'Host for suppression')->isPresent());
 		$form->query('id:filter_show_suppressed')->asCheckbox()->one()->check();
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertEquals($table->getRows()->count(), $before_show_count + 1);
+		$table->findRow('Name', 'Host for suppression')->isPresent();
 	}
 
 	/**
