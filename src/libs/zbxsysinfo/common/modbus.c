@@ -42,6 +42,8 @@ static struct modbus_datatype_ref
 modbus_datatype_map[] =
 {
 	{ ZBX_MODBUS_DATATYPE_BIT,	"bit" },
+	{ ZBX_MODBUS_DATATYPE_INT8,	"int8" },
+	{ ZBX_MODBUS_DATATYPE_UINT8,	"uint8" },
 	{ ZBX_MODBUS_DATATYPE_INT16,	"int16" },
 	{ ZBX_MODBUS_DATATYPE_UINT16,	"uint16" },
 	{ ZBX_MODBUS_DATATYPE_INT32,	"int32" },
@@ -304,6 +306,12 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 			count_w_offset = count + offset * ZBX_MODBUS_REGISTER_SZ;
 			dest8 = zbx_malloc(NULL, sizeof(uint16_t) * count_w_offset);
 			break;
+		case ZBX_MODBUS_DATATYPE_INT8:
+		case ZBX_MODBUS_DATATYPE_UINT8:
+			count_w_offset = (count + 1) >> 1;
+			count_w_offset = count_w_offset + offset * ZBX_MODBUS_REGISTER_SZ / 8;
+			dest16 = zbx_malloc(NULL, sizeof(uint16_t) * count_w_offset);
+			break;
 		case ZBX_MODBUS_DATATYPE_INT32:
 		case ZBX_MODBUS_DATATYPE_UINT32:
 		case ZBX_MODBUS_DATATYPE_FLOAT:
@@ -398,6 +406,10 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		{
 			switch(type)
 			{
+				case ZBX_MODBUS_DATATYPE_UINT8:
+				case ZBX_MODBUS_DATATYPE_INT8:
+					SET_UI64_RESULT(res, buf16[0] & 0xFF);
+					break;
 				case ZBX_MODBUS_DATATYPE_UINT32:
 				case ZBX_MODBUS_DATATYPE_INT32:
 					SET_UI64_RESULT(res, read_reg_32(buf16, 0, endianness));
@@ -419,32 +431,55 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		{
 			list = zbx_strdup(NULL, "[");
 
-			for (i = 0; i < count; i++)
+			i = 0;
+			while (i < count)
 			{
 				switch(type)
 				{
+					case ZBX_MODBUS_DATATYPE_UINT8:
+						list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
+								(unsigned)buf16[i >> 1] & 0xFF);
+						if (++i >= count)
+							break;
+						list = zbx_dsprintf(list, "%s,%u", list, (unsigned)buf16[i >> 1] >> 8);
+						i++;
+						break;
+					case ZBX_MODBUS_DATATYPE_INT8:
+						list = zbx_dsprintf(list, "%s%s%i", list, 0 == i ? "" : ",",
+								(char)(buf16[i >> 1] & 0xFF));
+						if (++i >= count)
+							break;
+						list = zbx_dsprintf(list, "%s,%i", list, (char)(buf16[i >> 1] >> 8));
+						i++;
+						break;
 					case ZBX_MODBUS_DATATYPE_UINT32:
 						list = zbx_dsprintf(list, "%s%s%lu", list, 0 == i ? "" : ",",
 								(long unsigned)(read_reg_32(buf16, i, endianness)));
+						i += 2;
 						break;
 					case ZBX_MODBUS_DATATYPE_INT32:
 						list = zbx_dsprintf(list, "%s%s%li", list, 0 == i ? "" : ",",
 								(long)(read_reg_32(buf16, i, endianness)));
+						i += 2;
 						break;
 					case ZBX_MODBUS_DATATYPE_FLOAT:
 						list = zbx_dsprintf(list, "%s%s%f", list, 0 == i ? "" : ",",
 								(float)(read_reg_32(buf16, i, endianness)));
+						i += 2;
 						break;
 					case ZBX_MODBUS_DATATYPE_UINT64:
 						list = zbx_dsprintf(list, "%s%s%lu", list, 0 == i ? "" : ",",
 								(long unsigned)(read_reg_64(buf16, i, endianness)));
+						i += 4;
 						break;
 					case ZBX_MODBUS_DATATYPE_DOUBLE:
 						list = zbx_dsprintf(list, "%s%s%f", list, 0 == i ? "" : ",",
 								(double)(read_reg_64(buf16, i, endianness)));
+						i += 4;
 						break;
 					default:
 						list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",", buf16[i]);
+						i++;
 				}
 			}
 

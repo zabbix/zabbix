@@ -46,7 +46,7 @@ extern int	CONFIG_TIMEOUT;
 #define ZBX_MODBUS_IP_LEN_MAX			(64+1)
 #define ZBX_MODBUS_PORT_LEN_MAX			(5+1)
 
-#define ZBX_MODBUS_BYTE_SWAP_16(t_int16)	((t_int16 >> 8) | (t_int16 << 8))
+#define ZBX_MODBUS_BYTE_SWAP_16(t_int16)	(((t_int16 >> 8) & 0xFF) | ((t_int16 & 0xFF) << 8))
 
 #define ZBX_MODBUS_32BE(t_int16, idx)							\
 		(((uint32_t)t_int16[idx]) << 16) | t_int16[(idx) + 1]
@@ -114,6 +114,8 @@ zbx_modbus_endpoint_t;
 typedef enum
 {
 	ZBX_MODBUS_DATATYPE_BIT,
+	ZBX_MODBUS_DATATYPE_INT8,
+	ZBX_MODBUS_DATATYPE_UINT8,
 	ZBX_MODBUS_DATATYPE_INT16,
 	ZBX_MODBUS_DATATYPE_UINT16,
 	ZBX_MODBUS_DATATYPE_INT32,
