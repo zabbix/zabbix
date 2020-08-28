@@ -17,17 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_JSON_H
-#define ZABBIX_JSON_H
+#ifndef ZABBIX_ZBXALERT_H
+#define ZABBIX_ZBXALERT_H
 
-#define SKIP_WHITESPACE(src)	\
-	while ('\0' != *(src) && NULL != strchr(ZBX_WHITESPACE, *(src))) (src)++
+#include "common.h"
 
-/* can only be used on non empty string */
-#define SKIP_WHITESPACE_NEXT(src)\
-	(src)++; \
-	SKIP_WHITESPACE(src)
+typedef struct
+{
+	int		source;
+	int		object;
+	zbx_uint64_t	objectid;
+	int		alerts_num;
+}
+zbx_am_source_stats_t;
 
-void	zbx_set_json_strerror(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error);
+
+int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error);
+
+int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error);
 
 #endif
