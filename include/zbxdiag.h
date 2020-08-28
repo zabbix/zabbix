@@ -17,17 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_JSON_H
-#define ZABBIX_JSON_H
 
-#define SKIP_WHITESPACE(src)	\
-	while ('\0' != *(src) && NULL != strchr(ZBX_WHITESPACE, *(src))) (src)++
+#ifndef ZABBIX_ZBXDIAG_H
+#define ZABBIX_ZBXDIAG_H
 
-/* can only be used on non empty string */
-#define SKIP_WHITESPACE_NEXT(src)\
-	(src)++; \
-	SKIP_WHITESPACE(src)
+#include "common.h"
+#include "zbxjson.h"
 
-void	zbx_set_json_strerror(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+typedef enum
+{
+	ZBX_DIAGINFO_UNDEFINED = -1,
+	ZBX_DIAGINFO_ALL,
+	ZBX_DIAGINFO_HISTORYCACHE,
+	ZBX_DIAGINFO_VALUECACHE,
+	ZBX_DIAGINFO_PREPROCESSING,
+	ZBX_DIAGINFO_LLD,
+	ZBX_DIAGINFO_ALERTING
+}
+zbx_diaginfo_section_t;
+
+#define ZBX_DIAG_HISTORYCACHE	"historycache"
+#define ZBX_DIAG_VALUECACHE	"valuecache"
+#define ZBX_DIAG_PREPROCESSING	"preprocessing"
+#define ZBX_DIAG_LLD		"lld"
+#define ZBX_DIAG_ALERTING	"alerting"
+
+int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
+void	zbx_diag_log_info(unsigned int flags);
 
 #endif
