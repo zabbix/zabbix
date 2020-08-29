@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-24T13:48:10Z</date>
+   <date>2020-08-29T09:23:37Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1349,6 +1349,56 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                </triggers>
             </item>
             <item>
+               <name>MSSQL: Percent of Adhoc queries running</name>
+               <type>CALCULATED</type>
+               <key>mssql.percent_of_adhoc_queries</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <params>last(mssql.sql_compilations_sec.rate) * 100 /
+(last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))</params>
+               <description>The ratio of SQL compilations per second to Batch requests per second in percent.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
+                     <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Percent of Recompiled Transact-SQL Objects</name>
+               <type>CALCULATED</type>
+               <key>mssql.percent_recompilations_to_compilations</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <params>last(mssql.sql_recompilations_sec.rate) * 100 /
+(last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))</params>
+               <description>The ratio of SQL re-compilations per second to SQL compilations per second in percent.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
+                     <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
                <name>MSSQL: Number of blocked processes</name>
                <type>DEPENDENT</type>
                <key>mssql.processes_blocked</key>
@@ -1423,6 +1473,29 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <master_item>
                   <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Full scans to Index searches ratio</name>
+               <type>CALCULATED</type>
+               <key>mssql.scan_to_search</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <params>last(mssql.full_scans_sec.rate) / (last(mssql.index_searches_sec.rate) + (last(mssql.index_searches_sec.rate)=0))</params>
+               <description>The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; 0.001</expression>
+                     <name>MSSQL: Index and table scans are often than index searches for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>MSSQL: SQL compilations per second</name>
@@ -3668,32 +3741,13 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
    </templates>
    <triggers>
       <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()} + ({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()}=0)) *&#13;
-1000 &lt; {Template DB MSSQL by ODBC:mssql.index_searches_sec.rate.last()}</expression>
-         <name>MSSQL: Index and table scans are often than index searches</name>
-         <priority>WARNING</priority>
-         <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
-      </trigger>
-      <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
-         <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}%</name>
-         <priority>WARNING</priority>
-         <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
-      </trigger>
-      <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.sql_recompilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
-         <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}%</name>
-         <priority>WARNING</priority>
-         <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
-      </trigger>
-      <trigger>
          <expression>{Template DB MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 &gt; 10 * {Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}</expression>
          <name>MSSQL: Too frequently pointers using</name>
          <priority>WARNING</priority>
          <description>Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} / {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX}</expression>
+         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()}</expression>
          <name>MSSQL: Too many physical reads occurring</name>
          <priority>WARNING</priority>
          <description>If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.</description>
