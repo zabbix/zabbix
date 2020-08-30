@@ -209,6 +209,7 @@ class CTabFilterItem extends CBaseComponent {
 	 */
 	setDisabled(state) {
 		this.toggleClass('disabled', state);
+		this._target.parentNode.classList.toggle('disabled', state);
 	}
 
 	/**
@@ -314,6 +315,11 @@ class CTabFilterItem extends CBaseComponent {
 	updateUnsavedState() {
 		let search_params = this.getFilterParams(),
 			src_query = new URLSearchParams(this._src_url);
+
+		if (search_params === null) {
+			// Not templated tabs does not contain form fields, no need to update unsaved state.
+			return;
+		}
 
 		if (src_query.get('filter_custom_time') !== '1') {
 			src_query.delete('from');

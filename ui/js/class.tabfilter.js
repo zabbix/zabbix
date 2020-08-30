@@ -151,7 +151,9 @@ class CTabFilter extends CBaseComponent {
 			 * Event handler for 'Save as' button
 			 */
 			popupUpdateAction: (ev) => {
-				var item = ev.detail.create ? this.create(this._active_item._target.cloneNode(), {}) : this._active_item;
+				var item = (ev.detail.create === '1')
+					? this.create(this._active_item._target.cloneNode(), {})
+					: this._active_item;
 
 				if (ev.detail.form_action === 'update') {
 					item.update(Object.assign(ev.detail, {

@@ -203,8 +203,11 @@ class CTabFilter extends CDiv {
 			->setAttribute('data-accessible', 1)
 			->setAttribute('data-profile-idx', $timerange['idx'])
 			->setAttribute('data-profile-idx2', $timerange['idx2']);
+		$link = (new CLink($data['label']))
+			->addClass(ZBX_STYLE_BTN_TIME)
+			->addClass($timerange['disabled'] ? ZBX_STYLE_DISABLED : null);
 
-		return $this->addTab((new CLink($data['label']))->addClass(ZBX_STYLE_BTN_TIME), $content, $data + [
+		return $this->addTab($link, $content, $data + [
 			'filter_sortable' => false,
 			'filter_configurable' => false
 		]);
