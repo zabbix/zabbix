@@ -29,6 +29,13 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			$show_counters = [];
 
 			foreach ($profile->getTabsWithDefaults() as $index => $tabfilter) {
+				if (!$tabfilter['filter_custom_time']) {
+					$tabfilter = [
+						'from' => $profile->from,
+						'to' => $profile->to
+					] + $tabfilter;
+				}
+
 				$show_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
 

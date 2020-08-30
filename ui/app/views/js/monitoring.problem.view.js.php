@@ -26,6 +26,9 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>),
+			refresh_interval = <?= $data['refresh_interval'] ?>,
+			refresh_url = '<?= $data['refresh_url'] ?>',
+			refresh_timer,
 			global_timerange = {
 				from: filter._timeselector._data.from,
 				to: filter._timeselector._data.to
@@ -50,6 +53,25 @@
 				to: data.to
 			});
 		});
+
+		function refreshCounters() {
+			clearTimeout(refresh_timer);
+
+			fetch(refresh_url, {
+				method: 'POST',
+				body: new URLSearchParams({filter_counters: 1})
+			})
+				.then(response => response.json())
+				.then(response => {
+					if (response.filter_counters) {
+						filter.updateCounters(response.filter_counters);
+					}
+
+					refresh_timer = setTimeout(refreshCounters, refresh_interval);
+				});
+		}
+
+		refreshCounters();
 
 		// Keep timeselector changes in global_timerange.
 		$.subscribe('timeselector.rangeupdate', (e, data) => {

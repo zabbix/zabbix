@@ -56,7 +56,17 @@ abstract class CControllerProblem extends CController {
 	];
 
 	protected function getCount(array $filter) {
-		return 0;
+		$range_time_parser = new CRangeTimeParser();
+		$range_time_parser->parse($filter['from']);
+		$filter['from'] = $range_time_parser->getDateTime(true)->getTimestamp();
+		$range_time_parser->parse($filter['to']);
+		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
+
+		$data = CScreenProblem::getData($filter, [
+			'search_limit' => select_config()['search_limit']
+		]);
+
+		return count($data['problems']);
 	}
 
 	protected function getData(array $filter): array {
