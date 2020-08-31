@@ -1170,7 +1170,7 @@ class CHttpTestManager {
 			return;
 		}
 
-		$stepids = zbx_objectValues($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid');
+		$stepids = array_column($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid');
 
 		$stepitems = DBfetchArrayAssoc(DBselect(
 			'SELECT i.itemid, hsi.httpstepid, hsi.type'.

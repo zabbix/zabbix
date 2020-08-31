@@ -1681,7 +1681,7 @@ class testWebScenario extends CAPITest {
 				$this->assertCount(3, $db_httptest_items,
 					'Incorrect item count for web scenario [httpstepid='.$httptestid.'].');
 
-				$application_itemids = array_flip(zbx_objectValues($db_httptest_items, 'itemid'));
+				$application_itemids = array_flip(array_column($db_httptest_items, 'itemid'));
 
 				foreach ($db_httptest_items as $db_httptest_item) {
 					$this->assertContains('"'.$db_httptest['name'].'"', $db_httptest_item['name']);
@@ -1720,7 +1720,7 @@ class testWebScenario extends CAPITest {
 					' WHERE '.dbConditionInt('hsi.httpstepid', $db_httpstepids)
 				);
 
-				$application_itemids += array_flip(zbx_objectValues($db_httpstep_items, 'itemid'));
+				$application_itemids += array_flip(array_column($db_httpstep_items, 'itemid'));
 
 				foreach ($db_httpstep_items as $db_httpstep_item) {
 					$db_httpsteps[$db_httpstep_item['httpstepid']]['db_items'][] = $db_httpstep_item;
