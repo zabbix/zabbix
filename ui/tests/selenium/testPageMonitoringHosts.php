@@ -21,17 +21,26 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 class testPageMonitoringHosts extends CWebTest {
 
 	use FilterTrait;
 	use TableTrait;
 
+	/**
+	 * Id of host that was updated.
+	 *
+	 * @var integer
+	 */
+	protected static $hostid;
+
 	public function testPageMonitoringHosts_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=host.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
 			'Graphs', 'Screens', 'Web'];
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking Title, Header and Column names.
 		$this->assertPageTitle('Hosts');
@@ -48,6 +57,12 @@ class testPageMonitoringHosts extends CWebTest {
 		foreach(['Name', 'IP', 'DNS', 'Port', 'tags_0_tag', 'tags_0_value'] as $field) {
 			$this->assertEquals(255, $form->query('xpath:.//input[@id="filter_'.strtolower($field).'"]')
 				->one()->getAttribute('maxlength'));
+		}
+
+		// Check disabled links.
+		foreach (['Graphs', 'Screens', 'Web'] as $disabled) {
+			$row = $table->findRow('Name', 'Available host');
+			$this->assertTrue($row->query('xpath://following::td/span[@class="disabled" and text()="'.$disabled.'"]')->exists());
 		}
 	}
 
@@ -461,7 +476,7 @@ class testPageMonitoringHosts extends CWebTest {
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertRowCount($start_rows_count);
-		$start_contents = $this->getTableResult($start_rows_count);
+		$start_contents = $this->getTableResult($start_rows_count, 'Name');
 
 		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
@@ -477,7 +492,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
 		$this->assertRowCount($reset_rows_count);
-		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count));
+		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count, 'Name'));
 	}
 
 	/**
@@ -497,14 +512,131 @@ class testPageMonitoringHosts extends CWebTest {
 		$table->findRow('Name', 'Host for suppression')->isPresent();
 	}
 
+	public static function getEnabledLinksData() {
+		return [
+			[
+				[
+					'name' => 'Dynamic widgets H1',
+					'link_name' => 'Graphs',
+					'page_header' => 'Graphs'
+				]
+			],
+			[
+				[
+					'name' => 'Host ZBX6663',
+					'link_name' => 'Web',
+					'page_header' => 'Web monitoring'
+				]
+			],
+			[
+				[
+					'name' => 'ЗАББИКС Сервер',
+					'link_name' => 'Screens',
+					'page_header' => 'Network interfaces on ЗАББИКС Сервер'
+				]
+			],
+			[
+				[
+					'name' => 'Empty host',
+					'link_name' => 'Problems',
+					'page_header' => 'Problems'
+				]
+			],
+			[
+				[
+					'name' => 'Available host',
+					'link_name' => 'Latest data',
+					'page_header' => 'Latest data'
+				]
+			]
+		];
+	}
+
 	/**
-	 * @param integer $rows_count	Rows amount whom host name should be checked
+	 * @dataProvider getEnabledLinksData
+	 *
+	 * Check enabled links and that correct host is displayed.
 	 */
-	private function getTableResult($rows_count) {
+	public function testPageMonitoringHosts_EnabledLinks($data) {
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		switch ($data['name']) {
+			case 'Dynamic widgets H1':
+				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
+				$form->checkValue(['Host' => $data['name']]);
+				$form->query('button:Reset')->one()->click();
+				break;
+			case 'Host ZBX6663':
+			case 'Available host':
+				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
+				$form->checkValue(['Hosts' => $data['name']]);
+				$form->query('button:Reset')->one()->click();
+				break;
+			case 'ЗАББИКС Сервер':
+				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
+				break;
+			case 'Empty host':
+				$this->query('xpath://td/a[text()="'.$data['name'].'"]/following::td/a[text()="'.$data['link_name'].'"]')
+					->one()->click();
+				$this->page->waitUntilReady();
+				$this->assertPageHeader($data['page_header']);
+				$form->checkValue(['Hosts' => $data['name']]);
+				$form->query('button:Reset')->one()->click();
+				break;
+		}
+	}
+
+	public function prepareUpdateData() {
+		$response = CDataHelper::call('host.update', [
+			'hostid' => '99013',
+			'status' => 1
+			]);
+
+		$this->assertArrayHasKey('hostids', $response);
+		self::$hostid = $response['hostids'][0];
+	}
+
+	/**
+	 * @backup hosts
+	 *
+	 * @on-before-once prepareUpdateData
+	 */
+	public function testPageMonitoringHosts_TableSorting() {
+		// Sort by name and status.
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$table = $this->query('class:list-table')->asTable()->one();
+		$rows_count = $table->getRows()->count();
+		foreach (['Name', 'Status'] as $listing) {
+			$this->query('xpath://a[@href and text()="'.$listing.'"]')->one()->click();
+			$after_listing = $this->getTableResult($rows_count, $listing);
+			$this->query('xpath://a[@href and text()="'.$listing.'"]')->one()->click();
+			$this->assertEquals(array_reverse($after_listing), $this->getTableResult($rows_count, $listing));
+		}
+	}
+
+	/**
+	 * @param integer $rows_count	Rows amount whom column value should be checked
+	 * @param string $column		Column name, where value should be checked
+	 */
+	private function getTableResult($rows_count, $column) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$result = [];
 		for ($i = 0; $i < $rows_count; $i ++) {
-			$result[] = $table->getRow($i)->getColumn('Name')->getText();
+			$result[] = $table->getRow($i)->getColumn($column)->getText();
 		}
+		return $result;
+	}
+
+	/**
+	 * @param string $host_name		Host name
+	 * @param string $column		Column name
+	 * @param string $page_header	Page header name
+	 */
+	private function selectLink($host_name, $column, $page_header) {
+		$table = $this->query('class:list-table')->asTable()->one();
+		$row = $table->findRow('Name', $host_name);
+		$row->getColumn($column)->click();
+		$this->page->waitUntilReady();
+		$this->assertPageHeader($page_header);
 	}
 }
