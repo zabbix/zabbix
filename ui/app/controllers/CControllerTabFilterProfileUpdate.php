@@ -109,6 +109,12 @@ class CControllerTabFilterProfileUpdate extends CController {
 
 		$filter->update();
 
+		$data += [
+			'property' => $property,
+			'idx' => $idx
+		];
+		$response = new CControllerResponseData($data);
+		$this->setResponse($response);
 	}
 
 	/**

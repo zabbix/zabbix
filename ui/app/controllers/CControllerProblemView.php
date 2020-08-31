@@ -118,6 +118,13 @@ class CControllerProblemView extends CControllerProblem {
 		}
 		unset($filter_tab);
 
+		$filter['tags'] = array_filter($filter['tags'], function($tag) {
+			return $tag['tag'] !== '' && $tag['value'] !== '';
+		});
+		$filter['inventory'] = array_filter($filter['inventory'], function($inventory) {
+			return $inventory['value'] !== '';
+		});
+
 		$refresh_curl = (new CUrl('zabbix.php'));
 		$filter['action'] = 'problem.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
