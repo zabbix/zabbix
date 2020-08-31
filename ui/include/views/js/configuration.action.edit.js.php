@@ -627,6 +627,7 @@
 		this.$authtype_select = this.$authtype.find('select');
 		this.$privatekey_input = this.$privatekey.find('input');
 		this.$publickey_input = this.$pubkey.find('input');
+		this.$password_input = this.$password.find('input');
 		this.$passphrase_input = this.$passphrase.find('input');
 
 		this.$authtype_select.on('change', ({target}) => {
@@ -644,9 +645,16 @@
 	 */
 	OperationViewCommandTypeSSH.prototype.viewAuthTypePublicKey = function() {
 		this.$password.hide();
+		this.$password_input.prop('disabled', true);
+
 		this.$passphrase.show();
+		this.$passphrase_input.prop('disabled', false);
+
 		this.$privatekey.show();
+		this.$privatekey_input.prop('disabled', false);
+
 		this.$pubkey.show();
+		this.$publickey_input.prop('disabled', false);
 	};
 
 	/**
@@ -654,9 +662,16 @@
 	 */
 	OperationViewCommandTypeSSH.prototype.viewAuthTypePassword = function() {
 		this.$password.show();
+		this.$password_input.prop('disabled', false);
+
 		this.$passphrase.hide();
+		this.$passphrase_input.prop('disabled', true);
+
 		this.$privatekey.hide();
+		this.$privatekey_input.prop('disabled', true);
+
 		this.$pubkey.hide();
+		this.$publickey_input.prop('disabled', true);
 	};
 
 	/**
@@ -669,6 +684,7 @@
 		this.$privatekey_input.val(conf.privatekey);
 		this.$publickey_input.val(conf.publickey);
 		this.$passphrase_input.val(conf.password);
+		this.$password_input.val(conf.password);
 	};
 
 	/**

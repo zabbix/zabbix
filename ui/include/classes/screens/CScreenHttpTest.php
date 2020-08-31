@@ -140,9 +140,7 @@ class CScreenHttpTest extends CScreenBase {
 			}
 
 			$table->addRow(new CRow([
-				($httptest['host']['status'] == HOST_STATUS_NOT_MONITORED)
-					? (new CSpan($httptest['hostname']))->addClass(ZBX_STYLE_RED)
-					: $httptest['hostname'],
+				(new CLinkAction($httptest['hostname']))->setMenuPopup(CMenuPopupHelper::getHost($httptest['hostid'])),
 				new CLink($httptest['name'], 'httpdetails.php?httptestid='.$httptest['httptestid']),
 				$httptest['steps'],
 				$lastcheck,

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-30T14:23:21Z</date>
+   <date>2020-08-13T11:04:30Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -171,7 +171,7 @@ UNION
   SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
 UNION
  SELECT 'SESSION::Lock rate' ,(cnt_block / cnt_all)* 100 pct
- FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM gv$session)
+ FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM v$session)
 UNION
  SELECT 'SESSION::Concurrency rate', NVL(ROUND(SUM(duty_act.cnt*100 / num_cores.val)), 0)
  FROM
@@ -748,7 +748,7 @@ SELECT
                <key>oracle.fra_space_used</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Amount of disk space (in bytes) used by fast recovery area files created in current and all previous fast recovery areas.</description>
                <applications>
                   <application>
@@ -1515,7 +1515,7 @@ SELECT
                <key>oracle.sga_buffer_cache</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The size of the cache of standard blocks.</description>
                <applications>
                   <application>
@@ -1540,7 +1540,7 @@ SELECT
                <key>oracle.sga_fixed</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The fixed SGA is an internal housekeeping area.</description>
                <applications>
                   <application>
@@ -1565,7 +1565,7 @@ SELECT
                <key>oracle.sga_java_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the java pool.</description>
                <applications>
                   <application>
@@ -1590,7 +1590,7 @@ SELECT
                <key>oracle.sga_large_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the large pool.</description>
                <applications>
                   <application>
@@ -1615,7 +1615,7 @@ SELECT
                <key>oracle.sga_log_buffer</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The number of bytes allocated for the redo log buffer.</description>
                <applications>
                   <application>
@@ -1640,7 +1640,7 @@ SELECT
                <key>oracle.sga_shared_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the shared pool.</description>
                <applications>
                   <application>
@@ -2378,7 +2378,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                <type>ODBC</type>
                <key>db.odbc.discovery[pdb_list,"{$ORACLE.DSN}"]</key>
                <delay>1h</delay>
-               <params>SELECT name as DBNAME, 'PDB' AS TYPE  FROM V$PDBS;</params>
+               <params>SELECT name as DBNAME FROM V$PDBS;</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
                <filter>
@@ -2408,7 +2408,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <description>1 - 'MOUNTED', 2 - 'READ WRITE', 3 - 'READ ONLY', 4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode)</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Oracle {#TYPE}</name>
+                           <name>Oracle PDB</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2475,12 +2475,36 @@ contents  FROM DBA_TABLESPACES;</params>
                <description>Scanning tablespaces in DBMS.</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Currently allocated bytes for tablespace (sum of the current size of datafiles).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Oracle TBS '{#TABLESPACE}': Tablespace free, bytes</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_free_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Free bytes of allocated space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2497,12 +2521,13 @@ contents  FROM DBA_TABLESPACES;</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace max size, bytes</name>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Maximum size of tablespace.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2565,28 +2590,6 @@ contents  FROM DBA_TABLESPACES;</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage, bytes</name>
-                     <type>DEPENDENT</type>
-                     <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <units>B</units>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
                      <name>Oracle TBS '{#TABLESPACE}': Tablespace usage percent</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
@@ -2594,6 +2597,7 @@ contents  FROM DBA_TABLESPACES;</params>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
+                     <description>Allocated bytes/Max bytes*100</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2637,7 +2641,7 @@ contents  FROM DBA_TABLESPACES;</params>
                            <color>1A7C11</color>
                            <item>
                               <host>Template DB Oracle by ODBC</host>
-                              <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                              <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>

@@ -199,7 +199,7 @@ function get_icon($type, $params = []) {
 function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
-			'hostid', 'status', 'proxy_hostid', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
+			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
 			'jmx_available', 'ipmi_available', 'error', 'snmp_error', 'jmx_error', 'ipmi_error'
 		],
 		'selectHostDiscovery' => ['ts_delete'],
@@ -293,19 +293,6 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem($breadcrumbs);
 	}
 	else {
-		$proxy_name = '';
-
-		if ($db_host['proxy_hostid'] != 0) {
-			$db_proxies = API::Proxy()->get([
-				'output' => ['host'],
-				'proxyids' => [$db_host['proxy_hostid']]
-			]);
-
-			$proxy_name = CHtml::encode($db_proxies[0]['host']).NAME_DELIMITER;
-		}
-
-		$name = $proxy_name.CHtml::encode($db_host['name']);
-
 		switch ($db_host['status']) {
 			case HOST_STATUS_MONITORED:
 				if ($db_host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -323,7 +310,9 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid']));
+		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
+			'hosts.php?form=update&hostid='.$db_host['hostid']
+		));
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);

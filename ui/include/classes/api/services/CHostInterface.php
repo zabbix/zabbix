@@ -155,15 +155,13 @@ class CHostInterface extends CApiService {
 		}
 
 		if ($this->outputIsRequested('details', $options['output'])) {
-			$sqlParts['left_join']['interface_snmp'] = ['from' => 'interface_snmp his',
-				'on' => 'his.interfaceid=hi.interfaceid'
-			];
-			$sqlParts['left_table'] = 'interface';
+			$sqlParts['left_join'][] = ['alias' => 'his', 'table' => 'interface_snmp', 'using' => 'interfaceid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($interface = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

@@ -548,11 +548,8 @@ class CHost extends CHostGeneral {
 					')';
 				}
 
-				$sqlParts['left_join']['hosts_templates'] = [
-					'from' => 'hosts_templates ht2',
-					'on' => 'h.hostid=ht2.hostid'
-				];
-				$sqlParts['left_table'] = $this->tableName();
+				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 
 				$operator = ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
 				$sqlParts['where'][] = '('.implode($operator, $where).')';
@@ -575,7 +572,7 @@ class CHost extends CHostGeneral {
 
 		// Return count or grouped counts via direct SQL count.
 		if ($options['countOutput'] && !$this->requiresPostSqlFiltering($options)) {
-			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $options['limit']);
+			$res = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 			while ($host = DBfetch($res)) {
 				if ($options['groupCount']) {
 					$result[] = $host;
@@ -588,7 +585,7 @@ class CHost extends CHostGeneral {
 			return $result;
 		}
 
-		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'hostid');
+		$result = zbx_toHash($this->customFetch(self::createSelectQueryFromParts($sqlParts), $options), 'hostid');
 
 		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {
@@ -643,11 +640,8 @@ class CHost extends CHostGeneral {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = [
-				'from' => 'host_inventory hinv',
-				'on' => $this->tableAlias().'.'.$this->pk().'=hinv.hostid'
-			];
-			$sqlParts['left_table'] = $this->tableName();
+			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		return $sqlParts;

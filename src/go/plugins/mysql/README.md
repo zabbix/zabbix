@@ -18,22 +18,6 @@ available for connection and configure monitoring.
 ## Configuration
 Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the required parameters.
 
-**Plugins.Mysql.Uri** — a URI to connect.  
-*Default value:* tcp://localhost:3306  
-*Requirements:*  
-- Must match the URI format.
-- Supported sockets: TCP, Unix.
-
-*Examples:*
-- tcp://myhost
-- unix:/var/run/mysql.sock
-
-**Plugins.Mysql.User** — a username to be used for MySQL authentication.  
-*Default value:* root.
-
-**Plugins.Mysql.Password** — a password to be used for MySQL authentication.  
-*Default value:* none.
-
 **Plugins.Mysql.KeepAlive** — inactive connection timeout (how long a connection can remain unused before it gets closed).  
 *Default value:* 300 sec.  
 *Limits:* 60-900
@@ -42,25 +26,24 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 *Default value:* equals the global 'Timeout' (configuration parameter set in zabbix_agent2.conf).  
 *Limits:* 1-30
 
-### Authentication
-The plugin uses username and password set in the Agent's configuration file for MySQL authentication (no password by default). 
-It is possible to monitor several MySQL instances by creating named sessions in the configuration file and providing 
-different usernames, passwords and URIs for each session.
+### Connection and authentication
+The plugin uses URI, username and password from item key parameters or from Plugins.Mysql.Sessions options of the Zabbix agent 2 configuration file.
+The first three parameters in all plugin keys are connection string (connString), username, and password.
+A URI or a session name can be used as a connString.  
+If passing a URI it must match the short URI format. Supported sockets are TCP and Unix.
+For example:
+- tcp://myhost:3306
+- tcp://172.16.0.10
+- unix:/var/run/mysql.sock
 
-**Note:** For security reasons, it is forbidden to pass embedded credentials within the connString item key parameter 
-(can be either a URI or a session name) — such credentials will be ignored.
+**Note!** Credentials passed via a connString will be ignored. 
+If the username and password for authentication are not provided, default values will be used: URI *tcp://localhost:3306*, username *root*, password  empty. 
 
-- If passing a URI as the connString and the connection requires authentication, you can use the username and password 
-in item key parameters or the Plugins.Mysql.User and Plugins.Mysql.Password parameters (the 1st level password) in 
-the configuration file. In other words, once defined, these parameters will be used for authenticating all connections 
-where the connString is represented by URI.
-
-- To use different usernames and passwords for different MySQL instances, create named session in the config file for each 
-instance and define a session-level username and password.
+It is possible to monitor several MySQL instances by creating a named session with separate URI, username and/or password parameters for each instance. 
 
 #### Named sessions
 Named sessions allow you to define specific parameters for each MySQL instance. Currently, only three parameters are supported: 
-URI, username, and password.
+URI, username, and password (if certain parameter is not specified for a named session, a hardcoded default value will be used). 
 
 *Example:*  
 If you have two instances: "MySQL1" and "MySQL2", the following options have to be added to the agent configuration:
@@ -78,12 +61,11 @@ Now, these names can be used as connStrings in keys instead of URIs:
     mysql.ping[MySQL2]
 
 ### Parameters priority
-There are 4 levels of parameters overwriting:
-1. Hardcoded default values →
-2. 1st level config params (Plugins.Mysql.\<parameter\>) →
-3. Named sessions (Plugins.Mysql.Sessions.\<sessionName\>.\<parameter\>) →
-4. Item key parameters.
-
+Zabbix checks parameters in the following order:
+1. Item key parameters (checked first). If a connString with session name is present, username and password key parameters should be empty. →
+2. Named session parameters in configuration file (Plugins.Mysql.Sessions.\<sessionName\>.\<parameter\>). Checked only if connString is provided in key parameters. →
+3. Hardcoded default values. Used to replace missing URI, username or password parameters either in item key or named session parameters.
+  
 ## Supported keys
 
 **mysql.ping[connString,username,password]** — tests whether a connection is alive or not.  
