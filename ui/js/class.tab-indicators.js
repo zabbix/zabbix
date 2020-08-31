@@ -64,6 +64,7 @@ class TabIndicators {
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const GRAPH = document.querySelector('#widget-dialogue-form');
+		const MAINTENANCE = document.querySelector('#maintenance-form');
 
 		switch (true) {
 			case !!TEMPLATE:
@@ -102,6 +103,8 @@ class TabIndicators {
 				return MAP;
 			case !!GRAPH:
 				return GRAPH;
+			case !!MAINTENANCE:
+				return MAINTENANCE;
 			default:
 				throw 'Form not found.';
 		}
@@ -245,6 +248,8 @@ class TabIndicatorFactory {
 				return new GraphProblemsTabIndicatorItem;
 			case 'GraphOverrides':
 				return new GraphOverridesTabIndicatorItem;
+			case 'Periods':
+				return new PeriodsTabIndicatorItem;
 		}
 
 		return null;
@@ -915,18 +920,18 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		};
 
 		if (target_node_op) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node_op, observer_options);
+			const observer_op = new MutationObserver(observer_callback);
+			observer_op.observe(target_node_op, observer_options);
 		}
 
 		if (target_node_rec) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node_rec, observer_options);
+			const observer_rec = new MutationObserver(observer_callback);
+			observer_rec.observe(target_node_rec, observer_options);
 		}
 
 		if (target_node_ack) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node_ack, observer_options);
+			const observer_ack = new MutationObserver(observer_callback);
+			observer_ack.observe(target_node_ack, observer_options);
 		}
 	}
 }
@@ -1191,13 +1196,13 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 		};
 
 		if (target_node_group) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node_group, observer_options);
+			const observer_group = new MutationObserver(observer_callback);
+			observer_group.observe(target_node_group, observer_options);
 		}
 
 		if (target_node_user) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node_user, observer_options);
+			const observer_user = new MutationObserver(observer_callback);
+			observer_user.observe(target_node_user, observer_options);
 		}
 	}
 }
@@ -1379,6 +1384,43 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(elem) {
 		const target_node = document.querySelector('.overrides-list');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class PeriodsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumberType;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#maintenance_periods tbody tr')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('#maintenance_periods tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true
