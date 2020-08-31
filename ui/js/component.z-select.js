@@ -214,7 +214,10 @@ class ZSelect {
 		document.removeEventListener('wheel', this._event_handlers.document_wheel);
 	}
 
-	// NOTE: Native select element collapses on document wheel event if list is not hovered and on window resize event.
+	/**
+	 * NOTE: Native select element collapses on document wheel event, if list is not hovered and always on window resize
+	 * event.
+	 */
 	_onWindowResize() {
 		this._push();
 		this._collapseList();
@@ -235,6 +238,95 @@ class ZSelect {
 		this._collapseList();
 	}
 
+	_handlePageDown(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		let curr_option = this._getOptionByIdx(this.state.idx_staged);
+		if (this.state.is_open) {
+			let {_node: node} = curr_option;
+			this._scrollIntoTopOfView(node);
+
+			const parent_offset = node.offsetParent.clientHeight + node.offsetParent.scrollTop;
+			const idx_len = this.state.option_idx.length;
+
+			for (let next_idx = this.state.idx_staged + 1; next_idx < idx_len; next_idx++) {
+				let option = this._getOptionByIdx(next_idx);
+				let is_visible = parent_offset - option._node.offsetTop - option._node.offsetHeight > -1;
+				if (!is_visible) {
+					break;
+				}
+				curr_option = option;
+			}
+
+			if (curr_option.disabled) {
+				const next_enabled = this._nextEnabledIdx(curr_option._data_idx);
+				if (next_enabled === curr_option._data_idx) {
+					this._stageIdx(this._prevEnabledIdx(curr_option._data_idx));
+				}
+				else {
+					this._stageIdx(next_enabled);
+				}
+			}
+			else {
+				this._stageIdx(curr_option._data_idx);
+			}
+
+			this._commit();
+		}
+		else {
+			let seek_to_idx = this.state.idx_staged;
+			for (let i = 0; i < 3; i++) {
+				seek_to_idx = this._nextEnabledIdx(seek_to_idx);
+			}
+			this._stageIdx(seek_to_idx);
+			this._commit();
+			this._push();
+		}
+	}
+
+	_handlePageUp(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		let curr_option = this._getOptionByIdx(this.state.idx_staged);
+		if (this.state.is_open) {
+			let {_node: node} = curr_option;
+			this._scrollIntoBottomOfView(node);
+
+			for (let prev_idx = this.state.idx_staged - 1; prev_idx > -1; prev_idx--) {
+				let option = this._getOptionByIdx(prev_idx);
+				let is_visible = option._node.offsetTop - option._node.offsetParent.scrollTop > -1;
+				if (!is_visible) {
+					break;
+				}
+				curr_option = option;
+			}
+
+			if (curr_option.disabled) {
+				const prev_enabled = this._prevEnabledIdx(curr_option._data_idx);
+				if (prev_enabled === curr_option._data_idx) {
+					this._stageIdx(this._nextEnabledIdx(curr_option._data_idx));
+				}
+				else {
+					this._stageIdx(prev_enabled);
+				}
+			}
+			else {
+				this._stageIdx(curr_option._data_idx);
+			}
+
+			this._commit();
+		}
+		else {
+			let seek_to_idx = this.state.idx_staged;
+			for (let i = 0; i < 3; i++) {
+				seek_to_idx = this._prevEnabledIdx(seek_to_idx);
+			}
+			this._stageIdx(seek_to_idx);
+			this._commit();
+			this._push();
+		}
+	}
+
 	_onButtonKeydown(e) {
 		if (e.which != KEY_SPACE && !e.metaKey && !e.ctrlKey && e.key.length == 1) {
 			const idx = this._nextIdxByChar(e.key);
@@ -247,102 +339,20 @@ class ZSelect {
 			return;
 		}
 
-		// TODO: PAGE_UP and PAGE_DOWN handlers are unreadable!!!!! Must be codefixed
 		switch (e.which) {
 			case KEY_PAGE_UP:
 				/*
-				 * NOTE: If open - Native select scrolls currently active option to bottom of visible list, and stages the
-				 * first visible option in list, if that is disabled, previous enabled option is chosen.
+				 * NOTE: If open - Native select scrolls currently active option to bottom of visible list, and stages
+				 * the first visible option in list, if that is disabled, previous enabled option is chosen.
 				 */
-				e.preventDefault();
-				e.stopPropagation();
-				let curr_option = this._getOptionByIdx(this.state.idx_staged);
-				if (this.state.is_open) {
-					let {_node: node} = curr_option;
-					this._scrollIntoBottomOfView(node);
-
-					for (let prev_idx = this.state.idx_staged - 1; prev_idx > -1; prev_idx--) {
-						let option = this._getOptionByIdx(prev_idx);
-						let is_visible = option._node.offsetTop - option._node.offsetParent.scrollTop > -1;
-						if (!is_visible) {
-							break;
-						}
-						curr_option = option;
-					}
-
-					if (curr_option.disabled) {
-						const prev_enabled = this._prevEnabledIdx(curr_option._data_idx);
-						if (prev_enabled === curr_option._data_idx) {
-							this._stageIdx(this._nextEnabledIdx(curr_option._data_idx));
-						}
-						else {
-							this._stageIdx(prev_enabled);
-						}
-					}
-					else {
-						this._stageIdx(curr_option._data_idx);
-					}
-
-					this._commit();
-				}
-				else {
-					let seek_to_idx = this.state.idx_staged;
-					for (let i = 0; i < 3; i++) {
-						seek_to_idx = this._prevEnabledIdx(seek_to_idx);
-					}
-					this._stageIdx(seek_to_idx);
-					this._commit();
-					this._push();
-				}
+				this._handlePageUp(e);
 				break;
 			case KEY_PAGE_DOWN:
 				/*
-				 * NOTE: If open - Native select scrolls currently active option to top of visible list, and stages the last
-				 * visible option in list, if that is disabled, then next enabled option is chosen.
+				 * NOTE: If open - Native select scrolls currently active option to top of visible list, and stages the
+				 * last visible option in list, if that is disabled, then next enabled option is chosen.
 				 */
-				e.preventDefault();
-				e.stopPropagation();
-				let urr_option = this._getOptionByIdx(this.state.idx_staged);
-				if (this.state.is_open) {
-					let {_node: node} = urr_option;
-					this._scrollIntoTopOfView(node);
-
-					const parent_offset = node.offsetParent.clientHeight + node.offsetParent.scrollTop;
-					const idx_len = this.state.option_idx.length;
-
-					for (let next_idx = this.state.idx_staged + 1; next_idx < idx_len; next_idx++) {
-						let option = this._getOptionByIdx(next_idx);
-						let is_visible = parent_offset - option._node.offsetTop - option._node.offsetHeight > -1;
-						if (!is_visible) {
-							break;
-						}
-						urr_option = option;
-					}
-
-					if (urr_option.disabled) {
-						const next_enabled = this._nextEnabledIdx(urr_option._data_idx);
-						if (next_enabled === urr_option._data_idx) {
-							this._stageIdx(this._prevEnabledIdx(urr_option._data_idx));
-						}
-						else {
-							this._stageIdx(next_enabled);
-						}
-					}
-					else {
-						this._stageIdx(urr_option._data_idx);
-					}
-
-					this._commit();
-				}
-				else {
-					let seek_to_idx = this.state.idx_staged;
-					for (let i = 0; i < 3; i++) {
-						seek_to_idx = this._nextEnabledIdx(seek_to_idx);
-					}
-					this._stageIdx(seek_to_idx);
-					this._commit();
-					this._push();
-				}
+				this._handlePageDown(e);
 				break;
 			case KEY_END:
 				e.preventDefault();
@@ -360,8 +370,8 @@ class ZSelect {
 				break;
 			case KEY_ARROW_DOWN:
 				/*
-				 * NOTE: In native select when an arrow key cannot select any next option because all of them are disabled,
-				 * and dropdown is opened, then scroll down happens.
+				 * NOTE: In native select, when an arrow key cannot select any next option because all of them are
+				 * disabled, and dropdown is opened, then regular scroll down happens.
 				 */
 				e.preventDefault();
 				e.stopPropagation();
@@ -378,7 +388,7 @@ class ZSelect {
 			case KEY_ARROW_UP:
 				/*
 				 * NOTE: In native select when an arrow key cannot select any previous option because all of them are
-				 * disabled and dropdown is opened, then scroll up happens.
+				 * disabled and dropdown is opened, then regular scroll up happens.
 				 */
 				e.preventDefault();
 				e.stopPropagation();
@@ -424,10 +434,9 @@ class ZSelect {
 	}
 
 	/**
-	 * NOTE: Native select element option responds to mouse move, also if mouseenter event is used, it is triggered when
-	 * node has to be scrolled in view, and pointer happens to be over another node after scroll.
+	 * NOTE: Native select element option actually responds to "mouse move". Also, if "mouseenter" event was used here,
+	 * it would be fire when node is programmatically scrolled under the pointer (see "this._scrollIntoViewIfNeeded").
 	 */
-
 	_onListMousemove(e) {
 		const idx = e.target.data_idx;
 
