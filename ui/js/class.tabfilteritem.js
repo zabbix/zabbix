@@ -355,5 +355,6 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 
 		this._src_url = src_query.toString();
+		this._target.parentNode.classList.remove('unsaved');
 	}
 }
