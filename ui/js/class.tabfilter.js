@@ -152,7 +152,7 @@ class CTabFilter extends CBaseComponent {
 			 */
 			popupUpdateAction: (ev) => {
 				var item = (ev.detail.create === '1')
-					? this.create(this._active_item._target.cloneNode(), {})
+					? this.create(this._active_item._target.parentNode.cloneNode(true), {})
 					: this._active_item;
 
 				if (ev.detail.form_action === 'update') {
