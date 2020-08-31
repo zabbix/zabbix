@@ -1573,7 +1573,6 @@ define('TAB_INDICATOR_SHARING', 'sharing');
 define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
 define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
 define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
-define('TAB_INDICATOR_GRAPH_AXES', 'graph-axes');
 define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');

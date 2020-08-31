@@ -240,8 +240,6 @@ class TabIndicatorFactory {
 				return new GraphOptionsTabIndicatorItem;
 			case 'GraphTime':
 				return new GraphTimeTabIndicatorItem;
-			case 'GraphAxes':
-				return new GraphAxesTabIndicatorItem;
 			case 'GraphLegend':
 				return new GraphLegendTabIndicatorItem;
 			case 'GraphProblems':
@@ -1289,35 +1287,6 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
-	}
-}
-
-class GraphAxesTabIndicatorItem extends TabIndicatorItem {
-
-	constructor() {
-		super();
-		this.TYPE = new TabIndicatorStatusType;
-	}
-
-	getValue() {
-		if (document.querySelector('#lefty:checked') || document.querySelector('#righty:checked')
-				|| document.querySelector('#axisx:checked')) {
-			return true;
-		}
-
-		return false;
-	}
-
-	initObserver(elem) {
-		[document.querySelector('#lefty'), document.querySelector('#righty'), document.querySelector('#axisx')].map(
-			(value) => {
-				value.addEventListener('click', () => {
-					elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-						!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-					);
-				});
-			}
-		);
 	}
 }
 
