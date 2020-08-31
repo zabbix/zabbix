@@ -98,9 +98,16 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// Create two macros arrays: from DB and from Frontend form.
 		$macros = [
-			'database' => CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+			'database' => CDBHelper::getAll('SELECT macro, value, description, type FROM globalmacro'),
 			'frontend' => []
 		];
+
+		// If the macro is expected to have type "Secret text", replace the value from db with the secret macro pattern.
+		for ($i = 0; $i < count($macros['database']); $i++) {
+			if ($macros['database'][$i]['type'] === '1') {
+				$macros['database'][$i]['value'] = '******';
+			}
+		}
 
 		// Write macros rows from Frontend to array.
 		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
@@ -109,8 +116,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$macro = [];
 			$row = $table->getRow($i);
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
-			$macro['value'] = $row->query('xpath:./td[2]/div/textarea')->one()->getValue();
+			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
 
 			$macros['frontend'][] = $macro;
 		}

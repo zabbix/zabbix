@@ -614,6 +614,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asMultiline($options);
 		}
 
+		if (in_array('input-group', $class)) {
+			return $this->asInputGroup($options);
+		}
+
 		CTest::addWarning('No specific element was detected');
 
 		return $this;

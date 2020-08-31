@@ -72,6 +72,7 @@ class CHostPrototype extends CHostBase {
 			'selectParentHost' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hostmacro_fields), 'default' => null],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -211,6 +212,10 @@ class CHostPrototype extends CHostBase {
 				'value' =>				['type' => API_STRING_UTF8, 'flag' => API_REQUIRED | API_NOT_EMPTY],
 				'type' =>				['type' => API_INT32, 'flag' => API_REQUIRED, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])],
 				'description' => 		['type' => API_STRING_UTF8]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
@@ -356,6 +361,8 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
+		$this->createTags(array_column($hostPrototypes, 'tags', 'hostid'));
+
 		return $hostPrototypes;
 	}
 
@@ -392,6 +399,10 @@ class CHostPrototype extends CHostBase {
 				'value' =>				['type' => API_STRING_UTF8],
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])],
 				'description' => 		['type' => API_STRING_UTF8]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
@@ -635,6 +646,8 @@ class CHostPrototype extends CHostBase {
 		// save inventory
 		DB::insertBatch('host_inventory', $inventory_create, false);
 		DB::delete('host_inventory', ['hostid' => $inventory_deleteids]);
+
+		$this->updateTags(array_column($host_prototypes, 'tags', 'hostid'));
 
 		return $host_prototypes;
 	}
@@ -915,6 +928,7 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
+			'selectTags' => ['tag', 'value'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
 		]);
@@ -1352,6 +1366,19 @@ class CHostPrototype extends CHostBase {
 			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
 			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
 			$result = $relationMap->mapMany($result, $macros, 'macros');
+		}
+
+		// adding tags
+		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
+			$tags = API::getApiService()->select('host_tag', [
+				'output' => $this->outputExtend($options['selectTags'], ['hostid', 'hosttagid']),
+				'filter' => ['hostid' => $hostPrototypeIds],
+				'preservekeys' => true
+			]);
+
+			$relation_map = $this->createRelationMap($tags, 'hostid', 'hosttagid');
+			$tags = $this->unsetExtraFields($tags, ['hostid', 'hosttagid'], []);
+			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;

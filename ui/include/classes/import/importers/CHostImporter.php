@@ -277,11 +277,7 @@ class CHostImporter extends CImporter {
 		}
 
 		foreach ($xmlHosts as &$xmlHost) {
-			// if interfaces in XML are empty then do not touch existing interfaces
-			if (!$xmlHost['interfaces']) {
-				unset($xmlHost['interfaces']);
-				continue;
-			}
+			// If interfaces in XML are non-existent or empty, delete the interfaces on host.
 
 			$xmlHostId = $xmlHost['hostid'];
 

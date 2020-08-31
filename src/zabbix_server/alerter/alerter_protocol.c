@@ -18,9 +18,11 @@
 **/
 
 #include "common.h"
-
 #include "log.h"
 #include "zbxserialize.h"
+#include "zbxalgo.h"
+#include "zbxipcservice.h"
+#include "zbxalert.h"
 
 #include "alerter_protocol.h"
 
@@ -729,4 +731,281 @@ void	zbx_alerter_deserialize_ids(const unsigned char *data, zbx_uint64_t **ids, 
 	*ids = (zbx_uint64_t *)zbx_malloc(NULL, *ids_num * sizeof(zbx_uint64_t));
 	for (i = 0; i < *ids_num; i++)
 		data += zbx_deserialize_value(data, &(*ids)[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_serialize_diag_stats                                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t alerts_num)
+{
+	zbx_uint32_t	data_len = 0;
+
+	zbx_serialize_prepare_value(data_len, alerts_num);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+	(void)zbx_serialize_value(*data, alerts_num);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_deserialize_diag_stats                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_alerter_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *alerts_num)
+{
+	(void)zbx_deserialize_value(data, alerts_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_serialize_top_request                                *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint32_t	zbx_alerter_serialize_top_request(unsigned char **data, int limit)
+{
+	zbx_uint32_t	len;
+
+	*data = (unsigned char *)zbx_malloc(NULL, sizeof(limit));
+	len = zbx_serialize_value(*data, limit);
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_deserialize_top_request                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_alerter_deserialize_top_request(const unsigned char *data, int *limit)
+{
+	(void)zbx_deserialize_value(data, limit);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_serialize_top_mediatypes_result                      *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_alerter_serialize_top_mediatypes_result(unsigned char **data, zbx_am_mediatype_t **mediatypes,
+		int mediatypes_num)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0, mediatype_len = 0;
+	int		i;
+
+	if (0 != mediatypes_num)
+	{
+		zbx_serialize_prepare_value(mediatype_len, mediatypes[0]->mediatypeid);
+		zbx_serialize_prepare_value(mediatype_len, mediatypes[0]->refcount);
+	}
+
+	zbx_serialize_prepare_value(data_len, mediatypes_num);
+	data_len += mediatype_len * mediatypes_num;
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, mediatypes_num);
+
+	for (i = 0; i < mediatypes_num; i++)
+	{
+		ptr += zbx_serialize_value(ptr, mediatypes[0]->mediatypeid);
+		ptr += zbx_serialize_value(ptr, mediatypes[0]->refcount);
+	}
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_deserialize_top_mediatypes_result                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *data,
+		zbx_vector_uint64_pair_t *mediatypes)
+{
+	int	i, mediatypes_num;
+
+	data += zbx_deserialize_value(data, &mediatypes_num);
+
+	if (0 != mediatypes_num)
+	{
+		zbx_vector_uint64_pair_reserve(mediatypes, mediatypes_num);
+
+		for (i = 0; i < mediatypes_num; i++)
+		{
+			zbx_uint64_pair_t	pair;
+			int			value;
+
+			data += zbx_deserialize_value(data, &pair.first);
+			data += zbx_deserialize_value(data, &value);
+			pair.second = value;
+			zbx_vector_uint64_pair_append_ptr(mediatypes, &pair);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_serialize_top_sources_result                         *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_am_source_stats_t **sources,
+		int sources_num)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0, source_len = 0;
+	int		i;
+
+	if (0 != sources_num)
+	{
+		zbx_serialize_prepare_value(source_len, sources[0]->source);
+		zbx_serialize_prepare_value(source_len, sources[0]->object);
+		zbx_serialize_prepare_value(source_len, sources[0]->objectid);
+		zbx_serialize_prepare_value(source_len, sources[0]->alerts_num);
+	}
+
+	zbx_serialize_prepare_value(data_len, sources_num);
+	data_len += source_len * sources_num;
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, sources_num);
+
+	for (i = 0; i < sources_num; i++)
+	{
+		ptr += zbx_serialize_value(ptr, sources[i]->source);
+		ptr += zbx_serialize_value(ptr, sources[i]->object);
+		ptr += zbx_serialize_value(ptr, sources[i]->objectid);
+		ptr += zbx_serialize_value(ptr, sources[i]->alerts_num);
+	}
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_deserialize_top_sources_result                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data, zbx_vector_ptr_t *sources)
+{
+	int	i, sources_num;
+
+	data += zbx_deserialize_value(data, &sources_num);
+
+	if (0 != sources_num)
+	{
+		zbx_vector_ptr_reserve(sources, sources_num);
+
+		for (i = 0; i < sources_num; i++)
+		{
+			zbx_am_source_stats_t	*source;;
+
+			source = (zbx_am_source_stats_t *)zbx_malloc(NULL, sizeof(zbx_am_source_stats_t));
+			data += zbx_deserialize_value(data, &source->source);
+			data += zbx_deserialize_value(data, &source->object);
+			data += zbx_deserialize_value(data, &source->objectid);
+			data += zbx_deserialize_value(data, &source->alerts_num);
+			zbx_vector_ptr_append(sources, source);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_get_diag_stats                                       *
+ *                                                                            *
+ * Purpose: get alerter manager diagnostic statistics                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
+{
+	unsigned char	*result;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_DIAG_STATS, SEC_PER_MIN, NULL, 0,
+			&result, error))
+	{
+		return FAIL;
+	}
+
+	zbx_alerter_deserialize_diag_stats(result, alerts_num);
+	zbx_free(result);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_get_top_mediatypes                                   *
+ *                                                                            *
+ * Purpose: get the top N mediatypes by the number of queued alerts           *
+ *                                                                            *
+ * Parameters limit      - [IN] the number of top records to retrieve         *
+ *            mediatypes - [OUT] a vector of top mediatypeid,alerts_num pairs *
+ *            error      - [OUT] the error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the top n mediatypes were returned successfully    *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error)
+{
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
+
+	data_len = zbx_alerter_serialize_top_request(&data, limit);
+
+	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_DIAG_TOP_MEDIATYPES,
+			SEC_PER_MIN, data, data_len, &result, error)))
+	{
+		goto out;
+	}
+
+	zbx_alerter_deserialize_top_mediatypes_result(result, mediatypes);
+	zbx_free(result);
+out:
+	zbx_free(data);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_alerter_get_top_sources                                      *
+ *                                                                            *
+ * Purpose: get the top N sources by the number of queued alerts              *
+ *                                                                            *
+ * Parameters limit   - [IN] the number of top records to retrieve            *
+ *            sources - [OUT] a vector of top zbx_alerter_source_stats_t      *
+ *                             structure                                      *
+ *            error   - [OUT] the error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the top n sources were returned successfully       *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error)
+{
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
+
+	data_len = zbx_alerter_serialize_top_request(&data, limit);
+
+	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_DIAG_TOP_SOURCES,
+			SEC_PER_MIN, data, data_len, &result, error)))
+	{
+		goto out;
+	}
+
+	zbx_alerter_deserialize_top_sources_result(result, sources);
+	zbx_free(result);
+out:
+	zbx_free(data);
+
+	return ret;
 }
