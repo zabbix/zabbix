@@ -81,7 +81,6 @@ class CTemplateDashboard extends CApiService {
 
 		// permissions
 		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
-
 			if (!is_null($options['templateids'])) {
 				unset($options['hostids']);
 
