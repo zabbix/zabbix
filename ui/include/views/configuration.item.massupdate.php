@@ -516,6 +516,11 @@ $form->addItem($tabs);
 
 $widget->addItem($form);
 
+$interface_ids_by_types = [];
+foreach ($data['hosts']['interfaces'] as $interface) {
+	$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+}
+
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 
 $widget->show();

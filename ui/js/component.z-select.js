@@ -544,28 +544,37 @@ class ZSelect {
 		const opts = [];
 
 		this.state.option_idx.forEach(value => {
-			const opt = this.state.option_map[value];
-			opts.push({
-				get disabled() {
-					return opt.disabled === true;
-				},
-				set disabled(val) {
-					if (val) {
-						opt._node.setAttribute('disabled', 'disabled');
-						opt.disabled = true;
-					}
-					else {
-						opt._node.removeAttribute('disabled');
-						opt.disabled = false;
-					}
-				},
-				get value() {
-					return opt.value;
-				}
-			});
+			opts.push(this.getOptionByValue(value));
 		});
 
 		return opts;
+	}
+
+	getOptionByValue(value) {
+		const opt = this.state.option_map[value];
+
+		if (!opt) {
+			return null;
+		}
+
+		return {
+			get disabled() {
+				return opt.disabled === true;
+			},
+			set disabled(val) {
+				if (val) {
+					opt._node.setAttribute('disabled', 'disabled');
+					opt.disabled = true;
+				}
+				else {
+					opt._node.removeAttribute('disabled');
+					opt.disabled = false;
+				}
+			},
+			get value() {
+				return opt.value;
+			}
+		};
 	}
 
 	unbindEvents() {
@@ -600,23 +609,23 @@ class ZSelect {
 
 	setReadonly(value) {
 		if (value) {
-			this.root.button.removeAttribute('readonly');
-			this.root.input.removeAttribute('readonly');
-		}
-		else {
 			this.root.button.setAttribute('readonly', 'readonly');
 			this.root.input.setAttribute('readonly', 'readonly');
+		}
+		else {
+			this.root.button.removeAttribute('readonly');
+			this.root.input.removeAttribute('readonly');
 		}
 	}
 
 	setDisabled(value) {
 		if (value) {
-			this.root.button.removeAttribute('readonly');
-			this.root.input.removeAttribute('readonly');
+			this.root.button.setAttribute('disabled', 'disabled');
+			this.root.input.setAttribute('disabled', 'disabled');
 		}
 		else {
-			this.root.button.setAttribute('readonly', 'readonly');
-			this.root.input.setAttribute('readonly', 'readonly');
+			this.root.button.removeAttribute('disabled');
+			this.root.input.removeAttribute('disabled');
 		}
 	}
 
@@ -637,6 +646,14 @@ class ZSelect {
 	setWidth(width) {
 		this.root.button.style.width = `${width}px`;
 		this.root.list.style.width = `${width}px`;
+	}
+
+	getDisabled() {
+		return this.root.input.disabled;
+	}
+
+	getName() {
+		return this.root.input.name;
 	}
 
 	getValue() {
@@ -723,12 +740,37 @@ class ZSelectElement extends HTMLElement {
 		this._select.addOption({title, value, desc, disabled, class_name});
 	}
 
+	getOptionByValue(value) {
+		return this._select.getOptionByValue(value);
+	}
+
 	getOptions() {
 		return this._select.getOptions();
 	}
 
 	focus() {
 		this._select.focus();
+	}
+
+	get disabled() {
+		return this._select.getDisabled();
+	}
+
+	set disabled(val) {
+		if (val) {
+			this.setAttribute('disabled', 'disabled');
+		}
+		else {
+			this.removeAttribute('disabled');
+		}
+	}
+
+	get name() {
+		return this._select.getName();
+	}
+
+	set name(val) {
+		this.setAttribute('name', val);
 	}
 
 	get value() {

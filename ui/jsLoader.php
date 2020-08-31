@@ -323,7 +323,8 @@ $tranStrings = [
 	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
-		'No interface found' => _('No interface found')
+		'No interface found' => _('No interface found'),
+		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'class.cnavtree.js' => [
 		'Edit' => _('Edit'),

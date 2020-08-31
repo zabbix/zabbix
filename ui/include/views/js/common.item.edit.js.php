@@ -258,13 +258,14 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 		$("#key").on('keyup change', updateItemTestBtn);
 
+
+		var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
+			interface_ids_by_types = <?= json_encode($interface_ids_by_types) ?>;
+
 		$('#type')
 			.change(function() {
-				// update the interface select with each item type change
-				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
-
 				updateItemTestBtn();
-				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())] || null);
+				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt($(this).val()));
 
 				setAuthTypeLabel();
 			})

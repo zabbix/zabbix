@@ -30,6 +30,11 @@ if (hasRequest('conditions')) {
 	$counter = key($conditions) + 1;
 }
 
+$interface_ids_by_types = [];
+foreach ($data['interfaces'] as $interface) {
+	$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+}
+
 include dirname(__FILE__).'/common.item.edit.js.php';
 include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
