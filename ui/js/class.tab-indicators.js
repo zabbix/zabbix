@@ -26,6 +26,8 @@ const TAB_INDICATOR_ATTR_STATUS     = 'data-indicator-status';
 const TAB_INDICATOR_STATUS_ENABLED  = 'enabled';
 const TAB_INDICATOR_STATUS_DISABLED = 'disabled';
 
+const TAB_INDICATOR_UPDATE_EVENT    = 'tab-indicator-update';
+
 /**
  * Main class to initialize tab indicators.
  */
@@ -253,6 +255,8 @@ class TabIndicatorFactory {
 				return new GraphOverridesTabIndicatorItem;
 			case 'Periods':
 				return new PeriodsTabIndicatorItem;
+			case 'Permissions':
+				return new PermissionsTabIndicatorItem;
 		}
 
 		return null;
@@ -1063,28 +1067,12 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(elem) {
-		const target_node = document.querySelector('#tagFilterFormList > li');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
-							!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
-						);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		// This event triggered in app/views/js/administration.usergroup.edit.js.php:179
+		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+			);
+		});
 	}
 }
 
@@ -1480,5 +1468,28 @@ class PeriodsTabIndicatorItem extends TabIndicatorItem {
 			const observer = new MutationObserver(observer_callback);
 			observer.observe(target_node, observer_options);
 		}
+	}
+}
+
+class PermissionsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatusType;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#group-right-table tbody tr')
+			.length > 1;
+	}
+
+	initObserver(elem) {
+		// This event triggered in app/views/js/administration.usergroup.edit.js.php:164
+		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
+			);
+		});
 	}
 }

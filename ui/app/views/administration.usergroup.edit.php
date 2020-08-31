@@ -203,7 +203,7 @@ $tag_filter_form_list->addRow(null,
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_list)
-	->addTab('permissions_tab', _('Permissions'), $permissions_form_list)
+	->addTab('permissions_tab', _('Permissions'), $permissions_form_list, TAB_INDICATOR_PERMISSIONS)
 	->addTab('tag_filter_tab', _('Tag filter'), $tag_filter_form_list, TAB_INDICATOR_TAG_FILTER);
 if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
