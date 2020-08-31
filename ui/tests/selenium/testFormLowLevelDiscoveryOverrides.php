@@ -145,7 +145,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty tags'
+								'Name' => 'Override with empty tags in trigger prototype'
 							],
 							'Operations' => [
 								[
@@ -166,7 +166,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty tag name'
+								'Name' => 'Override with empty tag name in trigger prototype'
 							],
 							'Operations' => [
 								[
@@ -200,6 +200,50 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								]
 							],
 							'error' => 'Incorrect value for field "Link templates": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with empty tag name in host prototype'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											['tag' => '', 'value' => 'value1']
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tag": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with empty tags in host prototype'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => []
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tags": cannot be empty.'
 						]
 					]
 				]
@@ -630,7 +674,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	/*
-	 * Overrides data for LLD creation.
+	 * Overrides data for LLD update.
 	 */
 	public static function getUpdateData() {
 		return [
@@ -846,6 +890,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Create enabled' => null,
 										'Discover' => null,
 										'Link templates' => null,
+										'Tags' => null,
 										'Host inventory' => null
 									]
 								]
@@ -931,6 +976,99 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								]
 							],
 							'error' => 'Incorrect value for field "Link templates": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'tag' => '',
+												'value' => ''
+											],
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 1
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tags": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'tag' => '',
+												'value' => 'new_value'
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tag": cannot be empty.'
+						]
+					]
+				]
+			],
+						[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 1
+											],
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 0
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tags": cannot be empty.'
 						]
 					]
 				]
@@ -1218,6 +1356,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Create enabled' => 'No',
 										'Discover' => 'Yes',
 										'Link templates' => 'Test Item Template',
+										'Tags' => [
+											['tag' => 'added_name1', 'value' => 'added_value1']
+										],
 										'Host inventory' => 'Disabled'
 									]
 								]
@@ -1300,6 +1441,30 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Discover' => 'Yes',
 										'Severity' => null,
 										'Tags' => null
+									]
+								]
+							]
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'fields' => [
+										'Discover' => 'No',
+									]
+								],
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Create enabled' => 'No',
+										'Discover' =>'Yes',
+										'Link templates' => null,
+										'Tags' => null,
+										'Host inventory' => null
 									]
 								]
 							]
@@ -1432,6 +1597,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Create enabled' => null,
 						'Discover' => null,
 						'Link templates' => 'Test Item Template',
+						'Tags' => [
+							['tag' => 'name1', 'value' => 'value1'],
+							['tag' => 'name2', 'value' => 'value2']
+						],
 						'Host inventory' => 'Automatic'
 					]
 				]
@@ -1823,13 +1992,18 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
+				// TODO: remove sort after fix ZBX-18271
+				sort($condition_text);
 
 				// Compare Conditions from table with data.
+				$actual_conditions = [];
 				for ($n = 0; $n < $operation_count - 1; $n++) {
-					$this->assertEquals($condition_text[$n],
-							$operation_container->getRow($n)->getColumn('Condition')->getText()
-					);
+					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
+				// TODO: remove sort after fix ZBX-18271
+				sort($actual_conditions);
+
+				$this->assertEquals($condition_text, $actual_conditions);
 
 				foreach($override['Operations'] as $i => $operation) {
 					$operation_container->getRow($i)->query('button:Edit')->one()->click();

@@ -85,7 +85,7 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getGuiData
 	 */
 	public function testLanguage_Gui($data) {
-		$this->userLogin('Admin', 'zabbix');
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->page->open('zabbix.php?action=gui.edit');
 
 		// Change default language.
@@ -163,7 +163,7 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getUserData
 	 */
 	public function testLanguage_User($data) {
-		$this->userLogin('user-zabbix', 'zabbix');
+		$this->page->userLogin('user-zabbix', 'zabbix');
 		$this->page->open('zabbix.php?action=userprofile.edit');
 		$form = $this->query('name:user_form')->one()->asForm();
 
@@ -249,26 +249,19 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getCreateUserData
 	 */
 	public function testLanguage_CreateUser($data) {
-		$this->userLogin('Admin', 'zabbix');
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
-		$this->userLogin($data['fields']['Alias'], $data['fields']['Password']);
+		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
 		$this->assertPageTitle($data['page_title']);
 		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.
 				zbx_dbstr($data['fields']['Alias'])));
 		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
-	}
-
-	private function userLogin($alias, $password) {
-		$this->page->open('index.php');
-		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
-		$this->query('id:password')->one()->fill($password);
-		$this->query('xpath://button[@type="submit"]')->one()->click();
 	}
 
 	private function checkLanguage($message, $page_title, $body_lang, $defaultdb_lang) {

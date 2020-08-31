@@ -242,4 +242,15 @@ trait CastableTrait {
 	public function asPopupButton($options = []) {
 		return $this->cast(CPopupButtonElement::class, $options);
 	}
+
+	/**
+	 * Cast object to InputGroup element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CInputGroupElement
+	 */
+	public function asInputGroup($options = []) {
+		return $this->cast(CInputGroupElement::class, $options);
+	}
 }

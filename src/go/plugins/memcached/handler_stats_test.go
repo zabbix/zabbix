@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alimy/mc/v2"
+	"github.com/memcachier/mc/v3"
 )
 
 func TestPlugin_statsHandler(t *testing.T) {

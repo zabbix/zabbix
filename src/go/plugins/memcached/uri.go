@@ -21,6 +21,7 @@ package memcached
 
 import (
 	"errors"
+	"net"
 	"net/url"
 	"strconv"
 	"strings"
@@ -44,7 +45,7 @@ func (u *URI) Addr() string {
 		return u.socket
 	}
 
-	return u.host + ":" + u.port
+	return net.JoinHostPort(u.host, u.port)
 }
 
 func (u *URI) Password() string {
@@ -56,11 +57,17 @@ func (u *URI) User() string {
 }
 
 func (u *URI) URI() string {
-	if len(u.user) == 0 || len(u.password) == 0 {
-		return u.scheme + "://" + u.Addr()
+	uri := &url.URL{
+		Scheme: u.scheme,
+		Host:   net.JoinHostPort(u.host, u.port),
+		Path:   u.socket,
 	}
 
-	return u.scheme + "://" + u.user + ":" + u.password + "@" + u.Addr()
+	if len(u.user) != 0 && len(u.password) != 0 {
+		uri.User = url.UserPassword(u.user, u.password)
+	}
+
+	return uri.String()
 }
 
 func newURIWithCreds(uri, user, password string) (res *URI, err error) {
@@ -82,6 +89,12 @@ const DefaultPort = "11211"
 // It ignores embedded credentials according to https://www.ietf.org/rfc/rfc3986.txt.
 func parseURI(uri string) (res *URI, err error) {
 	res = &URI{}
+
+	// https://tools.ietf.org/html/rfc6874#section-2
+	// %25 is allowed to escape a percent sign in IPv6 scoped-address literals
+	if !strings.Contains(uri, "%25") {
+		uri = strings.Replace(uri, "%", "%25", -1)
+	}
 
 	if u, err := url.Parse(uri); err == nil {
 		switch strings.ToLower(u.Scheme) {

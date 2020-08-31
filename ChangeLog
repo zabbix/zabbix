@@ -1,6 +1,46 @@
+Changes for 5.2.0alpha2
+
+New features:
+........S. [ZBXNEXT-6139] added GetHeaders method to CurlHttpRequest javascript object (wiper)
+.........T [ZBXNEXT-6116] added SysAid media type (afayantsev)
+.......PS. [ZBXNEXT-6167] added diaginfo runtime command to log internal diagnostic information (wiper)
+..F....... [ZBXNEXT-6106] added Host context menu to hosts listed on 'Web monitoring' page (kustalovs)
+.........T [ZBXNEXT-6117] added media "TOPdesk" (mchudinov)
+.........T [ZBXNEXT-5540] added LLD rules for stand-alone and CAPsMAN APs (mchudinov)
+.........T [ZBXCTR-10] added iLert media type (roman-ilert)
+..F.....S. [ZBXNEXT-5898] added user macro expanding in item description (asitals, kustalovs)
+A.F....PS. [ZBXNEXT-6085] added host prototype tag support (agriscenko, wiper)
+..F.....S. [ZBXNEXT-2603] increased user macros values maximum size from 255 to 2048 (agriscenko, arimdjonoks)
+
+Bug fixes:
+.........T [ZBX-18122] fixed russian character in setup section (afayantsev)
+..F....... [ZBX-18074] fixed unresolved macros in item names in data overview table (talbergs)
+...G...... [ZBX-18195] changed log level increase command for Agent 2 to match Agent 1 (esneiders)
+...G...... [ZBX-17984] added support of ipv6 and unix sockets for memcached plugin (vadimipatov)
+........S. [ZBX-18189] fixed crash when performing housekeeping with disabled value cache (viktors)
+........S. [ZBX-18267] fixed {ITEM.NAME<1-9>} and {ITEM.KEY<1-9>} macro expansion when host is configured without any interfaces (viktors)
+A......... [ZBX-18181] fixed undefined index when importing host with non-existing interface and host interfaces not being deleted if interfaces are not present in import file (Ivo)
+.........T [ZBXNEXT-6065] added SolarWinds Service Desk webhook (tuskov)
+.........T [ZBX-14503] updated JMX template to follow guidelines (tuskov)
+.........T [ZBX-18196] added overriding of triggers for IPMI Threshold sensors discovery (mchudinov)
+.........T [ZBX-18021] changed Opsgenie media to handle extra options Tags and Teams (mchudinov)
+..F....... [ZBX-18050] removed proxy name from host breadcrumbs (rlataria)
+..F....... [ZBX-18202] added new default item keys for item type "Zabbix aggregate" (agriscenko)
+..F....... [ZBX-18124] fixed discovered host group prototype saving during import (miks)
+..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
+..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
+..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+.........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
+.........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
+.........T [ZBX-17981] fixed Discord endpoint validation (vjaceslavs)
+..F....... [ZBXNEXT-6052] fixed "Shared" tag being displayed for users that are not the dashboard owners (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-5965] reworked session to cookie (ashubin, MVekslers, rlataria)
 ..F.....S. [ZBXNEXT-6073] added item log macros support in trigger names, operational data, descriptions, event tags, event values and trigger URL (rlataria, vso)
 A.F.I..... [ZBXNEXT-82] reworked part of parameters from definitions file to configurable parameters using frontend; added new API for settings, authentication, housekeepeing (vmaksimovs)
 A.F....... [ZBXNEXT-2156] implemented ability to create hosts without interfaces (miks, talbergs)
@@ -9,9 +49,59 @@ A.F.I...S. [ZBXNEXT-250] added support of global and per-user time zones for fro
 A.F.....S. [ZBXNEXT-3362] added ability to set the default system language (agriscenko)
 
 Bug fixes:
+.........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
+..F....... [ZBXNEXT-6052] added filter and showing additional details in the list of dashboards (Ivo, kustalovs)
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.4rc1
+
+New features:
+........S. [ZBXNEXT-6139] added GetHeaders method to CurlHttpRequest javascript object (wiper)
+.........T [ZBXNEXT-6116] added SysAid media type (afayantsev)
+.......PS. [ZBXNEXT-6167] added diaginfo runtime command to log internal diagnostic information (wiper)
+..F....... [ZBXNEXT-6106] added Host context menu to hosts listed on 'Web monitoring' page (kustalovs)
+.........T [ZBXNEXT-6117] added media "TOPdesk" (mchudinov)
+.........T [ZBXNEXT-5540] added LLD rules for stand-alone and CAPsMAN APs (mchudinov)
+.........T [ZBXCTR-10] added iLert media type (roman-ilert)
+
+Bug fixes:
+.........T [ZBX-18122] fixed russian character in setup section (afayantsev)
+..F....... [ZBX-18074] fixed unresolved macros in item names in data overview table (talbergs)
+...G...... [ZBX-18195] changed log level increase command for Agent 2 to match Agent 1 (esneiders)
+...G...... [ZBX-17984] added support of ipv6 and unix sockets for memcached plugin (vadimipatov)
+........S. [ZBX-18189] fixed crash when performing housekeeping with disabled value cache (viktors)
+A......... [ZBX-18181] fixed undefined index when importing host with non-existing interface (Ivo)
+.........T [ZBXNEXT-6065] added SolarWinds Service Desk webhook (tuskov)
+.........T [ZBX-14503] updated JMX template to follow guidelines (tuskov)
+.........T [ZBX-18196] added overriding of triggers for IPMI Threshold sensors discovery (mchudinov)
+.........T [ZBX-18021] changed Opsgenie media to handle extra options Tags and Teams (mchudinov)
+..F....... [ZBX-18050] removed proxy name from host breadcrumbs (rlataria)
+..F....... [ZBX-18202] added new default item keys for item type "Zabbix aggregate" (agriscenko)
+..F....... [ZBX-18124] fixed discovered host group prototype saving during import (miks)
+..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
+..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
+..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+.........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
+.........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
+.........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
+A......... [ZBX-17952] fixed compression availability not being checked when deleting history (talbergs)
+.........T [ZBX-17981] fixed Discord endpoint validation (vjaceslavs)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.3
+
+5.0.3rc2 was released as 5.0.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.3rc2
+
+Bug fixes:
+..F....... [ZBX-18261] fixed Latest data performance by allowing to filter items with data only if hosts are selected as well (averza)
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.3rc1
@@ -1677,6 +1767,30 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.25rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-14503] updated JMX template to follow guidelines (tuskov)
+........S. [ZBX-18189] fixed crash when performing housekeeping with disabled value cache (viktors)
+A......... [ZBX-18181] fixed undefined index when importing host with non-existing interface (Ivo)
+..F....... [ZBX-18050] removed proxy name from host breadcrumbs (rlataria)
+..F....... [ZBX-18202] added new default item keys for item type "Zabbix aggregate" (agriscenko)
+..F....... [ZBX-18124] fixed discovered host group prototype saving during import (miks)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24
+
+4.0.24rc2 was released as 4.0.24 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24rc2
+
+Bug fixes:
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.24rc1

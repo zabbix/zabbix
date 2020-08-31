@@ -18,6 +18,7 @@
 **/
 
 #include "control.h"
+#include "zbxdiag.h"
 
 static int	parse_log_level_options(const char *opt, size_t len, unsigned int *scope, unsigned int *data)
 {
@@ -166,6 +167,47 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		zbx_error("invalid runtime control option: no SNMP support enabled");
 		return FAIL;
 #endif
+	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
+			0 == strncmp(opt, ZBX_DIAGINFO, ZBX_CONST_STRLEN(ZBX_DIAGINFO)))
+	{
+		command = ZBX_RTC_DIAGINFO;
+		data = 0;
+		scope = ZBX_DIAGINFO_ALL;
+
+		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_DIAGINFO)])
+		{
+			const char	*section = opt + ZBX_CONST_STRLEN(ZBX_DIAGINFO) + 1;
+
+			if (0 == strcmp(section, ZBX_DIAG_HISTORYCACHE))
+			{
+				scope = ZBX_DIAGINFO_HISTORYCACHE;
+			}
+			else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
+			{
+				scope = ZBX_DIAGINFO_PREPROCESSING;
+			}
+			else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)))
+			{
+				if (0 == strcmp(section, ZBX_DIAG_VALUECACHE))
+					scope = ZBX_DIAGINFO_VALUECACHE;
+				else if (0 == strcmp(section, ZBX_DIAG_LLD))
+					scope = ZBX_DIAGINFO_LLD;
+				else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
+					scope = ZBX_DIAGINFO_ALERTING;
+			}
+
+			if (0 == scope)
+			{
+				zbx_error("invalid diaginfo section: %s", section);
+				return FAIL;
+			}
+		}
+		else if ('\0' != opt[ZBX_CONST_STRLEN(ZBX_DIAGINFO)])
+		{
+			zbx_error("invalid runtime control option: %s", opt);
+			return FAIL;
+		}
 	}
 	else
 	{
