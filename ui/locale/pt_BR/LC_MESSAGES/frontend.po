@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 20:04+0300\n"
+"POT-Creation-Date: 2020-08-31 12:28+0300\n"
 "PO-Revision-Date: 2019-06-19 11:23+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9696,6 +9696,8 @@ msgstr "O segundo parâmetro é inválido."
 #: include/classes/import/validators/C52XmlValidator.php:2348
 #: include/classes/import/validators/C52XmlValidator.php:2390
 #: include/classes/import/validators/C52XmlValidator.php:2451
+#: include/classes/import/validators/C52XmlValidator.php:2484
+#: include/classes/import/validators/C52XmlValidator.php:2490
 #: include/classes/import/validators/CXmlValidatorGeneral.php:98
 #: include/classes/import/validators/CXmlValidatorGeneral.php:117
 #: include/classes/import/validators/CXmlValidatorGeneral.php:136
@@ -19613,6 +19615,7 @@ msgstr "todas as mídias"
 #: include/classes/import/validators/C52XmlValidator.php:2304
 #: include/classes/import/validators/C52XmlValidator.php:2324
 #: include/classes/import/validators/C52XmlValidator.php:2451
+#: include/classes/import/validators/C52XmlValidator.php:2490
 #: include/classes/import/validators/CXmlValidatorGeneral.php:216
 #: include/classes/validators/CApiInputValidator.php:429
 #: include/classes/validators/CApiInputValidator.php:561
@@ -20965,6 +20968,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:681
 #: include/classes/api/services/CMap.php:1140
 #: include/classes/api/services/CMap.php:1146
+#: include/classes/import/validators/C52XmlValidator.php:2485
 #: include/classes/validators/CApiInputValidator.php:391
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CNewValidator.php:517

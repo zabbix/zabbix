@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 20:04+0300\n"
-"PO-Revision-Date: 2020-07-01 11:51+0300\n"
-"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
+"POT-Creation-Date: 2020-08-31 12:28+0300\n"
+"PO-Revision-Date: 2020-08-30 00:07+0300\n"
+"Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1593597100.000000\n"
+"X-POOTLE-MTIME: 1598738836.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -97,7 +97,7 @@ msgstr[2] "отображено %1$d из %3$d%2$s проблем"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:106
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d выбрано проблем."
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -9781,6 +9781,8 @@ msgstr "Ошибочный второй параметр."
 #: include/classes/import/validators/C52XmlValidator.php:2348
 #: include/classes/import/validators/C52XmlValidator.php:2390
 #: include/classes/import/validators/C52XmlValidator.php:2451
+#: include/classes/import/validators/C52XmlValidator.php:2484
+#: include/classes/import/validators/C52XmlValidator.php:2490
 #: include/classes/import/validators/CXmlValidatorGeneral.php:98
 #: include/classes/import/validators/CXmlValidatorGeneral.php:117
 #: include/classes/import/validators/CXmlValidatorGeneral.php:136
@@ -19728,6 +19730,7 @@ msgstr "все способы оповещения"
 #: include/classes/import/validators/C52XmlValidator.php:2304
 #: include/classes/import/validators/C52XmlValidator.php:2324
 #: include/classes/import/validators/C52XmlValidator.php:2451
+#: include/classes/import/validators/C52XmlValidator.php:2490
 #: include/classes/import/validators/CXmlValidatorGeneral.php:216
 #: include/classes/validators/CApiInputValidator.php:429
 #: include/classes/validators/CApiInputValidator.php:561
@@ -21079,6 +21082,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:681
 #: include/classes/api/services/CMap.php:1140
 #: include/classes/api/services/CMap.php:1146
+#: include/classes/import/validators/C52XmlValidator.php:2485
 #: include/classes/validators/CApiInputValidator.php:391
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CNewValidator.php:517
