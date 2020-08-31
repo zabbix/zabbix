@@ -27,7 +27,7 @@ const TAB_INDICATOR_STATUS_ENABLED  = 'enabled';
 const TAB_INDICATOR_STATUS_DISABLED = 'disabled';
 
 /**
- * Main class to initialize tab indicator.
+ * Main class to initialize tab indicators.
  */
 class TabIndicators {
 
@@ -119,7 +119,7 @@ class TabIndicators {
 		Object.values(tabs).map((elem) => {
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(elem));
 
-			if (indicator_item !== null) {
+			if (indicator_item instanceof TabIndicatorItem) {
 				this.addAttribute(elem, indicator_item.getType(), indicator_item.getValue());
 				indicator_item.initObserver(elem);
 			}
@@ -153,11 +153,16 @@ class TabIndicators {
 	 * @return {?string}
 	 */
 	getIndicatorNameByElement(elem) {
-		return elem
-			.getAttribute('js-indicator')
-			?.split('-')
-			?.map((value) => value[0].toUpperCase() + value.slice(1))
-			?.join('');
+		const attr = elem.getAttribute('js-indicator');
+
+		if (attr) {
+			return attr
+				.split('-')
+				.map((value) => value[0].toUpperCase() + value.slice(1))
+				.join('');
+		}
+
+		return null;
 	}
 
 	/**
@@ -350,13 +355,18 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 		let count = 0;
 
 		// Count saved templates.
-		count += target_node
-			?.querySelectorAll('tbody tr')
-			.length;
+		if (target_node) {
+			count += target_node
+				.querySelectorAll('tbody tr')
+				.length;
+		}
+
 		// Count new templates in multiselect.
-		count += multiselect_node
-			?.querySelectorAll('.selected li')
-			.length;
+		if (multiselect_node) {
+			count += multiselect_node
+				.querySelectorAll('.selected li')
+				.length;
+		}
 
 		return isNaN(count) ? 0 : count;
 	}
@@ -418,8 +428,10 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 			});
 		};
 
-		const observer = new MutationObserver(observer_callback);
-		observer.observe(target_node, observer_options);
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
 	}
 }
 
@@ -431,19 +443,25 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector('#http_auth_enabled')
-			.checked;
+		const node = document.querySelector('#http_auth_enabled');
+
+		if (node) {
+			return node.checked;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#http_auth_enabled')
-			?.addEventListener('click', () => {
+		const target_node = document.querySelector('#http_auth_enabled');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 	}
 }
 
@@ -455,19 +473,25 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector('#ldap_configured')
-			?.checked;
+		const node = document.querySelector('#ldap_configured');
+
+		if (node) {
+			return node.checked;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#ldap_configured')
-			?.addEventListener('click', () => {
+		const target_node = document.querySelector('#ldap_configured');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 	}
 }
 
@@ -479,19 +503,25 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector('#saml_auth_enabled')
-			?.checked;
+		const node = document.querySelector('#saml_auth_enabled');
+
+		if (node) {
+			return node.checked;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#saml_auth_enabled')
-			?.addEventListener('click', () => {
+		const target_node = document.querySelector('#saml_auth_enabled');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 	}
 }
 
@@ -503,15 +533,17 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const value = document
-			.querySelector('[name=inventory_mode]:checked')
-			?.value;
+		const node = document.querySelector('[name=inventory_mode]:checked');
 
-		return value === '0' || value === '1';
+		if (node) {
+			return (node.value === '0' || node.value === '1');
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		[...document.querySelectorAll('[name=inventory_mode]')]?.map((value) => {
+		[...document.querySelectorAll('[name=inventory_mode]')].map((value) => {
 			value.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
@@ -529,11 +561,9 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const tls_connect = document
-			.querySelector('[name=tls_connect]:checked')
-			?.value;
+		const tls_connect = document.querySelector('[name=tls_connect]:checked');
 
-		if (tls_connect === '2' || tls_connect === '4') {
+		if (tls_connect && (tls_connect.value === '2' || tls_connect.value === '4')) {
 			return true;
 		}
 
@@ -544,23 +574,26 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(elem) {
-		[...document.querySelectorAll('[name=tls_connect]')]?.map((value) =>
+		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
+		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
+
+		[...document.querySelectorAll('[name=tls_connect]')].map((value) =>
 			value.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 			))
 		);
 
-		document
-			.querySelector('[name=tls_in_psk]')
-			?.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+		if (tls_in_psk_node) {
+			tls_in_psk_node.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 			));
+		}
 
-		document
-			.querySelector('[name=tls_in_cert]')
-			?.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
+		if (tls_in_cert_node) {
+			tls_in_cert_node.addEventListener('click', () => elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 				!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 			));
+		}
 	}
 }
 
@@ -573,8 +606,7 @@ class GroupsTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelector('#group_links_')
-			?.querySelectorAll('.multiselect-list li')
+			.querySelectorAll('#group_links_ .multiselect-list li')
 			.length;
 	}
 
@@ -856,13 +888,15 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#authentication')
-			?.addEventListener('change', () => {
+		const auth_node = document.querySelector('#authentication');
+
+		if (auth_node) {
+			auth_node.addEventListener('change', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 
 		[...document.querySelectorAll('#verify_peer, #verify_host')].map((value) => {
 			value.addEventListener('click', () => {
@@ -891,9 +925,16 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		let count = 0;
-		count += document.querySelectorAll('#op-table tbody tr:not(:last-child)').length;
-		count += document.querySelectorAll('#rec-table tbody tr:not(:last-child)').length;
-		count += document.querySelectorAll('#ack-table tbody tr:not(:last-child)').length;
+
+		count += document
+			.querySelectorAll('#op-table tbody tr:not(:last-child)')
+			.length;
+		count += document
+			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
+			.length;
+		count += document
+			.querySelectorAll('#ack-table tbody tr:not(:last-child)')
+			.length;
 
 		return count;
 	}
@@ -1129,19 +1170,25 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector('#messages_enabled')
-			.checked;
+		const node = document.querySelector('#messages_enabled');
+
+		if (node) {
+			return node.checked;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#messages_enabled')
-			?.addEventListener('click', () => {
+		const target_node = document.querySelector('#messages_enabled');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 	}
 }
 
@@ -1153,7 +1200,9 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		if (document.querySelector("[name='private']:checked").value > 0) {
+		const node = document.querySelector("[name='private']:checked");
+
+		if (node && node.value > 0) {
 			return true;
 		}
 
@@ -1167,7 +1216,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(elem) {
 		[...document.querySelectorAll('[name=private]')].map((value) => {
-			value?.addEventListener('click', () => {
+			value.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
@@ -1250,9 +1299,13 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector("[name='source']:checked")
-			?.value > 0;
+		const node = document.querySelector("[name='source']:checked");
+
+		if (node) {
+			return node.value > 0;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
@@ -1274,19 +1327,25 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector('#graph_time')
-			?.checked;
+		const node = document.querySelector('#graph_time');
+
+		if (node) {
+			return node.checked;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#graph_time')
-			?.addEventListener('click', () => {
+		const target_node = document.querySelector('#graph_time');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 	}
 }
 
@@ -1298,19 +1357,25 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector('#legend')
-			?.checked;
+		const node = document.querySelector('#legend');
+
+		if (node) {
+			return node.checked;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#legend')
-			?.addEventListener('click', () => {
+		const target_node = document.querySelector('#legend');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 	}
 }
 
@@ -1322,19 +1387,25 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelector('#show_problems')
-			?.checked;
+		const node = document.querySelector('#show_problems');
+
+		if (node) {
+			return node.checked;
+		}
+
+		return false;
 	}
 
 	initObserver(elem) {
-		document
-			.querySelector('#show_problems')
-			?.addEventListener('click', () => {
+		const target_node = document.querySelector('#show_problems');
+
+		if (target_node) {
+			target_node.addEventListener('click', () => {
 				elem.setAttribute(TAB_INDICATOR_ATTR_STATUS,
 					!!this.getValue() ? TAB_INDICATOR_STATUS_ENABLED : TAB_INDICATOR_STATUS_DISABLED
 				);
 			});
+		}
 	}
 }
 
