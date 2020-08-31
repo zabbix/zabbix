@@ -1236,6 +1236,13 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
 }
 
+/**
+ * Prepares interfaces select element with options.
+ *
+ * @param array $interfaces
+ *
+ * @return CSelect
+ */
 function getInterfaceSelect(array $interfaces): CSelect {
 	$interface_select = new CSelect('interfaceid');
 

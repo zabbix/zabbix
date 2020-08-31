@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Web component view object. See "js/component.z-select.js" file for complementary parts.
+ */
 class CSelect extends CTag {
 
 	/**
