@@ -1506,8 +1506,8 @@ done:
 		{
 			if (NULL != CONFIG_VAULTTOKEN)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Zabbix proxy \"%s\" uses unencrypted connection",
-						host->host);
+				zabbix_log(LOG_LEVEL_WARNING, "connection with Zabbix proxy \"%s\" should be encrypted"
+						" when using Vault", host->host);
 			}
 		}
 
