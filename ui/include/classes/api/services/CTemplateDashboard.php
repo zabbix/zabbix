@@ -65,7 +65,8 @@ class CTemplateDashboard extends CApiService {
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
+			'groupCount' =>				['type' => API_BOOLEAN, 'default' => false]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -130,6 +131,10 @@ class CTemplateDashboard extends CApiService {
 			zbx_db_search('dashboard d', $options, $sql_parts);
 		}
 
+		if ($options['groupCount']) {
+			$sql_parts['group']['templateid'] = 'd.templateid';
+		}
+
 		$db_dashboards = [];
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
@@ -139,10 +144,16 @@ class CTemplateDashboard extends CApiService {
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
-				return $row['rowscount'];
+				if ($options['groupCount']) {
+					$db_dashboards[] = $row;
+				}
+				else {
+					return $row['rowscount'];
+				}
 			}
-
-			$db_dashboards[$row['dashboardid']] = $row;
+			else {
+				$db_dashboards[$row['dashboardid']] = $row;
+			}
 		}
 
 		if ($db_dashboards) {
