@@ -11,6 +11,8 @@ New features:
 .........T [ZBXCTR-10] added iLert media type (roman-ilert)
 
 Bug fixes:
+...G...... [ZBX-18322] Memcached and Mysql plugins enabled for windows (vadimipatov)
+.........T [ZBX-17982] added non-trigger event types support to webhooks (tuskov)
 .........T [ZBX-18190] removed triggers for items Log growths, Log shrinks (mchudinov)
 .........T [ZBX-18122] fixed russian character in setup section (afayantsev)
 ..F....... [ZBX-18074] fixed unresolved macros in item names in data overview table (talbergs)
