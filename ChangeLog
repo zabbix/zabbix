@@ -10,6 +10,7 @@ New features:
 .........T [ZBXCTR-10] added iLert media type (roman-ilert)
 
 Bug fixes:
+.........T [ZBX-18190] removed triggers for items Log growths, Log shrinks (mchudinov)
 .........T [ZBX-18122] fixed russian character in setup section (afayantsev)
 ..F....... [ZBX-18074] fixed unresolved macros in item names in data overview table (talbergs)
 ...G...... [ZBX-18195] changed log level increase command for Agent 2 to match Agent 1 (esneiders)
