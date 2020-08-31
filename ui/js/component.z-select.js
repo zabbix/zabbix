@@ -52,19 +52,34 @@ class ZSelect {
 		this.state.is_open = true;
 
 		const list_height = 332;
+		const offset_top = 4;
+		const offset_bottom = 38;
+
 		const {height: button_height, y: button_y, left: button_left} = this.root.button.getBoundingClientRect();
 		const doc_height = document.body.getBoundingClientRect().height;
 		const space_below = doc_height - button_y - button_height;
+		const space_above = button_y;
 
-		if (space_below - list_height > 38) {
+		const prefer_down = space_below - list_height > offset_bottom;
+
+		this.root.list.style.maxHeight = '';
+		if (prefer_down || space_below > space_above) {
 			this.root.list.classList.remove('fall-upwards');
 			this.root.list.style.top = `${button_y + button_height}px`;
 			this.root.list.style.bottom = '';
+
+			if (space_below < list_height) {
+				this.root.list.style.maxHeight = `${space_below - offset_bottom}px`;
+			}
 		}
 		else {
 			this.root.list.classList.add('fall-upwards')
 			this.root.list.style.top = '';
 			this.root.list.style.bottom = `${doc_height - button_y}px`;
+
+			if (space_above < list_height) {
+				this.root.list.style.maxHeight = `${space_above - offset_top}px`;
+			}
 		}
 
 		this.root.list.style.left = `${button_left}px`;
