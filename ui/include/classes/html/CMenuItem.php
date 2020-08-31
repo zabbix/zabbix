@@ -110,16 +110,16 @@ class CMenuItem extends CTag {
 	 * Set action name aliases.
 	 *
 	 * @param array $aliases  The aliases of menu item. Is able to specify the alias in following formats:
-	 *                        - \<action_name\> - The alias is appliable to page with specified action name with any GET
+	 *                        - {action_name} - The alias is applicable to page with specified action name with any GET
 	 *                          parameters in URL or without them;
-	 *                        - \<action_name\>?\<param\>=\<value\> - The alias is appliable to page with specified action
+	 *                        - {action_name}?{param}={value} - The alias is applicable to page with specified action
 	 *                          when specified GET parameter exists in URL and have the same value;
-	 *                        - \<action_name\>?\<param\>=* - The alias is appliable to page with specified action
-	 *                          when specified GET parameter exists in URL and have any value
-	 *                        - \<action_name\>?!\<param\>=\<value\> - The alias is appliable to page with specified action
-	 *                          when specified GET parameter not exists in URL or have different value
-	 *                        - \<action_name\>?!\<param\>=* - The alias is appliable to page with specified action
-	 *                          when specified GET parameter not exists in URL
+	 *                        - {action_name}?{param}=* - The alias is applicable to page with specified action
+	 *                          when specified GET parameter exists in URL and have any value;
+	 *                        - {action_name}?!{param}={value} - The alias is applicable to page with specified action
+	 *                          when specified GET parameter not exists in URL or have different value;
+	 *                        - {action_name}?!{param}=* - The alias is applicable to page with specified action
+	 *                          when specified GET parameter not exists in URL.
 	 *
 	 * @return CMenuItem
 	 */
