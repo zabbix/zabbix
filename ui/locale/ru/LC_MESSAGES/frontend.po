@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-28 19:58+0300\n"
-"PO-Revision-Date: 2020-07-21 08:51+0300\n"
-"Last-Translator: marinagen <marina.generalova@zabbix.com>\n"
+"PO-Revision-Date: 2020-08-30 00:06+0300\n"
+"Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1595314311.000000\n"
+"X-POOTLE-MTIME: 1598738795.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -334,11 +334,11 @@ msgstr "100 наиболее загруженных триггеров"
 
 #: tests/selenium/modules/module_number_1/Module.php:21
 msgid "1st Module"
-msgstr ""
+msgstr "1-ый модуль"
 
 #: tests/selenium/modules/module_number_2/Module.php:21
 msgid "2nd Module"
-msgstr ""
+msgstr "2-ой модуль"
 
 #: queue.php:113 queue.php:168
 msgid "30 seconds"
@@ -350,7 +350,7 @@ msgstr "3D вид"
 
 #: tests/selenium/modules/module_number_4/Module.php:21
 msgid "4th Module"
-msgstr ""
+msgstr "4-ый модуль"
 
 #: queue.php:115 queue.php:170
 msgid "5 minutes"
@@ -1628,19 +1628,19 @@ msgstr "Вычисляемое"
 
 #: include/classes/items/CHelpItems.php:677
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление среднего значения на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: include/classes/items/CHelpItems.php:685
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление максимального значения на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: include/classes/items/CHelpItems.php:681
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление минимального значения на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: include/classes/items/CHelpItems.php:689
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Вычисление суммы значений на основе различных заданных параметров. Zabbix сервер собирает агрегированную информацию выполняя прямые запросы в базу данных."
 
 #: jsLoader.php:166
 msgid "Calendar"
@@ -1908,7 +1908,7 @@ msgstr "Не удалось очистить историю"
 
 #: items.php:1287
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr ""
+msgstr "Не удалось очистить историю: по крайней мере один из выбранных элементов данных не принадлежит к какому-либо узлу сети под наблюдением"
 
 #: include/classes/api/services/CDiscoveryRule.php:2434
 msgid "Cannot clone graph prototypes."
@@ -2501,17 +2501,17 @@ msgstr "Не удалось найти иконку \"%1$s\" используе�
 #: include/classes/import/CConfigurationImport.php:972
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Не удалось найти интерфейс \"%1$s\", используемый правилом обнаружения \"%2$s\" на \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Не удалось найти интерфейс \"%1$s\", используемый элементом данных \"%2$s\" на \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Не удалось найти интерфейс \"%1$s\", используемый \"%2$s\" прототипом элементов данных \"%3$s\" правила обнаружения на \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1636
 #, c-format
@@ -2566,7 +2566,7 @@ msgstr "Не удалось найти шаблон \"%1$s\" для протот
 #: include/classes/import/CConfigurationImport.php:1025
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Не удалось найти шаблон \"%1$s\" для \"%2$s\" замещения правила обнаружения \"%3$s\" в \"%4$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:170
 #: include/classes/import/importers/CMapImporter.php:223
@@ -3040,7 +3040,7 @@ msgstr "Не удалось обновить способ оповещений"
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
-msgstr ""
+msgstr "Не удалось обновить модуль: %1$s."
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -3584,7 +3584,7 @@ msgstr "Условие \"%2$s\" не используется в формуле 
 #: include/classes/api/services/CDiscoveryRule.php:1547
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
-msgstr ""
+msgstr "Условие \"%2$s\" не используется в \"%3$s\" формуле для замещения \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:2724
 #, c-format
@@ -3604,7 +3604,7 @@ msgstr "Условие \"%2$s\" используемое в формуле \"%3$
 #: include/classes/api/services/CDiscoveryRule.php:1546
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
-msgstr ""
+msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" для замещения \"%1$s\" не задано."
 
 #: app/partials/popup.operations.php:364
 #: include/views/configuration.action.edit.php:139
@@ -3988,7 +3988,6 @@ msgid "Context name"
 msgstr "Имя контекста"
 
 #: app/views/popup.lldoverride.php:56
-#, fuzzy
 msgid "Continue overrides"
 msgstr "Продолжить замещения"
 
@@ -5260,7 +5259,7 @@ msgstr "Отбросить значение"
 #: include/views/configuration.trigger.prototype.edit.php:525
 #: include/views/configuration.trigger.prototype.list.php:59
 msgid "Discover"
-msgstr ""
+msgstr "Обнаруживать"
 
 #: include/discovery.inc.php:138 include/forms.inc.php:515
 #: include/views/configuration.triggers.list.php:144
@@ -5527,7 +5526,7 @@ msgstr "Стиль отрисовки"
 
 #: tests/selenium/modules/module_number_3/Module.php:21
 msgid "Dummy module"
-msgstr ""
+msgstr "Макет модуля"
 
 #: include/classes/api/services/CCorrelation.php:1169
 #: include/classes/api/services/CCorrelation.php:1321
@@ -6014,7 +6013,7 @@ msgstr "Активировано"
 
 #: app/views/administration.authentication.edit.php:226
 msgid "Encrypt"
-msgstr ""
+msgstr "Шифрование"
 
 #: app/views/administration.proxy.edit.php:123
 #: app/views/administration.proxy.list.php:74
@@ -6644,17 +6643,17 @@ msgstr "Формула"
 #: include/classes/api/services/CAction.php:2722
 #, c-format
 msgid "Formula missing for action \"%1$s\"."
-msgstr ""
+msgstr "Отсутствует формула для \"%1$s\" действия."
 
 #: include/classes/api/services/CDiscoveryRule.php:1750
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Отсутствует формула для \"%1$s\" правила обнаружения."
 
 #: include/classes/api/services/CDiscoveryRule.php:1543
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
-msgstr ""
+msgstr "Отсутствует формула для \"%1$s\" замещения."
 
 #: include/locales.inc.php:55
 msgid "French (fr_FR)"
@@ -8513,7 +8512,7 @@ msgstr "Некорректное пользовательское выражен
 #: include/classes/api/services/CDiscoveryRule.php:1544
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
-msgstr ""
+msgstr "Некорректное пользовательское выражение \"%2$s\" для замещения \"%1$s\": %3$s."
 
 #: app/controllers/CControllerWidgetClockView.php:72
 msgid "Incorrect data."
@@ -8579,7 +8578,7 @@ msgstr "Некорректный макрос условия фильтра дл
 #: include/classes/api/services/CDiscoveryRule.php:1579
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
-msgstr ""
+msgstr "Некорректный макрос условия фильтра для замещения \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1624
 #: include/classes/api/services/CAction.php:2762
@@ -9963,7 +9962,7 @@ msgstr "Элемент данных добавлен"
 
 #: app/views/popup.itemtestedit.view.php:298
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
-msgstr ""
+msgstr "Элемент данных содержит пользовательский макрос с типом \"Скрытый текст\". Значения таких макросов необходимо ввести вручную."
 
 #: items.php:1269
 msgid "Item copied"
@@ -10642,7 +10641,7 @@ msgstr "Присоединенные шаблоны"
 
 #: include/views/configuration.template.list.php:159
 msgid "Linked to templates"
-msgstr ""
+msgstr "Соединения с шаблонам"
 
 #: include/views/js/monitoring.sysmaps.js.php:682
 #: include/views/js/monitoring.sysmaps.js.php:693
@@ -11460,7 +11459,7 @@ msgstr "Модуль"
 #: tests/selenium/modules/module_number_5/Module.php:18
 #: tests/selenium/modules/module_number_5/Module.php:26
 msgid "Module 5 menu"
-msgstr ""
+msgstr "Меню 5 модуля"
 
 #: app/controllers/CControllerModuleScan.php:102
 #, c-format
@@ -11497,7 +11496,7 @@ msgstr[2] "Модулей активировано: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
 msgid "Module updated: %1$s."
-msgstr ""
+msgstr "Модуль обновлен: %1$s."
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -12808,7 +12807,7 @@ msgstr "ОС (Короткое описание)"
 
 #: app/views/popup.lldoperation.php:46
 msgid "Object"
-msgstr ""
+msgstr "Объект"
 
 #: include/func.inc.php:248
 msgid "Oct"
@@ -13233,7 +13232,7 @@ msgstr "Переопределить период хранения динами�
 #: app/controllers/CControllerPopupLldOverride.php:91
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
-msgstr ""
+msgstr "Замещение с \"%1$s\" именем уже существует."
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:415
 #: include/classes/widgets/views/widget.svggraph.form.view.php:294
@@ -13265,11 +13264,11 @@ msgstr "Отсутствует расширение PHP LDAP."
 
 #: include/classes/setup/CFrontendSetup.php:565
 msgid "PHP OpenSSL"
-msgstr ""
+msgstr "PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:569
 msgid "PHP OpenSSL extension missing."
-msgstr ""
+msgstr "Отсутствует расширение PHP OpenSSL."
 
 #: include/classes/setup/CFrontendSetup.php:308
 msgid "PHP bcmath"
@@ -13597,7 +13596,7 @@ msgstr "Вставить"
 
 #: app/views/monitoring.dashboard.view.php:110 jsLoader.php:128
 msgid "Paste widget"
-msgstr ""
+msgstr "Вставить виджет"
 
 #: jsLoader.php:217
 msgid "Paste without external links"
@@ -14266,7 +14265,7 @@ msgstr "Получатель (в порядке убывания)"
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
-msgstr ""
+msgstr "Получатели"
 
 #: app/views/administration.user.edit.php:388
 #: include/classes/screens/CScreenProblem.php:1083
@@ -14379,7 +14378,7 @@ msgstr "Обычные элементы данных"
 
 #: jsLoader.php:141
 msgid "Release to create a widget."
-msgstr ""
+msgstr "Отпустите, чтобы создать новый виджет."
 
 #: include/views/general.login.php:79
 msgid "Remember me for 30 days"
@@ -14724,7 +14723,7 @@ msgstr "Ресурс"
 
 #: app/views/reports.auditlog.list.php:53
 msgid "Resource ID"
-msgstr ""
+msgstr "ID ресурса"
 
 #: app/views/popup.mediatypetest.edit.php:46
 msgid "Response"
@@ -15539,11 +15538,11 @@ msgstr "На задний план"
 
 #: app/partials/popup.operations.php:75
 msgid "Send to user groups"
-msgstr ""
+msgstr "Отправлять группам пользователей"
 
 #: app/partials/popup.operations.php:95
 msgid "Send to users"
-msgstr ""
+msgstr "Отправлять пользователям"
 
 #: include/actions.inc.php:2127
 #: include/views/administration.auditacts.list.php:76
@@ -16375,7 +16374,7 @@ msgstr "Остановить"
 #: app/views/popup.lldoverride.php:57
 #: include/views/configuration.host.discovery.edit.php:740
 msgid "Stop processing"
-msgstr ""
+msgstr "Остановка обработки"
 
 #: app/views/popup.lldoperation.php:185 app/views/popup.lldoperation.php:206
 #: include/views/configuration.item.edit.php:690
@@ -16926,7 +16925,7 @@ msgstr "Y координата элемента комплексного экр�
 #: include/classes/db/DbBackend.php:130
 #, c-format
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
-msgstr ""
+msgstr "Версия базы данных Zabbix не соответствует текущим требованиям. Ваша версия базы данных: %1$s. Требуемая версия: %2$s. Пожалуйста, обратитесь к своему системному администратору."
 
 #: include/html.inc.php:701
 #, c-format
@@ -16952,11 +16951,11 @@ msgstr "Склонированный шаблон содержит пользо�
 #: include/html.inc.php:728
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "График более не обнаруживается и будет удален через %1$s (%2$s в %3$s)."
 
 #: include/html.inc.php:723
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "График более не обнаруживается и будет удален при следующей обработке правила обнаружения."
 
 #: include/html.inc.php:647
 #, c-format
@@ -17009,7 +17008,7 @@ msgstr "Количество процессов. Возвращает число
 #: index_sso.php:182
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
-msgstr ""
+msgstr "Параметр \"%1$s\" отсутствует в атрибутах пользователя."
 
 #: include/classes/core/CJsonRpc.php:194
 msgid "The received JSON is not a valid JSON-RPC Request."
@@ -17022,11 +17021,11 @@ msgstr "Запрашиваемая удаленная процедура не с
 #: include/html.inc.php:755
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "Триггер более не обнаруживается и будет удален через %1$s (%2$s в %3$s)."
 
 #: include/html.inc.php:750
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Триггер более не обнаруживается и будет удален при следующей обработке правила обнаружения."
 
 #: include/classes/api/services/CHttpTest.php:710
 msgid "The web scenario application belongs to a different host than the web scenario host."
@@ -17144,7 +17143,7 @@ msgstr "Время конкретного процесса Zabbix или гру�
 
 #: app/views/js/popup.mediatypetest.edit.js.php:104
 msgid "Time elapsed:"
-msgstr ""
+msgstr "Затрачено времени:"
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
@@ -17257,7 +17256,7 @@ msgstr "Общее количество"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:169
 msgid "Trace"
-msgstr ""
+msgstr "Трассировка"
 
 #: include/page_footer.php:40
 msgid "Transaction has not been closed. Aborting..."
@@ -17790,7 +17789,7 @@ msgstr "Не удалось создать файл конфигурации."
 #: include/classes/db/PostgresqlDbBackend.php:61
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
-msgstr ""
+msgstr "Не удалось определить текущую версию базы данных: %1$s."
 
 #: include/classes/core/CConfigFile.php:193
 msgid "Unable to overwrite the existing configuration file."
@@ -18473,7 +18472,7 @@ msgstr "Состояние кластера VMware, <url> - URL службы VMw
 
 #: include/classes/items/CHelpItems.php:735
 msgid "VMware datacenters and their IDs. Returns JSON"
-msgstr ""
+msgstr "Центры обработки данных VMware и их ID. Возвращает JSON"
 
 #: include/classes/items/CHelpItems.php:743
 #: include/classes/items/CHelpItems.php:767
@@ -18878,7 +18877,7 @@ msgstr "Вьетнамский (vi_VN)"
 
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:98
 msgid "View"
-msgstr ""
+msgstr "Просмотр"
 
 #: app/views/monitoring.charts.view.php:49
 #: include/views/monitoring.history.php:89
@@ -20054,7 +20053,7 @@ msgstr "правило обнаружения деактивировано"
 #: app/partials/monitoring.latest.view.html.php:126
 #, c-format
 msgid "displaying %1$s to %2$s of %3$s Items"
-msgstr ""
+msgstr "отображено c %1$s до %2$s из %3$s элементов данных"
 
 #: app/views/popup.lldoperation.php:61 include/actions.inc.php:27
 #: include/correlation.inc.php:34
@@ -20193,12 +20192,12 @@ msgstr "включая подгруппы"
 
 #: include/classes/parsers/CTriggerExpression.php:494
 msgid "incorrect calculated item formula"
-msgstr ""
+msgstr "некорректно вычисленная формула элемента данных"
 
 #: include/classes/parsers/CTriggerExpression.php:503
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
-msgstr ""
+msgstr "некорректно вычисленная формула элемента данных начиная с \"%1$s\""
 
 #: include/classes/validators/CEventCorrCondValidator.php:47
 msgid "incorrect condition type"
@@ -20785,7 +20784,7 @@ msgstr "параметр \"%1$s\" отсутствует"
 #: include/classes/db/PostgresqlDbBackend.php:62
 #, c-format
 msgid "the table \"%1$s\" was not found"
-msgstr ""
+msgstr "таблица \"%1$s\" не найдена"
 
 #: include/classes/export/CConfigurationExportBuilder.php:77
 #: include/classes/import/validators/C44XmlValidator.php:2039
