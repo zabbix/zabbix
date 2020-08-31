@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-03T02:21:21Z</date>
+    <date>2020-08-31T18:07:52Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -140,7 +140,8 @@
                 Jira.labels = [];&#13;
 &#13;
                 tags.forEach(function (tag) {&#13;
-                    if (typeof tag.tag !== 'undefined' &amp;&amp; typeof tag.value !== 'undefined' ) {&#13;
+                    if (typeof tag.tag !== 'undefined' &amp;&amp; typeof tag.value !== 'undefined' &#13;
+                        &amp;&amp; !tag.tag.startsWith('__zbx')) {&#13;
                         label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');&#13;
                         if (label.length &lt; 256) {&#13;
                             Jira.labels.push(label);&#13;
@@ -185,10 +186,8 @@
             if (schema) {&#13;
                 Object.keys(fields)&#13;
                     .forEach(function(field) {&#13;
-                        data.fields[field] = fields[field];&#13;
 &#13;
-                        if (typeof schema[field] === 'object' &amp;&amp; typeof schema[field].schema === 'object'&#13;
-                            &amp;&amp; (schema[field].schema.type === 'number' || schema[field].schema.type === 'datetime')) {&#13;
+                        if (typeof schema[field] === 'object' &amp;&amp; typeof schema[field].schema === 'object') {&#13;
                             switch (schema[field].schema.type) {&#13;
                                 case 'number':&#13;
                                     data.fields[field] = parseInt(fields[field]);&#13;
@@ -198,10 +197,24 @@
                                     if (fields[field].match(/\d+[.-]\d+[.-]\d+T\d+:\d+:\d+/) !== null) {&#13;
                                         data.fields[field] = fields[field].replace(/\./g, '-');&#13;
                                     }&#13;
+                                    break;&#13;
+&#13;
+                                case 'option':&#13;
+                                    data.fields[field] = {value: fields[field]};&#13;
+                                    break;&#13;
+&#13;
+                                case 'array':&#13;
+                                    if (schema[field].schema.items === 'option') {&#13;
+                                        data.fields[field] = [{value: fields[field]}];&#13;
+                                    }&#13;
                                     else {&#13;
-                                        delete data.fields[field];&#13;
+                                        data.fields[field] = [fields[field]];&#13;
                                     }&#13;
                                     break;&#13;
+&#13;
+                                default:&#13;
+                                    data.fields[field] = fields[field];&#13;
+&#13;
                             }&#13;
                         }&#13;
                     });&#13;
