@@ -49,17 +49,24 @@ class ZSelect {
 	}
 
 	_expandList() {
-		this.state.is_open = true;
-
 		const list_height = 332;
 		const offset_top = 4;
 		const offset_bottom = 38;
 
 		const {height: button_height, y: button_y, left: button_left} = this.root.button.getBoundingClientRect();
 		const doc_height = document.body.getBoundingClientRect().height;
+
+		const is_button_visible = button_y + button_height > 0 && doc_height - button_y > 0;
+
+		// NOTE: Native select does not open when it is not visible.
+		if (!is_button_visible) {
+			return;
+		}
+
+		this.state.is_open = true;
+
 		const space_below = doc_height - button_y - button_height;
 		const space_above = button_y;
-
 		const prefer_down = space_below - list_height > offset_bottom;
 
 		this.root.list.style.maxHeight = '';
