@@ -281,8 +281,6 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		goto out;
 	}
 
-
-
 #if defined(HAVE_LIBMODBUS_3_0)
 	{
 		struct timeval	tv;
@@ -564,7 +562,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* address (and update function) */
 	if (NULL == (tmp = get_rparam(request, 3)) || '\0' == *tmp)
 	{
-		address = 1;
+		address = 0;
 
 		if (ZBX_MODBUS_FUNCTION_EMPTY == function)
 			function = ZBX_MODBUS_FUNCTION_COIL;
@@ -579,18 +577,22 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 <= address && address <= 9999)
 		{
 			function = ZBX_MODBUS_FUNCTION_COIL;
+			address -= 1;
 		}
 		else if (10001 <= address && address <= 19999)
 		{
 			function = ZBX_MODBUS_FUNCTION_DISCRETE_INPUT;
+			address -= 10001;
 		}
 		else if (30001 <= address && address <= 39999)
 		{
 			function = ZBX_MODBUS_FUNCTION_INPUT_REGISTERS;
+			address -= 30001;
 		}
 		else if (40001 <= address && address <= 49999)
 		{
 			function = ZBX_MODBUS_FUNCTION_HOLDING_REGISTERS;
+			address -= 40001;
 		}
 		else
 		{
