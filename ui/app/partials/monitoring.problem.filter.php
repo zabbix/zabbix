@@ -145,9 +145,10 @@ $filter_tags_table->setId('filter-tags_#{uniqid}');
 $filter_tags_table->addRow(
 	(new CCol(
 		(new CRadioButtonList('evaltype', (int) $data['evaltype']))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
+			->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
 			->setModern(true)
+			->setId('evaltype_#{uniqid}')
 	))->setColSpan(4)
 );
 
@@ -184,20 +185,21 @@ $filter_tags_table->addRow(
 $tag_format_line = (new CHorList())
 	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
 		->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
-		->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
-		->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
-		->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
+		->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1, 'show_tags_1#{uniqid}')
+		->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2, 'show_tags_2#{uniqid}')
+		->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3, 'show_tags_3#{uniqid}')
 		->setModern(true)
 		->setId('show_tags_#{uniqid}')
 	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
 	->addItem(new CLabel(_('Tag name')))
 	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
-		->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL)
-		->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED)
-		->addValue(_('None'), PROBLEMS_TAG_NAME_NONE)
+		->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL, 'tag_name_format_0#{uniqid}')
+		->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED, 'tag_name_format_1#{uniqid}')
+		->addValue(_('None'), PROBLEMS_TAG_NAME_NONE, 'tag_name_format_2#{uniqid}')
 		->setModern(true)
 		->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
+		->setId('tag_name_format_#{uniqid}')
 	);
 
 $right_column = (new CFormList())
@@ -305,9 +307,10 @@ if (array_key_exists('render_html', $data)) {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE, 'tags_#{rowNum}0#{uniqid}')
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL, 'tags_#{rowNum}1#{uniqid}')
+				->setModern(true)
+				->setId('tags_#{rowNum}#{uniqid}'),
 			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
@@ -330,8 +333,37 @@ if (array_key_exists('render_html', $data)) {
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
 		let fields = ['show', 'application', 'name', 'tag_priority', 'show_opdata', 'show_suppressed',
-			'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age'
-		];
+				'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age'
+			],
+			eventHandler = {
+				show: () => {
+					// Dynamically disable hidden input elements to allow correct detection of unsaved changes.
+					var	filter_show = $('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>,
+						disabled = !filter_show || !$('[name="age_state"]:checked', container).length;
+
+					$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
+					$('[name="age_state"]', container).attr('disabled', !filter_show);
+
+					if (this._parent) {
+						this._parent.updateTimeselector(this, filter_show);
+					}
+				},
+				age_state: (ev) => {
+					$('[name="age"]', container).prop('disabled', !$('[name="age_state"]', container).is(':checked'));
+				},
+				compact_view: () => {
+					let checked = $('[name="compact_view"]', container).is(':checked');
+
+					$('[name="show_timeline"],[name="details"],[name="show_opdata"]', container).prop('disabled', checked);
+					$('[name="highlight_row"]', container).prop('disabled', !checked);
+				},
+				show_tags: () => {
+					let disabled = ($('[name="show_tags"]:checked', container).val() == <?= PROBLEMS_SHOW_TAGS_NONE ?>);
+
+					$('[name="tag_priority"]', container).prop('disabled', disabled);
+					$('[name="tag_name_format"]', container).prop('disabled', disabled);
+				}
+			};
 
 		// Input, radio and single checkboxes.
 		fields.forEach((key) => {
@@ -361,7 +393,8 @@ if (array_key_exists('render_html', $data)) {
 		$('#filter-tags_' + data.uniqid, container).dynamicRows({
 			template: '#filter-tag-row-tmpl',
 			rows: data.tags,
-			counter: 0
+			counter: 0,
+			dataCallback: tag => tag.uniqid = data.uniqid
 		});
 
 		// Host groups multiselect.
@@ -440,36 +473,17 @@ if (array_key_exists('render_html', $data)) {
 			}
 		});
 
-		$('#show_' + data.uniqid, container).change(() => {
-			// Dynamically disable hidden input elements to allow correct detection of unsaved changes.
-			var	filter_show = $('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>,
-				disabled = !filter_show || !$('[name="age_state"]:checked', container).length;
+		$('#show_' + data.uniqid, container).change(eventHandler.show);
+		eventHandler.show();
 
-			$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
-			$('[name="age_state"]', container).attr('disabled', !filter_show);
+		$('[name="age_state"]').change(eventHandler.age_state);
+		eventHandler.age_state();
 
-			if (this._parent) {
-				this._parent.updateTimeselector(this, filter_show);
-			}
-		}).trigger('change');
+		$('[name="compact_view"]', container).change(eventHandler.compact_view);
+		eventHandler.compact_view();
 
-		$('[name="age_state"]').change(function() {
-			$('[name="age"]').prop('disabled', !$(this).is(':checked'));
-		}).trigger('change');
-
-		$('[name="compact_view"]', container).change(function() {
-			let checked = $(this).is(':checked');
-
-			$('[name="show_timeline"],[name="details"],[name="show_opdata"]', container).prop('disabled', checked);
-			$('[name="highlight_row"]', container).prop('disabled', !checked);
-		}).trigger('change');
-
-		$('[name="show_tags"]').change(function () {
-			let disabled = (this.value == <?= PROBLEMS_SHOW_TAGS_NONE ?>);
-
-			$('[name="tag_priority"]', container).prop('disabled', disabled);
-			$('[name="tag_name_format"]', container).prop('disabled', disabled);
-		}).trigger('change');
+		$('[name="show_tags"]', container).change(eventHandler.show_tags);
+		eventHandler.show_tags();
 	}
 
 	function expand(data, container) {
