@@ -248,12 +248,22 @@
 				.fail(function() {});
 		}
 
+		function removeTagFilterRow($this) {
+			$this
+				.closest('tr')
+				.remove();
+
+			// Trigger event to update tab indicator.
+			document.dispatchEvent(new Event('tab-indicator-update'));
+		}
+
 		/**
 		 * Public API.
 		 */
 		window.usergroups = {
 			submitNewGroupRight: submitNewGroupRight,
-			submitNewTagFilter: submitNewTagFilter
+			submitNewTagFilter: submitNewTagFilter,
+			removeTagFilterRow: removeTagFilterRow
 		};
 	});
 </script>
