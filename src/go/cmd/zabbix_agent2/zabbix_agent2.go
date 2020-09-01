@@ -430,6 +430,9 @@ func main() {
 			listeners = append(listeners, listener)
 		}
 	}
+	if err = loadOSDependentItems(); err != nil {
+		fatalExit("cannot load os dependent items", err)
+	}
 
 	if foregroundFlag {
 		if agent.Options.LogType != "console" {

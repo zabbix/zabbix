@@ -1,3 +1,5 @@
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,22 +21,6 @@
 
 package main
 
-import (
-	"os"
-	"path/filepath"
-	"strings"
-
-	"zabbix.com/pkg/pdh"
-)
-
 func loadOSDependentItems() error {
-	return pdh.LocateObjectsAndDefaultCounters(true)
-}
-
-func init() {
-
-	if path, err := os.Executable(); err == nil {
-		dir, name := filepath.Split(path)
-		confDefault = dir + strings.TrimSuffix(name, filepath.Ext(name)) + ".win.conf"
-	}
+	return nil
 }

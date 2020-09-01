@@ -218,6 +218,8 @@ func handleWindowsService(conf string) error {
 	}
 
 	if winServiceRun {
+		fatalStopChan = make(chan bool, 1)
+		startChan = make(chan bool)
 		go runService()
 	}
 
@@ -424,8 +426,6 @@ func runService() {
 type winService struct{}
 
 func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
-	fatalStopChan = make(chan bool, 1)
-	startChan = make(chan bool)
 	changes <- svc.Status{State: svc.StartPending}
 	select {
 	case <-startChan:
