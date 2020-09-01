@@ -303,7 +303,9 @@ abstract class CControllerLatest extends CController {
 		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
-		$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
+		$history = Manager::History()->getLastValues($items, 2,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+		);
 
 		$prepared_data['items'] = $items;
 		$prepared_data['history'] = $history;
