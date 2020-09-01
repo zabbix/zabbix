@@ -36,7 +36,7 @@ class testPageMonitoringHosts extends CWebTest {
 	protected static $hostid;
 
 	public function testPageMonitoringHosts_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=host.view');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
 			'Graphs', 'Screens', 'Web'];
@@ -495,9 +495,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count, 'Name'));
 	}
 
-	/**
-	 * Checking that Show suppressed problems filter works.
-	 */
+	// Checking that Show suppressed problems filter works.
 	public function testPageMonitoringHosts_ShowSuppresed() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
@@ -586,6 +584,101 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 	}
 
+	public static function getHostContextMenuData() {
+		return [
+			[
+				[
+					'name' => 'ЗАББИКС Сервер',
+					'disabled' => ['Web'],
+					'displayed_titles' => ['Inventory',
+										'Latest data',
+										'Problems',
+										'Graphs',
+										'Screens',
+										'Web',
+										'Configuration',
+										'Detect operating system',
+										'Ping',
+										'Reboot',
+										'Selenium script',
+										'Traceroute']
+				]
+			],
+			[
+				[
+					'name' => 'Available host',
+					'disabled' => ['Web', 'Graphs', 'Screens'],
+					'displayed_titles' => ['Inventory',
+										'Latest data',
+										'Problems',
+										'Graphs',
+										'Screens',
+										'Web',
+										'Configuration',
+										'Detect operating system',
+										'Ping',
+										'Selenium script',
+										'Traceroute']
+				]
+			],
+			[
+				[
+					'name' => 'Dynamic widgets H1',
+					'disabled' => ['Screens', 'Web'],
+					'displayed_titles' => ['Inventory',
+										'Latest data',
+										'Problems',
+										'Graphs',
+										'Screens',
+										'Web',
+										'Configuration',
+										'Detect operating system',
+										'Ping',
+										'Selenium script',
+										'Traceroute']
+				]
+			],
+			[
+				[
+					'name' => 'Host ZBX6663',
+					'disabled' => ['Screens'],
+					'displayed_titles' => ['Inventory',
+										'Latest data',
+										'Problems',
+										'Graphs',
+										'Screens',
+										'Web',
+										'Configuration',
+										'Detect operating system',
+										'Ping',
+										'Reboot',
+										'Selenium script',
+										'Traceroute']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getHostContextMenuData
+	 *
+	 * Click on host name from the table and check displayed popup context.
+	 */
+	public function testPageMonitoringHosts_HostContextMenu($data) {
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$table = $this->query('class:list-table')->asTable()->one();
+		$row = $table->findRow('Name', $data['name']);
+		$row->query('xpath://a[@class="link-action" and text()="'.$data['name'].'"]')->one()->click();
+		$this->page->waitUntilReady();
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+		$this->assertTrue($popup->hasItems($data['displayed_titles']));
+		foreach ($data['disabled'] as $disabled) {
+			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '
+				.$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+		}
+	}
+
 	public function prepareUpdateData() {
 		$response = CDataHelper::call('host.update', [
 			'hostid' => '99013',
@@ -614,7 +707,41 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 	}
 
+	// Сount problems amount from first column and compare with displayed problems from another Problems column.
+	public function testPageMonitoringHosts_CountProblems() {
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$table = $this->query('class:list-table')->asTable()->one();
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$problem_hosts = ['1_Host_to_check_Monitoring_Overview',
+						'3_Host_to_check_Monitoring_Overview',
+						'4_Host_to_check_Monitoring_Overview',
+						'Host for tag permissions',
+						'Host for triggers filtering',
+						'ЗАББИКС Сервер'];
+		foreach ($problem_hosts as $host) {
+			$form->fill(['Name' => $host]);
+			$form->submit();
+			$this->page->waitUntilReady();
+
+			// Counting problems icon amount from first Problems column.
+			$icon_count = $table->query('xpath://td/div[@class="problem-icon-list"]/span')->count();
+			$result = [];
+			for ($i = 1; $i <= $icon_count; $i ++) {
+				$result[] = $table->query('xpath://td/div[@class="problem-icon-list"]/span['.$i.']')->one()->getText();
+			}
+
+			// Converting string array to int.
+			$int_result = array_map('intval', $result);
+
+			// Getting problems amount from second Problems column and then comparing with summarized first column.
+			$problem_amount = $table->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
+			$this->assertEquals((int)$problem_amount, array_sum($int_result));
+		}
+	}
+
 	/**
+	 * Get data from choosed column.
+	 *
 	 * @param integer $rows_count	Rows amount whom column value should be checked
 	 * @param string $column		Column name, where value should be checked
 	 */
@@ -628,15 +755,19 @@ class testPageMonitoringHosts extends CWebTest {
 	}
 
 	/**
+	 * Clicking on link from the table and then checking page header
+	 *
 	 * @param string $host_name		Host name
 	 * @param string $column		Column name
 	 * @param string $page_header	Page header name
 	 */
-	private function selectLink($host_name, $column, $page_header) {
+	private function selectLink($host_name, $column, $page_header = null) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $host_name);
 		$row->getColumn($column)->click();
 		$this->page->waitUntilReady();
-		$this->assertPageHeader($page_header);
+		if ($page_header != null) {
+			$this->assertPageHeader($page_header);
+		}
 	}
 }
