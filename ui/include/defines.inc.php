@@ -339,6 +339,9 @@ define('INTERFACE_TYPE_SNMP',		2);
 define('INTERFACE_TYPE_IPMI',		3);
 define('INTERFACE_TYPE_JMX',		4);
 
+define('HOST_PROT_INTERFACES_INHERIT',	0);
+define('HOST_PROT_INTERFACES_CUSTOM',	1);
+
 define('SNMP_BULK_DISABLED',	0);
 define('SNMP_BULK_ENABLED',		1);
 
@@ -1307,6 +1310,9 @@ define('API_LLD_MACRO',			29);
 define('API_PSK',				30);
 define('API_SORTORDER',			31);
 define('API_CALC_FORMULA',		32);
+define('API_IP',				33);
+define('API_DNS',				34);
+define('API_PORT',				35);
 
 // flags
 define('API_REQUIRED',					0x0001);
