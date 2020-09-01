@@ -4365,6 +4365,12 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application->flags = ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY;
 		application->lld_row = lld_row;
 
+		if (FAIL == lld_override_application(&lld_row->overrides, application->name))
+		{
+			lld_application_free(application);
+			goto out;
+		}
+
 		zbx_vector_ptr_append(applications, application);
 
 		application_index_local.application = application;
@@ -4397,7 +4403,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 	}
 
 	application->flags |= ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
