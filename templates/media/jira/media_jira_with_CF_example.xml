@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-31T18:07:52Z</date>
+    <date>2020-09-01T14:40:23Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -186,7 +186,6 @@
             if (schema) {&#13;
                 Object.keys(fields)&#13;
                     .forEach(function(field) {&#13;
-&#13;
                         if (typeof schema[field] === 'object' &amp;&amp; typeof schema[field].schema === 'object') {&#13;
                             switch (schema[field].schema.type) {&#13;
                                 case 'number':&#13;
@@ -214,7 +213,6 @@
 &#13;
                                 default:&#13;
                                     data.fields[field] = fields[field];&#13;
-&#13;
                             }&#13;
                         }&#13;
                     });&#13;
@@ -304,7 +302,8 @@
 &#13;
     getSchema: function() {&#13;
         var result = Jira.request('get', 'issue/createmeta?expand=projects.issuetypes.fields&amp;projectKeys=' +&#13;
-                Jira.params.project_key + '&amp;issuetypeNames=' + Jira.params.issue_type);&#13;
+            encodeURIComponent(Jira.params.project_key) + '&amp;issuetypeNames=' +&#13;
+            encodeURIComponent(Jira.params.issue_type));&#13;
 &#13;
         return result.response;&#13;
     },&#13;
@@ -342,7 +341,7 @@
             data.fields.summary = summary;&#13;
         }&#13;
 &#13;
-        Jira.request('put', 'issue/' + Jira.params.issue_key, Jira.addCustomFields(data, fields));&#13;
+        Jira.request('put', 'issue/' + encodeURIComponent(Jira.params.issue_key), Jira.addCustomFields(data, fields));&#13;
         Jira.commentIssue(update);&#13;
     },&#13;
 &#13;
@@ -351,7 +350,7 @@
 &#13;
         if (typeof update === 'string') {&#13;
             data.body = update;&#13;
-            Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
+            Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);&#13;
         }&#13;
         else if (update.status === '1') {&#13;
             data.body = update.user + ' ' + update.action + '.';&#13;
@@ -360,7 +359,7 @@
                 data.body += '\nMessage: {quote}' + Jira.escapeMarkup(update.message) + '{quote}';&#13;
             }&#13;
 &#13;
-            Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
+            Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);&#13;
         }&#13;
     }&#13;
 };&#13;
