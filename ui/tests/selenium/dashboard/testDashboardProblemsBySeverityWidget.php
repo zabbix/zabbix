@@ -510,427 +510,63 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
+
 	/**
 	 * Function used to create a dashboard with widgets required for the Update scenario.
 	 */
 	public function prepareUpdateData() {
+		// Form an array with configuration of widgets with "Show" = "Host groups"
+		$widgets_hostgroups = [];
+		$id = 1;
+		for ($y = 0; $y <= 39; $y += 3) {
+			for ($x = 0; $x <= 12; $x += 12) {
+				$widgets_hostgroups[] = [
+					'type' => 'problemsbysv',
+					'name' => 'Reference widget '.$id,
+					'x' => $x,
+					'y' => $y,
+					'width' => 12,
+					'height' => 3,
+					'view_mode' => 0
+				];
+
+				$id++;
+			}
+		}
+
+		// Form an array with configuration of widgets with "Show" = "Totals"
+		$widgets_totals = [];
+		$id = 1;
+		for ($y = 42; $y <= 48; $y += 3) {
+			for ($x = 0; $x <= 18; $x += 6) {
+				if ($id > 10) continue;
+				$widgets_totals[] = [
+					'type' => 'problemsbysv',
+					'name' => 'Totals reference widget '.$id,
+					'x' => $x,
+					'y' => $y,
+					'width' => 6,
+					'height' => 3,
+					'view_mode' => 0,
+					'fields' => [
+						[
+							'type' => 0,
+							'name' => 'show_type',
+							'value' => '1'
+						]
+					]
+				];
+
+				$id++;
+			}
+		}
+
+		$widgets = array_merge($widgets_hostgroups, $widgets_totals);
+
 		// Create dashboard
 		$response = CDataHelper::call('dashboard.create', [
 			'name' => 'Problems by severity update dashboard',
-			'widgets' => [
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 1',
-					'x' => 0,
-					'y' => 0,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 2',
-					'x' => 12,
-					'y' => 0,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 3',
-					'x' => 0,
-					'y' => 3,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 4',
-					'x' => 12,
-					'y' => 3,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 5',
-					'x' => 0,
-					'y' => 6,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 6',
-					'x' => 12,
-					'y' => 6,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 7',
-					'x' => 0,
-					'y' => 9,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 8',
-					'x' => 12,
-					'y' => 9,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 9',
-					'x' => 0,
-					'y' => 12,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 10',
-					'x' => 12,
-					'y' => 12,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 11',
-					'x' => 0,
-					'y' => 15,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 12',
-					'x' => 12,
-					'y' => 15,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 13',
-					'x' => 0,
-					'y' => 18,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 14',
-					'x' => 12,
-					'y' => 18,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 15',
-					'x' => 0,
-					'y' => 21,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 16',
-					'x' => 12,
-					'y' => 21,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 17',
-					'x' => 0,
-					'y' => 24,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 18',
-					'x' => 12,
-					'y' => 24,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 19',
-					'x' => 0,
-					'y' => 27,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 20',
-					'x' => 12,
-					'y' => 27,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 21',
-					'x' => 0,
-					'y' => 30,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 22',
-					'x' => 12,
-					'y' => 30,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 23',
-					'x' => 0,
-					'y' => 33,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 24',
-					'x' => 12,
-					'y' => 33,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 25',
-					'x' => 0,
-					'y' => 36,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 26',
-					'x' => 12,
-					'y' => 36,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 27',
-					'x' => 0,
-					'y' => 39,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget 28',
-					'x' => 12,
-					'y' => 39,
-					'width' => 12,
-					'height' => 3,
-					'view_mode' => 0
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 1',
-					'x' => 0,
-					'y' => 42,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 2',
-					'x' => 6,
-					'y' => 42,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 3',
-					'x' => 12,
-					'y' => 42,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 4',
-					'x' => 18,
-					'y' => 42,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 5',
-					'x' => 0,
-					'y' => 45,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 6',
-					'x' => 6,
-					'y' => 45,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 7',
-					'x' => 12,
-					'y' => 45,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 8',
-					'x' => 18,
-					'y' => 45,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 9',
-					'x' => 0,
-					'y' => 48,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				],
-				[
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget 10',
-					'x' => 6,
-					'y' => 48,
-					'width' => 6,
-					'height' => 3,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				]
-			]
+			'widgets' => array_values($widgets)
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
