@@ -22,8 +22,6 @@
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
 	protected function doAction() {
-		$filter = static::FILTER_FIELDS_DEFAULT;
-
 		if ($this->getInput('filter_counters', 0)) {
 			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 			$show_counters = [];
@@ -40,30 +38,6 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			}
 
 			$data['filter_counters'] = $show_counters;
-		}
-		else {
-			$this->getInputs($filter, array_keys($filter));
-			// Filter out empty tags.
-			$filter['tags'] = array_filter($filter['tags'], function ($tag) {
-				return $tag['tag'] !== '' && $tag['value'] !== '';
-			});
-			$prepared_data = $this->getData($filter);
-
-			$view_url = (new CUrl())
-				->setArgument('action', 'problem.view')
-				->removeArgument('page');
-
-			$severities = array_intersect_key(select_config(), array_fill_keys(['severity_name_0', 'severity_name_1',
-				'severity_name_2', 'severity_name_3', 'severity_name_4', 'severity_name_5'
-			], ''));
-
-			$data = [
-				'severities' => $severities,
-				'filter' => $filter,
-				'view_curl' => $view_url,
-				'sort' => $filter['sort'],
-				'sortorder' => $filter['sortorder']
-			] + $prepared_data;
 		}
 
 		$response = new CControllerResponseData($data);
