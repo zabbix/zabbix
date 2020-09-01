@@ -39,9 +39,15 @@ type watchRequest struct {
 // Plugin
 type Plugin struct {
 	plugin.Base
-	watcher *fsnotify.Watcher
-	input   chan *watchRequest
-	manager *watch.Manager
+	watcher      *fsnotify.Watcher
+	input        chan *watchRequest
+	manager      *watch.Manager
+	eventSources map[string]*fileWatcher
+}
+
+type fsNotify interface {
+	addPath(path string) error
+	removePath(path string)
 }
 
 var impl Plugin
@@ -61,8 +67,9 @@ func (p *Plugin) run() {
 				if b, v = ioutil.ReadFile(event.Name); v == nil {
 					v = b
 				}
-				es, _ := p.EventSourceByURI(event.Name)
-				p.manager.Notify(es, v)
+				if es, ok := p.eventSources[event.Name]; ok {
+					p.manager.Notify(es, v)
+				}
 			}
 		}
 	}
@@ -92,14 +99,14 @@ func (p *Plugin) Stop() {
 }
 
 type fileWatcher struct {
-	path    string
-	watcher *fsnotify.Watcher
+	path     string
+	fsnotify fsNotify
 }
 
 type eventFilter struct {
 }
 
-func (w *eventFilter) Convert(v interface{}) (value *string, err error) {
+func (w *eventFilter) Process(v interface{}) (value *string, err error) {
 	if b, ok := v.([]byte); !ok {
 		if err, ok = v.(error); !ok {
 			err = fmt.Errorf("unexpected input type %T", v)
@@ -111,24 +118,16 @@ func (w *eventFilter) Convert(v interface{}) (value *string, err error) {
 	}
 }
 
-func (w *fileWatcher) URI() (uri string) {
-	return w.path
+func (w *fileWatcher) Initialize() (err error) {
+	return w.fsnotify.addPath(w.path)
 }
 
-func (w *fileWatcher) Subscribe() (err error) {
-	return w.watcher.Add(w.path)
-}
-
-func (w *fileWatcher) Unsubscribe() {
-	_ = w.watcher.Remove(w.path)
+func (w *fileWatcher) Release() {
+	w.fsnotify.removePath(w.path)
 }
 
 func (w *fileWatcher) NewFilter(key string) (filter watch.EventFilter, err error) {
 	return &eventFilter{}, nil
-}
-
-func (p *Plugin) EventSourceByURI(uri string) (es watch.EventSource, err error) {
-	return &fileWatcher{path: uri, watcher: p.watcher}, nil
 }
 
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
@@ -136,11 +135,26 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	if _, params, err = itemutil.ParseKey(key); err != nil {
 		return
 	}
-	return &fileWatcher{path: params[0], watcher: p.watcher}, nil
+	watcher, ok := p.eventSources[params[0]]
+	if !ok {
+		watcher = &fileWatcher{path: params[0], fsnotify: p}
+		p.eventSources[key] = watcher
+	}
+	return watcher, nil
+}
+
+func (p *Plugin) addPath(path string) error {
+	return p.watcher.Add(path)
+}
+
+func (p *Plugin) removePath(path string) {
+	_ = p.watcher.Remove(path)
+	delete(p.eventSources, path)
 }
 
 func init() {
+	impl.eventSources = make(map[string]*fileWatcher)
 	impl.manager = watch.NewManager(&impl)
 
-	plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents")
+	plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
 }
