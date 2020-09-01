@@ -24,6 +24,7 @@
 #include "lld_protocol.h"
 #include "sysinfo.h"
 #include "zbxlld.h"
+#include "lld_manager.h"
 
 /******************************************************************************
  *                                                                            *
@@ -84,6 +85,127 @@ void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *ite
 	{
 		data += zbx_deserialize_value(data, lastlogsize);
 		(void)zbx_deserialize_value(data, mtime);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_serialize_diag_stats                                     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t items_num, zbx_uint64_t values_num)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0;
+
+	zbx_serialize_prepare_value(data_len, items_num);
+	zbx_serialize_prepare_value(data_len, values_num);
+
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, items_num);
+	(void)zbx_serialize_value(ptr, values_num);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_deserialize_diag_stats                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *items_num, zbx_uint64_t *values_num)
+{
+	data += zbx_deserialize_value(data, items_num);
+	(void)zbx_deserialize_value(data, values_num);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_serialize_top_request                                    *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint32_t	zbx_lld_serialize_top_items_request(unsigned char **data, int limit)
+{
+	zbx_uint32_t	data_len = 0;
+
+	zbx_serialize_prepare_value(data_len, limit);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+	(void)zbx_serialize_value(*data, limit);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_deserialize_top_request                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lld_deserialize_top_items_request(const unsigned char *data, int *limit)
+{
+	(void)zbx_deserialize_value(data, limit);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_serialize_top_items_result                               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, zbx_lld_rule_t **items, int items_num)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0, item_len = 0;
+	int		i;
+
+	if (0 != items_num)
+	{
+		zbx_serialize_prepare_value(item_len, items[0]->itemid);
+		zbx_serialize_prepare_value(item_len, items[0]->values_num);
+	}
+
+	zbx_serialize_prepare_value(data_len, items_num);
+	data_len += item_len * items_num;
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, items_num);
+
+	for (i = 0; i < items_num; i++)
+	{
+		ptr += zbx_serialize_value(ptr, items[i]->itemid);
+		ptr += zbx_serialize_value(ptr, items[i]->values_num);
+	}
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_deserialize_top_result                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_vector_uint64_pair_t *items)
+{
+	int	i, items_num;
+
+	data += zbx_deserialize_value(data, &items_num);
+
+	if (0 != items_num)
+	{
+		zbx_vector_uint64_pair_reserve(items, items_num);
+
+		for (i = 0; i < items_num; i++)
+		{
+			zbx_uint64_pair_t	pair;
+			int			value;
+
+			data += zbx_deserialize_value(data, &pair.first);
+			data += zbx_deserialize_value(data, &value);
+			pair.second = value;
+			zbx_vector_uint64_pair_append_ptr(items, &pair);
+		}
 	}
 }
 
@@ -202,6 +324,66 @@ int	zbx_lld_get_queue_size(zbx_uint64_t *size, char **error)
 out:
 	zbx_ipc_socket_close(&lld_socket);
 	zbx_ipc_message_clean(&message);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_get_diag_stats                                           *
+ *                                                                            *
+ * Purpose: get lld manager diagnostic statistics                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, char **error)
+{
+	unsigned char	*result;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_LLD, ZBX_IPC_LLD_DIAG_STATS, SEC_PER_MIN, NULL, 0,
+			&result, error))
+	{
+		return FAIL;
+	}
+
+	zbx_lld_deserialize_diag_stats(result, items_num, values_num);
+	zbx_free(result);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_get_top_items                                            *
+ *                                                                            *
+ * Purpose: get the top N items by the number of queued values                *
+ *                                                                            *
+ * Parameters field - [IN] the sort field                                     *
+ *            limit - [IN] the number of top records to retrieve              *
+ *            items - [OUT] a vector of top itemid, values_num pairs          *
+ *            error - [OUT] the error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the top n items were returned successfully         *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_lld_get_top_items(int limit, zbx_vector_uint64_pair_t *items, char **error)
+{
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
+
+	data_len = zbx_lld_serialize_top_items_request(&data, limit);
+
+	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_LLD, ZBX_IPC_LLD_TOP_ITEMS, SEC_PER_MIN, data,
+			data_len, &result, error)))
+	{
+		goto out;
+	}
+
+	zbx_lld_deserialize_top_items_result(result, items);
+	zbx_free(result);
+out:
+	zbx_free(data);
 
 	return ret;
 }

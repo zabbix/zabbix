@@ -323,6 +323,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
+
 		if ($this->case_backup !== null) {
 			CDBHelper::restoreTables();
 		}
@@ -339,7 +341,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
 		}
 
-		if (($errors = @file_get_contents(PHPUNIT_ERROR_LOG))) {
+		if ($errors !== '' && $errors !== false) {
 			$this->fail("Runtime errors:\n".$errors);
 		}
 	}

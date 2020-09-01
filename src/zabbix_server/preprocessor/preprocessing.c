@@ -599,6 +599,100 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_preprocessor_pack_diag_stats                                 *
+ *                                                                            *
+ * Purpose: pack diagnostic statistics data into a single buffer that can be  *
+ *          used in IPC                                                       *
+ * Parameters: data               - [OUT] memory buffer for packed data       *
+ *             values_num         - [IN] the number of queued values          *
+ *             values_preproc_num - [IN] the number of queued values with     *
+ *                                       preprocessing steps                  *
+ *             data               - [IN] IPC data buffer                      *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int values_num, int values_preproc_num)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0;
+
+	zbx_serialize_prepare_value(data_len, values_num);
+	zbx_serialize_prepare_value(data_len, values_preproc_num);
+
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, values_num);
+	(void)zbx_serialize_value(ptr, values_preproc_num);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_pack_top_request                                *
+ *                                                                            *
+ * Purpose: pack top request data into a single buffer that can be used in IPC*
+ *                                                                            *
+ * Parameters: data  - [OUT] memory buffer for packed data                    *
+ *             field - [IN] the sort field                                    *
+ *             limit - [IN] the number of top values to return                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_preprocessor_pack_top_items_request(unsigned char **data, int limit)
+{
+	zbx_uint32_t	data_len = 0;
+
+	zbx_serialize_prepare_value(data_len, limit);
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+	(void)zbx_serialize_value(*data, limit);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_pack_top_result                                 *
+ *                                                                            *
+ * Purpose: pack top result data into a single buffer that can be used in IPC *
+ *                                                                            *
+ * Parameters: data      - [OUT] memory buffer for packed data                *
+ *             items     - [IN] the array of item references                  *
+ *             items_num - [IN] the number of items                           *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_preprocessor_pack_top_items_result(unsigned char **data, zbx_preproc_item_stats_t **items,
+		int items_num)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len = 0, item_len = 0;
+	int		i;
+
+	if (0 != items_num)
+	{
+		zbx_serialize_prepare_value(item_len, items[0]->itemid);
+		zbx_serialize_prepare_value(item_len, items[0]->values_num);
+		zbx_serialize_prepare_value(item_len, items[0]->steps_num);
+	}
+
+	zbx_serialize_prepare_value(data_len, items_num);
+	data_len += item_len * items_num;
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr = *data;
+	ptr += zbx_serialize_value(ptr, items_num);
+
+	for (i = 0; i < items_num; i++)
+	{
+		ptr += zbx_serialize_value(ptr, items[i]->itemid);
+		ptr += zbx_serialize_value(ptr, items[i]->values_num);
+		ptr += zbx_serialize_value(ptr, items[i]->steps_num);
+	}
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_preprocessor_unpack_value                                    *
  *                                                                            *
  * Purpose: unpack item value data from IPC data buffer                       *
@@ -774,6 +868,75 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_ptr_t *results, zbx_vector_p
 
 	(void)zbx_deserialize_str(offset, error, value_len);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_unpack_diag_stats                               *
+ *                                                                            *
+ * Purpose: unpack preprocessing test data from IPC data buffer               *
+ *                                                                            *
+ * Parameters: values_num         - [OUT] the number of queued values         *
+ *             values_preproc_num - [OUT] the number of queued values with    *
+ *                                       preprocessing steps                  *
+ *             data               - [IN] IPC data buffer                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_diag_stats(int *values_num, int *values_preproc_num, const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+
+	offset += zbx_deserialize_int(offset, values_num);
+	(void)zbx_deserialize_int(offset, values_preproc_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_unpack_top_request                              *
+ *                                                                            *
+ * Purpose: unpack preprocessing test data from IPC data buffer               *
+ *                                                                            *
+ * Parameters: data  - [OUT] memory buffer for packed data                    *
+ *             limit - [IN] the number of top values to return                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data)
+{
+	(void)zbx_deserialize_value(data, limit);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_unpack_top_request                              *
+ *                                                                            *
+ * Purpose: unpack preprocessing test data from IPC data buffer               *
+ *                                                                            *
+ * Parameters: items - [OUT] the item diag data                               *
+ *             data  - [IN] memory buffer for packed data                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_top_result(zbx_vector_ptr_t *items, const unsigned char *data)
+{
+	int	i, items_num;
+
+	data += zbx_deserialize_value(data, &items_num);
+
+	if (0 != items_num)
+	{
+		zbx_vector_ptr_reserve(items, items_num);
+
+		for (i = 0; i < items_num; i++)
+		{
+			zbx_preproc_item_stats_t	*item;
+
+			item = (zbx_preproc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_preproc_item_stats_t));
+			data += zbx_deserialize_value(data, &item->itemid);
+			data += zbx_deserialize_value(data, &item->values_num);
+			data += zbx_deserialize_value(data, &item->steps_num);
+			zbx_vector_ptr_append(items, item);
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_send                                                *
@@ -1030,3 +1193,54 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_get_diag_stats                                  *
+ *                                                                            *
+ * Purpose: get preprocessing manager diagnostic statistics                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, char **error)
+{
+	unsigned char	*result;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_DIAG_STATS,
+			SEC_PER_MIN, NULL, 0, &result, error))
+	{
+		return FAIL;
+	}
+
+	zbx_preprocessor_unpack_diag_stats(values_num, values_preproc_num, result);
+	zbx_free(result);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_get_top_items                                   *
+ *                                                                            *
+ * Purpose: get the top N items by the number of queued values                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error)
+{
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
+
+	data_len = zbx_preprocessor_pack_top_items_request(&data, limit);
+
+	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TOP_ITEMS,
+			SEC_PER_MIN, data, data_len, &result, error)))
+	{
+		goto out;
+	}
+
+	zbx_preprocessor_unpack_top_result(items, result);
+	zbx_free(result);
+out:
+	zbx_free(data);
+
+	return ret;
+}

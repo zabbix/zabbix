@@ -33,12 +33,13 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+	// TODO: add wf.name in select and order by after fix ZBX-18271
+	private $sql = 'SELECT wf.widgetid, wf.type, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid';
 
 	public function getCreateWidgetData() {
