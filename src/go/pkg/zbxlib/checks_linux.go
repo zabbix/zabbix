@@ -116,14 +116,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
 	case "vfs.dir.size":
 		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
-	case "vfs.fs.discovery":
-		cfunc = unsafe.Pointer(C.VFS_FS_DISCOVERY)
-	case "vfs.fs.inode":
-		cfunc = unsafe.Pointer(C.VFS_FS_INODE)
-	case "vfs.fs.size":
-		cfunc = unsafe.Pointer(C.VFS_FS_SIZE)
-	case "vfs.fs.get":
-		cfunc = unsafe.Pointer(C.VFS_FS_GET)
 	case "vm.memory.size":
 		cfunc = unsafe.Pointer(C.VM_MEMORY_SIZE)
 	}

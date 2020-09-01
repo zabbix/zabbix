@@ -25,6 +25,7 @@
 #include "sysinfo.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "memalloc.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -847,6 +848,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	unsigned char	status;
+	int		values_num;
 
 	zbx_hc_data_t	*tail;
 	zbx_hc_data_t	*head;
@@ -981,5 +983,10 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env);
 const char	*zbx_dc_get_instanceid(void);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+
+/* diagnostic data */
+void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
+void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
+void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 
 #endif

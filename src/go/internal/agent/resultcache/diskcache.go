@@ -165,6 +165,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		c.Errf("cannot select from data table: %s", err.Error())
 		return
 	}
+
 	defer func() {
 		if err != nil && (c.lastError == nil || err.Error() != c.lastError.Error()) {
 			c.Warningf("cannot upload history data: %s", err)
@@ -197,6 +198,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 			c.Errf("cannot select from log table: %s", err.Error())
 			return
 		}
+
 		for rows.Next() {
 			if result, err = c.resultFetch(rows); err != nil {
 				rows.Close()
@@ -340,9 +342,13 @@ func (c *DiskCache) write(r *plugin.Result) {
 			atomic.StoreUint32(&c.persistFlag, 1)
 		}
 		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("log_%d", c.serverID)))
+
 		if err != nil {
 			c.Errf("cannot prepare SQL query to insert history in log_%d : %s", c.serverID, err)
+		} else {
+			defer stmt.Close()
 		}
+
 	} else {
 		if c.oldestData == 0 {
 			c.oldestData = clock
@@ -361,6 +367,8 @@ func (c *DiskCache) write(r *plugin.Result) {
 		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("data_%d", c.serverID)))
 		if err != nil {
 			c.Errf("cannot prepare SQL query to insert history in data_%d : %s", c.serverID, err)
+		} else {
+			defer stmt.Close()
 		}
 	}
 	if stmt != nil {
@@ -402,6 +410,7 @@ func (c *DiskCache) run() {
 
 func (c *DiskCache) updateOptions(options *agent.AgentOptions) {
 	c.storagePeriod = int64(options.PersistentBufferPeriod)
+	c.timeout = options.Timeout
 }
 
 func (c *DiskCache) insertResultTable(table string) string {
@@ -423,7 +432,10 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 	}
 
 	rows, err := c.database.Query(fmt.Sprintf("SELECT id FROM registry WHERE address = '%s'", c.uploader.Addr()))
+
 	if err == nil {
+		defer rows.Close()
+
 		for rows.Next() {
 			if err = rows.Scan(&c.serverID); err != nil {
 				c.Errf("cannot retrieve diskcache server ID ")

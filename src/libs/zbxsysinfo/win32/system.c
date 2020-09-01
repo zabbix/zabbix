@@ -20,6 +20,8 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "perfmon.h"
+#include "cfg.h"
+
 #pragma comment(lib, "user32.lib")
 
 /******************************************************************************
@@ -151,6 +153,18 @@ out:
 	return pvi;
 }
 
+static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, char **var,
+		double time_first_query_started, double *time_previous_query_finished)
+{
+	double	time_left = CONFIG_TIMEOUT - (*time_previous_query_finished - time_first_query_started);
+
+	if (0 >= time_left)
+		return;
+
+	zbx_wmi_get(wmi_namespace, query, time_left, var);
+	*time_previous_query_finished = zbx_time();
+}
+
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*os = NULL;
@@ -164,55 +178,74 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*proc_addresswidth = NULL;
 	char	*wmi_namespace = "root\\cimv2";
 	char	*arch = "<unknown architecture>";
+	int	ret = SYSINFO_RET_FAIL;
+	double	start_time = zbx_time();
+	double	time_previous_query_finished = start_time;
 
 	/* Emulates uname(2) (POSIX) since it is not provided natively by Windows by taking */
 	/* the relevant values from Win32_OperatingSystem and Win32_Processor WMI classes.  */
 	/* It was decided that in context of Windows OS ISA is more useful information than */
 	/* CPU architecture. This is contrary to POSIX and uname(2) in Unix.                */
 
-	zbx_wmi_get(wmi_namespace, "select CSName from Win32_OperatingSystem", &os_csname);
-	zbx_wmi_get(wmi_namespace, "select Version from Win32_OperatingSystem", &os_version);
-	zbx_wmi_get(wmi_namespace, "select Caption from Win32_OperatingSystem", &os_caption);
-	zbx_wmi_get(wmi_namespace, "select CSDVersion from Win32_OperatingSystem", &os_csdversion);
-	zbx_wmi_get(wmi_namespace, "select Architecture from Win32_Processor", &proc_architecture);
-	zbx_wmi_get(wmi_namespace, "select AddressWidth from Win32_Processor", &proc_addresswidth);
+	get_wmi_check_timeout(wmi_namespace, "select CSName from Win32_OperatingSystem", &os_csname, start_time,
+			&time_previous_query_finished);
+	get_wmi_check_timeout(wmi_namespace, "select Version from Win32_OperatingSystem", &os_version, start_time,
+			&time_previous_query_finished);
+	get_wmi_check_timeout(wmi_namespace, "select Caption from Win32_OperatingSystem", &os_caption, start_time,
+			&time_previous_query_finished);
+	get_wmi_check_timeout(wmi_namespace, "select CSDVersion from Win32_OperatingSystem", &os_csdversion, start_time,
+			&time_previous_query_finished);
+	get_wmi_check_timeout(wmi_namespace, "select Architecture from Win32_Processor", &proc_architecture, start_time,
+			&time_previous_query_finished);
+	get_wmi_check_timeout(wmi_namespace, "select AddressWidth from Win32_Processor", &proc_addresswidth, start_time,
+			&time_previous_query_finished);
 
-	if (NULL != proc_architecture)
+	if (0 >= CONFIG_TIMEOUT - (time_previous_query_finished - start_time))
 	{
-		switch (atoi(proc_architecture))
-		{
-			case 0: arch = "x86"; break;
-			case 6: arch = "ia64"; break;
-			case 9:
-				if (NULL != proc_addresswidth)
-				{
-					if (32 == atoi(proc_addresswidth))
-						arch = "x86";
-					else
-						arch = "x64";
-				}
-
-				break;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "WMI aggregate query timeout"));
 	}
+	else
+	{
+		if (NULL != proc_architecture)
+		{
+			switch (atoi(proc_architecture))
+			{
+				case 0: arch = "x86"; break;
+				case 6: arch = "ia64"; break;
+				case 9:
+					if (NULL != proc_addresswidth)
+					{
+						if (32 == atoi(proc_addresswidth))
+							arch = "x86";
+						else
+							arch = "x64";
+					}
 
-	/* The comments indicate the relevant field in struct utsname (POSIX) that is used in uname(2). */
-	zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "%s %s %s %s%s%s %s",
-		sysname,						/* sysname */
-		os_csname ? os_csname : "<unknown nodename>",		/* nodename */
-		os_version ? os_version : "<unknown release>",		/* release */
-		os_caption ? os_caption : "<unknown version>",		/* version */
-		os_caption && os_csdversion ? " " : "",
-		os_caption && os_csdversion ? os_csdversion : "",	/* version (cont.) */
-		arch);							/* machine */
+					break;
+			}
+		}
+
+		/* The comments indicate the relevant field in struct utsname (POSIX) that is used in uname(2). */
+		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "%s %s %s %s%s%s %s",
+				sysname,						/* sysname */
+				os_csname ? os_csname : "<unknown nodename>",		/* nodename */
+				os_version ? os_version : "<unknown release>",		/* release */
+				os_caption ? os_caption : "<unknown version>",		/* version */
+				os_caption && os_csdversion ? " " : "",
+				os_caption && os_csdversion ? os_csdversion : "",	/* version (cont.) */
+				arch);							/* machine */
+
+		SET_STR_RESULT(result, os);
+
+		ret = SYSINFO_RET_OK;
+	}
 
 	zbx_free(os_csname);
 	zbx_free(os_version);
 	zbx_free(os_caption);
 	zbx_free(os_csdversion);
 	zbx_free(proc_architecture);
+	zbx_free(proc_addresswidth);
 
-	SET_STR_RESULT(result, os);
-
-	return SYSINFO_RET_OK;
+	return ret;
 }

@@ -33,7 +33,9 @@ OBJS = \
 	$(OUTPUTDIR)\eventlog.o \
 	$(TARGETDIR)\resource.syso
 
-CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
+CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -DZBX_BUILD_AGENT2=1  -DHAVE_THREAD_LOCAL=1 \
+	-I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
+
 RFLAGS := $(RFLAGS) --input-format=rc -O coff
 GOPATH := $(GOPATH);$(TOPDIR)\go
 TAGS :=

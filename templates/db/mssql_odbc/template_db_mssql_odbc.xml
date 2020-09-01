@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-01T18:53:11Z</date>
+   <date>2020-08-29T09:23:37Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -18,12 +18,13 @@
   Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.&#13;
   See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.&#13;
   Note! Credentials in the odbc.ini do not work for MSSQL.&#13;
+3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name, please.&#13;
 The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -49,13 +50,13 @@ Template tooling version used: 0.36</description>
                <params>SELECT object_name, counter_name, instance_name, cntr_value
 FROM sys.dm_os_performance_counters 
 UNION 
-SELECT 'SQLServer' as object_name, 'Version' as counter_name, @@version as instance_name, 0 as cntr_value
+SELECT '{$MSSQL.INSTANCE}' as object_name, 'Version' as counter_name, @@version as instance_name, 0 as cntr_value
 UNION 
-SELECT 'SQLServer' as object_name, 'Uptime' as counter_name, '' as instance_name, 
+SELECT '{$MSSQL.INSTANCE}' as object_name, 'Uptime' as counter_name, '' as instance_name, 
 DATEDIFF(second, sqlserver_start_time, GETDATE()) as cntr_value
 FROM sys.dm_os_sys_info
 UNION
-SELECT 'SQLServer:Databases' as object_name, 'State' as counter_name, name as instance_name, state as cntr_value
+SELECT '{$MSSQL.INSTANCE}:Databases' as object_name, 'State' as counter_name, name as instance_name, state as cntr_value
 FROM sys.databases
 UNION
 SELECT a.object_name, 'BufferCacheHitRatio' as counter_name, '' as instance_name, 
@@ -64,9 +65,9 @@ FROM sys.dm_os_performance_counters  a
 JOIN  (SELECT cntr_value,OBJECT_NAME 
   FROM sys.dm_os_performance_counters  
     WHERE counter_name = 'Buffer cache hit ratio base'
-        AND OBJECT_NAME = 'SQLServer:Buffer Manager') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager') b ON  a.OBJECT_NAME = b.OBJECT_NAME
 WHERE a.counter_name = 'Buffer cache hit ratio'
-AND a.OBJECT_NAME = 'SQLServer:Buffer Manager'
+AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager'
 UNION
 SELECT a.object_name, 'WorktablesFromCacheRatio' as counter_name, '' as instance_name, 
 cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
@@ -74,9 +75,9 @@ FROM sys.dm_os_performance_counters  a
 JOIN  (SELECT cntr_value,OBJECT_NAME 
   FROM sys.dm_os_performance_counters  
     WHERE counter_name = 'Worktables From Cache Base'
-        AND OBJECT_NAME = 'SQLServer:Access Methods') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods') b ON  a.OBJECT_NAME = b.OBJECT_NAME
 WHERE a.counter_name = 'Worktables From Cache Ratio'
-AND a.OBJECT_NAME = 'SQLServer:Access Methods'
+AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods'
 UNION
 SELECT a.object_name, 'CacheHitRatio' as counter_name, '_Total' as instance_name, 
 cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
@@ -84,10 +85,10 @@ FROM sys.dm_os_performance_counters  a
 JOIN  (SELECT cntr_value,OBJECT_NAME 
   FROM sys.dm_os_performance_counters  
     WHERE counter_name = 'Cache Hit Ratio base'
-        AND OBJECT_NAME = 'SQLServer:Plan Cache'
+        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
         AND instance_name = '_Total') b ON  a.OBJECT_NAME = b.OBJECT_NAME
 WHERE a.counter_name = 'Cache Hit Ratio'
-  AND a.OBJECT_NAME = 'SQLServer:Plan Cache'
+  AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
   AND instance_name = '_Total'</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
@@ -114,7 +115,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Auto-Param Attempts/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Auto-Param Attempts/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -158,7 +159,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time Base')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time Base')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -181,7 +182,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time (ms)')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time (ms)')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -229,7 +230,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Average Wait Time Base' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Average Wait Time Base' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -252,7 +253,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Average Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Average Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -276,7 +277,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Batch Requests/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Batch Requests/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -304,7 +305,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='BufferCacheHitRatio')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='BufferCacheHitRatio')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -348,7 +349,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='CacheHitRatio' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='CacheHitRatio' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -370,7 +371,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Object Counts' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Object Counts' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -392,7 +393,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Objects in use' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Objects in use' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -414,7 +415,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Pages' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Pages' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -437,7 +438,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Checkpoint pages/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Checkpoint pages/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -464,7 +465,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -490,7 +491,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Database pages')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Database pages')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -513,7 +514,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -540,7 +541,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Failed Auto-Params/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Failed Auto-Params/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -567,7 +568,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Forwarded Records/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Forwarded Records/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -595,7 +596,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Free list stalls/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Free list stalls/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -630,7 +631,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Full Scans/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Full Scans/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -657,7 +658,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Granted Workspace Memory (KB)')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Granted Workspace Memory (KB)')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -684,7 +685,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Index Searches/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Index Searches/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -711,7 +712,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Info Errors')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Info Errors')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -738,7 +739,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Kill Connection Errors')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Kill Connection Errors')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -766,7 +767,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Latch Waits/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Latch Waits/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -793,7 +794,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Lazy writes/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Lazy writes/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -829,7 +830,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Requests/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Requests/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -865,7 +866,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Timeouts/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Timeouts/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -901,7 +902,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -929,7 +930,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Waits/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Waits/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -964,7 +965,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -991,7 +992,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -1018,7 +1019,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='Logins/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Logins/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1045,7 +1046,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='Logouts/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Logouts/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1072,7 +1073,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Maximum Workspace Memory (KB)')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Maximum Workspace Memory (KB)')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -1098,7 +1099,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Outstanding')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Outstanding')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1120,7 +1121,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Pending')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Pending')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1144,7 +1145,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Number of Deadlocks/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Number of Deadlocks/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1179,7 +1180,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='DB Offline Errors')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='DB Offline Errors')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1207,7 +1208,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page life expectancy')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page life expectancy')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1239,7 +1240,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page lookups/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page lookups/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1266,7 +1267,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page reads/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page reads/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1301,7 +1302,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Page Splits/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Page Splits/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1328,7 +1329,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page writes/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page writes/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1348,6 +1349,56 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                </triggers>
             </item>
             <item>
+               <name>MSSQL: Percent of Adhoc queries running</name>
+               <type>CALCULATED</type>
+               <key>mssql.percent_of_adhoc_queries</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <params>last(mssql.sql_compilations_sec.rate) * 100 /
+(last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))</params>
+               <description>The ratio of SQL compilations per second to Batch requests per second in percent.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
+                     <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Percent of Recompiled Transact-SQL Objects</name>
+               <type>CALCULATED</type>
+               <key>mssql.percent_recompilations_to_compilations</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <params>last(mssql.sql_recompilations_sec.rate) * 100 /
+(last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))</params>
+               <description>The ratio of SQL re-compilations per second to SQL compilations per second in percent.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
+                     <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
                <name>MSSQL: Number of blocked processes</name>
                <type>DEPENDENT</type>
                <key>mssql.processes_blocked</key>
@@ -1362,7 +1413,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='Processes blocked')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Processes blocked')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1385,7 +1436,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Readahead pages/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Readahead pages/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1412,7 +1463,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Safe Auto-Params/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Safe Auto-Params/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1422,6 +1473,29 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <master_item>
                   <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Full scans to Index searches ratio</name>
+               <type>CALCULATED</type>
+               <key>mssql.scan_to_search</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <params>last(mssql.full_scans_sec.rate) / (last(mssql.index_searches_sec.rate) + (last(mssql.index_searches_sec.rate)=0))</params>
+               <description>The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; 0.001</expression>
+                     <name>MSSQL: Index and table scans are often than index searches for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>MSSQL: SQL compilations per second</name>
@@ -1439,7 +1513,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='SQL Compilations/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='SQL Compilations/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1466,7 +1540,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='SQL Re-Compilations/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='SQL Re-Compilations/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1493,7 +1567,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Table Lock Escalations/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Table Lock Escalations/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1519,7 +1593,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Target pages')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Target pages')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1542,7 +1616,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Target Server Memory (KB)')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Target Server Memory (KB)')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -1570,7 +1644,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Total Latch Wait Time (ms)')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Total Latch Wait Time (ms)')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1597,7 +1671,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Total Server Memory (KB)')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Total Server Memory (KB)')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -1623,7 +1697,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Transactions' &amp;&amp; @.counter_name=='Transactions')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Transactions' &amp;&amp; @.counter_name=='Transactions')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1646,7 +1720,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1673,7 +1747,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Unsafe Auto-Params/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Unsafe Auto-Params/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1701,7 +1775,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer' &amp;&amp; @.counter_name=='Uptime')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}' &amp;&amp; @.counter_name=='Uptime')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1723,7 +1797,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                      <dependencies>
                         <dependency>
                            <name>MSSQL: Service is unavailable</name>
-                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].max(#3)}=0</expression>
+                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1744,7 +1818,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='User Connections')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='User Connections')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1767,7 +1841,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='User Errors')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='User Errors')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1795,7 +1869,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer' &amp;&amp; @.counter_name=='Version')].instance_name.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}' &amp;&amp; @.counter_name=='Version')].instance_name.first()</params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1831,7 +1905,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Workfiles Created/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Workfiles Created/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1866,7 +1940,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Worktables Created/sec')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Worktables Created/sec')].cntr_value.first()</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -1902,7 +1976,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='WorktablesFromCacheRatio')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='WorktablesFromCacheRatio')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1940,7 +2014,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{max(#3)}=0</expression>
+                     <expression>{last()}=0</expression>
                      <name>MSSQL: Service is unavailable</name>
                      <priority>DISASTER</priority>
                      <description>The TCP port of the MS SQL Server service is currently unavailable.</description>
@@ -2042,8 +2116,8 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                            <params>$[?(@.group_name=='{#GROUP_NAME}')].primary_replica.first()</params>
                         </step>
                         <step>
-                           <type>DISCARD_UNCHANGED</type>
-                           <params/>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2137,6 +2211,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2186,7 +2261,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Active Transactions' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Active Transactions' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2209,7 +2284,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -2237,7 +2312,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Bytes Flushed/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Bytes Flushed/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2264,7 +2339,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -2291,7 +2366,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -2319,7 +2394,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Flush Wait Time' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flush Wait Time' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2354,7 +2429,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Flush Waits/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flush Waits/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2389,7 +2464,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Flushes/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flushes/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2415,20 +2490,12 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Growths' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Growths' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
                         <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                      </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB '{#DBNAME}': Rate of log growths is high (over {$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
-                           <priority>WARNING</priority>
-                           <description>The transaction log for the database has grown too frequently.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log shrinks</name>
@@ -2445,20 +2512,12 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Shrinks' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Shrinks' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
                         <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                      </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB '{#DBNAME}': Rate of log shrinks is (over {$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
-                           <priority>WARNING</priority>
-                           <description>The transaction log for the database has shrunken too frequently.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log truncations</name>
@@ -2475,7 +2534,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Truncations' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Truncations' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2499,7 +2558,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Percent Log Used' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Percent Log Used' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2540,7 +2599,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='State' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='State' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2575,7 +2634,7 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -2587,6 +2646,7 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log size</name>
@@ -2604,6 +2664,34 @@ FROM sys.databases</params>
                            <item>
                               <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_files_used_size["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>MSSQL DB '{#DBNAME}': Number of Log changes</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_growths["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_shrinks["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_truncations["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2789,6 +2877,7 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -3022,6 +3111,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>MSSQL Mirroring '{#DBNAME}': States</name>
@@ -3171,6 +3261,7 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -3491,6 +3582,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {Template DB MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2</expression>
@@ -3550,6 +3642,11 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <description>The maximum free list stalls per second for trigger expression.</description>
             </macro>
             <macro>
+               <macro>{$MSSQL.INSTANCE}</macro>
+               <value>SQLServer</value>
+               <description>The instance name for the default instance is SQLServer. For named instance set macro value as MSSQL$instance name.</description>
+            </macro>
+            <macro>
                <macro>{$MSSQL.LAZY_WRITES.MAX}</macro>
                <value>20</value>
                <description>The maximum lazy writes per second for trigger expression.</description>
@@ -3573,16 +3670,6 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <macro>{$MSSQL.LOG_FLUSH_WAITS.MAX}</macro>
                <value>1</value>
                <description>The maximum log flush waits per second for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$MSSQL.LOG_GROWTHS.MAX}</macro>
-               <value>1</value>
-               <description>The maximum log growths for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$MSSQL.LOG_SHRINKS.MAX}</macro>
-               <value>1</value>
-               <description>The maximum log shrinks for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</macro>
@@ -3654,32 +3741,13 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
    </templates>
    <triggers>
       <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()} + ({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()}=0)) *&#13;
-1000 &lt; {Template DB MSSQL by ODBC:mssql.index_searches_sec.rate.last()}</expression>
-         <name>MSSQL: Index and table scans are often than index searches</name>
-         <priority>WARNING</priority>
-         <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
-      </trigger>
-      <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
-         <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}%</name>
-         <priority>WARNING</priority>
-         <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
-      </trigger>
-      <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.sql_recompilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
-         <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}%</name>
-         <priority>WARNING</priority>
-         <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
-      </trigger>
-      <trigger>
          <expression>{Template DB MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 &gt; 10 * {Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}</expression>
          <name>MSSQL: Too frequently pointers using</name>
          <priority>WARNING</priority>
          <description>Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} / {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX}</expression>
+         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()}</expression>
          <name>MSSQL: Too many physical reads occurring</name>
          <priority>WARNING</priority>
          <description>If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.</description>

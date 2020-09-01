@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T00:00:00Z</date>
+    <date>2020-08-12T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Discord</name>
@@ -50,6 +50,10 @@
                 <parameter>
                     <name>event_severity</name>
                     <value>{EVENT.SEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_source</name>
+                    <value>{EVENT.SOURCE}</value>
                 </parameter>
                 <parameter>
                     <name>event_tags</name>
@@ -134,22 +138,32 @@ try {&#13;
     if (!params.discord_endpoint) {&#13;
         throw 'Cannot get discord_endpoint';&#13;
     }&#13;
-    else if (!params.discord_endpoint.startsWith('https://discordapp.com/api/webhooks')) {&#13;
-        throw 'Invalid Discord webhook URL: ' + params.discord_endpoint;&#13;
-    }&#13;
     else {&#13;
-        params.discord_endpoint = params.discord_endpoint.replace('/api/', '/api/v1000/') + '?wait=True';&#13;
+        params.discord_endpoint = params.discord_endpoint.replace('/api/', '/api/v7/') + '?wait=True';&#13;
     }&#13;
 &#13;
     params.zabbix_url = (params.zabbix_url.endsWith('/'))&#13;
         ? params.zabbix_url.slice(0, -1) : params.zabbix_url;&#13;
 &#13;
-    if (!(params.event_value == 0 || params.event_value == 1)) {&#13;
-        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
+    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
+        throw 'Incorrect &quot;event_source&quot; parameter given: &quot;' + params.event_source + '&quot;.\nMust be 0-3.';&#13;
     }&#13;
 &#13;
-    if (!(params.event_update_status == 0 || params.event_update_status == 1)) {&#13;
-        throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
+    // Set params to true for non trigger-based events.&#13;
+    if (params.event_source !== '0') {&#13;
+        params.use_default_message = 'true';&#13;
+        params.event_nseverity = '0';&#13;
+    }&#13;
+&#13;
+    // Check {EVENT.VALUE} for trigger-based and internal events.&#13;
+    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'&#13;
+        &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: &quot;' + params.event_value + '&quot;.\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    // Check {EVENT.UPDATE.STATUS} only for trigger-based events.&#13;
+    if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
+        throw 'Incorrect &quot;event_update_status&quot; parameter given: &quot;' + params.event_update_status + '&quot;.\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
     if (params.event_value == 0) {&#13;
@@ -166,8 +180,10 @@ try {&#13;
             embeds: [&#13;
                 {&#13;
                     color: color || 0,&#13;
-                    url: params.zabbix_url + '/tr_events.php?triggerid=' +&#13;
-                        params.trigger_id + '&amp;eventid=' + params.event_id&#13;
+                    url: (params.event_source === '0')&#13;
+                        ? params.zabbix_url + '/tr_events.php?triggerid=' + params.trigger_id +&#13;
+                            '&amp;eventid=' + params.event_id&#13;
+                        : params.zabbix_url&#13;
                 }&#13;
             ]&#13;
         };&#13;
@@ -186,7 +202,7 @@ try {&#13;
         );&#13;
 &#13;
         // Resolved message.&#13;
-        if (params.event_value == 0) {&#13;
+        if (params.event_value == 0 &amp;&amp; params.event_update_status == 0) {&#13;
             body.embeds[0].title = stringTruncate('OK: ' + params.event_name, 256);&#13;
             fields.push(&#13;
                 {&#13;
@@ -198,7 +214,7 @@ try {&#13;
         }&#13;
 &#13;
         // Problem message.&#13;
-        else if (params.event_update_status == 0) {&#13;
+        else if (params.event_value == 1 &amp;&amp; params.event_update_status == 0) {&#13;
             body.embeds[0].title = stringTruncate('PROBLEM: ' + params.event_name, 256);&#13;
             fields.push(&#13;
                 {&#13;
@@ -298,6 +314,64 @@ catch (error) {&#13;
     Zabbix.Log(3, '[ Discord Webhook ] ERROR: ' + error);&#13;
     throw 'Sending failed: ' + error;&#13;
 }</script>
+            <message_templates>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>Problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Operational data: {EVENT.OPDATA}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>RECOVERY</operation_mode>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>UPDATE</operation_mode>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
+{EVENT.UPDATE.MESSAGE}&#13;
+&#13;
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.</message>
+                </message_template>
+                <message_template>
+                    <event_source>DISCOVERY</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}</subject>
+                    <message>Discovery rule: {DISCOVERY.RULE.NAME}&#13;
+&#13;
+Device IP: {DISCOVERY.DEVICE.IPADDRESS}&#13;
+Device DNS: {DISCOVERY.DEVICE.DNS}&#13;
+Device status: {DISCOVERY.DEVICE.STATUS}&#13;
+Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
+&#13;
+Device service name: {DISCOVERY.SERVICE.NAME}&#13;
+Device service port: {DISCOVERY.SERVICE.PORT}&#13;
+Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
+                </message_template>
+                <message_template>
+                    <event_source>AUTOREGISTRATION</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Autoregistration: {HOST.HOST}</subject>
+                    <message>Host name: {HOST.HOST}&#13;
+Host IP: {HOST.IP}&#13;
+Agent port: {HOST.PORT}</message>
+                </message_template>
+            </message_templates>
         </media_type>
     </media_types>
 </zabbix_export>

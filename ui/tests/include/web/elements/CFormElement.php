@@ -33,6 +33,8 @@ class CFormElement extends CElement {
 	const TABLE_FORM_LEFT = 'div[contains(@class, "table-forms-td-left")]';
 	const TABLE_FORM_RIGHT = 'div[contains(@class, "table-forms-td-right")]';
 
+	protected $toggle_fields = true;
+
 	/**
 	 * Local form input cache.
 	 * @var array
@@ -109,13 +111,27 @@ class CFormElement extends CElement {
 	/**
 	 * Get element field by label element.
 	 *
-	 * @param CElement $label    label element
+	 * @param CElement $label     label element
 	 *
 	 * @return CElement|CNullElement
 	 */
 	public function getFieldByLabelElement($label) {
 		if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT))->isValid()) {
 			return $element;
+		}
+		elseif ($this->toggle_fields) {
+			$for = $label->getAttribute('for');
+			if (substr($for, 0, 8) === 'visible_') {
+				try {
+					$this->query('id', $for)->asCheckbox()->one()->check();
+					if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT))->isValid()) {
+						return $element;
+					}
+				}
+				catch (\Exception $e) {
+					// Code is not missing here.
+				}
+			}
 		}
 
 		// Nested table forms.
@@ -172,7 +188,7 @@ class CFormElement extends CElement {
 		if (!$element->isValid()) {
 			$label = $this->getLabel($name);
 
-			if (($element = $this->getFieldByLabelElement($label))->isValid() === false) {
+			if (($element = $this->getFieldByLabelElement($label))->isValid() === false && $this->toggle_fields !== false) {
 				throw new Exception('Failed to find form field by label name or selector: "'.$name.'".');
 			}
 		}
@@ -192,8 +208,9 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getFieldById($id) {
-		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
-		$label = $this->query($prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).']')->one(false);
+		$prefix = './/'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
+		$label = $this->query('xpath:'.$prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).
+				' or @for='.CXPathHelper::escapeQuotes('visible_'.$id).']')->one(false);
 
 		if ($label->isValid() === false) {
 			$label = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_RIGHT.'//*[@id='.
@@ -288,6 +305,49 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Fill form fields with specific values.
+	 *
+	 * @param string $field   field name to filled in
+	 * @param string $values  value to be put in field
+	 *
+	 * @return
+	 */
+	private function setFieldValue($field, $values) {
+		$element = $this->getField($field);
+
+		if ($values === null) {
+			$label = $this->getLabel($field);
+			$for = $label->getAttribute('for');
+
+			if (substr($for, 0, 8) === 'visible_') {
+				try {
+					$this->query('id', $for)->asCheckbox()->one()->uncheck();
+
+					return;
+				}
+				catch (\Exception $e) {
+					// Code is not missing here.
+				}
+			}
+		}
+		elseif (is_array($values) && !in_array(get_class($element),
+				[CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class])) {
+
+			if ($values !== []) {
+				$container = $this->getFieldContainer($field);
+
+				foreach ($values as $name => $value) {
+					$container->query('id', $name)->one()->detect()->fill($value);
+				}
+			}
+
+			return;
+		}
+
+		$element->fill($values);
+	}
+
+	/**
 	 * Fill form with specified data.
 	 *
 	 * @param array $data    data array where keys are label text and values are values to be put in fields
@@ -296,16 +356,16 @@ class CFormElement extends CElement {
 	 */
 	public function fill($data) {
 		if ($data && is_array($data)) {
-			foreach ($data as $field => $value) {
+			foreach ($data as $field => $values) {
 				try {
-					$this->getField($field)->fill($value);
+					$this->setFieldValue($field, $values);
 				}
 				catch (\Exception $e1) {
 					sleep(1);
 
 					try {
 						$this->invalidate();
-						$this->getField($field)->fill($value);
+						$this->setFieldValue($field, $values);
 					} catch (\Exception $e2) {
 						throw $e1;
 					}
@@ -317,17 +377,73 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
+	* @inheritdoc
+	*/
 	public function checkValue($expected, $raise_exception = true) {
-		if ($expected && is_array($expected)) {
-			foreach ($expected as $field => $value) {
-				if ($this->getField($field)->checkValue($value, $raise_exception) === false) {
-					return false;
+		$state = $this->toggle_fields;
+		$this->toggle_fields = false;
+
+		try {
+			if ($expected && is_array($expected)) {
+				foreach ($expected as $field => $value) {
+					if ($this->checkFieldValue($field, $value, $raise_exception) === false) {
+						$this->toggle_fields = $state;
+						return false;
+					}
 				}
 			}
 		}
+		catch (\Exception $e) {
+			$this->toggle_fields = $state;
+			throw $e;
+		}
 
 		return true;
+	}
+
+	/**
+	 * Check single form field value to have a specific value.
+	 *
+	 * @param string  $field              field name to filled checked
+	 * @param mixed   $values             value to be checked in field
+	 * @param boolean $raise_exception    flag to raise exceptions on error
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception
+	 */
+	private function checkFieldValue($field, $values, $raise_exception = true) {
+		$element = $this->getField($field);
+
+		if ($values === null) {
+			$label = $this->getLabel($field);
+			$for = $label->getAttribute('for');
+
+			if (substr($for, 0, 8) === 'visible_') {
+				$checkbox = $this->query('id', $for)->asCheckbox()->one(false);
+				if ($checkbox->isValid()) {
+					return $checkbox->checkValue(false, $raise_exception);
+				}
+			}
+
+			return true;
+		}
+		elseif (is_array($values) && !in_array(get_class($element),
+				[CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class])) {
+
+			if ($values !== []) {
+				$container = $this->getFieldContainer($field);
+
+				foreach ($values as $name => $value) {
+					if (!$container->query('id', $name)->one()->detect()->checkValue($value, $raise_exception)) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		$element->checkValue($values, $raise_exception);
 	}
 }
