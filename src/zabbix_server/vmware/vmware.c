@@ -5719,8 +5719,6 @@ int	zbx_vmware_init(char **error)
 	if (SUCCEED != zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE, error))
 		goto out;
 
-	evt_req_chunk_size = zbx_mem_required_chunk_size(sizeof(zbx_vmware_event_t));
-
 	size_reserved = zbx_mem_required_size(1, "vmware cache size", "VMwareCacheSize");
 
 	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
@@ -5740,6 +5738,7 @@ int	zbx_vmware_init(char **error)
 	zbx_hashset_create_ext(&vmware->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
 		__vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
 	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
+	evt_req_chunk_size = zbx_mem_required_chunk_size(sizeof(zbx_vmware_event_t));
 #endif
 	ret = SUCCEED;
 out:
