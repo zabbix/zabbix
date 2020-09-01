@@ -660,6 +660,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+			COverlayDialogElement::ensureNotPresent();
 		}
 
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('evaltype'));

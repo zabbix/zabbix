@@ -243,6 +243,22 @@ static int	DBpatch_5010026(void)
 	return DBmodify_field_type("globalmacro", &field, NULL);
 }
 
+static int	DBpatch_5010027(void)
+{
+	const ZBX_FIELD	old_field = {"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"data", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_data", &field, &old_field);
+}
+
+static int	DBpatch_5010028(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -276,5 +292,7 @@ DBPATCH_ADD(5010023, 0, 1)
 DBPATCH_ADD(5010024, 0, 1)
 DBPATCH_ADD(5010025, 0, 1)
 DBPATCH_ADD(5010026, 0, 1)
+DBPATCH_ADD(5010027, 0, 1)
+DBPATCH_ADD(5010028, 0, 1)
 
 DBPATCH_END()

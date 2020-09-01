@@ -4,8 +4,11 @@ This guide describes how to integrate Zabbix 5.0 with MS Teams using the Zabbix 
 This integration is supported only for **Teams** as part of Office 365. Note, that **Teams** free plan does not support [incoming webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) feature.
 
 ## Setting up webhook in MS Teams 
+First, you need to get a webhook URL for the channel. There are two ways to do this:
 
-1\. Create **incoming webhook** for the channel, where you want to receive notifications.
+- Add official **Zabbix webhook** connector from MS Teams apps for the channel, where you want to receive notifications. (Check [how to add a connector to a channel](https://docs.microsoft.com/en-us/microsoftteams/office-365-custom-connectors#add-a-connector-to-a-channel))
+
+- Create **Incoming webhook** for your channel.
 (See **Teams** [documentation](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook#add-an-incoming-webhook-to-a-teams-channel) for the step-by-step instructions).
 
 
