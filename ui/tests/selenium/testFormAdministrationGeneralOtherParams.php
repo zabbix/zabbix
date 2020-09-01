@@ -39,7 +39,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 	private $default = [
 		'Refresh unsupported items' => '10m',
-		'Group for discovered hosts' => 'Discovered hosts',
+		'Group for discovered hosts' => 'Empty group',
 		'Default host inventory mode' => 'Disabled',
 		'User group for database down message' => 'Zabbix administrators',
 		'Log unmatched SNMP traps' => true,
@@ -61,33 +61,33 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	];
 
 	private $db_default = [
-		'Refresh unsupported items' => '10m',
-		'Group for discovered hosts' => 'Discovered hosts',
-		'Default host inventory mode' => 'Disabled',
-		'User group for database down message' => 'Selenium user group in configuration',
-		'Log unmatched SNMP traps' => true,
+		'refresh_unsupported' => '10m',
+		'discovery_groupid' => 50006,
+		'default_inventory_mode' => -1,
+		'alert_usrgrpid' => 7,
+		'snmptrap_logging' => 1,
 		// Authorization.
-		'Login attempts' => 5,
-		'Login blocking interval' => '30s',
+		'login_attempts' => 5,
+		'login_block' => '30s',
 		// Security.
-		'Validate URI schemes' => true,
-		'Valid URI schemes' => 'http,https,ftp,file,mailto,tel,ssh',
-		'X-Frame-Options HTTP header' => 'SAMEORIGIN',
-		'Use iframe sandboxing' => true,
-		'Iframe sandboxing exceptions' => '',
+		'validate_uri_schemes' => 1,
+		'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
+		'x_frame_options' => 'SAMEORIGIN',
+		'iframe_sandboxing_enabled' => 1,
+		'iframe_sandboxing_exceptions' => '',
 		// Communication with Zabbix server.
-		'Network timeout' => '3s',
-		'Connection timeout' => '3s',
-		'Network timeout for media type test' => '65s',
-		'Network timeout for script execution' => '60s',
-		'Network timeout for item test' => '60s'
+		'socket_timeout' => '3s',
+		'connect_timeout' => '3s',
+		'media_type_test_timeout' => '65s',
+		'script_timeout' => '60s',
+		'item_test_timeout' => '60s'
 	];
 
 	private $custom = [
 		'Refresh unsupported items' => '99m',
-		'Group for discovered hosts' => 'Empty group',
+		'Group for discovered hosts' => 'Hypervisors',
 		'Default host inventory mode' => 'Automatic',
-		'User group for database down message' => 'Selenium user group in configuration',
+		'User group for database down message' => 'Test timezone',
 		'Log unmatched SNMP traps' => false,
 		// Authorization.
 		'Login attempts' => 13,
@@ -186,6 +186,27 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	}
 
 	/**
+	 * Test for checking form update without changing any data.
+	 */
+	public function testFormAdministrationGeneralOtherParams_SimpleUpdate() {
+		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
+		$this->page->login()->open('zabbix.php?action=miscconfig.edit');
+		$form = $this->query('name:otherForm')->waitUntilPresent()->asForm()->one();
+		$values = $form->getFields()->asValues();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
+		$this->page->refresh();
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		// Check that DBdata is not changed.
+		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
+		// Check that Frontend form is not changed.
+		$this->assertEquals($values, $form->getFields()->asValues());
+	}
+
+	/**
 	 * Function for configuration resetting.
 	 *
 	 * @param element  $form      Settings configuration form
@@ -198,6 +219,13 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
 		switch ($action) {
 			case 'Reset defaults':
+				// In Other params form these fields have no default value, so can be filled with anyting.
+				$form->fill(
+					[
+						'Group for discovered hosts' => 'Empty group',
+						'User group for database down message' => 'Zabbix administrators'
+					]
+				);
 				$form->submit();
 				$this->assertMessage(TEST_GOOD, 'Configuration updated');
 				$this->page->refresh();
@@ -212,4 +240,3 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		}
 	}
 }
-
