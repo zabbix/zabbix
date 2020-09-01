@@ -76,7 +76,7 @@ class CDashboard extends CApiService {
 		$sql_parts = [
 			'select'	=> ['dashboard' => 'd.dashboardid'],
 			'from'		=> ['dashboard' => 'dashboard d'],
-			'where'		=> [],
+			'where'		=> ['dashboard' => 'd.templateid IS NULL'],
 			'order'		=> [],
 			'group'		=> []
 		];
@@ -142,6 +142,7 @@ class CDashboard extends CApiService {
 		if ($db_dashboards) {
 			$db_dashboards = $this->addRelatedObjects($options, $db_dashboards);
 			$db_dashboards = $this->unsetExtraFields($db_dashboards, ['dashboardid'], $options['output']);
+			$db_dashboards = $this->unsetExtraFields($db_dashboards, ['templateid'], []);
 
 			if (!$options['preservekeys']) {
 				$db_dashboards = array_values($db_dashboards);

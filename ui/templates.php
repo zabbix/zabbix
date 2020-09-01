@@ -1098,7 +1098,7 @@ else {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT,
+		'selectDashboards' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectTags' => ['tag', 'value'],
 		'templateids' => zbx_objectValues($templates, 'templateid'),

@@ -229,7 +229,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$options['selectItems'] = API_OUTPUT_COUNT;
 			$options['selectTriggers'] = API_OUTPUT_COUNT;
 			$options['selectGraphs'] = API_OUTPUT_COUNT;
-			$options['selectScreens'] = API_OUTPUT_COUNT;
+			$options['selectDashboards'] = API_OUTPUT_COUNT;
 			$options['selectDiscoveries'] = API_OUTPUT_COUNT;
 			$options['selectHttpTests'] = API_OUTPUT_COUNT;
 		}
@@ -397,16 +397,20 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 		$content_menu->addItem($graphs);
 
-		// screens
+		// Dashboards
 		if ($is_template) {
-			$screens = new CSpan([
-				new CLink(_('Screens'), 'screenconf.php?templateid='.$db_host['hostid']),
-				CViewHelper::showNum($db_host['screens'])
+			$dashboards = new CSpan([
+				new CLink(_('Dashboards'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'template.dashboard.list')
+						->setArgument('templateid', $db_host['hostid'])
+				),
+				CViewHelper::showNum($db_host['dashboards'])
 			]);
-			if ($current_element == 'screens') {
-				$screens->addClass(ZBX_STYLE_SELECTED);
+			if ($current_element == 'dashboards') {
+				$dashboards->addClass(ZBX_STYLE_SELECTED);
 			}
-			$content_menu->addItem($screens);
+			$content_menu->addItem($dashboards);
 		}
 
 		// discovery rules

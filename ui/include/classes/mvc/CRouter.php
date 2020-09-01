@@ -231,6 +231,8 @@ class CRouter {
 		'widget.trigover.view'			=> ['CControllerWidgetTrigOverView',				'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'				=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.web.view'				=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
+		'template.dashboard.list'		=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
+		'template.dashboard.delete'		=> ['CControllerTemplateDashboardDelete',				null,					null],
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
