@@ -187,7 +187,6 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 func (m *Manager) Notify(es EventSource, data interface{}) {
 	now := time.Now()
 	if sub, ok := m.subscriptions[es]; ok {
-		// outputs to be flushed after subcriptions have been processed
 		for source, writer := range sub {
 			if value, err := writer.filter.Process(data); value != nil || err != nil {
 				writer.output.Write(&plugin.Result{Itemid: source.Itemid, Ts: now, Value: value, Error: err})
@@ -199,16 +198,16 @@ func (m *Manager) Notify(es EventSource, data interface{}) {
 // Flush method flushes all outputs that are subscribed to the specified event source.
 func (m *Manager) Flush(es EventSource) {
 	if sub, ok := m.subscriptions[es]; ok {
-		// outputs to be flushed after subscriptions have been processed
 		outputs := make([]plugin.ResultWriter, 0, len(sub))
 		for _, writer := range sub {
-			var i int
-			for i = range outputs {
-				if writer.output == outputs[i] {
+			found := false
+			for _, output := range outputs {
+				if writer.output == output {
+					found = true
 					break
 				}
 			}
-			if i == len(outputs) {
+			if !found {
 				outputs = append(outputs, writer.output)
 				writer.output.Flush()
 			}
