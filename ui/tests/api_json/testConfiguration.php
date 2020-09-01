@@ -593,50 +593,101 @@ class testConfiguration extends CAPITest {
 				'error_contains' => 'Cannot read JSON: '
 			]],
 			// YAML format.
+			// Empty YAML.
 			[[
 				'format' => 'yaml',
 				'source' => '',
 				'error' => 'Cannot read YAML: File is empty.'
 			]],
+			// Empty YAML.
+			[[
+				'format' => 'yaml',
+				'source' => '---\r\n...',
+				'error' => 'Cannot read YAML: Invalid YAML file contents.'
+			]],
+			// Non UTF-8.
 			[[
 				'format' => 'yaml',
 				'source' => 'æų',
 				'error' => 'Cannot read YAML: Invalid YAML file contents.'
 			]],
+			// No "version" tag.
 			[[
 				'format' => 'yaml',
 				'source' => "---\nzabbix_export:\n  date: \"2020-07-27T12:58:01Z\"\n",
 				'error' => 'Invalid tag "/zabbix_export": the tag "version" is missing.'
 			]],
+			// No indentation before tags.
 			[[
 				'format' => 'yaml',
-				'source' => "---\nzabbix_export:\n  version: \"5.0\"\ndate: \"2020-07-27T12:58:01Z\"\n",
-				'error' => 'Invalid tag "/": unexpected tag "date".'
+				'source' => "---\r\nzabbix_export: \r\nversion: \"4.0\"\r\ndate: \"2020-08-03T11:38:33Z\"\r\ngroups:\r\nname: \"API host group yaml import\"\r\n...",
+				'error' => 'Invalid tag "/": unexpected tag "version".'
 			]],
+			// Empty "version" value.
 			[[
 				'format' => 'yaml',
 				'source' => "---\nzabbix_export:\n  version: \"\"\n  date: \"2020-07-27T12:58:01Z\"\n",
 				'error' => 'Invalid tag "/zabbix_export/version": unsupported version number.'
 			]],
+			// Invalid first tag.
 			[[
 				'format' => 'yaml',
 				'source' => "---\nexport:\n  version: \"4.0\"\n  date: \"2020-08-03T11:38:33Z\"\n...\n",
 				'error' => 'Invalid tag "/": unexpected tag "export".'
 			]],
+			// Invalid inner tag.
+			[[
+				'format' => 'yaml',
+				'source' => "---\r\nzabbix_export:\r\n  version: \"5.2\"\r\n  date: \"2020-08-31T14:44:18Z\"\r\n  groups:\r\n  - tag: 'name'\r\n...",
+				'error' => 'Invalid tag "/zabbix_export/groups/group(1)": unexpected tag "tag".'
+			]],
+			// Unclosed quotes after date value.
 			[[
 				'format' => 'yaml',
 				'source' => '---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T11:38:33Z',
 				'error' => 'A colon cannot be used in an unquoted mapping value at line 1 (near "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T11:38:33Z").'
 			]],
+			// XML contents in YAML file.
 			[[
 				'format' => 'yaml',
 				'source' => '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<zabbix_export><version>5.0</version><date>2020-08-03T12:36:11Z</date></zabbix_export>\n',
 				'error' => 'Cannot read YAML: Invalid YAML file contents.'
 			]],
+			// Unquotted version value.
 			[[
 				'format' => 'yaml',
-				'source' => '{\"zabbix_export\":{\"version\":\"5.0\",\"date\":\"2020-08-03T12:36:39Z\"}}',
-				'error' => 'Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}") at line 1 (near "{\"zabbix_export\":{\"version\":\"5.0\",\"date\":\"2020-08-03T12:36:39Z\"}}").'
+				'source' => "---\r\nzabbix_export: \r\n  version: 4.0\r\n  date: 2020-08-03T11:38:33Z\r\n...",
+				'error' => 'Invalid tag "/zabbix_export/version": a character string is expected.'
+			]],
+			// No space after : .
+			[[
+				'format' => 'yaml',
+				'source' => "---\r\nzabbix_export: \r\n  version:\"4.0\"\r\n  date:\"2020-08-03T11:38:33Z\"\r\n...",
+				'error' => 'Invalid tag "/zabbix_export": an array is expected.'
+			]],
+			// Invalid time and date format.
+			[[
+				'format' => 'yaml',
+				'source' => "---\r\nzabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T11:38:33\"\r\n...",
+				'error' => 'Invalid tag "/zabbix_export/date": "YYYY-MM-DDThh:mm:ssZ" is expected.'
+			]],
+			// YAML starts from ... instead of ---.
+			[[
+				'format' => 'yaml',
+				'source' => "...\r\nzabbix_export:\r\n  version: \"5.0\"\r\n  date: \"2021-08-03T11:38:33Z\"\r\n...",
+				'error' => 'Unable to parse at line 1 (near "...").'
+			]],
+			// No new line before date tag.
+			[[
+				'format' => 'yaml',
+				'source' => "---\r\nzabbix_export:\r\n  version: \"5.2\",date: \"2020-08-31T14:44:18Z\"\r\n...",
+				'error' => 'Unexpected characters near ",date: "2020-08-31T14:44:18Z"" at line 3 (near "version: "5.2",date: "2020-08-31T14:44:18Z"").'
+			]],
+			// Excessive intendation before "zabbix_export".
+			[[
+				'format' => 'yaml',
+				'source' => "---\r\n  zabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T12:41:17Z\"\r\n...",
+				'error' => 'Mapping values are not allowed in multi-line blocks at line 2 (near "  zabbix_export:").'
 			]]
 		];
 	}
@@ -689,10 +740,53 @@ class testConfiguration extends CAPITest {
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import\''
 			],
+			// Full YAML tags without quotes.
 			[
 				'format' => 'yaml',
 				'parameter' => 'groups',
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:41:17Z\"\n  groups:\n  - name: API host group yaml import\n...\n",
+				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
+			],
+			// Full YAML tags with double quotes.
+			[
+				'format' => 'yaml',
+				'parameter' => 'groups',
+				'source' => "---\n\"zabbix_export\":\n  \"version\": \"4.0\"\n  \"date\": \"2020-08-03T12:41:17Z\"\n  \"groups\":\n  - \"name\": \"API host group yaml import\"\n...\n",
+				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
+			],
+			// Pretty YAML (without --- and ...).
+			[
+				'format' => 'yaml',
+				'parameter' => 'groups',
+				'source' => "zabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T12:41:17Z\"\r\n  groups:\r\n  - name: API host group yaml import",
+				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
+			],
+			// Pretty YAML (without ... in the end).
+			[
+				'format' => 'yaml',
+				'parameter' => 'groups',
+				'source' => "---\nzabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T12:41:17Z\"\r\n  groups:\r\n  - name: API host group yaml import",
+				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
+			],
+			// "Ugly" YAML (with new lines after -).
+			[
+				'format' => 'yaml',
+				'parameter' => 'groups',
+				'source' => "---\r\nzabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T12:41:17Z\"\r\n  groups:\r\n  - \r\n    name: API host group yaml import\r\n...",
+				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
+			],
+			// JSON contents in YAML file (short, only date and version).
+			[
+				'format' => 'yaml',
+				'parameter' => 'groups',
+				'source' => "{\"zabbix_export\":{\"version\":\"5.0\",\"date\":\"2020-08-03T12:36:39Z\"}}",
+				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
+			],
+			// JSON contents in YAML file (with zabbix tags).
+			[
+				'format' => 'yaml',
+				'parameter' => 'groups',
+				'source' => "{\"zabbix_export\":{\"version\":\"4.0\",\"date\":\"2020-08-03T12:41:17Z\",\"groups\":[{\"name\":\"API host group yaml import\"}]}}",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			[
