@@ -85,9 +85,17 @@ class CControllerHostView extends CControllerHost {
 	}
 
 	protected function doAction(): void {
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
-			->read()
-			->setInput($this->getInputAll());
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$selected = $profile->getTabFilter($profile->selected);
+
+		if ($this->getInput('sort', $selected['sort']) !== $selected['sort']
+				|| $this->getInput('sortorder', $selected['sortorder']) !== $selected['sortorder']) {
+			$this->getInputs($selected, ['sort', 'sortorder']);
+			$profile->setTabFilter($profile->selected, $selected);
+			$profile->update();
+		}
+
+		$profile->setInput($this->getInputAll());
 		$filter = $profile->getTabFilter($profile->selected);
 		$this->getInputs($filter, ['page', 'sort', 'sortorder']);
 		$filter_tabs = $profile->getTabsWithDefaults();

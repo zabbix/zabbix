@@ -146,7 +146,9 @@ $template = (new CForm('get'))
 	->addItem($template)
 	->addVar('filter_name', '#{filter_name}')
 	->addVar('filter_show_counter', '#{filter_show_counter}')
-	->addVar('filter_custom_time', '#{filter_custom_time}');
+	->addVar('filter_custom_time', '#{filter_custom_time}')
+	->addVar('sort', '#{sort}')
+	->addVar('sortorder', '#{sortorder}');
 
 if (array_key_exists('render_html', $data)) {
 	/**

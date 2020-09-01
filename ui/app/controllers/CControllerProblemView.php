@@ -98,11 +98,19 @@ class CControllerProblemView extends CControllerProblem {
 	}
 
 	protected function doAction() {
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
-			->read()
-			->setInput($this->getInputAll());
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$selected = $profile->getTabFilter($profile->selected);
+
+		if ($this->getInput('sort', $selected['sort']) !== $selected['sort']
+				|| $this->getInput('sortorder', $selected['sortorder']) !== $selected['sortorder']) {
+			$this->getInputs($selected, ['sort', 'sortorder']);
+			$profile->setTabFilter($profile->selected, $selected);
+			$profile->update();
+		}
+
+		$profile->setInput($this->getInputAll());
 		$filter = $profile->getTabFilter($profile->selected);
-		$this->getInputs($filter, ['page', 'sort', 'sortorder', 'from', 'to']);
+		$this->getInputs($filter, ['page', 'from', 'to']);
 		$filter_tabs = $profile->getTabsWithDefaults();
 
 		foreach ($filter_tabs as &$filter_tab) {
@@ -154,7 +162,7 @@ class CControllerProblemView extends CControllerProblem {
 			'uncheck' => $this->hasInput('uncheck'),
 			'page' => $this->getInput('page', 1),
 			'filter' => $filter,
-		] + $this->getData($filter);
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));

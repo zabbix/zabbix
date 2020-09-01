@@ -48,6 +48,8 @@
 
 			// Modify filter data of flickerfreeScreen object with id 'problem'.
 			window.flickerfreeScreen.screens['problem'].data.filter = data;
+			window.flickerfreeScreen.screens['problem'].data.sort = data.sort;
+			window.flickerfreeScreen.screens['problem'].data.sortorder = data.sortorder;
 			$.publish('timeselector.rangeupdate', {
 				from: data.from,
 				to: data.to
