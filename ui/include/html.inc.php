@@ -199,7 +199,7 @@ function get_icon($type, $params = []) {
 function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
-			'hostid', 'status', 'proxy_hostid', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
+			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
 			'jmx_available', 'ipmi_available', 'error', 'snmp_error', 'jmx_error', 'ipmi_error'
 		],
 		'selectHostDiscovery' => ['ts_delete'],
@@ -293,19 +293,6 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem($breadcrumbs);
 	}
 	else {
-		$proxy_name = '';
-
-		if ($db_host['proxy_hostid'] != 0) {
-			$db_proxies = API::Proxy()->get([
-				'output' => ['host'],
-				'proxyids' => [$db_host['proxy_hostid']]
-			]);
-
-			$proxy_name = CHtml::encode($db_proxies[0]['host']).NAME_DELIMITER;
-		}
-
-		$name = $proxy_name.CHtml::encode($db_host['name']);
-
 		switch ($db_host['status']) {
 			case HOST_STATUS_MONITORED:
 				if ($db_host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -323,7 +310,9 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid']));
+		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
+			'hosts.php?form=update&hostid='.$db_host['hostid']
+		));
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);
@@ -882,14 +871,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'valuemap.list')
 		->getUrl();
 
-	$workingtime_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'workingtime.edit')
-		->getUrl();
-
-	$trigseverity_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'trigseverity.edit')
-		->getUrl();
-
 	$trigdisplay_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
@@ -913,8 +894,6 @@ function getAdministrationGeneralSubmenu() {
 				$regex_url        => _('Regular expressions'),
 				$macros_url       => _('Macros'),
 				$valuemap_url     => _('Value mapping'),
-				$workingtime_url  => _('Working time'),
-				$trigseverity_url => _('Trigger severities'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
 				$miscconfig_url   => _('Other')
@@ -1097,26 +1076,18 @@ function makeWarningIcon($error) {
 /**
  * Returns css for trigger severity backgrounds.
  *
- * @param array $config
- * @param array $config[severity_color_0]
- * @param array $config[severity_color_1]
- * @param array $config[severity_color_2]
- * @param array $config[severity_color_3]
- * @param array $config[severity_color_4]
- * @param array $config[severity_color_5]
- *
  * @return string
  */
-function getTriggerSeverityCss($config) {
+function getTriggerSeverityCss() {
 	$css = '';
 
 	$severities = [
-		ZBX_STYLE_NA_BG => $config['severity_color_0'],
-		ZBX_STYLE_INFO_BG => $config['severity_color_1'],
-		ZBX_STYLE_WARNING_BG => $config['severity_color_2'],
-		ZBX_STYLE_AVERAGE_BG => $config['severity_color_3'],
-		ZBX_STYLE_HIGH_BG => $config['severity_color_4'],
-		ZBX_STYLE_DISASTER_BG => $config['severity_color_5']
+		ZBX_STYLE_NA_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_0),
+		ZBX_STYLE_INFO_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_1),
+		ZBX_STYLE_WARNING_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_2),
+		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_3),
+		ZBX_STYLE_HIGH_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_4),
+		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_5)
 	];
 
 	foreach ($severities as $class => $color) {
@@ -1130,24 +1101,17 @@ function getTriggerSeverityCss($config) {
 /**
  * Returns css for trigger status colors, if those are customized.
  *
- * @param array $config
- * @param array $config[custom_color]
- * @param array $config[problem_unack_color]
- * @param array $config[problem_ack_color]
- * @param array $config[ok_unack_color]
- * @param array $config[ok_ack_color]
- *
  * @return string
  */
-function getTriggerStatusCss($config) {
+function getTriggerStatusCss() {
 	$css = '';
 
-	if ($config['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED) {
+	if (CSettingsHelper::getGlobal(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
 		$event_statuses = [
-			ZBX_STYLE_PROBLEM_UNACK_FG => $config['problem_unack_color'],
-			ZBX_STYLE_PROBLEM_ACK_FG => $config['problem_ack_color'],
-			ZBX_STYLE_OK_UNACK_FG => $config['ok_unack_color'],
-			ZBX_STYLE_OK_ACK_FG => $config['ok_ack_color']
+			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_COLOR),
+			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_COLOR),
+			ZBX_STYLE_OK_UNACK_FG => CSettingsHelper::get(CSettingsHelper::OK_UNACK_COLOR),
+			ZBX_STYLE_OK_ACK_FG => CSettingsHelper::get(CSettingsHelper::OK_ACK_COLOR)
 		];
 
 		foreach ($event_statuses as $class => $color) {

@@ -31,7 +31,7 @@ $filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 
 $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severityNames[] = getSeverityName($severity, $data['config']);
+	$severityNames[] = getSeverityName($severity);
 }
 
 $column1 = (new CFormList())

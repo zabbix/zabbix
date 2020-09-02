@@ -382,9 +382,11 @@ if (empty($_GET['files'])) {
 	];
 
 	require_once dirname(__FILE__).'/include/defines.inc.php';
+	require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
-	if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
-		$js .= 'window.ZBX_SESSION_NAME = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
+	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
+		$session = unserialize(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)));
+		$js .= 'window.ZBX_SESSION_NAME = "'.crc32($session['sessionid']).'";';
 		$files[] = 'class.localstorage.js';
 	}
 

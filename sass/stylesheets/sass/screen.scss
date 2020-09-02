@@ -5210,6 +5210,14 @@ a.link-action {
 	&:last-child {
 		margin: 0;
 	}
+
+	&.green-bg {
+		color: darken($alt-green, 45%);
+	}
+
+	&.yellow-bg {
+		color: darken($alt-yellow, 45%);
+	}
 }
 
 .green-bg {
@@ -5218,6 +5226,10 @@ a.link-action {
 
 .red-bg {
 	background-color: $alt-red;
+}
+
+.yellow-bg {
+	background-color: $alt-yellow;
 }
 
 // Severity statuses.
@@ -7313,4 +7325,18 @@ table.preprocessing-test-results {
 	.logtotalms {
 		margin-bottom: 10px;
 	}
+}
+
+// Table column styles
+#itemsTable {
+	.table-col-handle { width: 26px; }
+	.table-col-no { width: 20px; }
+	.table-col-name-normal { width: 285px; }
+	.table-col-name { width: 365px; }
+	.table-col-type { width: 85px; }
+	.table-col-function { width: 85px; }
+	.table-col-draw-style { width: 85px; }
+	.table-col-y-axis-side { width: 85px; }
+	.table-col-colour { width: 105px; }
+	.table-col-action { width: 55px; }
 }

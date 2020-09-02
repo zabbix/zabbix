@@ -49,7 +49,7 @@ $item_form_list = (new CFormList('item-form-list'))
 	);
 
 // Append hosts to item form list.
-if ($data['displayInterfaces']) {
+if ($data['display_interfaces']) {
 	$interfaces_combo_box = new CComboBox('interfaceid', $data['interfaceid']);
 	$interfaces_combo_box->addItem(new CComboItem(0, '', false, false));
 

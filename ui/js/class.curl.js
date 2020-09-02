@@ -140,7 +140,7 @@ Curl.prototype = {
 			sid = jQuery('meta[name="csrf-token"]').attr('content');
 		}
 
-		if ((/[\da-z]{16}/i).test(sid)) {
+		if ((/[0-9a-z]+/i).test(sid)) {
 			this.setArgument('sid', sid);
 		}
 	},

@@ -419,7 +419,7 @@ $form_list->addRow(
 );
 
 // append interfaces to form list
-if (!empty($data['interfaces'])) {
+if ($data['display_interfaces']) {
 	$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))->setAriaRequired();
 
 	// Set up interface groups sorted by priority.

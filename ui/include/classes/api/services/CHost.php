@@ -235,9 +235,10 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['from']['interface'] = 'interface hi';
+			$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+
 			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
-			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 		}
 
 		// itemids
@@ -453,8 +454,8 @@ class CHost extends CHostGeneral {
 			zbx_db_search('hosts h', $options, $sqlParts);
 
 			if (zbx_db_search('interface hi', $options, $sqlParts)) {
-				$sqlParts['from']['interface'] = 'interface hi';
-				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 		}
 
@@ -480,8 +481,8 @@ class CHost extends CHostGeneral {
 			$this->dbFilter('hosts h', $options, $sqlParts);
 
 			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
-				$sqlParts['from']['interface'] = 'interface hi';
-				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 		}
 
@@ -548,11 +549,8 @@ class CHost extends CHostGeneral {
 					')';
 				}
 
-				$sqlParts['left_join']['hosts_templates'] = [
-					'from' => 'hosts_templates ht2',
-					'on' => 'h.hostid=ht2.hostid'
-				];
-				$sqlParts['left_table'] = $this->tableName();
+				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 
 				$operator = ($options['evaltype'] == TAG_EVAL_TYPE_AND_OR) ? ' AND ' : ' OR ';
 				$sqlParts['where'][] = '('.implode($operator, $where).')';
@@ -575,7 +573,7 @@ class CHost extends CHostGeneral {
 
 		// Return count or grouped counts via direct SQL count.
 		if ($options['countOutput'] && !$this->requiresPostSqlFiltering($options)) {
-			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $options['limit']);
+			$res = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 			while ($host = DBfetch($res)) {
 				if ($options['groupCount']) {
 					$result[] = $host;
@@ -588,7 +586,7 @@ class CHost extends CHostGeneral {
 			return $result;
 		}
 
-		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'hostid');
+		$result = zbx_toHash($this->customFetch(self::createSelectQueryFromParts($sqlParts), $options), 'hostid');
 
 		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {
@@ -643,11 +641,8 @@ class CHost extends CHostGeneral {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = [
-				'from' => 'host_inventory hinv',
-				'on' => $this->tableAlias().'.'.$this->pk().'=hinv.hostid'
-			];
-			$sqlParts['left_table'] = $this->tableName();
+			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		return $sqlParts;
@@ -699,7 +694,6 @@ class CHost extends CHostGeneral {
 		$this->validateCreate($hosts);
 
 		$hostids = [];
-		$ins_tags = [];
 		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
 			if (!array_key_exists('name', $host) || !trim($host['name'])) {
@@ -722,10 +716,8 @@ class CHost extends CHostGeneral {
 			}
 			DB::insert('hosts_groups', $groupsToAdd);
 
-			if (array_key_exists('tags', $host)) {
-				foreach (zbx_toArray($host['tags']) as $tag) {
-					$ins_tags[] = ['hostid' => $hostid] + $tag;
-				}
+			if (array_key_exists('tags', $host) && $host['tags']) {
+				$this->createTags([$hostid => zbx_toArray($host['tags'])]);
 			}
 
 			$options = [
@@ -771,10 +763,6 @@ class CHost extends CHostGeneral {
 		unset($host);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hosts);
-
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
-		}
 
 		return ['hostids' => $hostids];
 	}
@@ -862,10 +850,6 @@ class CHost extends CHostGeneral {
 
 				unset($host['macros']);
 			}
-
-			if (array_key_exists('tags', $host)) {
-				$host['tags'] = zbx_toArray($host['tags']);
-			}
 		}
 		unset($host);
 
@@ -897,7 +881,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$this->updateTags($hosts, 'hostid');
+		$this->updateTags(array_column($hosts, 'tags', 'hostid'));
 
 		return ['hostids' => $hostids];
 	}
@@ -2039,8 +2023,9 @@ class CHost extends CHostGeneral {
 		$host_names = [];
 
 		foreach ($hosts as $host) {
-			if (!array_key_exists('interfaces', $host) || !is_array($host['interfaces']) || !$host['interfaces']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
+			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
+					&& !is_array($host['interfaces'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (array_key_exists('status', $host)) {
@@ -2231,10 +2216,9 @@ class CHost extends CHostGeneral {
 			$update_discovered_validator->setObjectName($host_name);
 			$this->checkPartialValidator($host, $update_discovered_validator, $db_host);
 
-			if (array_key_exists('interfaces', $host)) {
-				if (!is_array($host['interfaces']) || !$host['interfaces']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
-				}
+			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
+					&& !is_array($host['interfaces'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (array_key_exists('host', $host)) {

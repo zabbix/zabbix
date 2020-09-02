@@ -9819,6 +9819,32 @@ char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_dc_expand_user_macros                                        *
+ *                                                                            *
+ * Purpose: expand user macros in the specified text value                    *
+ *                                                                            *
+ * Parameters: text           - [IN] the text value to expand                 *
+ *             hostid         - [IN] related hostid                           *
+ *                                                                            *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
+ *               macros will be left unresolved.                              *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid)
+{
+	char	*resolved_text;
+
+	RDLOCK_CACHE;
+	resolved_text = dc_expand_user_macros(text, &hostid, 1);
+	UNLOCK_CACHE;
+
+	return resolved_text;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_expand_user_macros_in_expression                              *
  *                                                                            *
  * Purpose: expand user macros for triggers and calculated items in the       *

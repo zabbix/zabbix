@@ -438,7 +438,6 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 		// Get severity levels and colors and select list of sysmapids to count problems per maps.
 		$this->problems_per_severity_tpl = [];
-		$config = select_config();
 		$severity_config = [];
 
 		$maps_accessible = $sysmapids
@@ -452,7 +451,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$this->problems_per_severity_tpl[$severity] = 0;
 			$severity_config[$severity] = [
-				'name' => getSeverityName($severity, $config),
+				'name' => getSeverityName($severity),
 				'style_class' => getSeverityStatusStyle($severity)
 			];
 		}

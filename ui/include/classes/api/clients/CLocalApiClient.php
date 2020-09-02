@@ -167,7 +167,14 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		$user = $this->serviceFactory->getObject('user')->checkAuthentication(['sessionid' => $auth]);
-		$this->debug = $user['debug_mode'];
+
+		if (!$user) {
+			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('Not authorised.'));
+		}
+
+		if (array_key_exists('debug_mode', $user)) {
+			$this->debug = $user['debug_mode'];
+		}
 	}
 
 	/**
@@ -213,6 +220,7 @@ class CLocalApiClient extends CApiClient {
 	protected function requiresAuthentication($api, $method) {
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
+			|| ($api === 'apiinfo' && $method === 'version')
+			|| ($api === 'settings' && $method === 'getglobal'));
 	}
 }

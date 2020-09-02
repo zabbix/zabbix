@@ -184,9 +184,7 @@ abstract class CControllerHost extends CController {
 
 			$groupids = array_keys($filter_groups);
 		}
-
-		$config = select_config();
-
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status'],
 			'evaltype' => $filter['evaltype'],
@@ -210,7 +208,7 @@ abstract class CControllerHost extends CController {
 					: HOST_MAINTENANCE_STATUS_OFF,
 			],
 			'sortfield' => 'name',
-			'limit' => $config['search_limit'] + 1,
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 

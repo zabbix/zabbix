@@ -41,8 +41,6 @@ $fields = [
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
-$data['config'] = select_config();
-
 /*
  * Filter
  */

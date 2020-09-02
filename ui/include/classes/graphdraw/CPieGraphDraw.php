@@ -132,7 +132,6 @@ class CPieGraphDraw extends CGraphDraw {
 			$history = Manager::History()->getLastValues($lastValueItems);
 		}
 
-		$config = select_config();
 		$items = [];
 
 		for ($i = 0; $i < $this->num; $i++) {
@@ -143,15 +142,15 @@ class CPieGraphDraw extends CGraphDraw {
 			$to_resolve = [];
 
 			// Override item history setting with housekeeping settings, if they are enabled in config.
-			if ($config['hk_history_global']) {
-				$item['history'] = timeUnitToSeconds($config['hk_history']);
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+				$item['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 			}
 			else {
 				$to_resolve[] = 'history';
 			}
 
-			if ($config['hk_trends_global']) {
-				$item['trends'] = timeUnitToSeconds($config['hk_trends']);
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+				$item['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
 			}
 			else {
 				$to_resolve[] = 'trends';
@@ -163,7 +162,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 				$simple_interval_parser = new CSimpleIntervalParser();
 
-				if (!$config['hk_history_global']) {
+				if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 					if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
 						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'history',
 							_('invalid history storage period')
@@ -173,7 +172,7 @@ class CPieGraphDraw extends CGraphDraw {
 					$item['history'] = timeUnitToSeconds($item['history']);
 				}
 
-				if (!$config['hk_trends_global']) {
+				if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 					if ($simple_interval_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
 						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
 							_('invalid trend storage period')

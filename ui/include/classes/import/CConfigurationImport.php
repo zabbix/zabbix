@@ -738,8 +738,10 @@ class CConfigurationImport {
 					$applicationsIds = [];
 
 					foreach ($item['applications'] as $application) {
-						if ($applicationId = $this->referencer->resolveApplication($hostId, $application['name'])) {
-							$applicationsIds[] = $applicationId;
+						$applicationid = $this->referencer->resolveApplication($hostId, $application['name']);
+
+						if ($applicationid) {
+							$applicationsIds[] = $applicationid;
 						}
 						else {
 							throw new Exception(_s('Item "%1$s" on "%2$s": application "%3$s" does not exist.',
@@ -751,7 +753,16 @@ class CConfigurationImport {
 				}
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
+					$interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref']);
+
+					if ($interfaceid) {
+						$item['interfaceid'] = $interfaceid;
+					}
+					else {
+						throw new Exception(_s('Cannot find interface "%1$s" used for item "%2$s" on "%3$s".',
+							$item['interface_ref'], $item['name'], $host
+						));
+					}
 				}
 
 				if (isset($item['valuemap']) && $item['valuemap']) {
@@ -952,7 +963,16 @@ class CConfigurationImport {
 				$item['hostid'] = $hostId;
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
+					$interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref']);
+
+					if ($interfaceid) {
+						$item['interfaceid'] = $interfaceid;
+					}
+					else {
+						throw new Exception(_s('Cannot find interface "%1$s" used for discovery rule "%2$s" on "%3$s".',
+							$item['interface_ref'], $item['name'], $host
+						));
+					}
 				}
 
 				unset($item['item_prototypes']);
@@ -1073,8 +1093,9 @@ class CConfigurationImport {
 		// process prototypes
 		$prototypes_to_update = [];
 		$prototypes_to_create = [];
-		$hostPrototypesToUpdate = [];
+		$host_prototypes_to_update = [];
 		$hostPrototypesToCreate = [];
+		$ex_group_prototypes_where = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -1108,7 +1129,20 @@ class CConfigurationImport {
 					}
 
 					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
-						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostId][$prototype['interface_ref']];
+						$interfaceid = $this->referencer->resolveInterface($hostId, $prototype['interface_ref']);
+
+						if ($interfaceid) {
+							$prototype['interfaceid'] = $interfaceid;
+						}
+						else {
+							throw new Exception(_s(
+								'Cannot find interface "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+								$prototype['interface_ref'],
+								$prototype['name'],
+								$item['name'],
+								$host
+							));
+						}
 					}
 
 					if ($prototype['valuemap']) {
@@ -1233,32 +1267,53 @@ class CConfigurationImport {
 					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $itemId, $hostPrototype['host']);
 
 					if ($hostPrototypeId) {
+						if ($hostPrototype['groupPrototypes']) {
+							$ex_group_prototypes_where[] = '('.dbConditionInt('hostid', [$hostPrototypeId]).
+								' AND '.dbConditionString('name',
+									zbx_objectValues($hostPrototype['groupPrototypes'], 'name')
+								).
+							')';
+						}
+
 						$hostPrototype['hostid'] = $hostPrototypeId;
-						$hostPrototypesToUpdate[] = $hostPrototype;
+						$host_prototypes_to_update[] = $hostPrototype;
 					}
 					else {
 						$hostPrototype['ruleid'] = $itemId;
 						$hostPrototypesToCreate[] = $hostPrototype;
 					}
 				}
+			}
+		}
 
-				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
-				}
-				unset($item['item_prototypes']);
-				unset($item['trigger_prototypes']);
-				unset($item['graph_prototypes']);
-				unset($item['host_prototypes']);
+		// Attach existing host group prototype ids.
+		if ($ex_group_prototypes_where) {
+			$db_group_prototypes = DBFetchArray(DBselect(
+				'SELECT group_prototypeid,name,hostid'.
+					' FROM group_prototype'.
+					' WHERE '.implode(' OR ', $ex_group_prototypes_where)
+			));
 
-				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
+			if ($db_group_prototypes) {
+				$groups_hash = [];
+				foreach ($db_group_prototypes as $group) {
+					$groups_hash[$group['hostid']][$group['name']] = $group['group_prototypeid'];
+				}
 
-				if ($itemsId) {
-					$item['itemid'] = $itemsId;
-					$itemsToUpdate[] = $item;
+				foreach ($host_prototypes_to_update as &$host_prototype) {
+					if (!array_key_exists($host_prototype['hostid'], $groups_hash)) {
+						continue;
+					}
+
+					$hash = $groups_hash[$host_prototype['hostid']];
+					foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+						if (array_key_exists($group_prototype['name'], $hash)) {
+							$group_prototype['group_prototypeid'] = $hash[$group_prototype['name']];
+						}
+					}
+					unset($group_prototype, $hash);
 				}
-				else {
-					$itemsToCreate[] = $item;
-				}
+				unset($host_prototype, $groups_hash);
 			}
 		}
 
@@ -1275,8 +1330,8 @@ class CConfigurationImport {
 		if ($hostPrototypesToCreate) {
 			API::HostPrototype()->create($hostPrototypesToCreate);
 		}
-		if ($hostPrototypesToUpdate) {
-			API::HostPrototype()->update($hostPrototypesToUpdate);
+		if ($host_prototypes_to_update) {
+			API::HostPrototype()->update($host_prototypes_to_update);
 		}
 
 		// refresh prototypes because templated ones can be inherited to host and used in triggers prototypes or graph prototypes

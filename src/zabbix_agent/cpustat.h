@@ -61,10 +61,38 @@ typedef struct
 }
 ZBX_CPUS_STAT_DATA;
 
+#ifdef _AIX
+/* collector layout is designed to be cache-friendly for updates and large number of CPUs */
+typedef struct
+{
+	unsigned char	status;
+	/* data comes from IBM AIX 'perfstat_cpu_util_t' (percents of utilization) */
+	zbx_uint64_t	user_pct;	/* user mode */
+	zbx_uint64_t	kern_pct;	/* kernel mode */
+	zbx_uint64_t	idle_pct;	/* idle mode */
+	zbx_uint64_t	wait_pct;	/* wait mode */
+}
+ZBX_CPU_UTIL_PCT_AIX;
+
+typedef struct
+{
+	ZBX_CPU_UTIL_PCT_AIX	*counters;	/* pointer to 2D array with history data */
+	int			row_num;	/* number of rows (MAX_COLLECTOR_HISTORY) */
+	int			column_num;	/* number of columns (number of CPUs) */
+	int			h_latest;	/* the index of the most recent entry in the history data */
+	int			h_count;	/* the number of entries in the history data */
+}
+ZBX_CPUS_UTIL_DATA_AIX;
+#endif /* _AIX */
+
 #define CPU_COLLECTOR_STARTED(collector)	(collector)
 
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
+#ifdef _AIX
+void	collect_cpustat_physical(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util);
+int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode);
+#endif
 
 #endif	/* _WINDOWS */
 

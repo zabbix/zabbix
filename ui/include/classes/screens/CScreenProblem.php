@@ -32,11 +32,6 @@ class CScreenProblem extends CScreenBase {
 	public $data;
 
 	/**
-	 * @var array
-	 */
-	private $config;
-
-	/**
 	 * Init screen data.
 	 *
 	 * @param array $options
@@ -50,24 +45,6 @@ class CScreenProblem extends CScreenBase {
 			$this->data['filter']['from'] = $this->timeline['from_ts'];
 			$this->data['filter']['to'] = $this->timeline['to_ts'];
 		}
-
-		$config = select_config();
-
-		$this->config = [
-			'search_limit' => $config['search_limit'],
-			'severity_color_0' => $config['severity_color_0'],
-			'severity_color_1' => $config['severity_color_1'],
-			'severity_color_2' => $config['severity_color_2'],
-			'severity_color_3' => $config['severity_color_3'],
-			'severity_color_4' => $config['severity_color_4'],
-			'severity_color_5' => $config['severity_color_5'],
-			'severity_name_0' => $config['severity_name_0'],
-			'severity_name_1' => $config['severity_name_1'],
-			'severity_name_2' => $config['severity_name_2'],
-			'severity_name_3' => $config['severity_name_3'],
-			'severity_name_4' => $config['severity_name_4'],
-			'severity_name_5' => $config['severity_name_5']
-		];
 	}
 
 	/**
@@ -166,8 +143,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['show_suppressed']       (optional)
 	 * @param int    $filter['show_opdata']           (optional)
-	 * @param array  $config
-	 * @param int    $config['search_limit']
 	 * @param bool   $resolve_comments
 	 * @param bool   $resolve_urls
 	 *
@@ -175,7 +150,7 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, array $config, $resolve_comments = false, $resolve_urls = false) {
+	public static function getData(array $filter, $resolve_comments = false, $resolve_urls = false) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
@@ -257,7 +232,7 @@ class CScreenProblem extends CScreenBase {
 				'objectids' => $filter_triggerids,
 				'eventid_till' => $eventid_till,
 				'suppressed' => false,
-				'limit' => $config['search_limit'] + 1
+				'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 			];
 
 			if (array_key_exists('name', $filter) && $filter['name'] !== '') {
@@ -303,7 +278,7 @@ class CScreenProblem extends CScreenBase {
 				? self::getDataEvents($options)
 				: self::getDataProblems($options);
 
-			$end_of_data = (count($problems) < $config['search_limit'] + 1);
+			$end_of_data = (count($problems) < CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1);
 
 			if ($problems) {
 				$eventid_till = end($problems)['eventid'] - 1;
@@ -370,9 +345,11 @@ class CScreenProblem extends CScreenBase {
 				$data['problems'] += $problems;
 			}
 		}
-		while (count($data['problems']) < $config['search_limit'] + 1 && !$end_of_data);
+		while (count($data['problems']) < CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1 && !$end_of_data);
 
-		$data['problems'] = array_slice($data['problems'], 0, $config['search_limit'] + 1, true);
+		$data['problems'] = array_slice($data['problems'], 0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+			true
+		);
 
 		return $data;
 	}
@@ -422,8 +399,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $data
 	 * @param array  $data['problems']
 	 * @param array  $data['triggers']
-	 * @param array  $config
-	 * @param int    $config['search_limit']
 	 * @param string $sort
 	 * @param string $sortorder
 	 *
@@ -431,13 +406,15 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @return array
 	 */
-	public static function sortData(array $data, array $config, $sort, $sortorder) {
+	public static function sortData(array $data, $sort, $sortorder) {
 		if (!$data['problems']) {
 			return $data;
 		}
 
 		$last_problem = end($data['problems']);
-		$data['problems'] = array_slice($data['problems'], 0, $config['search_limit'], true);
+		$data['problems'] = array_slice($data['problems'], 0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
+			true
+		);
 
 		switch ($sort) {
 			case 'host':
@@ -782,8 +759,8 @@ class CScreenProblem extends CScreenBase {
 
 		$url = (new CUrl('zabbix.php'))->setArgument('action', 'problem.view');
 
-		$data = self::getData($this->data['filter'], $this->config, true);
-		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
+		$data = self::getData($this->data['filter'], true);
+		$data = self::sortData($data, $this->data['sort'], $this->data['sortorder']);
 
 		if ($this->data['action'] === 'problem.view') {
 			$paging = CPagerHelper::paginate($this->page, $data['problems'], ZBX_SORT_UP, $url);
@@ -1118,7 +1095,7 @@ class CScreenProblem extends CScreenBase {
 				// Add table row.
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
-					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
+					getSeverityCell($problem['severity'], null, $value == TRIGGER_VALUE_FALSE),
 					$show_recovery_data ? $cell_r_clock : null,
 					$show_recovery_data ? $cell_status : null,
 					$cell_info,
@@ -1133,9 +1110,7 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$problem_update_link,
-					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
-						$this->config
-					),
+					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users']),
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
 					? getSeverityFlhStyle($problem['severity'])
@@ -1154,7 +1129,7 @@ class CScreenProblem extends CScreenBase {
 		 * Search limit performs +1 selection to know if limit was exceeded, this will assure that csv has
 		 * "search_limit" records at most.
 		 */
-		array_splice($data['problems'], $this->config['search_limit']);
+		array_splice($data['problems'], CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
 
 		$csv = [];
 
@@ -1234,7 +1209,7 @@ class CScreenProblem extends CScreenBase {
 
 			$row = [];
 
-			$row[] = getSeverityName($problem['severity'], $this->config);
+			$row[] = getSeverityName($problem['severity']);
 			$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 			$row[] = ($problem['r_eventid'] != 0) ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']) : '';
 			$row[] = $value_str;
@@ -1274,7 +1249,9 @@ class CScreenProblem extends CScreenBase {
 		$latest_values = [];
 
 		$items = zbx_toHash($items, 'itemid');
-		$history_values = Manager::History()->getLastValues($items, 1, ZBX_HISTORY_PERIOD);
+		$history_values = Manager::History()->getLastValues($items, 1, timeUnitToSeconds(CSettingsHelper::get(
+			CSettingsHelper::HISTORY_PERIOD
+		)));
 
 		if ($html) {
 			$hint_table = (new CTable())->addClass('list-table');

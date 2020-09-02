@@ -139,7 +139,7 @@ class CUserGroup extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($usrgrp = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $usrgrp['rowscount'];
@@ -913,13 +913,10 @@ class CUserGroup extends CApiService {
 		}
 
 		// Check if user group are used in config.
-		$config = select_config();
-
-		if (array_key_exists($config['alert_usrgrpid'], $db_usrgrps)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'User group "%1$s" is used in configuration for database down messages.',
-				$db_usrgrps[$config['alert_usrgrpid']]['name']
-			));
+		if (array_key_exists(CSettingsHelper::get(CSettingsHelper::ALERT_USRGRPID), $db_usrgrps)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User group "%1$s" is used in configuration for database down messages.', $db_usrgrps[CSettingsHelper::get(CSettingsHelper::ALERT_USRGRPID)]['name'])
+			);
 		}
 
 		$this->checkUsersWithoutGroups($usrgrps);

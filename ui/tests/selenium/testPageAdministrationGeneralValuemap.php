@@ -32,7 +32,7 @@ class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 
 		$strings = [];
 
-		foreach (CDBHelper::getAll('select name from valuemaps', 100) as $valuemap) {
+		foreach (CDBHelper::getAll('SELECT name FROM valuemaps ORDER BY name', 100) as $valuemap) {
 			$strings[] = $valuemap['name'];
 		}
 
@@ -55,7 +55,7 @@ class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=valuemap.list');
 
 		// There is no need to check simple update of every valuemap.
-		foreach (CDBHelper::getAll('select name from valuemaps limit 10') as $valuemap) {
+		foreach (CDBHelper::getAll('SELECT name FROM valuemaps ORDER BY name', 10) as $valuemap) {
 			$this->zbxTestClickLinkText($valuemap['name']);
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('update');

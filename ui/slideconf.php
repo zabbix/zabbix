@@ -364,8 +364,7 @@ else {
 		DBend();
 	}
 
-	$config = select_config();
-	$limit = $config['search_limit'] + 1;
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 	$data = [
 		'filter' => [

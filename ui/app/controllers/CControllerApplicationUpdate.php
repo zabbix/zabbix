@@ -63,7 +63,7 @@ class CControllerApplicationUpdate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('application.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Application updated'));
+			CMessageHelper::setSuccessTitle(_('Application updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -72,7 +72,7 @@ class CControllerApplicationUpdate extends CController {
 				->setArgument('hostid', $this->getInput('hostid'))
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update application'));
+			CMessageHelper::setErrorTitle(_('Cannot update application'));
 		}
 
 		$this->setResponse($response);

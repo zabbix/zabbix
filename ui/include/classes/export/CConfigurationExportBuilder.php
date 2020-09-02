@@ -791,6 +791,7 @@ class CConfigurationExportBuilder {
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
 				'macros' => $this->formatMacros($hostPrototype['macros']),
+				'tags' => $this->formatTags($hostPrototype['tags']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
 				'inventory_mode' => $hostPrototype['inventory_mode']
 			];

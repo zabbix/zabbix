@@ -4115,12 +4115,19 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
+  .tag.green-bg {
+    color: #0e4123; }
+  .tag.yellow-bg {
+    color: #734d00; }
 
 .green-bg {
   background-color: #59db8f; }
 
 .red-bg {
   background-color: #e45959; }
+
+.yellow-bg {
+  background-color: #ffc859; }
 
 .na-bg {
   color: #2a353a;
@@ -5595,6 +5602,27 @@ table.preprocessing-test-results .rel-container {
 #mediatype_testlog .logtotalms {
   margin-bottom: 10px; }
 
+#itemsTable .table-col-handle {
+  width: 26px; }
+#itemsTable .table-col-no {
+  width: 20px; }
+#itemsTable .table-col-name-normal {
+  width: 285px; }
+#itemsTable .table-col-name {
+  width: 365px; }
+#itemsTable .table-col-type {
+  width: 85px; }
+#itemsTable .table-col-function {
+  width: 85px; }
+#itemsTable .table-col-draw-style {
+  width: 85px; }
+#itemsTable .table-col-y-axis-side {
+  width: 85px; }
+#itemsTable .table-col-colour {
+  width: 105px; }
+#itemsTable .table-col-action {
+  width: 55px; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }
 .sidebar button:focus, .sidebar .filter-container.tabfilter-container > nav li a[data-target]:focus, .filter-container.tabfilter-container > nav li .sidebar a[data-target]:focus {
@@ -5833,6 +5861,10 @@ a.link-action {
 
 .filter-trigger .arrow-down {
   border-top-color: #ffffff !important; }
+
+.tag.green-bg, .tag.yellow-bg {
+  background-color: #333333;
+  color: #ffffff; }
 
 .disabled {
   opacity: .5; }

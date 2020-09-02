@@ -261,7 +261,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = getSeverityName($severity, $data['config']);
+			$severity_name = getSeverityName($severity);
 
 			$media_active = ($media['severity'] & (1 << $severity));
 
@@ -425,7 +425,7 @@ if ($data['action'] !== 'user.edit') {
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 		$triggers_table->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
-				->setLabel(getSeverityName($severity, $data['config']))
+				->setLabel(getSeverityName($severity))
 				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[
