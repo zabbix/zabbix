@@ -30,6 +30,7 @@ if (!empty($data['hostid'])) {
 }
 
 $form = (new CForm())
+	->setId('item-prototype-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -727,7 +728,8 @@ $tab = (new CTabView())
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
 				getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
-			)
+			),
+		TAB_INDICATOR_PREPROCESSING
 	);
 
 if (!hasRequest('form_refresh')) {

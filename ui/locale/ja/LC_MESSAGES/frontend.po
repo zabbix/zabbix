@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 20:04+0300\n"
-"PO-Revision-Date: 2020-08-25 00:47+0300\n"
+"POT-Creation-Date: 2020-08-31 12:28+0300\n"
+"PO-Revision-Date: 2020-08-31 02:31+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1598309265.000000\n"
+"X-POOTLE-MTIME: 1598833919.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -1573,19 +1573,19 @@ msgstr "計算"
 
 #: include/classes/items/CHelpItems.php:677
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "引数に基づいて平均値を計算。Zabbixサーバーは直接データベークエリを実行して情報を収集する。"
 
 #: include/classes/items/CHelpItems.php:685
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "引数に基づいて最大値を計算。Zabbixサーバーは直接データベークエリを実行して情報を収集する。"
 
 #: include/classes/items/CHelpItems.php:681
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "引数に基づいて最小値を計算。Zabbixサーバーは直接データベークエリを実行して情報を収集する。"
 
 #: include/classes/items/CHelpItems.php:689
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "引数に基づいて合計値を計算。Zabbixサーバーは直接データベークエリを実行して情報を収集する。"
 
 #: jsLoader.php:166
 msgid "Calendar"
@@ -2378,17 +2378,17 @@ msgstr "マップ\"%2$s\"で使用されているアイコンのマッピング\
 #: include/classes/import/CConfigurationImport.php:972
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "\"%3$s\"上のディスカバリルール\"%2$s\"で使用されているインターフェース\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "\"%3$s\"上のアイテム\"%2$s\"で使用されているインターフェース\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムプロトタイプ\"%2$s\"で使用されているインターフェース\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1636
 #, c-format
@@ -9623,6 +9623,8 @@ msgstr "2つ目のパラメータが正しくありません。"
 #: include/classes/import/validators/C52XmlValidator.php:2348
 #: include/classes/import/validators/C52XmlValidator.php:2390
 #: include/classes/import/validators/C52XmlValidator.php:2451
+#: include/classes/import/validators/C52XmlValidator.php:2484
+#: include/classes/import/validators/C52XmlValidator.php:2490
 #: include/classes/import/validators/CXmlValidatorGeneral.php:98
 #: include/classes/import/validators/CXmlValidatorGeneral.php:117
 #: include/classes/import/validators/CXmlValidatorGeneral.php:136
@@ -9754,7 +9756,7 @@ msgstr "アイテムを追加しました"
 
 #: app/views/popup.itemtestedit.view.php:298
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
-msgstr ""
+msgstr "アイテムに\"隠しテキスト\"形式のユーザーマクロが含まれています。これらのマクロの値は手動で入力してください。"
 
 #: items.php:1268
 msgid "Item copied"
@@ -19496,6 +19498,7 @@ msgstr "すべてのメディア"
 #: include/classes/import/validators/C52XmlValidator.php:2304
 #: include/classes/import/validators/C52XmlValidator.php:2324
 #: include/classes/import/validators/C52XmlValidator.php:2451
+#: include/classes/import/validators/C52XmlValidator.php:2490
 #: include/classes/import/validators/CXmlValidatorGeneral.php:216
 #: include/classes/validators/CApiInputValidator.php:429
 #: include/classes/validators/CApiInputValidator.php:561
@@ -20847,6 +20850,7 @@ msgstr "値は\"%1$s\"以上にしてください"
 #: include/classes/api/services/CMap.php:681
 #: include/classes/api/services/CMap.php:1140
 #: include/classes/api/services/CMap.php:1146
+#: include/classes/import/validators/C52XmlValidator.php:2485
 #: include/classes/validators/CApiInputValidator.php:391
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CNewValidator.php:517
