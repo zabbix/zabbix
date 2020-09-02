@@ -102,7 +102,7 @@ function getMainMenu(): CMenu {
 						->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php'),
 					(new CMenuItem(_('Templates')))
 						->setUrl(new CUrl('templates.php'), 'templates.php')
-						->setAliases(['conf.import.php?rules_preset=template', 'template.dashboard.list']),
+						->setAliases(['conf.import.php?rules_preset=template', 'template.dashboard.list', 'template.dashboard.edit']),
 					(new CMenuItem(_('Hosts')))
 						->setUrl(new CUrl('hosts.php'), 'hosts.php')
 						->setAliases(['items.php', 'triggers.php', 'graphs.php', 'application.list', 'application.edit',

@@ -183,6 +183,9 @@ class CRouter {
 		'script.update'					=> ['CControllerScriptUpdate',						null,					null],
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search'],
 		'system.warning'				=> ['CControllerSystemWarning',						'layout.warning',		'system.warning'],
+		'template.dashboard.delete'		=> ['CControllerTemplateDashboardDelete',			null,					null],
+		'template.dashboard.edit'		=> ['CControllerTemplateDashboardEdit',				'layout.htmlpage',		'configuration.dashboard.edit'],
+		'template.dashboard.list'		=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
 		'timeselector.update'			=> ['CControllerTimeSelectorUpdate',				'layout.json',			null],
 		'trigdisplay.edit'				=> ['CControllerTrigDisplayEdit',					'layout.htmlpage',		'administration.trigdisplay.edit'],
 		'trigdisplay.update'			=> ['CControllerTrigDisplayUpdate',					null,					null],
@@ -231,8 +234,6 @@ class CRouter {
 		'widget.trigover.view'			=> ['CControllerWidgetTrigOverView',				'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'				=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.web.view'				=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
-		'template.dashboard.list'		=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
-		'template.dashboard.delete'		=> ['CControllerTemplateDashboardDelete',				null,					null],
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
