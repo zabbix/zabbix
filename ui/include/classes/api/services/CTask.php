@@ -450,21 +450,15 @@ class CTask extends CApiService {
 		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
 
 		if ($this->outputIsRequested('request', $options['output'])) {
-			$sql_parts['left_join']['task_data'] = [
-				'from' => 'task_data req',
-				'on' => 't.taskid=req.parent_taskid'
-			];
-			$sql_parts['left_table'] = $this->tableName();
+			$sql_parts['left_join'][] = ['alias' => 'req', 'table' => 'task_data', 'using' => 'parent_taskid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName()];
 
 			$sql_parts = $this->addQuerySelect('req.data AS request_data', $sql_parts);
 		}
 
 		if ($this->outputIsRequested('response', $options['output'])) {
-			$sql_parts['left_join']['task_result'] = [
-				'from' => 'task_result resp',
-				'on' => 't.taskid=resp.parent_taskid'
-			];
-			$sql_parts['left_table'] = $this->tableName();
+			$sql_parts['left_join'][] = ['alias' => 'resp', 'table' => 'task_result', 'using' => 'parent_taskid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName()];
 
 			$sql_parts = $this->addQuerySelect('resp.info AS response_info', $sql_parts);
 			$sql_parts = $this->addQuerySelect('resp.status AS response_status', $sql_parts);
