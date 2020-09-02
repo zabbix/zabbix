@@ -64,6 +64,17 @@ class testPageMonitoringHosts extends CWebTest {
 			$row = $table->findRow('Name', 'Available host');
 			$this->assertTrue($row->query('xpath://following::td/span[@class="disabled" and text()="'.$disabled.'"]')->exists());
 		}
+
+		// Check tags on the specific host.
+		$tags = $table->findRow('Name', 'Host with tags for cloning')->getColumn('Tags')->query('class:tag')->all();
+		$this->assertEquals(['action: clone', 'tag: host'], $tags->asText());
+
+		foreach ($tags as $tag) {
+			$tag->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
+			$this->assertEquals($tag->getText(), $hint->getText());
+			$hint->close();
+		}
 	}
 
 	public static function getCheckFilterData() {
