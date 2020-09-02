@@ -651,21 +651,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
-			// copy template screens
-			$dbTemplateScreens = API::TemplateScreen()->get([
-				'output' => ['screenid'],
+			// Copy template dashboards.
+			$dbTemplateDashboards = API::TemplateDashboard()->get([
+				'output' => API_OUTPUT_EXTEND,
 				'templateids' => $cloneTemplateId,
-				'preservekeys' => true,
-				'inherited' => false
+				'selectWidgets' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
 			]);
 
-			if ($dbTemplateScreens) {
-				$result &= API::TemplateScreen()->copy([
-					'screenIds' => zbx_objectValues($dbTemplateScreens, 'screenid'),
-					'templateIds' => $templateId
-				]);
+			if ($dbTemplateDashboards) {
+				$dbTemplateDashboards = array_map(function (array $dashboard) use ($templateId): array {
+					unset($dashboard['dashboardid']);
+					$dashboard['templateid'] = $templateId;
 
-				if (!$result) {
+					$dashboard['widgets'] = array_map(function (array $widget): array {
+						unset($widget['widgetid']);
+
+						return $widget;
+					}, $dashboard['widgets']);
+
+					return $dashboard;
+				}, $dbTemplateDashboards);
+
+
+				if (!API::TemplateDashboard()->create($dbTemplateDashboards)) {
 					throw new Exception();
 				}
 			}
