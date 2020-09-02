@@ -153,7 +153,7 @@ class CTabFilter extends CDiv {
 
 		if (!is_a($label, CTag::class)) {
 			if ($tab_index == 0) {
-				$label = (new CLink('&nbsp;'))->addClass('icon-home');
+				$label = (new CLink(''))->addClass('icon-home');
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false

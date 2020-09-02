@@ -4,7 +4,7 @@
 
 	/* All tab filters content container */
 	.tabfilter-content-container {
-		border: 1px solid #353535;	//	TODO: change to scss variable
+		border: 1px solid $ui-border-color;
 		padding: 10px 0;
 	}
 
@@ -13,29 +13,40 @@
 		background-color: $body-bg-color;
 	}
 
-	& > nav li {
+	nav > ul > li {
+		margin: 0 2px 5px 0;
+	}
+
+	nav li {
 		display: inline-block;
-		vertical-align: middle;
-		margin: 0;
+		vertical-align: top;
 		height: 26px;
 	}
 
 	/* tab filter label li element */
 	.tabfilter-item-label {
-		// @extend button;
-
 		display: inline-block;
 		background-color: $btn-bg-color;
-		border: 1px solid $btn-bg-color;
 		border-radius: 2px;
-		color: $btn-font-color;
-		margin-right: 1px;
+		color: $font-color;
+		margin-right: 2px;
 
-		&.active,
-		&.active:hover,
-		&.active:focus {
+		&.active::after {
+			display: block;
+			width: 100%;
+			height: 5px;
 			background-color: $ui-bg-color;
-			border: 0 none;
+			border-left: 1px solid silver;
+			border-right: 1px solid silver;
+			margin-left: -1px;
+			content: '';
+		}
+
+		&.active {
+			background-color: $ui-bg-color;
+			border: 1px solid silver;
+			border-radius: 0;
+			border-bottom: 0 none;
 
 			.icon-edit {
 				opacity: 0.5;
@@ -46,16 +57,12 @@
 				}
 			}
 
+			.tabfilter-item-link {
+				color: $font-color;
+			}
+
 			.tabfilter-item-link[data-counter]::after {
 				display: none;
-			}
-		}
-
-		&.unsaved .tabfilter-item-link {
-			font-style: italic;
-
-			&:before {
-				content: '*';
 			}
 		}
 
@@ -69,10 +76,18 @@
 		}
 	}
 
+	.tabfilter-item-label:not(:first) {
+		&.unsaved .tabfilter-item-link {
+			font-style: italic;
+
+			&::before {
+				content: '*';
+			}
+		}
+	}
+
 	/* tab filter label li clickable a element */
-	.tabfilter-item-link,
-	.tabfilter-item-link:focus,
-	.tabfilter-item-link:hover {
+	.tabfilter-item-link {
 		display: inline-block;
 		color: $btn-font-color;
 		border-bottom: 0 none;
@@ -87,5 +102,37 @@
 		vertical-align: middle;
 		display: inline-block;
 		opacity: 0;
+	}
+
+	/* tab filter contents container */
+	.tabfilter-tabs-container {
+		.filter-container.time-selection-container {
+			border: 0 none;
+		}
+	}
+}
+
+.icon-home::before {
+	display: block;
+	width: 22px;
+	height: 22px;
+	content: '';
+	// white icon
+	background: url($sprite-path) no-repeat -433px -510px;
+}
+.active .icon-home::before {
+	// grey icon
+	background: url($sprite-path) no-repeat -121px -510px;
+}
+
+@if $theme-name == 'hc-dark' {
+	.active .icon-home::before {
+		// white icon
+		background: url($sprite-path) no-repeat -433px -510px;
+	}
+
+	.icon-home::before {
+		// black icon
+		background: url($sprite-path) no-repeat -281px -510px;
 	}
 }
