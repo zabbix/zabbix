@@ -199,6 +199,8 @@ func makeRetArray(rawLen int, retType Bits16, arraySize uint) (v interface{}) {
 		v = make([]uint16, arraySize)
 	case Int8:
 		v = make([]int8, arraySize)
+	case Uint8:
+		v = make([]byte, arraySize)
 	}
 	return v
 }
