@@ -68,6 +68,151 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
+	 * Delete item from items collection.
+	 */
+	delete(item) {
+		let index = this._items.indexOf(item);
+
+		if (index > -1) {
+			this._active_item = this._items[index - 1];
+			this._active_item.select();
+			item.delete();
+			delete this._items[index];
+			this._items.splice(index, 1);
+			this._items.forEach((item, index) => {
+				item._index = index;
+			});
+		}
+	}
+
+	/**
+	 * Create new CTabFilterItem object with it container if it does not exists and append to _items array.
+	 *
+	 * @param {HTMLElement} title  HTML node element of tab label.
+	 * @param {object}      data   Filter item dynamic data for template.
+	 *
+	 * @return {CTabFilterItem}
+	 */
+	create(title, data) {
+		let item,
+			containers = this._target.querySelector('.tabfilter-tabs-container'),
+			container = containers.querySelector('#' + title.getAttribute('data-target'));
+
+		if (!container) {
+			container = document.createElement('div');
+			container.setAttribute('id', title.getAttribute('data-target'));
+			container.classList.add('display-none');
+			containers.appendChild(container);
+		}
+
+		item = new CTabFilterItem(title.querySelector('a'), {
+			parent: this,
+			idx_namespace: this._idx_namespace,
+			index: this._items.length,
+			expanded: data.expanded||false,
+			can_toggle: this._options.can_toggle,
+			container: container,
+			data: data,
+			template: this._templates[data.tab_view]||null,
+			support_custom_time: this._options.support_custom_time
+		});
+
+		this._items.push(item);
+
+		if (title.getAttribute('data-target') === 'tabfilter_timeselector') {
+			this._timeselector = item;
+		}
+
+		return item;
+	}
+
+	/**
+	 * Fire event TABFILTERITEM_EVENT_COLLAPSE on every expanded tab except passed one.
+	 *
+	 * @param {CTabFilterItem} except  Tab item object.
+	 */
+	collapseAllItemsExcept(except) {
+		for (const item of this._items) {
+			if (item !== except && item._expanded) {
+				item.fire(TABFILTERITEM_EVENT_COLLAPSE)
+			}
+		}
+	}
+
+	/**
+	 * Update timeselector tab and timeselector buttons accessibility according passed item.
+	 *
+	 * @param {CTabFilterItem} item     Tab item object.
+	 * @param {bool}           disable  Additional status to determine should the timeselector to be disabled or not.
+	 */
+	updateTimeselector(item, disable) {
+		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
+			buttons = this._target.querySelectorAll('button.btn-time-left,button.btn-time-out,button.btn-time-right');
+
+		if (this._timeselector) {
+			this._timeselector.setDisabled(disabled);
+
+			for (const button of buttons) {
+				if (disabled) {
+					button.setAttribute('disabled', 'disabled');
+				}
+				else {
+					button.removeAttribute('disabled');
+				}
+			}
+		}
+	}
+
+	/**
+	 * Updates filter values in user profile. Aborts any previous unfinished updates.
+	 *
+	 * @param {string} property  Filter property to be updated: 'selected', 'expanded', 'properties'.
+	 * @param {object} body      Key value pair of data to be passed to profile.update action.
+	 *
+	 * @return {Promise}
+	 */
+	profileUpdate(property, body) {
+		if (this._fetch && 'abort' in this._fetch && !this._fetch.aborted) {
+			this._fetch.abort();
+		}
+
+		body.idx = this._idx_namespace + '.' + property;
+		this._fetch = new AbortController();
+
+		return fetch('zabbix.php?action=tabfilter.profile.update', {
+			method: 'POST',
+			signal: this._fetch.signal,
+			body: new URLSearchParams(body)
+		}).then(() => {
+			this._fetch = null;
+		}).catch(() => {
+			// User aborted a request.
+		});
+	}
+
+	/**
+	 * Update all tab filter counters values.
+	 *
+	 * @param {array} counters  Array of counters to be set.
+	 */
+	updateCounters(counters) {
+		counters.forEach((value, index) => {
+			let item = this._items[index];
+
+			if (!item) {
+				return;
+			}
+
+			if (item._data.filter_show_counter) {
+				item.setCounter(value);
+			}
+			else {
+				item.removeCounter();
+			}
+		});
+	}
+
+	/**
 	 * Register tab filter events, called once during initialization.
 	 *
 	 * @param {object} options  Tab filter initialization options.
@@ -119,10 +264,10 @@ class CTabFilter extends CBaseComponent {
 			 */
 			tabSortChanged: (ev, ui) => {
 				// Update order of this._items array.
-				var from, to, target = ui.item[0].querySelector('[data-target]');
+				var from, to, target = ui.item[0].querySelector('[data-target] .tabfilter-item-link');
 
 				this._items.forEach((item, index) => from = (item._target === target) ? index : from);
-				this._target.querySelectorAll('nav [data-target]')
+				this._target.querySelectorAll('nav [data-target] .tabfilter-item-link')
 					.forEach((elm, index) => to = (elm === target) ? index : to);
 				this._items[to] = this._items.splice(from, 1, this._items[to])[0];
 
@@ -297,7 +442,8 @@ class CTabFilter extends CBaseComponent {
 			item.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateItem);
 		}
 
-		$('.ui-sortable', this._target).sortable({
+		$('.ui-sortable-container', this._target).sortable({
+			items: ':not(:first-child)',
 			update: this._events.tabSortChanged,
 			axis: 'x',
 			containment: 'parent'
@@ -314,150 +460,5 @@ class CTabFilter extends CBaseComponent {
 
 		this.on('keydown', this._events.keydown);
 		this.on('popup.tabfilter', this._events.popupUpdateAction);
-	}
-
-	/**
-	 * Delete item from items collection.
-	 */
-	delete(item) {
-		let index = this._items.indexOf(item);
-
-		if (index > -1) {
-			this._active_item = this._items[index - 1];
-			this._active_item.select();
-			item.delete();
-			delete this._items[index];
-			this._items.splice(index, 1);
-			this._items.forEach((item, index) => {
-				item._index = index;
-			});
-		}
-	}
-
-	/**
-	 * Create new CTabFilterItem object with it container if it does not exists and append to _items array.
-	 *
-	 * @param {HTMLElement} title  HTML node element of tab label.
-	 * @param {object}      data   Filter item dynamic data for template.
-	 *
-	 * @return {CTabFilterItem}
-	 */
-	create(title, data) {
-		let item,
-			containers = this._target.querySelector('.tabfilter-tabs-container'),
-			container = containers.querySelector('#' + title.getAttribute('data-target'));
-
-		if (!container) {
-			container = document.createElement('div');
-			container.setAttribute('id', title.getAttribute('data-target'));
-			container.classList.add('display-none');
-			containers.appendChild(container);
-		}
-
-		item = new CTabFilterItem(title.querySelector('a'), {
-			parent: this,
-			idx_namespace: this._idx_namespace,
-			index: this._items.length,
-			expanded: data.expanded||false,
-			can_toggle: this._options.can_toggle,
-			container: container,
-			data: data,
-			template: this._templates[data.tab_view]||null,
-			support_custom_time: this._options.support_custom_time
-		});
-
-		this._items.push(item);
-
-		if (title.getAttribute('data-target') === 'tabfilter_timeselector') {
-			this._timeselector = item;
-		}
-
-		return item;
-	}
-
-	/**
-	 * Fire event TABFILTERITEM_EVENT_COLLAPSE on every expanded tab except passed one.
-	 *
-	 * @param {CTabFilterItem} except  Tab item object.
-	 */
-	collapseAllItemsExcept(except) {
-		for (const item of this._items) {
-			if (item !== except && item._expanded) {
-				item.fire(TABFILTERITEM_EVENT_COLLAPSE)
-			}
-		}
-	}
-
-	/**
-	 * Update timeselector tab and timeselector buttons accessibility according passed item.
-	 *
-	 * @param {CTabFilterItem} item     Tab item object.
-	 * @param {bool}           disable  Additional status to determine should the timeselector to be disabled or not.
-	 */
-	updateTimeselector(item, disable) {
-		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
-			buttons = this._target.querySelectorAll('button.btn-time-left,button.btn-time-out,button.btn-time-right');
-
-		if (this._timeselector) {
-			this._timeselector.setDisabled(disabled);
-
-			for (const button of buttons) {
-				if (disabled) {
-					button.setAttribute('disabled', 'disabled');
-				}
-				else {
-					button.removeAttribute('disabled');
-				}
-			}
-		}
-	}
-
-	/**
-	 * Updates filter values in user profile. Aborts any previous unfinished updates.
-	 *
-	 * @param {string} property  Filter property to be updated: 'selected', 'expanded', 'properties'.
-	 * @param {object} body      Key value pair of data to be passed to profile.update action.
-	 *
-	 * @return {Promise}
-	 */
-	profileUpdate(property, body) {
-		if (this._fetch && 'abort' in this._fetch && !this._fetch.aborted) {
-			this._fetch.abort();
-		}
-
-		body.idx = this._idx_namespace + '.' + property;
-		this._fetch = new AbortController();
-
-		return fetch('zabbix.php?action=tabfilter.profile.update', {
-			method: 'POST',
-			signal: this._fetch.signal,
-			body: new URLSearchParams(body)
-		}).then(() => {
-			this._fetch = null;
-		}).catch(() => {
-			// User aborted a request.
-		});
-	}
-
-	/**
-	 * Update all tab filter counters values.
-	 *
-	 * @param {array} counters  Array of counters to be set.
-	 */
-	updateCounters(counters) {
-		counters.forEach((value, index) => {
-			let item = this._items[index];
-
-			if (!item) {
-				return;
-			}
-
-			if (item._data.filter_show_counter) {
-				item.setCounter(value);
-			}
-			else {
-				item.removeCounter();
-			}
-		});
 	}
 }

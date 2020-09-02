@@ -4,7 +4,7 @@ class CTabFilter extends CDiv {
 
 	const ZBX_STYLE_CLASS = 'tabfilter-container';
 	const CSS_TAB_ACTIVE = 'active';
-	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable';
+	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
 
 	/**
@@ -247,7 +247,7 @@ class CTabFilter extends CDiv {
 		$timeselector = end($static);
 		$index = key($static);
 		// First dynamic tab is 'Home' tab and cannot be sorted.
-		$home = array_shift($static);
+		array_unshift($sortable, array_shift($static));
 
 		if (is_a($this->contents[$index], CTag::class)
 				&& $this->contents[$index]->getId() === static::CSS_ID_PREFIX.'timeselector') {
@@ -261,9 +261,8 @@ class CTabFilter extends CDiv {
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectPrevTab')
 				->addClass('btn-iterator-page-previous'),
-			$home,
 			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
-			$static,
+			$static ? $static : null,
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
 				->addClass('btn-widget-expand'),
