@@ -25,7 +25,7 @@ if (array_key_exists('filter_counters', $data)) {
 	$output['filter_counters'] = $data['filter_counters'];
 }
 else {
-	$output['body'] = (new CPartial('monitoring.problem.view.html', $data))->getOutput();
+	// getData is handled by jsrpc.php 'screen.get' action.
 }
 
 if (($messages = getMessages()) !== null) {

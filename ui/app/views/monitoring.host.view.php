@@ -58,7 +58,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 
 	// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
 	$data['filter_options'] = $filter->options;
-
 	$widget->addItem($filter);
 }
 

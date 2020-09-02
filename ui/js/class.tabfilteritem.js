@@ -57,84 +57,12 @@ class CTabFilterItem extends CBaseComponent {
 			}
 
 			this.setBrowserLocation(this.getFilterParams());
-
-			// devcode: php will return src_url for selected tab, (all tabs(?)).
 			this.resetUnsavedState();
 		}
 
 		if (this._data.filter_show_counter) {
-			this.setCounter('-');
+			this.setCounter(' ');
 		}
-	}
-
-	registerEvents() {
-		this._events = {
-			click: () => {
-				if (this.hasClass('disabled')) {
-					return;
-				}
-
-				this._target.focus();
-
-				if (!this._expanded) {
-					this.fire(TABFILTERITEM_EVENT_EXPAND_BEFORE);
-					this.fire(TABFILTERITEM_EVENT_EXPAND);
-				}
-				else if (this._can_toggle) {
-					this.fire(TABFILTERITEM_EVENT_COLLAPSE);
-				}
-			},
-
-			expand: () => {
-				let item_template = this._template||this._content_container.querySelector('[data-template]');
-
-				this._expanded = true;
-				this._target.parentNode.classList.add('active');
-
-				if (!this._template_rendered) {
-					this.renderContentTemplate();
-					this._template_rendered = true;
-
-					if (this._src_url === null) {
-						this.resetUnsavedState();
-					}
-				}
-				else if (item_template instanceof HTMLElement) {
-					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
-				}
-
-				let search_params = this.getFilterParams();
-
-				if (search_params) {
-					this.setBrowserLocation(search_params);
-				}
-
-				this._content_container.classList.remove('display-none');
-
-				if (this._data.filter_configurable) {
-					this.addActionIcons();
-				}
-			},
-
-			collapse: () => {
-				let item_template = (this._template||this._content_container.querySelector('[data-template]'));
-
-				this._expanded = false;
-				this._target.parentNode.classList.remove('active');
-				this._content_container.classList.add('display-none');
-
-				if (item_template instanceof HTMLElement) {
-					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_COLLAPSE, {detail: this}));
-				}
-
-				this.removeActionIcons();
-			}
-		}
-
-		this
-			.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand)
-			.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse)
-			.on(TABFILTERITEM_EVENT_CLICK, this._events.click);
 	}
 
 	setCounter(value) {
@@ -316,7 +244,7 @@ class CTabFilterItem extends CBaseComponent {
 		let search_params = this.getFilterParams(),
 			src_query = new URLSearchParams(this._src_url);
 
-		if (search_params === null) {
+		if (search_params === null || !this._data.filter_configurable) {
 			// Not templated tabs does not contain form fields, no need to update unsaved state.
 			return;
 		}
@@ -356,5 +284,75 @@ class CTabFilterItem extends CBaseComponent {
 
 		this._src_url = src_query.toString();
 		this._target.parentNode.classList.remove('unsaved');
+	}
+
+	registerEvents() {
+		this._events = {
+			click: () => {
+				if (this.hasClass('disabled')) {
+					return;
+				}
+
+				this._target.focus();
+
+				if (!this._expanded) {
+					this.fire(TABFILTERITEM_EVENT_EXPAND_BEFORE);
+					this.fire(TABFILTERITEM_EVENT_EXPAND);
+				}
+				else if (this._can_toggle) {
+					this.fire(TABFILTERITEM_EVENT_COLLAPSE);
+				}
+			},
+
+			expand: () => {
+				let item_template = this._template||this._content_container.querySelector('[data-template]');
+
+				this._expanded = true;
+				this._target.parentNode.classList.add('active');
+
+				if (!this._template_rendered) {
+					this.renderContentTemplate();
+					this._template_rendered = true;
+
+					if (this._src_url === null) {
+						this.resetUnsavedState();
+					}
+				}
+				else if (item_template instanceof HTMLElement) {
+					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
+				}
+
+				let search_params = this.getFilterParams();
+
+				if (search_params) {
+					this.setBrowserLocation(search_params);
+				}
+
+				this._content_container.classList.remove('display-none');
+
+				if (this._data.filter_configurable) {
+					this.addActionIcons();
+				}
+			},
+
+			collapse: () => {
+				let item_template = (this._template||this._content_container.querySelector('[data-template]'));
+
+				this._expanded = false;
+				this._target.parentNode.classList.remove('active');
+				this._content_container.classList.add('display-none');
+
+				if (item_template instanceof HTMLElement) {
+					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_COLLAPSE, {detail: this}));
+				}
+
+				this.removeActionIcons();
+			}
+		}
+
+		this
+			.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand)
+			.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse)
+			.on(TABFILTERITEM_EVENT_CLICK, this._events.click);
 	}
 }

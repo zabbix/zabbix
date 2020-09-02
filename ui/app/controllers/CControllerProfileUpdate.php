@@ -21,15 +21,10 @@
 
 class CControllerProfileUpdate extends CController {
 
-	public function init() {
-		$this->disableSIDvalidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'idx' =>		'required|string',
-			'value_int' =>	'int32',
-			'value_str' =>	'string',
+			'value_int' =>	'required|int32',
 			'idx2' =>		'array_id'
 		];
 
@@ -85,14 +80,14 @@ class CControllerProfileUpdate extends CController {
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
 				case CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY:
-					$ret = $this->hasInput('value_int');
+					$ret = true;
 					break;
 
 				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 				case 'web.dashbrd.navtree.item.selected':
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
-					$ret = $this->hasInput('value_int');
+					$ret = $this->hasInput('idx2');
 					break;
 
 				default:
@@ -113,7 +108,7 @@ class CControllerProfileUpdate extends CController {
 
 	protected function doAction() {
 		$idx = $this->getInput('idx');
-		$value_int = $this->getInput('value_int', 0);
+		$value_int = $this->getInput('value_int');
 
 		DBstart();
 		switch ($idx) {

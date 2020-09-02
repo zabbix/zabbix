@@ -138,7 +138,9 @@ class CControllerProblemView extends CControllerProblem {
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
 
 		$data = [
+			'action' => $this->getAction(),
 			'tabfilter_idx' => static::FILTER_IDX,
+			'filter' => $filter,
 			'filter_view' => 'monitoring.problem.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'timerange' => [
@@ -154,12 +156,10 @@ class CControllerProblemView extends CControllerProblem {
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
-			'action' => $this->getAction(),
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('uncheck'),
 			'page' => $this->getInput('page', 1),
-			'filter' => $filter,
 		];
 
 		$response = new CControllerResponseData($data);

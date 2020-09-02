@@ -31,6 +31,14 @@
 		color: $font-color;
 		margin-right: 2px;
 
+		&.unsaved .tabfilter-item-link {
+			font-style: italic;
+
+			&::before {
+				content: '*';
+			}
+		}
+
 		&.active::after {
 			display: block;
 			width: 100%;
@@ -73,16 +81,6 @@
 			background-color: $form-bg-color;
 			color: $btn-alt-font-color;
 			content: attr(data-counter);
-		}
-	}
-
-	.tabfilter-item-label:not(:first) {
-		&.unsaved .tabfilter-item-link {
-			font-style: italic;
-
-			&::before {
-				content: '*';
-			}
 		}
 	}
 
