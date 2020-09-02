@@ -24,6 +24,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -68,7 +69,7 @@ func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{
 // Query executes a query from queryStorage by its name and returns multiple rows.
 func (conn *OraConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
-		return conn.Query(ctx, sql, args...)
+		return conn.Query(ctx, strings.TrimRight(sql, ";"), args...)
 	}
 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
