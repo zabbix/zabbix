@@ -24,7 +24,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"math"
 )
 
 func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
@@ -61,12 +60,12 @@ func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 		typeSize = 1
 	}
 
-	arr, _ := makeRetArray(len(val), p.RetType, typeSize)
-	r := bytes.NewReader(val)
-	binary.Read(r, p.Endianness.order, arr)
-
+	arr := makeRetArray(len(val), p.RetType, p.RetCount)
 	if typeSize == 1 && p.Endianness.order == binary.LittleEndian {
-		arr = swapPairByte(arr)
+		arr = swapPairByte(val, p.RetType, p.RetCount)
+	} else {
+		r := bytes.NewReader(val)
+		binary.Read(r, p.Endianness.order, arr)
 	}
 
 	if typeSize > 2 && 0 != p.Endianness.middle {
@@ -77,6 +76,10 @@ func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 		return getFirst(arr), nil
 	}
 
+	if p.RetType == Uint8 {
+		arr = getArr16(p.RetType, p.RetCount, arr.([]byte))
+	}
+
 	jd, jerr := json.Marshal(arr)
 	if jerr != nil {
 		return nil, fmt.Errorf("Unable to create json: %s", jerr)
@@ -84,34 +87,27 @@ func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 	return string(jd), nil
 }
 
-func swapPairByte(v interface{}) (ret interface{}) {
-	switch v.(type) {
-	case []int8:
-		ret = make([]int8, len(v.([]int8)))
-		for i := 0; i < len(v.([]int8))-1; i += 2 {
-			ret.([]int8)[i] = v.([]int8)[i+1]
-			ret.([]int8)[i+1] = v.([]int8)[i]
+func swapPairByte(v []byte, retType Bits16, retCount uint) (ret interface{}) {
+	switch retType {
+	case Int8:
+		ret = make([]int8, len(v))
+		for i := 0; i < len(v)-1; i += 2 {
+			ret.([]int8)[i] = int8(v[i+1])
+			ret.([]int8)[i+1] = int8(v[i])
 		}
-	case []byte:
-		ret = make([]byte, len(v.([]byte)))
-		for i := 0; i < len(v.([]byte))-1; i += 2 {
-			ret.([]byte)[i] = v.([]byte)[i+1]
-			ret.([]byte)[i+1] = v.([]byte)[i]
+		ret = ret.([]int8)[:retCount]
+	case Uint8:
+		ret = make([]byte, len(v))
+		for i := 0; i < len(v)-1; i += 2 {
+			ret.([]byte)[i] = v[i+1]
+			ret.([]byte)[i+1] = v[i]
 		}
+		ret = ret.([]byte)[:retCount]
 	}
 	return ret
 }
 
 func getArr16(retType Bits16, retCount uint, val []byte) interface{} {
-
-	if retType == Int8 {
-		s := make([]int16, retCount)
-		for i := range val {
-			s[i] = int16(val[i])
-		}
-		return s
-	}
-
 	ar := make([]uint16, retCount)
 	for i := range val {
 		if retType == Bit {
@@ -185,8 +181,7 @@ func middlePack(v interface{}, rt Bits16) interface{} {
 	return v
 }
 
-func makeRetArray(rawLen int, retType Bits16, typeSize int) (v interface{}, arraySize uint) {
-	arraySize = uint(math.Ceil(float64(rawLen / typeSize)))
+func makeRetArray(rawLen int, retType Bits16, arraySize uint) (v interface{}) {
 	switch retType {
 	case Uint64:
 		v = make([]uint64, arraySize)
@@ -205,7 +200,7 @@ func makeRetArray(rawLen int, retType Bits16, typeSize int) (v interface{}, arra
 	case Int8:
 		v = make([]int8, arraySize)
 	}
-	return v, arraySize
+	return v
 }
 
 func getFirst(v interface{}) interface{} {
