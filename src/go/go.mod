@@ -10,14 +10,15 @@ require (
 	github.com/go-ole/go-ole v1.2.4
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/godbus/dbus v4.1.0+incompatible
-	github.com/godror/godror v0.18.0
+	github.com/godror/godror v0.19.4
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mediocregopher/radix/v3 v3.5.0
 	github.com/natefinch/npipe v0.0.0-20160621034901-c1b8fa8bdcce
 	github.com/omeid/go-yarn v0.0.1
-	github.com/pkg/errors v0.9.1
+	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/sys v0.0.0-20200428200454-593003d681fa
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect

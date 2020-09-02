@@ -192,23 +192,19 @@ func (c *ConnManager) create(uri URI) (*OraConn, error) {
 			Module:     godror.DriverName,
 		})
 
-	dsn := fmt.Sprintf(
-		`%s/%s@(DESCRIPTION= (CONNECT_TIMEOUT=%d) (RETRY_COUNT=0) (ADDRESS= (PROTOCOL=tcp) (HOST=%s) (PORT=%s))
-  		(CONNECT_DATA= (SERVICE_NAME=%s)))`,
-		uri.User(),
-		uri.Password(),
-		c.connectTimeout/time.Second,
-		uri.Host(),
-		uri.Port(),
-		uri.ServiceName(),
-	)
+	connectString := fmt.Sprintf("%s:%s/%s?connect_timeout=%d&retry_count=0",
+		uri.Host(), uri.Port(), uri.ServiceName(), c.connectTimeout/time.Second)
 
-	client, err := sql.Open("godror", dsn)
-	if err != nil {
-		return nil, err
-	}
+	connector := godror.NewConnector(godror.ConnectionParams{
+		StandaloneConnection: true,
+		CommonParams: godror.CommonParams{
+			Username:      uri.User(),
+			ConnectString: connectString,
+			Password:      godror.NewPassword(uri.Password()),
+		},
+	})
 
-	client.SetMaxIdleConns(0) // use standalone connection
+	client := sql.OpenDB(connector)
 
 	serverVersion, err := godror.ServerVersion(ctx, client)
 	if err != nil {
