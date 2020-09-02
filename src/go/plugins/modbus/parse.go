@@ -29,7 +29,7 @@ import (
 )
 
 func parseParams(params *[]string) (*MBParams, error) {
-	if len(*params) == 0 || len(*params) > 7 {
+	if len(*params) == 0 || len(*params) > 8 {
 		return nil, fmt.Errorf("Invalid number of parameters:%d", len(*params))
 	}
 
@@ -59,6 +59,7 @@ func parseParams(params *[]string) (*MBParams, error) {
 	if p.FuncId, err = getFuncId(params, 2); err != nil {
 		return nil, err
 	}
+
 	if p.MemAddr, p.FuncId, err = getMemAddr(params, 3, p.FuncId); err != nil {
 		return nil, err
 	}
@@ -71,7 +72,7 @@ func parseParams(params *[]string) (*MBParams, error) {
 		return nil, err
 	}
 
-	if p.Endianness, err = getEndianness(params, 6); err != nil {
+	if p.Endianness, err = getEndianness(params, 6, p.RetType); err != nil {
 		return nil, err
 	}
 
@@ -109,6 +110,7 @@ func getSerial(v string) (addr *Serial, err error) {
 		a.PortName = val
 		return &a, nil
 	}
+	a.PortName = val[:inx]
 
 	var speed uint64
 	val = val[inx+1:]
@@ -275,7 +277,7 @@ func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcId uint8, er
 		return 0, fid, fmt.Errorf("Unsupported modbus function for address:%d", memAddr)
 	}
 
-	return memAddr, funcId, nil
+	return memAddr - 1, funcId, nil
 }
 
 func getRetType(p *[]string, n int, funcId uint8) (retType Bits16, err error) {
@@ -356,7 +358,7 @@ func getCount(p *[]string, n int, retType Bits16) (count uint16, retCount uint, 
 	return count, retCount, nil
 }
 
-func getEndianness(p *[]string, n int) (endianness Endianness, err error) {
+func getEndianness(p *[]string, n int, retType Bits16) (endianness Endianness, err error) {
 	v := "be"
 
 	if len(*p) > n {
@@ -381,6 +383,15 @@ func getEndianness(p *[]string, n int) (endianness Endianness, err error) {
 	default:
 		return endianness, fmt.Errorf("Unsupported endianness of data:%s", v)
 	}
+
+	if retType == Bit && (endianness.order != binary.BigEndian || endianness.middle != 0) {
+		return endianness, fmt.Errorf("Unsupported endianness with required data type:%s", v)
+	}
+
+	if 0 != (retType&(Uint8|Int8|Uint16|Int16)) && endianness.middle != 0 {
+		return endianness, fmt.Errorf("Unsupported middle-endian with required data type:%s", v)
+	}
+
 	return endianness, nil
 }
 
