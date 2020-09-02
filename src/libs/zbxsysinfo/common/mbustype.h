@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_COMMON_MODBUS_H
-#define ZABBIX_SYSINFO_COMMON_MODBUS_H
+#ifndef ZABBIX_SYSINFO_COMMON_MBUSTYPE_H
+#define ZABBIX_SYSINFO_COMMON_MBUSTYPE_H
 
 #include "sysinfo.h"
 
@@ -42,9 +42,6 @@ extern int	CONFIG_TIMEOUT;
 #define ZBX_MODBUS_ENDIANNESS_LE		2
 #define ZBX_MODBUS_ENDIANNESS_MBE		3
 #define ZBX_MODBUS_ENDIANNESS_MLE		4
-
-#define ZBX_MODBUS_IP_LEN_MAX			(64+1)
-#define ZBX_MODBUS_PORT_LEN_MAX			(5+1)
 
 #define ZBX_MODBUS_BYTE_SWAP_16(t_int16)	(((t_int16 >> 8) & 0xFF) | ((t_int16 & 0xFF) << 8))
 
@@ -85,8 +82,8 @@ typedef enum
 
 typedef struct
 {
-	char		*ip;
-	unsigned short	port;
+	char	*ip;
+	char	*port;
 }
 zbx_modbus_connection_tcp;
 
@@ -128,4 +125,4 @@ typedef enum
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int 	zbx_init_modbus(char **error);
 
-#endif /* ZABBIX_SYSINFO_COMMON_MODBUS_H */
+#endif /* ZABBIX_SYSINFO_COMMON_MBUSTYPE_H */
