@@ -653,13 +653,13 @@ class testConfiguration extends CAPITest {
 				'source' => '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<zabbix_export><version>5.0</version><date>2020-08-03T12:36:11Z</date></zabbix_export>\n',
 				'error' => 'Cannot read YAML: Invalid YAML file contents.'
 			]],
-			// Unquotted version value.
+			// Unquoted version value.
 			[[
 				'format' => 'yaml',
 				'source' => "---\r\nzabbix_export: \r\n  version: 4.0\r\n  date: 2020-08-03T11:38:33Z\r\n...",
 				'error' => 'Invalid tag "/zabbix_export/version": a character string is expected.'
 			]],
-			// No space after : .
+			// No space after colon.
 			[[
 				'format' => 'yaml',
 				'source' => "---\r\nzabbix_export: \r\n  version:\"4.0\"\r\n  date:\"2020-08-03T11:38:33Z\"\r\n...",
