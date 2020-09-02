@@ -29,11 +29,24 @@ import (
 
 func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 
-	if 0 != (p.RetType & (Bit | Uint8)) {
-		if jdata, err = json.Marshal(val); err != nil {
-			return nil, fmt.Errorf("Unable to create json: %s", err)
+	if len(val) < int(p.Offset*2) {
+		return nil, fmt.Errorf("Wrong length of received data: %d", len(val))
+	}
+
+	if p.Offset > 0 {
+		val = val[p.Offset*2:]
+	}
+
+	if p.RetType == Bit {
+		ar := getArr16(p.RetType, p.RetCount, val)
+		if p.RetCount == 1 {
+			return getFirst(ar), nil
 		}
-		return jdata, nil
+		jd, jerr := json.Marshal(ar)
+		if jerr != nil {
+			return nil, fmt.Errorf("Unable to create json: %s", jerr)
+		}
+		return string(jd), nil
 	}
 
 	var typeSize int
@@ -48,38 +61,71 @@ func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 		typeSize = 1
 	}
 
-	var v interface{}
-	arraySize := uint(math.Ceil(float64(len(val) / typeSize)))
-	switch p.RetType {
-	case Uint64:
-		v = make([]uint64, arraySize)
-	case Double:
-		v = make([]float64, arraySize)
-	case Int32:
-		v = make([]int32, arraySize)
-	case Uint32:
-		v = make([]uint32, arraySize)
-	case Float:
-		v = make([]float32, arraySize)
-	case Int16:
-		v = make([]int16, arraySize)
-	case Uint16:
-		v = make([]uint16, arraySize)
-	case Int8:
-		v = make([]int8, arraySize)
-	}
-
+	arr, _ := makeRetArray(len(val), p.RetType, typeSize)
 	r := bytes.NewReader(val)
-	binary.Read(r, p.Endianness.order, &v)
+	binary.Read(r, p.Endianness.order, arr)
+
+	if typeSize == 1 && p.Endianness.order == binary.LittleEndian {
+		arr = swapPairByte(arr)
+	}
 
 	if typeSize > 2 && 0 != p.Endianness.middle {
-		v = middlePack(v, p.RetType)
+		arr = middlePack(arr, p.RetType)
 	}
 
-	if jdata, err = json.Marshal(v); err != nil {
-		return nil, fmt.Errorf("Unable to create json: %s", err)
+	if p.RetCount == 1 {
+		return getFirst(arr), nil
 	}
-	return jdata, nil
+
+	jd, jerr := json.Marshal(arr)
+	if jerr != nil {
+		return nil, fmt.Errorf("Unable to create json: %s", jerr)
+	}
+	return string(jd), nil
+}
+
+func swapPairByte(v interface{}) (ret interface{}) {
+	switch v.(type) {
+	case []int8:
+		ret = make([]int8, len(v.([]int8)))
+		for i := 0; i < len(v.([]int8))-1; i += 2 {
+			ret.([]int8)[i] = v.([]int8)[i+1]
+			ret.([]int8)[i+1] = v.([]int8)[i]
+		}
+	case []byte:
+		ret = make([]byte, len(v.([]byte)))
+		for i := 0; i < len(v.([]byte))-1; i += 2 {
+			ret.([]byte)[i] = v.([]byte)[i+1]
+			ret.([]byte)[i+1] = v.([]byte)[i]
+		}
+	}
+	return ret
+}
+
+func getArr16(retType Bits16, retCount uint, val []byte) interface{} {
+
+	if retType == Int8 {
+		s := make([]int16, retCount)
+		for i := range val {
+			s[i] = int16(val[i])
+		}
+		return s
+	}
+
+	ar := make([]uint16, retCount)
+	for i := range val {
+		if retType == Bit {
+			for j := 0; j < 8; j++ {
+				ar[i*8+j] = uint16(val[i] & (1 << j) >> j)
+				if retCount--; retCount == 0 {
+					return ar
+				}
+			}
+		} else {
+			ar[i] = uint16(val[i])
+		}
+	}
+	return ar
 }
 
 func middlePack(v interface{}, rt Bits16) interface{} {
@@ -137,4 +183,51 @@ func middlePack(v interface{}, rt Bits16) interface{} {
 		}
 	}
 	return v
+}
+
+func makeRetArray(rawLen int, retType Bits16, typeSize int) (v interface{}, arraySize uint) {
+	arraySize = uint(math.Ceil(float64(rawLen / typeSize)))
+	switch retType {
+	case Uint64:
+		v = make([]uint64, arraySize)
+	case Double:
+		v = make([]float64, arraySize)
+	case Int32:
+		v = make([]int32, arraySize)
+	case Uint32:
+		v = make([]uint32, arraySize)
+	case Float:
+		v = make([]float32, arraySize)
+	case Int16:
+		v = make([]int16, arraySize)
+	case Uint16:
+		v = make([]uint16, arraySize)
+	case Int8:
+		v = make([]int8, arraySize)
+	}
+	return v, arraySize
+}
+
+func getFirst(v interface{}) interface{} {
+	switch v.(type) {
+	case []uint64:
+		return v.([]uint64)[0]
+	case []float64:
+		return v.([]float64)[0]
+	case []uint32:
+		return v.([]uint32)[0]
+	case []int32:
+		return v.([]int32)[0]
+	case []float32:
+		return v.([]float32)[0]
+	case []uint16:
+		return v.([]uint16)[0]
+	case []int16:
+		return v.([]int16)[0]
+	case []int8:
+		return v.([]int8)[0]
+	case []byte:
+		return v.([]byte)[0]
+	}
+	return nil
 }

@@ -129,7 +129,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	var raw_val []byte
-	if raw_val, err = mbRead(mbparams, p.options.Timeout); err != nil {
+	if raw_val, err = modbusRead(mbparams, p.options.Timeout); err != nil {
 		return nil, err
 	}
 
@@ -171,7 +171,7 @@ func (p *Plugin) Validate(options interface{}) error {
 	return nil
 }
 
-func mbRead(p *MBParams, timeout int) (results []byte, err error) {
+func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
 	handler := newHandler(p, timeout)
 	var lockName string
 	if p.ReqType == Tcp {
