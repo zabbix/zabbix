@@ -330,16 +330,12 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 			dest16 = zbx_malloc(NULL, sizeof(uint16_t) * count_w_offset);
 	}
 
-	if (ZBX_MODBUS_PROTOCOL_RTU == endpoint->protocol)
-		LOCK_MODBUS;
+	LOCK_MODBUS;
 
 	if (0 !=  modbus_connect(mdb_ctx))
 	{
 		*error = zbx_dsprintf(*error, "modbus_connect() failed: %s", modbus_strerror(errno));
-
-		if (ZBX_MODBUS_PROTOCOL_RTU == endpoint->protocol)
-			UNLOCK_MODBUS;
-
+		UNLOCK_MODBUS;
 		goto out;
 	}
 
@@ -360,18 +356,13 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			modbus_close(mdb_ctx);
-
-			if (ZBX_MODBUS_PROTOCOL_RTU == endpoint->protocol)
-				UNLOCK_MODBUS;
-
+			UNLOCK_MODBUS;
 			*error = zbx_strdup(*error, "invalid function");
 			goto out;
 	}
 
 	modbus_close(mdb_ctx);
-
-	if (ZBX_MODBUS_PROTOCOL_RTU == endpoint->protocol)
-		UNLOCK_MODBUS;
+	UNLOCK_MODBUS;
 
 	if (-1 == ret)
 	{
