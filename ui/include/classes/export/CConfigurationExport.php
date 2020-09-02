@@ -280,6 +280,7 @@ class CConfigurationExport {
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
+			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'templateids' => $templateids,
 			'preservekeys' => true
@@ -289,7 +290,7 @@ class CConfigurationExport {
 			// merge host groups with all groups
 			$this->data['groups'] += zbx_toHash($template['groups'], 'groupid');
 
-			$template['screens'] = [];
+			$template['dashboards'] = [];
 			$template['applications'] = [];
 			$template['discoveryRules'] = [];
 			$template['items'] = [];
@@ -298,7 +299,7 @@ class CConfigurationExport {
 		unset($template);
 
 		if ($templates) {
-			$templates = $this->gatherTemplateScreens($templates);
+			$templates = $this->gatherTemplateDashboards($templates);
 			$templates = $this->gatherApplications($templates);
 			$templates = $this->gatherItems($templates);
 			$templates = $this->gatherDiscoveryRules($templates);
@@ -353,25 +354,22 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get template screens from database.
+	 * Get template dashboards from database.
 	 *
 	 * @param array $templates
 	 *
 	 * @return array
 	 */
-	protected function gatherTemplateScreens(array $templates) {
-		$screens = API::TemplateScreen()->get([
+	protected function gatherTemplateDashboards(array $templates) {
+		$dashboards = API::TemplateDashboard()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'selectWidgets' => API_OUTPUT_EXTEND,
 			'templateids' => array_keys($templates),
-			'noInheritance' => true,
 			'preservekeys' => true
 		]);
 
-		$this->prepareScreenExport($screens);
-
-		foreach ($screens as $screen) {
-			$templates[$screen['templateid']]['screens'][] = $screen;
+		foreach ($dashboards as $dashboard) {
+			$templates[$dashboard['templateid']]['dashboards'][] = $dashboard;
 		}
 
 		return $templates;

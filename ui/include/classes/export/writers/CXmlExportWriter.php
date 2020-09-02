@@ -138,7 +138,10 @@ class CXmlExportWriter extends CExportWriter {
 			'parameters' => 'parameter',
 			'message_templates' => 'message_template',
 			'overrides' => 'override',
-			'operations' => 'operation'
+			'operations' => 'operation',
+			'dashboards' => 'dashboard',
+			'widgets' => 'widget',
+			'fields' => 'field'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

@@ -336,6 +336,24 @@ class C52XmlValidator {
 		CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC
 	];
 
+	private $DASHBOARD_WIDGET_TYPE = [
+		CXmlConstantValue::DASHBOARD_WIDGET_CLOCK => CXmlConstantName::DASHBOARD_WIDGET_CLOCK,
+		CXmlConstantValue::DASHBOARD_WIDGET_GRAPH_CLASSIC => CXmlConstantName::DASHBOARD_WIDGET_GRAPH_CLASSIC,
+		CXmlConstantValue::DASHBOARD_WIDGET_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_GRAPH_PROTOTYPE,
+		CXmlConstantValue::DASHBOARD_WIDGET_PLAIN_TEXT => CXmlConstantName::DASHBOARD_WIDGET_PLAIN_TEXT,
+		CXmlConstantValue::DASHBOARD_WIDGET_URL => CXmlConstantName::DASHBOARD_WIDGET_URL
+	];
+
+	private $DASHBOARD_WIDGET_FIELD_TYPE = [
+		CXmlConstantValue::DASHBOARD_FIELD_TYPE_INTEGER => CXmlConstantName::DASHBOARD_FIELD_TYPE_INTEGER,
+		CXmlConstantValue::DASHBOARD_FIELD_TYPE_STRING => CXmlConstantName::DASHBOARD_FIELD_TYPE_STRING,
+		CXmlConstantValue::DASHBOARD_FIELD_TYPE_HOST => CXmlConstantName::DASHBOARD_FIELD_TYPE_HOST,
+		CXmlConstantValue::DASHBOARD_FIELD_TYPE_ITEM => CXmlConstantName::DASHBOARD_FIELD_TYPE_ITEM,
+		CXmlConstantValue::DASHBOARD_FIELD_TYPE_ITEM_PROTOTYPE => CXmlConstantName::DASHBOARD_FIELD_TYPE_ITEM_PROTOTYPE,
+		CXmlConstantValue::DASHBOARD_FIELD_TYPE_GRAPH => CXmlConstantName::DASHBOARD_FIELD_TYPE_GRAPH,
+		CXmlConstantValue::DASHBOARD_FIELD_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_FIELD_TYPE_GRAPH_PROTOTYPE
+	];
+
 	/**
 	 * Format of import source.
 	 *
@@ -1558,32 +1576,25 @@ class C52XmlValidator {
 							'description' =>			['type' => XML_STRING, 'default' => '']
 						]]
 					]],
-					'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
-						'screen' =>					['type' => XML_ARRAY, 'rules' => [
+					'dashboards' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'dashboard', 'rules' => [
+						'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'hsize' =>					['type' => XML_STRING | XML_REQUIRED],
-							'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
-							'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
-								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
-									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_validate' method.
-									'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-									// The tag 'style' should be validated before the 'resource' because it is used in 'ex_validate' method.
-									'style' =>					['type' => XML_STRING | XML_REQUIRED],
-									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
-									'width' =>					['type' => XML_STRING | XML_REQUIRED],
-									'height' =>					['type' => XML_STRING | XML_REQUIRED],
-									'x' =>						['type' => XML_STRING | XML_REQUIRED],
-									'y' =>						['type' => XML_STRING | XML_REQUIRED],
-									'colspan' =>				['type' => XML_STRING | XML_REQUIRED],
-									'rowspan' =>				['type' => XML_STRING | XML_REQUIRED],
-									'elements' =>				['type' => XML_STRING | XML_REQUIRED],
-									'valign' =>					['type' => XML_STRING | XML_REQUIRED],
-									'halign' =>					['type' => XML_STRING | XML_REQUIRED],
-									'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
-									'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
-									'url' =>					['type' => XML_STRING | XML_REQUIRED],
-									'application' =>			['type' => XML_STRING | XML_REQUIRED],
-									'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
+							'widgets' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
+								'widget' =>					['type' => XML_ARRAY, 'rules' => [
+									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
+									'name' =>					['type' => XML_STRING, 'default' => ''],
+									'x' =>						['type' => XML_STRING, 'default' => '0'],
+									'y' =>						['type' => XML_STRING, 'default' => '0'],
+									'width' =>					['type' => XML_STRING, 'default' => '1'],
+									'height' =>					['type' => XML_STRING, 'default' => '2'],
+									'hide_header' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'fields' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
+										'field' =>					['type' => XML_ARRAY, 'rules' => [
+											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]]
 								]]
 							]]
 						]]

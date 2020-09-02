@@ -268,7 +268,7 @@ class CConfigurationExportBuilder {
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'screens' => $this->formatScreens($template['screens']),
+				'dashboards' => $this->formatDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags'])
 			];
 		}
@@ -1239,6 +1239,79 @@ class CConfigurationExportBuilder {
 				'resource' => $screenItem['resourceid'],
 				'max_columns' => $screenItem['max_columns'],
 				'application' => $screenItem['application']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format dashboards.
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	protected function formatDashboards(array $dashboards) {
+		$result = [];
+
+		CArrayHelper::sort($dashboards, ['name']);
+
+		foreach ($dashboards as $dashboard) {
+			$result[] = [
+				'name' => $dashboard['name'],
+				'widgets' => $this->formatWidgets($dashboard['widgets'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format widgets.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return array
+	 */
+	protected function formatWidgets(array $widgets) {
+		$result = [];
+
+		CArrayHelper::sort($widgets, ['name']);
+
+		foreach ($widgets as $widget) {
+			$result[] = [
+				'type' => $widget['type'],
+				'name' => $widget['name'],
+				'x' => $widget['x'],
+				'y' => $widget['y'],
+				'width' => $widget['width'],
+				'height' => $widget['height'],
+				'hide_header' => $widget['view_mode'],
+				'fields' => $this->formatWidgetFields($widget['fields'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format widget fields.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return array
+	 */
+	protected function formatWidgetFields(array $fields) {
+		$result = [];
+
+		CArrayHelper::sort($fields, ['type']);
+
+		foreach ($fields as $field) {
+			$result[] = [
+				'type' => $field['type'],
+				'name' => $field['name'],
+				'value' => $field['value']
 			];
 		}
 
