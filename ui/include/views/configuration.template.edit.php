@@ -302,7 +302,7 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($dashboardList);
 
-		$listBox = (new CListBox('screens', null, 8))
+		$listBox = (new CListBox('dashboards', null, 8))
 			->setAttribute('disabled', 'disabled')
 			->addItems($dashboardList);
 

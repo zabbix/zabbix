@@ -673,7 +673,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					return $dashboard;
 				}, $dbTemplateDashboards);
 
-
 				if (!API::TemplateDashboard()->create($dbTemplateDashboards)) {
 					throw new Exception();
 				}
