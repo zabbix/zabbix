@@ -163,7 +163,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		if (SUCCEED == (ret = parse_serveractive_element(ptr, &tmp, &port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
 		{
 			endpoint->conn_info.tcp.ip = tmp;
-			endpoint->conn_info.tcp.port = zbx_dsprintf(NULL, "%u", endpoint->conn_info.tcp.port);
+			endpoint->conn_info.tcp.port = zbx_dsprintf(NULL, "%u", port);
 		}
 	}
 	else if (0 == zbx_strncasecmp(endpoint_str, ZBX_MODBUS_PROTOCOL_PREFIX_RTU,
