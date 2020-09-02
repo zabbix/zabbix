@@ -191,7 +191,8 @@ class CImageHelper {
 			'match' => true,
 			'delta'	=> 0,
 			'error' => null,
-			'diff'	=> null
+			'diff'	=> null,
+			'ref'	=> null
 		];
 
 		if (md5($source) === md5($current)) {
@@ -207,6 +208,10 @@ class CImageHelper {
 			$height = imagesy($reference);
 
 			if ($width !== imagesx($target) || $height !== imagesy($target)) {
+				$result['ref'] = self::getImageString($reference);
+				imagedestroy($reference);
+				imagedestroy($target);
+
 				throw new Exception('Image size ('.imagesx($target).'x'.imagesy($target).
 						') doesn\'t match size of reference image ('.$width.'x'.$height.')'
 				);
@@ -241,7 +246,6 @@ class CImageHelper {
 				}
 			}
 
-			imagedestroy($reference);
 			imagedestroy($target);
 
 			if ($delta !== 0) {
@@ -255,7 +259,12 @@ class CImageHelper {
 				$result['delta'] = round($delta, 2);
 			}
 
-			$result['diff'] = ($result['match'] === false) ? self::getImageString($mask) : null;
+			if ($result['match'] === false) {
+				$result['ref'] = self::getImageString($reference);
+				$result['diff'] = self::getImageString($mask);
+			}
+
+			imagedestroy($reference);
 			imagedestroy($mask);
 		}
 		catch (Exception $e) {
