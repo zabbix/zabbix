@@ -74,6 +74,10 @@ class CTabFilterProfile {
 	public function __construct($idx, array $filter_defaults) {
 		$this->namespace = $idx;
 		$this->tabfilters = [];
+		$filter_defaults = array_intersect_key([
+			'from' => 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT),
+			'to' => 'now'
+		], $filter_defaults) + $filter_defaults;
 		$this->filter_defaults = $filter_defaults + [
 			'filter_name' => _('Untitled'),
 			'filter_show_counter' => 0,
@@ -225,8 +229,10 @@ class CTabFilterProfile {
 	 * Read profile from database.
 	 */
 	public function read() {
-		$this->from = CProfile::get($this->namespace.'.from', ZBX_PERIOD_DEFAULT_FROM);
-		$this->to = CProfile::get($this->namespace.'.to', ZBX_PERIOD_DEFAULT_TO);
+		$from = array_key_exists('from', $this->filter_defaults) ? $this->filter_defaults['from'] : null;
+		$to = array_key_exists('to', $this->filter_defaults) ? $this->filter_defaults['to'] : null;
+		$this->from = CProfile::get($this->namespace.'.from', $from);
+		$this->to = CProfile::get($this->namespace.'.to', $to);
 		$this->selected = (int) CProfile::get($this->namespace.'.selected', 0);
 		$this->expanded = (bool) CProfile::get($this->namespace.'.expanded', true);
 		// CProfile::updateArray assign new idx2 values do not need to store order in profile

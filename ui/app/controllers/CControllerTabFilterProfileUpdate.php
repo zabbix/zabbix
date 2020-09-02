@@ -76,7 +76,16 @@ class CControllerTabFilterProfileUpdate extends CController {
 		$idx_cunks = explode('.', $this->getInput('idx'));
 		$property = array_pop($idx_cunks);
 		$idx = implode('.', $idx_cunks);
-		$filter = (new CTabFilterProfile($idx, static::$namespaces[$idx]))->read();
+		$defaults = static::$namespaces[$idx];
+
+		if (array_key_exists('from', $defaults) || array_key_exists('to', $defaults)) {
+			$defaults += [
+				'from' => 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT),
+				'to' => 'now'
+			];
+		}
+
+		$filter = (new CTabFilterProfile($idx, $defaults))->read();
 
 		switch ($property) {
 			case 'selected':

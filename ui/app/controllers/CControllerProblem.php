@@ -51,12 +51,11 @@ abstract class CControllerProblem extends CController {
 		'page' => null,
 		'sort' => 'name',
 		'sortorder' => ZBX_SORT_UP,
-		'from' => ZBX_PERIOD_DEFAULT_FROM,
-		'to' => ZBX_PERIOD_DEFAULT_TO
+		'from' => '',
+		'to' => ''
 	];
 
 	protected function getCount(array $filter) {
-		$config = select_config();
 		$range_time_parser = new CRangeTimeParser();
 		$range_time_parser->parse($filter['from']);
 		$filter['from'] = $range_time_parser->getDateTime(true)->getTimestamp();
@@ -64,7 +63,7 @@ abstract class CControllerProblem extends CController {
 		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$data = CScreenProblem::getData($filter, [
-			'search_limit' => $config['search_limit']
+			'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 		]);
 
 		return count($data['problems']);

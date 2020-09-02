@@ -154,8 +154,6 @@ class CControllerProblemView extends CControllerProblem {
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
-
-
 			'action' => $this->getAction(),
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],

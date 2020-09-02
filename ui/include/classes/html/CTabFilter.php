@@ -188,8 +188,8 @@ class CTabFilter extends CDiv {
 	public function addTimeselector(array $timerange) {
 		$timerange += [
 			'format' => ZBX_FULL_DATE_TIME,
-			'from' => ZBX_PERIOD_DEFAULT_FROM,
-			'to' => ZBX_PERIOD_DEFAULT_TO,
+			'from' => 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT),
+			'to' => 'now',
 			'disabled' => false
 		];
 		$data = $timerange + [

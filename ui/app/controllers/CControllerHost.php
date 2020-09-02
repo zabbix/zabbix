@@ -99,8 +99,6 @@ abstract class CControllerHost extends CController {
 			$groupids = array_keys($filter_groups);
 		}
 
-		$config = select_config();
-
 		$count = API::Host()->get([
 			'output' => ['hostid', 'name', 'status'],
 			'evaltype' => $filter['evaltype'],
@@ -123,7 +121,7 @@ abstract class CControllerHost extends CController {
 					? null
 					: HOST_MAINTENANCE_STATUS_OFF,
 			],
-			'limit' => $config['search_limit'] + 1,
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
 			'countOutput' => true
 		]);
 
