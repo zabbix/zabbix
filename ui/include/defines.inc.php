@@ -1545,6 +1545,40 @@ define('ZBX_POPUP_CONDITION_TYPE_EVENT_CORR', 0);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
+// Tab indicator names.
+define('TAB_INDICATOR_MACROS', 'macros');
+define('TAB_INDICATOR_LINKED_TEMPLATE', 'linked-template');
+define('TAB_INDICATOR_TAGS', 'tags');
+define('TAB_INDICATOR_AUTH_HTTP', 'http');
+define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
+define('TAB_INDICATOR_AUTH_SAML', 'saml');
+define('TAB_INDICATOR_INVENTORY', 'inventory');
+define('TAB_INDICATOR_ENCRYPTION', 'encryption');
+define('TAB_INDICATOR_GROUPS', 'groups');
+define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_DEPENDENCY', 'dependency');
+define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
+define('TAB_INDICATOR_FILTERS', 'filters');
+define('TAB_INDICATOR_OVERRIDES', 'overrides');
+define('TAB_INDICATOR_STEPS', 'steps');
+define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
+define('TAB_INDICATOR_OPERATIONS', 'operations');
+define('TAB_INDICATOR_SERVICE_DEPENDENCY', 'service-dependency');
+define('TAB_INDICATOR_TIME', 'time');
+define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
+define('TAB_INDICATOR_MEDIA', 'media');
+define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
+define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_SHARING', 'sharing');
+define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
+define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
+define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
+define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
+define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
+define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
+define('TAB_INDICATOR_PERIODS', 'periods');
+define('TAB_INDICATOR_PERMISSIONS', 'permissions');
+
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
