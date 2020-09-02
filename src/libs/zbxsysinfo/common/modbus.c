@@ -30,6 +30,8 @@ zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 
 #define ZBX_MODBUS_DATATYPE_STRLEN_MAX	6
 
+#define ZBX_MODBUS_BAUDRATE_DEFAULT	115200
+
 #ifdef _WINDOWS
 #pragma comment(lib, "modbus")
 #endif
@@ -147,30 +149,30 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 {
 #define ZBX_MODBUS_PROTOCOL_PREFIX_TCP	"tcp://"
 #define ZBX_MODBUS_PROTOCOL_PREFIX_RTU	"rtu://"
-	char	*tmp = NULL;
+	char	*ptr, *tmp = NULL;
 	int	ret = SUCCEED;
 
 	if (0 == zbx_strncasecmp(endpoint_str, ZBX_MODBUS_PROTOCOL_PREFIX_TCP,
 			ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP)))
 	{
-		endpoint->protocol = ZBX_MODBUS_PROTOCOL_TCP;
+		unsigned short	port;
 
-		if (SUCCEED == (ret = parse_serveractive_element(
-				endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP), &tmp,
-				&endpoint->conn_info.tcp.port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
+		endpoint->protocol = ZBX_MODBUS_PROTOCOL_TCP;
+		ptr = endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP);
+
+		if (SUCCEED == (ret = parse_serveractive_element(ptr, &tmp, &port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
+		{
 			endpoint->conn_info.tcp.ip = tmp;
+			endpoint->conn_info.tcp.port = zbx_dsprintf(NULL, "%u", endpoint->conn_info.tcp.port);
+		}
 	}
 	else if (0 == zbx_strncasecmp(endpoint_str, ZBX_MODBUS_PROTOCOL_PREFIX_RTU,
 			ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_RTU)))
 	{
-		char	*ptr;
-
 		endpoint->protocol = ZBX_MODBUS_PROTOCOL_RTU;
-
 		ptr = endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_RTU);
-		tmp = strchr(ptr, ':');
 
-		if (NULL != tmp)
+		if (NULL != (tmp = strchr(ptr, ':')))
 		{
 			size_t	alloc_len = 0, offset = 0;
 			char	*baudrate_str;
@@ -199,7 +201,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		else
 		{
 			endpoint->conn_info.serial.port = zbx_strdup(NULL, ptr);
-			endpoint->conn_info.serial.baudrate = 115200;
+			endpoint->conn_info.serial.baudrate = ZBX_MODBUS_BAUDRATE_DEFAULT;
 			set_serial_params_default(&endpoint->conn_info.serial);
 		}
 
@@ -239,7 +241,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
  *                                                                            *
  ******************************************************************************/
 static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slaveid, unsigned char function,
-		unsigned short address, unsigned short count, unsigned char type, unsigned char endianness,
+		unsigned short address, unsigned short count, modbus_datatype_t type, unsigned char endianness,
 		unsigned short offset, AGENT_RESULT *res, char **error)
 {
 
@@ -249,13 +251,11 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	int		ret = FAIL;
 	unsigned int	count_w_offset, registers_count = 0, i;
 	char		*list;
-	char 		port[ZBX_MODBUS_PORT_LEN_MAX];
 
 	switch (endpoint->protocol)
 	{
 		case ZBX_MODBUS_PROTOCOL_TCP:
-			zbx_snprintf(port, sizeof(port) - offset, "%d", (int)endpoint->conn_info.tcp.port);
-			mdb_ctx = modbus_new_tcp_pi(endpoint->conn_info.tcp.ip, port);
+			mdb_ctx = modbus_new_tcp_pi(endpoint->conn_info.tcp.ip, endpoint->conn_info.tcp.port);
 			break;
 		case ZBX_MODBUS_PROTOCOL_RTU:
 			mdb_ctx = modbus_new_rtu(endpoint->conn_info.serial.port, endpoint->conn_info.serial.baudrate,
@@ -437,6 +437,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 
 			list = zbx_strdup(NULL, "[");
 			i = 0;
+
 			while (i < registers_count)
 			{
 				switch(type)
@@ -446,8 +447,10 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 						ub2 = (unsigned char)(buf16[i] >> 8);
 						list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",", ub1);
 						i++;
+
 						if (++bytes >= count)
 							break;
+
 						list = zbx_dsprintf(list, "%s,%u", list, ub2);
 						bytes++;
 						break;
@@ -456,8 +459,10 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 						b2 = (char)(buf16[i] >> 8);
 						list = zbx_dsprintf(list, "%s%s%i", list, 0 == i ? "" : ",", b1);
 						i++;
+
 						if (++bytes >= count)
 							break;
+
 						list = zbx_dsprintf(list, "%s,%i", list, b2);
 						bytes++;
 						break;
@@ -708,7 +713,10 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ret = SYSINFO_RET_OK;
 err:
 	if (ZBX_MODBUS_PROTOCOL_TCP == endpoint.protocol)
+	{
 		zbx_free(endpoint.conn_info.tcp.ip);
+		zbx_free(endpoint.conn_info.tcp.port);
+	}
 	else if (ZBX_MODBUS_PROTOCOL_RTU == endpoint.protocol)
 		zbx_free(endpoint.conn_info.serial.port);
 
