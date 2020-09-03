@@ -378,7 +378,7 @@ function invalid_url($msg = null) {
 	unset_all();
 	show_error_message($msg);
 
-	define('ZBX_PAGE_INVALID_URL', 1);
+	(new CWidget())->show();
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
