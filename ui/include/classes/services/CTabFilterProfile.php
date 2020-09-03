@@ -161,7 +161,7 @@ class CTabFilterProfile {
 		if (array_key_exists('filter_name', $input)) {
 			$name_indexes = [];
 
-			foreach ($this->tabfilters as $index => $tabfilter) {
+			foreach (array_slice($this->tabfilters, 1, null, true) as $index => $tabfilter) {
 				if ($tabfilter['filter_name'] === $input['filter_name']) {
 					$name_indexes[] = $index;
 				}
