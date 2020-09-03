@@ -21,7 +21,6 @@
 const TABFILTERITEM_EVENT_CLICK = 'click';
 const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.tabfilter';
 const TABFILTERITEM_EVENT_EXPAND   = 'expand.tabfilter';
-const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore.tabfilter';
 const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
 const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
 const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter';
@@ -51,24 +50,27 @@ class CTabFilterItem extends CBaseComponent {
 	init() {
 		if (this._expanded) {
 			this.renderContentTemplate();
-
-			if (this._data.filter_configurable) {
-				this.addActionIcons();
-			}
-
 			this.setBrowserLocation(this.getFilterParams());
 			this.resetUnsavedState();
 		}
 
 		if (this._data.filter_show_counter) {
-			this.setCounter(' ');
+			this.setCounter('');
 		}
 	}
 
+	/**
+	 * Set results counter value.
+	 *
+	 * @param {int} value  Results counter value.
+	 */
 	setCounter(value) {
 		this._target.setAttribute('data-counter', value);
 	}
 
+	/**
+	 * Remove results counter value.
+	 */
 	removeCounter() {
 		this._target.removeAttribute('data-counter');
 	}
@@ -99,32 +101,90 @@ class CTabFilterItem extends CBaseComponent {
 	addActionIcons() {
 		let edit = document.createElement('a');
 
-		edit.classList.add('icon-edit');
-		edit.addEventListener('click', (ev) => this.openPropertiesForm(ev.target, {
-			idx: this._idx_namespace,
-			idx2: this._index,
-			filter_name: this._data.filter_name,
-			filter_show_counter: this._data.filter_show_counter,
-			filter_custom_time: this._data.filter_custom_time,
-			tabfilter_from: this._data.from||'',
-			tabfilter_to: this._data.to||'',
-			support_custom_time: +this._support_custom_time
-		}));
-		this._target.parentNode.appendChild(edit);
-	}
-
-	removeActionIcons() {
-		let edit = this._target.parentNode.querySelector('.icon-edit');
-
-		edit && edit.remove();
-	}
-
-	select() {
-		if (!this._expanded) {
-			this._events.click();
+		if (!this._target.parentNode.querySelector('.icon-edit')) {
+			edit.classList.add('icon-edit');
+			edit.addEventListener('click', (ev) => this.openPropertiesForm(ev.target, {
+				idx: this._idx_namespace,
+				idx2: this._index,
+				filter_name: this._data.filter_name,
+				filter_show_counter: this._data.filter_show_counter,
+				filter_custom_time: this._data.filter_custom_time,
+				tabfilter_from: this._data.from||'',
+				tabfilter_to: this._data.to||'',
+				support_custom_time: +this._support_custom_time
+			}));
+			this._target.parentNode.appendChild(edit);
 		}
 	}
 
+	/**
+	 * Remove gear icon HTMLElement.
+	 */
+	removeActionIcons() {
+		this._target.parentNode.querySelector('.icon-edit')?.remove();
+	}
+
+	/**
+	 * Set selected state of item.
+	 */
+	setSelected() {
+		this._target.parentNode.classList.add('selected');
+
+		if (this._data.filter_configurable) {
+			this.addActionIcons();
+		}
+	}
+
+	/**
+	 * Remove selected state of item.
+	 */
+	removeSelected() {
+		this._target.parentNode.classList.remove('selected');
+
+		if (this._data.filter_configurable) {
+			this.removeActionIcons();
+		}
+	}
+
+	/**
+	 * Set expanded state of item and it content container, render content from template if it was not rendered yet.
+	 * Fire TABFILTERITEM_EVENT_EXPAND event on template.
+	 */
+	setExpanded() {
+		let item_template = this._template||this._content_container.querySelector('[data-template]');
+
+		this._expanded = true;
+		this._target.parentNode.classList.add('expanded');
+
+		if (!this._template_rendered) {
+			this.renderContentTemplate();
+			this._template_rendered = true;
+		}
+		else if (item_template instanceof HTMLElement) {
+			item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
+		}
+
+		this._content_container.classList.remove('display-none');
+	}
+
+	/**
+	 * Remove expanded state of item and it content. Fire TABFILTERITEM_EVENT_COLLAPSE on item template.
+	 */
+	removeExpanded() {
+		let item_template = (this._template||this._content_container.querySelector('[data-template]'));
+
+		this._expanded = false;
+		this._target.parentNode.classList.remove('expanded');
+		this._content_container.classList.add('display-none');
+
+		if (item_template instanceof HTMLElement) {
+			item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_COLLAPSE, {detail: this}));
+		}
+	}
+
+	/**
+	 * Delete item, clean up all related HTMLElement nodes.
+	 */
 	delete() {
 		this._target.parentNode.remove();
 		this._content_container.remove();
@@ -296,7 +356,6 @@ class CTabFilterItem extends CBaseComponent {
 				this._target.focus();
 
 				if (!this._expanded) {
-					this.fire(TABFILTERITEM_EVENT_EXPAND_BEFORE);
 					this.fire(TABFILTERITEM_EVENT_EXPAND);
 				}
 				else if (this._can_toggle) {
@@ -305,48 +364,22 @@ class CTabFilterItem extends CBaseComponent {
 			},
 
 			expand: () => {
-				let item_template = this._template||this._content_container.querySelector('[data-template]');
-
-				this._expanded = true;
-				this._target.parentNode.classList.add('active');
-
-				if (!this._template_rendered) {
-					this.renderContentTemplate();
-					this._template_rendered = true;
-
-					if (this._src_url === null) {
-						this.resetUnsavedState();
-					}
-				}
-				else if (item_template instanceof HTMLElement) {
-					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
-				}
+				this.setSelected();
+				this.setExpanded();
 
 				let search_params = this.getFilterParams();
+
+				if (this._src_url === null) {
+					this.resetUnsavedState();
+				}
 
 				if (search_params) {
 					this.setBrowserLocation(search_params);
 				}
-
-				this._content_container.classList.remove('display-none');
-
-				if (this._data.filter_configurable) {
-					this.addActionIcons();
-				}
 			},
 
 			collapse: () => {
-				let item_template = (this._template||this._content_container.querySelector('[data-template]'));
-
-				this._expanded = false;
-				this._target.parentNode.classList.remove('active');
-				this._content_container.classList.add('display-none');
-
-				if (item_template instanceof HTMLElement) {
-					item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_COLLAPSE, {detail: this}));
-				}
-
-				this.removeActionIcons();
+				this.removeExpanded();
 			}
 		}
 

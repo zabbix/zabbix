@@ -3,7 +3,8 @@
 class CTabFilter extends CDiv {
 
 	const ZBX_STYLE_CLASS = 'tabfilter-container';
-	const CSS_TAB_ACTIVE = 'active';
+	const CSS_TAB_SELECTED = 'selected';
+	const CSS_TAB_EXPANDED = 'expanded';
 	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
 
@@ -214,8 +215,8 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Add tab for render on browser side using passed $data. Active (expanded) tab will be pre-rendered on server side
-	 * to prevent screen flickering during page initial load.
+	 * Add tab for render on browser side using passed $data. Selected and expanded tab will be pre-rendered on server
+	 * side to prevent screen flickering during page initial load.
 	 *
 	 * @param string|CTag $label            Tab label.
 	 * @param string      $target_selector  CSS selector for tab content node to be shown/hidden.
@@ -235,7 +236,7 @@ class CTabFilter extends CDiv {
 		$static = [];
 
 		foreach ($this->labels as $index => $label) {
-			if ($this->contents[$index] === null && $this->options['data'][$index]['filter_sortable']) {
+			if ($this->options['data'][$index]['filter_sortable']) {
 				$sortable[$index] = $label;
 			}
 			else {
@@ -299,13 +300,13 @@ class CTabFilter extends CDiv {
 
 	public function bodyToString() {
 		$selected = $this->options['selected'];
-		$this->labels[$selected]->addClass(static::CSS_TAB_ACTIVE);
-		$nav = $this->getNavigation();
+		$this->labels[$selected]->addClass(static::CSS_TAB_SELECTED);
 
 		if ($this->options['expanded']) {
 			if ($this->contents[$selected] === null) {
 				$tab_data = $this->options['data'][$selected];
 				$tab_data['render_html'] = true;
+				$this->labels[$selected]->addClass(static::CSS_TAB_EXPANDED);
 				$this->contents[$selected] = (new CDiv([new CPartial($tab_data['tab_view'], $tab_data)]))
 					->setId($this->labels[$selected]->getAttribute('data-target'));
 			}
@@ -324,7 +325,7 @@ class CTabFilter extends CDiv {
 		}
 
 		return implode('', [
-			$nav,
+			$this->getNavigation(),
 			(new CDiv([
 				(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
 				$this->buttons,

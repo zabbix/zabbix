@@ -42,11 +42,11 @@ class CTabFilter extends CBaseComponent {
 	init(options) {
 		let item, index = 0;
 
+		this._shared_domnode = this._target.querySelector('.form-buttons');
+
 		if (options.expanded) {
 			options.data[options.selected].expanded = true;
 		}
-
-		this._shared_domnode = this._target.querySelector('.form-buttons');
 
 		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
@@ -55,12 +55,13 @@ class CTabFilter extends CBaseComponent {
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			item = this.create(title, options.data[index]||{});
 
-			if (item._expanded) {
-				this._active_item = item;
+			if (options.selected === index) {
+				item._target.focus();
+				this.setSelectedItem(item);
 			}
 
-			if (item._target.parentNode.classList.contains('active')) {
-				item._target.focus();
+			if (item._expanded) {
+				item.setExpanded();
 			}
 
 			index++;
@@ -74,8 +75,7 @@ class CTabFilter extends CBaseComponent {
 		let index = this._items.indexOf(item);
 
 		if (index > -1) {
-			this._active_item = this._items[index - 1];
-			this._active_item.select();
+			this.setSelectedItem(this._items[index - 1]);
 			item.delete();
 			delete this._items[index];
 			this._items.splice(index, 1);
@@ -213,6 +213,22 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
+	 * Set item object as current selected item, also ensures that only one selected item exists.
+	 *
+	 * @param {CTabFilterItem} item  Item object to be set as selected item.
+	 */
+	setSelectedItem(item) {
+		this._active_item = item;
+		item.setSelected();
+
+		for (const _item of this._items) {
+			if (_item !== this._active_item) {
+				_item.removeSelected();
+			}
+		}
+	}
+
+	/**
 	 * Register tab filter events, called once during initialization.
 	 *
 	 * @param {object} options  Tab filter initialization options.
@@ -223,21 +239,21 @@ class CTabFilter extends CBaseComponent {
 			 * Event handler on tab content expand.
 			 */
 			expand: (ev) => {
-				this._active_item = ev.detail.target;
-				this.collapseAllItemsExcept(this._active_item);
+				if (ev.detail.target != this._timeselector) {
+					this.setSelectedItem(ev.detail.target);
+				}
 
-				if (!this._active_item || !this._active_item._expanded) {
-					this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
+				this.collapseAllItemsExcept(ev.detail.target);
+				this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
 
-					if (this._active_item == this._timeselector) {
-						this._shared_domnode.classList.add('display-none');
-					}
-					else {
-						this._shared_domnode.classList.remove('display-none');
-						this.profileUpdate('selected', {
-							value_int: this._active_item._index
-						});
-					}
+				if (this._active_item == this._timeselector) {
+					this._shared_domnode.classList.add('display-none');
+				}
+				else {
+					this._shared_domnode.classList.remove('display-none');
+					this.profileUpdate('selected', {
+						value_int: this._active_item._index
+					});
 				}
 			},
 
@@ -330,7 +346,7 @@ class CTabFilter extends CBaseComponent {
 				let index = this._items.indexOf(this._active_item);
 
 				if (index > 0) {
-					this._items[index - 1].select();
+					this.setSelectedItem(this._items[index - 1]);
 				}
 			},
 
@@ -341,7 +357,7 @@ class CTabFilter extends CBaseComponent {
 				let index = this._items.indexOf(this._active_item);
 
 				if (index > -1 && index < this._items.length - 1) {
-					this._items[index + 1].select();
+					this.setSelectedItem(this._items[index + 1]);
 				}
 			},
 
@@ -352,16 +368,16 @@ class CTabFilter extends CBaseComponent {
 				let items = [],
 					dropdown = [{
 						items: [{
-								label: t('Home'),
-								clickCallback: () => this._items[0].select()
-							}]
+							label: t('Home'),
+							clickCallback: () => this.setSelectedItem(this._items[0])
+						}]
 					}];
 
 				if (this._items.length > 2) {
 					for (const item of this._items.slice(1, -1)) {
 						items.push({
 							label: item._data.filter_name,
-							clickCallback: () => item.select()
+							clickCallback: () => this.setSelectedItem(item)
 						});
 					}
 
@@ -437,7 +453,6 @@ class CTabFilter extends CBaseComponent {
 
 				if (ev.path.indexOf(this._target.querySelector('nav')) > -1) {
 					this._events[(ev.key == 'ArrowRight') ? 'selectNextTab' : 'selectPrevTab']();
-
 					cancelEvent(ev);
 				}
 			},
@@ -448,13 +463,13 @@ class CTabFilter extends CBaseComponent {
 			mouseWheelHandler: (container, ev) => {
 				if ((ev.deltaY < 0 && container.scrollLeft > 0)
 						|| (ev.deltaY > 0 && container.scrollLeft < container.scrollWidth - container.clientWidth)) {
-					container.scrollBy({ left: ev.deltaY })
+					container.scrollBy({left: ev.deltaY});
 				}
 			}
 		}
 
 		for (const item of this._items) {
-			item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
+			item.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
 			item.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
 			item.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateItem);
@@ -470,7 +485,7 @@ class CTabFilter extends CBaseComponent {
 		const container = this._target.querySelector('.ui-sortable-container').parentNode;
 
 		try {
-			addEventListener('test', null, { get passive() { passive = true; } });
+			addEventListener('test', null, {get passive() {}});
 			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev), {passive:true});
 		} catch(e) {
 			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev));
