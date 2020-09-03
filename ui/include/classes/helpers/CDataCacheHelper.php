@@ -34,7 +34,7 @@ class CDataCacheHelper {
 	/**
 	 * File name to store cache.
 	 *
-	 * @var string 
+	 * @var string
 	 */
 	protected const DATA_CACHE_FILE_NAME = 'zbx_config_cache';
 

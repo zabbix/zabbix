@@ -301,8 +301,8 @@ class CSetupWizard extends CForm {
 
 		if ($DB['CREDS_STORAGE'] == DB_STORE_CREDS_VAULT) {
 			$table
-				->addRow(_('Vault API endpoint'), 
-					(new CTextBox('vault_host', $this->getConfig('DB_VAULT_HOST') ? : self::VAULT_HOST_DEFAULT)) // TODO
+				->addRow(_('Vault API endpoint'),
+					(new CTextBox('vault_host', $this->getConfig('DB_VAULT_HOST') ? : self::VAULT_HOST_DEFAULT))
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
 				->addRow(_('Vault secret path'),
