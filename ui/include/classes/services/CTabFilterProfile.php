@@ -159,11 +159,20 @@ class CTabFilterProfile {
 	 */
 	public function setInput(array $input) {
 		if (array_key_exists('filter_name', $input)) {
-			// Convert to int to set value of $name_index to 0 when filter_name were not found.
-			$name_index = (int) array_search($input['filter_name'], array_column($this->tabfilters, 'filter_name'));
+			$name_indexes = [];
 
-			if ($this->selected != $name_index) {
-				$this->selected = $name_index;
+			foreach ($this->tabfilters as $index => $tabfilter) {
+				if ($tabfilter['filter_name'] === $input['filter_name']) {
+					$name_indexes[] = $index;
+				}
+			}
+
+			if (!$name_indexes) {
+				$name_indexes = [0];
+			}
+
+			if (!in_array($this->selected, $name_indexes)) {
+				$this->selected = reset($name_indexes);
 				$this->update();
 			}
 
@@ -174,7 +183,7 @@ class CTabFilterProfile {
 			$input += $this->filter_defaults;
 			$input['filter_show_counter'] = (int) $input['filter_show_counter'];
 			$input['filter_custom_time'] = (int) $input['filter_custom_time'];
-			$this->tabfilters[$name_index] = $input;
+			$this->tabfilters[$this->selected] = $input;
 		}
 
 		return $this;
