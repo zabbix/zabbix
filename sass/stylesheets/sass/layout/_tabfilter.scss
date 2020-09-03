@@ -6,21 +6,44 @@
 	.tabfilter-content-container {
 		border: 1px solid $ui-border-color;
 		padding: 10px 0;
+		margin-top: -1px;
 	}
 
 	/* Top navigation labels */
 	nav > ul {
+		display: flex;
+		flex: 1;
+		justify-content: space-between;
 		background-color: $body-bg-color;
 	}
 
 	nav > ul > li {
 		margin: 0 2px 5px 0;
+
+		// Container with sortable tab items. Occupy space left with overflow and scrolling of content (javascript)
+		&:nth-child(2) {
+			flex-grow: 1;
+			overflow: hidden;
+			margin: 0;
+			height: 31px;
+
+			ul {
+				white-space: nowrap;
+			}
+		}
+
+		// Left and right navigation containers. Occupy as much space as needed to render it content.
+		&:nth-child(1),
+		&:nth-child(3) {
+			white-space: nowrap;
+		}
 	}
 
 	nav li {
 		display: inline-block;
 		vertical-align: top;
 		height: 26px;
+		line-height: 26px;
 	}
 
 	/* tab filter label li element */
@@ -94,13 +117,19 @@
 		color: $btn-font-color;
 		border-bottom: 0 none;
 		line-height: 24px;
+		vertical-align: middle;
 		padding: 0 11px;
 	}
 
 	.icon-edit {
-		@extend .btn-widget-edit;
+		//@extend .btn-widget-edit;
+		@extend %btn-widget-defaults;
+		width: 24px;
+		height: 24px;
+		background: url($sprite-path) no-repeat -42px -619px;
 
 		cursor: pointer;
+		margin: 0;
 		vertical-align: middle;
 		display: inline-block;
 		opacity: 0;

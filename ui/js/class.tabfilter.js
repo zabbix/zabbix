@@ -440,6 +440,16 @@ class CTabFilter extends CBaseComponent {
 
 					cancelEvent(ev);
 				}
+			},
+
+			/**
+			 * Scroll horizontally with mouse wheel handler for sortable items container.
+			 */
+			mouseWheelHandler: (container, ev) => {
+				if ((ev.deltaY < 0 && container.scrollLeft > 0)
+						|| (ev.deltaY > 0 && container.scrollLeft < container.scrollWidth - container.clientWidth)) {
+					container.scrollBy({ left: ev.deltaY })
+				}
 			}
 		}
 
@@ -456,6 +466,15 @@ class CTabFilter extends CBaseComponent {
 			axis: 'x',
 			containment: 'parent'
 		});
+
+		const container = this._target.querySelector('.ui-sortable-container').parentNode;
+
+		try {
+			addEventListener('test', null, { get passive() { passive = true; } });
+			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev), {passive:true});
+		} catch(e) {
+			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev));
+		}
 
 		for (const action of this._target.querySelectorAll('nav [data-action]')) {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
