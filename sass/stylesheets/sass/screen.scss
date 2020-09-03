@@ -7051,8 +7051,8 @@ table.preprocessing-test-results {
 	}
 }
 
-.icon-invisible {
-	margin: 0;
+.icon-invisible.menu-popup-item,
+.icon-invisible.btn-dropdown-toggle {
 	width: 100%;
 
 	&::before {
@@ -7069,6 +7069,9 @@ table.preprocessing-test-results {
 			}
 		}
 	}
+}
+.icon-invisible.btn-dropdown-toggle {
+	margin: 0;
 }
 
 .btn-split {
