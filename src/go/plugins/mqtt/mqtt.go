@@ -17,38 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **
 
-** Eclipse Distribution License - v 1.0
-**
-** Copyright (c) 2007, Eclipse Foundation, Inc. and its licensors.
-**
-** All rights reserved.
-**
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**
-**   * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-**   * Neither the name of the Eclipse Foundation, Inc. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-** COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-** CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+******************************************************************************
+*
+* We use the library Eclipse Paho (eclipse/paho.mqtt.golang), which is
+* distributed under the terms of the Eclipse Distribution License 1.0 (The 3-Clause BSD License)
+* available at https://www.eclipse.org/org/documents/edl-v10.php
+*
+******************************************************************************
+
 **/
 
 package mqtt
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
 	"sync"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/watch"
-	"zabbix.com/pkg/web"
 )
 
 type mqttClient struct {
@@ -56,7 +48,6 @@ type mqttClient struct {
 	broker string
 	subs   map[string]*mqttSub
 	opts   *mqtt.ClientOptions
-	subMux *sync.RWMutex
 }
 
 type mqttSub struct {
@@ -83,7 +74,7 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 			opts.SetPassword(password)
 		}
 	}
-	opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert})
+
 	opts.OnConnectionLost = func(client mqtt.Client, reason error) {
 		impl.Errf("Connection lost to %s, reason: %s", broker, reason.Error())
 	}
@@ -94,18 +85,16 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 		mc, found := p.mqttClients[broker]
 		impl.clientMux.RUnlock()
 		if found {
-			if mc.broker == broker {
-				mc.subMux.RLock()
-				for _, ms := range mc.subs {
-					if ms.subscribed {
-						err := ms.subscribe(mc)
-						if err != nil {
-							impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
-						}
+			impl.manager.Lock()
+			for _, ms := range mc.subs {
+				if ms.subscribed {
+					err := ms.subscribe(mc)
+					if err != nil {
+						impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
 					}
 				}
-				mc.subMux.RUnlock()
 			}
+			impl.manager.Unlock()
 		}
 	}
 
@@ -124,19 +113,15 @@ func newClient(broker string, options *mqtt.ClientOptions) (mqtt.Client, error) 
 
 func (ms *mqttSub) subscribeCallback(client mqtt.Client, msg mqtt.Message) {
 	impl.manager.Lock()
-	resp[msg.Topic()] = string(msg.Payload())
-	impl.Tracef("Received publication from %s: [%s] %s", ms.broker, msg.Topic(),
-		string(msg.Payload()))
+	impl.Tracef("Received publication from %s: [%s] %s", ms.broker, msg.Topic(), string(msg.Payload()))
 	impl.manager.Notify(ms, msg)
 	impl.manager.Unlock()
 }
 
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
 	impl.Debugf("Subscribing to %s", ms.broker)
-	token := mc.client.Subscribe(
-		ms.topic, 0, ms.subscribeCallback)
-
-	if token.Wait() && token.Error() != nil {
+	token := mc.client.Subscribe(ms.topic, 0, ms.subscribeCallback)
+	if token.WaitTimeout(60*time.Second) && token.Error() != nil {
 		return error(token.Error())
 	}
 
@@ -149,18 +134,9 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 //Watch MQTT plugin
 func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	impl.manager.Lock()
-	impl.clientMux.Lock()
-	for broker, mc := range impl.mqttClients {
-		if mc != nil && mc.client != nil && !mc.client.IsConnected() {
-			delete(impl.mqttClients, broker)
-		}
-	}
-	impl.clientMux.Unlock()
 	impl.manager.Update(ctx.ClientID(), ctx.Output(), requests)
 	impl.manager.Unlock()
 }
-
-var resp = make(map[string]string)
 
 func (ms *mqttSub) Initialize() (err error) {
 	impl.clientMux.RLock()
@@ -193,12 +169,10 @@ func (ms *mqttSub) Release() {
 
 	impl.Debugf("Unsubscribing topic from %s", ms.topic)
 	token := mc.client.Unsubscribe(ms.topic)
-	if token.Wait() && token.Error() != nil {
+	if token.WaitTimeout(60*time.Second) && token.Error() != nil {
 		impl.Errf("Failed to unsubscribe from %s:%s", ms.topic, token.Error())
 	}
 
-	mc.subMux.Lock()
-	defer mc.subMux.Unlock()
 	delete(mc.subs, ms.topic)
 
 	impl.Debugf("Unsubscribed from %s", ms.topic)
@@ -245,8 +219,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	}
 
 	if len(params) != 2 {
-		return nil, fmt.Errorf(
-			"Incorrect key format for mqtt subscribe. Must be mqtt.get[<broker URL>,<topic>]")
+		return nil, fmt.Errorf("Incorrect key format for mqtt subscribe. Must be mqtt.get[<broker URL>,<topic>]")
 	}
 
 	topic := params[1]
@@ -262,11 +235,9 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 		impl.Debugf("Creating client options for %s", broker)
 		p.mqttClients[broker] = &mqttClient{
 			nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", url.Query().Get("username"),
-				url.Query().Get("password"), broker), &sync.RWMutex{}}
+				url.Query().Get("password"), broker)}
 	}
 
-	p.mqttClients[broker].subMux.Lock()
-	defer p.mqttClients[broker].subMux.Unlock()
 	if _, ok := p.mqttClients[broker].subs[topic]; !ok {
 		impl.Debugf("Creating subscriber for %s", topic)
 		p.mqttClients[broker].subs[topic] = &mqttSub{
@@ -281,20 +252,15 @@ func hasWildCards(topic string) bool {
 }
 
 func parseURL(broker string) (out *url.URL, err error) {
-	scheme, urlString, err := web.RemoveScheme(broker)
-	if err != nil {
-		return nil, err
+	if len(broker) > 0 && broker[0] == ':' {
+		broker = "localhost" + broker
 	}
 
-	if scheme == "" {
-		scheme = "tcp"
+	if !strings.Contains(broker, "://") {
+		broker = "tcp://" + broker
 	}
 
-	if urlString == "" {
-		urlString = "localhost"
-	}
-
-	out, err = url.Parse(fmt.Sprintf("%s://%s", scheme, web.EncloseIPv6(urlString)))
+	out, err = url.Parse(broker)
 	if err != nil {
 		return
 	}
