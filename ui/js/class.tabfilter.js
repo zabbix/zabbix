@@ -241,20 +241,17 @@ class CTabFilter extends CBaseComponent {
 			expand: (ev) => {
 				if (ev.detail.target != this._timeselector) {
 					this.setSelectedItem(ev.detail.target);
-				}
-
-				this.collapseAllItemsExcept(ev.detail.target);
-				this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
-
-				if (this._active_item == this._timeselector) {
-					this._shared_domnode.classList.add('display-none');
-				}
-				else {
 					this._shared_domnode.classList.remove('display-none');
 					this.profileUpdate('selected', {
 						value_int: this._active_item._index
 					});
 				}
+				else {
+					this._shared_domnode.classList.add('display-none');
+				}
+
+				this.collapseAllItemsExcept(ev.detail.target);
+				this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
 			},
 
 			/**
