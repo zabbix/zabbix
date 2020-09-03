@@ -240,13 +240,13 @@ func getFuncId(p *[]string, n int) (funcId uint8, err error) {
 }
 
 func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcId uint8, err error) {
-	v := "00001"
+	var v string
 
-	if len(*p) > n {
+	if len(*p) > n && strings.TrimSpace((*p)[n]) != "" {
 		v = strings.TrimSpace((*p)[n])
 	}
 	if len(v) == 0 {
-		return 0, fid, fmt.Errorf("Unsupported empty modbus address")
+		v = "00001"
 	}
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 16); err != nil {
