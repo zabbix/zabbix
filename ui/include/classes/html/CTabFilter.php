@@ -257,27 +257,21 @@ class CTabFilter extends CDiv {
 			$timeselector = null;
 		}
 
-		$nav = [
-			(new CSimpleButton())
-				->setAttribute('data-action', 'selectPrevTab')
-				->addClass('btn-iterator-page-previous'),
-			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
-			$static ? $static : null,
+		$nav_list = (new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
 				->addClass('btn-widget-expand'),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
-				->addClass('btn-iterator-page-next'),
-		];
+				->addClass('btn-iterator-page-next')
+		]));
 
 		if ($timeselector) {
 			$timeselector_data = end($this->options['data']);
 			$tab = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
 			$enabled = !$tab['filter_custom_time'] && !$timeselector_data['disabled'];
 			$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
-
-			$nav = array_merge($nav, [
+			array_map([$nav_list, 'addItem'], [
 				$timeselector,
 				(new CSimpleButton())
 					->setEnabled($enabled)
@@ -290,6 +284,15 @@ class CTabFilter extends CDiv {
 					->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
 			]);
 		}
+
+		$nav = [
+			(new CSimpleButton())
+				->setAttribute('data-action', 'selectPrevTab')
+				->addClass('btn-iterator-page-previous'),
+			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
+			$static ? $static : null,
+			$nav_list
+		];
 
 		return new CTag('nav', true , new CList($nav));
 	}

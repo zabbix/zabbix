@@ -81,7 +81,7 @@ class CTabFilterProfile {
 		$this->filter_defaults = $filter_defaults + [
 			'filter_name' => _('Untitled'),
 			'filter_show_counter' => 0,
-			'filter_custom_time' => 0,
+			'filter_custom_time' => 0
 		];
 		$this->selected = 0;
 		$this->expanded = false;
