@@ -46,6 +46,10 @@
 				data.tags = [];
 			}
 
+			if (data.severities) {
+				data.severities = data.severities.filter((value, key) => value == key);
+			}
+
 			// Modify filter data of flickerfreeScreen object with id 'problem'.
 			window.flickerfreeScreen.screens['problem'].data.filter = data;
 			window.flickerfreeScreen.screens['problem'].data.sort = data.sort;
