@@ -60,10 +60,11 @@ func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 		typeSize = 1
 	}
 
-	arr := makeRetArray(len(val), p.RetType, p.RetCount)
+	var arr interface{}
 	if typeSize == 1 && p.Endianness.order == binary.LittleEndian {
 		arr = swapPairByte(val, p.RetType, p.RetCount)
 	} else {
+		arr = makeRetArray(p.RetType, p.RetCount)
 		r := bytes.NewReader(val)
 		binary.Read(r, p.Endianness.order, arr)
 	}
@@ -181,7 +182,7 @@ func middlePack(v interface{}, rt Bits16) interface{} {
 	return v
 }
 
-func makeRetArray(rawLen int, retType Bits16, arraySize uint) (v interface{}) {
+func makeRetArray(retType Bits16, arraySize uint) (v interface{}) {
 	switch retType {
 	case Uint64:
 		v = make([]uint64, arraySize)
