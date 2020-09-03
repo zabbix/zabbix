@@ -49,11 +49,13 @@ class CTask extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
+		$output_fields = ['taskid', 'type', 'status', 'clock', 'ttl', 'proxy_hostid', 'request', 'response'];
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'taskids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
 			// output
-			'output' =>			['type' => API_OUTPUT, 'in' => implode(',', ['taskid', 'type', 'status', 'clock', 'ttl', 'proxy_hostid', 'request', 'response']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>			['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			// flags
 			'preservekeys' =>	['type' => API_BOOLEAN, 'default' => false]
 		]];
@@ -77,22 +79,20 @@ class CTask extends CApiService {
 			]
 		];
 
+		$db_tasks = [];
+
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-
-		$output_request = $this->outputIsRequested('request', $options['output']);
-		$output_response = $this->outputIsRequested('response', $options['output']);
-		$tasks = [];
 
 		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($row = DBfetch($result)) {
-			if ($output_request) {
+			if ($this->outputIsRequested('request', $options['output'])) {
 				$row['request']['data'] = json_decode($row['request_data']);
 				unset($row['request_data']);
 			}
 
-			if ($output_response) {
+			if ($this->outputIsRequested('response', $options['output'])) {
 				$row['result'] = [
 					'data' => $row['response_info'] ? json_decode($row['response_info']) : [],
 					'status' => $row['response_status']
@@ -100,18 +100,18 @@ class CTask extends CApiService {
 				unset($row['response_info'], $row['response_status']);
 			}
 
-			$tasks[$row['taskid']] = $row;
+			$db_tasks[$row['taskid']] = $row;
 		}
 
-		if ($tasks) {
-			$tasks = $this->unsetExtraFields($tasks, ['taskid', 'clock'], $options['output']);
+		if ($db_tasks) {
+			$db_tasks = $this->unsetExtraFields($db_tasks, ['taskid', 'clock'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$tasks = array_values($tasks);
+				$db_tasks = array_values($db_tasks);
 			}
 		}
 
-		return $tasks;
+		return $db_tasks;
 	}
 
 	/**
