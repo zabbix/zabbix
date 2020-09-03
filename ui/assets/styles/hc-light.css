@@ -481,6 +481,7 @@ footer {
     display: inline-block;
     background-color: #555555;
     border-radius: 2px;
+    border-top: 1px solid transparent;
     color: #000000;
     margin-right: 2px; }
     .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link {
