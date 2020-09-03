@@ -152,7 +152,7 @@ class CConfiguration extends CApiService {
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templateScreens' =>	['type' => API_OBJECT, 'fields' => [
+				'templateDashboards' =>	['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]

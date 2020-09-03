@@ -401,25 +401,33 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get template screens from the imported data.
+	 * Get template dashboards from the imported data.
 	 *
 	 * @return array
 	 */
-	public function getTemplateScreens() {
-		$screens = [];
+	public function getTemplateDashboards() {
+		$dashboards = [];
 
 		if (array_key_exists('templates', $this->data)) {
 			foreach ($this->data['templates'] as $template) {
-				if (array_key_exists('screens', $template)) {
-					foreach ($template['screens'] as $screen) {
-						$screens[$template['template']][$screen['name']] =
-							CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
+				if (array_key_exists('dashboards', $template)) {
+					foreach ($template['dashboards'] as $dashboard) {
+						// Rename hide_header to view_mode in widgets.
+						if (array_key_exists('widgets', $dashboard)) {
+							$dashboard['widgets'] = array_map(function (array $widget): array {
+								$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
+
+								return $widget;
+							}, $dashboard['widgets']);
+						}
+
+						$dashboards[$template['template']][$dashboard['name']] = $dashboard;
 					}
 				}
 			}
 		}
 
-		return $screens;
+		return $dashboards;
 	}
 
 	/**

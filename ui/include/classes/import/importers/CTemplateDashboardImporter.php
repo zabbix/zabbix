@@ -19,55 +19,55 @@
 **/
 
 
-class CTemplateScreenImporter extends CAbstractScreenImporter {
+/**
+ * Template dashboard importer.
+ */
+class CTemplateDashboardImporter extends CImporter {
 
 	/**
-	 * Import template screens.
+	 * Import template dashboard.
 	 *
-	 * @param array $allScreens
-	 *
-	 * @return null
+	 * @param array $dashboards
 	 */
-	public function import(array $allScreens) {
-		if ((!$this->options['templateScreens']['createMissing']
-				&& !$this->options['templateScreens']['updateExisting']) || !$allScreens) {
+	public function import(array $template_dashboards): void {
+		if ((!$this->options['templateDashboards']['createMissing']
+				&& !$this->options['templateDashboards']['updateExisting']) || !$template_dashboards) {
 			return;
 		}
 
-		$screensToCreate = [];
-		$screensToUpdate = [];
+		$dashboards_create = [];
+		$dashboards_update = [];
 
-		foreach ($allScreens as $template => $screens) {
-			$templateId = $this->referencer->resolveTemplate($template);
+		foreach ($template_dashboards as $template_name => $dashboards) {
+			$templateid = $this->referencer->resolveTemplate($template_name);
 
-			if (!$this->importedObjectContainer->isTemplateProcessed($templateId)) {
+			if (!$this->importedObjectContainer->isTemplateProcessed($templateid)) {
 				continue;
 			}
 
-			foreach ($screens as $screenName => $screen) {
-				$screen['screenid'] = $this->referencer->resolveTemplateScreen($templateId, $screenName);
+			foreach ($dashboards as $name => $dashboard) {
 
-				$screen = $this->resolveScreenReferences($screen);
-				if ($screen['screenid']) {
-					$screensToUpdate[] = $screen;
+				// $screen = $this->resolveScreenReferences($screen);
+				if ($this->referencer->resolveTemplateDashboards($templateid, $name)) {
+					$dashboards_update[] = $dashboard;
 				}
 				else {
-					$screen['templateid'] = $this->referencer->resolveTemplate($template);
-					$screensToCreate[] = $screen;
+					$dashboard['templateid'] = $templateid;
+					$dashboards_create[] = $dashboard;
 				}
 			}
 		}
 
-		if ($this->options['templateScreens']['createMissing'] && $screensToCreate) {
-			$newScreenIds = API::TemplateScreen()->create($screensToCreate);
-			foreach ($screensToCreate as $num => $newScreen) {
-				$screenId = $newScreenIds['screenids'][$num];
-				$this->referencer->addTemplateScreenRef($newScreen['name'], $screenId);
+		if ($this->options['templateDashboards']['createMissing'] && $dashboards_create) {
+			$created_ids = API::TemplateDashboard()->create($dashboards_create);
+			foreach ($dashboards_create as $key => $dashboard) {
+				$dashboardid = $created_ids['dashboardids'][$key];
+				$this->referencer->addTemplateDashboardsRef($dashboard['name'], $dashboardid);
 			}
 		}
 
-		if ($this->options['templateScreens']['updateExisting'] && $screensToUpdate) {
-			API::TemplateScreen()->update($screensToUpdate);
+		if ($this->options['templateDashboards']['updateExisting'] && $dashboards_update) {
+			API::TemplateDashboard()->update($dashboards_update);
 		}
 	}
 
