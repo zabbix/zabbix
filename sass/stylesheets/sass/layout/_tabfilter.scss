@@ -74,6 +74,10 @@
 			}
 		}
 
+		.icon-home.tabfilter-item-link[data-counter]::after {
+			display: none;
+		}
+
 		.tabfilter-item-link[data-counter]::after {
 			margin-left: .4em;
 			padding: 0.1em 0.4em;
