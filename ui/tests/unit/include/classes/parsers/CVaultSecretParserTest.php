@@ -32,11 +32,6 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 				'match' => 'path/to/secret:key',
 				'error' => ''
 			]],
-			['pathtosecret:key', 0, [], [
-				'rc' => CParser::PARSE_SUCCESS,
-				'match' => 'pathtosecret:key',
-				'error' => ''
-			]],
 			['path/to/secret', 0, ['with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => 'path/to/secret',
@@ -44,9 +39,9 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 			]],
 
 			// PARSE_SUCCESS_CONT
-			['pathtosecret:key', 0, ['with_key' => false], [
+			['path/to/secret:key', 0, ['with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => 'pathtosecret',
+				'match' => 'path/to/secret',
 				'error' => 'incorrect syntax near ":key"'
 			]],
 			['path/to/secret:key something unrelated', 0, [], [
@@ -56,6 +51,11 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 			]],
 
 			// PARSE_FAIL
+			['pathtosecret:key', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'error' => 'incorrect syntax near ":key"'
+			]],
 			[':key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',

@@ -57,6 +57,7 @@ class CVaultSecretParser extends CParser {
 		$this->length = 0;
 		$this->match = '';
 
+		$slash_symbol = false;
 		$state = self::STATE_NEW;
 		$this->errorClear();
 
@@ -68,8 +69,9 @@ class CVaultSecretParser extends CParser {
 			}
 			elseif ($state == self::STATE_AFTER_PATH_NODE_CHAR && $source[$p] === '/') {
 				$state = self::STATE_AFTER_PATH_SEP_CHAR;
+				$slash_symbol = true;
 			}
-			elseif ($state == self::STATE_AFTER_PATH_NODE_CHAR && $source[$p] === ':') {
+			elseif ($slash_symbol && $state == self::STATE_AFTER_PATH_NODE_CHAR && $source[$p] === ':') {
 				if (!$this->options['with_key']) {
 					break;
 				}
@@ -86,8 +88,8 @@ class CVaultSecretParser extends CParser {
 		}
 
 		$is_valid = $this->options['with_key']
-			? ($state == self::STATE_AFTER_KEY_CHAR)
-			: ($state == self::STATE_AFTER_PATH_NODE_CHAR);
+			? ($slash_symbol && $state == self::STATE_AFTER_KEY_CHAR)
+			: ($slash_symbol && $state == self::STATE_AFTER_PATH_NODE_CHAR);
 
 		if (!$is_valid) {
 			$this->errorPos($source, $p);
