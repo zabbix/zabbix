@@ -348,7 +348,7 @@ class CTabFilter extends CBaseComponent {
 					this.setSelectedItem(this._items[index - 1]);
 
 					if (expanded) {
-						this._active_item.setExpanded();
+						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
 					}
 				}
 			},
@@ -366,7 +366,7 @@ class CTabFilter extends CBaseComponent {
 					this.setSelectedItem(this._items[index + 1]);
 
 					if (expanded) {
-						this._active_item.setExpanded();
+						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
 					}
 				}
 			},
@@ -380,7 +380,7 @@ class CTabFilter extends CBaseComponent {
 					dropdown = [{
 						items: [{
 							label: t('Home'),
-							clickCallback: () => this.setSelectedItem(this._items[0])
+							clickCallback: () => this._items[0].fire(TABFILTERITEM_EVENT_EXPAND)
 						}]
 					}];
 
@@ -390,10 +390,7 @@ class CTabFilter extends CBaseComponent {
 						items.push({
 							label: item._data.filter_name,
 							dataAttributes: dataAttributes,
-							clickCallback: () => {
-								this.setSelectedItem(item);
-								item.setExpanded();
-							}
+							clickCallback: () => item.fire(TABFILTERITEM_EVENT_EXPAND)
 						});
 					}
 

@@ -554,6 +554,13 @@ footer {
   color: #768d99;
   content: attr(data-counter); }
 
+.menu-popup-item[data-counter]::after {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  height: 18px;
+  line-height: 18px; }
+
 .icon-home::before {
   display: block;
   width: 22px;
