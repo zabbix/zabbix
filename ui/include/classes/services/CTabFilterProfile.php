@@ -167,6 +167,10 @@ class CTabFilterProfile {
 				$this->update();
 			}
 
+			if ($input['filter_name'] === '') {
+				unset($input['filter_name']);
+			}
+
 			$input += $this->filter_defaults;
 			$input['filter_show_counter'] = (int) $input['filter_show_counter'];
 			$input['filter_custom_time'] = (int) $input['filter_custom_time'];
@@ -240,7 +244,7 @@ class CTabFilterProfile {
 
 		if (!$this->tabfilters) {
 			$this->tabfilters[] = $this->createFilterTab([
-				'filter_name' => _('Home')
+				'filter_name' => _('Untitled')
 			]);
 		}
 
