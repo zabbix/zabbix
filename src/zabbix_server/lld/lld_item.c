@@ -922,6 +922,9 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					case ITEM_TYPE_SNMPTRAP:
 					case ITEM_TYPE_DEPENDENT:
 						return;
+					case ITEM_TYPE_ZABBIX_ACTIVE:
+						if (0 == strncmp(item->key, "mqtt.get[", ZBX_CONST_STRLEN("mqtt.get[")))
+							return;
 				}
 
 				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
