@@ -69,6 +69,7 @@ $output = [
 			'isSubmit' => true,
 			'keepOpen' => true,
 			'enabled' => !$data['create'],
+			'class' => 'float-left',
 			'action' => 'return tabFilterFormAction("delete", overlay)'
 		],
 		[

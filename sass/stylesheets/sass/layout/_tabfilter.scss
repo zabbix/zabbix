@@ -1,3 +1,7 @@
+.float-left {
+	float: left;
+}
+
 .filter-container.tabfilter-container {
 	padding: 0;
 	border: 0 none;
@@ -63,34 +67,30 @@
 			}
 		}
 
-		&.active::after {
-			display: block;
-			width: 100%;
-			height: 5px;
-			background-color: $ui-bg-color;
-			border-left: 1px solid $ui-border-color;
-			border-right: 1px solid $ui-border-color;
-			margin-left: -1px;
-			content: '';
-		}
-
-		&.active {
+		&.selected.expanded {
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
 			border-radius: 0;
 			border-bottom: 0 none;
 
-			.icon-edit {
-				opacity: 0.5;
-
-				&:hover,
-				&:focus {
-					opacity: 1;
-				}
+			&::after {
+				display: block;
+				width: 100%;
+				height: 5px;
+				background-color: $ui-bg-color;
+				border-left: 1px solid $ui-border-color;
+				border-right: 1px solid $ui-border-color;
+				margin-left: -1px;
+				content: '';
 			}
+		}
+
+		&.selected {
+			background-color: $btn-alt-bg-color;
+			border: 1px solid $btn-border-color;
 
 			.tabfilter-item-link {
-				color: $font-color;
+				color: $btn-alt-font-color;
 			}
 
 			.tabfilter-item-link[data-counter]::after {
@@ -100,15 +100,6 @@
 
 		.icon-home.tabfilter-item-link[data-counter]::after {
 			display: none;
-		}
-
-		.tabfilter-item-link[data-counter]::after {
-			margin-left: .4em;
-			padding: 0.1em 0.4em;
-			font-size: $font-h3-size;
-			background-color: $form-bg-color;
-			color: $btn-alt-font-color;
-			content: attr(data-counter);
 		}
 	}
 
@@ -144,6 +135,15 @@
 	}
 }
 
+[data-counter]::after {
+	margin-left: .4em;
+	padding: 0.1em 0.4em;
+	font-size: $font-h3-size;
+	background-color: $form-bg-color;
+	color: $btn-alt-font-color;
+	content: attr(data-counter);
+}
+
 .icon-home::before {
 	display: block;
 	width: 22px;
@@ -152,13 +152,13 @@
 	// white icon
 	background: url($sprite-path) no-repeat -433px -510px;
 }
-.active .icon-home::before {
+.selected .icon-home::before {
 	// grey icon
 	background: url($sprite-path) no-repeat -121px -510px;
 }
 
 @if $theme-name == 'hc-dark' {
-	.active .icon-home::before {
+	.selected .icon-home::before {
 		// white icon
 		background: url($sprite-path) no-repeat -433px -510px;
 	}

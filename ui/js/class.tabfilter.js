@@ -56,7 +56,6 @@ class CTabFilter extends CBaseComponent {
 			item = this.create(title, options.data[index]||{});
 
 			if (options.selected === index) {
-				item._target.focus();
 				this.setSelectedItem(item);
 			}
 
@@ -343,7 +342,14 @@ class CTabFilter extends CBaseComponent {
 				let index = this._items.indexOf(this._active_item);
 
 				if (index > 0) {
+					let expanded = this._active_item._expanded;
+
+					this._active_item.removeExpanded();
 					this.setSelectedItem(this._items[index - 1]);
+
+					if (expanded) {
+						this._active_item.setExpanded();
+					}
 				}
 			},
 
@@ -353,8 +359,15 @@ class CTabFilter extends CBaseComponent {
 			selectNextTab: (ev) => {
 				let index = this._items.indexOf(this._active_item);
 
-				if (index > -1 && index < this._items.length - 1) {
+				if (index > -1 && index < this._items.length - 1 && this._items[index + 1] !== this._timeselector) {
+					let expanded = this._active_item._expanded;
+
+					this._active_item.removeExpanded();
 					this.setSelectedItem(this._items[index + 1]);
+
+					if (expanded) {
+						this._active_item.setExpanded();
+					}
 				}
 			},
 
@@ -363,6 +376,7 @@ class CTabFilter extends CBaseComponent {
 			 */
 			toggleTabsList: (ev) => {
 				let items = [],
+					dataAttributes,
 					dropdown = [{
 						items: [{
 							label: t('Home'),
@@ -372,9 +386,14 @@ class CTabFilter extends CBaseComponent {
 
 				if (this._items.length > 2) {
 					for (const item of this._items.slice(1, -1)) {
+						dataAttributes = item._data.filter_show_counter ? {'data-counter': item.getCounter()} : [];
 						items.push({
 							label: item._data.filter_name,
-							clickCallback: () => this.setSelectedItem(item)
+							dataAttributes: dataAttributes,
+							clickCallback: () => {
+								this.setSelectedItem(item);
+								item.setExpanded();
+							}
 						});
 					}
 

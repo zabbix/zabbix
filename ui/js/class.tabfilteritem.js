@@ -69,6 +69,13 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Get results counter value.
+	 */
+	getCounter() {
+		return this._target.getAttribute('data-counter');
+	}
+
+	/**
 	 * Remove results counter value.
 	 */
 	removeCounter() {
@@ -128,6 +135,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * Set selected state of item.
 	 */
 	setSelected() {
+		this._target.focus();
 		this._target.parentNode.classList.add('selected');
 
 		if (this._data.filter_configurable) {

@@ -1572,6 +1572,12 @@ jQuery(function($) {
 			link.addClass(options.class);
 		}
 
+		if ('dataAttributes' in options) {
+			$.each(options.dataAttributes, function (key, value) {
+				link.attr((key.substr(0, 5) === 'data-') ? key : 'data-' + key, value);
+			});
+		}
+
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
 			link.attr({
 				'aria-haspopup': 'true',
