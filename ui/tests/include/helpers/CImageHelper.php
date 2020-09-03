@@ -209,12 +209,12 @@ class CImageHelper {
 
 			if ($width !== imagesx($target) || $height !== imagesy($target)) {
 				$result['ref'] = self::getImageString($reference);
+				$message = 'Image size ('.imagesx($target).'x'.imagesy($target).
+						') doesn\'t match size of reference image ('.$width.'x'.$height.')';
 				imagedestroy($reference);
 				imagedestroy($target);
 
-				throw new Exception('Image size ('.imagesx($target).'x'.imagesy($target).
-						') doesn\'t match size of reference image ('.$width.'x'.$height.')'
-				);
+				throw new Exception($message);
 			}
 
 			$mask = imagecreatetruecolor($width, $height);
