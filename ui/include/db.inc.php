@@ -74,6 +74,12 @@ function DBconnect(&$error) {
 
 	if ($db->getError() || ($DB['ENCRYPTION'] && !$db->isConnectionSecure()) || !$db->checkDbVersion()
 			|| !$db->checkConfig()) {
+
+		if ($DB['VAULT_HOST'] !== '' && $DB['VAULT_SECRET'] !== '' && $DB['VAULT_TOKEN'] !== '') {
+			// Erase cached credentials on failed connection.
+			CDataCacheHelper::clearValues(['username', 'password', 'hashsum']);
+		}
+
 		$error = $db->getError();
 		return false;
 	}

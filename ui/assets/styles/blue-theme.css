@@ -5440,6 +5440,14 @@ table.preprocessing-test-results .rel-container {
 .icon-secret:not(.highlighted):enabled:hover::before, .icon-secret:not(.highlighted):enabled:focus::before, .icon-secret:not(.highlighted):enabled:active::before, .icon-secret:not(.highlighted):enabled[aria-expanded="true"]::before {
   background-position: -399px -510px; }
 
+.icon-invisible {
+  margin: 0;
+  width: 100%; }
+  .icon-invisible::before {
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -87px -800px; }
+  .icon-invisible:not(.highlighted):enabled:hover::before, .icon-invisible:not(.highlighted):enabled:focus::before, .icon-invisible:not(.highlighted):enabled:active::before, .icon-invisible:not(.highlighted):enabled[aria-expanded="true"]::before {
+    background-position: -399px -800px; }
+
 .btn-split {
   display: inline-block;
   position: relative;

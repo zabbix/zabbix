@@ -140,6 +140,18 @@ class CConfigFile {
 			$this->config['DB']['DOUBLE_IEEE754'] = $DB['DOUBLE_IEEE754'];
 		}
 
+		if (isset($DB['VAULT_HOST'])) {
+			$this->config['DB']['VAULT_HOST'] = $DB['VAULT_HOST'];
+		}
+
+		if (isset($DB['VAULT_SECRET'])) {
+			$this->config['DB']['VAULT_SECRET'] = $DB['VAULT_SECRET'];
+		}
+
+		if (isset($DB['VAULT_TOKEN'])) {
+			$this->config['DB']['VAULT_TOKEN'] = $DB['VAULT_TOKEN'];
+		}
+
 		if (isset($ZBX_SERVER)) {
 			$this->config['ZBX_SERVER'] = $ZBX_SERVER;
 		}
@@ -162,9 +174,61 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
+		if ($this->config['DB']['VAULT_HOST'] !== ''
+				&& $this->config['DB']['VAULT_SECRET'] !== ''
+				&& $this->config['DB']['VAULT_TOKEN'] !== '') {
+			list($this->config['DB']['USER'], $this->config['DB']['PASSWORD']) = $this->getCredentialsFromVault();
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
+	}
+
+	protected function getCredentialsFromVault(): array {
+		$username = CDataCacheHelper::getValue('username', '');
+		$password = CDataCacheHelper::getValue('password', '');
+		$hashsum = CDataCacheHelper::getValue('hashsum', '');
+
+		// Changes in any database related parameter causes cache renewal.
+		$current_hashsum = md5(implode('', [
+			$this->config['DB']['TYPE'],
+			$this->config['DB']['SERVER'],
+			$this->config['DB']['PORT'],
+			$this->config['DB']['DATABASE']
+		]));
+
+		if ($username === '' || $password === '' || $hashsum !== $current_hashsum) {
+			$vault = new CVaultHelper($this->config['DB']['VAULT_HOST'], $this->config['DB']['VAULT_TOKEN']);
+			$secret = $vault->loadSecret($this->config['DB']['VAULT_SECRET']);
+
+			$username = array_key_exists('username', $secret) ? $secret['username'] : '';
+			$password = array_key_exists('password', $secret) ? $secret['password'] : '';
+
+			if ($username !== '' && $password !== '') {
+				// Update cache.
+				CDataCacheHelper::setValueArray([
+					'username' => $username,
+					'password' => $password,
+					'hashsum' => $current_hashsum
+				]);
+			}
+			else {
+				CDataCacheHelper::clearValues(['username', 'password', 'hashsum']);
+
+				echo (new CView('general.warning', [
+					'header' => _('Vault connection failed.'),
+					'messages' => [
+						_('Username and password must be stored in Vault secret keys "username" and "password".')
+					],
+					'theme' => ZBX_DEFAULT_THEME
+				]))->getOutput();
+
+				exit;
+			}
+		}
+
+		return [$username, $password];
 	}
 
 	public function makeGlobal() {
@@ -229,6 +293,11 @@ $DB[\'CA_FILE\']			= \''.addcslashes($this->config['DB']['CA_FILE'], "'\\").'\';
 $DB[\'VERIFY_HOST\']		= '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false').';
 $DB[\'CIPHER_LIST\']		= \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
 
+// Vault configuration. Used if database credentials are stored in Vault secrets manager.
+$DB[\'VAULT_HOST\']		= \''.addcslashes($this->config['DB']['VAULT_HOST'], "'\\").'\';
+$DB[\'VAULT_SECRET\']		= \''.addcslashes($this->config['DB']['VAULT_SECRET'], "'\\").'\';
+$DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
+
 // Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
 // This option is enabled by default for new Zabbix installations.
 // For upgraded installations, please read database upgrade notes before enabling this option.
@@ -273,7 +342,10 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 			'CA_FILE' => '',
 			'VERIFY_HOST' => true,
 			'CIPHER_LIST' => '',
-			'DOUBLE_IEEE754' => false
+			'DOUBLE_IEEE754' => false,
+			'VAULT_HOST' => '',
+			'VAULT_SECRET' => '',
+			'VAULT_TOKEN' => ''
 		];
 		$this->config['ZBX_SERVER'] = 'localhost';
 		$this->config['ZBX_SERVER_PORT'] = '10051';

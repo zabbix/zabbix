@@ -303,6 +303,7 @@ class CXmlConstantValue {
 
 	const MACRO_TYPE_TEXT = ZBX_MACRO_TYPE_TEXT;
 	const MACRO_TYPE_SECRET = ZBX_MACRO_TYPE_SECRET;
+	const MACRO_TYPE_VAULT = ZBX_MACRO_TYPE_VAULT;
 
 	// Constants for low-level discovery rule overrides.
 	const LLD_OVERRIDE_STOP_NO = ZBX_LLD_OVERRIDE_STOP_NO;

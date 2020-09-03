@@ -141,6 +141,9 @@ define('ORACLE_MAX_STRING_SIZE', 4000);
 define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
 define('ORACLE_CESU8_CHARSET', 'UTF8');
 
+define('DB_STORE_CREDS_CONFIG', 0);
+define('DB_STORE_CREDS_VAULT', 1);
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
@@ -1347,6 +1350,7 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
+define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in HashiCorp Vault).
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 

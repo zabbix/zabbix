@@ -298,6 +298,7 @@ class CXmlConstantName {
 
 	const MACRO_TYPE_TEXT = 'TEXT';
 	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
+	const MACRO_TYPE_VAULT = 'VAULT';
 
 	// Constants for low-level discovery rule overrides.
 	const LLD_OVERRIDE_STOP_NO = 'NO_STOP';

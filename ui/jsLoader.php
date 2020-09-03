@@ -346,7 +346,9 @@ $tranStrings = [
 		'Cancel' => _('Cancel')
 	],
 	'macrovalue.js' => [
-		'Set new value' => _('Set new value')
+		'Set new value' => _('Set new value'),
+		'path/to/secret:key' => _('path/to/secret:key'),
+		'value' => _('value')
 	]
 ];
 
