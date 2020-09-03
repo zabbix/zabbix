@@ -115,11 +115,13 @@ func getSerial(v string) (addr *Serial, err error) {
 	var speed uint64
 	val = val[inx+1:]
 	if inx = strings.Index(val, ":"); inx < 0 {
-		speed, err = strconv.ParseUint(val, 10, 32)
+		if speed, err = strconv.ParseUint(val, 10, 32); err != nil {
+			return &a, fmt.Errorf("Unsupported speed value: %w", err)
+		}
 		a.Speed = uint32(speed)
-		return &a, err
+		return &a, nil
 	} else if speed, err = strconv.ParseUint(val[:inx], 10, 32); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Unsupported speed value: %w", err)
 	}
 	a.Speed = uint32(speed)
 
@@ -205,7 +207,7 @@ func getSlaveId(p *[]string, n int, reqType Bits8) (slaveId uint8, err error) {
 	}
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 8); err != nil {
-		return 0, err
+		return 0, fmt.Errorf("Unsupported slave id for serial line: %w", err)
 	}
 	slaveId = uint8(val)
 
@@ -228,7 +230,7 @@ func getFuncId(p *[]string, n int) (funcId uint8, err error) {
 
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 8); err != nil {
-		return 0, err
+		return 0, fmt.Errorf("Opration id: %w", err)
 	}
 	funcId = uint8(val)
 
@@ -246,11 +248,21 @@ func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcId uint8, er
 		v = strings.TrimSpace((*p)[n])
 	}
 	if len(v) == 0 {
-		v = "00001"
+		switch fid {
+		case 0:
+			v = "00001"
+		default:
+			v = "0"
+		}
 	}
+
+	if fid == 0 && len(v) != 5 {
+		return 0, fid, fmt.Errorf("Unsupported modbus address length for empty function:%d", len(v))
+	}
+
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 16); err != nil {
-		return 0, fid, err
+		return 0, fid, fmt.Errorf("Unsupported modbus address: %w", err)
 	}
 	memAddr = uint16(val)
 
@@ -334,7 +346,7 @@ func getCount(p *[]string, n int, retType Bits16) (count uint16, retCount uint, 
 
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 32); err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("Unsupported data length: %w", err)
 	} else if val == 0 {
 		return 0, 0, fmt.Errorf("Unsupported zero as data length")
 	}
@@ -406,7 +418,7 @@ func getOffset(p *[]string, n int, c uint16) (count uint16, offset uint16, err e
 	}
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 16); err != nil {
-		return c, 0, err
+		return c, 0, fmt.Errorf("Unsupported offset: %w", err)
 	}
 	offset = uint16(val)
 	if (offset + c) > 65535 {
