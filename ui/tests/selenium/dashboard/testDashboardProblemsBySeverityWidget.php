@@ -510,17 +510,16 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-
 	/**
 	 * Function used to create a dashboard with widgets required for the Update scenario.
 	 */
 	public function prepareUpdateData() {
 		// Form an array with configuration of widgets with "Show" = "Host groups"
-		$widgets_hostgroups = [];
+		$widgets = [];
 		$id = 1;
 		for ($y = 0; $y <= 39; $y += 3) {
 			for ($x = 0; $x <= 12; $x += 12) {
-				$widgets_hostgroups[] = [
+				$widgets[] = [
 					'type' => 'problemsbysv',
 					'name' => 'Reference widget '.$id,
 					'x' => $x,
@@ -535,12 +534,13 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 
 		// Form an array with configuration of widgets with "Show" = "Totals"
-		$widgets_totals = [];
 		$id = 1;
 		for ($y = 42; $y <= 48; $y += 3) {
 			for ($x = 0; $x <= 18; $x += 6) {
-				if ($id > 10) continue;
-				$widgets_totals[] = [
+				if ($id > 10) {
+					break 2;
+				}
+				$widgets[] = [
 					'type' => 'problemsbysv',
 					'name' => 'Totals reference widget '.$id,
 					'x' => $x,
@@ -560,8 +560,6 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				$id++;
 			}
 		}
-
-		$widgets = array_merge($widgets_hostgroups, $widgets_totals);
 
 		// Create dashboard
 		$response = CDataHelper::call('dashboard.create', [
