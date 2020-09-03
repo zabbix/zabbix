@@ -69,7 +69,9 @@ func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{
 // Query executes a query from queryStorage by its name and returns multiple rows.
 func (conn *OraConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
-		return conn.Query(ctx, strings.TrimRight(strings.TrimSpace(sql), "; \t"), args...)
+		normalizedSql := strings.TrimRight(strings.TrimSpace(sql), ";")
+
+		return conn.Query(ctx, normalizedSql, args...)
 	}
 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
@@ -89,7 +91,9 @@ func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interfa
 // Query executes a query from queryStorage by its name and returns a singe row.
 func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
-		return conn.QueryRow(ctx, strings.TrimRight(strings.TrimSpace(sql), "; \t"), args...)
+		normalizedSql := strings.TrimRight(strings.TrimSpace(sql), ";")
+
+		return conn.QueryRow(ctx, normalizedSql, args...)
 	}
 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
