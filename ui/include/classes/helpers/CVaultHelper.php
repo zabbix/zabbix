@@ -64,7 +64,8 @@ class CVaultHelper {
 		$options = [
 			'http' => [
 				'method' => 'GET',
-				'header' => "X-Vault-Token: $this->token\r\n"
+				'header' => "X-Vault-Token: $this->token\r\n",
+				'ignore_errors' => true
 			]
 		];
 
@@ -79,9 +80,9 @@ class CVaultHelper {
 			return [];
 		}
 
-		$secret = json_decode($secret);
+		$secret = json_decode($secret, true);
 
-		return (array) $secret->data->data;
+		return array_key_exists('data', $secret) ? $secret['data']['data'] : [];
 	}
 
 	/**
