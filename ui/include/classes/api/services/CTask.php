@@ -49,7 +49,7 @@ class CTask extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$output_fields = ['taskid', 'type', 'status', 'clock', 'ttl', 'proxy_hostid', 'request', 'response'];
+		$output_fields = ['taskid', 'type', 'status', 'clock', 'ttl', 'proxy_hostid', 'request', 'result'];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
@@ -92,12 +92,12 @@ class CTask extends CApiService {
 				unset($row['request_data']);
 			}
 
-			if ($this->outputIsRequested('response', $options['output'])) {
+			if ($this->outputIsRequested('result', $options['output'])) {
 				$row['result'] = [
-					'data' => $row['response_info'] ? json_decode($row['response_info']) : [],
-					'status' => $row['response_status']
+					'data' => $row['result_info'] ? json_decode($row['result_info']) : [],
+					'status' => $row['result_status']
 				];
-				unset($row['response_info'], $row['response_status']);
+				unset($row['result_info'], $row['result_status']);
 			}
 
 			$db_tasks[$row['taskid']] = $row;
@@ -456,12 +456,12 @@ class CTask extends CApiService {
 			$sql_parts = $this->addQuerySelect('req.data AS request_data', $sql_parts);
 		}
 
-		if ($this->outputIsRequested('response', $options['output'])) {
+		if ($this->outputIsRequested('result', $options['output'])) {
 			$sql_parts['left_join'][] = ['alias' => 'resp', 'table' => 'task_result', 'using' => 'parent_taskid'];
 			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName()];
 
-			$sql_parts = $this->addQuerySelect('resp.info AS response_info', $sql_parts);
-			$sql_parts = $this->addQuerySelect('resp.status AS response_status', $sql_parts);
+			$sql_parts = $this->addQuerySelect('resp.info AS result_info', $sql_parts);
+			$sql_parts = $this->addQuerySelect('resp.status AS result_status', $sql_parts);
 		}
 
 		return $sql_parts;
