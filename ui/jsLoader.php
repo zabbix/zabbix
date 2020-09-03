@@ -124,6 +124,9 @@ $tranStrings = [
 	'class.overlay.js' => [
 		'Operation details' => _('Operation details')
 	],
+	'class.tabfilter.js' => [
+		'Home' => _('Home')
+	],
 	'dashboard.grid.js' => [
 		'Edit widget' => _('Edit widget'),
 		'Add widget' => _('Add widget'),
