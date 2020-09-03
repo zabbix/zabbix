@@ -4890,8 +4890,11 @@ out:
 			}
 			else
 			{
-				zabbix_log(0 == service->eventlog.last_key ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG,
-						"Processed VMware events requires up to " ZBX_FS_UI64
+				int	level;
+
+				level = 0 == service->eventlog.last_key ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
+
+				zabbix_log(level, "Processed VMware events requires up to " ZBX_FS_UI64
 						" bytes of free VMwareCache memory. VMwareCache memory usage"
 						" (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
 						ZBX_FS_UI64, events_sz, vmware_mem->free_size, vmware->strpool_sz,
