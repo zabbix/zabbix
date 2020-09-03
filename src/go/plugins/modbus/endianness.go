@@ -28,24 +28,33 @@ import (
 
 func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 
+	if p.RetType == Bit {
+		ar := getArr16(p.RetType, uint(p.Count), val)
+		if p.RetCount == 1 {
+			return getFirst(ar), nil
+		}
+
+		if len(ar) < int(p.Offset) {
+			return nil, fmt.Errorf("Wrong length of received data: %d", len(ar))
+		}
+
+		if p.Offset > 0 {
+			ar = ar[p.Offset:]
+		}
+
+		jd, jerr := json.Marshal(ar)
+		if jerr != nil {
+			return nil, fmt.Errorf("Unable to create json: %s", jerr)
+		}
+		return string(jd), nil
+	}
+
 	if len(val) < int(p.Offset*2) {
 		return nil, fmt.Errorf("Wrong length of received data: %d", len(val))
 	}
 
 	if p.Offset > 0 {
 		val = val[p.Offset*2:]
-	}
-
-	if p.RetType == Bit {
-		ar := getArr16(p.RetType, p.RetCount, val)
-		if p.RetCount == 1 {
-			return getFirst(ar), nil
-		}
-		jd, jerr := json.Marshal(ar)
-		if jerr != nil {
-			return nil, fmt.Errorf("Unable to create json: %s", jerr)
-		}
-		return string(jd), nil
 	}
 
 	var typeSize int
@@ -108,7 +117,7 @@ func swapPairByte(v []byte, retType Bits16, retCount uint) (ret interface{}) {
 	return ret
 }
 
-func getArr16(retType Bits16, retCount uint, val []byte) interface{} {
+func getArr16(retType Bits16, retCount uint, val []byte) []uint16 {
 	ar := make([]uint16, retCount)
 	for i := range val {
 		if retType == Bit {
