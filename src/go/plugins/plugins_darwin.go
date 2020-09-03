@@ -22,6 +22,7 @@ package plugins
 import (
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/memcached"
+	_ "zabbix.com/plugins/modbus"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/postgres"
 	_ "zabbix.com/plugins/redis"
