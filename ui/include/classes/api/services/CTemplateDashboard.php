@@ -193,7 +193,7 @@ class CTemplateDashboard extends CApiService {
 
 		$this->updateWidget($dashboards, __FUNCTION__);
 
-		// $this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_DASHBOARD, $dashboards);
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE_DASHBOARD, $dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
@@ -285,7 +285,7 @@ class CTemplateDashboard extends CApiService {
 		}
 		unset($db_dashboard);
 
-		// $this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DASHBOARD, $dashboards, $db_dashboards);
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TEMPLATE_DASHBOARD, $dashboards, $db_dashboards);
 
 		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
 	}
@@ -917,7 +917,7 @@ class CTemplateDashboard extends CApiService {
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
 
-		// $this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DASHBOARD, $db_dashboards);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE_DASHBOARD, $db_dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
