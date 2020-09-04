@@ -141,6 +141,7 @@ class CControllerPopupTabFilterEdit extends CController {
 	 */
 	public function updateTab(array $data) {
 		$filter = (new CTabFilterProfile($data['idx'], []))->read();
+		$data['create'] = (int) $data['create'];
 		$properties = [
 			'filter_name' => $data['filter_name'],
 			'filter_show_counter' => (int) $data['filter_show_counter'],

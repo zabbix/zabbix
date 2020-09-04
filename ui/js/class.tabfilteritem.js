@@ -229,6 +229,10 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {object} data  Updated tab properties object.
 	 */
 	update(data) {
+		if (!this._template_rendered) {
+			this.renderContentTemplate();
+		}
+
 		var form = this._content_container.querySelector('form'),
 			fields = {
 				filter_name: form.querySelector('[name="filter_name"]'),
@@ -245,8 +249,9 @@ class CTabFilterItem extends CBaseComponent {
 		search_params = this.getFilterParams();
 
 		Object.keys(fields).forEach((key) => {
+			this._data[key] = data[key];
+
 			if (fields[key] instanceof HTMLElement) {
-				this._data[key] = data[key];
 				fields[key].value = data[key];
 			}
 

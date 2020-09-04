@@ -339,6 +339,9 @@ class CTabFilter extends CBaseComponent {
 							window.location.reload(true);
 						});
 					}
+					else {
+						item.setSelected();
+					}
 				}
 				else if (ev.detail.form_action === 'delete') {
 					this.delete(this._active_item);
