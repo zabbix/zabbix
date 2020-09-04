@@ -41,7 +41,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._expanded = options.expanded;
 		this._support_custom_time = options.support_custom_time;
 		this._template_rendered = false;
-		this._unsaved = false;
+		this._unsaved = options.unsaved;
 		this._src_url = options.src_url||null;
 
 		this.init();
@@ -52,7 +52,13 @@ class CTabFilterItem extends CBaseComponent {
 		if (this._expanded) {
 			this.renderContentTemplate();
 			this.setBrowserLocation(this.getFilterParams());
-			this.resetUnsavedState();
+
+			if (!this._unsaved) {
+				this.resetUnsavedState();
+			}
+			else {
+				this._target.parentNode.classList.toggle('unsaved', this._unsaved);
+			}
 		}
 
 		if (this._data.filter_show_counter) {
@@ -328,15 +334,13 @@ class CTabFilterItem extends CBaseComponent {
 			return;
 		}
 
-		if (src_query.get('filter_custom_time') !== '1') {
-			src_query.delete('from');
-			src_query.delete('to');
+		for (const field of ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action']) {
+			src_query.delete(field);
+			search_params.delete(field);
 		}
 
-		src_query.delete('action');
 		src_query.sort();
 		search_params.sort();
-
 		this._unsaved = (src_query.toString() !== search_params.toString());
 		this._target.parentNode.classList.toggle('unsaved', this._unsaved);
 	}
