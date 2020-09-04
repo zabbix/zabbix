@@ -1719,6 +1719,9 @@ Changes for 4.0.25rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-18326] fixed unsupported code for internet explorer (rlataria)
+.......PS. [ZBX-15904] added check of required cache size for vmware event messages (asestakovs)
+.......PS. [ZBX-18121] fixed SSH monitoring when compiled with libssh; thanks to MATSUDA Daiki for the patch (Andris, viktors)
 .........T [ZBX-14503] updated JMX template to follow guidelines (tuskov)
 ........S. [ZBX-18189] fixed crash when performing housekeeping with disabled value cache (viktors)
 A......... [ZBX-18181] fixed undefined index when importing host with non-existing interface (Ivo)
