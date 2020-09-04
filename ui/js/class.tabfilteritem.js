@@ -20,7 +20,8 @@
 
 const TABFILTERITEM_EVENT_CLICK = 'click';
 const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.tabfilter';
-const TABFILTERITEM_EVENT_EXPAND   = 'expand.tabfilter';
+const TABFILTERITEM_EVENT_EXPAND = 'expand.tabfilter';
+const TABFILTERITEM_EVENT_SELECT = 'select.tabfilter';
 const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
 const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
 const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter';
@@ -140,6 +141,10 @@ class CTabFilterItem extends CBaseComponent {
 
 		if (this._data.filter_configurable) {
 			this.addActionIcons();
+		}
+
+		if (this._template) {
+			this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_SELECT, {detail: this}));
 		}
 	}
 

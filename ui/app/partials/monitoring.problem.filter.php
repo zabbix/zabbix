@@ -497,11 +497,25 @@ if (array_key_exists('render_html', $data)) {
 		$('#show_' + data.uniqid, container).trigger('change');
 	}
 
+	function select(data, container) {
+		if (this._template_rendered) {
+			// Template rendered, use element events, trigger change to update timeselector ui disabled state.
+			$('#show_' + data.uniqid, container).trigger('change');
+		}
+		else if (this._parent) {
+			// Template is not rendered, use input data.
+			this._parent.updateTimeselector(this, (data.show != <?= TRIGGERS_OPTION_ALL ?>));
+		}
+	}
+
 	// Tab filter item events handlers.
 	template.addEventListener(TABFILTERITEM_EVENT_RENDER, function (ev) {
 		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
 		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
+	});
+	template.addEventListener(TABFILTERITEM_EVENT_SELECT, function (ev) {
+		select.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 </script>
