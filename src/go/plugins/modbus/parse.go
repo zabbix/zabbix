@@ -356,7 +356,7 @@ func getCount(p *[]string, n int, retType Bits16) (count uint16, retCount uint, 
 	switch retType {
 	case Int8, Uint8:
 		realCount = uint((retCount + 1) / 2)
-	case Int32, Uint32:
+	case Int32, Uint32, Float:
 		realCount = uint(retCount * 2)
 	case Double, Uint64:
 		realCount = retCount * 4
