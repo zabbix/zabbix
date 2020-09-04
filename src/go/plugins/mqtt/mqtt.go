@@ -16,15 +16,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **
+**/
 
-******************************************************************************
-*
-* We use the library Eclipse Paho (eclipse/paho.mqtt.golang), which is
-* distributed under the terms of the Eclipse Distribution License 1.0 (The 3-Clause BSD License)
-* available at https://www.eclipse.org/org/documents/edl-v10.php
-*
-******************************************************************************
-
+/*
+** We use the library Eclipse Paho (eclipse/paho.mqtt.golang), which is
+** distributed under the terms of the Eclipse Distribution License 1.0 (The 3-Clause BSD License)
+** available at https://www.eclipse.org/org/documents/edl-v10.php
 **/
 
 package mqtt
@@ -89,6 +86,7 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 					impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
 				}
 			}
+
 			return
 		}
 	}
@@ -96,9 +94,14 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	return opts
 }
 
-func newClient(broker string, options *mqtt.ClientOptions) (mqtt.Client, error) {
+func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 	c := mqtt.NewClient(options)
-	if token := c.Connect(); token.WaitTimeout(60*time.Second) && token.Error() != nil {
+	token := c.Connect()
+	if !token.WaitTimeout(60 * time.Second) {
+		return nil, fmt.Errorf("timed out while waiting for client to connect")
+	}
+
+	if token.Error() != nil {
 		return nil, token.Error()
 	}
 
@@ -114,8 +117,13 @@ func (ms *mqttSub) handler(client mqtt.Client, msg mqtt.Message) {
 
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
 	impl.Tracef("Subscribing to %s", ms.broker)
-	if token := mc.client.Subscribe(ms.topic, 0, ms.handler); token.WaitTimeout(60*time.Second) && token.Error() != nil {
-		return error(token.Error())
+	token := mc.client.Subscribe(ms.topic, 0, ms.handler)
+	if !token.WaitTimeout(60 * time.Second) {
+		return fmt.Errorf("timed out while waiting for topic '%s' to subscribe to '%s'", ms.topic, ms.broker)
+	}
+
+	if token.Error() != nil {
+		return token.Error()
 	}
 
 	impl.Tracef("Subscribed to %s", ms.broker)
@@ -133,12 +141,17 @@ func (ms *mqttSub) Initialize() (err error) {
 	mc, ok := impl.mqttClients[ms.broker]
 	if !ok {
 		return fmt.Errorf("client missing for broker %s", ms.broker)
-
 	}
 
 	if mc.client == nil {
 		impl.Debugf("Creating client for %s", ms.broker)
-		mc.client, err = newClient(ms.broker, mc.opts)
+		mc.client, err = newClient(mc.opts)
+		if err != nil {
+			impl.Errf("Failed to crient a client for %s", ms.broker)
+			return
+		}
+
+		impl.Debugf("Created client for %s", ms.broker)
 		return
 	}
 
@@ -157,7 +170,12 @@ func (ms *mqttSub) Release() {
 	}
 
 	impl.Tracef("Unsubscribing topic from %s", ms.topic)
-	if token := mc.client.Unsubscribe(ms.topic); token.WaitTimeout(60*time.Second) && token.Error() != nil {
+	token := mc.client.Unsubscribe(ms.topic)
+	if !token.WaitTimeout(60 * time.Second) {
+		impl.Errf("Timed out while waiting for topic '%s' to unsubscribe to '%s'", ms.topic, ms.broker)
+	}
+
+	if token.Error() != nil {
 		impl.Errf("Failed to unsubscribe from %s:%s", ms.topic, token.Error())
 	}
 
@@ -215,20 +233,26 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	}
 
 	broker := url.String()
-	if _, ok := p.mqttClients[broker]; !ok {
+	var client *mqttClient
+	var ok bool
+	if client, ok = p.mqttClients[broker]; !ok {
 		impl.Tracef("Creating client options for %s", broker)
-		p.mqttClients[broker] = &mqttClient{
+
+		client = &mqttClient{
 			nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", url.Query().Get("username"),
 				url.Query().Get("password"), broker), false}
+		p.mqttClients[broker] = client
 	}
 
-	if _, ok := p.mqttClients[broker].subs[topic]; !ok {
+	var sub *mqttSub
+	if sub, ok = client.subs[topic]; !ok {
 		impl.Tracef("Creating subscriber for %s", topic)
-		p.mqttClients[broker].subs[topic] = &mqttSub{
-			broker, topic, hasWildCards(topic)}
+
+		sub = &mqttSub{broker, topic, hasWildCards(topic)}
+		client.subs[topic] = sub
 	}
 
-	return p.mqttClients[broker].subs[topic], nil
+	return sub, nil
 }
 
 func hasWildCards(topic string) bool {
