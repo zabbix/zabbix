@@ -335,7 +335,8 @@ class CProfile {
 			'idx' => zbx_dbstr($idx),
 			$value_type => zbx_dbstr($value),
 			'type' => $type,
-			'idx2' => zbx_dbstr($idx2),
+			'idx2' => zbx_dbstr($idx2)
+		] + [
 			'value_str' => zbx_dbstr('')
 		];
 
