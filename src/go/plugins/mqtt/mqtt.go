@@ -28,6 +28,7 @@ package mqtt
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -144,7 +145,7 @@ func (ms *mqttSub) Initialize() (err error) {
 	}
 
 	if mc.client == nil {
-		impl.Debugf("Creating client for %s", ms.broker)
+		impl.Debugf("connecting to [%s]", ms.broker)
 		mc.client, err = newClient(mc.opts)
 		if err != nil {
 			impl.Errf("Failed to crient a client for %s", ms.broker)
@@ -221,9 +222,12 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	if _, params, err = itemutil.ParseKey(key); err != nil {
 		return
 	}
+	if len(params) > 2 {
+		return nil, fmt.Errorf("Too many parameters.")
+	}
 
-	if len(params) != 2 {
-		return nil, fmt.Errorf("Incorrect key format for mqtt subscribe. Must be mqtt.get[<broker URL>,<topic>]")
+	if len(params) < 2 || "" == params[1] {
+		return nil, errors.New("Invalid second parameter.")
 	}
 
 	topic := params[1]
