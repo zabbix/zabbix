@@ -72,11 +72,11 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	}
 
 	opts.OnConnectionLost = func(client mqtt.Client, reason error) {
-		impl.Errf("Connection lost to %s, reason: %s", broker, reason.Error())
+		impl.Errf("connection lost to %s, reason: %s", broker, reason.Error())
 	}
 	opts.OnConnect = func(client mqtt.Client) {
 		//Will show the query password and username in log
-		impl.Debugf("Connected to %s", broker)
+		impl.Debugf("connected to %s", broker)
 		impl.manager.Lock()
 		defer impl.manager.Unlock()
 		mc, found := p.mqttClients[broker]
@@ -111,13 +111,13 @@ func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 
 func (ms *mqttSub) handler(client mqtt.Client, msg mqtt.Message) {
 	impl.manager.Lock()
-	impl.Tracef("Received publication from %s: [%s] %s", ms.broker, msg.Topic(), string(msg.Payload()))
+	impl.Tracef("received publication from %s: [%s] %s", ms.broker, msg.Topic(), string(msg.Payload()))
 	impl.manager.Notify(ms, msg)
 	impl.manager.Unlock()
 }
 
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
-	impl.Tracef("Subscribing to %s", ms.broker)
+	impl.Tracef("subscribing to %s", ms.broker)
 	token := mc.client.Subscribe(ms.topic, 0, ms.handler)
 	if !token.WaitTimeout(60 * time.Second) {
 		return fmt.Errorf("timed out while waiting for topic '%s' to subscribe to '%s'", ms.topic, ms.broker)
@@ -127,7 +127,7 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 		return token.Error()
 	}
 
-	impl.Tracef("Subscribed to %s", ms.broker)
+	impl.Tracef("subscribed to %s", ms.broker)
 	return nil
 }
 
@@ -152,7 +152,7 @@ func (ms *mqttSub) Initialize() (err error) {
 			return
 		}
 
-		impl.Debugf("Created client for %s", ms.broker)
+		impl.Debugf("created client for %s", ms.broker)
 		return
 	}
 
@@ -170,7 +170,7 @@ func (ms *mqttSub) Release() {
 		return
 	}
 
-	impl.Tracef("Unsubscribing topic from %s", ms.topic)
+	impl.Tracef("unsubscribing topic from %s", ms.topic)
 	token := mc.client.Unsubscribe(ms.topic)
 	if !token.WaitTimeout(60 * time.Second) {
 		impl.Errf("Timed out while waiting for topic '%s' to unsubscribe to '%s'", ms.topic, ms.broker)
@@ -181,9 +181,9 @@ func (ms *mqttSub) Release() {
 	}
 
 	delete(mc.subs, ms.topic)
-	impl.Tracef("Unsubscribed from %s", ms.topic)
+	impl.Tracef("unsubscribed from %s", ms.topic)
 	if len(mc.subs) == 0 {
-		impl.Debugf("Disconnecting from %s", ms.broker)
+		impl.Debugf("disconnecting from %s", ms.broker)
 		mc.client.Disconnect(200)
 		delete(impl.mqttClients, mc.broker)
 	}
@@ -240,7 +240,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	var client *mqttClient
 	var ok bool
 	if client, ok = p.mqttClients[broker]; !ok {
-		impl.Tracef("Creating client options for %s", broker)
+		impl.Tracef("creating client options for %s", broker)
 
 		client = &mqttClient{
 			nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", url.Query().Get("username"),
@@ -250,7 +250,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 
 	var sub *mqttSub
 	if sub, ok = client.subs[topic]; !ok {
-		impl.Tracef("Creating subscriber for %s", topic)
+		impl.Tracef("creating subscriber for %s", topic)
 
 		sub = &mqttSub{broker, topic, hasWildCards(topic)}
 		client.subs[topic] = sub
@@ -264,7 +264,9 @@ func hasWildCards(topic string) bool {
 }
 
 func parseURL(broker string) (out *url.URL, err error) {
-	if len(broker) > 0 && broker[0] == ':' {
+	if len(broker) == 0 {
+		broker = "localhost"
+	} else if broker[0] == ':' {
 		broker = "localhost" + broker
 	}
 
