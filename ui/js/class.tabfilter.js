@@ -275,10 +275,8 @@ class CTabFilter extends CBaseComponent {
 						value_int: 0
 					});
 				}
-				else {
-					// Active tab switch.
-					item.updateUnsavedState();
-				}
+
+				item.updateUnsavedState();
 			},
 
 			/**
