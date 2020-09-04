@@ -34,7 +34,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -44,10 +43,11 @@ import (
 )
 
 type mqttClient struct {
-	client mqtt.Client
-	broker string
-	subs   map[string]*mqttSub
-	opts   *mqtt.ClientOptions
+	client    mqtt.Client
+	broker    string
+	subs      map[string]*mqttSub
+	opts      *mqtt.ClientOptions
+	connected bool
 }
 
 type mqttSub struct {
@@ -61,7 +61,6 @@ type Plugin struct {
 	plugin.Base
 	manager     *watch.Manager
 	mqttClients map[string]*mqttClient
-	clientMux   *sync.RWMutex
 }
 
 var impl Plugin
@@ -81,20 +80,18 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	opts.OnConnect = func(client mqtt.Client) {
 		//Will show the query password and username in log
 		impl.Infof("Connected to %s", broker)
-		impl.clientMux.RLock()
+		impl.manager.Lock()
+		defer impl.manager.Unlock()
 		mc, found := p.mqttClients[broker]
-		impl.clientMux.RUnlock()
 		if found {
-			impl.manager.Lock()
+			mc.connected = true
 			for _, ms := range mc.subs {
-				if ms.subscribed {
-					err := ms.subscribe(mc)
-					if err != nil {
-						impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
-					}
+				err := ms.subscribe(mc)
+				if err != nil {
+					impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
 				}
 			}
-			impl.manager.Unlock()
+			return
 		}
 	}
 
@@ -125,9 +122,7 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 		return error(token.Error())
 	}
 
-	ms.subscribed = true
 	impl.Debugf("Subscribed to %s", ms.broker)
-
 	return nil
 }
 
@@ -139,9 +134,7 @@ func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 }
 
 func (ms *mqttSub) Initialize() (err error) {
-	impl.clientMux.RLock()
 	mc, ok := impl.mqttClients[ms.broker]
-	impl.clientMux.RUnlock()
 	if !ok {
 		return fmt.Errorf("client missing for broker %s", ms.broker)
 
@@ -153,16 +146,18 @@ func (ms *mqttSub) Initialize() (err error) {
 		if err != nil {
 			return err
 		}
-
+		return
 	}
 
-	return ms.subscribe(mc)
+	if mc.connected {
+		return ms.subscribe(mc)
+	}
+
+	return
 }
 
 func (ms *mqttSub) Release() {
-	impl.clientMux.RLock()
 	mc, ok := impl.mqttClients[ms.broker]
-	impl.clientMux.RUnlock()
 	if !ok || mc == nil || mc.client == nil {
 		impl.Errf("Client not found during release for broker %s\n", ms.broker)
 	}
@@ -174,14 +169,11 @@ func (ms *mqttSub) Release() {
 	}
 
 	delete(mc.subs, ms.topic)
-
 	impl.Debugf("Unsubscribed from %s", ms.topic)
 	if len(mc.subs) == 0 {
 		impl.Debugf("Disconnecting from %s", ms.broker)
 		mc.client.Disconnect(200)
-		impl.clientMux.Lock()
 		delete(impl.mqttClients, mc.broker)
-		impl.clientMux.Unlock()
 	}
 }
 
@@ -229,13 +221,11 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	}
 
 	broker := url.String()
-	impl.clientMux.Lock()
-	defer impl.clientMux.Unlock()
 	if _, ok := p.mqttClients[broker]; !ok {
 		impl.Debugf("Creating client options for %s", broker)
 		p.mqttClients[broker] = &mqttClient{
 			nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", url.Query().Get("username"),
-				url.Query().Get("password"), broker)}
+				url.Query().Get("password"), broker), false}
 	}
 
 	if _, ok := p.mqttClients[broker].subs[topic]; !ok {
@@ -275,7 +265,6 @@ func parseURL(broker string) (out *url.URL, err error) {
 func init() {
 	impl.manager = watch.NewManager(&impl)
 	impl.mqttClients = make(map[string]*mqttClient)
-	impl.clientMux = &sync.RWMutex{}
 
 	plugin.RegisterMetrics(&impl, "MQTT", "mqtt.get", "Listen on MQTT topics for published messages.")
 }
