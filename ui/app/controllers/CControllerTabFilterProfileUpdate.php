@@ -144,7 +144,7 @@ class CControllerTabFilterProfileUpdate extends CController {
 
 		if (array_key_exists('inventory', $properties)) {
 			$inventory = array_filter($properties['inventory'], function ($field) {
-				return ($field['field'] !== 'type' && $field['value'] !== '');
+				return ($field['value'] !== '');
 			});
 
 			$properties['inventory'] = array_values($inventory);
