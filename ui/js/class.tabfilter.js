@@ -75,6 +75,11 @@ class CTabFilter extends CBaseComponent {
 
 		if (index > -1) {
 			this.setSelectedItem(this._items[index - 1]);
+
+			if (item._expanded) {
+				this._active_item.setExpanded();
+			}
+
 			item.delete();
 			delete this._items[index];
 			this._items.splice(index, 1);
