@@ -1,8 +1,18 @@
 Changes for 5.2.0alpha3
 
 New features:
+.........T [ZBX-18131] added support of single-select, checkbox and radio button customfield types and "__zbx" tag filter for labels in Jira webhook (tuskov)
+A.F.....S. [ZBXNEXT-4647,ZBXNEXT-6096] added support of digest authentication for HTTP Agent (agriscenko, arimdjonoks)
+..F....... [ZBXNEXT-4803] added tab indicator to show clearly that a tab in Zabbix UI contains non-empty list or enabled some functionality (ashubin, rlataria)
 
 Bug fixes:
+........S. [ZBX-18170] fixed LLD override for applications (viktors, wiper)
+.......PS. [ZBX-15904] added check of required cache size for vmware event messages (asestakovs)
+.......PS. [ZBX-18121] fixed SSH monitoring when compiled with libssh; thanks to MATSUDA Daiki for the patch (Andris, viktors)
+...G...... [ZBX-17927] fixed Agent2 user-defined parameter key testing (viktors)
+.........T [ZBX-18314] fixed description of URI field in Template DB MySQL by Zabbix agent 2 (mchudinov)
+..F....... [ZBX-18067] fixed using outdated dynamic host when editing dynamic widgets on dashboard (kustalovs)
+..F....... [ZBX-18261] fixed performance of the "Latest data" screen with partitioned history tables (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.0alpha2
