@@ -158,35 +158,35 @@ class CTask extends CApiService {
 			'request' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO])], 'type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 					'data' => ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-						'historycache' =>	['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+						'historycache' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'memory.data', 'memory.index'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 								'values' =>			['type' => API_INT32]
 							]]
 						]],
-						'valuecache' =>		['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+						'valuecache' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'mode'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
-								'values' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL],
-								'request.values' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL]
+							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+								'values' =>			['type' => API_INT32],
+								'request.values' =>	['type' => API_INT32]
 							]]
 						]],
-						'preprocessing' =>	['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+						'preprocessing' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'values', 'preproc.values'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 								'values' =>			['type' => API_INT32]
 							]]
 						]],
-						'alerting' =>		['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+						'alerting' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'alerts'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
-								'media.alerts' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL],
-								'source.alerts' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL]
+							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+								'media.alerts' =>	['type' => API_INT32],
+								'source.alerts' =>	['type' => API_INT32]
 							]]
 						]],
-						'lld' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+						'lld' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'rules', 'values'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'fields' => [
+							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 								'values' =>			['type' => API_INT32]
 							]]
 						]]
