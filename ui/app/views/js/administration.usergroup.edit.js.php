@@ -159,6 +159,9 @@
 			$new_group_right_table.find('[name="new_group_right[tag]"]').val('');
 			$new_group_right_table.find('[name="new_group_right[value]"]').val('');
 			$group_right_table_container.html(html);
+
+			// Trigger event to update tab indicator.
+			document.dispatchEvent(new Event('tab-indicator-update'));
 		}
 
 		/**
@@ -171,6 +174,9 @@
 			$new_tag_filter_table.find('[name="new_tag_filter[tag]"]').val('');
 			$new_tag_filter_table.find('[name="new_tag_filter[value]"]').val('');
 			$tag_filter_table_container.html(html);
+
+			// Trigger event to update tab indicator.
+			document.dispatchEvent(new Event('tab-indicator-update'));
 		}
 
 		/**
@@ -242,12 +248,22 @@
 				.fail(function() {});
 		}
 
+		function removeTagFilterRow($this) {
+			$this
+				.closest('tr')
+				.remove();
+
+			// Trigger event to update tab indicator.
+			document.dispatchEvent(new Event('tab-indicator-update'));
+		}
+
 		/**
 		 * Public API.
 		 */
 		window.usergroups = {
 			submitNewGroupRight: submitNewGroupRight,
-			submitNewTagFilter: submitNewTagFilter
+			submitNewTagFilter: submitNewTagFilter,
+			removeTagFilterRow: removeTagFilterRow
 		};
 	});
 </script>

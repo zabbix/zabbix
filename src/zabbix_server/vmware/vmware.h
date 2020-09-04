@@ -196,7 +196,8 @@ typedef struct
 {
 	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
 	unsigned char	skip_old;	/* skip old event log records */
-
+	unsigned char	oom;		/* no enough memory to store new events */
+	zbx_uint64_t	req_sz;		/* memory size required to store events */
 }
 zbx_vmware_eventlog_state_t;
 
@@ -271,6 +272,7 @@ typedef struct
 {
 	zbx_vector_ptr_t	services;
 	zbx_hashset_t		strpool;
+	zbx_uint64_t		strpool_sz;
 }
 zbx_vmware_t;
 

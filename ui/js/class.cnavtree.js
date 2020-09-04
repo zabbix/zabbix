@@ -587,7 +587,7 @@ jQuery(function($) {
 									'class': 'dialogue-widget-save',
 									'isSubmit': true,
 									'action': function(overlay) {
-										var form = $('#widget_dialogue_form'),
+										var form = $('#widget-dialogue-form'),
 											url = new Curl('zabbix.php');
 
 										url.setArgument('action', 'widget.navtree.item.update');

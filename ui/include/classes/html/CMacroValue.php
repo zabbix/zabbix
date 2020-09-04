@@ -56,6 +56,13 @@ class CMacroValue extends CInput {
 	protected $revert_button = null;
 
 	/**
+	 * Maxlength of macro value input field.
+	 *
+	 * @var int
+	 */
+	protected $maxlength = 2048;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param int    $type         Macro type one of ZBX_MACRO_TYPE_SECRET or ZBX_MACRO_TYPE_TEXT value.
@@ -120,6 +127,7 @@ class CMacroValue extends CInput {
 			$wrapper_class = self::ZBX_STYLE_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
 			$dropdown_btn_class = ZBX_STYLE_ICON_TEXT;
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
+				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->setReadonly($readonly);
 		}
@@ -127,6 +135,7 @@ class CMacroValue extends CInput {
 			$wrapper_class = self::ZBX_STYLE_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT;
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
+				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('path/to/secret:key'))
 				->setReadonly($readonly);
 		}
@@ -134,6 +143,7 @@ class CMacroValue extends CInput {
 			$wrapper_class = self::ZBX_STYLE_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
 			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE;
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
+				->setAttribute('maxlength', $this->maxlength)
 				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
 				->setAttribute('placeholder', _('value'));
 		}

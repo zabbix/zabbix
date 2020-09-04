@@ -742,6 +742,11 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 		service->eventlog.last_key = request->lastlogsize;
 		service->eventlog.skip_old = skip_old;
 	}
+	else if (0 != service->eventlog.oom)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Not enough shared memory to store VMware events."));
+		goto unlock;
+	}
 	else if (request->lastlogsize < service->eventlog.last_key)
 	{
 		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */

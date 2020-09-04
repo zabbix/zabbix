@@ -115,6 +115,14 @@
 
 				$obj.textareaFlexible();
 			});
+
+			// Init tab indicator observer.
+			const macro_indicator = new MacrosTabIndicatorItem;
+			// Tab element.
+			const tab = document.querySelector('#tab_macroTab');
+			if (tab) {
+				macro_indicator.initObserver(tab);
+			}
 		}
 
 		function initMacroTable($parent, show_inherited_macros) {

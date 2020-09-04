@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CMessageHelper.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
@@ -145,12 +146,13 @@ class CTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Execute callbacks specified at some point of test execution.
 	 *
-	 * @param mixed $context      class instance or class name
-	 * @param array $callbacks    callbacks to be called
+	 * @param mixed $context		class instance or class name
+	 * @param array $callbacks		callbacks to be called
+	 * @param bool $required		flag marking callbacks required
 	 *
 	 * @return boolean
 	 */
-	protected static function executeCallbacks($context, $callbacks) {
+	protected static function executeCallbacks($context, $callbacks, $required = false) {
 		if (!$callbacks) {
 			return true;
 		}
@@ -164,13 +166,25 @@ class CTest extends PHPUnit_Framework_TestCase {
 			$method = $class->getMethod($callback);
 
 			if (!$method) {
-				self::addWarning('Callback "'.$callback.'" is not defined in requested context.');
+				$error = 'Callback "'.$callback.'" is not defined in requested context.';
+				if (!$required) {
+					self::addWarning($error);
+				}
+				else {
+					throw new Exception($error);
+				}
 			}
 
 			try {
 				$method->invoke(!$method->isStatic() ? $context : null);
 			} catch (Exception $e) {
-				self::addWarning('Failed to execute callback "'.$callback.'": '.$e->getMessage());
+				$error = 'Failed to execute callback "'.$callback.'": '.$e->getMessage();
+				if (!$required) {
+					self::addWarning($error);
+				}
+				else {
+					throw new Exception($error);
+				}
 
 				return false;
 			}
@@ -253,7 +267,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 		}
 
 		// Execute callbacks that should be executed before every test case.
-		self::executeCallbacks($this, self::$suite_callbacks['before-each']);
+		self::executeCallbacks($this, self::$suite_callbacks['before-each'], true);
 
 		// Test case level annotations.
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
@@ -289,7 +303,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 				}
 
 				// Execute callbacks that should be executed once for multiple test cases.
-				self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before-once'));
+				self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before-once'), true);
 
 				// Store callback to be executed after test case is executed for all data sets.
 				self::$suite_callbacks['after-once'] = $this->getAnnotationTokensByName($method_annotations,
@@ -298,7 +312,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			}
 
 			// Execute callbacks that should be executed before specific test case.
-			self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before'));
+			self::executeCallbacks($this, $this->getAnnotationTokensByName($method_annotations, 'on-before'), true);
 
 			// Store callback to be executed after test case.
 			$this->case_callbacks = $this->getAnnotationTokensByName($method_annotations, 'on-after');
@@ -323,6 +337,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
+
 		if ($this->case_backup !== null) {
 			CDBHelper::restoreTables();
 		}
@@ -339,7 +355,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
 		}
 
-		if (($errors = @file_get_contents(PHPUNIT_ERROR_LOG))) {
+		if ($errors !== '' && $errors !== false) {
 			$this->fail("Runtime errors:\n".$errors);
 		}
 	}
@@ -460,7 +476,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 			}
 
 			$behavior->setTest($this);
-			$this->behaviors[$name] = $behavior;
+			if ($name !== null) {
+				$this->behaviors[$name] = $behavior;
+			}
+			else {
+				$this->behaviors[] = $behavior;
+			}
 		}
 		else {
 			throw new Exception('Cannot attach behavior that is not an instance of CBehavior class');

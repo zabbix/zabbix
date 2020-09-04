@@ -19,6 +19,8 @@
 **/
 
 
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Class for converting array with export data to YAML format.
  */
@@ -26,12 +28,14 @@ class CYamlExportWriter extends CExportWriter {
 
 	/**
 	 * Converts array with export data to YAML format.
+	 * Known issues:
+	 *   - Symfony dumpers second parameter makes the YAML output either too vertical or too horizontal.
 	 *
 	 * @param array $array
 	 *
 	 * @return string
 	 */
 	public function write(array $array): string {
-		return yaml_emit($array, YAML_UTF8_ENCODING, YAML_LN_BREAK);
+		return Yaml::dump($array, 100, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 	}
 }

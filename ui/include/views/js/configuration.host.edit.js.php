@@ -630,7 +630,7 @@
 		jQuery('input[name=tls_connect]').trigger('change');
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		jQuery('#hostsForm').submit(function() {
+		jQuery('#hosts-form').submit(function() {
 			var tls_accept = 0x00;
 
 			if (jQuery('#tls_in_none').is(':checked')) {

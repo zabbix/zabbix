@@ -78,3 +78,5 @@ catch (Exception $e) {
 
 	echo json_encode($response);
 }
+
+session_write_close();

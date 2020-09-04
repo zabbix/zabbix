@@ -33,7 +33,6 @@ class CFrontendSetup {
 	const MIN_PHP_MAX_INPUT_TIME = 300;
 	const MIN_PHP_GD_VERSION = '2.0';
 	const MIN_PHP_LIBXML_VERSION = '2.6.15';
-	const MIN_PHP_LIBYAML_VERION = '2.0.2'; // See https://pecl.php.net/package/yaml
 	const REQUIRED_PHP_ARG_SEPARATOR_OUTPUT = '&';
 
 	/**
@@ -77,7 +76,6 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpGdJpeg();
 		$result[] = $this->checkPhpGdGif();
 		$result[] = $this->checkPhpGdFreeType();
-		$result[] = $this->checkPhpLibYAML();
 		$result[] = $this->checkPhpLibxml();
 		$result[] = $this->checkPhpXmlWriter();
 		$result[] = $this->checkPhpXmlReader();
@@ -460,27 +458,6 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _('PHP gd FreeType support missing.')
-		];
-	}
-
-	/**
-	 * Checks for PHP LibYAML extension.
-	 *
-	 * @return array
-	 */
-	public function checkPhpLibYAML(): array {
-		if (!$current = phpversion('yaml')) {
-			$current = _('unknown');
-		}
-
-		$check = version_compare($current, self::MIN_PHP_LIBYAML_VERION, '>=');
-
-		return [
-			'name' => _('PHP LibYAML'),
-			'current' => $current,
-			'required' => self::MIN_PHP_LIBYAML_VERION,
-			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _('PHP LibYAML extension missing.')
 		];
 	}
 

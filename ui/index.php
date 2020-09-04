@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
-CWebUser::disableSessionCookie();
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -44,7 +43,7 @@ check_fields($fields);
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED
 			&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== ''
-			&& CSession::keyExists('saml_data')) {
+			&& CSessionHelper::has('saml_data')) {
 		redirect('index_sso.php?slo');
 	}
 
@@ -68,8 +67,6 @@ if (!hasRequest('form') && CAuthenticationHelper::get(CAuthenticationHelper::HTT
 		&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
 		&& !hasRequest('enter')) {
 	redirect('index_http.php');
-
-	exit;
 }
 
 // login via form
@@ -83,15 +80,13 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 
 	$redirect = array_filter([CWebUser::isGuest() ? '' : $request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
 	redirect(reset($redirect));
-
-	exit;
 }
 
 if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 	redirect(CWebUser::$data['url'] ? CWebUser::$data['url'] : ZBX_DEFAULT_URL);
 }
 
-$messages = clear_messages();
+$messages = get_and_clear_messages();
 
 echo (new CView('general.login', [
 	'http_login_url' => (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED)
@@ -104,3 +99,5 @@ echo (new CView('general.login', [
 	'autologin' => $autologin == 1,
 	'error' => (hasRequest('enter') && $messages) ? array_pop($messages) : null
 ]))->getOutput();
+
+session_write_close();

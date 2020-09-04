@@ -29,7 +29,7 @@ class CWidgetHelper {
 	public static function createForm() {
 		return (new CForm('post'))
 			->cleanItems()
-			->setId('widget_dialogue_form')
+			->setId('widget-dialogue-form')
 			->setName('widget_dialogue_form');
 	}
 
@@ -860,7 +860,7 @@ class CWidgetHelper {
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
 					'container.scrollTop(Math.max(container.scrollTop(),
-						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
 					));'.
 
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
@@ -1253,7 +1253,7 @@ class CWidgetHelper {
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
 					'container.scrollTop(Math.max(container.scrollTop(),
-						jQuery("#widget_dialogue_form")[0].scrollHeight - container.height()
+						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
 					));'.
 
 					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color) {'.
