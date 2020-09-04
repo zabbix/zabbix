@@ -219,25 +219,25 @@ func makeRetArray(retType Bits16, arraySize uint) (v interface{}) {
 }
 
 func getFirst(v interface{}) interface{} {
-	switch v.(type) {
+	switch v := v.(type) {
 	case []uint64:
-		return v.([]uint64)[0]
+		return v[0]
 	case []float64:
-		return v.([]float64)[0]
+		return v[0]
 	case []uint32:
-		return v.([]uint32)[0]
+		return v[0]
 	case []int32:
-		return v.([]int32)[0]
+		return v[0]
 	case []float32:
-		return v.([]float32)[0]
+		return v[0]
 	case []uint16:
-		return v.([]uint16)[0]
+		return v[0]
 	case []int16:
-		return v.([]int16)[0]
+		return v[0]
 	case []int8:
-		return v.([]int8)[0]
+		return v[0]
 	case []byte:
-		return v.([]byte)[0]
+		return v[0]
 	}
 	return nil
 }
