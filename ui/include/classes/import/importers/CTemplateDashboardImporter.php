@@ -27,7 +27,7 @@ class CTemplateDashboardImporter extends CImporter {
 	/**
 	 * Import template dashboard.
 	 *
-	 * @param array $dashboards
+	 * @param array $template_dashboards
 	 */
 	public function import(array $template_dashboards): void {
 		if ((!$this->options['templateDashboards']['createMissing']
@@ -46,8 +46,8 @@ class CTemplateDashboardImporter extends CImporter {
 			}
 
 			foreach ($dashboards as $name => $dashboard) {
+				$dashboard['widgets'] = $this->resolveDashboardWidgetReferences($dashboard['widgets'], $name);
 
-				// $screen = $this->resolveScreenReferences($screen);
 				if ($this->referencer->resolveTemplateDashboards($templateid, $name)) {
 					$dashboards_update[] = $dashboard;
 				}
@@ -72,55 +72,120 @@ class CTemplateDashboardImporter extends CImporter {
 	}
 
 	/**
-	 * Deletes missing template screens.
+	 * Deletes missing template dashboards.
 	 *
-	 * @param array $allScreens
-	 *
-	 * @return null
+	 * @param array $template_dashboards
 	 */
-	public function delete(array $allScreens) {
-		if (!$this->options['templateScreens']['deleteMissing']) {
+	public function delete(array $template_dashboards): void {
+		if (!$this->options['templateDashboards']['deleteMissing']) {
 			return;
 		}
 
-		$templateIdsXML = $this->importedObjectContainer->getTemplateIds();
+		$templateids = $this->importedObjectContainer->getTemplateIds();
 
 		// no templates have been processed
-		if (!$templateIdsXML) {
+		if (!$templateids) {
 			return;
 		}
 
-		$templateScreenIdsXML = [];
+		$dashboardids = [];
 
-		if ($allScreens) {
-			foreach ($allScreens as $template => $screens) {
-				$templateId = $this->referencer->resolveTemplate($template);
+		if ($template_dashboards) {
+			foreach ($template_dashboards as $template_name => $dashboards) {
+				$templateid = $this->referencer->resolveTemplate($template_name);
 
-				if ($templateId) {
-					foreach ($screens as $screenName => $screen) {
-						$templateScreenId = $this->referencer->resolveTemplateScreen($templateId, $screenName);
+				if ($templateid) {
+					foreach ($dashboards as $name => $dashboard) {
+						$dashboardid = $this->referencer->resolveTemplateDashboards($templateid, $name);
 
-						if ($templateScreenId) {
-							$templateScreenIdsXML[$templateScreenId] = $templateScreenId;
+						if ($dashboardid) {
+							$dashboardids[$dashboardid] = true;
 						}
 					}
 				}
 			}
 		}
 
-		$dbTemplateScreenIds = API::TemplateScreen()->get([
-			'output' => ['screenid'],
+		$db_dashboardids = API::TemplateDashboard()->get([
+			'output' => ['dashboardid'],
 			'filter' => [
-				'templateid' => $templateIdsXML
+				'templateid' => $templateids
 			],
-			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
-		$templateScreensToDelete = array_diff_key($dbTemplateScreenIds, $templateScreenIdsXML);
+		$dashboards_delete = array_diff_key($db_dashboardids, $dashboardids);
 
-		if ($templateScreensToDelete) {
-			API::TemplateScreen()->delete(array_keys($templateScreensToDelete));
+		if ($dashboards_delete) {
+			API::TemplateDashboard()->delete($dashboards_delete);
 		}
+	}
+
+	/**
+	 * Prepare dashboard data for import.
+	 * Each screen element has reference to resource it represents, reference structure may differ depending on type.
+	 * Referenced database objects ids are stored to 'resourceid' field of screen items.
+	 *
+	 * @throws Exception if referenced object is not found in database
+	 *
+	 * @param array $widgets
+	 * @param string $dashboard_name  for error purpose
+	 *
+	 * @return array
+	 */
+	protected function resolveDashboardWidgetReferences(array $widgets, string $dashboard_name): array {
+		if ($widgets) {
+			foreach ($widgets as &$widget) {
+				foreach ($widget['fields'] as &$field) {
+					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_HOST:
+							$host_name = $field['value']['host'];
+
+							$field['value'] = $this->referencer->resolveHost($host_name);
+
+							if (!$field['value']) {
+								throw new Exception(_s('Cannot find host "%1$s" used in dashboard "%2$s".',
+									$host_name, $dashboard_name
+								));
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ITEM:
+						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+							$host_name = $field['value']['host'];
+							$item_key = $field['value']['key'];
+
+							$hostid = $this->referencer->resolveHostOrTemplate($host_name);
+							$field['value'] = $this->referencer->resolveItem($hostid, $item_key);
+
+							if (!$field['value']) {
+								throw new Exception(_s('Cannot find item "%1$s" used in dashboard "%2$s".',
+									$host_name.':'.$item_key, $dashboard_name
+								));
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+							$host_name = $field['value']['host'];
+							$graph_name = $field['value']['name'];
+
+							$hostid = $this->referencer->resolveHostOrTemplate($host_name);
+							$field['value'] = $this->referencer->resolveGraph($hostid, $graph_name);
+
+							if (!$field['value']) {
+								throw new Exception(_s('Cannot find graph "%1$s" used in dashboard "%2$s".',
+									$graph_name, $dashboard_name
+								));
+							}
+							break;
+					}
+				}
+				unset($field);
+			}
+			unset($widget);
+		}
+
+		return $widgets;
 	}
 }

@@ -34,6 +34,21 @@ class C50ImportConverter extends CConverter {
 	public function convert($data): array {
 		$data['zabbix_export']['version'] = '5.2';
 
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = $this->convertScreenToDashboards($data['zabbix_export']['templates']);
+		}
+
 		return $data;
+	}
+
+	/**
+	 * Convert template screen to template dashboards.
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	protected function convertScreenToDashboards(array $templates): array {
+		return $templates;
 	}
 }

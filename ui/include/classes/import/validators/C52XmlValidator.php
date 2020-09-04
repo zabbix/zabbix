@@ -1592,7 +1592,7 @@ class C52XmlValidator {
 										'field' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+											'value' =>					['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
 										]]
 									]]
 								]]
@@ -2209,6 +2209,23 @@ class C52XmlValidator {
 	}
 
 	/**
+	 * Validate widget field "value" tag.
+	 *
+	 * @param string|array $data         Import data.
+	 * @param array        $parent_data  Data's parent array.
+	 * @param string       $path         XML path.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return string|array
+	 */
+	public function validateWidgetFieldValue($data, array $parent_data = null, string $path) {
+		$rules = $this->getWidgetFieldValueExtendedRules($parent_data);
+
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+	}
+
+	/**
 	 * Get extended validation rules.
 	 *
 	 * @param array $data  Import data.
@@ -2295,6 +2312,41 @@ class C52XmlValidator {
 
 			default:
 				return ['type' => XML_STRING, 'default' => ''];
+		}
+	}
+
+	/**
+	 * Get extended validation rules for widget field "value" tag.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function getWidgetFieldValueExtendedRules(array $data): array {
+		switch ($data['type']) {
+			case CXmlConstantName::DASHBOARD_FIELD_TYPE_HOST:
+			case CXmlConstantValue::DASHBOARD_FIELD_TYPE_HOST:
+				return ['type' => XML_ARRAY, 'rules' => [
+					'host' => ['type' => XML_STRING | XML_REQUIRED],
+				]];
+			case CXmlConstantName::DASHBOARD_FIELD_TYPE_ITEM:
+			case CXmlConstantName::DASHBOARD_FIELD_TYPE_ITEM_PROTOTYPE:
+			case CXmlConstantValue::DASHBOARD_FIELD_TYPE_ITEM:
+			case CXmlConstantValue::DASHBOARD_FIELD_TYPE_ITEM_PROTOTYPE:
+				return ['type' => XML_ARRAY, 'rules' => [
+					'host' => ['type' => XML_STRING | XML_REQUIRED],
+					'key' => ['type' => XML_STRING | XML_REQUIRED],
+				]];
+			case CXmlConstantName::DASHBOARD_FIELD_TYPE_GRAPH:
+			case CXmlConstantName::DASHBOARD_FIELD_TYPE_GRAPH_PROTOTYPE:
+			case CXmlConstantValue::DASHBOARD_FIELD_TYPE_GRAPH:
+			case CXmlConstantValue::DASHBOARD_FIELD_TYPE_GRAPH_PROTOTYPE:
+				return ['type' => XML_ARRAY, 'rules' => [
+					'host' => ['type' => XML_STRING | XML_REQUIRED],
+					'name' => ['type' => XML_STRING | XML_REQUIRED],
+				]];
+			default:
+				return ['type' => XML_STRING | XML_REQUIRED];
 		}
 	}
 

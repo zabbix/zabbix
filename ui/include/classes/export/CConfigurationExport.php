@@ -368,11 +368,73 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+
 		foreach ($dashboards as $dashboard) {
+			$dashboard['widgets'] = $this->prepareDashboardWidgets($dashboard['widgets']);
+
 			$templates[$dashboard['templateid']]['dashboards'][] = $dashboard;
 		}
 
 		return $templates;
+	}
+
+	/**
+	 * Get dashboard widgets related objects from database.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return array
+	 */
+	protected function prepareDashboardWidgets(array $widgets): array {
+		$hostids = [];
+		$itemids = [];
+		$graphids = [];
+
+		// Collect ids.
+		foreach ($widgets as $widget) {
+			foreach ($widget['fields'] as $field) {
+				switch ($field['type']) {
+					case ZBX_WIDGET_FIELD_TYPE_HOST:
+						$hostids[] = $field['value'];
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_ITEM:
+					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+						$itemids[] = $field['value'];
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+						$graphids[] = $field['value'];
+						break;
+				}
+			}
+		}
+
+		$hosts = $this->getHostsReferences($hostids);
+		$items = $this->getItemsReferences($itemids);
+		$graphs = $this->getGraphsReferences($graphids);
+
+		// Replace ids.
+		foreach ($widgets as &$widget) {
+			foreach ($widget['fields'] as &$field) {
+				switch ($field['type']) {
+					case ZBX_WIDGET_FIELD_TYPE_HOST:
+						$field['value'] = $hosts[$field['value']];
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_ITEM:
+					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+						$field['value'] = $items[$field['value']];
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+						$field['value'] = $graphs[$field['value']];
+						break;
+				}
+			}
+			unset($field);
+		}
+		unset($widget);
+
+		return $widgets;
 	}
 
 	/**
