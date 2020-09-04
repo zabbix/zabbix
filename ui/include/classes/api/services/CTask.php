@@ -336,65 +336,63 @@ class CTask extends CApiService {
 	 * @return array
 	 */
 	protected function createTasksCheckNow(array $tasks): array {
-		return [];
+		if (!$tasks) {
+			return [];
+		}
 
-		/*
+		$itemids = [];
+		$return = [];
+
+		foreach ($tasks as $index => $task) {
+			$itemids[$index] = $task['request']['data']['itemid'];
+			$return[$index] = 0;
+		}
+
 		// Check if tasks for items and LLD rules already exist.
 		$db_tasks = DBselect(
-			'SELECT t.taskid,tcn.itemid'.
+			'SELECT t.taskid, tcn.itemid'.
 			' FROM task t, task_check_now tcn'.
 			' WHERE t.taskid=tcn.taskid'.
 				' AND t.type='.ZBX_TM_TASK_CHECK_NOW.
 				' AND t.status='.ZBX_TM_STATUS_NEW.
-				' AND '.dbConditionId('tcn.itemid', [$data['data']['itemid']]) // TODO
+				' AND '.dbConditionId('tcn.itemid', array_keys(array_flip($itemids)))
 		);
 
-		$item_tasks = [];
-
-		foreach ($data['data']['itemid'] as $itemid) {
-			$item_tasks[$itemid] = 0;
-		}
-
 		while ($db_task = DBfetch($db_tasks)) {
-			$item_tasks[$db_task['itemid']] = $db_task['taskid'];
-		}
-
-		$itemids = [];
-
-		foreach ($item_tasks as $itemid => $taskid) {
-			if ($taskid == 0) {
-				$itemids[] = $itemid;
+			foreach (array_keys($itemids, $db_task['itemid']) as $index) {
+				$return[$index] = $db_task['taskid'];
+				unset($itemids[$index]);
 			}
 		}
 
+		// Create new tasks.
 		if ($itemids) {
 			$taskid = DB::reserveIds('task', count($itemids));
-			$ins_tasks = [];
-			$ins_check_now_tasks = [];
+			$task_rows = [];
+			$task_check_now_rows = [];
 			$time = time();
 
-			foreach ($itemids as $i => $itemid) {
-				$ins_tasks[] = [
+			foreach ($itemids as $index => $itemid) {
+				$task_rows[] = [
 					'taskid' => $taskid,
 					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'status' => ZBX_TM_STATUS_NEW,
 					'clock' => $time,
 					'ttl' => SEC_PER_HOUR
 				];
-				$ins_check_now_tasks[] = [
+				$task_check_now_rows[] = [
 					'taskid' => $taskid,
 					'itemid' => $itemid
 				];
 
-				$item_tasks[$itemid] = (string) $taskid++;
+				$return[$index] = (string) $taskid++;
 			}
 
-			DB::insertBatch('task', $ins_tasks, false);
-			DB::insertBatch('task_check_now', $ins_check_now_tasks, false);
+			DB::insertBatch('task', $task_rows, false);
+			DB::insertBatch('task_check_now', $task_check_now_rows, false);
 		}
 
-		return ['taskids' => array_values($item_tasks)];
-		*/
+		return $return;
 	}
 
 	/**
@@ -417,31 +415,33 @@ class CTask extends CApiService {
 	protected function createTasksDiagInfo(array $tasks): array {
 		$task_rows = [];
 		$task_data_rows = [];
+		$return = [];
+		$taskid = DB::reserveIds('task', count($tasks));
 
 		foreach ($tasks as $index => $task) {
-			$task_rows[$index] = [
+			$task_rows[] = [
+				'taskid' => $taskid,
 				'type' => ZBX_TM_TASK_DATA,
 				'status' => ZBX_TM_STATUS_NEW,
 				'clock' => time(),
 				'ttl' => SEC_PER_HOUR,
 				'proxy_hostid' => $task['proxy_hostid']
 			];
-		}
 
-		$task_rows = DB::insertBatch('task', $task_rows);
-
-		foreach ($tasks as $index => $task) {
-			$task_data_rows[$index] = [
-				'taskid' => $task_rows[$index],
+			$task_data_rows[] = [
+				'taskid' => $taskid,
 				'type' => $task['type'],
 				'data' => json_encode($task['request']['data']),
-				'parent_taskid' => $task_rows[$index]
+				'parent_taskid' => $taskid
 			];
+
+			$return[$index] = (string) $taskid++;
 		}
 
+		DB::insertBatch('task', $task_rows, false);
 		DB::insertBatch('task_data', $task_data_rows, false);
 
-		return $task_rows;
+		return $return;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
