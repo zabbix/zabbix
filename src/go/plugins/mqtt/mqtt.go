@@ -101,7 +101,7 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 func newClient(broker string, options *mqtt.ClientOptions) (mqtt.Client, error) {
 	c := mqtt.NewClient(options)
 	token := c.Connect()
-	if token.Wait() && token.Error() != nil {
+	if token.WaitTimeout(60*time.Second) && token.Error() != nil {
 		return nil, token.Error()
 	}
 
