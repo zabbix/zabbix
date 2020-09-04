@@ -51,10 +51,9 @@ type mqttClient struct {
 }
 
 type mqttSub struct {
-	broker     string
-	topic      string
-	wildCard   bool
-	subscribed bool
+	broker   string
+	topic    string
+	wildCard bool
 }
 
 type Plugin struct {
@@ -79,15 +78,14 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	}
 	opts.OnConnect = func(client mqtt.Client) {
 		//Will show the query password and username in log
-		impl.Infof("Connected to %s", broker)
+		impl.Debugf("Connected to %s", broker)
 		impl.manager.Lock()
 		defer impl.manager.Unlock()
 		mc, found := p.mqttClients[broker]
 		if found {
 			mc.connected = true
 			for _, ms := range mc.subs {
-				err := ms.subscribe(mc)
-				if err != nil {
+				if err := ms.subscribe(mc); err != nil {
 					impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
 				}
 			}
@@ -100,15 +98,14 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 
 func newClient(broker string, options *mqtt.ClientOptions) (mqtt.Client, error) {
 	c := mqtt.NewClient(options)
-	token := c.Connect()
-	if token.WaitTimeout(60*time.Second) && token.Error() != nil {
+	if token := c.Connect(); token.WaitTimeout(60*time.Second) && token.Error() != nil {
 		return nil, token.Error()
 	}
 
 	return c, nil
 }
 
-func (ms *mqttSub) subscribeCallback(client mqtt.Client, msg mqtt.Message) {
+func (ms *mqttSub) handler(client mqtt.Client, msg mqtt.Message) {
 	impl.manager.Lock()
 	impl.Tracef("Received publication from %s: [%s] %s", ms.broker, msg.Topic(), string(msg.Payload()))
 	impl.manager.Notify(ms, msg)
@@ -116,13 +113,12 @@ func (ms *mqttSub) subscribeCallback(client mqtt.Client, msg mqtt.Message) {
 }
 
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
-	impl.Debugf("Subscribing to %s", ms.broker)
-	token := mc.client.Subscribe(ms.topic, 0, ms.subscribeCallback)
-	if token.WaitTimeout(60*time.Second) && token.Error() != nil {
+	impl.Tracef("Subscribing to %s", ms.broker)
+	if token := mc.client.Subscribe(ms.topic, 0, ms.handler); token.WaitTimeout(60*time.Second) && token.Error() != nil {
 		return error(token.Error())
 	}
 
-	impl.Debugf("Subscribed to %s", ms.broker)
+	impl.Tracef("Subscribed to %s", ms.broker)
 	return nil
 }
 
@@ -143,9 +139,6 @@ func (ms *mqttSub) Initialize() (err error) {
 	if mc.client == nil {
 		impl.Debugf("Creating client for %s", ms.broker)
 		mc.client, err = newClient(ms.broker, mc.opts)
-		if err != nil {
-			return err
-		}
 		return
 	}
 
@@ -160,16 +153,16 @@ func (ms *mqttSub) Release() {
 	mc, ok := impl.mqttClients[ms.broker]
 	if !ok || mc == nil || mc.client == nil {
 		impl.Errf("Client not found during release for broker %s\n", ms.broker)
+		return
 	}
 
-	impl.Debugf("Unsubscribing topic from %s", ms.topic)
-	token := mc.client.Unsubscribe(ms.topic)
-	if token.WaitTimeout(60*time.Second) && token.Error() != nil {
+	impl.Tracef("Unsubscribing topic from %s", ms.topic)
+	if token := mc.client.Unsubscribe(ms.topic); token.WaitTimeout(60*time.Second) && token.Error() != nil {
 		impl.Errf("Failed to unsubscribe from %s:%s", ms.topic, token.Error())
 	}
 
 	delete(mc.subs, ms.topic)
-	impl.Debugf("Unsubscribed from %s", ms.topic)
+	impl.Tracef("Unsubscribed from %s", ms.topic)
 	if len(mc.subs) == 0 {
 		impl.Debugf("Disconnecting from %s", ms.broker)
 		mc.client.Disconnect(200)
@@ -181,23 +174,24 @@ type respFilter struct {
 	wildcard bool
 }
 
-func (f *respFilter) Process(v interface{}) (value *string, err error) {
-	if m, ok := v.(mqtt.Message); !ok {
-		err = fmt.Errorf("unexpected traper conversion input type %T", v)
-	} else {
-		var tmp string
-		if f.wildcard {
-			j, err := json.Marshal(map[string]string{m.Topic(): string(m.Payload())})
-			if err != nil {
-				return nil, err
-			}
-			tmp = string(j)
-		} else {
-			tmp = string(m.Payload())
-		}
-		value = &tmp
+func (f *respFilter) Process(v interface{}) (*string, error) {
+	m, ok := v.(mqtt.Message)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mqtt response conversion input type %T", v)
 	}
-	return
+
+	var value string
+	if f.wildcard {
+		j, err := json.Marshal(map[string]string{m.Topic(): string(m.Payload())})
+		if err != nil {
+			return nil, err
+		}
+		value = string(j)
+	} else {
+		value = string(m.Payload())
+	}
+
+	return &value, nil
 }
 
 func (ms *mqttSub) NewFilter(key string) (filter watch.EventFilter, err error) {
@@ -222,16 +216,16 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 
 	broker := url.String()
 	if _, ok := p.mqttClients[broker]; !ok {
-		impl.Debugf("Creating client options for %s", broker)
+		impl.Tracef("Creating client options for %s", broker)
 		p.mqttClients[broker] = &mqttClient{
 			nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", url.Query().Get("username"),
 				url.Query().Get("password"), broker), false}
 	}
 
 	if _, ok := p.mqttClients[broker].subs[topic]; !ok {
-		impl.Debugf("Creating subscriber for %s", topic)
+		impl.Tracef("Creating subscriber for %s", topic)
 		p.mqttClients[broker].subs[topic] = &mqttSub{
-			broker, topic, hasWildCards(topic), false}
+			broker, topic, hasWildCards(topic)}
 	}
 
 	return p.mqttClients[broker].subs[topic], nil
