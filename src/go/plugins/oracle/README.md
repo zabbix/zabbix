@@ -2,8 +2,9 @@
 Provides native Zabbix solution for monitoring Oracle Database. It can monitor several 
 Oracle instances simultaneously, remote or local to the Zabbix Agent.
 The plugin keeps connections in the open state to reduce network congestion, latency, CPU and 
-memory usage. Best for use in conjunction with the official  [Template DB Oracle Agent 2](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2). You can extend it or create your 
-template for your specific needs. 
+memory usage. Best for use in conjunction with the official 
+[Template DB Oracle Agent 2](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2). 
+You can extend it or create your template for your specific needs. 
 
 ## Requirements
 - Zabbix Agent 2
@@ -213,7 +214,7 @@ E.g:
 /* payment.sql */
 
 SELECT 
-    ammount 
+    amount 
 FROM 
     payment 
 WHERE
@@ -228,4 +229,4 @@ WHERE
 The plugin uses Zabbix agent's logs. You can increase a debug level of Zabbix agent if you need more details about 
 what is happening.  
 The environment variable DPI_DEBUG_LEVEL can be used to selectively turn on the printing of various logging messages
-from ODPI-C. See [ODPI-C Debugging](ODPI-C Debugging.)
+from ODPI-C. See [ODPI-C Debugging](https://oracle.github.io/odpi/doc/user_guide/debugging.html) for details.

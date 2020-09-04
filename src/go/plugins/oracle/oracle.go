@@ -113,7 +113,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 
 	conn, err := p.connMgr.GetConnection(*uri)
 	if err != nil {
-		// Special logic of processing connection errors should be used if redis.ping is requested
+		// Special logic of processing connection errors should be used if oracle.ping is requested
 		// because it must return pingFailed if any error occurred.
 		if key == keyPing {
 			return pingFailed, nil
