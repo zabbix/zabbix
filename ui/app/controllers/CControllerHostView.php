@@ -95,7 +95,7 @@ class CControllerHostView extends CControllerHost {
 			$profile->update();
 		}
 
-		$profile->setInput($this->getInputAll());
+		$profile->setInput($this->cleanInput($this->getInputAll()));
 		$filter = $profile->getTabFilter($profile->selected);
 		$this->getInputs($filter, ['page', 'sort', 'sortorder']);
 		$filter_tabs = $profile->getTabsWithDefaults();

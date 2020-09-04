@@ -108,7 +108,7 @@ class CControllerProblemView extends CControllerProblem {
 			$profile->update();
 		}
 
-		$profile->setInput($this->getInputAll());
+		$profile->setInput($this->cleanInput($this->getInputAll()));
 		$filter = $profile->getTabFilter($profile->selected);
 		$this->getInputs($filter, ['page', 'from', 'to']);
 		$filter_tabs = $profile->getTabsWithDefaults();
@@ -125,13 +125,6 @@ class CControllerProblemView extends CControllerProblem {
 			}
 		}
 		unset($filter_tab);
-
-		$filter['tags'] = array_filter($filter['tags'], function($tag) {
-			return $tag['tag'] !== '' && $tag['value'] !== '';
-		});
-		$filter['inventory'] = array_filter($filter['inventory'], function($inventory) {
-			return $inventory['value'] !== '';
-		});
 
 		$refresh_curl = (new CUrl('zabbix.php'));
 		$filter['action'] = 'problem.view.refresh';

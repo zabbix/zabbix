@@ -353,4 +353,21 @@ abstract class CControllerHost extends CController {
 
 		return $data;
 	}
+
+	/**
+	 * Clean passed filter fields in input from default values required for HTML presentation. Convert field
+	 *
+	 * @param array $input  Filter fields values.
+	 *
+	 * @return array
+	 */
+	protected function cleanInput(array $input): array {
+		if ($input['tags']) {
+			$input['tags'] = array_filter($input['tags'], function($tag) {
+				return $tag['tag'] !== '' && $tag['value'] !== '';
+			});
+		}
+
+		return $input;
+	}
 }

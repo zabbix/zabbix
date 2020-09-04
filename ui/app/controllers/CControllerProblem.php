@@ -55,7 +55,14 @@ abstract class CControllerProblem extends CController {
 		'to' => ''
 	];
 
-	protected function getCount(array $filter) {
+	/**
+	 * Get count of resulting rows for specified filter.
+	 *
+	 * @param array $filter   Filter fields values.
+	 *
+	 * @return int
+	 */
+	protected function getCount(array $filter): int {
 		$range_time_parser = new CRangeTimeParser();
 		$range_time_parser->parse($filter['from']);
 		$filter['from'] = $range_time_parser->getDateTime(true)->getTimestamp();
@@ -69,15 +76,31 @@ abstract class CControllerProblem extends CController {
 		return count($data['problems']);
 	}
 
+	/**
+	 * Get resulting rows for specified filter.
+	 *
+	 * @param array $filter  Filter fields values.
+	 *
+	 * @return array
+	 */
 	protected function getData(array $filter): array {
 		// getData is handled by jsrpc.php 'screen.get' action.
 		return [];
 	}
 
+	/**
+	 * Get additional data required for render filter as HTML.
+	 *
+	 * @param array $filter  Filter fileds values.
+	 *
+	 * @return array
+	 */
 	protected function getAdditionalData(array $filter): array {
-		$host_groups = [];
-		$triggers = [];
-		$hosts = [];
+		$data = [
+			'groups' => [],
+			'hosts' => [],
+			'triggers' => []
+		];
 
 		// Host groups multiselect.
 		if ($filter['groupids']) {
@@ -86,7 +109,7 @@ abstract class CControllerProblem extends CController {
 				'groupids' => $filter['groupids'],
 				'preservekeys' => true
 			]);
-			$host_groups = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+			$data['host_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
 		}
 
 		// Triggers multiselect.
@@ -107,22 +130,41 @@ abstract class CControllerProblem extends CController {
 				$trigger['prefix'] = $trigger['hosts'][0]['name'].NAME_DELIMITER;
 				unset($trigger['hosts']);
 			}
+
+			$data['triggers'] = $triggers;
 		}
 
 		// Hosts multiselect.
 		if ($filter['hostids']) {
-			$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
+			$data['hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
 				'output' => ['hostid', 'name'],
 				'hostids' => $filter['hostids']
 			]), ['hostid' => 'id']);
 		}
 
-		$data = [
-			'groups' => $host_groups,
-			'hosts' => $hosts,
-			'triggers' => $triggers
-		];
-
 		return $data;
+	}
+
+	/**
+	 * Clean passed filter fields in input from default values required for HTML presentation. Convert field
+	 *
+	 * @param array $input  Filter fields values.
+	 *
+	 * @return array
+	 */
+	protected function cleanInput(array $input): array {
+		if ($input['tags']) {
+			$input['tags'] = array_filter($input['tags'], function($tag) {
+				return $tag['tag'] !== '' && $tag['value'] !== '';
+			});
+		}
+
+		if ($input['inventory']) {
+			$input['inventory'] = array_filter($input['inventory'], function($inventory) {
+				return $inventory['value'] !== '';
+			});
+		}
+
+		return $input;
 	}
 }
