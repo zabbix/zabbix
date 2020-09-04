@@ -124,7 +124,7 @@ class CTask extends CApiService {
 	 * @param string|array $tasks[]['type']                             Type of task.
 	 * @param string|array $tasks[]['request']
 	 * @param array        $tasks[]['request']['data']                  Request object for task to create.
-	 * @param string|array $tasks[]['request']['data']['itemids']       (optional) ZBX_TM_TASK_CHECK_NOW task items.
+	 * @param string       $tasks[]['request']['data']['itemid']        Must be set for ZBX_TM_TASK_CHECK_NOW task.
 	 * @param array        $tasks[]['request']['data']['historycache']  (optional) object of history cache data request.
 	 * @param array        $tasks[]['request']['data']['valuecache']    (optional) object of value cache data request.
 	 * @param array        $tasks[]['request']['data']['preprocessing'] (optional) object of preprocessing data request.
@@ -137,15 +137,21 @@ class CTask extends CApiService {
 	public function create(array $tasks): array {
 		$this->validateCreate($tasks);
 
-		foreach ($tasks as $task) {
-			switch ($task['type']) {
-				case ZBX_TM_DATA_TYPE_CHECK_NOW:
-					return $this->createTaskCheckNow($task['request']);
+		$tasks_by_types = [
+			ZBX_TM_DATA_TYPE_CHECK_NOW => [],
+			ZBX_TM_DATA_TYPE_DIAGINFO => []
+		];
 
-				case ZBX_TM_DATA_TYPE_DIAGINFO:
-					return $this->createTaskDiagInfo($task);
-			}
+		foreach ($tasks as $index => $task) {
+			$tasks_by_types[$task['type']][$index] = $task;
 		}
+
+		$return = $this->createTasksCheckNow($tasks_by_types[ZBX_TM_DATA_TYPE_CHECK_NOW]);
+		$return += $this->createTasksDiagInfo($tasks_by_types[ZBX_TM_DATA_TYPE_DIAGINFO]);
+
+		ksort($return);
+
+		return ['taskids' => array_values($return)];
 	}
 
 	/**
@@ -197,7 +203,7 @@ class CTask extends CApiService {
 								]],
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_CHECK_NOW])], 'type' => API_OBJECT, 'fields' => [
 					'data' => ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-						'itemids' => ['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true]
+						'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 					]]
 								]]
 				]
@@ -209,67 +215,58 @@ class CTask extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$min_permissions = USER_TYPE_ZABBIX_ADMIN;
+		$itemids_editable = [];
 		$proxy_hostids = [];
 
 		foreach ($tasks as $task) {
 			switch ($task['type']) {
 				case ZBX_TM_DATA_TYPE_DIAGINFO:
-					$this->validateTaskDiagInfo();
+					$min_permissions = USER_TYPE_SUPER_ADMIN;
 
-					if ($task['proxy_hostid'] != 0) {
-						$proxy_hostids[$task['proxy_hostid']] = $task['proxy_hostid'];
-					}
+					$proxy_hostids[$task['proxy_hostid']] = $task['proxy_hostid'];
 					break;
 
 				case ZBX_TM_DATA_TYPE_CHECK_NOW:
-					$this->validateCreateTaskCheckNow($task['request']);
+					$itemids_editable[$task['request']['data']['itemid']] = true;
 					break;
 			}
 		}
 
-		// Check if specified proxies exists.
-		if ($proxy_hostids) {
-			$proxies = API::Proxy()->get([
-				'countOutput' => true,
-				'proxyids' => $proxy_hostids
-			]);
+		unset($proxy_hostids[0]);
 
-			if ($proxies != count($proxy_hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (self::$userData['type'] < $min_permissions) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
+
+		$this->checkProxyHostids(array_keys($proxy_hostids));
+		$this->checkEditableItems(array_keys($itemids_editable));
 	}
 
 	/**
 	 * Special validation for ZBX_TM_DATA_TYPE_CHECK_NOW create.
 	 *
 	 * @param array        $data             Request object for tasks to create.
-	 * @param string|array $data['itemids']  Array of item and LLD rule IDs to create tasks for.
+	 * @param string|array $data['itemid']   Item or LLD rule IDs to create tasks for.
 	 *
 	 * @throws APIException
 	 */
 	protected function validateCreateTaskCheckNow(array $data) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		// Check if user has permissions to items and LLD rules.
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'hostid', 'status'],
-			'itemids' => $data['data']['itemids'],
+			'itemids' => $data['data']['itemid'],
 			'editable' => true
 		]);
 
 		$discovery_rules = [];
-		$itemids_cnt = count($data['data']['itemids']);
+		$itemids_cnt = count([$data['data']['itemid']]); // TODO
 		$items_cnt = count($items);
 
 		if ($items_cnt != $itemids_cnt) {
 			$discovery_rules = API::DiscoveryRule()->get([
 				'output' => ['itemid', 'type', 'hostid', 'status'],
-				'itemids' => $data['data']['itemids'],
+				'itemids' => $data['data']['itemid'],
 				'editable' => true
 			]);
 
@@ -329,27 +326,19 @@ class CTask extends CApiService {
 	}
 
 	/**
-	 * Special validation for ZBX_TM_DATA_TYPE_DIAGINFO create.
-	 *
-	 * @throws APIException
-	 */
-	protected function validateTaskDiagInfo() {
-		if (self::$userData['type'] < USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-	}
-
-	/**
 	 * Create ZBX_TM_TASK_CHECK_NOW task.
 	 *
 	 * @param array        $data             Request object for tasks to create.
-	 * @param string|array $data['itemids']  Array of item and LLD rule IDs to create tasks for.
+	 * @param string|array $data['itemid']   Item or LLD rule IDs to create tasks for.
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	protected function createTaskCheckNow(array $data): array {
+	protected function createTasksCheckNow(array $tasks): array {
+		return [];
+
+		/*
 		// Check if tasks for items and LLD rules already exist.
 		$db_tasks = DBselect(
 			'SELECT t.taskid,tcn.itemid'.
@@ -357,12 +346,12 @@ class CTask extends CApiService {
 			' WHERE t.taskid=tcn.taskid'.
 				' AND t.type='.ZBX_TM_TASK_CHECK_NOW.
 				' AND t.status='.ZBX_TM_STATUS_NEW.
-				' AND '.dbConditionId('tcn.itemid', $data['data']['itemids'])
+				' AND '.dbConditionId('tcn.itemid', [$data['data']['itemid']]) // TODO
 		);
 
 		$item_tasks = [];
 
-		foreach ($data['data']['itemids'] as $itemid) {
+		foreach ($data['data']['itemid'] as $itemid) {
 			$item_tasks[$itemid] = 0;
 		}
 
@@ -405,48 +394,54 @@ class CTask extends CApiService {
 		}
 
 		return ['taskids' => array_values($item_tasks)];
+		*/
 	}
 
 	/**
-	 * Create ZBX_TM_DATA_TYPE_DIAGINFO task.
+	 * Create ZBX_TM_DATA_TYPE_DIAGINFO tasks.
 	 *
-	 * @param array    $task
-	 * @param array    $task['request']
-	 * @param array    $task['request']['data']                  Request object for task to create.
-	 * @param array    $task['request']['data']['historycache']  (optional) object of history cache data request.
-	 * @param array    $task['request']['data']['valuecache']    (optional) object of value cache data request.
-	 * @param array    $task['request']['data']['preprocessing'] (optional) object of preprocessing data request.
-	 * @param array    $task['request']['data']['alerting']      (optional) object of alerting data request.
-	 * @param array    $task['request']['data']['lld']	         (optional) object of lld cache data request.
-	 * @param array    $task['proxy_hostid']	                 (optional) object of lld cache data request.
+	 * @param array    $task[]
+	 * @param array    $task[]['request']
+	 * @param array    $task[]['request']['data']                  Request object for task to create.
+	 * @param array    $task[]['request']['data']['historycache']  (optional) object of history cache data request.
+	 * @param array    $task[]['request']['data']['valuecache']    (optional) object of value cache data request.
+	 * @param array    $task[]['request']['data']['preprocessing'] (optional) object of preprocessing data request.
+	 * @param array    $task[]['request']['data']['alerting']      (optional) object of alerting data request.
+	 * @param array    $task[]['request']['data']['lld']	       (optional) object of lld cache data request.
+	 * @param array    $task[]['proxy_hostid']                     (optional) object of lld cache data request.
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	protected function createTaskDiagInfo(array $task): array {
-		$taskid = DB::reserveIds('task', 1);
+	protected function createTasksDiagInfo(array $tasks): array {
+		$task_rows = [];
+		$task_data_rows = [];
 
-		$ins_task = [
-			'taskid' => $taskid,
-			'type' => ZBX_TM_TASK_DATA,
-			'status' => ZBX_TM_STATUS_NEW,
-			'clock' => time(),
-			'ttl' => SEC_PER_HOUR,
-			'proxy_hostid' => $task['proxy_hostid']
-		];
+		foreach ($tasks as $index => $task) {
+			$task_rows[$index] = [
+				'type' => ZBX_TM_TASK_DATA,
+				'status' => ZBX_TM_STATUS_NEW,
+				'clock' => time(),
+				'ttl' => SEC_PER_HOUR,
+				'proxy_hostid' => $task['proxy_hostid']
+			];
+		}
 
-		$ins_task_data = [
-			'taskid' => $taskid,
-			'type' => $task['type'],
-			'data' => json_encode($task['request']['data']),
-			'parent_taskid' => $taskid
-		];
+		$task_rows = DB::insertBatch('task', $task_rows);
 
-		DB::insert('task', [$ins_task], false);
-		DB::insert('task_data', [$ins_task_data], false);
+		foreach ($tasks as $index => $task) {
+			$task_data_rows[$index] = [
+				'taskid' => $task_rows[$index],
+				'type' => $task['type'],
+				'data' => json_encode($task['request']['data']),
+				'parent_taskid' => $task_rows[$index]
+			];
+		}
 
-		return ['taskids' => [$taskid]];
+		DB::insertBatch('task_data', $task_data_rows, false);
+
+		return $task_rows;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
@@ -468,5 +463,107 @@ class CTask extends CApiService {
 		}
 
 		return $sql_parts;
+	}
+
+	/**
+	 * Validate user permissions to items and LLD rules;
+	 * Check if requested items are allowed to make 'check now' operation;
+	 * Check if items are monitored and they belong to monitored hosts.
+	 *
+	 * @param array $itemids
+	 *
+	 * @throws Exception
+	 */
+	protected function checkEditableItems(array $itemids): void {
+		// Check permissions.
+		$items = API::Item()->get([
+			'output' => ['type', 'hostid', 'status', 'flags'],
+			'itemids' => $itemids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$discovery_rules = [];
+		$itemids_cnt = count($itemids);
+
+		if (count($items) != $itemids_cnt) {
+			$items += API::DiscoveryRule()->get([
+				'output' => ['type', 'hostid', 'status', 'flags'],
+				'itemids' => $itemids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			if (count($items) != $itemids_cnt) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+
+		// Validate item and LLD rule types and statuses, and collect host IDs for later.
+		$hostids = [];
+		$allowed_types = checkNowAllowedTypes();
+
+		foreach ($items as $item) {
+			if (!in_array($item['type'], $allowed_types)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot send request: %1$s.',
+						($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+							? _('wrong discovery rule type')
+							: _('wrong item type')
+					)
+				);
+			}
+
+			if ($item['status'] != ITEM_STATUS_ACTIVE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot send request: %1$s.',
+						($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+							? _('discovery rule is disabled')
+							: _('item is disabled')
+					)
+				);
+			}
+
+			$hostids[$item['hostid']] = true;
+		}
+
+		// Check if those are actually monitored hosts because given hostids could actually be templateids.
+		$hosts = API::Host()->get([
+			'output' => [],
+			'hostids' => array_keys($hostids),
+			'filter' => [
+				'status' => HOST_STATUS_MONITORED
+			],
+			'templated_hosts' => true,
+			'nopermissions' => true
+		]);
+
+		if (count($hosts) != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('host is not monitored')));
+		}
+	}
+
+	/**
+	 * Function to check if specified proxies exists.
+	 *
+	 * @param array $proxy_hostids  Proxy IDs to check.
+	 *
+	 * @throws Exception if proxy doesn't exist.
+	 */
+	protected function checkProxyHostids(array $proxy_hostids): void {
+		if (!$proxy_hostids) {
+			return;
+		}
+
+		$proxies = API::Proxy()->get([
+			'countOutput' => true,
+			'proxyids' => $proxy_hostids
+		]);
+
+		if ($proxies != count($proxy_hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 }

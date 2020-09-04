@@ -858,7 +858,7 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 		'request' => [
 			'data' => [
-				'itemids' => getRequest('itemid')
+				'itemid' => getRequest('itemid')
 			]
 		]
 	]);
@@ -1343,14 +1343,20 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-		'request' => [
-			'data' => [
-				'itemids' => getRequest('group_itemid')
+	$tasks = [];
+
+	foreach (getRequest('group_itemid') as $itemid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'data' => [
+					'itemid' => $itemid
+				]
 			]
-		]
-	]);
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));
