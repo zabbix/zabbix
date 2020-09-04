@@ -148,7 +148,7 @@ func (ms *mqttSub) Initialize() (err error) {
 		impl.Debugf("connecting to [%s]", ms.broker)
 		mc.client, err = newClient(mc.opts)
 		if err != nil {
-			impl.Errf("Failed to crient a client for %s", ms.broker)
+			impl.Errf("Failed to create a client for %s", ms.broker)
 			return
 		}
 
