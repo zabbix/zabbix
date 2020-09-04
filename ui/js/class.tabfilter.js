@@ -117,6 +117,7 @@ class CTabFilter extends CBaseComponent {
 			can_toggle: this._options.can_toggle,
 			container: container,
 			data: data,
+			unsaved: this._options.unsaved||false,
 			template: this._templates[data.tab_view]||null,
 			support_custom_time: this._options.support_custom_time
 		});
