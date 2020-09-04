@@ -1,6 +1,7 @@
 Changes for 5.0.4rc1
 
 New features:
+.........T [ZBX-18131] added support of single-select, checkbox and radio button customfield types and "__zbx" tag filter for labels in Jira webhook (tuskov)
 ........S. [ZBXNEXT-6139] added GetHeaders method to CurlHttpRequest javascript object (wiper)
 .........T [ZBXNEXT-6116] added SysAid media type (afayantsev)
 .......PS. [ZBXNEXT-6167] added diaginfo runtime command to log internal diagnostic information (wiper)
@@ -11,6 +12,13 @@ New features:
 .........T [ZBXCTR-10] added iLert media type (roman-ilert)
 
 Bug fixes:
+........S. [ZBX-18170] fixed LLD override for applications (viktors, wiper)
+.......PS. [ZBX-15904] added check of required cache size for vmware event messages (asestakovs)
+.......PS. [ZBX-18121] fixed SSH monitoring when compiled with libssh; thanks to MATSUDA Daiki for the patch (Andris, viktors)
+...G...... [ZBX-17927] fixed Agent2 user-defined parameter key testing (viktors)
+.........T [ZBX-18314] fixed description of URI field in Template DB MySQL by Zabbix agent 2 (mchudinov)
+..F....... [ZBX-18067] fixed using outdated dynamic host when editing dynamic widgets on dashboard (kustalovs)
+..F....... [ZBX-18261] fixed performance of the "Latest data" screen with partitioned history tables (Sasha)
 ...G...... [ZBX-18322] enabled Memcached and MySQL plugins for Windows (vadimipatov)
 .........T [ZBX-17982] added non-trigger event types support to webhooks (tuskov)
 .........T [ZBX-18190] removed triggers for items Log growths, Log shrinks for MSSQL ODBC template (mchudinov)
