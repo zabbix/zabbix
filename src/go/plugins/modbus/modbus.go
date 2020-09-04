@@ -171,6 +171,7 @@ func (p *Plugin) Validate(options interface{}) error {
 	return nil
 }
 
+// connecting and receiving data from modbus device
 func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
 	handler := newHandler(p, timeout)
 	var lockName string
@@ -222,6 +223,7 @@ func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
 	return results, nil
 }
 
+// make new modbus hendler depends on connection type
 func newHandler(p *MBParams, timeout int) (handler mblib.ClientHandler) {
 	switch p.ReqType {
 	case Tcp:
