@@ -153,13 +153,13 @@ abstract class CControllerProblem extends CController {
 	 * @return array
 	 */
 	protected function cleanInput(array $input): array {
-		if ($input['tags']) {
+		if (array_key_exists('tags', $input) && $input['tags']) {
 			$input['tags'] = array_filter($input['tags'], function($tag) {
 				return $tag['tag'] !== '' && $tag['value'] !== '';
 			});
 		}
 
-		if ($input['inventory']) {
+		if (array_key_exists('inventory', $input) && $input['inventory']) {
 			$input['inventory'] = array_filter($input['inventory'], function($inventory) {
 				return $inventory['value'] !== '';
 			});

@@ -71,6 +71,11 @@ class CTabFilterProfile {
 	 */
 	public $filter_defaults;
 
+	/**
+	 * Is selected tab modified by user input.
+	 */
+	public $modified = false;
+
 	public function __construct($idx, array $filter_defaults) {
 		$this->namespace = $idx;
 		$this->tabfilters = [];
@@ -179,6 +184,11 @@ class CTabFilterProfile {
 			if ($input['filter_name'] === '') {
 				unset($input['filter_name']);
 			}
+
+			$this->modified = array_diff_assoc(
+				array_map('serialize', CArrayHelper::unsetEqualValues($input, $this->filter_defaults)),
+				array_map('serialize', $this->tabfilters[$this->selected])
+			);
 
 			$input += $this->filter_defaults;
 			$input['filter_show_counter'] = (int) $input['filter_show_counter'];

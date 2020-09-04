@@ -26,20 +26,25 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		function hostPage() {
+			let filter_options = <?= json_encode($data['filter_options']) ?>;
+
 			this.refresh_url = '<?= $data['refresh_url'] ?>';
 			this.refresh_interval = <?= $data['refresh_interval'] ?>;
 			this.running = false;
 			this.timeout = null;
-			this.refresh_counters = this.createCountersRefresh(1);
-			this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], <?= json_encode($data['filter_options']) ?>);
-			this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
-				let url = new Curl('', false);
 
-				url.setArgument('action', 'host.view.refresh');
-				this.refresh_url = url.getUrl();
-				this.stop();
-				this.start();
-			});
+			if (filter_options) {
+				this.refresh_counters = this.createCountersRefresh(1);
+				this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
+				this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
+					let url = new Curl('', false);
+
+					url.setArgument('action', 'host.view.refresh');
+					this.refresh_url = url.getUrl();
+					this.stop();
+					this.start();
+				});
+			}
 		}
 
 		hostPage.prototype = {

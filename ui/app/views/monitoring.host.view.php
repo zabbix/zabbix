@@ -60,6 +60,9 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$data['filter_options'] = $filter->options;
 	$widget->addItem($filter);
 }
+else {
+	$data['filter_options'] = null;
+}
 
 $widget->addItem((new CForm())->setName('host_view')->addClass('is-loading'));
 $widget->show();
