@@ -53,7 +53,7 @@ class CTask extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'taskids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
+			'taskids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE | API_ALLOW_NULL, 'default' => null],
 			// output
 			'output' =>			['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			// flags
@@ -74,10 +74,13 @@ class CTask extends CApiService {
 			'select'	=> ['task' => 't.taskid'],
 			'from'		=> ['task' => 'task t'],
 			'where'		=> [
-				'type'		=> 't.type='.ZBX_TM_TASK_DATA,
-				'taskid'	=> dbConditionInt('t.taskid', $options['taskids'])
+				'type'		=> 't.type='.ZBX_TM_TASK_DATA
 			]
 		];
+
+		if ($options['taskids'] !== null) {
+			$sql_parts['where']['taskid'] = dbConditionInt('t.taskid', $options['taskids']);
+		}
 
 		$db_tasks = [];
 
