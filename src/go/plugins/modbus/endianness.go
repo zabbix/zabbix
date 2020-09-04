@@ -26,6 +26,7 @@ import (
 	"fmt"
 )
 
+// main data transformation
 func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 
 	if p.RetType == Bit {

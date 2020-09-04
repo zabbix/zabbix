@@ -28,6 +28,7 @@ import (
 	"strings"
 )
 
+// main parsing
 func parseParams(params *[]string) (*MBParams, error) {
 	if len(*params) == 0 || len(*params) > 8 {
 		return nil, fmt.Errorf("Invalid number of parameters:%d", len(*params))
