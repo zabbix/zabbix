@@ -82,8 +82,6 @@ class CTemplateDashboardImporter extends CImporter {
 		}
 
 		$templateids = $this->importedObjectContainer->getTemplateIds();
-
-		// no templates have been processed
 		if (!$templateids) {
 			return;
 		}
@@ -123,8 +121,8 @@ class CTemplateDashboardImporter extends CImporter {
 
 	/**
 	 * Prepare dashboard data for import.
-	 * Each screen element has reference to resource it represents, reference structure may differ depending on type.
-	 * Referenced database objects ids are stored to 'resourceid' field of screen items.
+	 * Each widget field "value" has reference to resource it represents, reference structure may differ depending on
+	 * widget field "type".
 	 *
 	 * @throws Exception if referenced object is not found in database
 	 *

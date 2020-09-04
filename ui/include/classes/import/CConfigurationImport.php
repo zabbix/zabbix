@@ -1828,11 +1828,11 @@ class CConfigurationImport {
 				|| $this->options['templateDashboards']['createMissing']
 				|| $this->options['templateDashboards']['deleteMissing']) {
 			$dashboards = $this->getFormattedTemplateDashboards();
-			$screenImporter = new CTemplateDashboardImporter($this->options, $this->referencer,
+			$dashboardImporter = new CTemplateDashboardImporter($this->options, $this->referencer,
 				$this->importedObjectContainer
 			);
-			// $screenImporter->delete($dashboards);
-			$screenImporter->import($dashboards);
+			$dashboardImporter->delete($dashboards);
+			$dashboardImporter->import($dashboards);
 		}
 	}
 
