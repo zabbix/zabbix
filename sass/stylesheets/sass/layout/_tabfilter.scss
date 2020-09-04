@@ -65,6 +65,10 @@
 			&::before {
 				content: '*';
 			}
+
+			&[data-counter]::after {
+				display: none;
+			}
 		}
 
 		&.selected.expanded {

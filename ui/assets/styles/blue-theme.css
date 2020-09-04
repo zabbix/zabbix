@@ -491,6 +491,8 @@ footer {
       font-style: italic; }
       .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link::before {
         content: '*'; }
+      .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link[data-counter]::after {
+        display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded {
       background-color: #ffffff;
       border: 1px solid #dfe4e7;

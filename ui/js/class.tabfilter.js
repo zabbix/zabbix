@@ -386,10 +386,10 @@ class CTabFilter extends CBaseComponent {
 
 				if (this._items.length > 2) {
 					for (const item of this._items.slice(1, -1)) {
-						dataAttributes = item._data.filter_show_counter ? {'data-counter': item.getCounter()} : [];
 						items.push({
 							label: item._data.filter_name,
-							dataAttributes: dataAttributes,
+							dataAttributes: (item._data.filter_show_counter && !item._unsaved)
+								? {'data-counter': item.getCounter()} : [],
 							clickCallback: () => item.fire(TABFILTERITEM_EVENT_EXPAND)
 						});
 					}
