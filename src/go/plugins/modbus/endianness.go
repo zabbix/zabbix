@@ -76,7 +76,9 @@ func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 	} else {
 		arr = makeRetArray(p.RetType, p.RetCount)
 		r := bytes.NewReader(val)
-		binary.Read(r, p.Endianness.order, arr)
+		if err = binary.Read(r, p.Endianness.order, arr); err != nil {
+			return nil, fmt.Errorf("Unable to convert returned data: %w", err)
+		}
 	}
 
 	if typeSize > 2 && 0 != p.Endianness.middle {
