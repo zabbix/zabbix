@@ -35,7 +35,7 @@ abstract class CControllerHost extends CController {
 		'ip' => '',
 		'dns' => '',
 		'port' => '',
-		'status' => HOST_STATUS_MONITORED,
+		'status' => -1,
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
 		'severities' => [],
