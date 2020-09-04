@@ -209,6 +209,11 @@ class CTabFilter extends CBaseComponent {
 				item.removeCounter();
 			}
 		});
+
+		if (this._active_item) {
+			// Position of selected item is changed, update it to ensure label is visible.
+			this._active_item.setSelected();
+		}
 	}
 
 	/**
@@ -489,7 +494,7 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		$('.ui-sortable-container', this._target).sortable({
-			items: ':not(:first-child)',
+			items: '.tabfilter-item-label:not(:first-child)',
 			update: this._events.tabSortChanged,
 			axis: 'x',
 			containment: 'parent'

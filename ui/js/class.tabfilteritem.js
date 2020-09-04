@@ -138,6 +138,7 @@ class CTabFilterItem extends CBaseComponent {
 	setSelected() {
 		this._target.focus();
 		this._target.parentNode.classList.add('selected');
+		this._target.parentNode.scrollIntoView({behavior: 'smooth'});
 
 		if (this._data.filter_configurable) {
 			this.addActionIcons();
