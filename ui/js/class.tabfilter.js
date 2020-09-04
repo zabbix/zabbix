@@ -375,18 +375,18 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'chevron down' button press. Creates dropdown with list of existing tabs.
 			 */
 			toggleTabsList: (ev) => {
-				let items = [],
-					dataAttributes,
+				let dropdown_items = [],
 					dropdown = [{
 						items: [{
 							label: t('Home'),
 							clickCallback: () => this._items[0].fire(TABFILTERITEM_EVENT_EXPAND)
 						}]
-					}];
+					}],
+					items = this._timeselector ? this._items.slice(1, -1) : this._items.slice(1);
 
-				if (this._items.length > 2) {
-					for (const item of this._items.slice(1, -1)) {
-						items.push({
+				if (items.length) {
+					for (const item of items) {
+						dropdown_items.push({
 							label: item._data.filter_name,
 							dataAttributes: (item._data.filter_show_counter && !item._unsaved)
 								? {'data-counter': item.getCounter()} : [],
@@ -394,7 +394,7 @@ class CTabFilter extends CBaseComponent {
 						});
 					}
 
-					dropdown.push({items: items});
+					dropdown.push({items: dropdown_items});
 				}
 
 				$(this._target).menuPopup(dropdown, $(ev), {
