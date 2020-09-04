@@ -157,6 +157,9 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 				curlauth = CURLAUTH_GSSNEGOTIATE;
 #endif
 				break;
+			case HTTPTEST_AUTH_DIGEST:
+				curlauth = CURLAUTH_DIGEST;
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;

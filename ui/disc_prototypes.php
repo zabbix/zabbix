@@ -207,7 +207,7 @@ $fields = [
 									],
 	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-											HTTPTEST_AUTH_KERBEROS
+											HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
 										]),
 										null
 									],
@@ -216,6 +216,7 @@ $fields = [
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
 												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
 											')',
 										_('Username')
 									],
@@ -224,6 +225,7 @@ $fields = [
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
 												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
 											')',
 										_('Password')
 									],
