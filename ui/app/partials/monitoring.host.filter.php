@@ -143,6 +143,7 @@ $template = (new CDiv())
 	]);
 $template = (new CForm('get'))
 	->cleanItems()
+	->setName('zbx_filter')
 	->addItem($template)
 	->addVar('filter_name', '#{filter_name}')
 	->addVar('filter_show_counter', '#{filter_show_counter}')
