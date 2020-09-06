@@ -139,7 +139,12 @@ class CControllerTabFilterProfileUpdate extends CController {
 				return ($tag['tag'] !== '' && $tag['value'] !== '');
 			});
 
-			$properties['tags'] = array_values($tags);
+			if ($tags) {
+				$properties['tags'] = array_values($tags);
+			}
+			else {
+				unset($properties['tags']);
+			}
 		}
 
 		if (array_key_exists('inventory', $properties)) {
@@ -147,7 +152,12 @@ class CControllerTabFilterProfileUpdate extends CController {
 				return ($field['value'] !== '');
 			});
 
-			$properties['inventory'] = array_values($inventory);
+			if ($inventory) {
+				$properties['inventory'] = array_values($inventory);
+			}
+			else {
+				unset($properties['inventory']);
+			}
 		}
 
 		return $properties;

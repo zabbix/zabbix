@@ -107,7 +107,9 @@ if ($data['age_state'] == 0) {
 
 $left_column
 	->addRow(_('Age less than'), [
-		(new CCheckBox('age_state'))->setChecked($data['age_state'] == 1),
+		(new CCheckBox('age_state'))
+			->setChecked($data['age_state'] == 1)
+			->setUncheckedValue(0),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$filter_age,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -222,35 +224,41 @@ $right_column = (new CFormList())
 	])
 	->addRow(_('Show suppressed problems'), [
 		(new CCheckBox('show_suppressed'))
-			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE),
+			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+			->setUncheckedValue(0),
 		(new CDiv([
 			(new CLabel(_('Show unacknowledged only'), 'unacknowledged'))
 				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('unacknowledged'))
 				->setChecked($data['unacknowledged'] == 1)
+				->setUncheckedValue(0)
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	])
 	->addRow(_('Compact view'), [
 		(new CCheckBox('compact_view'))
 			->setChecked($data['compact_view'] == 1)
+			->setUncheckedValue(0)
 			->setId('compact_view_#{uniqid}'),
 		(new CDiv([
 			(new CLabel(_('Show timeline'), 'show_timeline'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('show_timeline'))
 				->setChecked($data['show_timeline'] == 1)
 				->setEnabled($data['compact_view'] == 0)
+				->setUncheckedValue(0)
 				->setId('show_timeline_#{uniqid}'),
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	])
 	->addRow(_('Show details'), [
 		(new CCheckBox('details'))
 			->setChecked($data['details'] == 1)
-			->setEnabled($data['compact_view'] == 0),
+			->setEnabled($data['compact_view'] == 0)
+			->setUncheckedValue(0),
 		(new CDiv([
 			(new CLabel(_('Highlight whole row'), 'highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('highlight_row'))
 				->setChecked($data['highlight_row'] == 1)
 				->setEnabled($data['compact_view'] == 1)
+				->setUncheckedValue(0)
 		]))
 			->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 			->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)

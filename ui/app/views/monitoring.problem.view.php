@@ -110,9 +110,7 @@ if ($data['action'] === 'problem.view') {
 		];
 		$filter = (new CTabFilter())
 			->setId('monitoring_problem_filter')
-			->setIdx($data['tabfilter_idx'])
-			->setSelected((int) $data['tab_selected'])
-			->setExpanded((bool) $data['tab_expanded'])
+			->setOptions($data['tabfilter_options'])
 			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults'] + $defaults));
 
 		foreach ($data['filter_tabs'] as $tab) {

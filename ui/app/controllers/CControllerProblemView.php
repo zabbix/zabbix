@@ -99,17 +99,17 @@ class CControllerProblemView extends CControllerProblem {
 
 	protected function doAction() {
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
-		$selected = $profile->getTabFilter($profile->selected);
+		$filter = $profile->getTabFilter($profile->selected);
+		$input = $this->getInputAll();
 
-		if ($this->getInput('sort', $selected['sort']) !== $selected['sort']
-				|| $this->getInput('sortorder', $selected['sortorder']) !== $selected['sortorder']) {
-			$this->getInputs($selected, ['sort', 'sortorder']);
-			$profile->setTabFilter($profile->selected, $selected);
+		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
+				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
+			$this->getInputs($filter, ['sort', 'sortorder']);
+			$profile->setTabFilter($profile->selected, $filter);
 			$profile->update();
 		}
 
-		$profile->setInput($this->cleanInput($this->getInputAll()));
-		$filter = $profile->getTabFilter($profile->selected);
+		$profile->setInput($this->cleanInput($input));
 		$this->getInputs($filter, ['page', 'from', 'to']);
 		$filter_tabs = $profile->getTabsWithDefaults();
 
@@ -143,9 +143,14 @@ class CControllerProblemView extends CControllerProblem {
 				'from' => $filter['filter_custom_time'] ? $filter['from'] : $profile->from,
 				'to' => $filter['filter_custom_time'] ? $filter['to'] : $profile->to
 			],
+			'tabfilter_options' => [
+				'idx' => static::FILTER_IDX,
+				'can_toggle' => true,
+				'selected' => $profile->selected,
+				'expanded' => $profile->expanded,
+				'src_url' => $profile->getUnmodifiedUrl($input)
+			],
 			'filter_tabs' => $filter_tabs,
-			'tab_selected' => $profile->selected,
-			'tab_expanded' => $profile->expanded,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),

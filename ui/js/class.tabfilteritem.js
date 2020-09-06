@@ -41,8 +41,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._expanded = options.expanded;
 		this._support_custom_time = options.support_custom_time;
 		this._template_rendered = false;
-		this._unsaved = options.unsaved;
-		this._src_url = options.src_url||null;
+		this._src_url = null;
 
 		this.init();
 		this.registerEvents();
@@ -51,14 +50,6 @@ class CTabFilterItem extends CBaseComponent {
 	init() {
 		if (this._expanded) {
 			this.renderContentTemplate();
-			this.setBrowserLocation(this.getFilterParams());
-
-			if (!this._unsaved) {
-				this.resetUnsavedState();
-			}
-			else {
-				this._target.parentNode.classList.toggle('unsaved', this._unsaved);
-			}
 		}
 
 		if (this._data.filter_show_counter) {
@@ -144,7 +135,6 @@ class CTabFilterItem extends CBaseComponent {
 	setSelected() {
 		this._target.focus();
 		this._target.parentNode.classList.add('selected');
-		this._target.parentNode.scrollIntoView({behavior: 'smooth'});
 
 		if (this._data.filter_configurable) {
 			this.addActionIcons();

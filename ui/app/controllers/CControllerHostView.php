@@ -86,17 +86,17 @@ class CControllerHostView extends CControllerHost {
 
 	protected function doAction(): void {
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
-		$selected = $profile->getTabFilter($profile->selected);
+		$filter = $profile->getTabFilter($profile->selected);
+		$input = $this->getInputAll();
 
-		if ($this->getInput('sort', $selected['sort']) !== $selected['sort']
-				|| $this->getInput('sortorder', $selected['sortorder']) !== $selected['sortorder']) {
-			$this->getInputs($selected, ['sort', 'sortorder']);
-			$profile->setTabFilter($profile->selected, $selected);
+		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
+				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
+			$this->getInputs($filter, ['sort', 'sortorder']);
+			$profile->setTabFilter($profile->selected, $filter);
 			$profile->update();
 		}
 
-		$profile->setInput($this->cleanInput($this->getInputAll()));
-		$filter = $profile->getTabFilter($profile->selected);
+		$profile->setInput($this->cleanInput($input));
 		$this->getInputs($filter, ['page', 'sort', 'sortorder']);
 		$filter_tabs = $profile->getTabsWithDefaults();
 
@@ -114,14 +114,18 @@ class CControllerHostView extends CControllerHost {
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
 
 		$data = [
-			'tabfilter_idx' => static::FILTER_IDX,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'filter_tabs' => $filter_tabs,
-			'tab_selected' => $profile->selected,
-			'tab_expanded' => $profile->expanded
+			'tabfilter_options' => [
+				'idx' => static::FILTER_IDX,
+				'can_toggle' => true,
+				'selected' => $profile->selected,
+				'expanded' => $profile->expanded,
+				'src_url' => $profile->getUnmodifiedUrl($input)
+			],
 		] + $this->getData($filter);
 
 		$response = new CControllerResponseData($data);

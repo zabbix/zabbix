@@ -56,7 +56,15 @@ class CTabFilter extends CBaseComponent {
 			item = this.create(title, options.data[index]||{});
 
 			if (options.selected === index) {
+				let url = window.location.search;
+
 				this.setSelectedItem(item);
+				item.setBrowserLocation(item.getFilterParams());
+
+				if (url === window.location.search) {
+					item._src_url = options.src_url;
+					item.updateUnsavedState();
+				}
 			}
 
 			if (item._expanded) {
@@ -117,7 +125,6 @@ class CTabFilter extends CBaseComponent {
 			can_toggle: this._options.can_toggle,
 			container: container,
 			data: data,
-			unsaved: this._options.unsaved||false,
 			template: this._templates[data.tab_view]||null,
 			support_custom_time: this._options.support_custom_time
 		});

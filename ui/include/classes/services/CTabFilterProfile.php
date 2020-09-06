@@ -96,6 +96,8 @@ class CTabFilterProfile {
 	 * Create filter tab from controller input. Set default values.
 	 *
 	 * @param array $input  Controller input.
+	 *
+	 * @return array
 	 */
 	public function createFilterTab(array $input): array {
 		$filter = array_intersect_key($input, $this->filter_defaults) + $this->filter_defaults;
@@ -145,15 +147,26 @@ class CTabFilterProfile {
 	public function getTabsWithDefaults(): array {
 		$tabfilters = [];
 
-		if (!$this->tabfilters) {
-			$tabfilters[] = $this->createFilterTab([]);
-		}
-
 		foreach ($this->tabfilters as $tabfilter) {
 			$tabfilters[] = $tabfilter + $this->filter_defaults;
 		}
 
 		return $tabfilters;
+	}
+
+	/**
+	 * Get unmodified filter as URL string, required to initialize selected tab filter on page refresh.
+	 *
+	 * @param array $input  Unmodified posted input data.
+	 *
+	 * @return string
+	 */
+	public function getUnmodifiedUrl(array $input): string {
+		if (array_key_exists($this->selected, $this->profile_data)) {
+			$input = array_merge($input, $this->profile_data[$this->selected]);
+		}
+
+		return http_build_query($input, '', '&', PHP_QUERY_RFC3986);
 	}
 
 	/**
@@ -184,11 +197,6 @@ class CTabFilterProfile {
 			if ($input['filter_name'] === '') {
 				unset($input['filter_name']);
 			}
-
-			$this->modified = array_diff_assoc(
-				array_map('serialize', CArrayHelper::unsetEqualValues($input, $this->filter_defaults)),
-				array_map('serialize', $this->tabfilters[$this->selected])
-			);
 
 			$input += $this->filter_defaults;
 			$input['filter_show_counter'] = (int) $input['filter_show_counter'];
@@ -267,6 +275,7 @@ class CTabFilterProfile {
 			]);
 		}
 
+		$this->profile_data = $this->tabfilters;
 		return $this;
 	}
 

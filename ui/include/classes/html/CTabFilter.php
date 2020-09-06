@@ -26,6 +26,7 @@ class CTabFilter extends CDiv {
 		'expanded' => false,
 		'support_custom_time' => true,
 		'data' => [],
+		'src_url' => ''
 	];
 
 	/**
@@ -76,6 +77,17 @@ class CTabFilter extends CDiv {
 					->addClass(ZBX_STYLE_BTN_ALT)
 			)
 			->addClass('form-buttons');
+	}
+
+	/**
+	 * Set tabfilter options used by javascript.
+	 *
+	 * @param array $options  Array of options.
+	 */
+	public function setOptions(array $options) {
+		$this->options = $options;
+
+		return $this;
 	}
 
 	/**

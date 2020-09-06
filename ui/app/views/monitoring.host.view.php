@@ -45,9 +45,7 @@ $widget = (new CWidget())
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CTabFilter())
 		->setId('monitoring_hosts_filter')
-		->setIdx($data['tabfilter_idx'])
-		->setSelected((int) $data['tab_selected'])
-		->setExpanded((bool) $data['tab_expanded'])
+		->setOptions($data['tabfilter_options'])
 		->setSupportCustomTime(false)
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
