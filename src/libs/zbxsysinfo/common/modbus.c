@@ -498,7 +498,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 						list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
 								read_reg_8_most(buf16, endianness));
 
-						if (++i < count)
+						if (++i >= count)
 							break;
 
 						list = zbx_dsprintf(list, "%s,%u", list,
@@ -509,7 +509,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 						list = zbx_dsprintf(list, "%s%s%d", list, 0 == i ? "" : ",",
 								(int8_t)read_reg_8_most(buf16, endianness));
 
-						if (++i < count)
+						if (++i >= count)
 							break;
 
 						list = zbx_dsprintf(list, "%s,%d", list,
