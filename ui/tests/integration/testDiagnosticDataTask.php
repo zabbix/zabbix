@@ -34,20 +34,10 @@ class testDiagnosticDataTask extends CIntegrationTest {
 				'expected_error' => 'Invalid parameter "/1": the parameter "request" is missing.'
 			],
 			[
-				'request' => [],
-				'expected_error' => 'Invalid parameter "/1/request": cannot be empty.'
-			],
-			[
 				'request' => [
 					'unsupported_key' => null
 				],
 				'expected_error' => 'Invalid parameter "/1/request": unexpected parameter "unsupported_key".'
-			],
-			[
-				'request' => [
-					'historycache' => []
-				],
-				'expected_error' => 'Invalid parameter "/1/request/historycache": cannot be empty.'
 			],
 			[
 				'request' => [

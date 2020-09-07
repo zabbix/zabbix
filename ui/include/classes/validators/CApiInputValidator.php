@@ -875,7 +875,7 @@ class CApiInputValidator {
 	 * @param array  $rul
 	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
-	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_NOT_EMPTY, API_DEPRECATED
+	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
@@ -893,11 +893,6 @@ class CApiInputValidator {
 
 		if (!is_array($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
-			return false;
-		}
-
-		if (($flags & API_NOT_EMPTY) && !$data) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
 			return false;
 		}
 
