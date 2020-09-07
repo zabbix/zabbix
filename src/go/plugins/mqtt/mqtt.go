@@ -72,7 +72,7 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	}
 
 	opts.OnConnectionLost = func(client mqtt.Client, reason error) {
-		impl.Errf("connection lost to %s, reason: %s", broker, reason.Error())
+		impl.Warningf("connection lost to [%s]: %s", broker, reason.Error())
 	}
 
 	opts.OnConnect = func(client mqtt.Client) {
@@ -83,14 +83,14 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 
 		mc, ok := p.mqttClients[broker]
 		if !ok {
-			impl.Debugf("cannot subscribe to [%s]: broker is not connected", broker)
+			impl.Warningf("cannot subscribe to [%s]: broker is not connected", broker)
 			return
 		}
 
 		mc.connected = true
 		for _, ms := range mc.subs {
 			if err := ms.subscribe(mc); err != nil {
-				impl.Errf("cannot subscribe topic '%s' to [%s]: %s\n", ms.topic, broker, err)
+				impl.Warningf("cannot subscribe topic '%s' to [%s]: %s", ms.topic, broker, err)
 			}
 		}
 	}
