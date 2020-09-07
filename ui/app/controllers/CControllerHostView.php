@@ -123,6 +123,7 @@ class CControllerHostView extends CControllerHost {
 				'idx' => static::FILTER_IDX,
 				'can_toggle' => true,
 				'selected' => $profile->selected,
+				'support_custom_time' => false,
 				'expanded' => $profile->expanded,
 				'src_url' => $profile->getUnmodifiedUrl($input)
 			],

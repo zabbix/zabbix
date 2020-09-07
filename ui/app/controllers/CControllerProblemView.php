@@ -147,6 +147,7 @@ class CControllerProblemView extends CControllerProblem {
 				'idx' => static::FILTER_IDX,
 				'can_toggle' => true,
 				'selected' => $profile->selected,
+				'support_custom_time' => true,
 				'expanded' => $profile->expanded,
 				'src_url' => $profile->getUnmodifiedUrl($input)
 			],

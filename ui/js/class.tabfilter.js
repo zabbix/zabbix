@@ -56,6 +56,10 @@ class CTabFilter extends CBaseComponent {
 			item = this.create(title, options.data[index]||{});
 
 			if (options.selected === index) {
+				if (!item._expanded) {
+					item.renderContentTemplate();
+				}
+
 				let url = window.location.search;
 
 				this.setSelectedItem(item);
