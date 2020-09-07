@@ -77,6 +77,10 @@ class CTabFilter extends CBaseComponent {
 
 			index++;
 		}
+
+		if (this._active_item) {
+			this._active_item._target.parentNode.scrollIntoView();
+		}
 	}
 
 	/**
