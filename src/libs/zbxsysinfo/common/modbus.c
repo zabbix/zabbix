@@ -125,14 +125,14 @@ static void	set_serial_params_default(zbx_modbus_connection_serial *serial_param
  *                                                                            *
  * Function: get_total_count                                                  *
  *                                                                            *
- * Purpose: get total number of bytes to read from device                     *
+ * Purpose: get total count of bits/registers plus offset                     *
  *                                                                            *
  * Parameters: count  - [IN] count of sequenced same data type values to      *
  *                               be read from device                          *
  *             offset - [IN] number of registers to be discarded              *
  *             type   - [IN] data type                                        *
  *                                                                            *
- * Return value: total number of bytes                                        *
+ * Return value: total count                                                  *
  *                                                                            *
  ******************************************************************************/
 static unsigned int	get_total_count(unsigned short count, unsigned short offset, modbus_datatype_t type)
@@ -142,28 +142,26 @@ static unsigned int	get_total_count(unsigned short count, unsigned short offset,
 	switch(type)
 	{
 		case ZBX_MODBUS_DATATYPE_BIT:
-			total_count = (count - 1) / 9;
+			total_count = count;
 			break;
 		case ZBX_MODBUS_DATATYPE_INT8:
 		case ZBX_MODBUS_DATATYPE_UINT8:
-			total_count = count;
+			total_count = (count - 1) / 2 + 1;
 			break;
-
 		case ZBX_MODBUS_DATATYPE_INT32:
 		case ZBX_MODBUS_DATATYPE_UINT32:
 		case ZBX_MODBUS_DATATYPE_FLOAT:
-			total_count = count * 4;
+			total_count = count * 2;
 			break;
 		case ZBX_MODBUS_DATATYPE_UINT64:
 		case ZBX_MODBUS_DATATYPE_DOUBLE:
-			total_count = count * 8;
+			total_count =count * 4;
 			break;
 		default:
-			total_count = count * 2;
-			break;
+			total_count = count;
 	}
 
-	return total_count + offset * 2;
+	return total_count + offset;
 }
 
 /******************************************************************************
@@ -307,7 +305,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
  *             type        - [IN] data type                                   *
  *             endianness  - [IN] endianness                                  *
  *             offset      - [IN] number of registers to be discarded         *
- *             total_count - [IN] total number of bytes to read               *
+ *             total_count - [IN] total number bits/registers with offset     *
  *             res         - [OUT] retrieved modbus data                      *
  *             error       - [OUT] error message in case of failure           *
  *                                                                            *
@@ -323,7 +321,6 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	modbus_t	*mdb_ctx;
 	uint8_t		*dest8 = NULL;
 	uint16_t	*dest16 = NULL;
-	unsigned short	dest_sz;
 	char		*list;
 	int		i, ret = FAIL;
 
@@ -366,15 +363,9 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 #endif
 
 	if (ZBX_MODBUS_DATATYPE_BIT != type)
-	{
-		dest_sz = (total_count - 1) / 2 + 1;
-		dest16 = zbx_malloc(NULL, sizeof(uint16_t) * dest_sz);
-	}
+		dest16 = zbx_malloc(NULL, sizeof(uint16_t) * total_count);
 	else
-	{
-		dest_sz = count + offset * ZBX_MODBUS_REGISTER_SZ;
-		dest8 = zbx_malloc(NULL, sizeof(uint8_t) * dest_sz);
-	}
+		dest8 = zbx_malloc(NULL, sizeof(uint8_t) * total_count);
 
 	LOCK_MODBUS;
 
@@ -388,16 +379,16 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	switch(function)
 	{
 		case ZBX_MODBUS_FUNCTION_COIL:
-			ret = modbus_read_bits(mdb_ctx, address, dest_sz, dest8);
+			ret = modbus_read_bits(mdb_ctx, address, total_count, dest8);
 			break;
 		case ZBX_MODBUS_FUNCTION_DISCRETE_INPUT:
-			ret = modbus_read_input_bits(mdb_ctx, address, dest_sz, dest8);
+			ret = modbus_read_input_bits(mdb_ctx, address, total_count, dest8);
 			break;
 		case ZBX_MODBUS_FUNCTION_INPUT_REGISTERS:
-			ret = modbus_read_input_registers(mdb_ctx, address, dest_sz, dest16);
+			ret = modbus_read_input_registers(mdb_ctx, address, total_count, dest16);
 			break;
 		case ZBX_MODBUS_FUNCTION_HOLDING_REGISTERS:
-			ret = modbus_read_registers(mdb_ctx, address, dest_sz, dest16);
+			ret = modbus_read_registers(mdb_ctx, address, total_count, dest16);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -420,7 +411,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	{
 		uint8_t	*buf8;
 
-		buf8 = dest8 + offset * ZBX_MODBUS_REGISTER_SZ;
+		buf8 = dest8 + offset;
 
 		if (1 < count)
 		{
@@ -540,7 +531,9 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 					case ZBX_MODBUS_DATATYPE_DOUBLE:
 						val_uint64 = read_reg_64(buf16, endianness);
 						memcpy(&val_double, &val_uint64, sizeof(double));
-						list = zbx_dsprintf(list, "%s%s%g", list, 0 == i ? "" : ",", val_double);
+						list = zbx_dsprintf(list, "%s%s%g", list, 0 == i ? "" : ",",
+								val_double);
+						buf16 += 4;
 						break;
 					case ZBX_MODBUS_DATATYPE_UINT16:
 						list = zbx_dsprintf(list, "%s%s%hu", list, 0 == i ? "" : ",",
