@@ -2322,9 +2322,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 -- testProblemsBySeverityWidget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (104, 'Dashboard for Problems by severity', 1, 1);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (106, 104, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (107, 104, 'problemsbysv', 'Reference PBS widget to delete', 0, 5, 12, 5);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (108, 104, 'problemsbysv', 'Totals reference widget', 12, 0, 6, 3);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (108, 136, 0, 'show_type', 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (107, 104, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (109, 104, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (109, 137, 0, 'show_type', 1);
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (109, 138, 0, 'layout', 1);
@@ -2628,11 +2626,9 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904030, 164, 0, 'ext_ack', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904031, 164, 0, 'hide_empty_groups', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904032, 164, 0, 'rf_rate', 30);
--- delete this line and add three following after ZBX-17812 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904033, 164, 0, 'severities', 4);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904034, 164, 0, 'severities', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904035, 164, 0, 'severities', 3);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904036, 164, 0, 'severities', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904034, 164, 0, 'severities', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904035, 164, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904036, 164, 0, 'severities', 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904037, 164, 0, 'show_suppressed', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904038, 164, 0, 'tags.operator.0', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904039, 164, 1, 'problem', 0, 'Test');
@@ -2645,11 +2641,9 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (165, 130, 'problems', 'Test copy Problems', 0, 12, 8, 6);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904045, 165, 0, 'evaltype', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904046, 165, 0, 'rf_rate', 900);
--- delete this line and add three following after ZBX-17812 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904047, 165, 0, 'severities', 5);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90321, 165, 0, 'severities', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90415, 165, 0, 'severities', 4);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90416, 165, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90321, 165, 0, 'severities', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90415, 165, 0, 'severities', 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90416, 165, 0, 'severities', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904048, 165, 0, 'show', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904049, 165, 0, 'show_lines', 12);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904050, 165, 0, 'show_opdata', 1);
@@ -2704,10 +2698,8 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904092, 167, 0, 'ext_ack', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904093, 167, 0, 'layout', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904094, 167, 0, 'rf_rate', 30);
--- delete this line and add following after ZBX-17812 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904095, 167, 0, 'severities', 5);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904096, 167, 0, 'severities', 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904097, 167, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904096, 167, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904097, 167, 0, 'severities', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904098, 167, 0, 'show_opdata', 2);
 -- change show_timeline to 0 after ZBX-17813 is fixed:
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904099, 167, 0, 'show_timeline', 1);
@@ -2748,12 +2740,11 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (172, 130, 'problems', 'Test copy Problems 3', 10, 21, 14, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905024, 172, 0, 'evaltype', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905025, 172, 0, 'rf_rate', 60);
--- add following lines after ZBX-17812 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905026, 172, 0, 'severities', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905027, 172, 0, 'severities', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905028, 172, 0, 'severities', 2);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905029, 172, 0, 'severities', 3);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905030, 172, 0, 'severities', 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905026, 172, 0, 'severities', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905027, 172, 0, 'severities', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905028, 172, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905029, 172, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905030, 172, 0, 'severities', 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905031, 172, 0, 'severities', 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905032, 172, 0, 'show', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905033, 172, 0, 'show_lines', 5);

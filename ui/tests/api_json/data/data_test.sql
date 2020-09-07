@@ -1395,3 +1395,22 @@ INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (5
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50231, 50171, 50115, 'last', '');
 
 -- trigger permissions: END
+
+-- test discovered host groups after import parent host
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50025, 'Master group', 0);
+INSERT INTO hstgrp (groupid, name, internal, flags) VALUES (50026, 'host group discovered', 0, 4);
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99010, 'Host having discovered hosts', 'Host having discovered hosts', 0, 0, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99012, 'discovered', 'discovered', 0, 4, '');
+INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params, description, posts, headers) VALUES (58735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '', '', '', '');
+INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (10, 99011, 'host group {#VALUE}');
+INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (11, 99011, 50025);
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50026, 10, 'host group {#VALUE}');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50020, 99010, 50025);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50021, 99012, 50025);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50022, 99012, 50026);
+INSERT INTO host_discovery (hostid, parent_itemid, host) VALUES (99011, 58735, '');
+INSERT INTO host_discovery (hostid, parent_hostid, host) VALUES (99012, 99011, '{#VALUE}');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50026, 99010, 1, 1, 1, '127.0.0.1', '10050');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50027, 99012, 1, 1, 1, '127.0.0.1', '10050');
+INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027, 50026);

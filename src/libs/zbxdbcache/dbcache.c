@@ -3721,7 +3721,7 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
  ******************************************************************************/
 static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, data, data};
+	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, 0, data, data};
 
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 }
@@ -3985,6 +3985,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			item->head->next = data;
 			item->head = data;
 		}
+		item->values_num++;
 	}
 }
 
@@ -4139,6 +4140,7 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
 				hc_queue_item(item);
 				break;
 			case ZBX_HC_ITEM_STATUS_NORMAL:
+				item->values_num--;
 				data_free = item->tail;
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
@@ -4472,4 +4474,67 @@ out:
 	zbx_vector_ptr_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_diag_stats                                            *
+ *                                                                            *
+ * Purpose: get history cache diagnostics statistics                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
+{
+	LOCK_CACHE;
+
+	*values_num = cache->history_num;
+	*items_num = cache->history_items.num_data;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_mem_stats                                             *
+ *                                                                            *
+ * Purpose: get shared memory allocator statistics                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
+{
+	LOCK_CACHE;
+
+	if (NULL != data)
+		zbx_mem_get_stats(hc_mem, data);
+
+	if (NULL != index)
+		zbx_mem_get_stats(hc_index_mem, index);
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_items                                                 *
+ *                                                                            *
+ * Purpose: get statistics of cached items                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_hc_item_t		*item;
+
+	LOCK_CACHE;
+
+	zbx_vector_uint64_pair_reserve(items, cache->history_items.num_data);
+
+	zbx_hashset_iter_reset(&cache->history_items, &iter);
+	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
+		zbx_vector_uint64_pair_append_ptr(items, &pair);
+	}
+
+	UNLOCK_CACHE;
 }

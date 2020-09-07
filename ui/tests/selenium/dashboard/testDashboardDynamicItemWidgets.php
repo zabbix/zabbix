@@ -357,6 +357,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	}
 
 	public function removeTestFile() {
-		@unlink(PHPUNIT_BASEDIR.'/frontends/php/iframe.php');
+		@unlink(PHPUNIT_BASEDIR.'/ui/iframe.php');
 	}
 }
