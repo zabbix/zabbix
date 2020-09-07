@@ -247,7 +247,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	var client *mqttClient
 	var ok bool
 	if client, ok = p.mqttClients[broker]; !ok {
-		impl.Tracef("creating client options for %s", broker)
+		impl.Tracef("creating client for [%s]", broker)
 
 		client = &mqttClient{
 			nil, broker, make(map[string]*mqttSub), p.createOptions(getClientID(),
@@ -257,7 +257,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 
 	var sub *mqttSub
 	if sub, ok = client.subs[topic]; !ok {
-		impl.Tracef("creating subscriber for %s", topic)
+		impl.Tracef("creating new subscriber on topic '%s' for [%s]", topic, broker)
 
 		sub = &mqttSub{broker, topic, hasWildCards(topic)}
 		client.subs[topic] = sub
