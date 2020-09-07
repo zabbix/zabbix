@@ -51,7 +51,7 @@ type Plugin struct {
 var impl Plugin
 
 // whereToConnect builds a URI based on key's parameters and a configuration file.
-func whereToConnect(params []string, sessions map[string]*Session, defaultURI, defaultService string) (u *URI, err error) {
+func whereToConnect(params []string, sessions map[string]*Session, defaultURI string) (u *URI, err error) {
 	user := ""
 	if len(params) > 1 {
 		user = params[1]
@@ -62,7 +62,7 @@ func whereToConnect(params []string, sessions map[string]*Session, defaultURI, d
 		password = params[2]
 	}
 
-	serviceName := defaultService
+	serviceName := ""
 	if len(params) > 3 {
 		serviceName = params[3]
 	}
@@ -96,7 +96,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		handlerParams []string
 	)
 
-	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI, p.options.ServiceName)
+	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI)
 	if err != nil {
 		return nil, err
 	}
