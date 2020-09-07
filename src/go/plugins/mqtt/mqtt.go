@@ -113,6 +113,7 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 		for _, ms := range mc.subs {
 			if err := ms.subscribe(mc); err != nil {
 				impl.Warningf("cannot subscribe topic '%s' to [%s]: %s", ms.topic, broker, err)
+				impl.manager.Notify(ms, err)
 			}
 		}
 	}
@@ -193,24 +194,24 @@ func (ms *mqttSub) Initialize() (err error) {
 func (ms *mqttSub) Release() {
 	mc, ok := impl.mqttClients[ms.broker]
 	if !ok || mc == nil || mc.client == nil {
-		impl.Errf("Client not found during release for broker %s\n", ms.broker)
+		impl.Errf("cannot release [%s]: broker was not initialized", ms.broker)
 		return
 	}
 
-	impl.Tracef("unsubscribing topic from %s", ms.topic)
+	impl.Tracef("unsubscribing topic '%s' from [%s]", ms.topic, ms.broker)
 	token := mc.client.Unsubscribe(ms.topic)
 	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
-		impl.Errf("Timed out while waiting for topic '%s' to unsubscribe to '%s'", ms.topic, ms.broker)
+		impl.Errf("cannot unsubscribe topic '%s' from [%s]: timed out", ms.topic, ms.broker)
 	}
 
 	if token.Error() != nil {
-		impl.Errf("Failed to unsubscribe from %s:%s", ms.topic, token.Error())
+		impl.Errf("cannot unsubscribe topic '%s' from [%s]: %s", ms.topic, ms.broker, token.Error())
 	}
 
 	delete(mc.subs, ms.topic)
-	impl.Tracef("unsubscribed from %s", ms.topic)
+	impl.Tracef("unsubscribed topic '%s' from [%s]", ms.topic, ms.broker)
 	if len(mc.subs) == 0 {
-		impl.Debugf("disconnecting from %s", ms.broker)
+		impl.Debugf("disconnecting from [%s]", ms.broker)
 		mc.client.Disconnect(200)
 		delete(impl.mqttClients, mc.broker)
 	}
@@ -220,10 +221,13 @@ type respFilter struct {
 	wildcard bool
 }
 
-func (f *respFilter) Process(v interface{}) (*string, error) {
+func (f *respFilter) Process(v interface{}) (s *string, err error) {
 	m, ok := v.(mqtt.Message)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mqtt response conversion input type %T", v)
+		if err, ok = v.(error); !ok {
+			err = fmt.Errorf("unexpected input type %T", v)
+		}
+		return
 	}
 
 	var value string
