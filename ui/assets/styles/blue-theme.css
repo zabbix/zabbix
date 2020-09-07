@@ -3395,10 +3395,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue .table-paging {
     border: 0;
     border-top: 1px solid #ebeef0; }
-  .overlay-dialogue .table-forms-td-right td {
-    vertical-align: middle; }
-    .overlay-dialogue .table-forms-td-right td label {
-      display: block; }
+  .overlay-dialogue .table-forms-td-right {
+    white-space: normal; }
+    .overlay-dialogue .table-forms-td-right td {
+      vertical-align: middle; }
+      .overlay-dialogue .table-forms-td-right td label {
+        display: block; }
   .overlay-dialogue .dashbrd-widget-head {
     margin: -10px -10px 6px; }
   .overlay-dialogue .maps-container {
