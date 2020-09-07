@@ -534,5 +534,9 @@ class CTabFilter extends CBaseComponent {
 
 		this.on('keydown', this._events.keydown);
 		this.on('popup.tabfilter', this._events.popupUpdateAction);
+		this.on('submit', (ev) => {
+			ev.preventDefault();
+			this._shared_domnode.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));
+		});
 	}
 }

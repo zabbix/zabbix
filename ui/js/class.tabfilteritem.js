@@ -126,7 +126,11 @@ class CTabFilterItem extends CBaseComponent {
 	 * Remove gear icon HTMLElement.
 	 */
 	removeActionIcons() {
-		this._target.parentNode.querySelector('.icon-edit')?.remove();
+		let icon = this._target.parentNode.querySelector('.icon-edit');
+
+		if (icon) {
+			icon.remove();
+		}
 	}
 
 	/**
