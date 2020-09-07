@@ -115,23 +115,24 @@ func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 
 func (ms *mqttSub) handler(client mqtt.Client, msg mqtt.Message) {
 	impl.manager.Lock()
-	impl.Tracef("received publication from %s: [%s] %s", ms.broker, msg.Topic(), string(msg.Payload()))
+	impl.Tracef("received publish from [%s] on topic '%s' got: %s", ms.broker, msg.Topic(), string(msg.Payload()))
 	impl.manager.Notify(ms, msg)
 	impl.manager.Unlock()
 }
 
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
-	impl.Tracef("subscribing to %s", ms.broker)
+	impl.Tracef("subscribing to [%s]", ms.broker)
+
 	token := mc.client.Subscribe(ms.topic, 0, ms.handler)
 	if !token.WaitTimeout(60 * time.Second) {
-		return fmt.Errorf("timed out while waiting for topic '%s' to subscribe to '%s'", ms.topic, ms.broker)
+		return fmt.Errorf("timed out while subscribing")
 	}
 
 	if token.Error() != nil {
 		return token.Error()
 	}
 
-	impl.Tracef("subscribed to %s", ms.broker)
+	impl.Tracef("subscribed to [%s]", ms.broker)
 	return nil
 }
 
@@ -294,7 +295,7 @@ func parseURL(broker string) (out *url.URL, err error) {
 	}
 
 	if out.Port() == "" {
-		out.Host = fmt.Sprintf("%s:%d", out.Host, 1883)
+		out.Host = fmt.Sprintf("%s:1883", out.Host)
 	}
 
 	return
