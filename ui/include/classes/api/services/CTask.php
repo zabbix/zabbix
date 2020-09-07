@@ -32,7 +32,7 @@ class CTask extends CApiService {
 	 * String constant to retrieve all possible fields for dyagnostic requested.
 	 * Must be synchronized with server.
 	 */
-	const FIELD_ALL = 'all';
+	const FIELD_EXTEND = 'extend';
 
 	/**
 	 * Get results of requested ZBX_TM_TASK_DATA task.
@@ -167,33 +167,33 @@ class CTask extends CApiService {
 			'request' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO])], 'type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'historycache' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'memory.data', 'memory.index'])],
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'items', 'values', 'memory', 'memory.data', 'memory.index'])],
 					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 						'values' =>			['type' => API_INT32]
 					]]
 				]],
 				'valuecache' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'mode'])],
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'items', 'values', 'memory', 'mode'])],
 					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 						'values' =>			['type' => API_INT32],
 						'request.values' =>	['type' => API_INT32]
 					]]
 				]],
 				'preprocessing' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'values', 'preproc.values'])],
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'values', 'preproc.values'])],
 					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 						'values' =>			['type' => API_INT32]
 					]]
 				]],
 				'alerting' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'alerts'])],
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'alerts'])],
 					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 						'media.alerts' =>	['type' => API_INT32],
 						'source.alerts' =>	['type' => API_INT32]
 					]]
 				]],
 				'lld' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'rules', 'values'])],
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'rules', 'values'])],
 					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 						'values' =>			['type' => API_INT32]
 					]]

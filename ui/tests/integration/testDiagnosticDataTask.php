@@ -61,11 +61,11 @@ class testDiagnosticDataTask extends CIntegrationTest {
 				'request' => [
 					'historycache' => [
 						'top' => [
-							'all' => 10
+							'extend' => 10
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/request/historycache/top": unexpected parameter "all".'
+				'expected_error' => 'Invalid parameter "/1/request/historycache/top": unexpected parameter "extend".'
 			],
 
 			// Valid cases.
@@ -133,7 +133,7 @@ class testDiagnosticDataTask extends CIntegrationTest {
 			[
 				'request' => [
 					'valuecache' => [
-						'stats' => ['all']
+						'stats' => ['extend']
 					]
 				],
 				'expected_error' => null
