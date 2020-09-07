@@ -32,9 +32,7 @@ class testTaskCreate extends CAPITest {
 				'tasks' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '40068'
-						]
+						'itemid' => '40068'
 					],
 					'flag' => true
 				],
@@ -44,9 +42,7 @@ class testTaskCreate extends CAPITest {
 			[
 				'task' => [
 					'request' => [
-						'data' => [
-							'itemid' => '40068'
-						]
+						'itemid' => '40068'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "type" is missing.'
@@ -55,9 +51,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '',
 					'request' => [
-						'data' => [
-							'itemid' => '40068'
-						]
+						'itemid' => '40068'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
@@ -66,9 +60,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => 'æų',
 					'request' => [
-						'data' => [
-							'itemid' => '40068'
-						]
+						'itemid' => '40068'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
@@ -77,9 +69,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '2',
 					'request' => [
-						'data' => [
-							'itemid' => '40068'
-						]
+						'itemid' => '40068'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 6.'
@@ -95,31 +85,25 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => ''
-						]
+						'itemid' => ''
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/request/data/itemid": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/request/itemid": a number is expected.'
 			],
 			[
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => ['']
-						]
+						'itemid' => ['']
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/request/data/itemid": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/request/itemid": a number is expected.'
 			],
 			[
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '123456'
-						]
+						'itemid' => '123456'
 					]
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -129,9 +113,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '90002'
-						]
+						'itemid' => '90002'
 					]
 				],
 				'expected_error' => 'Cannot send request: host is not monitored.'
@@ -140,9 +122,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '90003'
-						]
+						'itemid' => '90003'
 					]
 				],
 				'expected_error' => 'Cannot send request: host is not monitored.'
@@ -152,9 +132,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '90000'
-						]
+						'itemid' => '90000'
 					]
 				],
 				'expected_error' => 'Cannot send request: item is disabled.'
@@ -164,9 +142,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '90001'
-						]
+						'itemid' => '90001'
 					]
 				],
 				'expected_error' => 'Cannot send request: discovery rule is disabled.'
@@ -176,9 +152,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '90004'
-						]
+						'itemid' => '90004'
 					]
 				],
 				'expected_error' => null
@@ -188,9 +162,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '29207'
-						]
+						'itemid' => '29207'
 					]
 				],
 				'expected_error' => null
@@ -200,9 +172,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '110001'
-						]
+						'itemid' => '110001'
 					]
 				],
 				'expected_error' => 'Cannot send request: wrong item type.'
@@ -212,9 +182,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '110002'
-						]
+						'itemid' => '110002'
 					]
 				],
 				'expected_error' => null
@@ -224,9 +192,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '110004'
-						]
+						'itemid' => '110004'
 					]
 				],
 				'expected_error' => 'Cannot send request: host is not monitored.'
@@ -235,9 +201,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '110005'
-						]
+						'itemid' => '110005'
 					]
 				],
 				'expected_error' => 'Cannot send request: host is not monitored.'
@@ -260,7 +224,7 @@ class testTaskCreate extends CAPITest {
 			foreach ($result['result']['taskids'] as $key => $id) {
 				$dbResult = DBSelect('select * from task_check_now where taskid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['itemid'], $task['request']['data']['itemid']);
+				$this->assertEquals($dbRow['itemid'], $task['request']['itemid']);
 			}
 		}
 		else {
@@ -346,9 +310,7 @@ class testTaskCreate extends CAPITest {
 		$task = [
 			'type' => '6',
 			'request' => [
-				'data' => [
-					'itemid' => $object['itemid']
-				]
+				'itemid' => $object['itemid']
 			]
 		];
 
@@ -363,9 +325,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '23287'
-						]
+						'itemid' => '23287'
 					]
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -375,9 +335,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '23279'
-						]
+						'itemid' => '23279'
 					]
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -387,9 +345,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '23287'
-						]
+						'itemid' => '23287'
 					]
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
@@ -399,9 +355,7 @@ class testTaskCreate extends CAPITest {
 				'task' => [
 					'type' => '6',
 					'request' => [
-						'data' => [
-							'itemid' => '23279'
-						]
+						'itemid' => '23279'
 					]
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'

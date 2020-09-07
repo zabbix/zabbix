@@ -857,9 +857,7 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
 		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 		'request' => [
-			'data' => [
-				'itemid' => getRequest('itemid')
-			]
+			'itemid' => getRequest('itemid')
 		]
 	]);
 
@@ -1349,9 +1347,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 		$tasks[] = [
 			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
 			'request' => [
-				'data' => [
-					'itemid' => $itemid
-				]
+				'itemid' => $itemid
 			]
 		];
 	}

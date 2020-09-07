@@ -45,117 +45,95 @@ class testDiagnosticDataTask extends CIntegrationTest {
 			],
 			[
 				'request' => [
-					'data' => [
-						'historycache' => []
-					]
+					'historycache' => []
 				],
-				'expected_error' => 'Invalid parameter "/1/request/data/historycache": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/request/historycache": cannot be empty.'
 			],
 			[
 				'request' => [
-					'data' => [
-						'historycache' => [
-							'stats' => ''
-						]
+					'historycache' => [
+						'stats' => ''
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/request/data/historycache/stats": an array is expected.'
+				'expected_error' => 'Invalid parameter "/1/request/historycache/stats": an array is expected.'
 			],
 			[
 				'request' => [
-					'data' => [
-						'historycache' => [
-							'top' => [
-								'all' => 10
-							]
+					'historycache' => [
+						'top' => [
+							'all' => 10
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/request/data/historycache/top": unexpected parameter "all".'
+				'expected_error' => 'Invalid parameter "/1/request/historycache/top": unexpected parameter "all".'
 			],
 
 			// Valid cases.
 			[
 				'request' => [
-					'data' => [
-						'historycache' => [
-							'stats' => ['items', 'values', 'memory', 'memory.data', 'memory.index'],
-							'top' => ['values' => 2]
-						]
+					'historycache' => [
+						'stats' => ['items', 'values', 'memory', 'memory.data', 'memory.index'],
+						'top' => ['values' => 2]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'data' => [
-						'valuecache' => [
-							'stats' => ['items', 'values', 'memory', 'mode'],
-							'top' => ['values' => 2, 'request.values' => 2]
-						]
+					'valuecache' => [
+						'stats' => ['items', 'values', 'memory', 'mode'],
+						'top' => ['values' => 2, 'request.values' => 2]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'data' => [
 						'preprocessing' => [
 							'stats' => ['values', 'preproc.values'],
 							'top' => ['values' => 2]
 						]
+				],
+				'expected_error' => null
+			],
+			[
+				'request' => [
+					'alerting' => [
+						'stats' => ['alerts'],
+						'top' => ['media.alerts' => 2, 'source.alerts' => 2]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'data' => [
-						'alerting' => [
-							'stats' => ['alerts'],
-							'top' => ['media.alerts' => 2, 'source.alerts' => 2]
-						]
+					'lld' => [
+						'stats' => ['rules', 'values'],
+						'top' => ['values' => 2]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'data' => [
-						'lld' => [
-							'stats' => ['rules', 'values'],
-							'top' => ['values' => 2]
-						]
+					'lld' => [
+						'stats' => ['rules', 'values']
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'data' => [
-						'lld' => [
-							'stats' => ['rules', 'values']
-						]
+					'lld' => [
+						'top' => ['values' => 2]
 					]
 				],
 				'expected_error' => null
 			],
 			[
 				'request' => [
-					'data' => [
-						'lld' => [
-							'top' => ['values' => 2]
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'data' => [
-						'valuecache' => [
-							'stats' => ['all']
-						]
+					'valuecache' => [
+						'stats' => ['all']
 					]
 				],
 				'expected_error' => null
@@ -174,8 +152,8 @@ class testDiagnosticDataTask extends CIntegrationTest {
 
 		$result = $this->call('task.create', $api_request, $expected_error);
 
-		if ($expected_error === null && isset($result['result']['data']['taskids'])) {
-			foreach ($result['result']['data']['taskids'] as $taskid) {
+		if ($expected_error === null && isset($result['result']['taskids'])) {
+			foreach ($result['result']['taskids'] as $taskid) {
 				$this->waitUntilTaskIsDone($taskid, 3);
 
 				$response = $this->call('task.get', [

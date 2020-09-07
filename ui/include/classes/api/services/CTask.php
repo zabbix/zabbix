@@ -91,7 +91,7 @@ class CTask extends CApiService {
 
 		while ($row = DBfetch($result)) {
 			if ($this->outputIsRequested('request', $options['output'])) {
-				$row['request']['data'] = json_decode($row['request_data']);
+				$row['request'] = json_decode($row['request_data']);
 				unset($row['request_data']);
 			}
 
@@ -123,13 +123,13 @@ class CTask extends CApiService {
 	 * @param array        $tasks                                       Tasks to create.
 	 * @param string|array $tasks[]['type']                             Type of task.
 	 * @param string|array $tasks[]['request']
-	 * @param array        $tasks[]['request']['data']                  Request object for task to create.
-	 * @param string       $tasks[]['request']['data']['itemid']        Must be set for ZBX_TM_TASK_CHECK_NOW task.
-	 * @param array        $tasks[]['request']['data']['historycache']  (optional) object of history cache data request.
-	 * @param array        $tasks[]['request']['data']['valuecache']    (optional) object of value cache data request.
-	 * @param array        $tasks[]['request']['data']['preprocessing'] (optional) object of preprocessing data request.
-	 * @param array        $tasks[]['request']['data']['alerting']      (optional) object of alerting data request.
-	 * @param array        $tasks[]['request']['data']['lld']           (optional) object of lld cache data request.
+	 * @param array        $tasks[]['request']                  Request object for task to create.
+	 * @param string       $tasks[]['request']['itemid']        Must be set for ZBX_TM_TASK_CHECK_NOW task.
+	 * @param array        $tasks[]['request']['historycache']  (optional) object of history cache data request.
+	 * @param array        $tasks[]['request']['valuecache']    (optional) object of value cache data request.
+	 * @param array        $tasks[]['request']['preprocessing'] (optional) object of preprocessing data request.
+	 * @param array        $tasks[]['request']['alerting']      (optional) object of alerting data request.
+	 * @param array        $tasks[]['request']['lld']           (optional) object of lld cache data request.
 	 * @param array        $tasks[]['proxy_hostid']                     (optional) Proxy to get diagnostic data about.
 	 *
 	 * @return array
@@ -166,48 +166,43 @@ class CTask extends CApiService {
 			'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_CHECK_NOW])],
 			'request' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO])], 'type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-					'data' => ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-						'historycache' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'memory.data', 'memory.index'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-								'values' =>			['type' => API_INT32]
-							]]
-						]],
-						'valuecache' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'mode'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-								'values' =>			['type' => API_INT32],
-								'request.values' =>	['type' => API_INT32]
-							]]
-						]],
-						'preprocessing' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'values', 'preproc.values'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-								'values' =>			['type' => API_INT32]
-							]]
-						]],
-						'alerting' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'alerts'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-								'media.alerts' =>	['type' => API_INT32],
-								'source.alerts' =>	['type' => API_INT32]
-							]]
-						]],
-						'lld' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-							'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'rules', 'values'])],
-							'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-								'values' =>			['type' => API_INT32]
-							]]
-						]]
+				'historycache' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'memory.data', 'memory.index'])],
+					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+						'values' =>			['type' => API_INT32]
 					]]
+				]],
+				'valuecache' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'items', 'values', 'memory', 'mode'])],
+					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+						'values' =>			['type' => API_INT32],
+						'request.values' =>	['type' => API_INT32]
+					]]
+				]],
+				'preprocessing' =>	['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'values', 'preproc.values'])],
+					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+						'values' =>			['type' => API_INT32]
+					]]
+				]],
+				'alerting' =>		['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'alerts'])],
+					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+						'media.alerts' =>	['type' => API_INT32],
+						'source.alerts' =>	['type' => API_INT32]
+					]]
+				]],
+				'lld' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_ALL, 'rules', 'values'])],
+					'top' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+						'values' =>			['type' => API_INT32]
+					]]
+				]]
 								]],
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_CHECK_NOW])], 'type' => API_OBJECT, 'fields' => [
-					'data' => ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-						'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-					]]
+				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 								]]
-				]
-			],
+			]],
 			'proxy_hostid' => ['type' => API_ID, 'default' => 0]
 		]];
 
@@ -228,7 +223,7 @@ class CTask extends CApiService {
 					break;
 
 				case ZBX_TM_DATA_TYPE_CHECK_NOW:
-					$itemids_editable[$task['request']['data']['itemid']] = true;
+					$itemids_editable[$task['request']['itemid']] = true;
 					break;
 			}
 		}
@@ -246,8 +241,8 @@ class CTask extends CApiService {
 	/**
 	 * Create ZBX_TM_TASK_CHECK_NOW task.
 	 *
-	 * @param array        $data             Request object for tasks to create.
-	 * @param string|array $data['itemid']   Item or LLD rule IDs to create tasks for.
+	 * @param array        $tasks             Request object for tasks to create.
+	 * @param string|array $tasks[]['request']['itemid']   Item or LLD rule IDs to create tasks for.
 	 *
 	 * @throws APIException
 	 *
@@ -262,7 +257,7 @@ class CTask extends CApiService {
 		$return = [];
 
 		foreach ($tasks as $index => $task) {
-			$itemids[$index] = $task['request']['data']['itemid'];
+			$itemids[$index] = $task['request']['itemid'];
 			$return[$index] = 0;
 		}
 
@@ -317,15 +312,14 @@ class CTask extends CApiService {
 	/**
 	 * Create ZBX_TM_DATA_TYPE_DIAGINFO tasks.
 	 *
-	 * @param array    $task[]
-	 * @param array    $task[]['request']
-	 * @param array    $task[]['request']['data']                  Request object for task to create.
-	 * @param array    $task[]['request']['data']['historycache']  (optional) object of history cache data request.
-	 * @param array    $task[]['request']['data']['valuecache']    (optional) object of value cache data request.
-	 * @param array    $task[]['request']['data']['preprocessing'] (optional) object of preprocessing data request.
-	 * @param array    $task[]['request']['data']['alerting']      (optional) object of alerting data request.
-	 * @param array    $task[]['request']['data']['lld']	       (optional) object of lld cache data request.
-	 * @param array    $task[]['proxy_hostid']                     (optional) object of lld cache data request.
+	 * @param array    $tasks[]
+	 * @param array    $tasks[]['request']                  Request object for task to create.
+	 * @param array    $tasks[]['request']['historycache']  (optional) object of history cache data request.
+	 * @param array    $tasks[]['request']['valuecache']    (optional) object of value cache data request.
+	 * @param array    $tasks[]['request']['preprocessing'] (optional) object of preprocessing data request.
+	 * @param array    $tasks[]['request']['alerting']      (optional) object of alerting data request.
+	 * @param array    $tasks[]['request']['lld']	       (optional) object of lld cache data request.
+	 * @param array    $tasks[]['proxy_hostid']             (optional) object of lld cache data request.
 	 *
 	 * @throws APIException
 	 *
@@ -350,7 +344,7 @@ class CTask extends CApiService {
 			$task_data_rows[] = [
 				'taskid' => $taskid,
 				'type' => $task['type'],
-				'data' => json_encode($task['request']['data']),
+				'data' => json_encode($task['request']),
 				'parent_taskid' => $taskid
 			];
 
