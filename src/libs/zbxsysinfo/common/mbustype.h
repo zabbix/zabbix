@@ -38,41 +38,36 @@ extern int	CONFIG_TIMEOUT;
 #define ZBX_MODBUS_SERIAL_PARAMS_PARITY_EVEN	'E'
 #define ZBX_MODBUS_SERIAL_PARAMS_PARITY_ODD	'O'
 
-#define ZBX_MODBUS_ENDIANNESS_BE		1
-#define ZBX_MODBUS_ENDIANNESS_LE		2
-#define ZBX_MODBUS_ENDIANNESS_MBE		3
-#define ZBX_MODBUS_ENDIANNESS_MLE		4
-
 #define ZBX_MODBUS_BYTE_SWAP_16(t_int16)	(((t_int16 >> 8) & 0xFF) | ((t_int16 & 0xFF) << 8))
 
-#define ZBX_MODBUS_32BE(t_int16, idx)							\
-		(((uint32_t)t_int16[idx]) << 16) | t_int16[(idx) + 1]
-#define ZBX_MODBUS_32MLE(t_int16, idx)							\
-		(((uint32_t)t_int16[(idx) + 1]) << 16) | t_int16[idx]
-#define ZBX_MODBUS_32MBE(t_int16, idx)							\
-		(((uint32_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[idx])) << 16) |		\
-		ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 1])
-#define ZBX_MODBUS_32LE(t_int16, idx)							\
-		(((uint32_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 1])) << 16) |	\
-		ZBX_MODBUS_BYTE_SWAP_16(t_int16[idx])
-#define ZBX_MODBUS_64BE(t_int16, idx)							\
-		(((uint64_t)t_int16[idx]) << 48) |					\
-		(((uint64_t)t_int16[(idx) + 1]) << 32) | 				\
-		(((uint64_t)t_int16[(idx) + 2]) << 16) | t_int16[(idx) + 3]
-#define ZBX_MODBUS_64MLE(t_int16, idx)							\
-		(((uint64_t)t_int16[(idx) + 3]) << 48) |				\
-		(((uint64_t)t_int16[(idx) + 2]) << 32) |				\
-		(((uint64_t)t_int16[(idx) + 1]) << 16) | t_int16[idx]
-#define ZBX_MODBUS_64MBE(t_int16, idx)							\
-		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[idx])) << 48) |		\
-		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 1])) << 32) |	\
-		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 2])) << 16) |	\
-		ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 3])
-#define ZBX_MODBUS_64LE(t_int16, idx)							\
-		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 3])) << 48) |	\
-		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 2])) << 32) |	\
-		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[(idx) + 1])) << 16) |	\
-		ZBX_MODBUS_BYTE_SWAP_16(t_int16[idx])
+#define ZBX_MODBUS_32BE(t_int16)						\
+		(((uint32_t)t_int16[0]) << 16) | t_int16[1]
+#define ZBX_MODBUS_32MLE(t_int16)						\
+		(((uint32_t)t_int16[1]) << 16) | t_int16[0]
+#define ZBX_MODBUS_32MBE(t_int16)						\
+		(((uint32_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[0])) << 16) |	\
+		ZBX_MODBUS_BYTE_SWAP_16(t_int16[1])
+#define ZBX_MODBUS_32LE(t_int16)						\
+		(((uint32_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[1])) << 16) |	\
+		ZBX_MODBUS_BYTE_SWAP_16(t_int16[0])
+#define ZBX_MODBUS_64BE(t_int16)						\
+		(((uint64_t)t_int16[0]) << 48) |				\
+		(((uint64_t)t_int16[1]) << 32) | 				\
+		(((uint64_t)t_int16[2]) << 16) | t_int16[3]
+#define ZBX_MODBUS_64MLE(t_int16)						\
+		(((uint64_t)t_int16[3]) << 48) |				\
+		(((uint64_t)t_int16[2]) << 32) |				\
+		(((uint64_t)t_int16[1]) << 16) | t_int16[0]
+#define ZBX_MODBUS_64MBE(t_int16)						\
+		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[0])) << 48) |	\
+		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[1])) << 32) |	\
+		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[2])) << 16) |	\
+		ZBX_MODBUS_BYTE_SWAP_16(t_int16[3])
+#define ZBX_MODBUS_64LE(t_int16)						\
+		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[3])) << 48) |	\
+		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[2])) << 32) |	\
+		(((uint64_t)ZBX_MODBUS_BYTE_SWAP_16(t_int16[1])) << 16) |	\
+		ZBX_MODBUS_BYTE_SWAP_16(t_int16[0])
 
 typedef enum
 {
@@ -121,6 +116,14 @@ typedef enum
 	ZBX_MODBUS_DATATYPE_UINT64,
 	ZBX_MODBUS_DATATYPE_DOUBLE
 } modbus_datatype_t;
+
+typedef enum
+{
+	ZBX_MODBUS_ENDIANNESS_BE,
+	ZBX_MODBUS_ENDIANNESS_LE,
+	ZBX_MODBUS_ENDIANNESS_MBE,
+	ZBX_MODBUS_ENDIANNESS_MLE
+} modbus_endianness_t;
 
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int 	zbx_init_modbus(char **error);
