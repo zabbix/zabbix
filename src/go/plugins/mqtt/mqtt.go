@@ -103,7 +103,8 @@ func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 	c := mqtt.NewClient(options)
 	token := c.Connect()
 	if !token.WaitTimeout(60 * time.Second) {
-		return nil, fmt.Errorf("timed out while waiting for client to connect")
+		c.Disconnect(200)
+		return nil, fmt.Errorf("timed out while connecting")
 	}
 
 	if token.Error() != nil {
@@ -146,18 +147,18 @@ func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 func (ms *mqttSub) Initialize() (err error) {
 	mc, ok := impl.mqttClients[ms.broker]
 	if !ok {
-		return fmt.Errorf("client missing for broker %s", ms.broker)
+		return fmt.Errorf("Cannot connect to [%s]: broker could not be initialized", ms.broker)
 	}
 
 	if mc.client == nil {
-		impl.Debugf("connecting to [%s]", ms.broker)
+		impl.Debugf("establishing connection to [%s]", ms.broker)
 		mc.client, err = newClient(mc.opts)
 		if err != nil {
-			impl.Errf("Failed to create a client for %s", ms.broker)
+			impl.Warningf("cannot establish connection to [%s]: %s", ms.broker, err)
 			return
 		}
 
-		impl.Debugf("created client for %s", ms.broker)
+		impl.Debugf("established connection to [%s]", ms.broker)
 		return
 	}
 
