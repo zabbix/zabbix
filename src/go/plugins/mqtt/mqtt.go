@@ -38,6 +38,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/watch"
 )
 
@@ -270,9 +271,9 @@ func getClientID() string {
 	_, err := rand.Read(b)
 	if err != nil {
 		impl.Errf("failed to generate a uuid for mqtt Client ID: %s", err.Error)
-		return "Zabbix Agent 2"
+		return "Zabbix agent 2" + version.Long()
 	}
-	return fmt.Sprintf("Zabbix Agent 2 %x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+	return fmt.Sprintf("Zabbix agent 2 %s %x-%x-%x-%x-%x", version.Long(), b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
 
 func hasWildCards(topic string) bool {
