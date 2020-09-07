@@ -260,7 +260,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 }
 
 func hasWildCards(topic string) bool {
-	return strings.Contains(topic, "#") || strings.Contains(topic, "+")
+	return strings.HasSuffix(topic, "/#") || strings.Contains(topic, "/+/")
 }
 
 func parseURL(broker string) (out *url.URL, err error) {
