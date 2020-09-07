@@ -27,6 +27,7 @@
 package mqtt
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -246,8 +247,8 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 		impl.Tracef("creating client options for %s", broker)
 
 		client = &mqttClient{
-			nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", url.Query().Get("username"),
-				url.Query().Get("password"), broker), false}
+			nil, broker, make(map[string]*mqttSub), p.createOptions(getClientID(),
+				url.Query().Get("username"), url.Query().Get("password"), broker), false}
 		p.mqttClients[broker] = client
 	}
 
@@ -260,6 +261,16 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	}
 
 	return sub, nil
+}
+
+func getClientID() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		impl.Errf("failed to generate a uuid for mqtt Client ID: %s", err.Error)
+		return "Zabbix Agent 2"
+	}
+	return fmt.Sprintf("Zabbix Agent 2 %x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
 
 func hasWildCards(topic string) bool {
