@@ -95,6 +95,13 @@ ZBX_METRIC	parameters_common[] =
 	{NULL}
 };
 
+const char	*user_parameter_path = NULL;
+
+void	set_user_parameter_path(const char *path)
+{
+	user_parameter_path = path;
+}
+
 static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
@@ -115,6 +122,9 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	command = get_rparam(request, 0);
+
+	if (NULL != user_parameter_path)
+		chdir(user_parameter_path);
 
 	return EXECUTE_STR(command, result);
 }
