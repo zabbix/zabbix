@@ -29,6 +29,10 @@ class testTaskCreate extends CAPITest {
 	public static function tasks() {
 		return [
 			[
+				'tasks' => [],
+				'expected_error' => 'Invalid parameter "/": cannot be empty.'
+			],
+			[
 				'tasks' => [
 					'type' => '6',
 					'request' => [
