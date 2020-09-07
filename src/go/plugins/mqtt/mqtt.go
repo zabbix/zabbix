@@ -36,6 +36,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/version"
@@ -58,11 +59,30 @@ type mqttSub struct {
 
 type Plugin struct {
 	plugin.Base
+	options     Options
 	manager     *watch.Manager
 	mqttClients map[string]*mqttClient
 }
 
 var impl Plugin
+
+type Options struct {
+	Timeout int `conf:"optional,range=1:30"`
+}
+
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	if err := conf.Unmarshal(options, &p.options); err != nil {
+		p.Warningf("cannot unmarshal configuration options: %s", err)
+	}
+	if p.options.Timeout == 0 {
+		p.options.Timeout = global.Timeout
+	}
+}
+
+func (p *Plugin) Validate(options interface{}) error {
+	var o Options
+	return conf.Unmarshal(options, &o)
+}
 
 func (p *Plugin) createOptions(clientid, username, password, broker string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions().AddBroker(broker).SetClientID(clientid).SetCleanSession(true)
@@ -103,7 +123,7 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 	c := mqtt.NewClient(options)
 	token := c.Connect()
-	if !token.WaitTimeout(60 * time.Second) {
+	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
 		c.Disconnect(200)
 		return nil, fmt.Errorf("timed out while connecting")
 	}
@@ -123,10 +143,10 @@ func (ms *mqttSub) handler(client mqtt.Client, msg mqtt.Message) {
 }
 
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
-	impl.Tracef("subscribing to [%s]", ms.broker)
+	impl.Tracef("subscribing '%s' to [%s]", ms.topic, ms.broker)
 
 	token := mc.client.Subscribe(ms.topic, 0, ms.handler)
-	if !token.WaitTimeout(60 * time.Second) {
+	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
 		return fmt.Errorf("timed out while subscribing")
 	}
 
@@ -134,7 +154,7 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 		return token.Error()
 	}
 
-	impl.Tracef("subscribed to [%s]", ms.broker)
+	impl.Tracef("subscribed '%s' to [%s]", ms.topic, ms.broker)
 	return nil
 }
 
@@ -179,7 +199,7 @@ func (ms *mqttSub) Release() {
 
 	impl.Tracef("unsubscribing topic from %s", ms.topic)
 	token := mc.client.Unsubscribe(ms.topic)
-	if !token.WaitTimeout(60 * time.Second) {
+	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
 		impl.Errf("Timed out while waiting for topic '%s' to unsubscribe to '%s'", ms.topic, ms.broker)
 	}
 
@@ -277,7 +297,7 @@ func getClientID() string {
 }
 
 func hasWildCards(topic string) bool {
-	return strings.HasSuffix(topic, "#") || strings.Contains(topic, "/+/")
+	return strings.HasSuffix(topic, "#") || strings.Contains(topic, "+")
 }
 
 func parseURL(broker string) (out *url.URL, err error) {
