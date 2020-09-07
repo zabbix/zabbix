@@ -64,10 +64,12 @@ class CTask extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$config = select_config();
+
 		$options += [
 			'sortfield' => 'taskid',
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit'		=> select_config()['search_limit']
+			'limit'		=> $config['search_limit']
 		];
 
 		$sql_parts = [
@@ -75,7 +77,9 @@ class CTask extends CApiService {
 			'from'		=> ['task' => 'task t'],
 			'where'		=> [
 				'type'		=> 't.type='.ZBX_TM_TASK_DATA
-			]
+			],
+			'order'     => [],
+			'group'     => []
 		];
 
 		if ($options['taskids'] !== null) {
@@ -107,7 +111,7 @@ class CTask extends CApiService {
 		}
 
 		if ($db_tasks) {
-			$db_tasks = $this->unsetExtraFields($db_tasks, ['taskid', 'clock'], $options['output']);
+			$db_tasks = $this->unsetExtraFields($db_tasks, ['taskid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_tasks = array_values($db_tasks);
@@ -163,7 +167,7 @@ class CTask extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_CHECK_NOW])],
 			'request' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+								['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_DIAGINFO], 'type' => API_OBJECT, 'fields' => [
 				'historycache' =>	['type' => API_OBJECT, 'fields' => [
 					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['items', 'values', 'memory', 'memory.data', 'memory.index']), 'default' => API_OUTPUT_EXTEND],
 					'top' =>			['type' => API_OBJECT, 'fields' => [
@@ -197,7 +201,7 @@ class CTask extends CApiService {
 					]]
 				]]
 								]],
-								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_CHECK_NOW])], 'type' => API_OBJECT, 'fields' => [
+								['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_CHECK_NOW], 'type' => API_OBJECT, 'fields' => [
 				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 								]]
 			]],
@@ -217,7 +221,7 @@ class CTask extends CApiService {
 				case ZBX_TM_DATA_TYPE_DIAGINFO:
 					$min_permissions = USER_TYPE_SUPER_ADMIN;
 
-					$proxy_hostids[$task['proxy_hostid']] = $task['proxy_hostid'];
+					$proxy_hostids[$task['proxy_hostid']] = true;
 					break;
 
 				case ZBX_TM_DATA_TYPE_CHECK_NOW:
