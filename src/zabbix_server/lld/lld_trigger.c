@@ -1702,11 +1702,11 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 		}
 		else
 		{
-			zbx_db_tag_t	*tag;
+			zbx_db_tag_t	*dbtag;
 
-			tag = trigger->override_tags.values[i - trigger_prototype->tags.values_num];
-			key = tag->tag;
-			value = tag->value;
+			dbtag = trigger->override_tags.values[i - trigger_prototype->tags.values_num];
+			key = dbtag->tag;
+			value = dbtag->value;
 		}
 
 		if (i < trigger->tags.values_num)

@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup widget
@@ -28,6 +29,13 @@ require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	use FilterTrait;
+
+	/**
+	 * Id of the dashboard that is created within this test specifically for the update scenario.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid;
 
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -502,11 +510,73 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
+	/**
+	 * Function used to create a dashboard with widgets required for the Update scenario.
+	 */
+	public function prepareUpdateData() {
+		// Form an array with configuration of widgets with "Show" = "Host groups"
+		$widgets = [];
+		$id = 1;
+		for ($y = 0; $y <= 39; $y += 3) {
+			for ($x = 0; $x <= 12; $x += 12) {
+				$widgets[] = [
+					'type' => 'problemsbysv',
+					'name' => 'Reference widget '.$id,
+					'x' => $x,
+					'y' => $y,
+					'width' => 12,
+					'height' => 3,
+					'view_mode' => 0
+				];
+
+				$id++;
+			}
+		}
+
+		// Form an array with configuration of widgets with "Show" = "Totals"
+		$id = 1;
+		for ($y = 42; $y <= 48; $y += 3) {
+			for ($x = 0; $x <= 18; $x += 6) {
+				if ($id > 10) {
+					break 2;
+				}
+				$widgets[] = [
+					'type' => 'problemsbysv',
+					'name' => 'Totals reference widget '.$id,
+					'x' => $x,
+					'y' => $y,
+					'width' => 6,
+					'height' => 3,
+					'view_mode' => 0,
+					'fields' => [
+						[
+							'type' => 0,
+							'name' => 'show_type',
+							'value' => '1'
+						]
+					]
+				];
+
+				$id++;
+			}
+		}
+
+		// Create dashboard
+		$response = CDataHelper::call('dashboard.create', [
+			'name' => 'Problems by severity update dashboard',
+			'widgets' => array_values($widgets)
+		]);
+
+		$this->assertArrayHasKey('dashboardids', $response);
+		self::$dashboardid = $response['dashboardids'][0];
+	}
+
 	public function getUpdateWidgetData() {
 		return [
 			// Update widget to have a default name.
 			[
 				[
+					'widget to update' => 'Reference widget 1',
 					'fields' => [
 						'Name' => ''
 					]
@@ -515,6 +585,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Hide host groups without problems and remove timeline.
 			[
 				[
+					'widget to update' => 'Reference widget 2',
 					'fields' => [
 						'Name' => 'Hide timeline and groupt without problems',
 						'Refresh interval' => 'Default (1 minute)',
@@ -553,6 +624,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Show only average problems including suppressed ones, problem display - separated, exclude hostgroups without problems.
 			[
 				[
+					'widget to update' => 'Reference widget 3',
 					'fields' => [
 						'Name' => 'Show only average problems including suppressed ones',
 						'Hide groups without problems' => true,
@@ -582,6 +654,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Update widget to display only unaknowledged problems and to show latest values.
 			[
 				[
+					'widget to update' => 'Reference widget 4',
 					'fields' => [
 						'Name' => 'Display only unacknowledged problems',
 						'Problem display' => 'Unacknowledged only',
@@ -614,6 +687,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Update the widget to return only "Group to check Overview" hostgroup problems.
 			[
 				[
+					'widget to update' => 'Reference widget 5',
 					'fields' => [
 						'Name' => 'Show only problems of hostgroup Group to check Overview',
 						'Host groups' => 'Group to check Overview'
@@ -633,6 +707,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Empty widget output: return problems of 'Zabbix servers' hostroup and a host that doesn't belong to it.
 			[
 				[
+					'widget to update' => 'Reference widget 6',
 					'fields' => [
 						'Name' => 'Return "Zabbix servers" and "Another group to check Overview" problems',
 						'Host groups' => ['Zabbix servers'],
@@ -650,6 +725,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Update widget to exclude 'Group to check Overview' host group.
 			[
 				[
+					'widget to update' => 'Reference widget 7',
 					'fields' => [
 						'Name' => 'Exclude "Group to check Overview"',
 						'Exclude host groups' => ['Group to check Overview']
@@ -674,6 +750,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Update widget to return problems of 'ЗАББИКС Сервер' host.
 			[
 				[
+					'widget to update' => 'Reference widget 8',
 					'fields' => [
 						'Name' => 'Return "ЗАББИКС Сервер" problems',
 						'Hosts' => [
@@ -692,6 +769,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Empty widget output: problems of "ЗАББИКС Сервер" host with excluded "Zabbix servers" hostgroup.
 			[
 				[
+					'widget to update' => 'Reference widget 9',
 					'fields' => [
 						'Name' => 'Display ЗАББИКС Сервер problems with excluded "Zabbix servers"',
 						'Exclude host groups' => ['Zabbix servers'],
@@ -710,6 +788,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Update widget to show a non existing problem.
 			[
 				[
+					'widget to update' => 'Reference widget 10',
 					'fields' => [
 						'Name' => 'No problems should be returned',
 						'Problem' => 'Please place Your problem name here'
@@ -720,6 +799,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Update widget to show only warning and information problems that contain '_trigger_'.
 			[
 				[
+					'widget to update' => 'Reference widget 11',
 					'fields' => [
 						'Name' => 'Display only warning and information problems containing "_trigger_',
 						'Problem' => '_trigger_',
@@ -733,169 +813,10 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Show only average problems including suppressed ones, problem display - separated.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: separately show average problems including suppressed ones',
-						'Show suppressed problems' => true,
-						'Problem display' => 'Separated',
-						'Severity' => ['Average']
-					],
-					'expected' => [
-						'Average' => "4\nof 6"
-					]
-				]
-			],
-			// Update widget to display only unaknowledged problems and to show latest values without timeline.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: Display only unacknowledged problems with operational data withour timeline',
-						'Problem display' => 'Unacknowledged only',
-						'Show operational data' => 'Separately',
-						'Show timeline' => false
-					],
-					'expected' => [
-						'Disaster' => '1',
-						'High' => '1',
-						'Average' => '3',
-						'Warning' => '6',
-						'Information' => '0',
-						'Not classified' => '3'
-					],
-					'check' => [
-						'pop-up' => true,
-						'rows' => 3
-					]
-				]
-			],
-			// Update the widget to return only "Group to check Overview" hostgroup problems.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: Show only problems of hostgroup Group to check Overview',
-						'Host groups' => 'Group to check Overview'
-					],
-					'expected' => [
-						'Disaster' => '1',
-						'High' => '1',
-						'Average' => '2',
-						'Warning' => '1',
-						'Information' => '1',
-						'Not classified' => '1'
-					]
-				]
-			],
-			// Empty widget output: return problems of 'Zabbix servers' hostroup and a host that doesn't belong to it.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Return "Zabbix servers" and "Another group to check Overview" problems',
-						'Host groups' => ['Zabbix servers'],
-						'Hosts' => [
-							'values' => ['Empty host'],
-							'context' => 'Empty group'
-						]
-					],
-					'expected' => []
-				]
-			],
-			// Update widget to exclude 'Group to check Overview' host group.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: Exclude "Group to check Overview"',
-						'Exclude host groups' => ['Group to check Overview']
-					],
-					'expected' => [
-						'Average' => '3',
-						'Warning' => '5',
-						'Not classified' => '2'
-					]
-				]
-			],
-			// Update widget to return problems of 'ЗАББИКС Сервер' host.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: Return "ЗАББИКС Сервер" problems',
-						'Hosts' => [
-							'values' => ['ЗАББИКС Сервер'],
-							'context' => 'Zabbix servers'
-						]
-					],
-					'expected' => [
-						'Average' => '1',
-						'Warning' => '5'
-					]
-				]
-			],
-			// Empty widget output: problems of "ЗАББИКС Сервер" host with excluded "Zabbix servers" hostgroup.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: Display ЗАББИКС Сервер problems with excluded "Zabbix servers"',
-						'Exclude host groups' => ['Zabbix servers'],
-						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-						'Hosts' => [
-							'values' => ['ЗАББИКС Сервер'],
-							'context' => 'Zabbix servers'
-						]
-					],
-					'expected' => []
-				]
-			],
-			// Update widget to show a non existing problem.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: No problems should be returned',
-						'Problem' => 'Please place Your problem name here'
-					],
-					'expected' => []
-				]
-			],
-			// Update widget to show only warning and information problems that contain '_trigger_'.
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Totals: Display only warning and information problems containing "_trigger_',
-						'Problem' => '_trigger_',
-						'Severity' => ['Information', 'Warning']
-					],
-					'expected' => [
-						'Warning' => '1',
-						'Information' => '1'
-					]
-				]
-			],
-			// Change "Show" from "Totals" to "Host groups"
-			[
-				[
-					'widget to update' => 'Totals reference widget',
-					'fields' => [
-						'Name' => 'Changing "show" from "Totals" to "Host groups"',
-						'Show' => 'Host groups'
-					],
-					'check' => [
-						'disabled' => true
-					]
-				]
-			],
 			// Change "Show" from "Host groups" to "Totals"
 			[
 				[
-
+					'widget to update' => 'Reference widget 12',
 					'fields' => [
 						'Name' => 'Changing "show" from "Host groups" to "Totals"',
 						'Show' => 'Totals'
@@ -916,6 +837,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: Use tag filter option with a single tag that is equal to a certain value.
 			[
 				[
+					'widget to update' => 'Reference widget 13',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Single tag filter equals value'
@@ -938,6 +860,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: Display all problems that have a certain tag.
 			[
 				[
+					'widget to update' => 'Reference widget 14',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Single tag filter with empty value'
@@ -959,6 +882,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: Show all problems that have 2 speciffic tags, one of them contains a speciffic value.
 			[
 				[
+					'widget to update' => 'Reference widget 15',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Two And/Or tags in filter'
@@ -977,6 +901,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: Show all problems that have at least one of 2 speciffic tags, one of them contains a value.
 			[
 				[
+					'widget to update' => 'Reference widget 16',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Two Or tags in filter',
@@ -1002,6 +927,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
+					'widget to update' => 'Reference widget 17',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Two And/Or tags in filter 2'
@@ -1020,6 +946,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
+					'widget to update' => 'Reference widget 18',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Two Or tags in filter 2',
@@ -1040,6 +967,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: 2 tags with Or operator, both of them equal to speciffic values.
 			[
 				[
+					'widget to update' => 'Reference widget 19',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Two Or tags in filter 3',
@@ -1059,6 +987,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Host groups: A tag that doesn't exist.
 			[
 				[
+					'widget to update' => 'Reference widget 20',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Widget with a non-existing tag in filter'
@@ -1072,6 +1001,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: Use tag filter option with a single tag that is equal to a certain value.
 			[
 				[
+					'widget to update' => 'Reference widget 21',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Single tag filter equals value',
@@ -1094,6 +1024,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: Display all problems that have a certain tag.
 			[
 				[
+					'widget to update' => 'Reference widget 22',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Single tag filter with empty value',
@@ -1112,6 +1043,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: Show all problems that have 2 speciffic tags, one of them contains a speciffic value.
 			[
 				[
+					'widget to update' => 'Reference widget 23',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two And/Or tags in filter',
@@ -1129,6 +1061,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: Show all problems that have at least one of 2 speciffic tags, one of them contains a value.
 			[
 				[
+					'widget to update' => 'Reference widget 24',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter',
@@ -1151,6 +1084,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
+					'widget to update' => 'Reference widget 25',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two And/Or tags in filter 2',
@@ -1168,6 +1102,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
+					'widget to update' => 'Reference widget 26',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter 2',
@@ -1187,6 +1122,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: 2 tags with Or operator, both of them equal to speciffic values.
 			[
 				[
+					'widget to update' => 'Reference widget 27',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter 3',
@@ -1205,6 +1141,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Totals: A tag that doesn't exist.
 			[
 				[
+					'widget to update' => 'Reference widget 28',
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Widget with a non-existing tag in filter',
@@ -1215,25 +1152,179 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => []
 				]
+			],
+			// Show only average problems including suppressed ones, problem display - separated.
+			[
+				[
+					'widget to update' => 'Totals reference widget 1',
+					'fields' => [
+						'Name' => 'Totals: separately show average problems including suppressed ones',
+						'Show suppressed problems' => true,
+						'Problem display' => 'Separated',
+						'Severity' => ['Average']
+					],
+					'expected' => [
+						'Average' => "4\nof 6"
+					]
+				]
+			],
+			// Update widget to display only unaknowledged problems and to show latest values without timeline.
+			[
+				[
+					'widget to update' => 'Totals reference widget 2',
+					'fields' => [
+						'Name' => 'Totals: Display only unacknowledged problems with operational data withour timeline',
+						'Problem display' => 'Unacknowledged only',
+						'Show operational data' => 'Separately',
+						'Show timeline' => false
+					],
+					'expected' => [
+						'Disaster' => '1',
+						'High' => '1',
+						'Average' => '3',
+						'Warning' => '6',
+						'Information' => '0',
+						'Not classified' => '3'
+					],
+					'check' => [
+						'pop-up' => true,
+						'rows' => 3
+					]
+				]
+			],
+			// Update the widget to return only "Group to check Overview" hostgroup problems.
+			[
+				[
+					'widget to update' => 'Totals reference widget 3',
+					'fields' => [
+						'Name' => 'Totals: Show only problems of hostgroup Group to check Overview',
+						'Host groups' => 'Group to check Overview'
+					],
+					'expected' => [
+						'Disaster' => '1',
+						'High' => '1',
+						'Average' => '2',
+						'Warning' => '1',
+						'Information' => '1',
+						'Not classified' => '1'
+					]
+				]
+			],
+			// Empty widget output: return problems of 'Zabbix servers' hostroup and a host that doesn't belong to it.
+			[
+				[
+					'widget to update' => 'Totals reference widget 4',
+					'fields' => [
+						'Name' => 'Totals: return "Zabbix servers" and "Another group to check Overview" problems',
+						'Host groups' => ['Zabbix servers'],
+						'Hosts' => [
+							'values' => ['Empty host'],
+							'context' => 'Empty group'
+						]
+					],
+					'expected' => []
+				]
+			],
+			// Update widget to exclude 'Group to check Overview' host group.
+			[
+				[
+					'widget to update' => 'Totals reference widget 5',
+					'fields' => [
+						'Name' => 'Totals: Exclude "Group to check Overview"',
+						'Exclude host groups' => ['Group to check Overview']
+					],
+					'expected' => [
+						'Average' => '3',
+						'Warning' => '5',
+						'Not classified' => '2'
+					]
+				]
+			],
+			// Update widget to return problems of 'ЗАББИКС Сервер' host.
+			[
+				[
+					'widget to update' => 'Totals reference widget 6',
+					'fields' => [
+						'Name' => 'Totals: Return "ЗАББИКС Сервер" problems',
+						'Hosts' => [
+							'values' => ['ЗАББИКС Сервер'],
+							'context' => 'Zabbix servers'
+						]
+					],
+					'expected' => [
+						'Average' => '1',
+						'Warning' => '5'
+					]
+				]
+			],
+			// Empty widget output: problems of "ЗАББИКС Сервер" host with excluded "Zabbix servers" hostgroup.
+			[
+				[
+					'widget to update' => 'Totals reference widget 7',
+					'fields' => [
+						'Name' => 'Totals: Display ЗАББИКС Сервер problems with excluded "Zabbix servers"',
+						'Exclude host groups' => ['Zabbix servers'],
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+						'Hosts' => [
+							'values' => ['ЗАББИКС Сервер'],
+							'context' => 'Zabbix servers'
+						]
+					],
+					'expected' => []
+				]
+			],
+			// Update widget to show a non existing problem.
+			[
+				[
+					'widget to update' => 'Totals reference widget 8',
+					'fields' => [
+						'Name' => 'Totals: No problems should be returned',
+						'Problem' => 'Please place Your problem name here'
+					],
+					'expected' => []
+				]
+			],
+			// Update widget to show only warning and information problems that contain '_trigger_'.
+			[
+				[
+					'widget to update' => 'Totals reference widget 9',
+					'fields' => [
+						'Name' => 'Totals: Display only warning and information problems containing "_trigger_',
+						'Problem' => '_trigger_',
+						'Severity' => ['Information', 'Warning']
+					],
+					'expected' => [
+						'Warning' => '1',
+						'Information' => '1'
+					]
+				]
+			],
+			// Change "Show" from "Totals" to "Host groups"
+			[
+				[
+					'widget to update' => 'Totals reference widget 10',
+					'fields' => [
+						'Name' => 'Changing "show" from "Totals" to "Host groups"',
+						'Show' => 'Host groups'
+					],
+					'check' => [
+						'disabled' => true
+					]
+				]
 			]
 		];
 	}
 
 	/**
-	 * @backup widget
+	 * @on-before-once prepareUpdateData
 	 * @dataProvider getUpdateWidgetData
 	 */
 	public function testDashboardProblemsBySeverityWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		// Select the widget to update
-		if (CTestArrayHelper::get($data, 'widget to update', 'Reference widget') === 'Reference widget') {
-			$form = $dashboard->getWidget('Reference widget')->edit();
-		}
-		else {
-			$form = $dashboard->getWidget($data['widget to update'])->edit();
-		}
+		$form = $dashboard->getWidget($data['widget to update'])->edit();
 
 		// Attempt to update the widget.
 		$header = ($data['fields']['Name'] === '') ? 'Problems by severity' : $data['fields']['Name'];
@@ -1243,9 +1334,9 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		// Check that Dashboard has been saved and that there are no errors in the widget
 		$this->checkDashboardMessage();
 
-		if ((CTestArrayHelper::get($data, 'widget to update', 'Reference widget') === 'Reference widget'
+		if ((strpos($data['widget to update'], 'Totals reference widget') === false
 				&& CTestArrayHelper::get($data['fields'], 'Show', 'Host groups') === 'Host groups')
-				|| (CTestArrayHelper::get($data, 'widget to update', 'Reference widget') === 'Totals reference widget'
+				|| (strpos($data['widget to update'], 'Totals reference widget') !== false
 				&& CTestArrayHelper::get($data['fields'], 'Show', 'Totals') === 'Host groups')) {
 			$this->checkWidgetContent($data, $widget);
 			if (CTestArrayHelper::get($data, 'check.pop-up', false)) {

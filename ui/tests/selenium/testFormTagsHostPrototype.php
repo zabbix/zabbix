@@ -177,7 +177,7 @@ class testFormTagsHostPrototype extends CWebTest {
 
 		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
 		$this->query('button:Create host prototype')->waitUntilPresent()->one()->click();
-		$form = $this->query('id:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 		$form->fill(['Host name' => $data['host_name']]);
 
 		$form->selectTab('Groups');
@@ -283,7 +283,7 @@ class testFormTagsHostPrototype extends CWebTest {
 
 		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
 		$this->query('link', $this->update_prototype)->waitUntilPresent()->one()->click();
-		$form = $this->query('id:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
 		$this->fillParameters($data['tags']);
@@ -313,7 +313,7 @@ class testFormTagsHostPrototype extends CWebTest {
 
 		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
 		$this->query('link', $this->clone_prototype)->waitUntilPresent()->one()->click();
-		$form = $this->query('id:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 		$form->getField('Host name')->fill($new_name);
 
 		$form->selectTab('Tags');
@@ -342,7 +342,7 @@ class testFormTagsHostPrototype extends CWebTest {
 	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_name']));
 		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.self::DICROVERY_RULE_ID.'&hostid='.$id);
-		$form = $this->query('id:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
 		$this->assertValues($data['tags']);
 	}

@@ -128,6 +128,7 @@ class ZBase {
 		require_once 'include/validate.inc.php';
 		require_once 'include/locales.inc.php';
 		require_once 'include/db.inc.php';
+		require_once 'vendor/autoload.php';
 
 		// page specific includes
 		require_once 'include/actions.inc.php';

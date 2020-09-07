@@ -439,6 +439,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
 #define ZBX_SNMP_CACHE_RELOAD	"snmp_cache_reload"
+#define ZBX_DIAGINFO		"diaginfo"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -930,13 +931,15 @@ zbx_task_t;
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 #define ZBX_RTC_SNMP_CACHE_RELOAD	9
+#define ZBX_RTC_DIAGINFO		10
 
 typedef enum
 {
 	HTTPTEST_AUTH_NONE = 0,
 	HTTPTEST_AUTH_BASIC,
 	HTTPTEST_AUTH_NTLM,
-	HTTPTEST_AUTH_NEGOTIATE
+	HTTPTEST_AUTH_NEGOTIATE,
+	HTTPTEST_AUTH_DIGEST
 }
 zbx_httptest_auth_t;
 

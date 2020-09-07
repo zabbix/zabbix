@@ -288,6 +288,42 @@ func Test_parseURI(t *testing.T) {
 			true,
 		},
 		{
+			"Parse URI with ipv6 address. Test 1",
+			args{"tcp://[fe80::1ce7:d24a:97f0:3d83%25en0]:11211"},
+			&URI{scheme: "tcp", host: "fe80::1ce7:d24a:97f0:3d83%en0", port: "11211"},
+			false,
+		},
+		{
+			"Parse URI with ipv6 address. Test 2",
+			args{"tcp://[fe80::1ce7:d24a:97f0:3d83%en0]:11211"},
+			&URI{scheme: "tcp", host: "fe80::1ce7:d24a:97f0:3d83%en0", port: "11211"},
+			false,
+		},
+		{
+			"Parse URI with ipv6 address. Test 3",
+			args{"tcp://[fe80::1%25lo0]:11211"},
+			&URI{scheme: "tcp", host: "fe80::1%lo0", port: "11211"},
+			false,
+		},
+		{
+			"Parse URI with ipv6 address. Test 4",
+			args{"tcp://[::1]"},
+			&URI{scheme: "tcp", host: "::1", port: "11211"},
+			false,
+		},
+		{
+			"Parse URI with ipv6 address. Test 5",
+			args{"tcp://fe80::1:11211"},
+			&URI{scheme: "tcp", host: "fe80::1", port: "11211"},
+			false,
+		},
+		{
+			"Parse URI with ipv6 address. Test 6",
+			args{"tcp://::1:11289"},
+			&URI{scheme: "tcp", host: "::1", port: "11289"},
+			false,
+		},
+		{
 			"Should fail when URI without host is passed",
 			args{"tcp://:11211"},
 			nil,

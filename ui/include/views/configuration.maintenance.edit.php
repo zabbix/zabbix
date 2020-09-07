@@ -29,6 +29,7 @@ $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
 $maintenanceForm = (new CForm())
+	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
@@ -246,7 +247,7 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 // Append tabs to form.
 $maintenanceTab = (new CTabView())
 	->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList)
-	->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList)
+	->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList, TAB_INDICATOR_PERIODS)
 	->addTab('hostTab', _('Hosts and groups'), $hostsAndGroupsFormList);
 if (!$this->data['form_refresh']) {
 	$maintenanceTab->setSelected(0);

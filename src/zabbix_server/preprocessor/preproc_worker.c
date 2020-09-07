@@ -326,7 +326,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 
 		result = (SUCCEED == ret ? zbx_variant_value_desc(&value) : error);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __func__, zbx_variant_value_desc(&value_start));
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__func__,  zbx_result_string(ret), result);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__func__, zbx_result_string(ret), result);
 	}
 
 	size = zbx_preprocessor_pack_result(&data, &value, &history_out, error);
