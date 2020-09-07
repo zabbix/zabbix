@@ -165,33 +165,33 @@ class CTask extends CApiService {
 			'request' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'historycache' =>	['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'items', 'values', 'memory', 'memory.data', 'memory.index'])],
+					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['items', 'values', 'memory', 'memory.data', 'memory.index']), 'default' => API_OUTPUT_EXTEND],
 					'top' =>			['type' => API_OBJECT, 'fields' => [
 						'values' =>			['type' => API_INT32]
 					]]
 				]],
 				'valuecache' =>		['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'items', 'values', 'memory', 'mode'])],
+					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['items', 'values', 'memory', 'mode']), 'default' => API_OUTPUT_EXTEND],
 					'top' =>			['type' => API_OBJECT, 'fields' => [
 						'values' =>			['type' => API_INT32],
 						'request.values' =>	['type' => API_INT32]
 					]]
 				]],
 				'preprocessing' =>	['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'values', 'preproc.values'])],
+					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['values', 'preproc.values']), 'default' => API_OUTPUT_EXTEND],
 					'top' =>			['type' => API_OBJECT, 'fields' => [
 						'values' =>			['type' => API_INT32]
 					]]
 				]],
 				'alerting' =>		['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'alerts'])],
+					'stats' =>			['type' => API_OUTPUT, 'in' => 'alerts', 'default' => API_OUTPUT_EXTEND],
 					'top' =>			['type' => API_OBJECT, 'fields' => [
 						'media.alerts' =>	['type' => API_INT32],
 						'source.alerts' =>	['type' => API_INT32]
 					]]
 				]],
 				'lld' =>			['type' => API_OBJECT, 'fields' => [
-					'stats' =>			['type' => API_STRINGS_UTF8, 'in' => implode(',', [self::FIELD_EXTEND, 'rules', 'values'])],
+					'stats' =>			['type' => API_OUTPUT, 'in' => implode(',', ['rules', 'values']), 'default' => API_OUTPUT_EXTEND],
 					'top' =>			['type' => API_OBJECT, 'fields' => [
 						'values' =>			['type' => API_INT32]
 					]]
