@@ -39,7 +39,7 @@ class testTimezone extends CWebTest {
 	 * Change zabbix timezone from GUI and check that system time displayed correctly according to timezone.
 	 */
 	public function testTimezone_Gui() {
-		$this->userLogin('Admin', 'zabbix');
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('Europe/Riga', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$etc_time = $this->getProblemTime('Trigger for tag permissions Oracle');
@@ -91,14 +91,14 @@ class testTimezone extends CWebTest {
 	 */
 	public function testTimezone_UserSettings($data) {
 		// Set system timezone.
-		$this->userLogin('Admin', 'zabbix');
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('Europe/Riga', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->page->logout();
 
 		// User timezone change.
-		$this->userLogin('test-timezone', 'zabbix');
+		$this->page->userLogin('test-timezone', 'zabbix');
 		$this->setTimezone($data['user_timezone'], 'userprofile');
 		date_modify($system_time, $data['time_diff']);
 
@@ -180,7 +180,7 @@ class testTimezone extends CWebTest {
 	 * to choosed timezone.
 	 */
 	public function testTimezone_CreateUsers($data) {
-		$this->userLogin('Admin', 'zabbix');
+		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('Europe/Riga', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
@@ -192,7 +192,7 @@ class testTimezone extends CWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
-		$this->userLogin($data['fields']['Alias'], $data['fields']['Password']);
+		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
 		$this->page->open('zabbix.php?action=problem.view');
 
 		// Expected time after timezone change.
@@ -242,19 +242,5 @@ class testTimezone extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $message);
-	}
-
-	/**
-	 * Allows to login with user credentials.
-	 *
-	 * @param string $alias     Username on login screen
-	 * @param string $password  Password on login screen
-	 */
-	private function userLogin($alias, $password) {
-		$this->page->open('index.php');
-		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
-		$this->query('id:password')->one()->fill($password);
-		$this->query('button:Sign in')->one()->click();
-		$this->page->waitUntilReady();
 	}
 }

@@ -246,7 +246,8 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue([
 				HTTPTEST_AUTH_BASIC => ['http_username_row', 'http_password_row'],
 				HTTPTEST_AUTH_NTLM => ['http_username_row', 'http_password_row'],
-				HTTPTEST_AUTH_KERBEROS => ['http_username_row', 'http_password_row']
+				HTTPTEST_AUTH_KERBEROS => ['http_username_row', 'http_password_row'],
+				HTTPTEST_AUTH_DIGEST => ['http_username_row', 'http_password_row']
 			], true) ?>);
 		}
 

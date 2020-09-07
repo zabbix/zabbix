@@ -807,7 +807,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestTabSwitch('Operations');
 
-		$form = $this->query('id:action.edit')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('id:action-form')->asForm()->waitUntilVisible()->one();
 		$operations_field = $form->getField('Operations')->asTable();
 
 		switch ($eventsource) {
@@ -1631,6 +1631,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if (isset($data['operations'])) {
+			$this->page->waitUntilReady();
 			$this->zbxTestTabSwitch('Operations');
 
 			foreach ($data['operations'] as $operation) {

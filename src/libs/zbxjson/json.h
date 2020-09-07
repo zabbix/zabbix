@@ -29,6 +29,5 @@
 	SKIP_WHITESPACE(src)
 
 void	zbx_set_json_strerror(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 
 #endif

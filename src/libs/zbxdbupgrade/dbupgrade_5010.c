@@ -245,6 +245,22 @@ static int	DBpatch_5010026(void)
 
 static int	DBpatch_5010027(void)
 {
+	const ZBX_FIELD	old_field = {"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"data", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_data", &field, &old_field);
+}
+
+static int	DBpatch_5010028(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
+static int	DBpatch_5010029(void)
+{
 	const ZBX_FIELD	field = {"custom_interfaces", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
@@ -284,5 +300,7 @@ DBPATCH_ADD(5010024, 0, 1)
 DBPATCH_ADD(5010025, 0, 1)
 DBPATCH_ADD(5010026, 0, 1)
 DBPATCH_ADD(5010027, 0, 1)
+DBPATCH_ADD(5010028, 0, 1)
+DBPATCH_ADD(5010029, 0, 1)
 
 DBPATCH_END()

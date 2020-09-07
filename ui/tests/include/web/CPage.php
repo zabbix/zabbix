@@ -553,7 +553,7 @@ class CPage {
 		$this->open('index.php');
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
-		$this->query('button:Sign in')->one()->click();
+		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 	}
 }

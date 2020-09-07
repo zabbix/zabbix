@@ -52,7 +52,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=create'
 		);
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->fill([ucfirst($host_type).' name' => $data['Name']]);
 
 		if ($is_prototype) {
@@ -103,7 +103,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->removeMacros();
 		$form->submit();
@@ -129,7 +129,7 @@ abstract class testFormMacros extends CWebTest {
 	protected function checkChangeRemoveInheritedMacro($form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		if ($is_prototype) {
 			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 
 			$name = 'Host prototype with edited global {#MACRO}';
 			$form->fill([ucfirst($host_type).' name' => $name]);
@@ -218,7 +218,7 @@ abstract class testFormMacros extends CWebTest {
 			$old_hash = $this->getHash();
 		}
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->fillMacros($data['macros']);
 		$form->submit();
@@ -261,7 +261,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
-		$form = $this->query('id:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
 		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
@@ -593,6 +593,6 @@ abstract class testFormMacros extends CWebTest {
 			$this->page->login();
 		}
 		$this->page->open($url)->waitUntilReady();
-		$this->query('id:'.$source.'Form')->asForm()->one()->selectTab('Macros');
+		$this->query('id:'.$source.'-form')->asForm()->one()->selectTab('Macros');
 	}
 }

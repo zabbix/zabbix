@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SERVER 8 "2019\-01\-29" Zabbix
+.TH ZABBIX_SERVER 8 "2020\-09\-04" Zabbix
 .SH NAME
 zabbix_server \- Zabbix server daemon
 .SH SYNOPSIS
@@ -80,6 +80,13 @@ Reload SNMP cache.
 .B housekeeper_execute
 Execute the housekeeper.
 Ignored if housekeeper is being currently executed.
+.RE
+.RS 4
+.TP 4
+\fBdiaginfo\fR[=\fIsection\fR]
+Log internal diagnostic information of the specified section. Section can be \fIhistorycache\fR, \fIpreprocessing\fR,
+\fIalerting\fR, \fIlld\fR, \fIvaluecache\fR.
+By default diagnostic information of all sections is logged.
 .RE
 .RS 4
 .TP 4
