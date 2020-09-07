@@ -1071,7 +1071,7 @@ insert_javascript_for_visibilitybox();
 			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'opinventory']
 		};
 
-		jQuery('#operation_object', this.$form)
+		jQuery('#operationobject', this.$form)
 			.change(function() {
 				window.lldoverrides.actions.forEach(function(action) {
 					if (available_actions[this.value].indexOf(action) !== -1) {
@@ -1085,7 +1085,7 @@ insert_javascript_for_visibilitybox();
 	};
 
 	OperationEditForm.prototype.initHideActionRows = function() {
-		jQuery('#operation_object', this.$form).trigger('change');
+		jQuery('#operationobject', this.$form).trigger('change');
 	};
 
 	OperationEditForm.prototype.showActionRow = function(row_id) {

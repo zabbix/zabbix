@@ -36,7 +36,7 @@ class COverlayDialogElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://div[contains(@class, "overlay-dialogue modal modal-popup")]'))->asOverlayDialog();
+		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'))->asOverlayDialog();
 	}
 
 	/**
@@ -51,40 +51,26 @@ class COverlayDialogElement extends CElement {
 	/**
 	 * Set context (host / hostgroup) of overlay dialog.
 	 *
-	 * @param array $context
+	 * This code should be different from older versions of Zabbix (< 5.0).
+	 *
+	 * @param array    $context
+	 * @param integer  $mode    multiselect fill mode, or null if default
 	 */
-	public function setDataContext($context) {
+	public function setDataContext($context, $mode = null) {
 		if (!$context) {
 			return $this;
 		}
 
-		if (!is_array($context)) {
-			// Assuming that we are looking for a single multiselect...
-			$this->query('xpath:./div[@class="overlay-dialogue-controls"]//./div[@class="multiselect-control"]')
-					->asMultiselect()->one()->fill($context);
-			$this->waitUntilReady();
+		// Assuming that we are looking for a single multiselect...
+		$element = $this->query('xpath:./div[@class="overlay-dialogue-controls"]//./div[@class="multiselect-control"]')
+				->asMultiselect()->one();
 
-			return $this;
+		if ($mode !== null) {
+			$element->setFillMode($mode);
 		}
 
-		$form = $this->query('xpath:./div[@class="overlay-dialogue-controls"]')->asForm(['normalized' => true])
-				->waitUntilPresent()->one();
-		$fields = $form->getFields();
-
-		foreach ($context as $name => $value) {
-			if (is_array($value) && array_key_exists('name', $value) && array_key_exists('value', $value)) {
-				$name = $value['name'];
-				$value = $value['value'];
-			}
-
-			if ($fields->exists($name)) {
-				$fields->get($name)->fill($value);
-				$this->waitUntilReady();
-			}
-			else {
-				throw new Exception('Cannot set overlay dialog context for \"'.$name.'\" to \"'.$value.'\".');
-			}
-		}
+		$element->fill($context);
+		$this->waitUntilReady();
 
 		return $this;
 	}
@@ -115,5 +101,13 @@ class COverlayDialogElement extends CElement {
 	public function close() {
 		$this->query('class:overlay-close-btn')->one()->click();
 		return $this->waitUntilNotPresent();
+	}
+
+	/**
+	 * Wait until overlay dialogue and overlay dialogue background is not visible one page.
+	 */
+	public static function ensureNotPresent() {
+		(new CElementQuery('xpath', '//*['.CXPathHelper::fromClass('overlay-dialogue-body').' or '.
+				CXPathHelper::fromClass('overlay-bg').']'))->waitUntilNotVisible();
 	}
 }

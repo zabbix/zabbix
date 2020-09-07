@@ -31,9 +31,6 @@ function submitConditionPopup(response, overlay) {
 		inputs = response.inputs,
 		cond_dialogueid = jQuery(document.forms['popup.condition'])
 			.closest('[data-dialogueid]')
-			.data('dialogueid'),
-		opr_dialogueid = jQuery(document.forms['popup.operation'])
-			.closest('[data-dialogueid]')
 			.data('dialogueid');
 
 	if (!cond_dialogueid) {
@@ -55,16 +52,9 @@ function submitConditionPopup(response, overlay) {
 		}
 	}
 
-	if (form_param === 'add_opcondition') {
-		overlayDialogueDestroy(cond_dialogueid);
-
-		PopUp('popup.action.operation', jQuery(document.forms['popup.operation']).serialize(), opr_dialogueid);
-	}
-	else {
-		// XHR has finished, but the state is still considered as loading at form submission.
-		overlay.setLoading();
-		submitFormWithParam(form_name, form_param, '1');
-	}
+	// XHR has finished, but the state is still considered as loading at form submission.
+	overlay.setLoading();
+	submitFormWithParam(form_name, form_param, '1');
 }
 
 /**
@@ -73,6 +63,10 @@ function submitConditionPopup(response, overlay) {
  * @param {Overlay} overlay
  */
 function validateConditionPopup(overlay) {
+	if (window.operation_popup && window.operation_popup.overlay.$dialogue.is(':visible')) {
+		return window.operation_popup.view.operation_condition.onConditionPopupSubmit(overlay);
+	}
+
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action'));
 

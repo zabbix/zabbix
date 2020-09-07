@@ -119,6 +119,9 @@ $tranStrings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
+	'class.overlay.js' => [
+		'Operation details' => _('Operation details')
+	],
 	'dashboard.grid.js' => [
 		'Edit widget' => _('Edit widget'),
 		'Add widget' => _('Add widget'),

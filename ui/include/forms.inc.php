@@ -911,6 +911,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
+		$data['interfaceid'] = $item['interfaceid'];
 
 		// discovery rule
 		if ($data['is_discovery_rule']) {

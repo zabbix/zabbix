@@ -59,7 +59,14 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 		];
 
 		foreach ($widget_fields[0]['fields'] as $field) {
-			if ($field['value']) {
+			if (array_key_exists($field['name'], $output['fields'])) {
+				if (!is_array($output['fields'][$field['name']])) {
+					$output['fields'][$field['name']] = [$output['fields'][$field['name']]];
+				}
+
+				$output['fields'][$field['name']][] = $field['value'];
+			}
+			else {
 				$output['fields'][$field['name']] = $field['value'];
 			}
 		}

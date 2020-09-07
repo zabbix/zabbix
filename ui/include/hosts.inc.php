@@ -533,33 +533,6 @@ function get_host_by_hostid($hostid, $no_error_message = 0) {
 	return false;
 }
 
-function updateHostStatus($hostids, $status) {
-	zbx_value2array($hostids);
-
-	$hostIds = [];
-	$oldStatus = ($status == HOST_STATUS_MONITORED ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_MONITORED);
-
-	$db_hosts = DBselect(
-		'SELECT h.hostid,h.host,h.status'.
-		' FROM hosts h'.
-		' WHERE '.dbConditionInt('h.hostid', $hostids).
-			' AND h.status='.zbx_dbstr($oldStatus)
-	);
-	while ($host = DBfetch($db_hosts)) {
-		$hostIds[] = $host['hostid'];
-
-		$host_new = $host;
-		$host_new['status'] = $status;
-		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
-		info(_s('Updated status of host "%1$s".', $host['host']));
-	}
-
-	return DB::update('hosts', [
-		'values' => ['status' => $status],
-		'where' => ['hostid' => $hostIds]
-	]);
-}
-
 /**
  * Get parent templates for each given application.
  *

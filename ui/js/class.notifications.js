@@ -629,7 +629,7 @@ ZBX_Notifications.util.slideDown = function(node, duration, delay) {
  */
 ZBX_Notifications.util.fadeIn = function(node) {
 	node.style.opacity = 0;
-	node.style.display = 'flex';
+	node.style.display = 'inherit';
 
 	var op = 0;
 	var id = setInterval(function() {

@@ -44,7 +44,7 @@ func TestMain(m *testing.M) {
 	}
 	// initialize plugin
 	impl.Init(pluginName)
-	impl.Configure(&plugin.GlobalOptions{}, nil)
+	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
 
 	code = m.Run()
 	if code != 0 {

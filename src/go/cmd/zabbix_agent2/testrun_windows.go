@@ -55,6 +55,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`zabbix.stats[127.0.0.1,10051]`,
 		`vfs.fs.size[c:,free]`,
 		`vfs.fs.discovery`,
+		`vfs.fs.get`,
 		`net.tcp.listen[80]`,
 		`net.if.in[MS TCP Loopback interface,bytes]`,
 		`net.if.out[MS TCP Loopback interface,bytes]`,

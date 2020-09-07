@@ -138,7 +138,10 @@ class CControllerModuleUpdate extends CController {
 		}
 
 		if ($result) {
-			if ($set_status == MODULE_STATUS_ENABLED) {
+			if ($this->getAction() === 'module.update') {
+				$response->setMessageOk(_s('Module updated: %1$s.', $db_modules_update_names[0]));
+			}
+			elseif ($set_status == MODULE_STATUS_ENABLED) {
 				$response->setMessageOk(_n('Module enabled: %1$s.', 'Modules enabled: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
@@ -150,7 +153,10 @@ class CControllerModuleUpdate extends CController {
 			}
 		}
 		else {
-			if ($set_status == MODULE_STATUS_ENABLED) {
+			if ($this->getAction() === 'module.update') {
+				$response->setMessageError(_s('Cannot update module: %1$s.', $db_modules_update_names[0]));
+			}
+			elseif ($set_status == MODULE_STATUS_ENABLED) {
 				$response->setMessageError(_n('Cannot enable module: %1$s.', 'Cannot enable modules: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));

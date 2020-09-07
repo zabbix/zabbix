@@ -28,7 +28,8 @@ class testPageStatusOfZabbix extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Parameter', 'Value', 'Details']);
 
 		$this->zbxTestTextPresent('Zabbix server is running');
-		$this->zbxTestTextPresent('Number of hosts (enabled/disabled/templates)');
+		$this->zbxTestTextPresent('Number of hosts (enabled/disabled)');
+		$this->zbxTestTextPresent('Number of templates');
 		$this->zbxTestTextPresent('Number of items (enabled/disabled/not supported)');
 		$this->zbxTestTextPresent('Number of triggers (enabled/disabled [problem/ok])');
 		$this->zbxTestTextPresent('Number of users (online)');

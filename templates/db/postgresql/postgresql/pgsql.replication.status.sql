@@ -6,7 +6,7 @@ BEGIN
 	SELECT current_setting('server_version_num') INTO ver;
 
 	IF (SELECT pg_is_in_recovery()) THEN
-		IF (ver >= 100000) THEN
+		IF (ver >= 90600) THEN
 			SELECT * INTO res from (
 				SELECT COUNT(*) FROM pg_stat_wal_receiver
 				) T;

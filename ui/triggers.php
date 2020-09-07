@@ -879,6 +879,10 @@ else {
 			}
 
 			foreach (array_column($item['triggers'], 'triggerid') as $triggerid) {
+				if (!array_key_exists($triggerid, $triggers)) {
+					continue;
+				}
+
 				if (!array_key_exists('ts_delete', $triggers[$triggerid]['triggerDiscovery'])) {
 					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = $ts_delete;
 				}

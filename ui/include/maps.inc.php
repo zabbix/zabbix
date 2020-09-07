@@ -617,6 +617,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			'output' => [],
 			'triggerids' => array_keys($triggers),
 			'monitored' => true,
+			'skipDependent' => true,
 			'preservekeys' => true
 		]);
 
@@ -633,7 +634,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 		}
-
 		unset($triggers, $monitored_triggers);
 	}
 
@@ -717,6 +717,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	$info = [];
 	foreach ($selements as $selementId => $selement) {
 		$i = [
+			'elementtype' => $selement['elementtype'],
 			'disabled' => 0,
 			'maintenance' => 0,
 			'problem' => 0,
@@ -835,7 +836,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			$selement['iconid_disabled'] = $selement['iconid_off'];
 		}
 
-		$i['elementtype'] = $selement['elementtype'];
 		$i['iconid_off'] = $selement['iconid_off'];
 		$i['iconid_on'] = $selement['iconid_on'];
 		$i['iconid_maintenance'] = $selement['iconid_maintenance'];

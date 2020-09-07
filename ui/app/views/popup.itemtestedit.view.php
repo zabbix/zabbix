@@ -51,6 +51,14 @@ foreach ($data['inputs'] as $name => $value) {
 	elseif ($name === 'proxy_hostid') {
 		continue;
 	}
+	elseif ($name === 'query_fields' || $name === 'headers') {
+		foreach (['name', 'value'] as $key) {
+			if (array_key_exists($key, $value)) {
+				$form->addVar($name.'['.$key.']', $value[$key]);
+			}
+		}
+		continue;
+	}
 
 	$form->addItem((new CInput('hidden', $name, $value))->removeId());
 }
@@ -286,10 +294,19 @@ $templates = [
 		)
 ];
 
+$warning_message = [[
+	'message' => _('Item contains user defined macros with type "Secret text". Values of these macros should be entered manually.')
+]];
+$warning_box = $data['show_warning']
+	? makeMessageBox(false, $warning_message, null, true, false)
+		->removeAttribute('class')
+		->addClass(ZBX_STYLE_MSG_WARNING)
+	: null;
+
 $output = [
 	'header' => $data['title'],
 	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
-	'body' => (new CDiv([$form, $templates]))->toString(),
+	'body' => (new CDiv([$warning_box, $form, $templates]))->toString(),
 	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[

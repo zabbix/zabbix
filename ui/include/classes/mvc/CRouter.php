@@ -55,6 +55,8 @@ class CRouter {
 	 */
 	private $routes = [
 		// action						controller											layout					view
+		'action.operation.get'			=> ['CControllerActionOperationGet',				'layout.json',			null],
+		'action.operation.validate'		=> ['CControllerActionOperationValidate',			'layout.json',			null],
 		'auditlog.list'					=> ['CControllerAuditLogList',						'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'			=> ['CControllerAuthenticationEdit',				'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'			=> ['CControllerAuthenticationUpdate',				null,					null],
@@ -128,9 +130,6 @@ class CRouter {
 		'popup'							=> ['CControllerPopup',								'layout.htmlpage',		'popup.view'],
 		'popup.acknowledge.edit'		=> ['CControllerPopupAcknowledgeEdit',				'layout.json',			'popup.acknowledge.edit'],
 		'popup.acknowledge.create'		=> ['CControllerPopupAcknowledgeCreate',			'layout.json',			null],
-		'popup.action.acknowledge'		=> ['CControllerPopupActionAcknowledge',			'layout.json',			'popup.operation.common'],
-		'popup.action.operation'		=> ['CControllerPopupActionOperation',				'layout.json',			'popup.operation.common'],
-		'popup.action.recovery'			=> ['CControllerPopupActionRecovery',				'layout.json',			'popup.operation.common'],
 		'popup.condition.actions'		=> ['CControllerPopupConditionActions',				'layout.json',			'popup.condition.common'],
 		'popup.condition.event.corr'	=> ['CControllerPopupConditionEventCorr',			'layout.json',			'popup.condition.common'],
 		'popup.condition.operations'	=> ['CControllerPopupConditionOperations',			'layout.json',			'popup.condition.common'],

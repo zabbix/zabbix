@@ -58,8 +58,8 @@ class CDashboardElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getWidgets() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget" or contains(@class, "dashbrd-grid-widget ") or'.
-				' @class="dashbrd-grid-iterator" or contains(@class, "dashbrd-grid-iterator ")]')->asWidget()->all();
+		return $this->query("xpath:.//div[".CXPathHelper::fromClass("dashbrd-grid-widget").
+				" or ".CXPathHelper::fromClass("dashbrd-grid-iterator")."]")->asWidget()->all();
 	}
 
 	/**
@@ -172,7 +172,8 @@ class CDashboardElement extends CElement {
 	 */
 	public function deleteWidget($name) {
 		$this->checkIfEditable();
-		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or contains(@class,'.
+				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
 
 

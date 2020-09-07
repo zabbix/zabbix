@@ -77,7 +77,7 @@ class CElasticsearchHelper {
 	private static function getScrollApiEndpoint($endpoint) {
 		$url = $endpoint;
 
-		for ($i = 0; $i < 3; $i++) {
+		for ($i = 0; $i < 2; $i++) {
 			if (($pos = strrpos($url, '/')) !== false) {
 				$url = substr($url, 0, $pos);
 			}
@@ -348,7 +348,12 @@ class CElasticsearchHelper {
 	public static function addSort($query, $options) {
 		foreach ($options['sortfield'] as $i => $sortfield) {
 			// Add sort field to order.
-			$sortorder = array_key_exists($i, $options['sortorder']) ? $options['sortorder'][$i] : ZBX_SORT_UP;
+			if (is_array($options['sortorder'])) {
+				$sortorder = array_key_exists($i, $options['sortorder']) ? $options['sortorder'][$i] : ZBX_SORT_UP;
+			}
+			else {
+				$sortorder = ($options['sortorder'] !== '') ? $options['sortorder'] : ZBX_SORT_UP;
+			}
 
 			if ($sortorder === ZBX_SORT_DOWN) {
 				$query['sort'][$sortfield] = $sortorder;

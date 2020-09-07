@@ -167,9 +167,9 @@ class CControllerPopupMaintenancePeriod extends CController {
 
 		if ($this->getInput('refresh', 0)) {
 			$data += [
-				'month_date_type' => 	0,
-				'hour' => 				0,
-				'minute' =>				0,
+				'month_date_type' => 0,
+				'hour' => 0,
+				'minute' => 0
 			];
 
 			if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {

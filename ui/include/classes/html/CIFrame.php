@@ -29,7 +29,6 @@ class CIFrame extends CTag {
 		$this->setHeight($height);
 		$this->setScrolling($scrolling);
 		$this->setId($id);
-		$this->setSandbox();
 	}
 
 	public function setSrc($value = null) {
@@ -69,11 +68,5 @@ class CIFrame extends CTag {
 
 		$this->setAttribute('scrolling', $value);
 		return $this;
-	}
-
-	private function setSandbox() {
-		if (ZBX_IFRAME_SANDBOX !== false) {
-			$this->setAttribute('sandbox', ZBX_IFRAME_SANDBOX);
-		}
 	}
 }

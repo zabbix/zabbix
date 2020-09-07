@@ -35,6 +35,7 @@ class CAudit {
 		AUDIT_RESOURCE_DISCOVERY_RULE =>	['druleid', 'name', 'drules'],
 		AUDIT_RESOURCE_GRAPH =>				['graphid', 'name', 'graphs'],
 		AUDIT_RESOURCE_GRAPH_PROTOTYPE =>	['graphid', 'name', 'graphs'],
+		AUDIT_RESOURCE_HOST =>				['hostid', 'name', 'hosts'],
 		AUDIT_RESOURCE_HOST_GROUP =>		['groupid', 'name', 'groups'],
 		AUDIT_RESOURCE_HOST_PROTOTYPE =>	['hostid', 'host', 'hosts'],
 		AUDIT_RESOURCE_ICON_MAP =>			['iconmapid', 'name', 'icon_map'],
@@ -85,8 +86,19 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => ['passwd' => true],
-			'config' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			'users' => [
+				'fields' => ['passwd' => true]
+			],
+			'config' => [
+				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			],
+			'media_type' => [
+				'fields' => ['passwd' => true]
+			],
+			'globalmacro' => [
+				'fields' => ['value' => true],
+				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+			]
 		];
 
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
@@ -124,18 +136,44 @@ class CAudit {
 					continue;
 				}
 
+				if (array_key_exists($table_name, $masked_fields)) {
+					$table_masked_fields = $masked_fields[$table_name]['fields'];
+					$mask_object_old = true;
+					$mask_object = true;
+
+					if (array_key_exists('conditions', $masked_fields[$table_name])) {
+						foreach ($masked_fields[$table_name]['conditions'] as $field_name => $value) {
+							if ($mask_object_old) {
+								$mask_object_old = ($object_old[$field_name] == $value);
+							}
+							if ($mask_object) {
+								$mask_object = array_key_exists($field_name, $object)
+									? ($object[$field_name] == $value)
+									: ($object_old[$field_name] == $value);
+							}
+						}
+					}
+				}
+				else {
+					$table_masked_fields = [];
+					$mask_object_old = false;
+					$mask_object = false;
+				}
+
 				foreach ($object_diff as $field_name => &$values) {
-					if (array_key_exists($table_name, $masked_fields)
-							&& array_key_exists($field_name, $masked_fields[$table_name])) {
-						$object_old[$field_name] = '********';
-						$object[$field_name] = '********';
+					if (array_key_exists($field_name, $table_masked_fields)) {
+						if ($mask_object_old) {
+							$object_old[$field_name] = ZBX_SECRET_MASK;
+						}
+						if ($mask_object) {
+							$object[$field_name] = ZBX_SECRET_MASK;
+						}
 					}
 
 					$values = [
 						'old' => $object_old[$field_name],
 						'new' => $object[$field_name]
 					];
-
 				}
 				unset($values);
 

@@ -790,7 +790,7 @@ class CService extends CApiService {
 			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
-		$sql = $this->createSelectQueryFromParts($sqlParts);
+		$sql = self::createSelectQueryFromParts($sqlParts);
 
 		return DBfetchArray(DBselect($sql));
 	}
@@ -824,7 +824,7 @@ class CService extends CApiService {
 			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
-		$sql = $this->createSelectQueryFromParts($sqlParts);
+		$sql = self::createSelectQueryFromParts($sqlParts);
 
 		return DBfetchArray(DBselect($sql));
 	}

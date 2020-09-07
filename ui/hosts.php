@@ -847,8 +847,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			else {
 				throw new Exception();
 			}
-
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostId, $host['host'], null, null, null);
 		}
 		else {
 			$host['hostid'] = $hostId;
@@ -856,16 +854,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if (!API::Host()->update($host)) {
 				throw new Exception();
 			}
-
-			$dbHostNew = API::Host()->get([
-				'output' => API_OUTPUT_EXTEND,
-				'hostids' => $hostId,
-				'editable' => true
-			]);
-			$dbHostNew = reset($dbHostNew);
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $dbHostNew['hostid'], $dbHostNew['host'], 'hosts',
-				$dbHost, $dbHostNew);
 		}
 
 		// full clone
@@ -1001,13 +989,14 @@ elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('
 		'templated_hosts' => true,
 		'output' => ['hostid']
 	]);
-	$actHosts = zbx_objectValues($actHosts, 'hostid');
 
 	if ($actHosts) {
-		DBstart();
+		foreach ($actHosts as &$host) {
+			$host['status'] = $status;
+		}
+		unset($host);
 
-		$result = updateHostStatus($actHosts, $status);
-		$result = DBend($result);
+		$result = (bool) API::Host()->update($actHosts);
 
 		if ($result) {
 			uncheckTableRows();
@@ -1446,7 +1435,6 @@ else {
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groups'],
-			'real_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['groupid' => 'id'])

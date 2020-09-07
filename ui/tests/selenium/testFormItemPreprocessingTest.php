@@ -478,7 +478,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				];
 
 				if ($macros['expected']) {
-					foreach ($form->getField('Macros')->getRows() as $row) {
+					foreach ($form->getField('Macros')->asTable()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
 						 * Macro columns are represented in following way:

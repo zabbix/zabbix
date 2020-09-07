@@ -965,3 +965,31 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 
 	return $scale_values;
 }
+
+/**
+ * @param string $short_item  Comma separated <short_field_name>:<value> pairs.
+ *
+ * @return array
+ */
+function expandShortGraphItem($short_item) {
+	$map = [
+		'gi' => 'gitemid',
+		'it' => 'itemid',
+		'so' => 'sortorder',
+		'fl' => 'flags',
+		'ty' => 'type',
+		'dr' => 'drawtype',
+		'ya' => 'yaxisside',
+		'ca' => 'calc_fnc',
+		'co' => 'color',
+	];
+
+	$item = [];
+
+	foreach (explode(',', $short_item) as $short_field) {
+		list($short_name, $value) = explode(':', $short_field);
+		$item[$map[$short_name]] = $value;
+	}
+
+	return $item;
+}

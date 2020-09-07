@@ -104,6 +104,21 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get interface ID by host ID and interface reference name.
+	 *
+	 * @param string $hostid  Host ID.
+	 * @param string $name    Interface reference name.
+	 *
+	 * @return string|bool
+	 */
+	public function resolveInterface($hostid, $name) {
+		return (array_key_exists($hostid, $this->interfacesCache)
+				&& array_key_exists($name, $this->interfacesCache[$hostid]))
+			? $this->interfacesCache[$hostid][$name]
+			: false;
+	}
+
+	/**
 	 * Get template id by host.
 	 *
 	 * @param string $host
@@ -1101,7 +1116,7 @@ class CImportReferencer {
 					' FROM hosts h,host_discovery hd,items i'.
 					' WHERE h.hostid=hd.hostid'.
 						' AND hd.parent_itemid=i.itemid'.
-						' AND '.implode(' OR ', $sqlWhere)
+						' AND ('.implode(' OR ', $sqlWhere).')'
 				);
 				while ($data = DBfetch($query)) {
 					$this->hostPrototypesRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
@@ -1176,7 +1191,7 @@ class CImportReferencer {
 					'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
 					' FROM httptest ht,httpstep hs'.
 					' WHERE ht.httptestid=hs.httptestid'.
-						' AND '.implode(' OR ', $sql_where)
+						' AND ('.implode(' OR ', $sql_where).')'
 				);
 				while ($db_httpstep = DBfetch($db_httpsteps)) {
 					$this->httpstepsRefs[$db_httpstep['hostid']][$db_httpstep['httptestid']][$db_httpstep['name']] =

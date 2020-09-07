@@ -174,6 +174,7 @@ class CControllerHostView extends CControllerHost {
 			->setArgument('filter_groupids', $filter['groupids'])
 			->setArgument('filter_ip', $filter['ip'])
 			->setArgument('filter_dns', $filter['dns'])
+			->setArgument('filter_port', $filter['port'])
 			->setArgument('filter_status', $filter['status'])
 			->setArgument('filter_evaltype', $filter['evaltype'])
 			->setArgument('filter_tags', $filter['tags'])

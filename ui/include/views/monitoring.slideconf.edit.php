@@ -80,7 +80,7 @@ if ($slideshow_ownerid !== '') {
 		: [
 			'id' => $slideshow_ownerid,
 			'name' => _('Inaccessible user'),
-			'inmaccessible' => true
+			'inaccessible' => true
 		];
 }
 

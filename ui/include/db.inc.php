@@ -499,15 +499,6 @@ function get_dbid($table, $field) {
 	return $ret2;
 }
 
-function zbx_db_distinct($sql_parts) {
-	$count = count($sql_parts['from']);
-	if (array_key_exists('left_join', $sql_parts)) {
-		$count += count($sql_parts['left_join']);
-	}
-
-	return ($count > 1 ? ' DISTINCT' : '');
-}
-
 function zbx_db_search($table, $options, &$sql_parts) {
 	global $DB;
 	list($table, $tableShort) = explode(' ', $table);
