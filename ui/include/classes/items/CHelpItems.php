@@ -81,7 +81,7 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'modbus.get[<endpoint>,<slaveid>,<function>,<address>,<count>,<type>,<endianess>,<offset>]',
+					'key' => 'modbus.get[<endpoint>,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 					'description' => _('Reads modbus data. Returns various types')
 				],
 				[
@@ -403,7 +403,7 @@ class CHelpItems {
 					'description' => _('Count of matched lines in log file monitoring with log rotation support. Returns integer')
 				],
 				[
-					'key' => 'modbus.get[<endpoint>,<slaveid>,<function>,<address>,<count>,<type>,<endianess>,<offset>]',
+					'key' => 'modbus.get[<endpoint>,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 					'description' => _('Reads modbus data. Returns various types')
 				],
 				[
