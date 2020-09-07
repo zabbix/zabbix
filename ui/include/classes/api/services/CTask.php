@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with task.
+ * Class containing methods for operations with tasks.
  */
 class CTask extends CApiService {
 
@@ -29,7 +29,7 @@ class CTask extends CApiService {
 	protected $sortColumns = ['taskid'];
 
 	/*
-	 * String constant to retrieve all possible fields for dyagnostic requested.
+	 * String constant to retrieve all possible fields for dyagnostic request.
 	 * Must be synchronized with server.
 	 */
 	const FIELD_EXTEND = 'extend';
@@ -120,17 +120,15 @@ class CTask extends CApiService {
 	/**
 	 * Create tasks.
 	 *
-	 * @param array        $tasks                                       Tasks to create.
-	 * @param string|array $tasks[]['type']                             Type of task.
-	 * @param string|array $tasks[]['request']
-	 * @param array        $tasks[]['request']                  Request object for task to create.
+	 * @param array        $tasks                               Tasks to create.
+	 * @param string|array $tasks[]['type']                     Type of task.
 	 * @param string       $tasks[]['request']['itemid']        Must be set for ZBX_TM_TASK_CHECK_NOW task.
 	 * @param array        $tasks[]['request']['historycache']  (optional) object of history cache data request.
 	 * @param array        $tasks[]['request']['valuecache']    (optional) object of value cache data request.
 	 * @param array        $tasks[]['request']['preprocessing'] (optional) object of preprocessing data request.
 	 * @param array        $tasks[]['request']['alerting']      (optional) object of alerting data request.
 	 * @param array        $tasks[]['request']['lld']           (optional) object of lld cache data request.
-	 * @param array        $tasks[]['proxy_hostid']                     (optional) Proxy to get diagnostic data about.
+	 * @param array        $tasks[]['proxy_hostid']             (optional) Proxy to get diagnostic data about.
 	 *
 	 * @return array
 	 */
@@ -239,9 +237,9 @@ class CTask extends CApiService {
 	}
 
 	/**
-	 * Create ZBX_TM_TASK_CHECK_NOW task.
+	 * Create ZBX_TM_TASK_CHECK_NOW tasks.
 	 *
-	 * @param array        $tasks             Request object for tasks to create.
+	 * @param array        $tasks                          Request object for tasks to create.
 	 * @param string|array $tasks[]['request']['itemid']   Item or LLD rule IDs to create tasks for.
 	 *
 	 * @throws APIException
@@ -313,13 +311,12 @@ class CTask extends CApiService {
 	 * Create ZBX_TM_DATA_TYPE_DIAGINFO tasks.
 	 *
 	 * @param array    $tasks[]
-	 * @param array    $tasks[]['request']                  Request object for task to create.
 	 * @param array    $tasks[]['request']['historycache']  (optional) object of history cache data request.
 	 * @param array    $tasks[]['request']['valuecache']    (optional) object of value cache data request.
 	 * @param array    $tasks[]['request']['preprocessing'] (optional) object of preprocessing data request.
 	 * @param array    $tasks[]['request']['alerting']      (optional) object of alerting data request.
-	 * @param array    $tasks[]['request']['lld']	       (optional) object of lld cache data request.
-	 * @param array    $tasks[]['proxy_hostid']             (optional) object of lld cache data request.
+	 * @param array    $tasks[]['request']['lld']	        (optional) object of lld cache data request.
+	 * @param array    $tasks[]['proxy_hostid']             Proxy to get diagnostic data about.
 	 *
 	 * @throws APIException
 	 *
