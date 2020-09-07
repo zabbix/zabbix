@@ -42,14 +42,6 @@ class testDiagnosticDataTask extends CIntegrationTest {
 			[
 				'request' => [
 					'historycache' => [
-						'stats' => ''
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/request/historycache/stats": an array is expected.'
-			],
-			[
-				'request' => [
-					'historycache' => [
 						'top' => [
 							'extend' => 10
 						]
@@ -123,7 +115,7 @@ class testDiagnosticDataTask extends CIntegrationTest {
 			[
 				'request' => [
 					'valuecache' => [
-						'stats' => ['extend']
+						'stats' => 'extend'
 					]
 				],
 				'expected_error' => null
