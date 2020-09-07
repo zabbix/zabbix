@@ -74,21 +74,24 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	opts.OnConnectionLost = func(client mqtt.Client, reason error) {
 		impl.Errf("connection lost to %s, reason: %s", broker, reason.Error())
 	}
+
 	opts.OnConnect = func(client mqtt.Client) {
-		//Will show the query password and username in log
-		impl.Debugf("connected to %s", broker)
+		impl.Debugf("connected to [%s]", broker)
+
 		impl.manager.Lock()
 		defer impl.manager.Unlock()
-		mc, found := p.mqttClients[broker]
-		if found {
-			mc.connected = true
-			for _, ms := range mc.subs {
-				if err := ms.subscribe(mc); err != nil {
-					impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
-				}
-			}
 
+		mc, ok := p.mqttClients[broker]
+		if !ok {
+			impl.Debugf("cannot subscribe to [%s]: broker is not connected", broker)
 			return
+		}
+
+		mc.connected = true
+		for _, ms := range mc.subs {
+			if err := ms.subscribe(mc); err != nil {
+				impl.Errf("cannot subscribe topic '%s' to [%s]: %s\n", ms.topic, broker, err)
+			}
 		}
 	}
 
