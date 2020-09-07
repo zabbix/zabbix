@@ -382,7 +382,8 @@ class CTask extends CApiService {
 				];
 				$task_check_now_rows[] = [
 					'taskid' => $taskid,
-					'itemid' => $itemid
+					'itemid' => $itemid,
+					'parent_taskid' => $taskid
 				];
 
 				$return[$index] = (string) $taskid++;
