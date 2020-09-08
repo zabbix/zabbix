@@ -115,7 +115,7 @@ class CTemplateDashboardImporter extends CImporter {
 		$dashboards_delete = array_diff_key($db_dashboardids, $dashboardids);
 
 		if ($dashboards_delete) {
-			API::TemplateDashboard()->delete($dashboards_delete);
+			API::TemplateDashboard()->delete(array_keys($dashboards_delete));
 		}
 	}
 
