@@ -19,25 +19,17 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationGeneralOtherParams extends CWebTest {
+class testFormAdministrationGeneralOtherParams extends testFormAdministrationGeneral {
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
+	public $config_link = 'zabbix.php?action=miscconfig.edit';
+	public $form_path = 'name:otherForm';
 
-	private $default = [
+	public $default = [
 		'Refresh unsupported items' => '10m',
 		'Group for discovered hosts' => 'Empty group',
 		'Default host inventory mode' => 'Disabled',
@@ -60,7 +52,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		'Network timeout for item test' => '60s'
 	];
 
-	private $db_default = [
+	public $db_default = [
 		'refresh_unsupported' => '10m',
 		'discovery_groupid' => 50006,
 		'default_inventory_mode' => -1,
@@ -83,7 +75,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		'item_test_timeout' => '60s'
 	];
 
-	private $custom = [
+	public $custom = [
 		'Refresh unsupported items' => '99m',
 		'Group for discovered hosts' => 'Hypervisors',
 		'Default host inventory mode' => 'Automatic',
@@ -110,10 +102,10 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	 * Test for checking form layout.
 	 */
 	public function testFormAdministrationGeneralOtherParams_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=miscconfig.edit');
+		$this->page->login()->open($this->config_link);
 		$this->assertPageTitle('Other configuration parameters');
 		$this->assertPageHeader('Other configuration parameters');
-		$form = $this->query('name:otherForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilPresent()->asForm()->one();
 
 		foreach (['Authorization', 'Security', 'Communication with Zabbix server'] as $header) {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
@@ -158,52 +150,17 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	}
 
 	/**
-	 * Test for checking 'Reset defaults' button.
-	 */
-	public function testFormAdministrationGeneralOtherParams_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=miscconfig.edit');
-		$form = $this->query('name:otherForm')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of some previous scenario.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		$default_sql = CDBHelper::getRow('SELECT * FROM config');
-
-		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		foreach (['Reset defaults', 'Cancel'] as $action) {
-			// Fill form with custom data.
-			$form->fill($this->custom);
-			$form->submit();
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
-			// Check custom data in form.
-			$this->page->refresh();
-			$this->page->waitUntilReady();
-			$form->invalidate();
-			$form->checkValue($this->custom);
-			$this->resetConfiguration($form, $this->default, $action, $this->custom);
-			$sql = ($action === 'Reset defaults') ? $default_sql : $custom_sql;
-			$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
-		}
-	}
-
-	/**
 	 * Test for checking form update without changing any data.
 	 */
 	public function testFormAdministrationGeneralOtherParams_SimpleUpdate() {
-		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
-		$this->page->login()->open('zabbix.php?action=miscconfig.edit');
-		$form = $this->query('name:otherForm')->waitUntilPresent()->asForm()->one();
-		$values = $form->getFields()->asValues();
-		$form->submit();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->executeSimpleUpdate();
+	}
 
-		$this->page->refresh();
-		$this->page->waitUntilReady();
-		$form->invalidate();
-		// Check that DBdata is not changed.
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
-		// Check that Frontend form is not changed.
-		$this->assertEquals($values, $form->getFields()->asValues());
+	/**
+	 * Test for checking 'Reset defaults' button.
+	 */
+	public function testFormAdministrationGeneralOtherParams_ResetButton() {
+		$this->executeResetButtonTest(true);
 	}
 
 	/**
@@ -920,75 +877,6 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	 * @dataProvider getCheckFormData
 	 */
 	public function testFormAdministrationGeneralOtherParams_CheckForm($data) {
-		$this->page->login()->open('zabbix.php?action=miscconfig.edit');
-		$form = $this->query('name:otherForm')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of previous test case.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		// Fill form with new data.
-		$form->fill($data['fields']);
-		$form->submit();
-		$this->page->waitUntilReady();
-		$message = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? 'Configuration updated'
-			: 'Cannot update configuration';
-		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
-		// Check saved configuration in frontend.
-		$this->page->open('zabbix.php?action=miscconfig.edit');
-		$form->invalidate();
-		// Check trimming symbols in Login attempts field.
-		if ((CTestArrayHelper::get($data['fields'], 'Login attempts')) === '3M') {
-			$data['fields']['Login attempts'] = '3';
-		}
-		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
-		$form->checkValue($values);
-		// Check saved configuration in database.
-		$sql = CDBHelper::getRow('SELECT * FROM config');
-		$db = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? CTestArrayHelper::get($data, 'db', [])
-			: $this->db_default;
-		foreach ($db as $key => $value) {
-			$this->assertArrayHasKey($key, $sql);
-			$this->assertEquals($value, $sql[$key]);
-		}
-	}
-
-	/**
-	 * Function for configuration resetting.
-	 *
-	 * @param element  $form      Settings configuration form
-	 * @param array    $default   Default form values
-	 * @param string   $action    Reset defaults or Cancel
-	 * @param array    $custom    Custom values for filling into settings form
-	 */
-	private function resetConfiguration($form, $default, $action, $custom = null) {
-		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
-		switch ($action) {
-			case 'Reset defaults':
-				// In Other parameters form these fields have no default value, so can be filled with anyting.
-				$form->checkValue(
-					[
-						'Group for discovered hosts' => null,
-						'User group for database down message' => null
-					]
-				);
-				$form->fill(
-					[
-						'Group for discovered hosts' => 'Empty group',
-						'User group for database down message' => 'Zabbix administrators'
-					]
-				);
-				$form->submit();
-				$this->assertMessage(TEST_GOOD, 'Configuration updated');
-				$this->page->refresh();
-				$this->page->waitUntilReady();
-				$form->invalidate();
-				// Check reset form.
-				$form->checkValue($default);
-				break;
-			case 'Cancel':
-				$form->checkValue($custom);
-				break;
-		}
+		$this->executeCheckForm($data, true);
 	}
 }

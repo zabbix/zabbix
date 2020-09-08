@@ -19,25 +19,17 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
+class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrationGeneral {
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
+	public $config_link = 'zabbix.php?action=trigdisplay.edit';
+	public $form_path = 'xpath://form[contains(@action, "trigdisplay.update")]';
 
-	private $default= [
+	public $default = [
 		'Use custom event status colours' => false,
 		'Unacknowledged PROBLEM events' => true,
 		'Acknowledged PROBLEM events' => true,
@@ -63,7 +55,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		'id:severity_color_5' => 'E45959'
 	];
 
-	private $db_default = [
+	public $db_default = [
 		'custom_color' => 0,
 		'problem_unack_style' => 1,
 		'problem_ack_style'=> 1,
@@ -89,7 +81,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		'severity_color_5' => 'E45959'
 	];
 
-	private $custom = [
+	public $custom = [
 		'Use custom event status colours' => true,
 		'Unacknowledged PROBLEM events' => false,
 		'Acknowledged PROBLEM events' => false,
@@ -212,78 +204,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	}
 
 	/**
-	 * Test for checking 'Reset defaults' button.
-	 */
-	public function testFormAdministrationGeneralTrigDisplOptions_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=trigdisplay.edit');
-		$form = $this->query('xpath://form[contains(@action, "trigdisplay.update")]')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of some previous scenario.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		$default_sql = CDBHelper::getRow('SELECT * FROM config');
-
-		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		foreach (['Reset defaults', 'Cancel'] as $action) {
-			// Fill form with custom data.
-			$form->fill($this->custom);
-			$form->submit();
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
-			// Check custom data in form.
-			$this->page->refresh();
-			$this->page->waitUntilReady();
-			$form->invalidate();
-			$form->checkValue($this->custom);
-			$this->resetConfiguration($form, $this->default, $action, $this->custom);
-			$sql = ($action === 'Reset defaults') ? $default_sql : $custom_sql;
-			$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
-		}
-	}
-
-	/**
-	 * Function for configuration resetting.
-	 *
-	 * @param element  $form      Settings configuration form
-	 * @param array    $default   Default form values
-	 * @param string   $action    Reset defaults or Cancel
-	 * @param array    $custom    Custom values for filling into settings form
-	 */
-	private function resetConfiguration($form, $default, $action, $custom = null) {
-		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
-		switch ($action) {
-			case 'Reset defaults':
-				$form->submit();
-				$this->assertMessage(TEST_GOOD, 'Configuration updated');
-				$this->page->refresh();
-				$this->page->waitUntilReady();
-				$form->invalidate();
-				// Check reset form.
-				$form->checkValue($default);
-				break;
-			case 'Cancel':
-				$form->checkValue($custom);
-				break;
-		}
-	}
-
-	/**
 	 * Test for checking form update without changing any data.
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_SimpleUpdate() {
-		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
-		$this->page->login()->open('zabbix.php?action=trigdisplay.edit');
-		$form = $this->query('xpath://form[contains(@action, "trigdisplay.update")]')->waitUntilPresent()->asForm()->one();
-		$values = $form->getFields()->asValues();
-		$form->submit();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		$this->page->refresh();
-		$this->page->waitUntilReady();
-		$form->invalidate();
-		// Check that DBdata is not changed.
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
-		// Check that Frontend form is not changed.
-		$this->assertEquals($values, $form->getFields()->asValues());
+		$this->executeSimpleUpdate();
+	}
+
+	/**
+	 * Test for checking 'Reset defaults' button.
+	 */
+	public function testFormAdministrationGeneralTrigDisplOptions_ResetButton() {
+		$this->executeResetButtonTest();
 	}
 
 	/**
@@ -903,31 +834,6 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	 * @dataProvider getCheckFormData
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_CheckForm($data) {
-		$this->page->login()->open('zabbix.php?action=trigdisplay.edit');
-		$form = $this->query('xpath://form[contains(@action, "trigdisplay.update")]')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of previous test case.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		// Fill form with new data.
-		$form->fill($data['fields']);
-		$form->submit();
-		$this->page->waitUntilReady();
-		$message = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? 'Configuration updated'
-			: 'Cannot update configuration';
-		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
-		// Check saved configuration in frontend.
-		$this->page->open('zabbix.php?action=trigdisplay.edit');
-		$form->invalidate();
-		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
-		$form->checkValue($values);
-		// Check saved configuration in database.
-		$sql = CDBHelper::getRow('SELECT * FROM config');
-		$db = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? CTestArrayHelper::get($data, 'db', [])
-			: $this->db_default;
-		foreach ($db as $key => $value) {
-			$this->assertArrayHasKey($key, $sql);
-			$this->assertEquals($value, $sql[$key]);
-		}
+		$this->executeCheckForm($data);
 	}
 }

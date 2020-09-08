@@ -19,25 +19,17 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationGeneralGUI extends CWebTest {
+class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
+	public $config_link = 'zabbix.php?action=gui.edit';
+	public $form_path = 'xpath://form[contains(@action, "gui.update")]';
 
-	private $default = [
+	public $default = [
 		'Default language' => 'English (en_GB)',
 		'Default time zone' => 'System',
 		'Default theme' => 'Blue',
@@ -52,7 +44,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		'Max period' => '2y'
 	];
 
-	private $db_default = [
+	public $db_default = [
 		'default_lang' => 'en_GB',
 		'default_timezone' => 'system',
 		'default_theme' => 'blue-theme',
@@ -67,7 +59,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		'max_period' => '2y'
 	];
 
-	private $custom = [
+	public $custom = [
 		'Default language' => 'English (en_US)',
 		'Default theme' => 'Dark',
 		'Limit for search and filter results' => '50',
@@ -105,6 +97,20 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 				' because locales for them are not installed on the web server.',
 			$this->query('class:red')->one()->getText()
 		);
+	}
+
+	/**
+	 * Test for checking form update without changing any data.
+	 */
+	public function testFormAdministrationGeneralGUI_SimpleUpdate() {
+		$this->executeSimpleUpdate();
+	}
+
+	/**
+	 * Test for checking 'Reset defaults' button.
+	 */
+	public function testFormAdministrationGeneralGUI_ResetButton() {
+		$this->executeResetButtonTest();
 	}
 
 	/**
@@ -885,32 +891,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	 * @dataProvider getCheckFormData
 	 */
 	public function testFormAdministrationGeneralGUI_CheckForm($data) {
-		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of previous test case.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		// Fill form with new data.
-		$form->fill($data['fields']);
-		$form->submit();
-		$this->page->waitUntilReady();
-		$message = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? 'Configuration updated'
-			: 'Cannot update configuration';
-		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
-		// Check saved configuration in frontend.
-		$this->page->open('zabbix.php?action=gui.edit');
-		$form->invalidate();
-		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
-		$form->checkValue($values);
-		// Check saved configuration in database.
-		$sql = CDBHelper::getRow('SELECT * FROM config');
-		$db = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? CTestArrayHelper::get($data, 'db', [])
-			: $this->db_default;
-		foreach ($db as $key => $value) {
-			$this->assertArrayHasKey($key, $sql);
-			$this->assertEquals($value, $sql[$key]);
-		}
+		$this->executeCheckForm($data);
 	}
 
 
@@ -1038,82 +1019,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 				$this->query('button:Apply')->one()->click();
 				$this->assertEquals('Maximum time period to display is 366 days.',
 						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
-				break;
-		}
-	}
-
-	/**
-	 * Test for checking form update without changing any data.
-	 */
-	public function testFormAdministrationGeneralGUI_SimpleUpdate() {
-		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
-		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
-		$values = $form->getFields()->asValues();
-		$form->submit();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-
-		$this->page->refresh();
-		$this->page->waitUntilReady();
-		$form->invalidate();
-		// Check that DBdata is not changed.
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
-		// Check that Frontend form is not changed.
-		$this->assertEquals($values, $form->getFields()->asValues());
-	}
-
-	/**
-	 * Test for checking 'Reset defaults' button.
-	 */
-	public function testFormAdministrationGeneralGUI_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of some previous scenario.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		$default_sql = CDBHelper::getRow('SELECT * FROM config');
-
-		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		foreach (['Reset defaults', 'Cancel'] as $action) {
-			// Fill form with custom data.
-			$form->fill($this->custom);
-			$form->submit();
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
-			// Check custom data in form.
-			$this->page->refresh();
-			$this->page->waitUntilReady();
-			$form->invalidate();
-			$form->checkValue($this->custom);
-			$this->resetConfiguration($form, $this->default, $action, $this->custom);
-			$sql = ($action === 'Reset defaults') ? $default_sql : $custom_sql;
-			$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
-		}
-	}
-
-	/**
-	 * Function for configuration resetting.
-	 *
-	 * @param element  $form      Settings configuration form
-	 * @param array    $default   Default form values
-	 * @param string   $action    Reset defaults or Cancel
-	 * @param array    $custom    Custom values for filling into settings form
-	 */
-	private function resetConfiguration($form, $default, $action, $custom = null) {
-		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
-		switch ($action) {
-			case 'Reset defaults':
-				$form->submit();
-				$this->assertMessage(TEST_GOOD, 'Configuration updated');
-				$this->page->refresh();
-				$this->page->waitUntilReady();
-				$form->invalidate();
-				// Check reset form.
-				$form->checkValue($default);
-				break;
-			case 'Cancel':
-				$form->checkValue($custom);
 				break;
 		}
 	}

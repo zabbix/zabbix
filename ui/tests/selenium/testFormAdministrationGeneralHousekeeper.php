@@ -19,25 +19,17 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationGeneralHousekeeper extends CWebTest {
+class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGeneral {
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
+	public $config_link = 'zabbix.php?action=housekeeping.edit';
+	public $form_path = 'id:housekeeping';
 
-	private $default = [
+	public $default = [
 		// Events and alerts.
 		'id:hk_events_mode' => true,
 		'id:hk_events_trigger' => '365d',
@@ -63,7 +55,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		'id:hk_trends' => '365d'
 	];
 
-	private $db_default = [
+	public $db_default = [
 		'hk_events_mode' => 1,
 		'hk_events_trigger' => '365d',
 		'hk_events_internal' => '1d',
@@ -83,7 +75,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		'hk_trends' => '365d'
 	];
 
-	private $custom = [
+	public $custom = [
 		// Events and alerts.
 		'id:hk_events_mode' => true,
 		'id:hk_events_trigger' => '43d',
@@ -162,77 +154,17 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	}
 
 	/**
-	 * Test for checking 'Reset defaults' button.
-	 */
-	public function testFormAdministrationGeneralHousekeeper_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
-		$form = $this->query('id:housekeeping')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of some previous scenario.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		$default_sql = CDBHelper::getRow('SELECT * FROM config');
-
-		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		foreach (['Reset defaults', 'Cancel'] as $action) {
-			// Fill form with custom data.
-			$form->fill($this->custom);
-			$form->submit();
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
-			// Check custom data in form.
-			$this->page->refresh();
-			$this->page->waitUntilReady();
-			$form->invalidate();
-			$form->checkValue($this->custom);
-			$this->resetConfiguration($form, $this->default, $action, $this->custom);
-			$sql = ($action === 'Reset defaults') ? $default_sql : $custom_sql;
-			$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
-		}
-	}
-
-	/**
 	 * Test for checking form update without changing any data.
 	 */
 	public function testFormAdministrationGeneralHousekeeper_SimpleUpdate() {
-		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
-		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
-		$form = $this->query('id:housekeeping')->waitUntilPresent()->asForm()->one();
-		$values = $form->getFields()->asValues();
-		$form->submit();
-
-		$this->page->refresh();
-		$this->page->waitUntilReady();
-		$form->invalidate();
-		// Check that DBdata is not changed.
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
-		// Check that Frontend form is not changed.
-		$this->assertEquals($values, $form->getFields()->asValues());
+		$this->executeSimpleUpdate();
 	}
 
 	/**
-	 * Function for configuration resetting.
-	 *
-	 * @param element  $form      Settings configuration form
-	 * @param array    $default   Default form values
-	 * @param string   $action    Reset defaults or Cancel
-	 * @param array    $custom    Custom values for filling into settings form
+	 * Test for checking 'Reset defaults' button.
 	 */
-	private function resetConfiguration($form, $default, $action, $custom = null) {
-		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
-		switch ($action) {
-			case 'Reset defaults':
-				$form->submit();
-				$this->assertMessage(TEST_GOOD, 'Configuration updated');
-				$this->page->refresh();
-				$this->page->waitUntilReady();
-				$form->invalidate();
-				// Check reset form.
-				$form->checkValue($default);
-				break;
-			case 'Cancel':
-				$form->checkValue($custom);
-				break;
-		}
+	public function testFormAdministrationGeneralHousekeeper_ResetButton() {
+		$this->executeResetButtonTest();
 	}
 
 	/**
@@ -1855,31 +1787,6 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	 * @dataProvider getCheckFormData
 	 */
 	public function testFormAdministrationGeneralHousekeeper_CheckForm($data) {
-		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
-		$form = $this->query('id:housekeeping')->waitUntilPresent()->asForm()->one();
-		// Reset form in case of previous test case.
-		$this->resetConfiguration($form, $this->default, 'Reset defaults');
-		// Fill form with new data.
-		$form->fill($data['fields']);
-		$form->submit();
-		$this->page->waitUntilReady();
-		$message = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? 'Configuration updated'
-			: 'Cannot update configuration';
-		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
-		// Check saved configuration in frontend.
-		$this->page->open('zabbix.php?action=housekeeping.edit');
-		$form->invalidate();
-		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
-		$form->checkValue($values);
-		// Check saved configuration in database.
-		$sql = CDBHelper::getRow('SELECT * FROM config');
-		$db = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? CTestArrayHelper::get($data, 'db', [])
-			: $this->db_default;
-		foreach ($db as $key => $value) {
-			$this->assertArrayHasKey($key, $sql);
-			$this->assertEquals($value, $sql[$key]);
-		}
+		$this->executeCheckForm($data);
 	}
 }
