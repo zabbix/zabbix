@@ -31,8 +31,8 @@ DIST_SUBDIRS = \
 	zbxcompress \
 	zbxembed \
 	zbxprometheus \
+	zbxvault \
 	zbxdiag
-
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -52,6 +52,7 @@ SERVER_SUBDIRS = \
 	zbxcompress \
 	zbxembed \
 	zbxprometheus \
+	zbxvault \
 	zbxdiag
 else
 if PROXY
@@ -71,6 +72,7 @@ PROXY_SUBDIRS = \
 	zbxcompress \
 	zbxembed \
 	zbxprometheus \
+	zbxvault \
 	zbxdiag
 endif
 endif
