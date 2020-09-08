@@ -205,6 +205,16 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		// Check template exists.
+		$db_template = API::Template()->get([
+			'countOutput' => true,
+			'templateids' => array_column($dashboards, 'templateid'),
+		]);
+
+		if (!$db_template) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		$names = [];
 		foreach ($dashboards as $value) {
 			$names[$value['templateid']][] = $value['name'];
@@ -366,67 +376,5 @@ class CTemplateDashboard extends CDashboardGeneral {
 			ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
 			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
 		];
-	}
-
-	protected function addRelatedObjects(array $options, array $result): array {
-		$result = parent::addRelatedObjects($options, $result);
-
-		$dashboardids = array_keys($result);
-
-		// Adding widgets.
-		if ($options['selectWidgets'] !== null) {
-			$fields_requested = $this->outputIsRequested('fields', $options['selectWidgets']);
-			if ($fields_requested && is_array($options['selectWidgets'])) {
-				$key = array_search('fields', $options['selectWidgets']);
-				unset($options['selectWidgets'][$key]);
-			}
-
-			$db_widgets = API::getApiService()->select('widget', [
-				'output' => $this->outputExtend($options['selectWidgets'], ['widgetid', 'dashboardid']),
-				'filter' => ['dashboardid' => $dashboardids],
-				'preservekeys' => true
-			]);
-
-			if ($db_widgets && $fields_requested) {
-				foreach ($db_widgets as &$db_widget) {
-					$db_widget['fields'] = [];
-				}
-				unset($db_widget);
-
-				$db_widget_fields = DB::select('widget_field', [
-					'output' => ['widgetid', 'type', 'name', 'value_int', 'value_str', 'value_groupid', 'value_hostid',
-						'value_itemid', 'value_graphid', 'value_sysmapid'
-					],
-					'filter' => ['widgetid' => array_keys($db_widgets)]
-				]);
-
-				$field_names_by_type = self::getFieldNamesByType();
-
-				foreach ($db_widget_fields as $db_widget_field) {
-					$db_widgets[$db_widget_field['widgetid']]['fields'][] = [
-						'type' => $db_widget_field['type'],
-						'name' => $db_widget_field['name'],
-						'value' => $db_widget_field[$field_names_by_type[$db_widget_field['type']]]
-
-					];
-				}
-			}
-
-			foreach ($result as &$row) {
-				$row['widgets'] = [];
-			}
-			unset($row);
-
-			$db_widgets = $this->unsetExtraFields($db_widgets, ['widgetid'], $options['selectWidgets']);
-
-			foreach ($db_widgets as $db_widget) {
-				$dashboardid = $db_widget['dashboardid'];
-				unset($db_widget['dashboardid']);
-
-				$result[$dashboardid]['widgets'][] = $db_widget;
-			}
-		}
-
-		return $result;
 	}
 }
