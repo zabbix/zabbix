@@ -212,9 +212,21 @@ func main() {
 		remoteDefault     = ""
 		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
 	)
-	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
+
+	var helpFlag bool
+	const (
+		helpDefault     = false
+		helpDescription = "Display this help message"
+	)
+	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
+	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
 
 	flag.Parse()
+
+	if helpFlag {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
