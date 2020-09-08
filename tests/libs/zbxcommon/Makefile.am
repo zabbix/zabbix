@@ -20,7 +20,8 @@ SERVER_tests = \
 	zbx_truncate_itemkey \
 	zbx_truncate_value \
 	zbx_dyn_escape_string \
-	zbx_tm_add
+	zbx_tm_add \
+	zbx_tm_sub
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -386,5 +387,20 @@ zbx_tm_add_LDADD += @SERVER_LIBS@
 zbx_tm_add_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_tm_add_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_tm_sub
+
+zbx_tm_sub_SOURCES = \
+	zbx_tm_sub.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tm_sub_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tm_sub_LDADD += @SERVER_LIBS@
+
+zbx_tm_sub_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_tm_sub_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

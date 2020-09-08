@@ -260,13 +260,17 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 	if (-1 != (time_new = mktime(&tm_new)))
 	{
 		tm_new = *localtime(&time_new);
+
+		printf("TZ: %d -> %d\n", tm->tm_isdst, tm_new.tm_isdst);
+
 		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 		{
 			*tm = tm_new;
 			if (0 == tm->tm_isdst)
-				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
-			else
 				tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
+			else
+				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
+
 		}
 	}
 }
