@@ -102,11 +102,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		// History.
 		'id:hk_history_mode' => false,
 		'id:hk_history_global' => true,
-		'id:hk_history' => '90d',   // This should be changed to another custom value after ZBX-18206 is fixed.
+		'id:hk_history' => '90d',   // This should be changed to another custom value after DEV-1673 is fixed.
 		// Trends.
 		'id:hk_trends_mode' => false,
 		'id:hk_trends_global' => true,
-		'id:hk_trends' => '365d'	// This should be changed to another custom value after ZBX-18206 is fixed.
+		'id:hk_trends' => '365d'	// This should be changed to another custom value after DEV-1673 is fixed.
 	];
 
 	/**
@@ -190,7 +190,53 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	}
 
 	/**
-	 * Test data for GUI form.
+	 * Test for checking form update without changing any data.
+	 */
+	public function testFormAdministrationGeneralHousekeeper_SimpleUpdate() {
+		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
+		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
+		$form = $this->query('id:housekeeping')->waitUntilPresent()->asForm()->one();
+		$values = $form->getFields()->asValues();
+		$form->submit();
+
+		$this->page->refresh();
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		// Check that DBdata is not changed.
+		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
+		// Check that Frontend form is not changed.
+		$this->assertEquals($values, $form->getFields()->asValues());
+	}
+
+	/**
+	 * Function for configuration resetting.
+	 *
+	 * @param element  $form      Settings configuration form
+	 * @param array    $default   Default form values
+	 * @param string   $action    Reset defaults or Cancel
+	 * @param array    $custom    Custom values for filling into settings form
+	 */
+	private function resetConfiguration($form, $default, $action, $custom = null) {
+		$form->query('button:Reset defaults')->one()->click();
+		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
+		switch ($action) {
+			case 'Reset defaults':
+				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'Configuration updated');
+				$this->page->refresh();
+				$this->page->waitUntilReady();
+				$form->invalidate();
+				// Check reset form.
+				$form->checkValue($default);
+				break;
+			case 'Cancel':
+				$form->checkValue($custom);
+				break;
+		}
+	}
+
+	/**
+	 * Test data for Housekeeping form.
 	 */
 	public function getCheckFormData() {
 		return [
@@ -1803,7 +1849,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	}
 
 	/**
-	 * Backup in needed because of ZBX-18206, and can be removed after bug is fixed.
+	 * Backup in needed because of DEV-1673, and can be removed after bug is fixed.
 	 * @backup config
 	 *
 	 * @dataProvider getCheckFormData
@@ -1834,52 +1880,6 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		foreach ($db as $key => $value) {
 			$this->assertArrayHasKey($key, $sql);
 			$this->assertEquals($value, $sql[$key]);
-		}
-	}
-
-	/**
-	 * Test for checking form update without changing any data.
-	 */
-	public function testFormAdministrationGeneralHousekeeper_SimpleUpdate() {
-		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
-		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
-		$form = $this->query('id:housekeeping')->waitUntilPresent()->asForm()->one();
-		$values = $form->getFields()->asValues();
-		$form->submit();
-
-		$this->page->refresh();
-		$this->page->waitUntilReady();
-		$form->invalidate();
-		// Check that DBdata is not changed.
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
-		// Check that Frontend form is not changed.
-		$this->assertEquals($values, $form->getFields()->asValues());
-	}
-
-	/**
-	 * Function for configuration resetting.
-	 *
-	 * @param element  $form      Settings configuration form
-	 * @param array    $default   Default form values
-	 * @param string   $action    Reset defaults or Cancel
-	 * @param array    $custom    Custom values for filling into settings form
-	 */
-	private function resetConfiguration($form, $default, $action, $custom = null) {
-		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
-		switch ($action) {
-			case 'Reset defaults':
-				$form->submit();
-				$this->assertMessage(TEST_GOOD, 'Configuration updated');
-				$this->page->refresh();
-				$this->page->waitUntilReady();
-				$form->invalidate();
-				// Check reset form.
-				$form->checkValue($default);
-				break;
-			case 'Cancel':
-				$form->checkValue($custom);
-				break;
 		}
 	}
 }
