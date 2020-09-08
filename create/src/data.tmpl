@@ -17,10 +17,17 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 
+TABLE |role
+FIELDS|roleid|name            |type|readonly|
+ROW   |1     |User role       |1   |0       |
+ROW   |2     |Admin role      |2   |0       |
+ROW   |3     |Super Admin role|3   |1       |
+ROW   |4     |Guest role      |1   |0       |
+
 TABLE |users
-FIELDS|userid|alias|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|type|rows_per_page|
-ROW   |1     |Admin|Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |3   |50           |
-ROW   |2     |guest|      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|    |0        |15m       |30s    |1   |50           |
+FIELDS|userid|alias|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|roleid|rows_per_page|
+ROW   |1     |Admin|Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |3     |50           |
+ROW   |2     |guest|      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|    |0        |15m       |30s    |1     |50           |
 
 TABLE |hstgrp
 FIELDS|groupid|name                       |internal|flags|
@@ -743,3 +750,26 @@ TABLE |config_autoreg_tls
 FIELDS|autoreg_tlsid|tls_psk_identity|tls_psk|
 ROW   |1            |                |       |
 
+TABLE |role_rule
+FIELDS|role_ruleid|roleid|type|name                    |value_int|value_str|value_moduleid|
+ROW   |1          |1     |0   |ui.default_access       |1        |         |NULL          |
+ROW   |2          |1     |0   |modules.default_access  |1        |         |NULL          |
+ROW   |3          |1     |0   |api                     |1        |         |NULL          |
+ROW   |4          |1     |0   |actions.default_access  |1        |         |NULL          |
+ROW   |5          |2     |0   |ui.default_access       |1        |         |NULL          |
+ROW   |6          |2     |0   |modules.default_access  |1        |         |NULL          |
+ROW   |7          |2     |0   |api                     |1        |         |NULL          |
+ROW   |8          |2     |0   |actions.default_access  |1        |         |NULL          |
+ROW   |9          |3     |0   |ui.default_access       |1        |         |NULL          |
+ROW   |10         |3     |0   |modules.default_access  |1        |         |NULL          |
+ROW   |11         |3     |0   |api                     |1        |         |NULL          |
+ROW   |12         |3     |0   |actions.default_access  |1        |         |NULL          |
+ROW   |13         |4     |0   |ui.default_access       |1        |         |NULL          |
+ROW   |14         |4     |0   |module.default_access   |1        |         |NULL          |
+ROW   |15         |4     |0   |api                     |0        |         |NULL          |
+ROW   |16         |4     |0   |actions.default_access  |0        |         |NULL          |
+ROW   |17         |4     |0   |actions.edit.dashboards |0        |         |NULL          |
+ROW   |18         |4     |0   |actions.edit.maps       |0        |         |NULL          |
+ROW   |19         |4     |0   |actions.edit.maintenance|0        |         |NULL          |
+ROW   |20         |4     |0   |actions.update.problems |0        |         |NULL          |
+ROW   |21         |4     |0   |actions.execute.scripts |0        |         |NULL          |
