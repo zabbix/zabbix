@@ -1,0 +1,57 @@
+---
+test case: Invalid period ''
+in:
+  period: 
+  shift: now/h
+  time: 2020-09-01 00:00:00.000000000 +00:00
+out:
+  return: FAIL
+---
+test case: Invalid period 'h'
+in:
+  period: h
+  shift: now/h
+  time: 2020-09-01 00:00:00.000000000 +00:00
+out:
+  return: FAIL
+---
+test case: Invalid period '1'
+in:
+  period: 1
+  shift: now/h
+  time: 2020-09-01 00:00:00.000000000 +00:00
+out:
+  return: FAIL
+---
+test case: Invalid period '1H'
+in:
+  period: 1H
+  shift: now/h
+  time: 2020-09-01 00:00:00.000000000 +00:00
+out:
+  return: FAIL
+---
+test case: Invalid period '0h'
+in:
+  period: 0h
+  shift: now/h
+  time: 2020-09-01 00:00:00.000000000 +00:00
+out:
+  return: FAIL
+---
+test case: Invalid period '12345678901234567890h'
+in:
+  period: 12345678901234567890h
+  shift: now/h
+  time: 2020-09-01 00:00:00.000000000 +00:00
+out:
+  return: FAIL
+---
+test case: Valid period '1h'
+in:
+  period: 1h
+  shift: now/h
+  time: 2020-09-01 00:00:00.000000000 +00:00
+out:
+  return: SUCCEED
+...

@@ -1650,4 +1650,22 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 #define AUDIT_ACTION_EXECUTE	7
 #define AUDIT_RESOURCE_SCRIPT	25
 
+typedef enum
+{
+	ZBX_TIME_UNIT_UNKNOWN,
+	ZBX_TIME_UNIT_HOUR,
+	ZBX_TIME_UNIT_DAY,
+	ZBX_TIME_UNIT_WEEK,
+	ZBX_TIME_UNIT_MONTH,
+	ZBX_TIME_UNIT_YEAR
+}
+zbx_time_unit_t;
+
+void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
+void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
+void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
+
+zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
+int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
+
 #endif
