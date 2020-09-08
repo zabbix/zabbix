@@ -27,7 +27,7 @@ func setServiceRun(fourground bool) {}
 
 func openEventLog() error { return nil }
 
-func fatalcloseOSItems(confPath string) error { return nil }
+func fatalcloseOSItems() {}
 
 func eventLogInfo(msg string) error { return nil }
 
