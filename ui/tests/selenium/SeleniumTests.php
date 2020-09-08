@@ -90,7 +90,6 @@ require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
-require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
@@ -237,7 +236,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
-		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
