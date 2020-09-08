@@ -26,7 +26,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js',
+	'class.tab-indicators.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -161,7 +163,7 @@ $fields = [
 								],
 	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
 									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-										HTTPTEST_AUTH_KERBEROS
+										HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
 									]),
 									null
 								],
@@ -169,14 +171,18 @@ $fields = [
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+											' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+										')',
 									_('Username')
 								],
 	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+											' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+										')',
 									_('Password')
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],

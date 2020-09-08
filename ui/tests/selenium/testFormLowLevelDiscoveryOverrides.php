@@ -1517,9 +1517,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @backup items
 	 */
-	public function testFormLowLevelDiscoveryOverrides_Update($data) {
+	// TODO: uncomment after fix ZBX-18271
+/*	public function testFormLowLevelDiscoveryOverrides_Update($data) {
 		$this->overridesUpdate($data);
 	}
+*/
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');

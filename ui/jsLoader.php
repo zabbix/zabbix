@@ -107,6 +107,7 @@ $availableJScripts = [
 	'class.rpc.js' => '',
 	'class.template.js' => '',
 	'init.js' => '',
+	'class.tab-indicators.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts

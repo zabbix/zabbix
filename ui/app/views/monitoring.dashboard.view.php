@@ -44,6 +44,7 @@ else {
 	$this->addJsFile('class.mapWidget.js');
 	$this->addJsFile('class.svg.canvas.js');
 	$this->addJsFile('class.svg.map.js');
+	$this->addJsFile('class.tab-indicators.js');
 
 	$this->includeJsFile('monitoring.dashboard.view.js.php');
 
@@ -63,7 +64,7 @@ else {
 				(new CMultiSelect([
 					'name' => 'dynamic_hostid',
 					'object_name' => 'hosts',
-					'data' => $data['dynamic']['host'],
+					'data' => $data['dynamic']['host'] ? [$data['dynamic']['host']] : [],
 					'multiple' => false,
 					'popup' => [
 						'parameters' => [
@@ -151,9 +152,9 @@ else {
 
 	$dashboard_data = [
 		// Name is required for new dashboard creation.
-		'name'		=> $data['dashboard']['name'],
-		'userid'	=> $data['dashboard']['owner']['id'],
-		'dynamic'	=> $data['dynamic']
+		'name' => $data['dashboard']['name'],
+		'userid' => $data['dashboard']['owner']['id'],
+		'dynamic_hostid' => $data['dynamic']['host'] ? $data['dynamic']['host']['id'] : null
 	];
 
 	if (array_key_exists('sharing', $data['dashboard'])) {
