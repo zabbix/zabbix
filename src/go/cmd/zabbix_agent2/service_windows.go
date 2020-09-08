@@ -106,7 +106,7 @@ func setServiceRun(forground bool) {
 	winServiceRun = !forground
 }
 
-func fatalcloseOSItems() {
+func fatalCloseOSItems() {
 	if winServiceRun {
 		sendFatalStopSig()
 	}
