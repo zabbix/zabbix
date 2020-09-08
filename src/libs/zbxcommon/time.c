@@ -261,8 +261,6 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 	{
 		tm_new = *localtime(&time_new);
 
-		printf("TZ: %d -> %d\n", tm->tm_isdst, tm_new.tm_isdst);
-
 		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 		{
 			*tm = tm_new;
