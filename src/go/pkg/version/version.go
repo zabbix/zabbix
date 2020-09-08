@@ -98,8 +98,14 @@ func Revision() string {
 	return ZABBIX_VERSION_REVISION
 }
 
+func CopyrightMessageMQTT() (message string) {
+	return "\nWe use the library Eclipse Paho (eclipse/paho.mqtt.golang), which is\n" +
+		"distributed under the terms of the Eclipse Distribution License 1.0 (The 3-Clause BSD License)\n" +
+		"available at https://www.eclipse.org/org/documents/edl-v10.php\n"
+}
+
 func CopyrightMessage() string {
-	return copyrightMessage + tls.CopyrightMessage()
+	return copyrightMessage + tls.CopyrightMessage() + CopyrightMessageMQTT()
 }
 
 func CompileDate() string {
