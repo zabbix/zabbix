@@ -369,7 +369,7 @@ class CDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException  if user is not valid.
 	 */
-	private function checkUsers(array $dashboards, array $db_dashboards = null): void {
+	protected function checkUsers(array $dashboards, array $db_dashboards = null): void {
 		$userids = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -422,7 +422,7 @@ class CDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException  if user group is not valid.
 	 */
-	private function checkUserGroups(array $dashboards): void {
+	protected function checkUserGroups(array $dashboards): void {
 		$usrgrpids = [];
 
 		foreach ($dashboards as $dashboard) {
