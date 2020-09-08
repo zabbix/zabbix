@@ -212,6 +212,7 @@ func main() {
 		remoteDefault     = ""
 		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
 	)
+	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
 	var helpFlag bool
 	const (
