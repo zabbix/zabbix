@@ -506,7 +506,7 @@ func main() {
 }
 
 func fatalExit(message string, err error) {
-	closeOSSpecificItems()
+	fatalcloseOSItems()
 	if len(message) == 0 {
 		message = err.Error()
 	} else {

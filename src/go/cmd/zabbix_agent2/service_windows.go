@@ -106,7 +106,7 @@ func setServiceRun(forground bool) {
 	winServiceRun = !forground
 }
 
-func closeOSSpecificItems() {
+func fatalcloseOSItems() {
 	if winServiceRun {
 		sendFatalStopSig()
 	}
@@ -199,7 +199,7 @@ func setHostname() error {
 	return nil
 }
 
-func handleWindowsService(conf string) error {
+func handleWindowsService(confPath string) error {
 	if svcMultipleAgentFlag {
 		if len(agent.Options.Hostname) == 0 {
 			if err := setHostname(); err != nil {
@@ -210,7 +210,11 @@ func handleWindowsService(conf string) error {
 	}
 
 	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
-		if err := resolveWindowsService(conf); err != nil {
+		absPath, err := filepath.Abs(confPath)
+		if err != nil {
+			return err
+		}
+		if err := resolveWindowsService(absPath); err != nil {
 			return err
 		}
 		closeEventLog()
@@ -226,11 +230,11 @@ func handleWindowsService(conf string) error {
 	return nil
 }
 
-func resolveWindowsService(conf string) error {
+func resolveWindowsService(confPath string) error {
 	var msg string
 	switch true {
 	case svcInstallFlag:
-		if err := svcInstall(conf); err != nil {
+		if err := svcInstall(confPath); err != nil {
 			return fmt.Errorf("failed to install %s as service: %s", serviceName, err)
 		}
 		msg = fmt.Sprintf("'%s' installed succesfully", serviceName)
@@ -240,7 +244,7 @@ func resolveWindowsService(conf string) error {
 		}
 		msg = fmt.Sprintf("'%s' uninstalled succesfully", serviceName)
 	case svcStartFlag:
-		if err := svcStart(conf); err != nil {
+		if err := svcStart(confPath); err != nil {
 			return fmt.Errorf("failed to start %s service: %s", serviceName, err)
 		}
 		msg = fmt.Sprintf("'%s' started succesfully", serviceName)
