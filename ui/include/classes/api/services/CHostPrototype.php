@@ -1733,7 +1733,9 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		$this->createInterfacesReal($interfaces);
+		if ($interfaces) {
+			$this->createInterfacesReal($interfaces);
+		}
 	}
 
 	/**
