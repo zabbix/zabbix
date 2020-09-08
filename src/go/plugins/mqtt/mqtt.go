@@ -331,5 +331,5 @@ func init() {
 	impl.manager = watch.NewManager(&impl)
 	impl.mqttClients = make(map[string]*mqttClient)
 
-	plugin.RegisterMetrics(&impl, "MQTT", "mqtt.get", "Listen on MQTT topics for published messages.")
+	plugin.RegisterMetrics(&impl, "MQTT", "mqtt.get", "Subscribe to MQTT topics for published messages.")
 }
