@@ -24,6 +24,8 @@
  */
 class CDashboard extends CDashboardGeneral {
 
+	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_DASHBOARD;
+
 	/**
 	 * @param array $options
 	 *

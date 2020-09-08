@@ -27,8 +27,6 @@ abstract class CDashboardGeneral extends CApiService {
 	protected const MAX_X = 23; // DASHBOARD_MAX_COLUMNS - 1;
 	protected const MAX_Y = 62; // DASHBOARD_MAX_ROWS - 2;
 
-	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_DASHBOARD;
-
 	protected $tableName = 'dashboard';
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['dashboardid', 'name'];
@@ -71,7 +69,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 		$this->updateWidget($dashboards, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $dashboards);
+		$this->addAuditBulk(AUDIT_ACTION_ADD, static::AUDIT_RESOURCE, $dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
@@ -143,7 +141,7 @@ abstract class CDashboardGeneral extends CApiService {
 		}
 		unset($db_dashboard);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $dashboards, $db_dashboards);
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, static::AUDIT_RESOURCE, $dashboards, $db_dashboards);
 
 		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
 	}
@@ -679,7 +677,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, self::AUDIT_RESOURCE, $db_dashboards);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
