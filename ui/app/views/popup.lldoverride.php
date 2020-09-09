@@ -186,6 +186,7 @@ $overrides_popup_form_list->addRow(_('Operations'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		->addStyle('width: 100%;')
+		->addStyle('max-width: 775px;')
 );
 
 $output['buttons'] = [
