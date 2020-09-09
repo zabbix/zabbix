@@ -98,8 +98,14 @@ func Revision() string {
 	return ZABBIX_VERSION_REVISION
 }
 
+func CopyrightMessageModbus() (message string) {
+	return "\nWe use the library go-modbus (goburrow/modbus), which is\n" +
+		"distributed under the terms of the 3-Clause BSD License\n" +
+		"available at https://github.com/goburrow/modbus/blob/master/LICENSE\n"
+}
+
 func CopyrightMessage() string {
-	return copyrightMessage + tls.CopyrightMessage()
+	return copyrightMessage + tls.CopyrightMessage() + CopyrightMessageModbus()
 }
 
 func CompileDate() string {

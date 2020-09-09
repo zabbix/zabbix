@@ -17,6 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/*
+**
+** We use the library go-modbus (goburrow/modbus), which is
+** distributed under the terms of the 3-Clause BSD License
+** available at https://github.com/goburrow/modbus/blob/master/LICENSE
+**
+**/
+
 package modbus
 
 import (
@@ -121,7 +129,7 @@ const (
 var impl Plugin
 
 func init() {
-	plugin.RegisterMetrics(&impl, "modbus",
+	plugin.RegisterMetrics(&impl, "Modbus",
 		"modbus.get", "Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianess>,<offset>].")
 }
 
@@ -173,7 +181,7 @@ func (p *Plugin) Validate(options interface{}) error {
 		return err
 	}
 
-	if opts.Timeout > 3600 || opts.Timeout < 0 {
+	if opts.Timeout > 30 || opts.Timeout < 0 {
 		return fmt.Errorf("Unacceptable Timeout value:%d", opts.Timeout)
 	}
 
