@@ -81,6 +81,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 			$options['output'] = array_keys($options['output']);
 		}
 
+		$options['groupCount'] = ($options['groupCount'] && $options['countOutput']);
+
 		// permissions
 		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
 			if ($options['templateids'] !== null) {
@@ -154,7 +156,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			}
 		}
 
-		if ($db_dashboards) {
+		if ($db_dashboards && !$options['groupCount']) {
 			$db_dashboards = $this->addRelatedObjects($options, $db_dashboards);
 			$db_dashboards = $this->unsetExtraFields($db_dashboards, ['dashboardid'], $options['output']);
 
