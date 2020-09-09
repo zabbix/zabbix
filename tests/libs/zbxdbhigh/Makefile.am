@@ -75,6 +75,8 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(COMMON_LIB)
 
 DBselect_uint64_SOURCES = \
