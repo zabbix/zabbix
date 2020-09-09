@@ -27,7 +27,7 @@ import (
 )
 
 // main data transformation
-func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
+func pack2Json(val []byte, p *mbParams) (jdata interface{}, err error) {
 
 	if p.RetType == Bit {
 		ar := getArr16(p.RetType, uint(p.Count), val)
@@ -100,7 +100,7 @@ func pack2Json(val []byte, p *MBParams) (jdata interface{}, err error) {
 	return string(jd), nil
 }
 
-func swapPairByte(v []byte, retType Bits16, retCount uint) (ret interface{}) {
+func swapPairByte(v []byte, retType bits16, retCount uint) (ret interface{}) {
 	switch retType {
 	case Int8:
 		ret = make([]int8, len(v))
@@ -120,24 +120,27 @@ func swapPairByte(v []byte, retType Bits16, retCount uint) (ret interface{}) {
 	return ret
 }
 
-func getArr16(retType Bits16, retCount uint, val []byte) []uint16 {
+func getArr16(retType bits16, retCount uint, val []byte) []uint16 {
 	ar := make([]uint16, retCount)
-	for i := range val {
-		if retType == Bit {
+	if retType == Bit {
+		for i := range val {
 			for j := 0; j < 8; j++ {
 				ar[i*8+j] = uint16(val[i] & (1 << j) >> j)
 				if retCount--; retCount == 0 {
 					return ar
 				}
 			}
-		} else {
+		}
+	} else {
+		for i := range val {
 			ar[i] = uint16(val[i])
 		}
 	}
+
 	return ar
 }
 
-func middlePack(v interface{}, rt Bits16) interface{} {
+func middlePack(v interface{}, rt bits16) interface{} {
 	buf := new(bytes.Buffer)
 	switch rt {
 	case Uint64:
@@ -194,7 +197,7 @@ func middlePack(v interface{}, rt Bits16) interface{} {
 	return v
 }
 
-func makeRetArray(retType Bits16, arraySize uint) (v interface{}) {
+func makeRetArray(retType bits16, arraySize uint) (v interface{}) {
 	switch retType {
 	case Uint64:
 		v = make([]uint64, arraySize)

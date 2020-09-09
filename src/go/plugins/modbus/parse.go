@@ -30,12 +30,12 @@ import (
 )
 
 // main parsing
-func parseParams(params *[]string) (*MBParams, error) {
+func parseParams(params *[]string) (*mbParams, error) {
 	if len(*params) == 0 || len(*params) > 8 {
 		return nil, fmt.Errorf("Invalid number of parameters:%d", len(*params))
 	}
 
-	var p MBParams
+	var p mbParams
 	var err error
 
 	if p.ReqType, err = getReqType((*params)[0]); err != nil {
@@ -43,30 +43,30 @@ func parseParams(params *[]string) (*MBParams, error) {
 	}
 
 	switch p.ReqType {
-	case Rtu, Ascii:
+	case RTU, ASCII:
 		if p.Serial, err = getSerial((*params)[0]); err != nil {
 			return nil, err
 		}
-	case Tcp:
+	case TCP:
 		if p.NetAddr, err = getNetAddr((*params)[0]); err != nil {
 			return nil, err
 		}
 	default:
-		return nil, fmt.Errorf("Unsupported modbus protocol.")
+		return nil, fmt.Errorf("Unsupported modbus protocol")
 	}
 
-	if p.SlaveId, err = getSlaveId(params, 1, p.ReqType); err != nil {
+	if p.SlaveID, err = getSlaveID(params, 1, p.ReqType); err != nil {
 		return nil, err
 	}
-	if p.FuncId, err = getFuncId(params, 2); err != nil {
-		return nil, err
-	}
-
-	if p.MemAddr, p.FuncId, err = getMemAddr(params, 3, p.FuncId); err != nil {
+	if p.FuncID, err = getFuncID(params, 2); err != nil {
 		return nil, err
 	}
 
-	if p.RetType, err = getRetType(params, 5, p.FuncId); err != nil {
+	if p.MemAddr, p.FuncID, err = getMemAddr(params, 3, p.FuncID); err != nil {
+		return nil, err
+	}
+
+	if p.RetType, err = getRetType(params, 5, p.FuncID); err != nil {
 		return nil, err
 	}
 
@@ -85,18 +85,18 @@ func parseParams(params *[]string) (*MBParams, error) {
 	return &p, nil
 }
 
-func getReqType(v string) (reqType Bits8, err error) {
+func getReqType(v string) (reqType bits8, err error) {
 	pos := strings.Index(v, "://")
 	if pos < 0 {
-		return 0, fmt.Errorf("Unsupported endpoint format.")
+		return 0, fmt.Errorf("Unsupported endpoint format")
 	}
 	switch v[:pos] {
 	case "rtu":
-		reqType = Rtu
+		reqType = RTU
 	case "ascii":
-		reqType = Ascii
+		reqType = ASCII
 	case "tcp":
-		reqType = Tcp
+		reqType = TCP
 	default:
 		reqType = 0
 	}
@@ -110,13 +110,13 @@ func getSerial(v string) (addr *Serial, err error) {
 	inx := strings.Index(val, ":")
 	if inx < 0 {
 		a.PortName = val
-		if runtime.GOOS != "windows" && strings.HasPrefix(a.PortName, "/dev/") == false {
+		if runtime.GOOS != "windows" && strings.Index(a.PortName, "/") < 0 {
 			a.PortName = "/dev/" + a.PortName
 		}
 		return &a, nil
 	}
 	a.PortName = val[:inx]
-	if runtime.GOOS != "windows" && strings.HasPrefix(a.PortName, "/dev/") == false {
+	if runtime.GOOS != "windows" && strings.Index(a.PortName, "/") < 0 {
 		a.PortName = "/dev/" + a.PortName
 	}
 
@@ -135,7 +135,7 @@ func getSerial(v string) (addr *Serial, err error) {
 
 	val = val[inx+1:]
 	if len(val) != 3 {
-		return nil, fmt.Errorf("Unsupported params format of serial line.")
+		return nil, fmt.Errorf("Unsupported params format of serial line")
 	}
 
 	switch val[0] {
@@ -192,23 +192,26 @@ func getNetAddr(v string) (netAddr string, err error) {
 		checkAddr = val
 	}
 
-	if h, p, err1 := net.SplitHostPort(checkAddr); err1 != nil {
-		return "", fmt.Errorf("address \"%s\": %s", val, err1)
-	} else {
-		netAddr = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
+	var (
+		h string
+		p string
+	)
+	if h, p, err = net.SplitHostPort(checkAddr); err != nil {
+		return "", fmt.Errorf("address \"%s\": %s", val, err)
 	}
+	netAddr = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
 
 	return netAddr, nil
 }
 
-func getSlaveId(p *[]string, n int, reqType Bits8) (slaveId uint8, err error) {
-	v := ""
+func getSlaveID(p *[]string, n int, reqType bits8) (slaveID uint8, err error) {
+	v := "1"
 
 	if len(*p) > n {
 		v = strings.TrimSpace((*p)[n])
 	}
 	if len(v) == 0 {
-		if reqType == Tcp {
+		if reqType == TCP {
 			return 255, nil
 		}
 		return 0, fmt.Errorf("Unsupported empty value of slave id for serial line")
@@ -217,16 +220,16 @@ func getSlaveId(p *[]string, n int, reqType Bits8) (slaveId uint8, err error) {
 	if val, err = strconv.ParseUint(v, 10, 8); err != nil {
 		return 0, fmt.Errorf("Unsupported slave id for serial line: %w", err)
 	}
-	slaveId = uint8(val)
+	slaveID = uint8(val)
 
-	if 0 != (reqType&(Rtu|Ascii)) && (slaveId == 0 || slaveId > 247) {
-		return 0, fmt.Errorf("Unsupported slave id value for serial line:%d", slaveId)
+	if 0 != (reqType&(RTU|ASCII)) && (slaveID == 0 || slaveID > 247) {
+		return 0, fmt.Errorf("Unsupported slave id value for serial line:%d", slaveID)
 	}
 
-	return slaveId, nil
+	return slaveID, nil
 }
 
-func getFuncId(p *[]string, n int) (funcId uint8, err error) {
+func getFuncID(p *[]string, n int) (funcID uint8, err error) {
 	v := ""
 
 	if len(*p) > n {
@@ -240,16 +243,16 @@ func getFuncId(p *[]string, n int) (funcId uint8, err error) {
 	if val, err = strconv.ParseUint(v, 10, 8); err != nil {
 		return 0, fmt.Errorf("Opration id: %w", err)
 	}
-	funcId = uint8(val)
+	funcID = uint8(val)
 
-	if funcId == 0 || funcId > 4 {
-		return 0, fmt.Errorf("Unsupported modbus opration:%d", funcId)
+	if funcID == 0 || funcID > 4 {
+		return 0, fmt.Errorf("Unsupported modbus opration:%d", funcID)
 	}
 
-	return funcId, nil
+	return funcID, nil
 }
 
-func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcId uint8, err error) {
+func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcID uint8, err error) {
 	var v string
 
 	if len(*p) > n && strings.TrimSpace((*p)[n]) != "" {
@@ -281,13 +284,13 @@ func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcId uint8, er
 	if memAddr >= 50000 || memAddr == 0 {
 		return 0, fid, fmt.Errorf("Unsupported modbus address for empty function:%d", memAddr)
 	}
-	funcId = uint8(memAddr / 10000)
+	funcID = uint8(memAddr / 10000)
 
-	switch funcId {
+	switch funcID {
 	case 0:
-		funcId = 1
+		funcID = 1
 	case 1:
-		funcId = 2
+		funcID = 2
 		memAddr = memAddr - 10000
 	case 3:
 		memAddr = memAddr - 30000
@@ -297,17 +300,17 @@ func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcId uint8, er
 		return 0, fid, fmt.Errorf("Unsupported modbus function for address:%d", memAddr)
 	}
 
-	return memAddr - 1, funcId, nil
+	return memAddr - 1, funcID, nil
 }
 
-func getRetType(p *[]string, n int, funcId uint8) (retType Bits16, err error) {
+func getRetType(p *[]string, n int, funcID uint8) (retType bits16, err error) {
 	v := ""
 
 	if len(*p) > n {
 		v = strings.TrimSpace((*p)[n])
 	}
 	if len(v) == 0 {
-		if funcId == ReadCoil || funcId == ReadDiscrete {
+		if funcID == ReadCoil || funcID == ReadDiscrete {
 			return Bit, nil
 		}
 		return Uint16, nil
@@ -336,13 +339,13 @@ func getRetType(p *[]string, n int, funcId uint8) (retType Bits16, err error) {
 	default:
 		return 0, fmt.Errorf("Unsupported type:%s", v)
 	}
-	if (funcId == ReadCoil || funcId == ReadDiscrete) && retType != Bit {
+	if (funcID == ReadCoil || funcID == ReadDiscrete) && retType != Bit {
 		return 0, fmt.Errorf("Unsupported type for Read Coil and Read Discrete Input:%s", v)
 	}
 	return retType, nil
 }
 
-func getCount(p *[]string, n int, retType Bits16) (count uint16, retCount uint, err error) {
+func getCount(p *[]string, n int, retType bits16) (count uint16, retCount uint, err error) {
 	v := "1"
 
 	if len(*p) > n {
@@ -378,7 +381,7 @@ func getCount(p *[]string, n int, retType Bits16) (count uint16, retCount uint, 
 	return count, retCount, nil
 }
 
-func getEndianness(p *[]string, n int, retType Bits16) (endianness Endianness, err error) {
+func getEndianness(p *[]string, n int, retType bits16) (endianness Endianness, err error) {
 	v := "be"
 
 	if len(*p) > n {
