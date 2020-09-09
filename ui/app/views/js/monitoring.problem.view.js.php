@@ -38,9 +38,15 @@
 			let url = new Curl(),
 				data = $.extend(<?= json_encode($data['filter_defaults'])?>, global_timerange, url.getArgumentsObject());
 
-			data.inventory = data.inventory?.filter(inventory => 'value' in inventory && inventory.value !== '');
-			data.tags = data.tags?.filter(tag => 'tag' in tag && tag.tag !== '' && tag.value !== '');
-			data.severities = data.severities?.filter((value, key) => value == key);
+			data.inventory = data.inventory
+				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')
+				: data.inventory;
+			data.tags = data.tags
+				? data.tags.filter(tag => 'tag' in tag && tag.tag !== '' && tag.value !== '')
+				: data.tags;
+			data.severities = data.severities
+				? data.severities.filter((value, key) => value == key)
+				: data.severities;
 
 			// Modify filter data of flickerfreeScreen object with id 'problem'.
 			window.flickerfreeScreen.screens['problem'].data.filter = data;
