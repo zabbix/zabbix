@@ -319,7 +319,7 @@ class CTask extends CApiService {
 	 * @param array    $tasks[]['request']['valuecache']    (optional) object of value cache data request.
 	 * @param array    $tasks[]['request']['preprocessing'] (optional) object of preprocessing data request.
 	 * @param array    $tasks[]['request']['alerting']      (optional) object of alerting data request.
-	 * @param array    $tasks[]['request']['lld']	        (optional) object of lld cache data request.
+	 * @param array    $tasks[]['request']['lld']           (optional) object of lld cache data request.
 	 * @param array    $tasks[]['proxy_hostid']             Proxy to get diagnostic data about.
 	 *
 	 * @throws APIException
