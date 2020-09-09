@@ -70,7 +70,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$sql_parts = [
 			'select'	=> ['dashboard' => 'd.dashboardid'],
 			'from'		=> ['dashboard' => 'dashboard d'],
-			'where'		=> ['template' => 'd.templateid IS NOT NULL'],
+			'where'		=> [],
 			'order'		=> [],
 			'group'		=> []
 		];
@@ -118,9 +118,9 @@ class CTemplateDashboard extends CDashboardGeneral {
 		}
 
 		// dashboardids
-		if ($options['templateids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('d.templateid', $options['templateids']);
-		}
+		$sql_parts['where'][] = ($options['templateids'] !== null)
+			? dbConditionInt('d.templateid', $options['templateids'])
+			: 'd.templateid IS NOT NULL';
 
 		// filter
 		if ($options['filter'] !== null) {

@@ -71,7 +71,7 @@ class CDashboard extends CDashboardGeneral {
 		$sql_parts = [
 			'select'	=> ['dashboard' => 'd.dashboardid'],
 			'from'		=> ['dashboard' => 'dashboard d'],
-			'where'		=> ['dashboard' => 'd.templateid IS NULL'],
+			'where'		=> ['d.templateid IS NULL'],
 			'order'		=> [],
 			'group'		=> []
 		];
