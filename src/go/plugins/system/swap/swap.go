@@ -20,3 +20,62 @@
 **/
 
 package win32
+
+import (
+	"errors"
+	"fmt"
+
+	"zabbix.com/pkg/plugin"
+)
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if key != "system.swap.size" {
+		return nil, plugin.UnsupportedMetricError
+	}
+
+	if len(params) > 2 {
+		return nil, errors.New("Too many parameters.")
+	}
+
+	var mode string
+	if len(params) == 2 && params[1] != "" {
+		mode = params[1]
+	}
+
+	if len(params) > 0 && params[0] != "" && params[0] != "all" {
+		return nil, errors.New("Invalid first parameter.")
+	}
+
+	total, avail, err := p.getSwap()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get Swap data:%s", err.Error())
+	}
+
+	switch mode {
+	case "", "total":
+		return total, nil
+	case "free":
+		return avail, nil
+	case "used":
+		return total - avail, nil
+	case "pfree":
+		return float64(avail) / float64(total) * 100, nil
+	case "pused":
+		return float64(total-avail) / float64(total) * 100, nil
+	default:
+		return nil, errors.New("Invalid second parameter.")
+	}
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "Swap",
+		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
+	)
+}

@@ -1,4 +1,4 @@
-// +build windows
+// +build !windows
 
 /*
 ** Zabbix
@@ -19,25 +19,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package swap
+package win32
 
-import (
-	"zabbix.com/pkg/win32"
-)
+import "syscall"
 
-// Export -
 func (p *Plugin) getSwap() (total, avail uint64, err error) {
-	m, err := win32.GlobalMemoryStatusEx()
-	if err != nil {
+	info := &syscall.Sysinfo_t{}
+	if err = syscall.Sysinfo(info); err != nil {
 		return
 	}
 
-	if m.TotalPageFile > m.TotalPhys {
-		total = m.TotalPageFile - m.TotalPhys
-	}
-	if m.AvailPageFile > m.AvailPhys {
-		avail = m.AvailPageFile - m.AvailPhys
-	}
+	total = info.Totalswap
+	avail = info.Freeswap
+
 	if avail > total {
 		avail = total
 	}
