@@ -18,11 +18,9 @@
 **/
 
 /*
-**
 ** We use the library go-modbus (goburrow/modbus), which is
 ** distributed under the terms of the 3-Clause BSD License
 ** available at https://github.com/goburrow/modbus/blob/master/LICENSE
-**
 **/
 
 package modbus
