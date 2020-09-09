@@ -35,9 +35,10 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
-
 
 if SERVER
 SERVER_COMMON_LIB = \
@@ -75,8 +76,6 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
-	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(COMMON_LIB)
 
 DBselect_uint64_SOURCES = \
