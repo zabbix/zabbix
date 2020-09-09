@@ -707,7 +707,8 @@ abstract class CDashboardGeneral extends CApiService {
 
 					$relation_map = $this->createRelationMap($db_dashboard_users, 'dashboardid', 'dashboard_userid');
 
-					$db_dashboard_users = $this->unsetExtraFields($db_dashboard_users, ['userid'], $options['selectUsers']);
+					$db_dashboard_users =
+						$this->unsetExtraFields($db_dashboard_users, ['userid'], $options['selectUsers']);
 
 					foreach ($db_dashboard_users as &$db_dashboard_user) {
 						unset($db_dashboard_user['dashboard_userid'], $db_dashboard_user['dashboardid']);
@@ -741,7 +742,8 @@ abstract class CDashboardGeneral extends CApiService {
 						'preservekeys' => true
 					]);
 
-					$relation_map = $this->createRelationMap($db_dashboard_usrgrps, 'dashboardid', 'dashboard_usrgrpid');
+					$relation_map =
+						$this->createRelationMap($db_dashboard_usrgrps, 'dashboardid', 'dashboard_usrgrpid');
 
 					$db_dashboard_usrgrps =
 						$this->unsetExtraFields($db_dashboard_usrgrps, ['usrgrpid'], $options['selectUserGroups']);
