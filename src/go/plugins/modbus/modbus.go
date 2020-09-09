@@ -38,20 +38,23 @@ type Plugin struct {
 	options PluginOptions
 }
 
+// PluginOptions -
 type PluginOptions struct {
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 }
 
-type Bits8 uint8
-type Bits16 uint16
+type bits8 uint8
+type bits16 uint16
 
+// Set of supported modbus connection types
 const (
-	Rtu Bits8 = 1 << iota
-	Ascii
-	Tcp
+	RTU bits8 = 1 << iota
+	ASCII
+	TCP
 )
 
+// Serial - structure for storing the Modbus connection parameters
 type Serial struct {
 	PortName string
 	Speed    uint32
@@ -60,31 +63,34 @@ type Serial struct {
 	StopBit  uint8
 }
 
+// Net - structure for storing the Modbus connection parameters
 type Net struct {
 	Address string
 	Port    uint32
 }
 
+// Endianness - byte order of received data
 type Endianness struct {
 	order  binary.ByteOrder
-	middle Bits8
+	middle bits8
 }
-type MBParams struct {
-	ReqType    Bits8
+type mbParams struct {
+	ReqType    bits8
 	NetAddr    string
 	Serial     *Serial
-	SlaveId    uint8
-	FuncId     uint8
+	SlaveID    uint8
+	FuncID     uint8
 	MemAddr    uint16
-	RetType    Bits16
+	RetType    bits16
 	RetCount   uint
 	Count      uint16
 	Endianness Endianness
 	Offset     uint16
 }
 
+// Set of supported types
 const (
-	Bit Bits16 = 1 << iota
+	Bit bits16 = 1 << iota
 	Int8
 	Uint8
 	Int16
@@ -96,13 +102,15 @@ const (
 	Double
 )
 
+// Set of supported byte orders
 const (
-	Be Bits8 = 1 << iota
+	Be bits8 = 1 << iota
 	Le
 	Mbe
 	Mle
 )
 
+// Set of supported modbus functions
 const (
 	ReadCoil     = 1
 	ReadDiscrete = 2
@@ -117,23 +125,24 @@ func init() {
 		"modbus.get", "Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianess>,<offset>].")
 }
 
+// Export - interface function of pugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 
 	if key != "modbus.get" {
 		return nil, plugin.UnsupportedMetricError
 	}
 
-	var mbparams *MBParams
+	var mbparams *mbParams
 	if mbparams, err = parseParams(&params); err != nil {
 		return nil, err
 	}
 
-	var raw_val []byte
-	if raw_val, err = modbusRead(mbparams, p.options.Timeout); err != nil {
+	var rawVal []byte
+	if rawVal, err = modbusRead(mbparams, p.options.Timeout); err != nil {
 		return nil, err
 	}
 
-	if result, err = pack2Json(raw_val, mbparams); err != nil {
+	if result, err = pack2Json(rawVal, mbparams); err != nil {
 		return nil, err
 	}
 
@@ -172,10 +181,10 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 // connecting and receiving data from modbus device
-func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
+func modbusRead(p *mbParams, timeout int) (results []byte, err error) {
 	handler := newHandler(p, timeout)
 	var lockName string
-	if p.ReqType == Tcp {
+	if p.ReqType == TCP {
 		lockName = p.NetAddr
 	} else {
 		lockName = p.Serial.PortName
@@ -184,13 +193,13 @@ func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
 	named.Lock(lockName)
 
 	switch p.ReqType {
-	case Tcp:
+	case TCP:
 		err = handler.(*mblib.TCPClientHandler).Connect()
 		defer handler.(*mblib.TCPClientHandler).Close()
-	case Rtu:
+	case RTU:
 		err = handler.(*mblib.RTUClientHandler).Connect()
 		defer handler.(*mblib.RTUClientHandler).Close()
-	case Ascii:
+	case ASCII:
 		err = handler.(*mblib.ASCIIClientHandler).Connect()
 		defer handler.(*mblib.ASCIIClientHandler).Close()
 	}
@@ -201,7 +210,7 @@ func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
 	}
 
 	client := mblib.NewClient(handler)
-	switch p.FuncId {
+	switch p.FuncID {
 	case ReadCoil:
 		results, err = client.ReadCoils(p.MemAddr, p.Count)
 	case ReadDiscrete:
@@ -224,29 +233,29 @@ func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
 }
 
 // make new modbus hendler depends on connection type
-func newHandler(p *MBParams, timeout int) (handler mblib.ClientHandler) {
+func newHandler(p *mbParams, timeout int) (handler mblib.ClientHandler) {
 	switch p.ReqType {
-	case Tcp:
+	case TCP:
 		h := mblib.NewTCPClientHandler(p.NetAddr)
-		h.SlaveId = p.SlaveId
+		h.SlaveId = p.SlaveID
 		h.Timeout = time.Duration(timeout) * time.Second
 		handler = h
-	case Rtu:
+	case RTU:
 		h := modbus.NewRTUClientHandler(p.Serial.PortName)
 		h.BaudRate = int(p.Serial.Speed)
 		h.DataBits = int(p.Serial.DataBits)
 		h.Parity = p.Serial.Parity
 		h.StopBits = int(p.Serial.StopBit)
-		h.SlaveId = p.SlaveId
+		h.SlaveId = p.SlaveID
 		h.Timeout = time.Duration(timeout) * time.Second
 		handler = h
-	case Ascii:
+	case ASCII:
 		h := modbus.NewASCIIClientHandler(p.Serial.PortName)
 		h.BaudRate = int(p.Serial.Speed)
 		h.DataBits = int(p.Serial.DataBits)
 		h.Parity = p.Serial.Parity
 		h.StopBits = int(p.Serial.StopBit)
-		h.SlaveId = p.SlaveId
+		h.SlaveId = p.SlaveID
 		h.Timeout = time.Duration(timeout) * time.Second
 		handler = h
 	}
