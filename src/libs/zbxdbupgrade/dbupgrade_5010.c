@@ -259,6 +259,31 @@ static int	DBpatch_5010028(void)
 	return DBmodify_field_type("task_result", &field, &old_field);
 }
 
+static int	DBpatch_5010029(void)
+{
+	const ZBX_FIELD	field = {"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_5010030(void)
+{
+	const ZBX_TABLE	table =
+			{"trigger_queue", "functionid", 0,
+				{
+					{"functionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+
 #endif
 
 DBPATCH_START(5010)
@@ -294,5 +319,7 @@ DBPATCH_ADD(5010025, 0, 1)
 DBPATCH_ADD(5010026, 0, 1)
 DBPATCH_ADD(5010027, 0, 1)
 DBPATCH_ADD(5010028, 0, 1)
+DBPATCH_ADD(5010029, 0, 1)
+DBPATCH_ADD(5010030, 0, 1)
 
 DBPATCH_END()
