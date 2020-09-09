@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -109,9 +110,15 @@ func getSerial(v string) (addr *Serial, err error) {
 	inx := strings.Index(val, ":")
 	if inx < 0 {
 		a.PortName = val
+		if runtime.GOOS != "windows" && strings.HasPrefix(a.PortName, "/dev/") == false {
+			a.PortName = "/dev/" + a.PortName
+		}
 		return &a, nil
 	}
 	a.PortName = val[:inx]
+	if runtime.GOOS != "windows" && strings.HasPrefix(a.PortName, "/dev/") == false {
+		a.PortName = "/dev/" + a.PortName
+	}
 
 	var speed uint64
 	val = val[inx+1:]
