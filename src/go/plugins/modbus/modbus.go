@@ -200,7 +200,7 @@ func modbusRead(p *MBParams, timeout int) (results []byte, err error) {
 		return nil, fmt.Errorf("Unable to connect: %s", err)
 	}
 
-	client := modbus.NewClient(handler)
+	client := mblib.NewClient(handler)
 	switch p.FuncId {
 	case ReadCoil:
 		results, err = client.ReadCoils(p.MemAddr, p.Count)
