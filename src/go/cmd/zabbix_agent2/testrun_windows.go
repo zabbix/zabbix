@@ -89,7 +89,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`perf_instance.discovery[Processor]`,
 		`perf_instance_en.discovery[Processor]`,
 		`modbus.get[tcp://localhost]`,
-		`system.hostname`
+		`system.hostname`,
 	}
 
 	for _, metric := range metrics {
