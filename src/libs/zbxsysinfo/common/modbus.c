@@ -278,8 +278,11 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		}
 
 #if !(defined(_WINDOWS) || defined(__MINGW32__))
-		endpoint->conn_info.serial.port = zbx_dsprintf(endpoint->conn_info.serial.port, "/dev/%s",
-				endpoint->conn_info.serial.port);
+		if ('/' != *endpoint->conn_info.serial.port)
+		{
+			endpoint->conn_info.serial.port = zbx_dsprintf(endpoint->conn_info.serial.port, "/dev/%s",
+					endpoint->conn_info.serial.port);
+		}
 #endif
 	}
 	else
