@@ -83,22 +83,19 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		// permissions
 		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
-			if (!is_null($options['templateids'])) {
-				unset($options['hostids']);
-
-				$options['templateids'] = API::Template()->get([
-					'output' => ['templateid'],
+			if ($options['templateids'] !== null) {
+				$options['templateids'] = array_keys(API::Template()->get([
+					'output' => [],
 					'templateids' => $options['templateids'],
 					'editable' => $options['editable'],
 					'preservekeys' => true
-				]);
-				$options['templateids'] = array_keys($options['templateids']);
+				]));
 			}
 			else {
 				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
 
-				$sqlParts['where'][] = 'EXISTS ('.
+				$sql_parts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM hosts_groups hgg'.
 						' JOIN rights r'.
