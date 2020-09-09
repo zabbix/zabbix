@@ -214,7 +214,7 @@ func getSlaveID(p *[]string, n int, reqType bits8) (slaveID uint8, err error) {
 		if reqType == TCP {
 			return 255, nil
 		}
-		return 0, fmt.Errorf("Unsupported empty value of slave id for serial line")
+		return 1, nil
 	}
 	var val uint64
 	if val, err = strconv.ParseUint(v, 10, 8); err != nil {
