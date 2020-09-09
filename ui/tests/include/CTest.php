@@ -461,6 +461,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		if (is_string($behavior)) {
 			$behavior = ['class' => $behavior];
+			if ($name !== null) {
+				$this->behaviors[$name] = $behavior;
+			}
+			else {
+				$this->behaviors[] = $behavior;
+			}
 		}
 
 		if (is_array($behavior) && array_key_exists('class', $behavior) && class_exists($behavior['class'])) {
