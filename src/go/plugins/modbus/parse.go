@@ -205,7 +205,7 @@ func getNetAddr(v string) (netAddr string, err error) {
 }
 
 func getSlaveID(p *[]string, n int, reqType bits8) (slaveID uint8, err error) {
-	v := "1"
+	v := ""
 
 	if len(*p) > n {
 		v = strings.TrimSpace((*p)[n])
