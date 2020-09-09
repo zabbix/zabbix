@@ -75,6 +75,12 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'group'		=> []
 		];
 
+		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $this->getTableSchema()['fields'];
+			unset($options['output']['userid'], $options['output']['private']);
+			$options['output'] = array_keys($options['output']);
+		}
+
 		// permissions
 		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
 			if (!is_null($options['templateids'])) {
@@ -154,7 +160,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 		if ($db_dashboards) {
 			$db_dashboards = $this->addRelatedObjects($options, $db_dashboards);
 			$db_dashboards = $this->unsetExtraFields($db_dashboards, ['dashboardid'], $options['output']);
-			$db_dashboards = $this->unsetExtraFields($db_dashboards, ['userid', 'private'], []);
 
 			if (!$options['preservekeys']) {
 				$db_dashboards = array_values($db_dashboards);
