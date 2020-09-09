@@ -342,6 +342,9 @@ func getRetType(p *[]string, n int, funcID uint8) (retType bits16, err error) {
 	if (funcID == ReadCoil || funcID == ReadDiscrete) && retType != Bit {
 		return 0, fmt.Errorf("Unsupported type for Read Coil and Read Discrete Input:%s", v)
 	}
+	if (funcID == ReadHolding || funcID == ReadInput) && retType == Bit {
+		return 0, fmt.Errorf("Unsupported type for Read Holding and Read Input registers:%s", v)
+	}
 	return retType, nil
 }
 
