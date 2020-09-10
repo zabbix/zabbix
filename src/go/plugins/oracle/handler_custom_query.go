@@ -48,6 +48,7 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+	defer rows.Close()
 
 	// JSON marshaling
 	var data []string

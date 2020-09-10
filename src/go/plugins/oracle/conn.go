@@ -197,7 +197,8 @@ func (c *ConnManager) create(uri URI) (*OraConn, error) {
 			Module:     godror.DriverName,
 		})
 
-	connectString := fmt.Sprintf("%s:%s/%s?connect_timeout=%d&retry_count=0",
+	connectString := fmt.Sprintf(`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
+		`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
 		uri.Host(), uri.Port(), uri.ServiceName(), c.connectTimeout/time.Second)
 
 	connector := godror.NewConnector(godror.ConnectionParams{

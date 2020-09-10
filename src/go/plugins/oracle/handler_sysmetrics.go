@@ -64,6 +64,7 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+	defer rows.Close()
 
 	var metric, value string
 
