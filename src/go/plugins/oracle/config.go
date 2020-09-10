@@ -81,6 +81,9 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		if session.URI == "" {
 			session.URI = p.options.URI
 		}
+		if session.ServiceName == "" {
+			session.ServiceName = p.options.ServiceName
+		}
 	}
 }
 

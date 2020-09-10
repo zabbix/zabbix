@@ -23,7 +23,6 @@ import (
 	"context"
 	"net/http"
 	"time"
-
 	"zabbix.com/pkg/zbxerr"
 
 	"github.com/omeid/go-yarn"
@@ -51,7 +50,7 @@ type Plugin struct {
 var impl Plugin
 
 // whereToConnect builds a URI based on key's parameters and a configuration file.
-func whereToConnect(params []string, sessions map[string]*Session, defaultURI string) (u *URI, err error) {
+func whereToConnect(params []string, options *PluginOptions) (u *URI, err error) {
 	user := ""
 	if len(params) > 1 {
 		user = params[1]
@@ -62,12 +61,12 @@ func whereToConnect(params []string, sessions map[string]*Session, defaultURI st
 		password = params[2]
 	}
 
-	serviceName := ""
+	serviceName := options.ServiceName
 	if len(params) > 3 {
 		serviceName = params[3]
 	}
 
-	uri := defaultURI
+	uri := options.URI
 
 	// The first param can be either a URI or a session identifier
 	if len(params) > 0 && len(params[0]) > 0 {
@@ -75,15 +74,14 @@ func whereToConnect(params []string, sessions map[string]*Session, defaultURI st
 			// Use a URI defined as key's parameter
 			uri = params[0]
 		} else {
-			if _, ok := sessions[params[0]]; !ok {
+			if _, ok := options.Sessions[params[0]]; !ok {
 				return nil, zbxerr.ErrorUnknownSession
 			}
-
 			// Use a pre-defined session
-			uri = sessions[params[0]].URI
-			user = sessions[params[0]].User
-			password = sessions[params[0]].Password
-			serviceName = sessions[params[0]].ServiceName
+			uri = options.Sessions[params[0]].URI
+			user = options.Sessions[params[0]].User
+			password = options.Sessions[params[0]].Password
+			serviceName = options.Sessions[params[0]].ServiceName
 		}
 	}
 
@@ -96,7 +94,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		handlerParams []string
 	)
 
-	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI)
+	uri, err := whereToConnect(params, &p.options)
 	if err != nil {
 		return nil, err
 	}
