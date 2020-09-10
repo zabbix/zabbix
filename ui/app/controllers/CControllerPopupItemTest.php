@@ -310,7 +310,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @return CItem|CItemPrototype|CDiscoveryRule
 	 */
-	protected function getPreprocessingItemClassInstance($test_type) {
+	protected static function getPreprocessingItemClassInstance($test_type) {
 		switch ($test_type) {
 			case self::ZBX_TEST_TYPE_ITEM:
 				return new CItem;
