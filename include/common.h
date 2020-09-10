@@ -779,6 +779,17 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 
 #define ZBX_USER_ONLINE_TIME	600
 
+/* user role permissions */
+typedef enum
+{
+	ROLE_PERM_DENY = 0,
+	ROLE_PERM_ALLOW = 1,
+}
+zbx_user_role_permission_t;
+
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute.scripts"
+
 /* user permissions */
 typedef enum
 {
@@ -792,6 +803,7 @@ typedef struct
 {
 	zbx_uint64_t	userid;
 	zbx_user_type_t	type;
+	zbx_uint64_t	roleid;
 }
 zbx_user_t;
 

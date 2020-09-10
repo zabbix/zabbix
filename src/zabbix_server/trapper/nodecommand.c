@@ -147,6 +147,58 @@ static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, z
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_check_user_administration_permissions                        *
+ *                                                                            *
+ * Purpose: check if the user has specific or default access for              *
+ *          administration actions                                            *
+ *                                                                            *
+ * Return value:  SUCCEED - the access is granted                             *
+ *                FAIL    - the access is denied                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, const char *role_rule)
+{
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
+
+	result = DBselect("select value_int from role_rule where roleid=" ZBX_FS_UI64 " and name='%s'", user->roleid,
+			role_rule);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		if (ROLE_PERM_ALLOW == atoi(row[0]))
+			ret = SUCCEED;
+	}
+	else
+	{
+		DBfree_result(result);
+		result = DBselect("select value_int from role_rule where roleid=" ZBX_FS_UI64 " and name='%s'",
+				user->roleid, ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			if (ROLE_PERM_ALLOW == atoi(row[0]))
+				ret = SUCCEED;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot read default access rule database for actions");
+			ret = FAIL;
+		}
+	}
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: execute_script                                                   *
  *                                                                            *
  * Purpose: executing command                                                 *
@@ -178,6 +230,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	if (SUCCEED != (rc = DBget_user_by_active_session(sessionid, &user)))
 	{
 		zbx_strlcpy(error, "Permission denied.", sizeof(error));
+		goto fail;
+	}
+
+	if (SUCCEED != (rc = zbx_check_user_administration_actions_permissions(&user,
+			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS)))
+	{
+		zbx_strlcpy(error, "Permission denied. No role access.", sizeof(error));
 		goto fail;
 	}
 
