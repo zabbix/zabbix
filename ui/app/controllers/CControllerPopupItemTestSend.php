@@ -108,7 +108,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', 0));
+			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));

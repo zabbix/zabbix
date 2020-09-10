@@ -236,11 +236,11 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Get testable item types based on host type.
 	 *
-	 * @param int $hostid
+	 * @param string $hostid
 	 *
 	 * @return array
 	 */
-	public static function getTestableItemTypes(int $hostid = 0): array {
+	public static function getTestableItemTypes(string $hostid = '0'): array {
 		if ($hostid != 0 && self::isItemTypeTestable($hostid)) {
 			self::$testable_item_types[] = ITEM_TYPE_IPMI;
 			self::$testable_item_types[] = ITEM_TYPE_SNMP;
@@ -252,11 +252,11 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Function checks if item type can be tested depending on what type of host it belongs to.
 	 *
-	 * @param int $hostid
+	 * @param string $hostid
 	 *
 	 * @return bool
 	 */
-	protected static function isItemTypeTestable(int $hostid): bool {
+	protected static function isItemTypeTestable(string $hostid): bool {
 		$ret = (bool) API::Template()->get([
 			'countOutput' => true,
 			'templateids' => [$hostid]

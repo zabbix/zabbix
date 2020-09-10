@@ -73,7 +73,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', 0));
+			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->item_type = $this->getInput('item_type');
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
