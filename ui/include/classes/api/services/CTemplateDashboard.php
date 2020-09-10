@@ -209,19 +209,21 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Check template exists.
-		$db_template = API::Template()->get([
-			'countOutput' => true,
-			'templateids' => array_column($dashboards, 'templateid'),
-		]);
-
-		if (!$db_template) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		$names = [];
 		foreach ($dashboards as $value) {
 			$names[$value['templateid']][] = $value['name'];
+		}
+
+		$templateids = array_keys($names);
+
+		// Check template exists.
+		$db_templates = API::Template()->get([
+			'countOutput' => true,
+			'templateids' => $templateids
+		]);
+
+		if ($db_templates != count($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$this->checkDuplicates($names);
