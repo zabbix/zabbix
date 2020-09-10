@@ -35,20 +35,53 @@ class C50ImportConverter extends CConverter {
 		$data['zabbix_export']['version'] = '5.2';
 
 		if (array_key_exists('templates', $data['zabbix_export'])) {
-			$data['zabbix_export']['templates'] = $this->convertScreenToDashboards($data['zabbix_export']['templates']);
+			$data['zabbix_export']['templates'] = $this->convertScreensToDashboards(
+				$data['zabbix_export']['templates']
+			);
 		}
 
 		return $data;
 	}
 
 	/**
-	 * Convert template screen to template dashboards.
+	 * Convert template screens to template dashboards.
 	 *
 	 * @param array $templates
 	 *
 	 * @return array
 	 */
-	protected function convertScreenToDashboards(array $templates): array {
+	protected function convertScreensToDashboards(array $templates): array {
+		foreach ($templates as &$template) {
+			if (!array_key_exists('screens', $template)) {
+				continue;
+			}
+
+			$dashboards = [];
+
+			foreach ($template['screens'] as $screen) {
+				try {
+					$dashboard = (new CTemplateScreenConverter($screen))->convertToTemplateDashboard();
+
+					$key = 'dashboard';
+					if (count($dashboards) > 0) {
+						$key .= count($dashboards);
+					}
+
+					$dashboards[$key] = $dashboard;
+				}
+				catch (Exception $e) {
+					// Skip screens containing errors.
+				}
+			}
+
+			unset($template['screens']);
+
+			if ($dashboards) {
+				$template['dashboards'] = $dashboards;
+			}
+		}
+		unset($template);
+
 		return $templates;
 	}
 }
