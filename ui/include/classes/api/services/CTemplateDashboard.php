@@ -209,12 +209,12 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$names = [];
+		$names_by_templateid = [];
 		foreach ($dashboards as $dashboard) {
-			$names[$dashboard['templateid']][] = $dashboard['name'];
+			$names_by_templateid[$dashboard['templateid']][] = $dashboard['name'];
 		}
 
-		$templateids = array_keys($names);
+		$templateids = array_keys($names_by_templateid);
 
 		// Check template exists.
 		$db_templates = API::Template()->get([
@@ -226,7 +226,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkDuplicates($names);
+		$this->checkDuplicates($names_by_templateid);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards, __FUNCTION__, [ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
@@ -287,7 +287,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		$dashboards = $this->extendObjectsByKey($dashboards, $db_dashboards, 'dashboardid', ['name']);
 
-		$names = [];
+		$names_by_templateid = [];
 
 		$widget_defaults = [
 			'name' => DB::getDefault('widget', 'name'),
@@ -309,7 +309,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			$db_dashboard = $db_dashboards[$dashboard['dashboardid']];
 
 			if ($dashboard['name'] !== $db_dashboard['name']) {
-				$names[$dashboard['templateid']][] = $dashboard['name'];
+				$names_by_templateid[$dashboard['templateid']][] = $dashboard['name'];
 			}
 
 			if (array_key_exists('widgets', $dashboard)) {
@@ -340,8 +340,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 		}
 		unset($dashboard);
 
-		if ($names) {
-			$this->checkDuplicates($names);
+		if ($names_by_templateid) {
+			$this->checkDuplicates($names_by_templateid);
 		}
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards, __FUNCTION__, [ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -352,18 +352,18 @@ class CTemplateDashboard extends CDashboardGeneral {
 	/**
 	 * Check for duplicated dashboards.
 	 *
-	 * @param array  $names
+	 * @param array  $names_by_templateid
 	 *
 	 * @throws APIException  if dashboard already exists.
 	 */
-	protected function checkDuplicates(array $names): void {
+	protected function checkDuplicates(array $names_by_templateid): void {
 		$where = [];
-		foreach ($names as $templateid => $value) {
-			$where[] = '('.dbConditionId('templateid', [$templateid]).' AND '. dbConditionString('name', $value).')';
+		foreach ($names_by_templateid as $templateid => $names) {
+			$where[] = '('.dbConditionId('templateid', [$templateid]).' AND '.dbConditionString('name', $names).')';
 		}
 
-		if ($result = DBfetch(DBselect('SELECT name FROM dashboard WHERE '.implode(' OR ', $where), 1))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" already exists.', $result['name']));
+		if ($db_dashboard = DBfetch(DBselect('SELECT name FROM dashboard WHERE '.implode(' OR ', $where), 1))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" already exists.', $db_dashboard['name']));
 		}
 	}
 
