@@ -784,7 +784,7 @@ abstract class CDashboardGeneral extends CApiService {
 					'filter' => ['widgetid' => array_keys($db_widgets)]
 				]);
 
-				$field_names_by_type = self::getFieldNamesByType();
+				$field_names_by_type = static::getFieldNamesByType();
 
 				foreach ($db_widget_fields as $db_widget_field) {
 					$db_widgets[$db_widget_field['widgetid']]['fields'][] = [
