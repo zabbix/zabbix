@@ -305,7 +305,10 @@ class CTabFilter extends CBaseComponent {
 				this._items.forEach((item, index) => from = (item._target === target) ? index : from);
 				this._target.querySelectorAll('nav [data-target] .tabfilter-item-link')
 					.forEach((elm, index) => to = (elm === target) ? index : to);
-				this._items[to] = this._items.splice(from, 1, this._items[to])[0];
+
+				var item_moved = this._items[from];
+				this._items.splice(from, 1);
+				this._items.splice(to, 0, item_moved);
 
 				// Tab order changed, update changes via ajax.
 				let value_str = this._items.map((item) => item._index).join(',');
