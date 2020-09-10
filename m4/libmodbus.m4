@@ -18,38 +18,51 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-AC_DEFUN([LIBMODBUS_TRY_LINK],
+AC_DEFUN([LIBMODBUS30_TRY_LINK],
 [
 AC_TRY_LINK(
 [
-#include <modbus/modbus.h>
+#include "modbus.h"
 ],
 [
-	modbus_t	*mdb_ctx;
-	mdb_ctx = modbus_new_tcp("127.0.0.1", 502);
+  modbus_t  *mdb_ctx;
+  mdb_ctx = modbus_new_tcp("127.0.0.1", 502);
+  modbus_set_response_timeout(mdb_ctx, NULL);
 ],
-found_libmodbus="yes",)
+found_libmodbus="30",)
+])dnl
+
+AC_DEFUN([LIBMODBUS31_TRY_LINK],
+[
+AC_TRY_LINK(
+[
+#include "modbus.h"
+],
+[
+  modbus_t  *mdb_ctx;
+  mdb_ctx = modbus_new_tcp("127.0.0.1", 502);
+  modbus_set_response_timeout(mdb_ctx, 1, 0)
+],
+found_libmodbus="31",)
 ])dnl
 
 AC_DEFUN([LIBMODBUS_ACCEPT_VERSION],
 [
-	# Zabbix minimal major supported version of libmodbus:
-	minimal_libmodbus_major_version=3
-	minimal_libmodbus_minor_version=0
+  _lib_version_parse="eval $AWK '{split(\$NF,A,\".\"); X=256*256*A[[1]]+256*A[[2]]+A[[3]]; print X;}'"
+  _lib_version=`echo ifelse([$1],,[0],[$1]) | $_lib_version_parse`
+  _lib_wanted=`echo ifelse([$2],,[0],[$2]) | $_lib_version_parse`
 
-	# get the major version
-	found_libmodbus_version_major=`cat $1 | $EGREP \#define.*'LIBMODBUS_VERSION_MAJOR ' | $AWK '{print @S|@3;}' | $EGREP -o "[0-9]+"`
-	found_libmodbus_version_minor=`cat $1 | $EGREP \#define.*'LIBMODBUS_VERSION_MINOR ' | $AWK '{print @S|@3;}' | $EGREP -o "[0-9]+"`
-
-	if test $((found_libmodbus_version_major)) -gt $((minimal_libmodbus_major_version)); then
-		accept_libmodbus_version="yes"
-	elif test $((found_libmodbus_version_major)) -lt $((minimal_libmodbus_major_version)); then
-		accept_libmodbus_version="no"
-	elif test $((found_libmodbus_version_minor)) -ge $((minimal_libmodbus_minor_version)); then
-		accept_libmodbus_version="yes"
-	else
-		accept_libmodbus_version="no"
-	fi;
+  if test $_lib_wanted -gt 0; then
+    AC_CACHE_CHECK([for libmodbus $1 >= version $2],
+      [libmodbus_cv_version_ok],[
+        if test $_lib_version -lt $_lib_wanted; then
+          AC_MSG_ERROR([libmodbus version mismatch])
+        else
+          libmodbus_cv_version_ok="yes"
+        fi
+      ]
+    )
+  fi
 ])dnl
 
 AC_DEFUN([LIBMODBUS_CHECK_CONFIG],
@@ -58,54 +71,54 @@ AC_DEFUN([LIBMODBUS_CHECK_CONFIG],
 If you want to use MODBUS based checks:
 AC_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no@:>@, DIR is the MODBUS library install directory.])],
     [
-	if test "$withval" = "no"; then
-	    want_libmodbus="no"
-	    _libmodbus_dir="no"
-	elif test "$withval" = "yes"; then
-	    want_libmodbus="yes"
-	    _libmodbus_dir="no"
-	else
-	    want_libmodbus="yes"
-	    _libmodbus_dir=$withval
-	fi
-	accept_libmodbus_version="no"
-    ],[want_libmodbus=ifelse([$1],,[no],[$1])]
+      if test "$withval" = "no"; then
+        want_libmodbus="no"
+        _libmodbus_dir="no"
+      elif test "$withval" = "yes"; then
+        want_libmodbus="yes"
+        _libmodbus_dir="no"
+      else
+        want_libmodbus="yes"
+        _libmodbus_dir=$withval
+      fi
+      _libmodbus_version_wanted=ifelse([$1],,[3.0.0],[$1])
+    ],[
+      want_libmodbus="no"
+    ]
   )
 
   if test "x$want_libmodbus" = "xyes"; then
-     AC_MSG_CHECKING(for LIBMODBUS support)
-     if test "x$_libmodbus_dir" = "xno"; then
-       if test -f /usr/include/modbus/modbus.h; then
-         LIBMODBUS_CFLAGS=-I/usr/include
-         LIBMODBUS_LDFLAGS=-L/usr/lib
-         LIBMODBUS_LIBS="-lmodbus"
-         found_libmodbus="yes"
-	 LIBMODBUS_ACCEPT_VERSION([/usr/include/modbus/modbus-version.h])
-       elif test -f /usr/local/include/modbus/modbus.h; then
-         LIBMODBUS_CFLAGS=-I/usr/local/include
-         LIBMODBUS_LDFLAGS=-L/usr/local/lib
-         LIBMODBUS_LIBS="-lmodbus"
-         found_libmodbus="yes"
-	 LIBMODBUS_ACCEPT_VERSION([/usr/local/include/modbus/modbus-version.h])
-       else #libraries are not found in default directories
-         found_libmodbus="no"
-         AC_MSG_RESULT(no)
-       fi # test -f /usr/include/modbus/modbus.h; then
-     else # test "x$_libmodbus_dir" = "xno"; then
-       if test -f $_libmodbus_dir/include/modbus/modbus.h; then
-	 LIBMODBUS_CFLAGS=-I$_libmodbus_dir/include
-         LIBMODBUS_LDFLAGS=-L$_libmodbus_dir/lib
-         LIBMODBUS_LIBS="-lmodbus"
-         found_libmodbus="yes"
-	 LIBMODBUS_ACCEPT_VERSION([$_libmodbus_dir/include/modbus/modbus-version.h])
-       else #if test -f $_libmodbus_dir/include/modbus/modbus.h; then
-         found_libmodbus="no"
-         AC_MSG_RESULT(no)
-       fi #test -f $_libmodbus_dir/include/modbus/modbus.h; then
-     fi #if test "x$_libmodbus_dir" = "xno"; then--with-libmodbu
-  fi # if test "x$want_libmodbus" != "xno"; then
+    AC_PROG_AWK
+    AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+    PKG_PROG_PKG_CONFIG()
+    test -z "$PKG_CONFIG" && AC_MSG_ERROR([Not found pkg-config library])
+    m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 
-  if test "x$found_libmodbus" = "xyes"; then
+    if test "x$_libmodbus_dir" = "xno"; then
+      PKG_CHECK_EXISTS(libmodbus,[
+        LIBMODBUS_LIBS=`$PKG_CONFIG --libs libmodbus`
+      ],[
+        AC_MSG_ERROR([Not found libmodbus package])
+      ])
+      LIBMODBUS_CFLAGS=`$PKG_CONFIG --cflags libmodbus`
+      LIBMODBUS_LDFLAGS=""
+      _libmodbus_version=`$PKG_CONFIG --modversion libmodbus`
+    else
+      AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libmodbus_dir/lib/pkgconfig" $PKG_CONFIG --exists --print-errors libmodbus]) || AC_MSG_ERROR(["Not found libmodbus package in $_libmodbus_dir/lib/pkgconfig"])
+      LIBMODBUS_LDFLAGS="-L$_libmodbus_dir/lib"
+      LIBMODBUS_LIBS=`PKG_CONFIG_LIBDIR="$_libmodbus_dir/lib/pkgconfig" $PKG_CONFIG --libs libmodbus`
+      LIBMODBUS_CFLAGS=`PKG_CONFIG_LIBDIR="$_libmodbus_dir/lib/pkgconfig" $PKG_CONFIG --cflags libmodbus`
+      _libmodbus_version=`PKG_CONFIG_LIBDIR="$_libmodbus_dir/lib/pkgconfig" $PKG_CONFIG --modversion libmodbus`
+    fi
+
+    LIBMODBUS_ACCEPT_VERSION($_libmodbus_version,$_libmodbus_version_wanted)
+    if test "x$enable_static_libs" = "xyes"; then
+      if test "x$static_linking_support" = "xno"; then
+        LIBMODBUS_LIBS=`echo "$LIBMODBUS_LIBS"|sed "s|-lmodbus|$_libmodbus_dir/lib/libmodbus.a|g"`
+      else
+        LIBMODBUS_LIBS=`echo "$LIBMODBUS_LIBS"|sed "s/-lmodbus/${static_linking_support}static -lmodbus ${static_linking_support}dynamic/g"`
+      fi
+    fi
     am_save_cflags="$CFLAGS"
     am_save_ldflags="$LDFLAGS"
     am_save_libs="$LIBS"
@@ -115,27 +128,26 @@ AC_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no
     LIBS="$LIBS $LIBMODBUS_LIBS"
 
     found_libmodbus="no"
-    LIBMODBUS_TRY_LINK([no])
-
+    LIBMODBUS31_TRY_LINK([no])
+    if test "x$found_libmodbus" = "xno"; then
+      LIBMODBUS30_TRY_LINK([no])
+    fi
     CFLAGS="$am_save_cflags"
     LDFLAGS="$am_save_ldflags"
     LIBS="$am_save_libs"
 
-    if test "x$found_libmodbus" = "xyes"; then
+    AC_MSG_CHECKING(for libmodbus support)
+    if test "x$found_libmodbus" != "xno"; then
       AC_DEFINE([HAVE_LIBMODBUS], 1, [Define to 1 if you have the 'libmodbus' library (-lmodbus)])
-      AC_MSG_RESULT(yes)
-      if test $((found_libmodbus_version_major)) = 3 &&  test $((found_libmodbus_version_minor)) = 0; then
+      if test "x$found_libmodbus" = "x30"; then
         AC_DEFINE([HAVE_LIBMODBUS_3_0], 1, [Define to 1 if you have the 'libmodbus' library version 3.0.x (-lmodbus)])
-        AC_MSG_RESULT(yes)
-      elif test $((found_libmodbus_version_major)) = 3 &&  test $((found_libmodbus_version_minor)) = 1; then
+      elif test "x$found_libmodbus" = "x31"; then
         AC_DEFINE([HAVE_LIBMODBUS_3_1], 1, [Define to 1 if you have the 'libmodbus' library version 3.1.x (-lmodbus)])
-        AC_MSG_RESULT(yes)
       fi
+      found_libmodbus="yes"
+      AC_MSG_RESULT(yes)
     else
-      AC_MSG_RESULT(no)
-      LIBMODBUS_CFLAGS=""
-      LIBMODBUS_LDFLAGS=""
-      LIBMODBUS_LIBS=""
+      AC_MSG_ERROR([Not compatible libmodbus library])
     fi
   fi
 

@@ -1731,21 +1731,16 @@ ZBXJS_LDFLAGS="$ZLIB_LDFLAGS $TLS_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $TLS_LIBS"
 
 dnl Check for libmodbus [by default - skip]
-LIBMODBUS_CHECK_CONFIG([no])
+LIBMODBUS_CHECK_CONFIG([3.0.0])
 if test "x$want_libmodbus" = "xyes"; then
-	if test "x$found_libmodbus" != "xyes"; then
-		AC_MSG_ERROR([Invalid LIBMODBUS directory - unable to find modbus.h])
-	elif test "x$accept_libmodbus_version" != "xyes"; then
-		AC_MSG_ERROR([LIBMODBUS library version requirement not met (>= 3.0.0)])
-	else
+	if test "x$found_libmodbus" = "xyes"; then
 		have_libmodbus="yes"
 	fi
 fi
 
 LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
 LIBS="$LIBS $LIBMODBUS_LIBS"
-
-AC_SUBST(LIBMODBUS_CFLAGS)
+CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
 
 
 if test "x$agent2" = "xyes"; then
@@ -2210,7 +2205,7 @@ if test "x$agent" != "xno"; then
 
 echo "  Agent details:
     TLS:                   ${have_tls}
-    MODBUS:                ${have_libmodbus}
+    Modbus:                ${have_libmodbus}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}
     Configuration file:    ${AGENT_CONFIG_FILE}
