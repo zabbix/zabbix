@@ -50,16 +50,21 @@ if ($data['display_interfaces']) {
 			->setId('interface-select')
 			->setValue($data['interfaceid']);
 
-	$span = (new CSpan(_('No interface found')))
-		->addClass(ZBX_STYLE_RED)
-		->setId('interface_not_defined')
-		->addStyle('display: none;');
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setChecked(array_key_exists('interfaceid', $data['visible']))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
-		(new CDiv([$interfaces_select, $span]))->setId('interfaceDiv'),
+		(new CDiv([
+			getInterfaceSelect($data['hosts']['interfaces'])
+				->setId('interface-select')
+				->setValue($data['interfaceid'])
+				->addClass('host-interface'),
+			(new CSpan(_('No interface found')))
+				->addClass(ZBX_STYLE_RED)
+				->setId('interface_not_defined')
+				->addStyle('display: none;')
+		]))->setId('interfaceDiv'),
 		'interface_row'
 	);
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);

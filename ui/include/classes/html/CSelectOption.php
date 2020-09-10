@@ -25,41 +25,42 @@
 class CSelectOption {
 
 	/**
-	 * @var string $title
+	 * @var string
 	 */
-	protected $title;
+	protected $label;
 
 	/**
-	 * @var string $value
+	 * @var string
 	 */
 	protected $value;
 
 	/**
-	 * @var ?string $description
+	 * @var array
 	 */
-	protected $description;
+	protected $label_extra = [];
 
 	/**
-	 * @var bool $disabled
+	 * @var bool
 	 */
-	protected $disabled;
+	protected $disabled = false;
 
 	/**
-	 * @param string $title   Option name.
-	 * @param string $value  Option value.
+	 * @param mixed  $value  Option value.
+	 * @param string $label  Option name.
 	 */
-	public function __construct(string $title, string $value) {
-		$this->title = $title;
+	public function __construct($value, string $label) {
 		$this->value = $value;
-		$this->description = null;
-		$this->disabled = false;
+		$this->label = $label;
 	}
 
 	/**
-	 * @param string $description
+	 * @param string $key
+	 * @param string $value
+	 *
+	 * @return self
 	 */
-	public function setDescription(string $description): self {
-		$this->description = $description;
+	public function setLabelExtra(string $key, string $value): self {
+		$this->label_extra[$key] = $value;
 
 		return $this;
 	}
@@ -80,16 +81,16 @@ class CSelectOption {
 	 */
 	public function toArray(): array {
 		$option_fmt = [
-			'title' => $this->title,
-			'value' => $this->value
+			'value' => $this->value,
+			'label' => $this->label
 		];
 
-		if ($this->description !== null) {
-			$option_fmt['desc'] = $this->description;
+		if ($this->label_extra) {
+			$option_fmt['label_extra'] = $this->label_extra;
 		}
 
 		if ($this->disabled) {
-			$option_fmt['disabled'] = 1;
+			$option_fmt['is_disabled'] = true;
 		}
 
 		return $option_fmt;

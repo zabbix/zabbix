@@ -1250,20 +1250,20 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	$options_by_type = [];
 
 	foreach ($interfaces as $interface) {
-		$title = $interface['useip']
+		$label = $interface['useip']
 			? $interface['ip'].' : '.$interface['port']
 			: $interface['dns'].' : '.$interface['port'];
 
-		$option = new CSelectOption($title, $interface['interfaceid']);
+		$option = new CSelectOption($interface['interfaceid'], $label);
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 			$version = $interface['details']['version'];
 			if ($version == 3) {
-				$option->setDescription(sprintf('%s: %d, %s: %s', _('Version'), $version, _('Context name'),
-					$interface['details']['contextname']
+				$option->setLabelExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
+					_('Context name'), $interface['details']['contextname']
 				));
 			} else {
-				$option->setDescription(sprintf('%s: %d, %s: %s', _('Version'), $version,
+				$option->setLabelExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
 					_x('Community', 'SNMP Community'), $interface['details']['community']
 				));
 			}
@@ -1273,16 +1273,17 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	}
 
 	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		if (!array_key_exists($interface_type, $options_by_type)) {
-			continue;
-		}
+		if (array_key_exists($interface_type, $options_by_type)) {
+			$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
 
-		$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
-		foreach ($options_by_type[$interface_type] as $option) {
-			$interface_group->addOption($option);
-		}
+			if ($interface_type == INTERFACE_TYPE_SNMP) {
+				$interface_group->setOptionTemplate('#{label}' . (new CDiv('#{description}'))->addClass('description'));
+			}
 
-		$interface_select->addOptionGroup($interface_group);
+			$interface_group->addOptions($options_by_type[$interface_type]);
+
+			$interface_select->addOptionGroup($interface_group);
+		}
 	}
 
 	return $interface_select;

@@ -1,824 +1,582 @@
-class ZSelect {
-	onchange = () => {}
-
-	_event_handlers = {
-		document_wheel: this._onDocumentWheel.bind(this),
-		window_resize: this._onWindowResize.bind(this),
-		button_blur: this._onButtonBlur.bind(this),
-		button_mousedown: this._onButtonMousedown.bind(this),
-		button_keydown: this._onButtonKeydown.bind(this),
-		button_keydown: this._onButtonKeydown.bind(this),
-		list_mouseenter: () => this.state.list_hover = true,
-		list_mouseleave: () => this.state.list_hover = false,
-		list_mousedown: this._onListMousedown.bind(this),
-		list_mousemove: this._onListMousemove.bind(this)
-	}
-
-	state = {
-		is_open: false,
-		idx_commited: 0,
-		idx_staged: 0,
-		option_idx: [],
-		option_map: {},
-		list_hover: false,
-		value: null
-	}
-
-	root = {
-		button: null,
-		list: null,
-		input: null
-	}
+class ZSelect extends HTMLElement {
 
 	constructor() {
-		this.root.button = document.createElement('button');
-		this.root.button.setAttribute('type', 'button');
+		super();
 
-		this.root.input = document.createElement('input');
-		this.root.input.setAttribute('type', 'hidden');
+		this._options_map = new Map();
 
-		this.root.list = document.createElement('ul');
-		this.root.list.classList.add('list');
-	}
+		this._option_template = "#{label}";
 
-	_collapseList() {
-		this.state.is_open = false;
-		this.root.list.classList.remove('is-expanded');
+		this._preselected_index = 0;
+		this._staged_index = 0;
+		this._value = null;
 
-		this._unbindDocumentWheelEvent();
-	}
+		this._expanded = false;
+		this._list_hovered = false;
 
-	_expandList() {
-		const list_height = 332;
-		const offset_top = 4;
-		const offset_bottom = 38;
+		this._button = document.createElement('button');
+		this._input = document.createElement('input');
+		this._list = document.createElement('ul');
 
-		const {height: button_height, y: button_y, left: button_left} = this.root.button.getBoundingClientRect();
-		const doc_height = document.body.getBoundingClientRect().height;
-
-		const is_button_visible = button_y + button_height > 0 && doc_height - button_y > 0;
-
-		// NOTE: Native select does not open when it is not visible.
-		if (!is_button_visible) {
-			return;
-		}
-
-		this.state.is_open = true;
-
-		const space_below = doc_height - button_y - button_height;
-		const space_above = button_y;
-		const prefer_down = space_below - list_height > offset_bottom;
-
-		this.root.list.style.maxHeight = '';
-		if (prefer_down || space_below > space_above) {
-			this.root.list.classList.remove('fall-upwards');
-			this.root.list.style.top = `${button_y + button_height}px`;
-			this.root.list.style.bottom = '';
-
-			if (space_below < list_height) {
-				this.root.list.style.maxHeight = `${space_below - offset_bottom}px`;
-			}
-		}
-		else {
-			this.root.list.classList.add('fall-upwards')
-			this.root.list.style.top = '';
-			this.root.list.style.bottom = `${doc_height - button_y}px`;
-
-			if (space_above < list_height) {
-				this.root.list.style.maxHeight = `${space_above - offset_top}px`;
-			}
-		}
-
-		this.root.list.style.left = `${button_left}px`;
-
-		this.root.list.classList.add('is-expanded');
-		this._stageIdx(this.state.idx_commited);
-
-		this._bindDocumentWheelEvent();
-	}
-
-	_scrollIntoBottomOfView(node) {
-		node.offsetParent.scrollTop = node.offsetTop - node.offsetParent.clientHeight + node.clientHeight;
-	}
-
-	_scrollIntoTopOfView(node) {
-		node.offsetParent.scrollTop = node.offsetTop;
-	}
-
-	_scrollIntoViewIfNeeded(node) {
-		const node_pos = node.offsetTop;
-		const node_height = node.scrollHeight;
-
-		const parent_scroll_top = node.offsetParent.scrollTop;
-		const parent_height = node.offsetParent.clientHeight;
-
-		const upper_overflow = parent_scroll_top - node_pos;
-		const lower_overflow = upper_overflow + parent_height - node_height;
-
-		if (upper_overflow > 0) {
-			node.offsetParent.scrollTop -= upper_overflow;
-		} else if (lower_overflow < 0) {
-			node.offsetParent.scrollTop -= lower_overflow;
-		}
-	}
-
-	_stageIdx(idx) {
-		const {_node: old_node} = this._getOptionByIdx(this.state.idx_staged);
-		const {_node: new_node} = this._getOptionByIdx(idx);
-
-		old_node.classList.remove('hover');
-		new_node.classList.add('hover');
-
-		this.state.is_open && this._scrollIntoViewIfNeeded(new_node);
-		this.state.idx_staged = idx;
-	}
-
-	_prevEnabledIdx(exclusive_from) {
-		for (let prev_idx = exclusive_from - 1; prev_idx > -1; prev_idx--) {
-			if (this._getOptionByIdx(prev_idx).disabled) {
-				continue;
-			}
-
-			return prev_idx;
-		}
-
-		return exclusive_from;
-	}
-
-	_firstIdx() {
-		let idx_len = this.state.option_idx.length;
-		for (let first_idx = 0;first_idx < idx_len;first_idx++) {
-			if (!this._getOptionByIdx(first_idx).disabled) {
-				return first_idx;
-			}
-		}
-
-		return this.state.idx_staged;
-	}
-
-	_lastIdx() {
-		let last_idx = this.state.option_idx.length - 1;
-		for (;last_idx > -1;last_idx--) {
-			if (!this._getOptionByIdx(last_idx).disabled) {
-				return last_idx;
-			}
-		}
-
-		return this.state.idx_staged;
-	}
-
-	_nextEnabledIdx(exclusive_from) {
-		const idx_len = this.state.option_idx.length;
-		for (let next_idx = exclusive_from + 1; next_idx < idx_len; next_idx++) {
-			if (!this._getOptionByIdx(next_idx).disabled) {
-				return next_idx;
-			}
-		}
-
-		return exclusive_from;
-	}
-
-	_push() {
-		const {value} = this._getOptionByIdx(this.state.idx_commited);
-
-		if (this.getValue() != value) {
-			const evt = new Event('change');
-
-			this.root.input.setAttribute('value', value);
-			this.onchange(evt);
-		}
-	}
-
-	_commit() {
-		const {title} = this._getOptionByIdx(this.state.idx_staged);
-
-		this.root.button.innerText = title
-		this.state.idx_commited = this.state.idx_staged;
-	}
-
-	_nextIdxByChar(char) {
-		const idx_frame = this.state.option_idx.length;
-		let start = this.state.idx_staged - idx_frame;
-		const end = start + idx_frame;
-
-		while (start++ < end) {
-			const idx = (start + idx_frame) % idx_frame;
-			const {title, disabled} = this._getOptionByIdx(idx);
-
-			if (disabled) {
-				continue;
-			}
-
-			if (title[0].toLowerCase() === char.toLowerCase()) {
-				return idx;
-			}
-		}
-
-		return null;
-	}
-
-	_getOptionByIdx(idx) {
-		return this.state.option_map[this.state.option_idx[idx]];
-	}
-
-	_onDocumentWheel() {
-		if (!this.state.list_hover) {
-			this._push();
-			this._collapseList();
-		}
-	}
-
-	_bindDocumentWheelEvent() {
-		document.addEventListener('wheel', this._event_handlers.document_wheel);
-	}
-
-	_unbindDocumentWheelEvent() {
-		document.removeEventListener('wheel', this._event_handlers.document_wheel);
-	}
-
-	/**
-	 * NOTE: Native select element collapses on document wheel event, if list is not hovered and always on window resize
-	 * event.
-	 */
-	_onWindowResize() {
-		this._push();
-		this._collapseList();
-	}
-
-	_onButtonMousedown() {
-		if (this.state.is_open) {
-			this._push();
-			this._collapseList();
-		}
-		else {
-			this._expandList();
-		}
-	}
-
-	_onButtonBlur() {
-		this._push();
-		this._collapseList();
-	}
-
-	_handlePageDown(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		let curr_option = this._getOptionByIdx(this.state.idx_staged);
-		if (this.state.is_open) {
-			let {_node: node} = curr_option;
-			this._scrollIntoTopOfView(node);
-
-			const parent_offset = node.offsetParent.clientHeight + node.offsetParent.scrollTop;
-			const idx_len = this.state.option_idx.length;
-
-			for (let next_idx = this.state.idx_staged + 1; next_idx < idx_len; next_idx++) {
-				let option = this._getOptionByIdx(next_idx);
-				let is_visible = parent_offset - option._node.offsetTop - option._node.offsetHeight > -1;
-				if (!is_visible) {
-					break;
-				}
-				curr_option = option;
-			}
-
-			if (curr_option.disabled) {
-				const next_enabled = this._nextEnabledIdx(curr_option._data_idx);
-				if (next_enabled === curr_option._data_idx) {
-					this._stageIdx(this._prevEnabledIdx(curr_option._data_idx));
-				}
-				else {
-					this._stageIdx(next_enabled);
-				}
-			}
-			else {
-				this._stageIdx(curr_option._data_idx);
-			}
-
-			this._commit();
-		}
-		else {
-			let seek_to_idx = this.state.idx_staged;
-			for (let i = 0; i < 3; i++) {
-				seek_to_idx = this._nextEnabledIdx(seek_to_idx);
-			}
-			this._stageIdx(seek_to_idx);
-			this._commit();
-			this._push();
-		}
-	}
-
-	_handlePageUp(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		let curr_option = this._getOptionByIdx(this.state.idx_staged);
-		if (this.state.is_open) {
-			let {_node: node} = curr_option;
-			this._scrollIntoBottomOfView(node);
-
-			for (let prev_idx = this.state.idx_staged - 1; prev_idx > -1; prev_idx--) {
-				let option = this._getOptionByIdx(prev_idx);
-				let is_visible = option._node.offsetTop - option._node.offsetParent.scrollTop > -1;
-				if (!is_visible) {
-					break;
-				}
-				curr_option = option;
-			}
-
-			if (curr_option.disabled) {
-				const prev_enabled = this._prevEnabledIdx(curr_option._data_idx);
-				if (prev_enabled === curr_option._data_idx) {
-					this._stageIdx(this._nextEnabledIdx(curr_option._data_idx));
-				}
-				else {
-					this._stageIdx(prev_enabled);
-				}
-			}
-			else {
-				this._stageIdx(curr_option._data_idx);
-			}
-
-			this._commit();
-		}
-		else {
-			let seek_to_idx = this.state.idx_staged;
-			for (let i = 0; i < 3; i++) {
-				seek_to_idx = this._prevEnabledIdx(seek_to_idx);
-			}
-			this._stageIdx(seek_to_idx);
-			this._commit();
-			this._push();
-		}
-	}
-
-	_onButtonKeydown(e) {
-		if (e.which != KEY_SPACE && !e.metaKey && !e.ctrlKey && e.key.length == 1) {
-			const idx = this._nextIdxByChar(e.key);
-			if (idx !== null) {
-				this._stageIdx(idx);
-				this._commit();
-				!this.state.is_open && this._push();
-			}
-
-			return;
-		}
-
-		switch (e.which) {
-			case KEY_PAGE_UP:
-				/*
-				 * NOTE: If open - Native select scrolls currently active option to bottom of visible list, and stages
-				 * the first visible option in list, if that is disabled, previous enabled option is chosen.
-				 */
-				this._handlePageUp(e);
-				break;
-			case KEY_PAGE_DOWN:
-				/*
-				 * NOTE: If open - Native select scrolls currently active option to top of visible list, and stages the
-				 * last visible option in list, if that is disabled, then next enabled option is chosen.
-				 */
-				this._handlePageDown(e);
-				break;
-			case KEY_END:
-				e.preventDefault();
-				e.stopPropagation();
-				this._stageIdx(this._lastIdx());
-				this._commit();
-				!this.state.is_open && this._push();
-				break;
-			case KEY_HOME:
-				e.preventDefault();
-				e.stopPropagation();
-				this._stageIdx(this._firstIdx());
-				this._commit();
-				!this.state.is_open && this._push();
-				break;
-			case KEY_ARROW_DOWN:
-				/*
-				 * NOTE: In native select, when an arrow key cannot select any next option because all of them are
-				 * disabled, and dropdown is opened, then regular scroll down happens.
-				 */
-				e.preventDefault();
-				e.stopPropagation();
-				let next_enabled_idx = this._nextEnabledIdx(this.state.idx_staged);
-				if (next_enabled_idx == this.state.idx_staged) {
-					this.state.is_open && (this.root.list.scrollTop += 50);
-				}
-				else {
-					this._stageIdx(next_enabled_idx);
-					this._commit();
-					!this.state.is_open && this._push();
-				}
-				break
-			case KEY_ARROW_UP:
-				/*
-				 * NOTE: In native select when an arrow key cannot select any previous option because all of them are
-				 * disabled and dropdown is opened, then regular scroll up happens.
-				 */
-				e.preventDefault();
-				e.stopPropagation();
-				let prev_enabled_idx = this._prevEnabledIdx(this.state.idx_staged);
-				if (prev_enabled_idx == this.state.idx_staged) {
-					this.state.is_open && (this.root.list.scrollTop -= 50);
-				}
-				else {
-					this._stageIdx(prev_enabled_idx);
-					this._commit();
-					!this.state.is_open && this._push();
-				}
-				break;
-			case KEY_ENTER:
-				if (!this.state.is_open) {
-					this._expandList();
-				}
-				else {
-					this._commit();
-					this._push();
-					this._collapseList();
-				}
-				break;
-			case KEY_TAB:
-				// NOTE: Native select element if opened, on "tab" submits hovered option and remains focused.
-				if (this.state.is_open) {
-					e.preventDefault();
-					this._commit();
-					this._push();
-					this._collapseList();
-				}
-				break;
-			case KEY_SPACE:
-				// NOTE: Native select element does not closes or chooses option on "space" key, only opens dropdown.
-				!this.state.is_open && this._expandList();
-				break;
-			case KEY_ESCAPE:
-				this.state.is_open && e.stopPropagation();
-				this._push();
-				this._collapseList();
-				break;
-		}
-	}
-
-	/**
-	 * NOTE: Native select element option actually responds to "mouse move". Also, if "mouseenter" event was used here,
-	 * it would be fire when node is programmatically scrolled under the pointer (see "this._scrollIntoViewIfNeeded").
-	 */
-	_onListMousemove(e) {
-		const idx = e.target.data_idx;
-
-		if (idx === undefined) {
-			return;
-		}
-
-		if (this.state.idx_staged != idx) {
-			const {disabled} = this._getOptionByIdx(idx);
-			!disabled && this._stageIdx(idx);
-		}
-	}
-
-	_onListMousedown(e) {
-		const idx = e.target.data_idx;
-
-		if (idx === undefined) {
-			return;
-		}
-
-		e.preventDefault();
-		this._stageIdx(idx);
-		this._commit();
-		this._push();
-		this._collapseList();
-	}
-
-	_createOptionNode({title, value, desc, disabled, class_name}) {
-		const li = document.createElement('li');
-
-		li.innerText = title;
-		li.setAttribute('value', value);
-
-		if (class_name) {
-			li.classList.add(class_name);
-		}
-
-		desc && li.setAttribute('description', desc);
-		disabled && li.setAttribute('disabled', 'disabled');
-
-		return li;
-	}
-
-	_registerOption({title, value, desc, disabled}, node) {
-		if (this.state.option_map[value]) {
-			throw new Error(`Duplicate option value: ${value}`);
-		}
-
-		node.data_idx = this.state.option_idx.length;
-
-		this.state.option_map[value] = {title, value, desc, disabled};
-		Object.defineProperties(this.state.option_map[value], {
-			_node: {
-				get: () => node
-			},
-			_data_idx: {
-				get: () => node.data_idx
-			}
-		});
-
-		this.state.option_idx.push(value);
-
-		// It is possible to set value of an option before option is registered.
-		if (this.state.value === value) {
-			this.setIdx(node.data_idx);
-		}
-	}
-
-	_measureListWidth() {
-		const tmp = document.createElement('z-select-clone');
-		const list = this.root.list.cloneNode(true);
-		list.classList.add('is-expanded');
-
-		tmp.style.left = '-9999px';
-		tmp.style.position = 'fixed';
-		tmp.appendChild(list);
-
-		document.body.appendChild(tmp);
-
-		const {width} = list.getBoundingClientRect();
-
-		tmp.remove();
-
-		return Math.ceil(width);
-	}
-
-	addOptionGroup(title, options) {
-		const li = document.createElement('li');
-		const ul = document.createElement('ul');
-
-		li.setAttribute('optgroup', title);
-		li.appendChild(ul);
-
-		for (const option of options) {
-			this.addOption(option, ul);
-		}
-
-		this.root.list.appendChild(li);
-	}
-
-	addOption({title, value, desc, disabled, class_name}, container) {
-		title = title.trim();
-		if (!container) {
-			container = this.root.list;
-		}
-
-		const node = this._createOptionNode({title, value, desc, disabled, class_name});
-		this._registerOption({title, value, desc, disabled}, node);
-
-		container.appendChild(node);
-	}
-
-	getOptions() {
-		const opts = [];
-
-		this.state.option_idx.forEach(value => {
-			opts.push(this.getOptionByValue(value));
-		});
-
-		return opts;
-	}
-
-	getOptionByValue(value) {
-		const opt = this.state.option_map[value];
-
-		if (!opt) {
-			return null;
-		}
-
-		return {
-			get disabled() {
-				return opt.disabled === true;
-			},
-			set disabled(val) {
-				if (val) {
-					opt._node.setAttribute('disabled', 'disabled');
-					opt.disabled = true;
-				}
-				else {
-					opt._node.removeAttribute('disabled');
-					opt.disabled = false;
-				}
-			},
-			get value() {
-				return opt.value;
-			}
-		};
-	}
-
-	unbindEvents() {
-		this.root.list.removeEventListener('mouseenter', this._event_handlers.list_mouseenter);
-		this.root.list.removeEventListener('mouseleave', this._event_handlers.list_mouseleave);
-		this.root.list.removeEventListener('mousedown', this._event_handlers.list_mousedown);
-		this.root.list.removeEventListener('mousemove', this._event_handlers.list_mousemove);
-
-		this.root.button.removeEventListener('blur', this._event_handlers.button_blur);
-		this.root.button.removeEventListener('mousedown', this._event_handlers.button_mousedown);
-		this.root.button.removeEventListener('keydown', this._event_handlers.button_keydown);
-
-		window.removeEventListener('resize', this._event_handlers.window_resize);
-	}
-
-	bindEvents() {
-		this.root.list.addEventListener('mouseenter', this._event_handlers.list_mouseenter);
-		this.root.list.addEventListener('mouseleave', this._event_handlers.list_mouseleave);
-		this.root.list.addEventListener('mousedown', this._event_handlers.list_mousedown);
-		this.root.list.addEventListener('mousemove', this._event_handlers.list_mousemove);
-
-		this.root.button.addEventListener('blur', this._event_handlers.button_blur);
-		this.root.button.addEventListener('mousedown', this._event_handlers.button_mousedown);
-		this.root.button.addEventListener('keydown', this._event_handlers.button_keydown);
-
-		window.addEventListener('resize', this._event_handlers.window_resize);
-	}
-
-	setName(name) {
-		this.root.input.setAttribute('name', name);
-	}
-
-	setReadonly(value) {
-		if (value) {
-			this.root.button.setAttribute('readonly', 'readonly');
-			this.root.input.setAttribute('readonly', 'readonly');
-		}
-		else {
-			this.root.button.removeAttribute('readonly');
-			this.root.input.removeAttribute('readonly');
-		}
-	}
-
-	setDisabled(value) {
-		if (value) {
-			this.root.button.setAttribute('disabled', 'disabled');
-			this.root.input.setAttribute('disabled', 'disabled');
-		}
-		else {
-			this.root.button.removeAttribute('disabled');
-			this.root.input.removeAttribute('disabled');
-		}
-	}
-
-	setIdx(idx) {
-		this._stageIdx(idx);
-		this._commit();
-		this._push();
-	}
-
-	getIdx() {
-		return this.state.idx_commited;
-	}
-
-	setButtonId(id) {
-		this.root.button.setAttribute('id', id);
-	}
-
-	setWidth(width) {
-		this.root.button.style.width = `${width}px`;
-		this.root.list.style.width = `${width}px`;
-	}
-
-	getDisabled() {
-		return this.root.input.disabled;
-	}
-
-	getName() {
-		return this.root.input.name;
-	}
-
-	getValue() {
-		return this.root.input.value;
-	}
-
-	setValue(value) {
-		const option = this.state.option_map[value];
-
-		if (option) {
-			this._stageIdx(option._data_idx);
-			this._commit();
-			this._push();
-		}
-
-		this.state.value = value;
-	}
-
-	focus() {
-		this.root.button.focus();
-	}
-}
-
-class ZSelectElement extends HTMLElement {
-
-	constructor() {
-		super()
-		this._select = new ZSelect();
-		this._select.onchange = event => this.dispatchEvent(event);
-	}
-
-	disconnectedCallback() {
-		this._select.unbindEvents();
+		this.onchange = () => {};
 	}
 
 	connectedCallback() {
-		this.appendChild(this._select.root.button);
-		this.appendChild(this._select.root.list);
-		this.appendChild(this._select.root.input);
+		this.init();
+		this.registerEvents();
+	}
 
-		if (!this.hasAttribute('width')) {
-			this.setAttribute('width', this._select._measureListWidth() + 13);
-		}
-
-		this._select.bindEvents();
+	disconnectedCallback() {
+		this.unregisterEvents();
 	}
 
 	/**
 	 * @return {array}
 	 */
 	static get observedAttributes() {
-		return ['disabled', 'value', 'name', 'onchange', 'width', 'data-options', 'data-buttonid'];
+		return ['name', 'value', 'disabled', 'readonly', 'data-options', 'option-template', 'focusable-element-id',
+			'width', 'onchange'];
 	}
 
-	attributeChangedCallback(name, _old_value, new_value) {
+	attributeChangedCallback(name, old_value, new_value) {
 		switch (name) {
-			case 'data-buttonid': this._select.setButtonId(new_value); break;
-			case 'name': this._select.setName(new_value); break;
-			case 'value': this._select.setValue(new_value); break;
-			case 'width': this._select.setWidth(new_value); break;
-			case 'disabled': this._select.setDisabled(new_value !== null); break;
-			case 'data-options':
-				if (new_value === null) {
-					return;
-				}
-
-				const options = JSON.parse(new_value);
-
-				for (const option of options) {
-					option.value instanceof Array
-						? this._select.addOptionGroup(option.title, option.value)
-						: this._select.addOption(option);
-				}
-
-				this.removeAttribute('data-options');
+			case 'name':
+				this._input.setAttribute('name', new_value);
 				break;
+
+			case 'value':
+				this._value = new_value;
+
+				if (this._options_map.has(new_value)) {
+					this._highlight(this._options_map.get(new_value)._index);
+					this._preSelect();
+					this._change();
+				}
+				break;
+
+			case 'disabled':
+				this._button.toggleAttribute('disabled', new_value !== null);
+				this._input.toggleAttribute('disabled', new_value !== null);
+				break;
+
+			case 'readonly':
+				this._button.toggleAttribute('readonly', new_value !== null);
+				this._input.toggleAttribute('readonly', new_value !== null);
+				break;
+
+			case 'data-options':
+				if (new_value !== null) {
+					const options = JSON.parse(new_value);
+
+					for (const option of options) {
+						option.options instanceof Array
+							? this.addOptionGroup(option)
+							: this.addOption(option);
+					}
+
+					this.removeAttribute('data-options');
+				}
+				break;
+
+			case 'option-template':
+				if (new_value !== null) {
+					this._option_template = new_value;
+					this.removeAttribute('option-template');
+				}
+
+				break
+
+			case 'focusable-element-id':
+				if (new_value !== null) {
+					this._button.setAttribute('id', new_value);
+					this.removeAttribute('focusable-element-id');
+				}
+
+				break;
+
+			case 'width':
+				this._button.style.width = `${new_value}px`;
+				this._list.style.width = `${new_value}px`;
+				break;
+
 			case 'onchange':
-				this.onchange = new Function('event', new_value);
+				this.onchange = new Function('e', new_value);
 				break;
 		}
 	}
 
-	addOption({title, value, desc, disabled, class_name}) {
-		this._select.addOption({title, value, desc, disabled, class_name});
+	init() {
+		this._button.setAttribute('type', 'button');
+		this.appendChild(this._button);
+
+		this._input.setAttribute('type', 'hidden');
+		this.appendChild(this._input);
+
+		this._list.classList.add('list');
+		this.appendChild(this._list);
+
+		if (!this.hasAttribute('width')) {
+			const container = document.createElement('div');
+			const list = this._list.cloneNode(true);
+
+			container.classList.add('z-select', 'is-expanded');
+			container.style.position = 'fixed';
+			container.style.left = '-9999px';
+			container.appendChild(list);
+
+			document.body.appendChild(container);
+
+			this.setAttribute('width', Math.ceil(list.scrollWidth) + 24);  // 24 = padding + border width
+
+			container.remove();
+		}
+	}
+
+	getOptionByIndex(index) {
+		return this.getOptions()[index];
 	}
 
 	getOptionByValue(value) {
-		return this._select.getOptionByValue(value);
+		return this._options_map.has(value) ? this._options_map.get(value) : null;
 	}
 
 	getOptions() {
-		return this._select.getOptions();
+		return [...this._options_map.values()];
+	}
+
+	addOption({value, label, label_extra, class_name, is_disabled}, container, template) {
+		if (this._options_map.has(value)) {
+			throw new Error('Duplicate option value: ' + value);
+		}
+
+		const option = {value, label, label_extra, class_name, is_disabled, template};
+		const li = document.createElement('li');
+
+		li._index = this._options_map.size;
+		li.setAttribute('value', value);
+		li.innerHTML = new Template(template || this._option_template).evaluate(
+			Object.assign({label: label.trim()}, label_extra || {})
+		);
+		class_name && li.classList.add(class_name);
+		is_disabled && li.setAttribute('disabled', 'disabled');
+
+		this._options_map.set(value, Object.defineProperties(option, {
+			_node: {
+				get: () => li
+			},
+			_index: {
+				get: () => li._index
+			},
+			value: {
+				get: () => value
+			},
+			disabled: {
+				get: () => option.is_disabled === true,
+				set: (is_disabled) => {
+					option.is_disabled = is_disabled;
+					li.toggleAttribute('disabled', is_disabled);
+				}
+			}
+		}));
+
+		// Should accept both integer and string.
+		if (this._value == value) {
+			this.selectedIndex = li._index
+		}
+
+		(container || this._list).appendChild(li);
+	}
+
+	addOptionGroup({label, option_template, options}) {
+		const li = document.createElement('li');
+		const ul = document.createElement('ul');
+
+		li.setAttribute('optgroup', label);
+		li.appendChild(ul);
+
+		for (const option of options) {
+			this.addOption(option, ul, option_template);
+		}
+
+		this._list.appendChild(li);
 	}
 
 	focus() {
-		this._select.focus();
-	}
-
-	get disabled() {
-		return this._select.getDisabled();
-	}
-
-	set disabled(val) {
-		if (val) {
-			this.setAttribute('disabled', 'disabled');
-		}
-		else {
-			this.removeAttribute('disabled');
-		}
+		this._button.focus();
 	}
 
 	get name() {
-		return this._select.getName();
+		return this._input.name;
 	}
 
-	set name(val) {
-		this.setAttribute('name', val);
+	set name(name) {
+		this.setAttribute('name', name);
 	}
 
 	get value() {
-		return this._select.getValue();
+		return this._input.value;
 	}
 
-	set value(val) {
-		this.setAttribute('value', val);
+	set value(value) {
+		this.setAttribute('value', value);
+	}
+
+	get disabled() {
+		return this._input.disabled;
+	}
+
+	set disabled(is_disabled) {
+		this.toggleAttribute('disabled', is_disabled);
+	}
+
+	get readOnly() {
+		return this._input.readOnly;
+	}
+
+	set readOnly(is_readonly) {
+		this.toggleAttribute('readonly', is_readonly);
 	}
 
 	get selectedIndex() {
-		return this._select.getIdx();
+		return this._preselected_index;
 	}
 
-	set selectedIndex(val) {
-		this._select.setIdx(val);
+	set selectedIndex(value) {
+		this._highlight(value);
+		this._preSelect();
+		this._change();
+	}
+
+	_expand() {
+		const {height: button_height, y: button_y, left: button_left} = this._button.getBoundingClientRect();
+		const {height: document_height} = document.body.getBoundingClientRect();
+
+		if (button_y + button_height < 0 && document_height - button_y < 0) {
+			return;
+		}
+
+		this._expanded = true;
+		this.classList.add('is-expanded');
+
+		const list_max_height = 362;
+		const offset_top = 4;
+		const offset_bottom = 38;
+		const list_height = Math.min(this._list.scrollHeight, list_max_height);
+		const space_below = document_height - button_y - button_height;
+		const space_above = button_y;
+
+		this._list.style.left = `${button_left}px`;
+		this._list.style.maxHeight = '';
+
+		if (space_below - list_height > offset_bottom || space_below > space_above) {
+			this._list.classList.remove('fall-upwards');
+			this._list.style.top = `${button_y + button_height}px`;
+			this._list.style.bottom = '';
+
+			if (space_below < list_height) {
+				this._list.style.maxHeight = `${space_below - offset_bottom}px`;
+			}
+		}
+		else {
+			this._list.classList.add('fall-upwards');
+			this._list.style.top = '';
+			this._list.style.bottom = `${document_height - button_y}px`;
+
+			if (space_above < list_height) {
+				this._list.style.maxHeight = `${space_above - offset_top}px`;
+			}
+		}
+
+		this._highlight(this._preselected_index);
+
+		document.addEventListener('wheel', this._events.document_wheel);
+	}
+
+	_collapse() {
+		this._expanded = false;
+		this.classList.remove('is-expanded');
+
+		document.removeEventListener('wheel', this._events.document_wheel);
+	}
+
+	_highlight(index) {
+		const {_node: old_node} = this.getOptionByIndex(this._staged_index);
+		const {_node: new_node, disabled} = this.getOptionByIndex(index);
+
+		if (!disabled) {
+			old_node.classList.remove('hover');
+			new_node.classList.add('hover');
+
+			this._expanded && new_node.scrollIntoView({block: 'nearest'});
+			this._staged_index = index;
+		}
+	}
+
+	_preSelect() {
+		const {label} = this.getOptionByIndex(this._staged_index);
+
+		this._button.innerText = label;
+		this._preselected_index = this._staged_index;
+	}
+
+	_change() {
+		const {value} = this.getOptionByIndex(this._preselected_index);
+
+		if (this._input.value != value) {
+			this._input.setAttribute('value', value);
+			this.dispatchEvent(new Event('change'));
+		}
+	}
+
+	_prev(current_index) {
+		const options = this.getOptions();
+		for (let index = current_index - 1; index >= 0; index--) {
+			if (!options[index].disabled) {
+				return index;
+			}
+		}
+
+		return current_index;
+	}
+
+	_next(current_index) {
+		const options = this.getOptions();
+		for (let index = current_index + 1; index < this._options_map.size; index++) {
+			if (!options[index].disabled) {
+				return index;
+			}
+		}
+
+		return current_index;
+	}
+
+	_prevPage(current_index) {
+		let index = current_index;
+
+		for (let i = 0; i < (this._expanded ? 14 : 3); i++) {
+			index = this._prev(index);
+		}
+
+		return index;
+	}
+
+	_nextPage(current_index) {
+		let index = current_index;
+
+		for (let i = 0; i < (this._expanded ? 14 : 3); i++) {
+			index = this._next(index);
+		}
+
+		return index;
+	}
+
+	_first(current_index) {
+		const option = this.getOptionByIndex(this._next(-1));
+
+		return option ? option._index : current_index;
+	}
+
+	_last(current_index) {
+		const option = this.getOptionByIndex(this._prev(this._options_map.size));
+
+		return option ? option._index : current_index;
+	}
+
+	_search(char) {
+		const options = this.getOptions();
+		const size = this._options_map.size;
+		let start = this._staged_index - size;
+		const end = start + size;
+
+		while (start++ < end) {
+			const index = (start + size) % size;
+			const {label, disabled} = options[index];
+
+			if (!disabled && label[0].toLowerCase() === char.toLowerCase()) {
+				return index;
+			}
+		}
+
+		return null;
+	}
+
+	registerEvents() {
+		this._events = {
+			button_mousedown: () => {
+				if (this._expanded) {
+					this._change();
+					this._collapse();
+				}
+				else {
+					this._expand();
+				}
+			},
+
+			button_keydown: (e) => {
+				if (e.which !== KEY_SPACE && !e.metaKey && !e.ctrlKey && e.key.length === 1) {
+					const index = this._search(e.key);
+					if (index !== null) {
+						this._highlight(index);
+						this._preSelect();
+						!this._expanded && this._change();
+					}
+
+					return;
+				}
+
+				switch (e.which) {
+					case KEY_ARROW_UP:
+					case KEY_ARROW_DOWN:
+					case KEY_PAGE_UP:
+					case KEY_PAGE_DOWN:
+					case KEY_HOME:
+					case KEY_END:
+						e.preventDefault();
+						e.stopPropagation();
+
+						let new_index, scroll = 0;
+						switch (e.which) {
+							case KEY_ARROW_UP:
+								new_index = this._prev(this._staged_index);
+								scroll = -48;
+								break;
+
+							case KEY_ARROW_DOWN:
+								new_index = this._next(this._staged_index);
+								scroll = 48;
+								break;
+
+							case KEY_PAGE_UP:
+								new_index = this._prevPage(this._staged_index);
+								break;
+
+							case KEY_PAGE_DOWN:
+								new_index = this._nextPage(this._staged_index);
+								break;
+
+							case KEY_HOME:
+								new_index = this._first(this._staged_index);
+								break;
+
+							case KEY_END:
+								new_index = this._last(this._staged_index);
+								break;
+						}
+
+						if (scroll !== 0 && this._staged_index === new_index) {
+							this._list.scrollTop += scroll;
+						}
+						else {
+							this._highlight(new_index);
+							this._preSelect();
+							!this._expanded && this._change();
+						}
+						break;
+
+					case KEY_ENTER:
+						if (!this._expanded) {
+							this._expand();
+						}
+						else {
+							this._preSelect();
+							this._change();
+							this._collapse();
+						}
+						break;
+
+					case KEY_TAB:
+						if (this._expanded) {
+							e.preventDefault();
+							this._preSelect();
+							this._change();
+							this._collapse();
+						}
+						break;
+
+					case KEY_SPACE:
+						!this._expanded && this._expand();
+						break;
+
+					case KEY_ESCAPE:
+						this._expanded && e.stopPropagation();
+						this._change();
+						this._collapse();
+						break;
+				}
+			},
+
+			button_blur: () => {
+				this._change();
+				this._collapse();
+			},
+
+			list_mouseenter: () => {
+				this._list_hovered = true;
+			},
+
+			list_mouseleave: () => {
+				this._list_hovered = false;
+			},
+
+			list_mousedown: (e) => {
+				const index = e.target._index;
+
+				if (index !== undefined) {
+					e.preventDefault();
+					this._highlight(index);
+					this._preSelect();
+					this._change();
+					this._collapse();
+				}
+			},
+
+			list_mousemove: (e) => {
+				const index = e.target._index;
+
+				if (index !== undefined && this._staged_index !== index) {
+					const {disabled} = this.getOptionByIndex(index);
+
+					!disabled && this._highlight(index);
+				}
+			},
+
+			document_wheel: () => {
+				if (!this._list_hovered) {
+					this._change();
+					this._collapse();
+				}
+			},
+
+			window_resize: () => {
+				this._change();
+				this._collapse();
+			}
+		}
+
+		this._button.addEventListener('mousedown', this._events.button_mousedown);
+		this._button.addEventListener('keydown', this._events.button_keydown);
+		this._button.addEventListener('blur', this._events.button_blur);
+
+		this._list.addEventListener('mouseenter', this._events.list_mouseenter);
+		this._list.addEventListener('mouseleave', this._events.list_mouseleave);
+		this._list.addEventListener('mousedown', this._events.list_mousedown);
+		this._list.addEventListener('mousemove', this._events.list_mousemove);
+
+		window.addEventListener('resize', this._events.window_resize);
+	}
+
+	unregisterEvents() {
+		this._button.removeEventListener('mousedown', this._events.button_mousedown);
+		this._button.removeEventListener('keydown', this._events.button_keydown);
+		this._button.removeEventListener('blur', this._events.button_blur);
+
+		this._list.removeEventListener('mouseenter', this._events.list_mouseenter);
+		this._list.removeEventListener('mouseleave', this._events.list_mouseleave);
+		this._list.removeEventListener('mousedown', this._events.list_mousedown);
+		this._list.removeEventListener('mousemove', this._events.list_mousemove);
+
+		window.removeEventListener('resize', this._events.window_resize);
 	}
 }
 
-customElements.define('z-select', ZSelectElement);
+customElements.define('z-select', ZSelect);

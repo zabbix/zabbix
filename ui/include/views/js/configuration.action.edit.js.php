@@ -442,14 +442,14 @@
 		const $mediatype_only_select = this.$mediatype_only.find('z-select');
 		conf.mediatypes.forEach(({mediatypeid, name, status}) => {
 			$mediatype_default_select.get(0).addOption({
-				title: name,
 				value: mediatypeid,
+				label: name,
 				class_name: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
 			});
 
 			$mediatype_only_select.get(0).addOption({
-				title: name,
 				value: mediatypeid,
+				label: name,
 				class_name: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
 			});
 		});

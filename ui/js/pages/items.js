@@ -24,12 +24,12 @@
  * @param {number|null} item_type          Current item type.
  */
 function organizeInterfaces(interface_ids_by_types, item_interface_types, item_type) {
-	const $interface_select = jQuery('#interface-select'),
+	const $interface_select = $('#interface-select'),
 		interface_select_node = $interface_select.get(0),
-		selected_interfaceid = +jQuery('#selectedInterfaceId').val();
+		selected_interfaceid = +$('#selectedInterfaceId').val();
 
-	if (jQuery('#visible_interfaceid').data('multipleInterfaceTypes') && !jQuery('#visible_type').is(':checked')) {
-		jQuery('#interface_not_defined').html(t('To set a host interface select a single item type for all items')).show();
+	if ($('#visible_interfaceid').data('multipleInterfaceTypes') && !$('#visible_type').is(':checked')) {
+		$('#interface_not_defined').html(t('To set a host interface select a single item type for all items')).show();
 		interface_select_node.disabled = true;
 		$interface_select.hide();
 
@@ -47,27 +47,27 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 	if (iterface_type === undefined) {
 		interface_select_node.disabled = true;
 		$interface_select.hide();
-		jQuery('#interface_not_defined').html(t('Item type does not use interface')).show();
+		$('#interface_not_defined').html(t('Item type does not use interface')).show();
 	}
 	// If any interface type allowed, enable all options.
 	else if (iterface_type == -1) {
 		interface_select_node.disabled = false;
 		interface_select_node.getOptions().map(opt => opt.disabled = false)
 		$interface_select.show();
-		jQuery('#interface_not_defined').hide();
+		$('#interface_not_defined').hide();
 	}
 	// If none of required interfaces found.
 	else if (!available_interfaceids) {
 		interface_select_node.disabled = true;
 		$interface_select.hide();
-		jQuery('#interface_not_defined').html(t('No interface found')).show();
+		$('#interface_not_defined').html(t('No interface found')).show();
 	}
 	// Enable required interfaces, disable other interfaces.
 	else {
 		interface_select_node.disabled = false;
 		interface_select_node.getOptions().map(opt => opt.disabled = !available_interfaceids.includes(opt.value))
 		$interface_select.show();
-		jQuery('#interface_not_defined').hide();
+		$('#interface_not_defined').hide();
 	}
 
 	interface_select_node.value = selected_interfaceid;

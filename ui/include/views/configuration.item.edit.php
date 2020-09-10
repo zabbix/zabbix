@@ -438,20 +438,18 @@ if ($data['display_interfaces']) {
 		}
 	}
 	else {
-		$interface_select = getInterfaceSelect($data['interfaces'])
-			->setButtonId('interfaceid')
-			->setId('interface-select')
-			->setValue($data['interfaceid'])
-			->setAriaRequired();
-
-		$span = (new CSpan(_('No interface found')))
-			->addClass(ZBX_STYLE_RED)
-			->setId('interface_not_defined')
-			->setAttribute('style', 'display: none;');
-
-		$form_list->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(),
-			[$interface_select, $span], 'interface_row'
-		);
+		$form_list->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(), [
+			getInterfaceSelect($data['interfaces'])
+				->setId('interface-select')
+				->setValue($data['interfaceid'])
+				->addClass('host-interface')
+				->setFocusableElementId('interfaceid')
+				->setAriaRequired(),
+			(new CSpan(_('No interface found')))
+				->setId('interface_not_defined')
+				->addClass(ZBX_STYLE_RED)
+				->setAttribute('style', 'display: none;')
+		], 'interface_row');
 		$form->addVar('selectedInterfaceId', $data['interfaceid']);
 	}
 }

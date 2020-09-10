@@ -19,18 +19,15 @@
 **/
 
 
-/**
- * Web component view object. See "js/component.z-select.js" file for complementary parts.
- */
 class CSelect extends CTag {
 
 	/**
-	 * @var string $name
+	 * @var string
 	 */
 	protected $name;
 
 	/**
-	 * @var CSelectOption[]|CSelectOptionGroup[] $options  List of options and option groups.
+	 * @var CSelectOption[]|CSelectOptionGroup[]  List of options and option groups.
 	 */
 	protected $options = [];
 
@@ -55,6 +52,19 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * @param CSelectOption[] $options
+	 *
+	 * @return self
+	 */
+	public function addOptions(array $options): self {
+		foreach ($options as $option) {
+			$this->addOption($option);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * @param CSelectOptionGroup $option_group
 	 *
 	 * @return self
@@ -68,25 +78,52 @@ class CSelect extends CTag {
 	/**
 	 * Selected option value. If no value is set, first available option will be preselected client at side.
 	 *
-	 * @param string $value
+	 * @param mixed $value
 	 *
 	 * @return self
 	 */
-	public function setValue(string $value): self {
+	public function setValue($value): self {
 		$this->setAttribute('value', $value);
 
 		return $this;
 	}
 
 	/**
-	 * ID to be used on button in conjunction with label's "for" attribute that binds delegates focus.
+	 * Get ID for element that should be focused when focusing this component.
 	 *
-	 * @param string $buttonid
+	 * @return string|null
+	 */
+	public function getFocusableElementId(): ?string {
+		return $this->getAttribute('focusable-element-id');
+	}
+
+	/**
+	 * ID for element that should be focused when focusing this component.
+	 *
+	 * @param string $id
 	 *
 	 * @return self
 	 */
-	public function setButtonId(string $buttonid): self {
-		$this->setAttribute('data-buttonid', $buttonid);
+	public function setFocusableElementId(string $id): self {
+		$this->setAttribute('focusable-element-id', $id);
+
+		return $this;
+	}
+
+	/**
+	 * @return self
+	 */
+	public function setDisabled(): self {
+		$this->setAttribute('disabled', 'disabled');
+
+		return $this;
+	}
+
+	/**
+	 * @return self
+	 */
+	public function setReadonly(): self {
+		$this->setAttribute('readonly', 'true');
 
 		return $this;
 	}
@@ -103,6 +140,19 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * Set custom template for options.
+	 *
+	 * @param string $template
+	 *
+	 * @return self
+	 */
+	public function setOptionTemplate(string $template) {
+		$this->setAttribute('option-template', $template);
+
+		return $this;
+	}
+
+	/**
 	 * @param string $onchange
 	 *
 	 * @return self
@@ -114,25 +164,22 @@ class CSelect extends CTag {
 	}
 
 	/**
-	 * @param bool $value
+	 * Convert values in associative array to options object collection.
 	 *
-	 * @return self
-	 */
-	public function setReadonly(): self {
-		$this->setAttribute('readonly', 'true');
-
-		return $this;
-	}
-
-	/**
-	 * @param bool $value
+	 * @static
 	 *
-	 * @return self
+	 * @param array $values
+	 *
+	 * @return CSelectOption[]
 	 */
-	public function setDisabled(): self {
-		$this->setAttribute('disabled', 'disabled');
+	public static function createOptionsFromArray(array $values): array {
+		$options = [];
 
-		return $this;
+		foreach ($values as $value => $label) {
+			$options[] = new CSelectOption($value, $label);
+		}
+
+		return $options;
 	}
 
 	/**

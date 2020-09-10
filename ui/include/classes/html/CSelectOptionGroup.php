@@ -25,20 +25,38 @@
 class CSelectOptionGroup {
 
 	/**
-	 * @var string $title
+	 * @var string $label
 	 */
-	protected $title;
+	protected $label;
 
 	/**
-	 * @var CSelectOption[] $options  List of options.
+	 * @var CSelectOption[]  List of options.
 	 */
 	protected $options = [];
 
 	/**
-	 * @param string $title   Option group title.
+	 * @var string  Custom template for group options.
 	 */
-	public function __construct(string $title) {
-		$this->title = $title;
+	protected $option_template;
+
+	/**
+	 * @param string $label  Option group label.
+	 */
+	public function __construct(string $label) {
+		$this->label = $label;
+	}
+
+	/**
+	 * @param CSelectOption[] $options
+	 *
+	 * @return self
+	 */
+	public function addOptions(array $options): self {
+		foreach ($options as $option) {
+			$this->addOption($option);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -53,18 +71,32 @@ class CSelectOptionGroup {
 	}
 
 	/**
+	 * Set custom template for this group options.
+	 *
+	 * @param string $template
+	 *
+	 * @return $this
+	 */
+	public function setOptionTemplate(string $template) {
+		$this->option_template = $template;
+
+		return $this;
+	}
+
+	/**
 	 * Provides this object in associative array format.
 	 *
 	 * @return array
 	 */
 	public function toArray(): array {
 		$optgroup = [
-			'title' => $this->title,
-			'value' => []
+			'label' => $this->label,
+			'option_template' => $this->option_template,
+			'options' => []
 		];
 
 		foreach ($this->options as $option) {
-			$optgroup['value'][] = $option->toArray();
+			$optgroup['options'][] = $option->toArray();
 		}
 
 		return $optgroup;

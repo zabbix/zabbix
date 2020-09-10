@@ -50,21 +50,21 @@ $item_form_list = (new CFormList('item-form-list'))
 
 // Append hosts to item form list.
 if ($data['display_interfaces']) {
-	$interfaces_select = getInterfaceSelect($data['hosts']['interfaces'])
-			->setId('interface-select')
-			->setValue($data['interfaceid']);
-
-	$span = (new CSpan(_('No interface found')))
-		->addClass(ZBX_STYLE_RED)
-		->setId('interface_not_defined')
-		->setAttribute('style', 'display: none;');
-
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setChecked(isset($data['visible']['interfaceid']))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
-		(new CDiv([$interfaces_select, $span]))->setId('interfaceDiv'),
+		(new CDiv([
+			getInterfaceSelect($data['hosts']['interfaces'])
+				->setId('interface-select')
+				->setValue($data['interfaceid'])
+				->addClass('host-interface'),
+			(new CSpan(_('No interface found')))
+				->addClass(ZBX_STYLE_RED)
+				->setId('interface_not_defined')
+				->setAttribute('style', 'display: none;')
+		]))->setId('interfaceDiv'),
 		'interface_row'
 	);
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);

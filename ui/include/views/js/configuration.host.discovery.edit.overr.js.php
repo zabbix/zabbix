@@ -74,9 +74,9 @@ insert_javascript_for_visibilitybox();
 				->setAttribute('placeholder', '{#MACRO}')
 				->setAttribute('data-formulaid', '#{formulaId}'),
 			(new CSelect('overrides_filters[#{rowNum}][operator]'))
-				->setValue((string) CONDITION_OPERATOR_REGEXP)
-				->addOption(new CSelectOption(_('matches'), (string) CONDITION_OPERATOR_REGEXP))
-				->addOption(new CSelectOption(_('does not match'), (string) CONDITION_OPERATOR_NOT_REGEXP)),
+				->setValue(CONDITION_OPERATOR_REGEXP)
+				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match'))),
 			(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
 					DB::getFieldLength('lld_override_condition', 'value')))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)

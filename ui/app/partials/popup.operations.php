@@ -35,7 +35,7 @@ $form_list = new CFormList();
  * Operation type row.
  */
 $form_list->addRow(new CLabel(_('Operation type'), 'operationtype'),
-	(new CSelect('operationtype'))->setButtonId('operationtype'), 'operation-type'
+	(new CSelect('operationtype'))->setFocusableElementId('operationtype'), 'operation-type'
 );
 
 /*
@@ -116,8 +116,8 @@ $form_list->addRow(_('Send to users'), (new CDiv(
  */
 $form_list->addRow(new CLabel(_('Default media type'), 'operation_opmessage_mediatypeid'),
 	(new CSelect('operation[opmessage][mediatypeid]'))
-		->setButtonId('operation_opmessage_mediatypeid')
-		->addOption(new CSelectOption('- '._('All').' -', '0')),
+		->setFocusableElementId('operation_opmessage_mediatypeid')
+		->addOption(new CSelectOption('0', '- '._('All').' -')),
 	'operation-message-mediatype-default'
 );
 
@@ -126,8 +126,8 @@ $form_list->addRow(new CLabel(_('Default media type'), 'operation_opmessage_medi
  */
 $form_list->addRow(new CLabel(_('Send only to'), 'operation_opmessage_mediatypeid'),
 	(new CSelect('operation[opmessage][mediatypeid]'))
-		->setButtonId('operation_opmessage_mediatypeid')
-		->addOption(new CSelectOption('- '._('All').' -', '0')),
+		->setFocusableElementId('operation_opmessage_mediatypeid')
+		->addOption(new CSelectOption('0', '- '._('All').' -')),
 	'operation-message-mediatype-only'
 );
 
@@ -191,12 +191,14 @@ $form_list->addRow((new CLabel(_('Target list')))->setAsteriskMark(),
 $form_list->addRow(new CLabel(_('Type'), 'operation-opcommand-type'),
 	(new CSelect('operation[opcommand][type]'))
 		->setValue((string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
-		->addOption(new CSelectOption(_('IPMI'), (string) ZBX_SCRIPT_TYPE_IPMI))
-		->addOption(new CSelectOption(_('Custom script'), (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT))
-		->addOption(new CSelectOption(_('SSH'), (string) ZBX_SCRIPT_TYPE_SSH))
-		->addOption(new CSelectOption(_('Telnet'), (string) ZBX_SCRIPT_TYPE_TELNET))
-		->addOption(new CSelectOption(_('Global script'), (string) ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT))
-		->setButtonId('operation-opcommand-type')
+		->setFocusableElementId('operation-opcommand-type')
+		->addOptions(CSelect::createOptionsFromArray([
+			ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+			ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
+			ZBX_SCRIPT_TYPE_SSH => _('SSH'),
+			ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
+			ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
+		]))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'operation-command-type'
 );
@@ -232,9 +234,9 @@ $form_list->addRow((new CLabel(_('Execute on'), 'operation_opcommand_execute_on'
  */
 $form_list->addRow(new CLabel(_('Authentication method'), 'operation-opcommand-authtype'),
 	(new CSelect('operation[opcommand][authtype]'))
-		->setButtonId('operation-opcommand-authtype')
-		->addOption(new CSelectOption(_('Password'), (string) ITEM_AUTHTYPE_PASSWORD))
-		->addOption(new CSelectOption(_('Public key'), (string) ITEM_AUTHTYPE_PUBLICKEY))
+		->setFocusableElementId('operation-opcommand-authtype')
+		->addOption(new CSelectOption(ITEM_AUTHTYPE_PASSWORD, _('Password')))
+		->addOption(new CSelectOption(ITEM_AUTHTYPE_PUBLICKEY, _('Public key')))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 	'operation-command-authtype'
 );
@@ -359,10 +361,10 @@ $form_list->addRow(new CLabel(_('Inventory mode'), 'operation_opinventory_invent
 $form_list->addRow(new CLabel(_('Type of calculation'), 'operation-evaltype'), [
 		(new CSelect('operation[evaltype]'))
 			->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
-			->addOption(new CSelectOption(_('And/Or'), (string) CONDITION_EVAL_TYPE_AND_OR))
-			->addOption(new CSelectOption(_('And'), (string) CONDITION_EVAL_TYPE_AND))
-			->addOption(new CSelectOption(_('Or'), (string) CONDITION_EVAL_TYPE_OR))
-			->setButtonId('operation-evaltype'),
+			->setFocusableElementId('operation-evaltype')
+			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
+			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
+			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or'))),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('operation-condition-evaltype-formula')
 	],

@@ -195,10 +195,10 @@ else {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CSelect('mode'))
 					->setValue($report_mode)
-					->setButtonId('mode')
+					->setFocusableElementId('mode')
 					->onChange('$(this).closest("form").submit()')
-					->addOption(new CSelectOption(_('By host'), (string) AVAILABILITY_REPORT_BY_HOST))
-					->addOption(new CSelectOption(_('By trigger template'), (string) AVAILABILITY_REPORT_BY_TEMPLATE))
+					->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_HOST, _('By host')))
+					->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template')))
 			])
 	));
 
@@ -243,13 +243,12 @@ else {
 
 		$filter_hostid_combobox = (new CSelect('filter_templateid'))
 			->setValue($data['filter']['hostids'])
-			->setButtonId('filter_templateid')
-			->onChange('$(this).closest("form").submit()');
-
-		$filter_hostid_combobox->addOption(new CSelectOption(_('all'), '0'));
+			->setFocusableElementId('filter_templateid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($templates as $templateid => $template) {
-			$filter_hostid_combobox->addOption(new CSelectOption($template['name'], (string) $templateid));
+			$filter_hostid_combobox->addOption(new CSelectOption($templateid, $template['name']));
 		}
 
 		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" combo box.
@@ -286,19 +285,17 @@ else {
 			$data['filter']['tpl_triggerid'] = 0;
 		}
 
-
 		$tpl_triggerid_combobox = (new CSelect('tpl_triggerid'))
 			->setValue($data['filter']['tpl_triggerid'])
-			->setButtonId('tpl_triggerid')
-			->onChange('$(this).closest("form").submit()');
-
-		$tpl_triggerid_combobox->addOption(new CSelectOption(_('all'), '0'));
+			->setFocusableElementId('tpl_triggerid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		$tpl_triggerids = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
-			$title = (($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description'];
-			$tpl_triggerid_combobox->addOption(new CSelectOption($title, (string) $triggerid));
+			$label = (($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description'];
+			$tpl_triggerid_combobox->addOption(new CSelectOption($triggerid, $label));
 
 			$tpl_triggerids[$triggerid] = true;
 		}
@@ -318,13 +315,12 @@ else {
 
 		$hostgroupid_combobox = (new CSelect('hostgroupid'))
 			->setValue($data['filter']['hostgroupid'])
-			->setButtonId('hostgroupid')
-			->onChange('$(this).closest("form").submit()');
-
-		$hostgroupid_combobox->addOption(new CSelectOption(_('all'), '0'));
+			->setFocusableElementId('hostgroupid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($host_groups as $groupid => $group) {
-			$hostgroupid_combobox->addOption(new CSelectOption($group['name'], (string) $groupid));
+			$hostgroupid_combobox->addOption(new CSelectOption($groupid, $group['name']));
 		}
 
 		$hostgroupids = [];
@@ -376,13 +372,12 @@ else {
 
 		$filter_groupid_combobox = (new CSelect('filter_groups'))
 			->setValue($data['filter']['groups'])
-			->setButtonId('filter_groups')
-			->onChange('$(this).closest("form").submit()');
-
-		$filter_groupid_combobox->addOption(new CSelectOption(_('all'), '0'));
+			->setFocusableElementId('filter_groups')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($groups as $groupid => $group) {
-			$filter_groupid_combobox->addOption(new CSelectOption($group['name'], (string) $groupid));
+			$filter_groupid_combobox->addOption(new CSelectOption($groupid, $group['name']));
 		}
 
 		$filter_column

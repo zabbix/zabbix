@@ -85,46 +85,36 @@ else {
 		$minYear = date('Y');
 	}
 
-	$controls = new CList();
-
-	$cmb_media = (new CSelect('media_type'))
-			->setButtonId('media_type')
-			->setValue($media_type)
-			->onChange('$(this).closest("form").submit()');
-
-	$cmb_media->addOption(new CSelectOption(_('all'), '0'));
-
-	foreach ($media_types as $media_type_id => $name) {
-		$cmb_media->addOption(new CSelectOption($name, $media_type_id));
-
-		// we won't need other media types in the future, if only one was selected
-		if ($media_type > 0 && $media_type != $media_type_id) {
-			unset($media_types[$media_type_id]);
-		}
-	}
-	$controls
+	$controls = (new CList())
 		->addItem([
 			new CLabel(_('Media type'), 'media_type'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmb_media
+			(new CSelect('media_type'))
+				->setValue($media_type)
+				->setFocusableElementId('media_type')
+				->onChange('$(this).closest("form").submit()')
+				->addOption(new CSelectOption(0, _('all')))
+				->addOptions(CSelect::createOptionsFromArray($media_types))
 		])
 		->addItem([
 			new CLabel(_('Period'), 'period'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSelect('period'))
 				->setValue($period)
-				->setButtonId('period')
-				->addOption(new CSelectOption(_('Daily'), 'daily'))
-				->addOption(new CSelectOption(_('Weekly'), 'weekly'))
-				->addOption(new CSelectOption(_('Monthly'), 'monthly'))
-				->addOption(new CSelectOption(_('Yearly'), 'yearly'))
+				->setFocusableElementId('period')
 				->onChange('$(this).closest("form").submit()')
+				->addOptions(CSelect::createOptionsFromArray([
+					'daily' => _('Daily'),
+					'weekly' => _('Weekly'),
+					'monthly' => _('Monthly'),
+					'yearly' => _('Yearly')
+				]))
 		]);
 
 	if ($period != 'yearly') {
 		$cmb_year = (new CSelect('year'))
 			->setValue($year)
-			->setButtonId('year')
+			->setFocusableElementId('year')
 			->onChange('$(this).closest("form").submit()');
 
 		for ($y = $minYear; $y <= date('Y'); $y++) {
@@ -160,7 +150,6 @@ else {
 		$users[] = $user_data['userid'];
 	}
 
-	$intervals = [];
 	switch ($period) {
 		case 'yearly':
 			$minTime = mktime(0, 0, 0, 1, 1, $minYear);
@@ -236,6 +225,11 @@ else {
 	CArrayHelper::sort($alerts, ['clock']);
 
 	$table->setHeader($header);
+
+	if ($media_type > 0) {
+		$media_types = [$media_type => $media_types[$media_type]];
+	}
+
 	foreach ($intervals as $from => $till) {
 		// interval start
 		$row = [zbx_date2str($dateFormat, $from)];

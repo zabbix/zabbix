@@ -7340,3 +7340,21 @@ table.preprocessing-test-results {
 	.table-col-colour { width: 105px; }
 	.table-col-action { width: 55px; }
 }
+
+z-select,
+.z-select {
+	&.host-interface {
+		.description:not(:empty) {
+			display: block;
+			margin-top: 5px;
+			color: $input-placeholder-color;
+		}
+
+		&[disabled],
+		li[disabled] {
+			.description:not(:empty) {
+				color: $form-disabled-font-color;
+			}
+		}
+	}
+}

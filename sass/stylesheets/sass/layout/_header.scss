@@ -83,18 +83,18 @@ header {
 		button {
 			line-height: 22px;
 		}
+	}
 
-		z-select {
-			>ul {
-				text-align: left;
-			}
+	z-select {
+		> button {
+			line-height: normal;
+		}
 
-			>button {
-				line-height: normal;
-			}
+		.list {
+			text-align: left;
 
 			li:first-child {
-				padding: .4em 5px;
+				padding: 5px;
 			}
 		}
 	}

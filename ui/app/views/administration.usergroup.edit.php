@@ -63,18 +63,15 @@ $form_list = (new CFormList())
 	);
 
 if ($data['can_update_group']) {
-	$select = (new CSelect('gui_access'))
-			->setValue($data['gui_access'])
-			->setButtonId('gui_access');
-
-	$access_types = [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP,
-		GROUP_GUI_ACCESS_DISABLED];
-
-	foreach ($access_types as $access_type) {
-		$select->addOption(new CSelectOption(user_auth_type2str($access_type), (string) $access_type));
-	}
-
-	$form_list->addRow((new CLabel(_('Frontend access'), 'gui_access')), $select);
+	$form_list->addRow((new CLabel(_('Frontend access'), 'gui_access')), (new CSelect('gui_access'))
+		->setValue($data['gui_access'])
+		->setFocusableElementId('gui_access')
+		->addOptions(CSelect::createOptionsFromArray([
+			GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
+			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
+			GROUP_GUI_ACCESS_LDAP => user_auth_type2str(GROUP_GUI_ACCESS_LDAP),
+			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
+		])));
 	$form_list->addRow(_('Enabled'),
 		(new CCheckBox('users_status', GROUP_STATUS_ENABLED))
 			->setUncheckedValue(GROUP_STATUS_DISABLED)

@@ -61,12 +61,14 @@ $overrides_popup_form_list = (new CFormList())
 
 // filters
 $override_evaltype_select = (new CSelect('overrides_evaltype'))
+	->setId('overrides-evaltype')
 	->setValue($options['overrides_evaltype'])
-	->addOption(new CSelectOption(_('And/Or'), (string) CONDITION_EVAL_TYPE_AND_OR))
-	->addOption(new CSelectOption(_('And'), (string) CONDITION_EVAL_TYPE_AND))
-	->addOption(new CSelectOption(_('Or'), (string) CONDITION_EVAL_TYPE_OR))
-	->addOption(new CSelectOption(_('Custom expression'), (string) CONDITION_EVAL_TYPE_EXPRESSION))
-	->setId('overrides-evaltype');
+	->addOptions(CSelect::createOptionsFromArray([
+		CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+		CONDITION_EVAL_TYPE_AND => _('And'),
+		CONDITION_EVAL_TYPE_OR => _('Or'),
+		CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+	]));
 
 if ($options['templated']) {
 	$override_evaltype_select->setReadonly();
@@ -111,11 +113,6 @@ else {
 	$overrides_filters = CConditionHelper::sortConditionsByFormulaId($overrides_filters);
 }
 
-$operators = [
-	CONDITION_OPERATOR_REGEXP => _('matches'),
-	CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-];
-
 foreach ($overrides_filters as $i => $overrides_filter) {
 	$formulaid = [
 		new CSpan($overrides_filter['formulaid']),
@@ -143,14 +140,12 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 	];
 
 	$operator_select = (new CSelect('overrides_filters['.$i.'][operator]'))
-		->setValue($overrides_filter['operator']);
+		->setValue($overrides_filter['operator'])
+		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
+		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')));
 
 	if ($options['templated']) {
 		$operator_select->setReadonly();
-	}
-
-	foreach ($operators as $operatorid => $operator_name) {
-		$operator_select->addOption(new CSelectOption($operator_name, (string) $operatorid));
 	}
 
 	$row = [$formulaid, $macro, $operator_select, $value, (new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)];
