@@ -220,11 +220,10 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param int    $dashboards[]['widgets'][]['type']
 	 * @param mixed  $dashboards[]['widgets'][]['value']
 	 * @param string $method
-	 * @param array  $types
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	protected function checkWidgetFields(array $dashboards, string $method, array $types): void {
+	protected function checkWidgetFields(array $dashboards, string $method): void {
 		$widget_fields = [];
 
 		if ($method === 'validateUpdate') {
@@ -266,10 +265,15 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		$ids = [];
-		foreach ($types as $type) {
-			$ids[$type] = [];
-		}
+		$ids = [
+			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
+			ZBX_WIDGET_FIELD_TYPE_HOST => [],
+			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
+			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
+			ZBX_WIDGET_FIELD_TYPE_MAP => []
+		];
 
 		foreach ($dashboards as $dashboard) {
 			if (array_key_exists('widgets', $dashboard)) {
@@ -289,7 +293,7 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists(ZBX_WIDGET_FIELD_TYPE_GROUP, $ids) && $ids[ZBX_WIDGET_FIELD_TYPE_GROUP]) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]) {
 			$groupids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]);
 
 			$db_groups = API::HostGroup()->get([
@@ -307,7 +311,7 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists(ZBX_WIDGET_FIELD_TYPE_HOST, $ids) && $ids[ZBX_WIDGET_FIELD_TYPE_HOST]) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_HOST]) {
 			$hostids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_HOST]);
 
 			$db_hosts = API::Host()->get([
@@ -323,7 +327,7 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists(ZBX_WIDGET_FIELD_TYPE_ITEM, $ids) && $ids[ZBX_WIDGET_FIELD_TYPE_ITEM]) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]) {
 			$itemids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]);
 
 			$db_items = API::Item()->get([
@@ -340,8 +344,7 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists(ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, $ids)
-				&& $ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]) {
 			$item_prototypeids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]);
 
 			$db_item_prototypes = API::ItemPrototype()->get([
@@ -359,7 +362,7 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists(ZBX_WIDGET_FIELD_TYPE_GRAPH, $ids) && $ids[ZBX_WIDGET_FIELD_TYPE_GRAPH]) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH]) {
 			$graphids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH]);
 
 			$db_graphs = API::Graph()->get([
@@ -375,8 +378,7 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE, $ids)
-				&& $ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]) {
 			$graph_prototypeids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]);
 
 			$db_graph_prototypes = API::GraphPrototype()->get([
@@ -394,7 +396,7 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		if (array_key_exists(ZBX_WIDGET_FIELD_TYPE_MAP, $ids) && $ids[ZBX_WIDGET_FIELD_TYPE_MAP]) {
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_MAP]) {
 			$sysmapids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MAP]);
 
 			$db_sysmaps = API::Map()->get([

@@ -206,10 +206,7 @@ class CDashboard extends CDashboardGeneral {
 		$this->checkUsers($dashboards);
 		$this->checkUserGroups($dashboards);
 		$this->checkWidgets($dashboards);
-		$this->checkWidgetFields($dashboards, __FUNCTION__, [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST,
-			ZBX_WIDGET_FIELD_TYPE_ITEM, ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH,
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_MAP
-		]);
+		$this->checkWidgetFields($dashboards, __FUNCTION__);
 	}
 
 	/**
@@ -335,10 +332,7 @@ class CDashboard extends CDashboardGeneral {
 		$this->checkUsers($dashboards, $db_dashboards);
 		$this->checkUserGroups($dashboards);
 		$this->checkWidgets($dashboards);
-		$this->checkWidgetFields($dashboards, __FUNCTION__, [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST,
-			ZBX_WIDGET_FIELD_TYPE_ITEM, ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH,
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_MAP
-		]);
+		$this->checkWidgetFields($dashboards, __FUNCTION__);
 	}
 
 	/**

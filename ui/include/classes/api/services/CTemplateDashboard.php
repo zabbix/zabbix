@@ -228,9 +228,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		$this->checkDuplicates($names_by_templateid);
 		$this->checkWidgets($dashboards);
-		$this->checkWidgetFields($dashboards, __FUNCTION__, [ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
-		]);
+		$this->checkWidgetFields($dashboards, __FUNCTION__);
 	}
 
 	/**
@@ -351,9 +349,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			$this->checkDuplicates($names_by_templateid);
 		}
 		$this->checkWidgets($dashboards);
-		$this->checkWidgetFields($dashboards, __FUNCTION__, [ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
-		]);
+		$this->checkWidgetFields($dashboards, __FUNCTION__);
 	}
 
 	/**
