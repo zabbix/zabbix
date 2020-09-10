@@ -269,9 +269,9 @@ static int	DBpatch_5010029(void)
 static int	DBpatch_5010030(void)
 {
 	const ZBX_TABLE	table =
-			{"trigger_queue", "functionid", 0,
+			{"trigger_queue", "", 0,
 				{
-					{"functionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
