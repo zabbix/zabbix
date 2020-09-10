@@ -389,6 +389,10 @@ class CTask extends CApiService {
 	 * @throws Exception
 	 */
 	protected function checkEditableItems(array $itemids): void {
+		if (!$itemids) {
+			return;
+		}
+
 		// Check permissions.
 		$items = API::Item()->get([
 			'output' => ['type', 'hostid', 'status', 'flags'],
