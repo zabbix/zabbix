@@ -3707,44 +3707,53 @@ static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, zbx_timespec_t
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_init_trigger_timer_schedule                                   *
+ * Function: dc_schedule_new_trigger_timers                                   *
  *                                                                            *
  * Purpose: set timer schedule and evaluation times based on functions and    *
  *          old trend function queue                                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_init_trigger_timer_schedule(zbx_vector_ptr_t *timers, zbx_hashset_t *trend_queue, int now)
+static void	dc_schedule_new_trigger_timers(zbx_vector_ptr_t *timer_functions, zbx_hashset_t *trend_queue, int now)
 {
 	int 			i;
+	ZBX_DC_FUNCTION		*function;
+	ZBX_DC_TRIGGER		*trigger;
 	zbx_trigger_timer_t	*timer, *old;
+	zbx_timespec_t		ts;
 
-	for (i = 0; i < timers->values_num; i++)
+	ts.ns = 0;
+
+	for (i = 0; i < timer_functions->values_num; i++)
 	{
-		timer = (zbx_trigger_timer_t *)timers->values[i];
+		function = (ZBX_DC_FUNCTION *)timer_functions->values[i];
+		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
+			continue;
+
+		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
+			continue;
+
+		timer = dc_trigger_timer_create(function);
 
 		if (NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue, &timer->objectid)))
 		{
 			/* if the trigger was scheduled during next 10 minutes         */
 			/* schedule its evaluation later to reduce server startup load */
 			if (old->eval_ts.sec < now + 10 * SEC_PER_MIN)
-			{
-				timer->exec_ts.ns = 0;
-				timer->exec_ts.sec = now + 10 * SEC_PER_MIN + timer->triggerid % (10 * SEC_PER_MIN);
-			}
+				ts.sec = now + 10 * SEC_PER_MIN + timer->triggerid % (10 * SEC_PER_MIN);
 			else
-				timer->exec_ts = old->eval_ts;
+				ts.sec = old->eval_ts.sec;
 
-			timer->eval_ts = old->eval_ts;
+			dc_schedule_trigger_timer(timer, &old->eval_ts, &ts);
 		}
 		else
 		{
-			/* reset timer so it's recalculated during timer rescheduling */
-			timer->exec_ts.sec = 0;
+			ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid);
+			dc_schedule_trigger_timer(timer, NULL, &ts);
 		}
 	}
 }
 
-static void	DCsync_functions(zbx_dbsync_t *sync, zbx_vector_ptr_t *timers)
+static void	DCsync_functions(zbx_dbsync_t *sync, zbx_vector_ptr_t *timer_functions)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -3753,7 +3762,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_vector_ptr_t *timers)
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_HOST		*host;
 	ZBX_DC_FUNCTION		*function;
-	zbx_trigger_timer_t	*timer;
 
 	int			found, ret;
 	zbx_uint64_t		itemid, functionid, triggerid;
@@ -3815,11 +3823,8 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_vector_ptr_t *timers)
 		if (NULL != item->triggers)
 			item->triggers[0] = NULL;
 
-		if ((ZBX_FUNCTION_TYPE_TIMER == function->type || ZBX_FUNCTION_TYPE_TRENDS == function->type))
-		{
-			if (NULL != (timer = dc_trigger_timer_create(function)))
-				zbx_vector_ptr_append(timers, timer);
-		}
+		if (ZBX_FUNCTION_TYPE_TIMER == function->type || ZBX_FUNCTION_TYPE_TRENDS == function->type)
+			zbx_vector_ptr_append(timer_functions, function);
 	}
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
@@ -5265,15 +5270,15 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_uint64_t	update_flags = 0;
 
 	zbx_hashset_t		trend_queue;
-	zbx_vector_ptr_t	timers;
+	zbx_vector_ptr_t	timer_functions;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_dbsync_init_env(config);
 
 	zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_ptr_create(&timers);
-	zbx_vector_ptr_reserve(&timers, 1000);
+	zbx_vector_ptr_create(&timer_functions);
+	zbx_vector_ptr_reserve(&timer_functions, 1000);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		dc_load_trigger_queue(&trend_queue);
@@ -5504,11 +5509,9 @@ void	DCsync_configuration(unsigned char mode)
 
 	START_SYNC;
 	sec = zbx_time();
-	DCsync_functions(&func_sync, &timers);
+	DCsync_functions(&func_sync, &timer_functions);
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
-
-	dc_init_trigger_timer_schedule(&timers, &trend_queue, time(NULL));
 
 	/* sync rest of the data */
 
@@ -5635,8 +5638,8 @@ void	DCsync_configuration(unsigned char mode)
 		dc_trigger_update_cache();
 	}
 
-	if (0 != timers.values_num)
-		dc_reschedule_trigger_timers(&timers, time(NULL));
+	if (0 != timer_functions.values_num)
+		dc_schedule_new_trigger_timers(&timer_functions, &trend_queue, time(NULL));
 
 	update_sec = zbx_time() - sec;
 
@@ -5934,7 +5937,7 @@ out:
 	zbx_dbsync_clear(&maintenance_host_sync);
 	zbx_dbsync_clear(&hgroup_host_sync);
 
-	zbx_vector_ptr_destroy(&timers);
+	zbx_vector_ptr_destroy(&timer_functions);
 	zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
@@ -8011,7 +8014,12 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 		zbx_binary_heap_remove_min(&config->trigger_queue);
 
-		if (NULL == (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &timer->triggerid)))
+		/* check if function exists and trigger should be calculated */
+		if (NULL == zbx_hashset_search(&config->functions, &timer->objectid) ||
+				NULL == (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+						&timer->triggerid)) ||
+				TRIGGER_STATUS_ENABLED != dc_trigger ||
+				TRIGGER_FUNCTIONAL_TRUE != dc_trigger->functional)
 		{
 			dc_trigger_timer_free(timer);
 			continue;
@@ -8062,15 +8070,6 @@ void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	for (i = 0; i < timers->values_num; i++)
 	{
 		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
-		ZBX_DC_TRIGGER		*trigger;
-
-		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &timer->triggerid)) ||
-				TRIGGER_STATUS_ENABLED != trigger->status ||
-				TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
-		{
-			dc_trigger_timer_free(timer);
-			continue;
-		}
 
 		/* timers with reseted scheduling must be rescheduled at new time, while other */
 		/* timers must be rescheduled at the old time                                  */
