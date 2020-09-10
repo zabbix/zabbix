@@ -54,6 +54,22 @@ void	zbx_mock_test_entry(void **state)
 	tm = *localtime(&time_tmp);
 
 	zbx_tm_round_up(&tm, base);
+
+	if (0 > tm.tm_hour || 23 < tm.tm_hour)
+		fail_msg("invalid tm_hour:%d", tm.tm_hour);
+
+	if (1 > tm.tm_mday || 31 < tm.tm_mday)
+		fail_msg("invalid tm.tm_mday:%d", tm.tm_mday);
+
+	if (0 > tm.tm_mon || 11 < tm.tm_mon)
+		fail_msg("invalid tm.tm_mon:%d", tm.tm_mon);
+
+	if (0 > tm.tm_wday || 6 < tm.tm_wday)
+		fail_msg("invalid tm.tm_wday:%d", tm.tm_wday);
+
+	if (0 > tm.tm_yday || 365 < tm.tm_yday)
+		fail_msg("invalid tm.tm_yday:%d", tm.tm_yday);
+
 	if (-1 == (time_tmp = mktime(&tm)))
 		fail_msg("invalid time structure");
 
