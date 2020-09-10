@@ -995,7 +995,7 @@ typedef struct
 	zbx_time_unit_t		trend_base;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
 	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
-	zbx_timespec_t		timer_ts;	/* real time when the trigger must be recalculated */
+	zbx_timespec_t		exec_ts;	/* real time when the timer must be executed */
 }
 zbx_trigger_timer_t;
 

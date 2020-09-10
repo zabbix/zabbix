@@ -3607,7 +3607,7 @@ static int	dc_function_calculate_nextcheck(zbx_trigger_timer_t *timer, time_t fr
 		int		nextcheck;
 		int		offsets[] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR, SEC_PER_HOUR, SEC_PER_HOUR, SEC_PER_HOUR};
 		int		periods[] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR, SEC_PER_HOUR * 11,
-		   		           SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR};
+					SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR};
 
 		tm = *localtime(&from);
 		zbx_tm_round_up(&tm, timer->trend_base);
@@ -3627,7 +3627,7 @@ static int	dc_function_calculate_nextcheck(zbx_trigger_timer_t *timer, time_t fr
  *                                                                            *
  * Function: dc_trigger_timer_create                                          *
  *                                                                            *
- * Purpose: Create trigger timer based on the specified function              *
+ * Purpose: create trigger timer based on the specified function              *
  *                                                                            *
  * Return value:  Created timer or NULL in the case of error.                 *
  *                                                                            *
@@ -3669,7 +3669,7 @@ zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
  *                                                                            *
  * Function: dc_trigger_timer_free                                            *
  *                                                                            *
- * Purpose: Free trigger timer                                                *
+ * Purpose: free trigger timer                                                *
  *                                                                            *
  ******************************************************************************/
 void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
@@ -3677,16 +3677,28 @@ void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
 	__config_mem_free_func(timer);
 }
 
-static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, zbx_timespec_t *eval_ts, zbx_timespec_t *timer_ts)
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_schedule_trigger_timer                                        *
+ *                                                                            *
+ * Purpose: schedule trigger timer to be executed at the specified time       *
+ *                                                                            *
+ * Parameter: timer   - [IN] the timer to schedule                            *
+ *            eval_ts - [IN] the history snapshot time, by default (NULL)     *
+ *                           execution time will be used.                     *
+ *            exec_ts - [IN] the tiemer execution time                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, zbx_timespec_t *eval_ts, zbx_timespec_t *exec_ts)
 {
 	zbx_binary_heap_elem_t	elem;
 
 	if (NULL == eval_ts)
-		timer->eval_ts = *timer_ts;
+		timer->eval_ts = *exec_ts;
 	else
 		timer->eval_ts = *eval_ts;
 
-	timer->timer_ts = *timer_ts;
+	timer->exec_ts = *exec_ts;
 
 	elem.key = 0;
 	elem.data = (void *)timer;
@@ -3712,12 +3724,23 @@ static void	dc_init_trigger_timer_schedule(zbx_vector_ptr_t *timers, zbx_hashset
 
 		if (NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue, &timer->objectid)))
 		{
-			timer->timer_ts.ns = 0;
-			timer->timer_ts.sec = now + 10 * SEC_PER_MIN + timer->triggerid % (10 * SEC_PER_MIN);
+			/* if the trigger was scheduled during next 10 minutes         */
+			/* schedule its evaluation later to reduce server startup load */
+			if (old->eval_ts.sec < now + 10 * SEC_PER_MIN)
+			{
+				timer->exec_ts.ns = 0;
+				timer->exec_ts.sec = now + 10 * SEC_PER_MIN + timer->triggerid % (10 * SEC_PER_MIN);
+			}
+			else
+				timer->exec_ts = old->eval_ts;
+
 			timer->eval_ts = old->eval_ts;
 		}
 		else
-			timer->timer_ts.sec = 0;
+		{
+			/* reset timer so it's recalculated during timer rescheduling */
+			timer->exec_ts.sec = 0;
+		}
 	}
 }
 
@@ -6205,7 +6228,7 @@ static int	__config_timer_compare(const void *d1, const void *d2)
 
 	int	ret;
 
-	if (0 != (ret = zbx_timespec_compare(&t1->timer_ts, &t2->timer_ts)))
+	if (0 != (ret = zbx_timespec_compare(&t1->exec_ts, &t2->exec_ts)))
 		return ret;
 
 	ZBX_RETURN_IF_NOT_EQUAL(t1->triggerid, t2->triggerid);
@@ -7970,7 +7993,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		elem = zbx_binary_heap_find_min(&config->trigger_queue);
 		timer = (zbx_trigger_timer_t *)elem->data;
 
-		if (timer->timer_ts.sec > now)
+		if (timer->exec_ts.sec > now)
 			break;
 
 		/* first_timer stores the first timer from a list of timers of the same trigger with the same */
@@ -8008,7 +8031,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		if (0 == dc_trigger->locked || ZBX_FUNCTION_TYPE_TRENDS != timer->type ||
 				(NULL != first_timer && 1 == first_timer->lock))
 		{
-			timer->timer_ts.sec = 0;
+			timer->exec_ts.sec = 0;
 		}
 
 		/* remember if the timer locked trigger, so it would unlock it's unlocked during rescheduling */
@@ -8051,7 +8074,7 @@ void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 
 		/* timers with reseted scheduling must be rescheduled at new time, while other */
 		/* timers must be rescheduled at the old time                                  */
-		if (0 == timer->timer_ts.sec)
+		if (0 == timer->exec_ts.sec)
 		{
 			zbx_timespec_t	ts;
 
@@ -8060,7 +8083,7 @@ void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 			dc_schedule_trigger_timer(timer, NULL, &ts);
 		}
 		else
-			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->timer_ts);
+			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->exec_ts);
 	}
 }
 
