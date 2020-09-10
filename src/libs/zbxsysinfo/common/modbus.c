@@ -152,44 +152,44 @@ static char	*result_to_str(uint16_t *buf, modbus_datatype_t type, unsigned short
 		switch(type)
 		{
 			case ZBX_MODBUS_DATATYPE_UINT8:
-				list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
+				list = zbx_dsprintf(list, "%s%s%" PRIu8, list, 0 == i ? "" : ",",
 						read_reg_8_most(buf, endianness));
 
 				if (++i >= count)
 					break;
 
-				list = zbx_dsprintf(list, "%s,%u", list,
+				list = zbx_dsprintf(list, "%s,%" PRIu8, list,
 						read_reg_8_less(buf, endianness));
 				buf++;
 				break;
 			case ZBX_MODBUS_DATATYPE_INT8:
-				list = zbx_dsprintf(list, "%s%s%d", list, 0 == i ? "" : ",",
+				list = zbx_dsprintf(list, "%s%s%" PRId8, list, 0 == i ? "" : ",",
 						(int8_t)read_reg_8_most(buf, endianness));
 
 				if (++i >= count)
 					break;
 
-				list = zbx_dsprintf(list, "%s,%d", list,
+				list = zbx_dsprintf(list, "%s,%" PRId8, list,
 						(int8_t)read_reg_8_less(buf, endianness));
 				buf++;
 				break;
 			case ZBX_MODBUS_DATATYPE_UINT16:
-				list = zbx_dsprintf(list, "%s%s%hu", list, 0 == i ? "" : ",",
+				list = zbx_dsprintf(list, "%s%s%" PRIu16, list, 0 == i ? "" : ",",
 						read_reg_16(buf, endianness));
 				buf++;
 				break;
 			case ZBX_MODBUS_DATATYPE_INT16:
-				list = zbx_dsprintf(list, "%s%s%hi", list, 0 == i ? "" : ",",
+				list = zbx_dsprintf(list, "%s%s%" PRId16, list, 0 == i ? "" : ",",
 						(int16_t)read_reg_16(buf, endianness));
 				buf++;
 				break;
 			case ZBX_MODBUS_DATATYPE_UINT32:
-				list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
+				list = zbx_dsprintf(list, "%s%s%" PRIu32, list, 0 == i ? "" : ",",
 						read_reg_32(buf, endianness));
 				buf += 2;
 				break;
 			case ZBX_MODBUS_DATATYPE_INT32:
-				list = zbx_dsprintf(list, "%s%s%i", list, 0 == i ? "" : ",",
+				list = zbx_dsprintf(list, "%s%s%" PRId32, list, 0 == i ? "" : ",",
 						(int32_t)read_reg_32(buf, endianness));
 				buf += 2;
 				break;
@@ -241,7 +241,7 @@ static char	*result_to_str_bit(uint8_t *buf8, unsigned short count)
 	list = zbx_strdup(NULL, "[");
 
 	for (i = 0; i < count; i++)
-		list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",", buf8[i]);
+		list = zbx_dsprintf(list, "%s%s%" PRIu8, list, 0 == i ? "" : ",", buf8[i]);
 
 	list = zbx_dsprintf(list, "%s]", list);
 
