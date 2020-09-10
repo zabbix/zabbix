@@ -28,7 +28,7 @@ class CTabFilter extends CBaseComponent {
 		// Array of CTabFilterItem objects.
 		this._items = [];
 		this._active_item = null;
-		this._shared_domnode = null;
+		this._filters_footer = null;
 		// NodeList of available templates (<script> DOM elements).
 		this._templates = {};
 		this._fetchpromise = null;
@@ -42,7 +42,7 @@ class CTabFilter extends CBaseComponent {
 	init(options) {
 		let item, index = 0;
 
-		this._shared_domnode = this._target.querySelector('.form-buttons');
+		this._filters_footer = this._target.querySelector('.form-buttons');
 
 		if (options.expanded) {
 			options.data[options.selected].expanded = true;
@@ -266,13 +266,13 @@ class CTabFilter extends CBaseComponent {
 			expand: (ev) => {
 				if (ev.detail.target != this._timeselector) {
 					this.setSelectedItem(ev.detail.target);
-					this._shared_domnode.classList.remove('display-none');
+					this._filters_footer.classList.remove('display-none');
 					this.profileUpdate('selected', {
 						value_int: this._active_item._index
 					});
 				}
 				else {
-					this._shared_domnode.classList.add('display-none');
+					this._filters_footer.classList.add('display-none');
 				}
 
 				this.collapseAllItemsExcept(ev.detail.target);
@@ -527,17 +527,17 @@ class CTabFilter extends CBaseComponent {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
 		}
 
-		this._shared_domnode.querySelector('[name="filter_update"]').addEventListener('click', this._events.buttonUpdateAction);
-		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.buttonSaveAsAction);
-		this._shared_domnode.querySelector('[name="filter_apply"]').addEventListener('click', this._events.buttonApplyAction);
-		this._shared_domnode.querySelector('[name="filter_reset"]').addEventListener('click', this._events.buttonResetAction);
+		this._filters_footer.querySelector('[name="filter_update"]').addEventListener('click', this._events.buttonUpdateAction);
+		this._filters_footer.querySelector('[name="filter_new"]').addEventListener('click', this._events.buttonSaveAsAction);
+		this._filters_footer.querySelector('[name="filter_apply"]').addEventListener('click', this._events.buttonApplyAction);
+		this._filters_footer.querySelector('[name="filter_reset"]').addEventListener('click', this._events.buttonResetAction);
 
 		this.on('keydown', this._events.keydown);
 		this.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateActiveFilterTab);
 		this.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteActiveFilterTab);
 		this.on('submit', (ev) => {
 			ev.preventDefault();
-			this._shared_domnode.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));
+			this._filters_footer.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));
 		});
 	}
 }
