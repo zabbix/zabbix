@@ -90,6 +90,17 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to CheckboxForm element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CFormElement
+	 */
+	public function asCheckboxForm($options = []) {
+		return $this->cast(CCheckboxFormElement::class, $options);
+	}
+
+	/**
 	 * Cast object to Message element.
 	 *
 	 * @param array $options    additional casting options
