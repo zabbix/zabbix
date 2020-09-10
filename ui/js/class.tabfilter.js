@@ -454,7 +454,7 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Action on 'Save as' button press, open properties popup.
 			 */
-			buttonSaveasAction: (ev) => {
+			buttonSaveAsAction: (ev) => {
 				let data = this._active_item._data;
 
 				this._active_item.openPropertiesForm(ev.target, {
@@ -466,7 +466,7 @@ class CTabFilter extends CBaseComponent {
 					filter_custom_time: data.filter_custom_time,
 					tabfilter_from: data.from,
 					tabfilter_to: data.to,
-					support_custom_time: data.filter_custom_time
+					support_custom_time: +this._options.support_custom_time
 				});
 			},
 
@@ -539,7 +539,7 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		this._shared_domnode.querySelector('[name="filter_update"]').addEventListener('click', this._events.buttonUpdateAction);
-		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.buttonSaveasAction);
+		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.buttonSaveAsAction);
 		this._shared_domnode.querySelector('[name="filter_apply"]').addEventListener('click', this._events.buttonApplyAction);
 		this._shared_domnode.querySelector('[name="filter_reset"]').addEventListener('click', this._events.buttonResetAction);
 
