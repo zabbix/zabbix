@@ -123,6 +123,201 @@ static void	set_serial_params_default(zbx_modbus_connection_serial *serial_param
 
 /******************************************************************************
  *                                                                            *
+ * Function: result_to_str                                                    *
+ *                                                                            *
+ * Purpose: converts result to a string                                       *
+ *                                                                            *
+ * Parameters: buf        - [IN] modbus data                                  *
+ *             type       - [IN] data type                                    *
+ *             count      - [IN] number of values                             *
+ *             endianness - [IN] endianness                                   *
+ *                                                                            *
+ * Return value: string with result                                           *
+ *                                                                            *
+ ******************************************************************************/
+static char	*result_to_str(uint16_t *buf, modbus_datatype_t type, unsigned short count,
+		modbus_endianness_t endianness)
+{
+	uint32_t	val_uint32;
+	uint64_t	val_uint64;
+	float		val_float;
+	double		val_double;
+	int		i;
+	char		*list;
+
+	list = zbx_strdup(NULL, "[");
+
+	for (i = 0; i < count; i++)
+	{
+		switch(type)
+		{
+			case ZBX_MODBUS_DATATYPE_UINT8:
+				list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
+						read_reg_8_most(buf, endianness));
+
+				if (++i >= count)
+					break;
+
+				list = zbx_dsprintf(list, "%s,%u", list,
+						read_reg_8_less(buf, endianness));
+				buf++;
+				break;
+			case ZBX_MODBUS_DATATYPE_INT8:
+				list = zbx_dsprintf(list, "%s%s%d", list, 0 == i ? "" : ",",
+						(int8_t)read_reg_8_most(buf, endianness));
+
+				if (++i >= count)
+					break;
+
+				list = zbx_dsprintf(list, "%s,%d", list,
+						(int8_t)read_reg_8_less(buf, endianness));
+				buf++;
+				break;
+			case ZBX_MODBUS_DATATYPE_UINT16:
+				list = zbx_dsprintf(list, "%s%s%hu", list, 0 == i ? "" : ",",
+						read_reg_16(buf, endianness));
+				buf++;
+				break;
+			case ZBX_MODBUS_DATATYPE_INT16:
+				list = zbx_dsprintf(list, "%s%s%hi", list, 0 == i ? "" : ",",
+						(int16_t)read_reg_16(buf, endianness));
+				buf++;
+				break;
+			case ZBX_MODBUS_DATATYPE_UINT32:
+				list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
+						read_reg_32(buf, endianness));
+				buf += 2;
+				break;
+			case ZBX_MODBUS_DATATYPE_INT32:
+				list = zbx_dsprintf(list, "%s%s%i", list, 0 == i ? "" : ",",
+						(int32_t)read_reg_32(buf, endianness));
+				buf += 2;
+				break;
+			case ZBX_MODBUS_DATATYPE_FLOAT:
+				val_uint32 = read_reg_32(buf, endianness);
+				memcpy(&val_float, &val_uint32, sizeof(float));
+				list = zbx_dsprintf(list, "%s%s%f", list, 0 == i ? "" : ",", val_float);
+				buf += 2;
+				break;
+			case ZBX_MODBUS_DATATYPE_UINT64:
+				list = zbx_dsprintf(list, "%s%s%lu", list, 0 == i ? "" : ",",
+						read_reg_64(buf, endianness));
+				buf += 4;
+				break;
+			case ZBX_MODBUS_DATATYPE_DOUBLE:
+				val_uint64 = read_reg_64(buf, endianness);
+				memcpy(&val_double, &val_uint64, sizeof(double));
+				list = zbx_dsprintf(list, "%s%s%g", list, 0 == i ? "" : ",", val_double);
+				buf += 4;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto end;
+		}
+	}
+end:
+	list = zbx_dsprintf(list, "%s]", list);
+
+	return list;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: result_to_str_bit                                                *
+ *                                                                            *
+ * Purpose: converts bits result to a string                                  *
+ *                                                                            *
+ * Parameters: buf8       - [IN] modbus data                                  *
+ *             count      - [IN] number of values                             *
+ *                                                                            *
+ * Return value: string with result                                           *
+ *                                                                            *
+ ******************************************************************************/
+static char	*result_to_str_bit(uint8_t *buf8, unsigned short count)
+{
+	char	*list;
+	int	i;
+
+	list = zbx_strdup(NULL, "[");
+
+	for (i = 0; i < count; i++)
+		list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",", buf8[i]);
+
+	list = zbx_dsprintf(list, "%s]", list);
+
+	return list;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: set_result                                                       *
+ *                                                                            *
+ * Purpose: set result                                                        *
+ *                                                                            *
+ * Parameters: buf        - [IN] modbus data                                  *
+ *             type       - [IN] data type                                    *
+ *             count      - [IN] number of values                             *
+ *             endianness - [IN] endianness                                   *
+ *             res        - [OUT] result                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	set_result(uint16_t *buf, modbus_datatype_t type, unsigned short count, modbus_endianness_t endianness,
+		AGENT_RESULT *res)
+{
+	if (1 == count)
+	{
+		uint32_t	val_uint32;
+		uint64_t	val_uint64;
+		float		val_float;
+		double		val_double;
+
+		switch(type)
+		{
+			case ZBX_MODBUS_DATATYPE_BIT:
+				SET_UI64_RESULT(res, *(uint8_t*)buf);
+				break;
+			case ZBX_MODBUS_DATATYPE_UINT8:
+				SET_UI64_RESULT(res, read_reg_8_most(buf, endianness));
+				break;
+			case ZBX_MODBUS_DATATYPE_INT8:
+				SET_DBL_RESULT(res, (int8_t)read_reg_8_most(buf, endianness));
+				break;
+			case ZBX_MODBUS_DATATYPE_UINT16:
+				SET_UI64_RESULT(res, read_reg_16(buf, endianness));
+				break;
+			case ZBX_MODBUS_DATATYPE_INT16:
+				SET_DBL_RESULT(res, (int16_t)read_reg_16(buf, endianness));
+				break;
+			case ZBX_MODBUS_DATATYPE_UINT32:
+				SET_UI64_RESULT(res, read_reg_32(buf, endianness));
+				break;
+			case ZBX_MODBUS_DATATYPE_INT32:
+				SET_DBL_RESULT(res, (int32_t)read_reg_32(buf, endianness));
+				break;
+			case ZBX_MODBUS_DATATYPE_FLOAT:
+				val_uint32 = read_reg_32(buf, endianness);
+				memcpy(&val_float, &val_uint32, sizeof(float));
+				SET_DBL_RESULT(res, val_float);
+				break;
+			case ZBX_MODBUS_DATATYPE_UINT64:
+				SET_UI64_RESULT(res, read_reg_64(buf, endianness));
+				break;
+			case ZBX_MODBUS_DATATYPE_DOUBLE:
+				val_uint64 = read_reg_64(buf, endianness);
+				memcpy(&val_double, &val_uint64, sizeof(double));
+				SET_DBL_RESULT(res, val_double);
+		}
+	}
+	else
+	{
+		SET_STR_RESULT(res, ZBX_MODBUS_DATATYPE_BIT == type ?
+				result_to_str_bit((uint8_t*)buf, count) :
+				result_to_str(buf, type, count, endianness));
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_total_count                                                  *
  *                                                                            *
  * Purpose: get total count of bits/registers plus offset                     *
@@ -322,10 +517,8 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 {
 
 	modbus_t	*mdb_ctx;
-	uint8_t		*dest8 = NULL;
-	uint16_t	*dest16 = NULL;
-	char		*list;
-	int		i, ret = FAIL;
+	void		*dst = NULL;
+	int		ret = FAIL;
 
 	if (ZBX_MODBUS_PROTOCOL_RTU == endpoint->protocol)
 	{
@@ -366,9 +559,9 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 #endif
 
 	if (ZBX_MODBUS_DATATYPE_BIT != type)
-		dest16 = zbx_malloc(NULL, sizeof(uint16_t) * total_count);
+		dst = zbx_malloc(NULL, sizeof(uint16_t) * total_count);
 	else
-		dest8 = zbx_malloc(NULL, sizeof(uint8_t) * total_count);
+		dst = zbx_malloc(NULL, sizeof(uint8_t) * total_count);
 
 	LOCK_MODBUS;
 
@@ -382,16 +575,16 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	switch(function)
 	{
 		case ZBX_MODBUS_FUNCTION_COIL:
-			ret = modbus_read_bits(mdb_ctx, address, total_count, dest8);
+			ret = modbus_read_bits(mdb_ctx, address, total_count, (uint8_t*)dst);
 			break;
 		case ZBX_MODBUS_FUNCTION_DISCRETE_INPUT:
-			ret = modbus_read_input_bits(mdb_ctx, address, total_count, dest8);
+			ret = modbus_read_input_bits(mdb_ctx, address, total_count, (uint8_t*)dst);
 			break;
 		case ZBX_MODBUS_FUNCTION_INPUT_REGISTERS:
-			ret = modbus_read_input_registers(mdb_ctx, address, total_count, dest16);
+			ret = modbus_read_input_registers(mdb_ctx, address, total_count, (uint16_t*)dst);
 			break;
 		case ZBX_MODBUS_FUNCTION_HOLDING_REGISTERS:
-			ret = modbus_read_registers(mdb_ctx, address, total_count, dest16);
+			ret = modbus_read_registers(mdb_ctx, address, total_count, (uint16_t*)dst);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -411,161 +604,14 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	}
 
 	if (ZBX_MODBUS_DATATYPE_BIT == type)
-	{
-		uint8_t	*buf8;
-
-		buf8 = dest8 + offset;
-
-		if (1 < count)
-		{
-			list = zbx_strdup(NULL, "[");
-
-			for (i = 0; i < count; i++)
-				list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",", buf8[i]);
-
-			list = zbx_dsprintf(list, "%s]", list);
-			SET_STR_RESULT(res, list);
-		}
-		else
-			SET_UI64_RESULT(res, *buf8);
-	}
+		set_result((uint16_t*)((uint8_t*)dst + offset), type, count, endianness, res);
 	else
-	{
-		uint16_t	*buf16;
-		uint32_t	val_uint32;
-		uint64_t	val_uint64;
-		float		val_float;
-		double		val_double;
-
-		buf16 = dest16 + offset;
-
-		if (1 == count)
-		{
-			switch(type)
-			{
-				case ZBX_MODBUS_DATATYPE_UINT8:
-					SET_UI64_RESULT(res, read_reg_8_most(buf16, endianness));
-					break;
-				case ZBX_MODBUS_DATATYPE_INT8:
-					SET_DBL_RESULT(res, (int8_t)read_reg_8_most(buf16, endianness));
-					break;
-				case ZBX_MODBUS_DATATYPE_UINT32:
-					SET_UI64_RESULT(res, read_reg_32(buf16, endianness));
-					break;
-				case ZBX_MODBUS_DATATYPE_INT32:
-					SET_DBL_RESULT(res, (int32_t)read_reg_32(buf16, endianness));
-					break;
-				case ZBX_MODBUS_DATATYPE_FLOAT:
-					val_uint32 = read_reg_32(buf16, endianness);
-					memcpy(&val_float, &val_uint32, sizeof(float));
-					SET_DBL_RESULT(res, val_float);
-					break;
-				case ZBX_MODBUS_DATATYPE_UINT64:
-					SET_UI64_RESULT(res, read_reg_64(buf16, endianness));
-					break;
-				case ZBX_MODBUS_DATATYPE_DOUBLE:
-					val_uint64 = read_reg_64(buf16, endianness);
-					memcpy(&val_double, &val_uint64, sizeof(double));
-					SET_DBL_RESULT(res, val_double);
-					break;
-				case ZBX_MODBUS_DATATYPE_UINT16:
-					SET_UI64_RESULT(res, read_reg_16(buf16, endianness));
-					break;
-				case ZBX_MODBUS_DATATYPE_INT16:
-					SET_DBL_RESULT(res, (int16_t)read_reg_16(buf16, endianness));
-					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					*error = zbx_strdup(*error, "internal error: unexpected data type");
-					goto out;
-			}
-		}
-		else
-		{
-			list = zbx_strdup(NULL, "[");
-
-			for (i = 0; i < count; i++)
-			{
-				switch(type)
-				{
-					case ZBX_MODBUS_DATATYPE_UINT8:
-						list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
-								read_reg_8_most(buf16, endianness));
-
-						if (++i >= count)
-							break;
-
-						list = zbx_dsprintf(list, "%s,%u", list,
-								read_reg_8_less(buf16, endianness));
-						buf16++;
-						break;
-					case ZBX_MODBUS_DATATYPE_INT8:
-						list = zbx_dsprintf(list, "%s%s%d", list, 0 == i ? "" : ",",
-								(int8_t)read_reg_8_most(buf16, endianness));
-
-						if (++i >= count)
-							break;
-
-						list = zbx_dsprintf(list, "%s,%d", list,
-								(int8_t)read_reg_8_less(buf16, endianness));
-						buf16++;
-						break;
-					case ZBX_MODBUS_DATATYPE_UINT32:
-						list = zbx_dsprintf(list, "%s%s%u", list, 0 == i ? "" : ",",
-								read_reg_32(buf16, endianness));
-						buf16 += 2;
-						break;
-					case ZBX_MODBUS_DATATYPE_INT32:
-						list = zbx_dsprintf(list, "%s%s%i", list, 0 == i ? "" : ",",
-								(int32_t)read_reg_32(buf16, endianness));
-						buf16 += 2;
-						break;
-					case ZBX_MODBUS_DATATYPE_FLOAT:
-						val_uint32 = read_reg_32(buf16, endianness);
-						memcpy(&val_float, &val_uint32, sizeof(float));
-						list = zbx_dsprintf(list, "%s%s%f", list, 0 == i ? "" : ",", val_float);
-						buf16 += 2;
-						break;
-					case ZBX_MODBUS_DATATYPE_UINT64:
-						list = zbx_dsprintf(list, "%s%s%lu", list, 0 == i ? "" : ",",
-								read_reg_64(buf16, endianness));
-						buf16 += 4;
-						break;
-					case ZBX_MODBUS_DATATYPE_DOUBLE:
-						val_uint64 = read_reg_64(buf16, endianness);
-						memcpy(&val_double, &val_uint64, sizeof(double));
-						list = zbx_dsprintf(list, "%s%s%g", list, 0 == i ? "" : ",",
-								val_double);
-						buf16 += 4;
-						break;
-					case ZBX_MODBUS_DATATYPE_UINT16:
-						list = zbx_dsprintf(list, "%s%s%hu", list, 0 == i ? "" : ",",
-								read_reg_16(buf16, endianness));
-						buf16++;
-						break;
-					case ZBX_MODBUS_DATATYPE_INT16:
-						list = zbx_dsprintf(list, "%s%s%hi", list, 0 == i ? "" : ",",
-								(int16_t)read_reg_16(buf16, endianness));
-						buf16++;
-						break;
-					default:
-						THIS_SHOULD_NEVER_HAPPEN;
-						zbx_free(list);
-						*error = zbx_strdup(*error, "internal error: unexpected data type");
-						goto out;
-				}
-			}
-
-			list = zbx_dsprintf(list, "%s]", list);
-			SET_STR_RESULT(res, list);
-		}
-	}
+		set_result((uint16_t*)dst + offset, type, count, endianness, res);
 
 	ret = SUCCEED;
 out:
 	modbus_free(mdb_ctx);
-	zbx_free(dest8);
-	zbx_free(dest16);
+	zbx_free(dst);
 
 	return ret;
 }
