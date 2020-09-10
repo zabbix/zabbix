@@ -25,8 +25,7 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
-// Export -
-func (p *Plugin) getSwap() (total, avail uint64, err error) {
+func getSwap() (total, avail uint64, err error) {
 	m, err := win32.GlobalMemoryStatusEx()
 	if err != nil {
 		return

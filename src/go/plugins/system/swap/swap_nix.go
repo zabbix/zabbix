@@ -19,11 +19,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package win32
+package swap
 
 import "syscall"
 
-func (p *Plugin) getSwap() (total, avail uint64, err error) {
+func getSwap() (total, avail uint64, err error) {
 	info := &syscall.Sysinfo_t{}
 	if err = syscall.Sysinfo(info); err != nil {
 		return

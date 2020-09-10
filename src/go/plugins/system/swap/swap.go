@@ -1,5 +1,3 @@
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package win32
+package swap
 
 import (
 	"errors"
@@ -53,7 +51,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("Invalid first parameter.")
 	}
 
-	total, avail, err := p.getSwap()
+	total, avail, err := getSwap()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get Swap data:%s", err.Error())
 	}
