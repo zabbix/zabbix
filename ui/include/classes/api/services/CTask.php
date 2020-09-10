@@ -254,7 +254,6 @@ class CTask extends CApiService {
 
 		foreach ($tasks as $index => $task) {
 			$itemids[$index] = $task['request']['itemid'];
-			$return[$index] = 0;
 		}
 
 		// Check if tasks for items and LLD rules already exist.
@@ -264,7 +263,7 @@ class CTask extends CApiService {
 			' WHERE t.taskid=tcn.taskid'.
 				' AND t.type='.ZBX_TM_TASK_CHECK_NOW.
 				' AND t.status='.ZBX_TM_STATUS_NEW.
-				' AND '.dbConditionId('tcn.itemid', array_keys(array_flip($itemids)))
+				' AND '.dbConditionId('tcn.itemid', $itemids)
 		);
 
 		while ($db_task = DBfetch($db_tasks)) {
