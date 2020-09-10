@@ -99,15 +99,11 @@ abstract class CDashboardGeneral extends CApiService {
 			if (array_key_exists('name', $dashboard) && $dashboard['name'] !== $db_dashboard['name']) {
 				$upd_dashboard['name'] = $dashboard['name'];
 			}
-
-			if ($this instanceof CDashboard) {
-				if (array_key_exists('userid', $dashboard) && bccomp($dashboard['userid'], $db_dashboard['userid']) != 0) {
-					$upd_dashboard['userid'] = $dashboard['userid'];
-				}
-
-				if (array_key_exists('private', $dashboard) && $dashboard['private'] != $db_dashboard['private']) {
-					$upd_dashboard['private'] = $dashboard['private'];
-				}
+			if (array_key_exists('userid', $dashboard) && bccomp($dashboard['userid'], $db_dashboard['userid']) != 0) {
+				$upd_dashboard['userid'] = $dashboard['userid'];
+			}
+			if (array_key_exists('private', $dashboard) && $dashboard['private'] != $db_dashboard['private']) {
+				$upd_dashboard['private'] = $dashboard['private'];
 			}
 
 			if ($upd_dashboard) {
