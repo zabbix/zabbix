@@ -248,7 +248,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			[ZBX_WIDGET_FIELD_TYPE_INT32, ZBX_WIDGET_FIELD_TYPE_STR]
 		);
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid']], 'fields' => [
 			'dashboardid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'templateid' =>		['type' => API_ID],
@@ -285,6 +285,21 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'preservekeys' => true
 		]);
 
+		foreach ($dashboards as $dashboard) {
+			if (!array_key_exists($dashboard['dashboardid'], $db_dashboards)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+
+		$dashboards = $this->extendObjectsByKey($dashboards, $db_dashboards, 'dashboardid', ['templateid']);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['templateid', 'name']]];
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $dashboards, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$dashboards = $this->extendObjectsByKey($dashboards, $db_dashboards, 'dashboardid', ['name']);
 
 		$names_by_templateid = [];
@@ -299,13 +314,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 		];
 
 		foreach ($dashboards as &$dashboard) {
-			// Check if this dashboard exists.
-			if (!array_key_exists($dashboard['dashboardid'], $db_dashboards)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
 			$db_dashboard = $db_dashboards[$dashboard['dashboardid']];
 
 			if ($dashboard['name'] !== $db_dashboard['name']) {
