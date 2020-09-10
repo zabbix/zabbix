@@ -226,6 +226,23 @@ abstract class CDashboardGeneral extends CApiService {
 	protected function checkWidgetFields(array $dashboards, string $method): void {
 		$widget_fields = [];
 
+		$field_names = ['value_itemid', 'value_graphid'];
+		$ids = [
+			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
+			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH => [],
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => []
+		];
+
+		if ($this instanceof CDashboard) {
+			array_push($field_names, 'value_groupid', 'value_hostid', 'value_sysmapid');
+			$ids += [
+				ZBX_WIDGET_FIELD_TYPE_GROUP => [],
+				ZBX_WIDGET_FIELD_TYPE_HOST => [],
+				ZBX_WIDGET_FIELD_TYPE_MAP => []
+			];
+		}
+
 		if ($method === 'validateUpdate') {
 			$widgetids = [];
 
@@ -241,15 +258,10 @@ abstract class CDashboardGeneral extends CApiService {
 
 			if ($widgetids) {
 				$db_widget_fields = DB::select('widget_field', [
-					'output' => ['widgetid', 'type', 'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid',
-						'value_sysmapid'
-					],
+					'output' => array_merge(['widgetid', 'type'], $field_names),
 					'filter' => [
 						'widgetid' => $widgetids,
-						'type' => [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-							ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH,
-							ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_MAP
-						]
+						'type' => array_keys($ids)
 					]
 				]);
 
@@ -265,16 +277,6 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 		}
 
-		$ids = [
-			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
-			ZBX_WIDGET_FIELD_TYPE_HOST => [],
-			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
-			ZBX_WIDGET_FIELD_TYPE_GRAPH => [],
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
-			ZBX_WIDGET_FIELD_TYPE_MAP => []
-		];
-
 		foreach ($dashboards as $dashboard) {
 			if (array_key_exists('widgets', $dashboard)) {
 				foreach ($dashboard['widgets'] as $widget) {
@@ -285,44 +287,15 @@ abstract class CDashboardGeneral extends CApiService {
 							if ($widgetid == 0 || !array_key_exists($widgetid, $widget_fields)
 									|| !array_key_exists($field['type'], $widget_fields[$widgetid])
 									|| !array_key_exists($field['value'], $widget_fields[$widgetid][$field['type']])) {
-								$ids[$field['type']][$field['value']] = true;
+								if ($this instanceof CDashboard) {
+									$ids[$field['type']][$field['value']] = true;
+								}
+								else {
+									$ids[$field['type']][$field['value']][$dashboard['templateid']] = true;
+								}
 							}
 						}
 					}
-				}
-			}
-		}
-
-		if ($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]) {
-			$groupids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]);
-
-			$db_groups = API::HostGroup()->get([
-				'output' => [],
-				'groupids' => $groupids,
-				'preservekeys' => true
-			]);
-
-			foreach ($groupids as $groupid) {
-				if (!array_key_exists($groupid, $db_groups)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Host group with ID "%1$s" is not available.', $groupid)
-					);
-				}
-			}
-		}
-
-		if ($ids[ZBX_WIDGET_FIELD_TYPE_HOST]) {
-			$hostids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_HOST]);
-
-			$db_hosts = API::Host()->get([
-				'output' => [],
-				'hostids' => $hostids,
-				'preservekeys' => true
-			]);
-
-			foreach ($hostids as $hostid) {
-				if (!array_key_exists($hostid, $db_hosts)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with ID "%1$s" is not available.', $hostid));
 				}
 			}
 		}
@@ -331,7 +304,7 @@ abstract class CDashboardGeneral extends CApiService {
 			$itemids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]);
 
 			$db_items = API::Item()->get([
-				'output' => [],
+				'output' => ($this instanceof CDashboard) ? [] : ['hostid'],
 				'itemids' => $itemids,
 				'webitems' => true,
 				'preservekeys' => true
@@ -341,6 +314,16 @@ abstract class CDashboardGeneral extends CApiService {
 				if (!array_key_exists($itemid, $db_items)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with ID "%1$s" is not available.', $itemid));
 				}
+
+				if ($this instanceof CTemplateDashboard) {
+					foreach (array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM][$itemid]) as $templateid) {
+						if ($db_items[$itemid]['hostid'] != $templateid) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Item with ID "%1$s" is not available.', $itemid)
+							);
+						}
+					}
+				}
 			}
 		}
 
@@ -348,7 +331,7 @@ abstract class CDashboardGeneral extends CApiService {
 			$item_prototypeids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE]);
 
 			$db_item_prototypes = API::ItemPrototype()->get([
-				'output' => [],
+				'output' => ($this instanceof CDashboard) ? [] : ['hostid'],
 				'itemids' => $item_prototypeids,
 				'preservekeys' => true
 			]);
@@ -359,6 +342,16 @@ abstract class CDashboardGeneral extends CApiService {
 						_s('Item prototype with ID "%1$s" is not available.', $item_prototypeid)
 					);
 				}
+
+				if ($this instanceof CTemplateDashboard) {
+					foreach (array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE][$item_prototypeid]) as $templateid) {
+						if ($db_item_prototypes[$item_prototypeid]['hostid'] != $templateid) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Item prototype with ID "%1$s" is not available.', $item_prototypeid)
+							);
+						}
+					}
+				}
 			}
 		}
 
@@ -367,6 +360,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 			$db_graphs = API::Graph()->get([
 				'output' => [],
+				'selectHosts' => ($this instanceof CDashboard) ? null : ['hostid'],
 				'graphids' => $graphids,
 				'preservekeys' => true
 			]);
@@ -374,6 +368,16 @@ abstract class CDashboardGeneral extends CApiService {
 			foreach ($graphids as $graphid) {
 				if (!array_key_exists($graphid, $db_graphs)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with ID "%1$s" is not available.', $graphid));
+				}
+
+				if ($this instanceof CTemplateDashboard) {
+					foreach (array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH][$graphid]) as $templateid) {
+						if (!in_array($templateid, array_column($db_graphs[$graphid]['hosts'], 'hostid'))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Graph with ID "%1$s" is not available.', $graphid)
+							);
+						}
+					}
 				}
 			}
 		}
@@ -383,6 +387,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 			$db_graph_prototypes = API::GraphPrototype()->get([
 				'output' => [],
+				'selectHosts' => ($this instanceof CDashboard) ? null : ['hostid'],
 				'graphids' => $graph_prototypeids,
 				'preservekeys' => true
 			]);
@@ -393,21 +398,71 @@ abstract class CDashboardGeneral extends CApiService {
 						_s('Graph prototype with ID "%1$s" is not available.', $graph_prototypeid)
 					);
 				}
+
+				if ($this instanceof CTemplateDashboard) {
+					$templateids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE][$graph_prototypeid]);
+					foreach ($templateids as $templateid) {
+						$hostids = array_column($db_graph_prototypes[$graph_prototypeid]['hosts'], 'hostid');
+						if (!in_array($templateid, $hostids)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Graph prototype with ID "%1$s" is not available.', $graph_prototypeid)
+							);
+						}
+					}
+				}
 			}
 		}
 
-		if ($ids[ZBX_WIDGET_FIELD_TYPE_MAP]) {
-			$sysmapids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MAP]);
+		if ($this instanceof CDashboard) {
+			if ($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]) {
+				$groupids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GROUP]);
 
-			$db_sysmaps = API::Map()->get([
-				'output' => [],
-				'sysmapids' => $sysmapids,
-				'preservekeys' => true
-			]);
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					'groupids' => $groupids,
+					'preservekeys' => true
+				]);
 
-			foreach ($sysmapids as $sysmapid) {
-				if (!array_key_exists($sysmapid, $db_sysmaps)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with ID "%1$s" is not available.', $sysmapid));
+				foreach ($groupids as $groupid) {
+					if (!array_key_exists($groupid, $db_groups)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Host group with ID "%1$s" is not available.', $groupid)
+						);
+					}
+				}
+			}
+
+			if ($ids[ZBX_WIDGET_FIELD_TYPE_HOST]) {
+				$hostids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_HOST]);
+
+				$db_hosts = API::Host()->get([
+					'output' => [],
+					'hostids' => $hostids,
+					'preservekeys' => true
+				]);
+
+				foreach ($hostids as $hostid) {
+					if (!array_key_exists($hostid, $db_hosts)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with ID "%1$s" is not available.', $hostid));
+					}
+				}
+			}
+
+			if ($ids[ZBX_WIDGET_FIELD_TYPE_MAP]) {
+				$sysmapids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MAP]);
+
+				$db_sysmaps = API::Map()->get([
+					'output' => [],
+					'sysmapids' => $sysmapids,
+					'preservekeys' => true
+				]);
+
+				foreach ($sysmapids as $sysmapid) {
+					if (!array_key_exists($sysmapid, $db_sysmaps)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map with ID "%1$s" is not available.', $sysmapid)
+						);
+					}
 				}
 			}
 		}
