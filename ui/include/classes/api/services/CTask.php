@@ -301,7 +301,8 @@ class CTask extends CApiService {
 					'parent_taskid' => $taskid
 				];
 
-				$return[$index] = (string) $taskid++;
+				$return[$index] = (string) $taskid;
+				$taskid = bcadd($taskid, 1, 0);
 			}
 
 			DB::insertBatch('task', $task_rows, false);
@@ -349,7 +350,8 @@ class CTask extends CApiService {
 				'parent_taskid' => $taskid
 			];
 
-			$return[$index] = (string) $taskid++;
+			$return[$index] = (string) $taskid;
+			$taskid = bcadd($taskid, 1, 0);
 		}
 
 		DB::insertBatch('task', $task_rows, false);
