@@ -110,13 +110,6 @@ abstract class CDashboardGeneral extends CApiService {
 				}
 			}
 
-			if ($this instanceof CTemplateDashboard) {
-				if (array_key_exists('templateid', $dashboard)
-						&& bccomp($dashboard['templateid'], $db_dashboard['templateid']) != 0) {
-					$upd_dashboard['templateid'] = $dashboard['templateid'];
-				}
-			}
-
 			if ($upd_dashboard) {
 				$upd_dashboards[] = [
 					'values' => $upd_dashboard,

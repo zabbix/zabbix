@@ -251,7 +251,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid']], 'fields' => [
 			'dashboardid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
-			'templateid' =>		['type' => API_ID],
 			'widgets' =>		['type' => API_OBJECTS, 'fields' => [
 				'widgetid' =>		['type' => API_ID],
 				'type' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', $widget_types), 'length' => DB::getFieldLength('widget', 'type')],
