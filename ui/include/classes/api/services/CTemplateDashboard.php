@@ -175,8 +175,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 */
 	protected function validateCreate(array &$dashboards): void {
 		$widget_types = [WIDGET_CLOCK, WIDGET_GRAPH, WIDGET_GRAPH_PROTOTYPE, WIDGET_PLAIN_TEXT, WIDGET_URL];
-		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
+		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_ITEM, ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
+			ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
 		];
 		$widget_field_types = array_merge($ids_widget_field_types,
 			[ZBX_WIDGET_FIELD_TYPE_INT32, ZBX_WIDGET_FIELD_TYPE_STR]
@@ -239,8 +239,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 */
 	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null): void {
 		$widget_types = [WIDGET_CLOCK, WIDGET_GRAPH, WIDGET_GRAPH_PROTOTYPE, WIDGET_PLAIN_TEXT, WIDGET_URL];
-		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
+		$ids_widget_field_types = [ZBX_WIDGET_FIELD_TYPE_ITEM, ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
+			ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
 		];
 		$widget_field_types = array_merge($ids_widget_field_types,
 			[ZBX_WIDGET_FIELD_TYPE_INT32, ZBX_WIDGET_FIELD_TYPE_STR]
@@ -379,7 +379,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 		return [
 			ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
 			ZBX_WIDGET_FIELD_TYPE_STR => 'value_str',
-			ZBX_WIDGET_FIELD_TYPE_HOST => 'value_hostid',
 			ZBX_WIDGET_FIELD_TYPE_ITEM => 'value_itemid',
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => 'value_itemid',
 			ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
