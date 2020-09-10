@@ -284,7 +284,6 @@ func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcID uint8, er
 	if memAddr >= 50000 || memAddr == 0 {
 		return 0, fid, fmt.Errorf("Unsupported modbus address for empty function:%d", memAddr)
 	}
-	funcID = uint8(memAddr / 10000)
 
 	switch funcID {
 	case 0:
@@ -293,8 +292,10 @@ func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcID uint8, er
 		funcID = 2
 		memAddr = memAddr - 10000
 	case 3:
+		funcID = 4
 		memAddr = memAddr - 30000
 	case 4:
+		funcID = 3
 		memAddr = memAddr - 40000
 	default:
 		return 0, fid, fmt.Errorf("Unsupported modbus function for address:%d", memAddr)
