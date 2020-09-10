@@ -40,15 +40,12 @@ class CMacroParser extends CParser {
 	private $reference;
 
 	/**
-	 * @var CSetParser
-	 */
-	private $set_parser;
-
-	/**
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'ref_type' => CMacroParser::REFERENCE_NONE            Default, do not support any reference tyep.
+	 *   'macros' => true                                      All macros are supported.
+	 *   'macros' => []                                        Array of supported macros. Empty means no macros.
+	 *   'ref_type' => CMacroParser::REFERENCE_NONE            Default, do not support any reference type.
 	 *   'ref_type' => CMacroParser::REFERENCE_NUMERIC         Support only numeric reference <1-9>, {HOST.HOST3}.
 	 *   'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC    Allow alpha numeric reference, {EVENT.TAGS.issue_number}.
 	 *                                                         Reference can be quoted if it contains non alphanumeric
@@ -56,16 +53,29 @@ class CMacroParser extends CParser {
 	 *
 	 * @var array
 	 */
-	private $options = ['ref_type' => self::REFERENCE_NONE];
+	private $options = [
+		'macros' => [],
+		'ref_type' => self::REFERENCE_NONE
+	];
+
+	/**
+	 * Array of macros to match against or boolean (true) if all macros are supported.
+	 *
+	 * @var array|bool
+	 */
+	private $macros = [];
 
 	/**
 	 * Array of strings to search for.
 	 *
-	 * @param array $macros   The list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}'].
-	 * @param array $options
+	 * @param array      $options             Parser options.
+	 * @param array|bool $options['macros']   The list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}']
+	 * @param int        $options['ref_type'] Reference options.
 	 */
-	public function __construct(array $macros, array $options = []) {
-		$this->set_parser = new CSetParser(array_map(function($macro) { return substr($macro, 1, -1); }, $macros));
+	public function __construct(array $options = []) {
+		if (array_key_exists('macros', $options)) {
+			$this->macros = $options['macros'];
+		}
 
 		if (array_key_exists('ref_type', $options)) {
 			$this->options['ref_type'] = $options['ref_type'];
@@ -93,10 +103,11 @@ class CMacroParser extends CParser {
 		}
 		$p++;
 
-		if ($this->set_parser->parse($source, $p) == self::PARSE_FAIL) {
+		$s = $p;
+		if (!$this->parseName($source, $p)) {
 			return self::PARSE_FAIL;
 		}
-		$p += $this->set_parser->getLength();
+		$e = $p - $s;
 
 		if (!$this->parseReference($source, $p)) {
 			return self::PARSE_FAIL;
@@ -109,13 +120,52 @@ class CMacroParser extends CParser {
 		}
 		$p++;
 
-		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
-		$this->macro = $this->set_parser->getMatch();
+		$len = $p - $pos;
+		$match = substr($source, $pos, $len);
+		$macro = substr($source, $s, $e);
+
+		if (is_array($this->macros)) {
+			$macros = array_map(function($macro) {
+				return substr($macro, 1, -1);
+			}, $this->macros);
+
+			if ($this->macros) {
+				if (!in_array($macro, $macros)) {
+					return self::PARSE_FAIL;
+				}
+			}
+			else {
+				return self::PARSE_FAIL;
+			}
+		}
+		elseif ($this->macros === false) {
+			return self::PARSE_FAIL;
+		}
+
+		$this->length = $len;
+		$this->match = $match;
+		$this->macro = $macro;
 
 		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}
 
+	/**
+	 * Parse macro name.
+	 *
+	 * @param string $source
+	 * @param int $pos
+	 *
+	 * @return bool
+	 */
+	private function parseName(string $source, int &$pos): bool {
+		if (preg_match('/(^[A-Z\._]+[^\.\"0-9a-z\}$])/', substr($source, $pos), $matches)) {
+			$pos += strlen($matches[0]);
+
+			return true;
+		}
+
+		return false;
+	}
 	/**
 	 * Parse reference of type defined in "ref_type". Reference of type REFERENCE_ALPHANUMERIC containing non
 	 * alphanumeric characters or underscore should be quoted. Inside quotes only " and \ escape sequences are allowed.

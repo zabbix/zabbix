@@ -1875,8 +1875,8 @@ class CHostPrototype extends CHostBase {
 			'interfaces' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
 				'useip' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO ,'length' => DB::getFieldLength('interface', 'ip')],
-				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO,  'length' => DB::getFieldLength('interface', 'dns')],
+				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO,'length' => DB::getFieldLength('interface', 'ip')],
+				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO,  'length' => DB::getFieldLength('interface', 'dns')],
 				'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
 				'main' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
 				'details' =>			['type' => API_MULTIPLE, 'rules' => [

@@ -1816,7 +1816,7 @@ class CApiInputValidator {
 	 * IP address validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1830,46 +1830,31 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data === '') {
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
 			return true;
 		}
 
-		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $data)) {
-			return true;
+		$ip_parser = new CIPParser([
+			'v6' => ZBX_HAVE_IPV6,
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'macros' => ($flags & API_ALLOW_MACRO)
+		]);
+
+		if ($ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid IP address "%1$s".', $data);
+
+			return false;
 		}
 
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$user_macro_parser = new CUserMacroParser();
-
-			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
-		}
-
-		$ip_parser = new CIPParser(['v6' => ZBX_HAVE_IPV6]);
-
-		if ($ip_parser->parse($data) == CParser::PARSE_SUCCESS) {
-			return true;
-		}
-
-		$error = _s('Invalid IP address "%1$s".', $data);
-
-		return false;
+		return true;
 	}
 
 	/**
 	 * DNS name validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1883,33 +1868,23 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data === '') {
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
 			return true;
 		}
 
-		if (preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $data)) {
-			return true;
+		$dns_parser = new CDnsParser([
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'macros' => ($flags & API_ALLOW_MACRO)
+		]);
+
+		if ($dns_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Incorrect interface DNS parameter "%1$s" provided.', $data);
+
+			return false;
 		}
 
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$user_macro_parser = new CUserMacroParser();
-
-			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
-		}
-
-		$error = _s('Incorrect interface DNS parameter "%1$s" provided.', $data);
-
-		return false;
+		return true;
 	}
 
 	/**
