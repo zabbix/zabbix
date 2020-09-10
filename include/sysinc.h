@@ -433,11 +433,8 @@
 #endif
 
 #ifdef HAVE_LIBMODBUS
-#	ifdef _WINDOWS
-#		include <modbus.h>
-#	else
-#		include <modbus/modbus.h>
-#	endif
+#	include "modbus.h"
 #endif
+
 
 #endif
