@@ -343,11 +343,12 @@ class CDashboard extends CDashboardGeneral {
 	 * @throws APIException  if dashboard already exists.
 	 */
 	protected function checkDuplicates(array $names): void {
-		$db_dashboards = DB::select('dashboard', [
-			'output' => ['name'],
-			'filter' => ['name' => $names],
-			'limit' => 1
-		]);
+		$db_dashboards = DBfetchArray(DBselect(
+			'SELECT d.name'.
+			' FROM dashboard d'.
+			' WHERE d.templateid IS NULL'.
+				' AND '.dbConditionString('d.name', $names), 1
+		));
 
 		if ($db_dashboards) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
