@@ -243,6 +243,19 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		$show_warning = false;
 
+		if (array_key_exists('interface', $inputs)) {
+			if (array_key_exists('address', $inputs['interface'])
+					&& $inputs['interface']['address'] === ZBX_SECRET_MASK) {
+				$inputs['interface']['address'] = '';
+				$show_warning = true;
+			}
+
+			if (array_key_exists('port', $inputs['interface']) && $inputs['interface']['port'] === ZBX_SECRET_MASK) {
+				$inputs['interface']['port'] = '';
+				$show_warning = true;
+			}
+		}
+
 		// Set resolved macros to previously specified values.
 		foreach (array_keys($usermacros['macros']) as $macro_name) {
 			if ($usermacros['macros'] && array_key_exists('macros', $data) && is_array($data['macros'])
