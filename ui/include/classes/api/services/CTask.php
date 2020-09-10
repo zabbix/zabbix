@@ -28,12 +28,6 @@ class CTask extends CApiService {
 	protected $tableAlias = 't';
 	protected $sortColumns = ['taskid'];
 
-	/*
-	 * String constant to retrieve all possible fields for dyagnostic request.
-	 * Must be synchronized with server.
-	 */
-	const FIELD_EXTEND = 'extend';
-
 	/**
 	 * Get results of requested ZBX_TM_TASK_DATA task.
 	 *
@@ -403,7 +397,6 @@ class CTask extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$discovery_rules = [];
 		$itemids_cnt = count($itemids);
 
 		if (count($items) != $itemids_cnt) {
