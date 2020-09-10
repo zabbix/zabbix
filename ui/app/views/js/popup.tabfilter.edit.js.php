@@ -29,10 +29,36 @@ $('.overlay-dialogue-body #filter_custom_time').on('click', function () {
 	$('input,button', $calendars).prop('disabled', $(this).is(':not(:checked)'));
 });
 
-function tabFilterFormAction(form_action, overlay) {
+function tabFilterDelete(overlay) {
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action')),
-		$action_intput = $('<input/>', {type: 'hidden', name: 'form_action', value: form_action}).appendTo($form);
+		form_data = $form.serializeJSON();;
+	
+	url.setArgument('action', 'popup.tabfilter.delete');
+	url.setArgument('idx', form_data['idx']);
+	url.setArgument('idx2', form_data['idx2']);
+
+	overlay.setLoading();
+	overlay.xhr = $.post(url.getUrl(), null, 'json')
+		.done((response) => {
+			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+
+			if ('errors' in response) {
+				$(response.errors).insertBefore($form);
+			}
+			else {
+				overlayDialogueDestroy(overlay.dialogueid);
+				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_DELETE, {bubbles: true}));
+			}
+		})
+		.always(() => {
+			overlay.unsetLoading();
+		});
+}
+
+function tabFilterUpdate(overlay) {
+	var $form = overlay.$dialogue.find('form'),
+		url = new Curl($form.attr('action'));
 
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), $form.serialize(), 'json')
@@ -41,11 +67,11 @@ function tabFilterFormAction(form_action, overlay) {
 
 			if ('errors' in response) {
 				$(response.errors).insertBefore($form);
-				$action_intput.remove();
 			}
 			else {
 				overlayDialogueDestroy(overlay.dialogueid);
-				overlay.element.dispatchEvent(new CustomEvent('popup.tabfilter', {detail: response, bubbles: true}));
+				const properties = {detail: response, bubbles: true};
+				overlay.element.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_UPDATE, properties));
 			}
 		})
 		.always(() => {

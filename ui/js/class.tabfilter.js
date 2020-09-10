@@ -323,45 +323,35 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
-			 * Item properties updated event handler, is called when tab properties popup were closed pressing 'Update'.
+			 * Event handler for 'Delete' button
 			 */
-			updateItem: (ev) => {
-				if (this._active_item != this._timeselector) {
-					this.updateTimeselector(this._active_item);
-				}
+			deleteActiveFilterTab: (ev) => {
+				this.delete(this._active_item);
 			},
 
 			/**
 			 * Event handler for 'Save as' button
 			 */
-			popupUpdateAction: (ev) => {
-				var item = (ev.detail.create === '1')
+			updateActiveFilterTab: (ev) => {
+				var item = (ev.detail.create == '1')
 					? this.create(this._active_item._target.parentNode.cloneNode(true), {})
 					: this._active_item;
 
-				if (ev.detail.form_action === 'update') {
-					item.update(Object.assign(ev.detail, {
-						from: ev.detail.tabfilter_from,
-						to: ev.detail.tabfilter_to
-					}));
-					var params = item.getFilterParams();
+				item.update(ev.detail);
+				var params = item.getFilterParams();
 
-					if (ev.detail.create) {
-						// Popup were created by 'Save as' button, reload page for simplicity.
-						this.profileUpdate('properties', {
-							'idx2': ev.detail.idx2,
-							'value_str': params.toString()
-						}).then(() => {
-							item.setBrowserLocation(params);
-							window.location.reload(true);
-						});
-					}
-					else {
-						item.setSelected();
-					}
+				if (ev.detail.create == '1') {
+					// Popup were created by 'Save as' button, reload page for simplicity.
+					this.profileUpdate('properties', {
+						'idx2': ev.detail.idx2,
+						'value_str': params.toString()
+					}).then(() => {
+						item.setBrowserLocation(params);
+						window.location.reload(true);
+					});
 				}
-				else if (ev.detail.form_action === 'delete') {
-					this.delete(this._active_item);
+				else {
+					item.setSelected();
 				}
 			},
 
@@ -515,7 +505,6 @@ class CTabFilter extends CBaseComponent {
 			item.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
 			item.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
-			item.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateItem);
 		}
 
 		$('.ui-sortable-container', this._target).sortable({
@@ -544,7 +533,8 @@ class CTabFilter extends CBaseComponent {
 		this._shared_domnode.querySelector('[name="filter_reset"]').addEventListener('click', this._events.buttonResetAction);
 
 		this.on('keydown', this._events.keydown);
-		this.on('popup.tabfilter', this._events.popupUpdateAction);
+		this.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateActiveFilterTab);
+		this.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteActiveFilterTab);
 		this.on('submit', (ev) => {
 			ev.preventDefault();
 			this._shared_domnode.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));

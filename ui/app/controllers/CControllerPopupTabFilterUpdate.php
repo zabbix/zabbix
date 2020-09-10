@@ -19,7 +19,10 @@
 **/
 
 
-class CControllerPopupTabFilterEdit extends CController {
+/**
+ * Controller to update tab filter.
+ */
+class CControllerPopupTabFilterUpdate extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -47,16 +50,14 @@ class CControllerPopupTabFilterEdit extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
 	}
 
 	protected function customValidation(): bool {
-		if (!$this->getInput('support_custom_time', 0) || $this->getInput('filter_custom_time', 0)) {
+		if (!$this->getInput('support_custom_time', 0) || !$this->getInput('filter_custom_time', 0)) {
 			return true;
 		}
 
@@ -88,36 +89,35 @@ class CControllerPopupTabFilterEdit extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'form_action' => '',
-			'idx' => '',
-			'idx2' => '',
-			'filter_name' => '',
-			'filter_show_counter' => 0,
-			'filter_custom_time' => 0,
-			'tabfilter_from' => '',
-			'tabfilter_to' => '',
-			'support_custom_time' => 0,
-			'create' => 0
-		];
-		$this->getInputs($data, array_keys($data));
+		$idx = $this->getInput('idx', '');
+		$idx2 = $this->getInput('idx2', '');
+		$create = (int) $this->getInput('create', 0);
 
-		if (!$data['support_custom_time'] || !$data['filter_custom_time']) {
-			$data = [
-				'filter_custom_time' => 0,
-				'tabfilter_from' => 'now-1h',
-				'tabfilter_to' => 'now'
-			] + $data;
+		$properties = [
+			'filter_name' => $this->getInput('filter_name'),
+			'filter_show_counter' => (int) $this->getInput('filter_show_counter', 0),
+			'filter_custom_time' => (int) $this->getInput('filter_custom_time', 0)
+		];
+
+		if ($this->getInput('support_custom_time', 0) && $properties['filter_custom_time']) {
+			$properties['from'] = $this->getInput('tabfilter_from', '');
+			$properties['to'] = $this->getInput('tabfilter_to', '');
 		}
 
-		$data += [
-			'title' => _('Filter properties'),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		];
+		$filter = (new CTabFilterProfile($idx, []))->read();
 
-		$this->setResponse(new CControllerResponseData($data));
+		if (array_key_exists($idx2, $filter->tabfilters)) {
+			$properties = $properties + $filter->tabfilters[$idx2];
+		}
+		else {
+			$idx2 = count($filter->tabfilters);
+		}
+
+		$filter->tabfilters[$idx2] = $properties;
+		$filter->update();
+
+		$this->setResponse(new CControllerResponseData([
+			'main_block' => json_encode($properties + ['idx2' => $idx2, 'create' => $create])
+		]));
 	}
 }

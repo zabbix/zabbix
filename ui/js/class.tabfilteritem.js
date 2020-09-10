@@ -25,6 +25,7 @@ const TABFILTERITEM_EVENT_SELECT = 'select.tabfilter';
 const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
 const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
 const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter';
+const TABFILTERITEM_EVENT_DELETE = 'delete.tabfilter';
 
 class CTabFilterItem extends CBaseComponent {
 

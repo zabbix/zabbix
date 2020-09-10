@@ -53,7 +53,7 @@ $form_list = (new CFormList())
 $form = (new CForm())
 	->cleanItems()
 	->setName('tabfilter_form')
-	->addVar('action', $data['action'])
+	->addVar('action', 'popup.tabfilter.update')
 	->addItem([
 		$form_list,
 		(new CInput('submit', 'submit'))->addStyle('display: none;')
@@ -70,13 +70,13 @@ $output = [
 			'keepOpen' => true,
 			'enabled' => !$data['create'],
 			'class' => 'float-left',
-			'action' => 'return tabFilterFormAction("delete", overlay)'
+			'action' => 'return tabFilterDelete(overlay)'
 		],
 		[
 			'title' => _('Save'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return tabFilterFormAction("update", overlay)'
+			'action' => 'return tabFilterUpdate(overlay)'
 		]
 	]
 ];
