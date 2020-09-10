@@ -210,8 +210,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 		}
 
 		$names = [];
-		foreach ($dashboards as $value) {
-			$names[$value['templateid']][] = $value['name'];
+		foreach ($dashboards as $dashboard) {
+			$names[$dashboard['templateid']][] = $dashboard['name'];
 		}
 
 		$templateids = array_keys($names);
