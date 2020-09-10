@@ -898,11 +898,6 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids);
 
-void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
-void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
-void	zbx_dc_clear_timer_queue(void);
-
 /* data session support */
 
 typedef struct
@@ -991,5 +986,23 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
+
+typedef struct
+{
+	zbx_uint64_t		objectid;
+	zbx_uint64_t		triggerid;
+	zbx_function_type_t	type;
+	zbx_time_unit_t		trend_base;
+	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
+	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
+	zbx_timespec_t		timer_ts;	/* real time when the trigger must be recalculated */
+}
+zbx_trigger_timer_t;
+
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now);
+void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit);
+void	zbx_dc_clear_timer_queue(void);
+void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+		const zbx_vector_ptr_t *timers);
 
 #endif

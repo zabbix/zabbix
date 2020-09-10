@@ -23,7 +23,7 @@
 
 #include "common.h"
 
-int	zbx_trends_parse_base(const char *period_shift, zbx_time_unit_t *base, char **error);
+int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);
 
 int	zbx_trends_parse_range(const char *period, const char *period_shift, int *start, int *end, char **error);
 

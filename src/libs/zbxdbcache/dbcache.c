@@ -70,6 +70,7 @@ extern int		CONFIG_DOUBLE_PRECISION;
 /* the maximum number of items in one synchronization batch */
 #define ZBX_HC_SYNC_MAX		1000
 #define ZBX_HC_TIMER_MAX	(ZBX_HC_SYNC_MAX / 2)
+#define ZBX_HC_TIMER_SOFT_MAX	(ZBX_HC_TIMER_MAX - 10)
 
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -1521,15 +1522,15 @@ static void	DCsync_trends(void)
  *                                                                            *
  * Parameters: history           - [IN] array of history data                 *
  *             history_num       - [IN] number of history structures          *
- *             timer_triggerids  - [IN] the timer triggerids to process       *
+ *             timers            - [IN] the trigger timers                    *
  *             trigger_diff      - [OUT] trigger updates                      *
  *             timers_num        - [OUT] processed timer triggers             *
  *                                                                            *
  ******************************************************************************/
-static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
-		const zbx_vector_uint64_t *timer_triggerids, zbx_vector_ptr_t *trigger_diff)
+static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num, const zbx_vector_ptr_t *timers,\
+		zbx_vector_ptr_t *trigger_diff)
 {
-	int			i, item_num = 0;
+	int			i, item_num = 0, timers_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
@@ -1556,10 +1557,18 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 		}
 	}
 
-	if (0 == item_num && 0 == timer_triggerids->values_num)
+	for (i = 0; i < timers->values_num; i++)
+	{
+		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+
+		if (0 != timer->lock)
+			timers_num++;
+	}
+
+	if (0 == item_num && 0 == timers_num)
 		goto out;
 
-	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num + timer_triggerids->values_num),
+	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num + timers_num),
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&trigger_order);
@@ -1573,13 +1582,8 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 		zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
 	}
 
-	if (0 != timer_triggerids->values_num)
-	{
-		zbx_timespec_t	ts;
-
-		zbx_timespec(&ts);
-		zbx_dc_get_timer_triggers_by_triggerids(&trigger_info, &trigger_order, timer_triggerids, &ts);
-	}
+	if (0 != timers_num)
+		zbx_dc_get_triggers_by_timers(&trigger_info, &trigger_order, timers);
 
 	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	evaluate_expressions(&trigger_order);
@@ -2886,8 +2890,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
 					history_text_num, history_log_num, txn_error, compression_age;
 	time_t				sync_start;
-	zbx_vector_uint64_t		triggerids, timer_triggerids;
-	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
+	zbx_vector_uint64_t		triggerids ;
+	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
 
@@ -2932,8 +2936,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, ZBX_HC_SYNC_MAX);
 
-	zbx_vector_uint64_create(&timer_triggerids);
-	zbx_vector_uint64_reserve(&timer_triggerids, ZBX_HC_TIMER_MAX);
+	zbx_vector_ptr_create(&trigger_timers);
+	zbx_vector_ptr_reserve(&trigger_timers, ZBX_HC_TIMER_MAX);
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
@@ -3019,23 +3023,27 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		if (FAIL != ret)
 		{
-			zbx_dc_get_timer_triggerids(&timer_triggerids, time(NULL), ZBX_HC_TIMER_MAX);
-			timers_num = timer_triggerids.values_num;
+			zbx_dc_get_trigger_timers(&trigger_timers, time(NULL), ZBX_HC_TIMER_SOFT_MAX, ZBX_HC_TIMER_MAX);
+			timers_num = trigger_timers.values_num;
 
-			if (ZBX_HC_TIMER_MAX == timers_num)
+			if (ZBX_HC_TIMER_SOFT_MAX <= timers_num)
 				*more = ZBX_SYNC_MORE;
 
 			if (0 != history_num || 0 != timers_num)
 			{
-				/* timer triggers do not intersect with item triggers because item triggers */
-				/* where already locked and skipped when retrieving timer triggers          */
-				zbx_vector_uint64_append_array(&triggerids, timer_triggerids.values,
-						timer_triggerids.values_num);
+				for (i = 0; i < trigger_timers.values_num; i++)
+				{
+					zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)trigger_timers.values[i];
+
+					if (0 != timer->lock)
+						zbx_vector_uint64_append(&triggerids, timer->triggerid);
+				}
+
 				do
 				{
 					DBbegin();
 
-					recalculate_triggers(history, history_num, &timer_triggerids, &trigger_diff);
+					recalculate_triggers(history, history_num, &trigger_timers, &trigger_diff);
 
 					/* process trigger events generated by recalculate_triggers() */
 					zbx_process_events(&trigger_diff, &triggerids);
@@ -3054,8 +3062,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
-
-			zbx_vector_uint64_clear(&timer_triggerids);
 		}
 
 		if (0 != triggerids.values_num)
@@ -3063,6 +3069,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			*triggers_num += triggerids.values_num;
 			DCconfig_unlock_triggers(&triggerids);
 			zbx_vector_uint64_clear(&triggerids);
+		}
+
+		if (0 != trigger_timers.values_num)
+		{
+			zbx_dc_reschedule_trigger_timers(&trigger_timers, time(NULL));
+			zbx_vector_ptr_clear(&trigger_timers);
 		}
 
 		if (0 != proxy_subscribtions.values_num)
@@ -3147,7 +3159,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 	zbx_vector_uint64_pair_destroy(&proxy_subscribtions);
 
-	zbx_vector_uint64_destroy(&timer_triggerids);
+	zbx_vector_ptr_destroy(&trigger_timers);
 	zbx_vector_uint64_destroy(&triggerids);
 }
 

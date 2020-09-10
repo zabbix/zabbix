@@ -34,8 +34,6 @@ typedef struct
 	const char		*correlation_tag;
 	const char		*opdata;
 	int			lastchange;
-	int			nextcheck;		/* time of next trigger recalculation,    */
-							/* valid for triggers with time functions */
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -46,7 +44,6 @@ typedef struct
 	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines      */
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
-	unsigned char		timer;			/* see ZBX_TRIGGER_TIMER_* defines       */
 
 	zbx_vector_ptr_t	tags;
 }
@@ -68,7 +65,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
-	unsigned char	timer;
+	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
 
@@ -824,7 +821,7 @@ typedef struct
 	zbx_hashset_t		data_sessions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
-	zbx_binary_heap_t	timer_queue;
+	zbx_binary_heap_t	trigger_queue;
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;

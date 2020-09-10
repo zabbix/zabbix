@@ -1321,7 +1321,6 @@ int	is_macro_char(unsigned char c);
 
 int	is_discovery_macro(const char *name);
 
-int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
 
 int	parse_key(const char **exp);
@@ -1667,5 +1666,16 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
 int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
+
+typedef enum
+{
+	ZBX_FUNCTION_TYPE_UNKNOWN,
+	ZBX_FUNCTION_TYPE_HISTORY,
+	ZBX_FUNCTION_TYPE_TIMER,
+	ZBX_FUNCTION_TYPE_TRENDS
+}
+zbx_function_type_t;
+
+zbx_function_type_t	zbx_get_function_type(const char *func);
 
 #endif

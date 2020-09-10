@@ -22,7 +22,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_trends_parse_base                                            *
+ * Function: trends_parse_base                                                *
  *                                                                            *
  * Purpose: parse period base from trend function shift argument              *
  *                                                                            *
@@ -34,7 +34,7 @@
  *               FAIL    - invalid time period was specified                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trends_parse_base(const char *period_shift, zbx_time_unit_t *base, char **error)
+static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, char **error)
 {
 	zbx_time_unit_t	time_unit;
 
@@ -52,6 +52,47 @@ int	zbx_trends_parse_base(const char *period_shift, zbx_time_unit_t *base, char 
 
 	*base = time_unit;
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: trends_parse_base                                                *
+ *                                                                            *
+ * Purpose: parse period base from function parameters                        *
+ *                                                                            *
+ * Parameters: params - [IN] the function parameters                          *
+ *             base   - [OUT] the period shift base (now/?)                   *
+ *             error  - [OUT] the error message if parsing failed             *
+ *                                                                            *
+ * Return value: SUCCEED - period was parsed successfully                     *
+ *               FAIL    - invalid time period was specified                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error)
+{
+	zbx_time_unit_t	time_unit;
+	char		*period_shift;
+	int		ret = FAIL;
+
+	period_shift = zbx_function_get_param_dyn(params, 2);
+
+	if (0 != strncmp(period_shift, "now/", 4))
+	{
+		*error = zbx_strdup(*error, "invalid period shift expression");
+		goto out;
+	}
+
+	if (ZBX_TIME_UNIT_UNKNOWN == (time_unit = zbx_tm_str_to_unit(period_shift + 4)))
+	{
+		*error = zbx_strdup(*error, "invalid period shift cycle");
+		goto out;
+	}
+
+	*base = time_unit;
+	ret = SUCCEED;
+out:
+	zbx_free(period_shift);
+	return ret;
 }
 
 /******************************************************************************
@@ -78,11 +119,9 @@ int	zbx_trends_parse_base(const char *period_shift, zbx_time_unit_t *base, char 
 int	zbx_trends_parse_range(const char *period, const char *period_shift, int *start, int *end, char **error)
 {
 	const char	*ptr;
-	int		period_num, period_start;
+	int		period_num;
 	zbx_time_unit_t	period_unit, base;
 	size_t		len;
-	struct tm	*tm;
-	time_t		now;
 
 	/* parse period */
 
@@ -97,11 +136,11 @@ int	zbx_trends_parse_range(const char *period, const char *period_shift, int *st
 
 	/* parse period shift */
 
-	if (FAIL == zbx_trends_parse_base(period_shift, &base, error))
+	if (FAIL == trends_parse_base(period_shift, &base, error))
 		return FAIL;
 
-	now = time(NULL);
-	tm = localtime(&now);
+	ZBX_UNUSED(start);
+	ZBX_UNUSED(end);
 
 
 	return SUCCEED;
