@@ -294,7 +294,7 @@ class CTask extends CApiService {
 					'parent_taskid' => $taskid
 				];
 
-				$return[$index] = (string) $taskid;
+				$return[$index] = $taskid;
 				$taskid = bcadd($taskid, 1, 0);
 			}
 
@@ -343,7 +343,7 @@ class CTask extends CApiService {
 				'parent_taskid' => $taskid
 			];
 
-			$return[$index] = (string) $taskid;
+			$return[$index] = $taskid;
 			$taskid = bcadd($taskid, 1, 0);
 		}
 
