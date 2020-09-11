@@ -387,6 +387,23 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null) {
+		$host_prototypes = zbx_toArray($host_prototypes);
+
+		$db_host_prototypes = $this->get([
+			'output' => ['hostid', 'host', 'name', 'custom_interfaces', 'status'],
+			'selectDiscoveryRule' => ['itemid'],
+			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
+			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
+			'selectInterfaces' => ['interfaceid'],
+			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
+			['custom_interfaces']
+		);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
@@ -422,17 +439,6 @@ class CHostPrototype extends CHostBase {
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$db_host_prototypes = $this->get([
-			'output' => ['hostid', 'host', 'name', 'custom_interfaces', 'status'],
-			'selectDiscoveryRule' => ['itemid'],
-			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
-			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
-			'selectInterfaces' => ['interfaceid'],
-			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
 
 		$hosts_by_ruleid = [];
 		$names_by_ruleid = [];
@@ -523,7 +529,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
-			['host', 'name', 'custom_interfaces', 'groupLinks', 'groupPrototypes']
+			['host', 'name', 'groupLinks', 'groupPrototypes']
 		);
 
 		if ($hosts_by_ruleid) {
@@ -1566,14 +1572,17 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Validate host prototype interfaces on create and update.
 	 *
-	 * @param array $host_prototypes                        Array of host prototype data.
-	 * @param array $host_prototype[]['interfaces']         Host prototype interfaces.
-	 * @param int   $host_prototype[]['custom_interfaces']  Use custom or inherited interfaces.
+	 * @param array $host_prototypes                           Array of host prototype data.
+	 * @param array $host_prototype[]['interfaces']            Host prototype interfaces.
+	 * @param int   $host_prototype[]['custom_interfaces']     Use custom or inherited interfaces.
+	 * @param array $db_host_prototypes                        Array of DB host prototype data.
 	 *
 	 * @throws APIException if the interfaces input is invalid.
 	 */
-	private function validateInterfaces(array $host_prototypes): void {
+	private function validateInterfaces(array $host_prototypes, array $db_host_prototypes = []): void {
 		$interfaces = [];
+
+		//$db_host_prototypes
 
 		foreach ($host_prototypes as $hp_idx => $host_prototype) {
 			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
@@ -1766,7 +1775,7 @@ class CHostPrototype extends CHostBase {
 			]);
 		}
 
-		$this->validateInterfaces($host_prototypes);
+		$this->validateInterfaces($host_prototypes, $db_host_prototypes);
 
 		$interfaces_to_delete = [];
 		$interfaces_to_create = [];
