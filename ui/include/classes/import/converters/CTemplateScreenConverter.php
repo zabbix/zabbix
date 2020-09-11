@@ -188,8 +188,8 @@ class CTemplateScreenConverter {
 		$items_y_min = [];
 
 		foreach ($screen_items as $key => $screen_item) {
-			$preferred_size = self::getPreferredWidgetSizeOnDashboard($screen_item);
-			$min_size = self::getMinWidgetSizeOnDashboard((int) $screen_item['resourcetype']);
+			$preferred_size = self::getPreferredWidgetSize($screen_item);
+			$min_size = self::getMinWidgetSize((int) $screen_item['resourcetype']);
 
 			$items_x_preferred[$key] = [
 				'position' => (int) $screen_item['x'],
@@ -362,7 +362,7 @@ class CTemplateScreenConverter {
 	 *
 	 * @return array
 	 */
-	private static function getPreferredWidgetSizeOnDashboard(array $screen_item): array {
+	private static function getPreferredWidgetSize(array $screen_item): array {
 		$width = $screen_item['width'];
 		$height = $screen_item['height'];
 
@@ -384,7 +384,7 @@ class CTemplateScreenConverter {
 	 *
 	 * @return array
 	 */
-	private static function getMinWidgetSizeOnDashboard(int $resourcetype): array {
+	private static function getMinWidgetSize(int $resourcetype): array {
 		switch ($resourcetype) {
 			case 7: // SCREEN_RESOURCE_CLOCK
 				[$width, $height] = [1, 2];
