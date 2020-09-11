@@ -550,7 +550,7 @@ abstract class CDashboardGeneral extends CApiService {
 		}
 
 		if ($db_widgets) {
-			$this->deleteWidgets(array_keys($db_widgets));
+			self::deleteWidgets(array_keys($db_widgets));
 		}
 
 		$this->updateWidgetField($dashboards, $method);
@@ -559,9 +559,11 @@ abstract class CDashboardGeneral extends CApiService {
 	/**
 	 * Delete widgets.
 	 *
+	 * @static
+	 *
 	 * @param array  $widgetids
 	 */
-	protected function deleteWidgets(array $widgetids): void {
+	private static function deleteWidgets(array $widgetids): void {
 		DB::delete('profiles', [
 			'idx' => 'web.dashbrd.widget.rf_rate',
 			'idx2' => $widgetids
@@ -718,7 +720,7 @@ abstract class CDashboardGeneral extends CApiService {
 		}
 
 		if ($widgetids) {
-			$this->deleteWidgets($widgetids);
+			self::deleteWidgets($widgetids);
 		}
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
