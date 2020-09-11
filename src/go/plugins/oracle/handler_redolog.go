@@ -17,18 +17,41 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package oracle
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+
+	"zabbix.com/pkg/zbxerr"
 )
+
+const keyRedoLog = "oracle.redolog.info"
+
+const redoLogMaxParams = 0
+
+func RedoLogHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var redolog string
+
+	if len(params) > redoLogMaxParams {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+
+	row, err := conn.QueryRow(ctx, `
+		SELECT
+			JSON_OBJECT('available' VALUE COUNT(*))
+		FROM
+			V$LOG	
+		WHERE 
+			STATUS IN ('INACTIVE', 'UNUSED')
+	`)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&redolog)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return redolog, nil
+}

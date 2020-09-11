@@ -17,18 +17,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package oracle
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+
+	"zabbix.com/pkg/zbxerr"
 )
+
+const keyProc = "oracle.proc.stats"
+
+const procMaxParams = 0
+
+func ProcHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var proc string
+
+	if len(params) > procMaxParams {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+
+	row, err := conn.QueryRow(ctx, `
+		SELECT
+			JSON_OBJECT('proc_num' VALUE COUNT(*))
+		FROM
+			V$PROCESS
+	`)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&proc)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return proc, nil
+}

@@ -17,18 +17,44 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package oracle
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+
+	"zabbix.com/pkg/zbxerr"
 )
+
+const keyTablespacesDiscovery = "oracle.ts.discovery"
+
+const tablespacesDiscoveryMaxParams = 0
+
+func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var lld string
+
+	if len(params) > tablespacesDiscoveryMaxParams {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+
+	row, err := conn.QueryRow(ctx, `
+		SELECT
+			JSON_ARRAYAGG(
+				JSON_OBJECT(
+					'{#TABLESPACE}' VALUE TABLESPACE_NAME, 
+					'{#CONTENTS}'   VALUE CONTENTS
+				)
+			) LLD
+		FROM
+			DBA_TABLESPACES
+	`)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&lld)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return lld, nil
+}
