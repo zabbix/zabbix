@@ -442,7 +442,7 @@ if ($data['display_interfaces']) {
 			getInterfaceSelect($data['interfaces'])
 				->setId('interface-select')
 				->setValue($data['interfaceid'])
-				->addClass('host-interface')
+				->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 				->setFocusableElementId('interfaceid')
 				->setAriaRequired(),
 			(new CSpan(_('No interface found')))

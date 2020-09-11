@@ -59,7 +59,7 @@ if ($data['display_interfaces']) {
 			getInterfaceSelect($data['hosts']['interfaces'])
 				->setId('interface-select')
 				->setValue($data['interfaceid'])
-				->addClass('host-interface'),
+				->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE),
 			(new CSpan(_('No interface found')))
 				->addClass(ZBX_STYLE_RED)
 				->setId('interface_not_defined')

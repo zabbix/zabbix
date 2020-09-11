@@ -5715,13 +5715,13 @@ table.preprocessing-test-results .rel-container {
 #itemsTable .table-col-action {
   width: 55px; }
 
-z-select.host-interface .description:not(:empty),
-.z-select.host-interface .description:not(:empty) {
+z-select.z-select-host-interface .description:not(:empty),
+.z-select.z-select-host-interface .description:not(:empty) {
   display: block;
   margin-top: 5px;
   color: #9d9d9d; }
-z-select.host-interface[disabled] .description:not(:empty),
-z-select.host-interface li[disabled] .description:not(:empty),
-.z-select.host-interface[disabled] .description:not(:empty),
-.z-select.host-interface li[disabled] .description:not(:empty) {
+z-select.z-select-host-interface[disabled] .description:not(:empty),
+z-select.z-select-host-interface li[disabled] .description:not(:empty),
+.z-select.z-select-host-interface[disabled] .description:not(:empty),
+.z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   color: #acbbc2; }

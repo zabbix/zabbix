@@ -5670,15 +5670,15 @@ table.preprocessing-test-results .rel-container {
 #itemsTable .table-col-action {
   width: 55px; }
 
-z-select.host-interface .description:not(:empty),
-.z-select.host-interface .description:not(:empty) {
+z-select.z-select-host-interface .description:not(:empty),
+.z-select.z-select-host-interface .description:not(:empty) {
   display: block;
   margin-top: 5px;
   color: #bbbbbb; }
-z-select.host-interface[disabled] .description:not(:empty),
-z-select.host-interface li[disabled] .description:not(:empty),
-.z-select.host-interface[disabled] .description:not(:empty),
-.z-select.host-interface li[disabled] .description:not(:empty) {
+z-select.z-select-host-interface[disabled] .description:not(:empty),
+z-select.z-select-host-interface li[disabled] .description:not(:empty),
+.z-select.z-select-host-interface[disabled] .description:not(:empty),
+.z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   color: #7d7d7d; }
 
 .sidebar .logo:focus .sidebar-logo {

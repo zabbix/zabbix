@@ -7343,7 +7343,7 @@ table.preprocessing-test-results {
 
 z-select,
 .z-select {
-	&.host-interface {
+	&.z-select-host-interface {
 		.description:not(:empty) {
 			display: block;
 			margin-top: 5px;
