@@ -676,7 +676,6 @@ abstract class CControllerPopupItemTest extends CController {
 				: [];
 
 			if (count($interfaces) > 0) {
-				// Macros in interface details are not resolved.
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
 
 				$interface_data = [
