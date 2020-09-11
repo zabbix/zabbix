@@ -222,7 +222,6 @@ abstract class CDashboardGeneral extends CApiService {
 	protected function checkWidgetFields(array $dashboards, string $method): void {
 		$widget_fields = [];
 
-		$field_names = ['value_itemid', 'value_graphid'];
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
@@ -231,7 +230,6 @@ abstract class CDashboardGeneral extends CApiService {
 		];
 
 		if ($this instanceof CDashboard) {
-			array_push($field_names, 'value_groupid', 'value_hostid', 'value_sysmapid');
 			$ids += [
 				ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 				ZBX_WIDGET_FIELD_TYPE_HOST => [],
@@ -253,8 +251,13 @@ abstract class CDashboardGeneral extends CApiService {
 			}
 
 			if ($widgetids) {
+				$output = ['widgetid', 'type', 'value_itemid', 'value_graphid'];
+				if ($this instanceof CDashboard) {
+					array_push($output, 'value_groupid', 'value_hostid', 'value_sysmapid');
+				}
+
 				$db_widget_fields = DB::select('widget_field', [
-					'output' => array_merge(['widgetid', 'type'], $field_names),
+					'output' => $output,
 					'filter' => [
 						'widgetid' => $widgetids,
 						'type' => array_keys($ids)
@@ -609,11 +612,16 @@ abstract class CDashboardGeneral extends CApiService {
 		}
 		unset($widget_fields);
 
+		$output = ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str', 'value_itemid',
+			'value_graphid'
+		];
+		if ($this instanceof CDashboard) {
+			array_push($output, 'value_groupid', 'value_hostid', 'value_sysmapid');
+		}
+
 		$db_widget_fields = ($method === 'update')
 			? DB::select('widget_field', [
-				'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str', 'value_groupid',
-					'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
-				],
+				'output' => $output,
 				'filter' => ['widgetid' => array_keys($widgets_fields)],
 				'sortfield' => ['widgetid', 'type', 'name']
 			])
