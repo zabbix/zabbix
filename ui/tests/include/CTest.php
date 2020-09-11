@@ -476,6 +476,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 			$behavior->setTest($this);
 			$this->behaviors[$name] = $behavior;
+			if ($name !== null) {
+				$this->behaviors[$name] = $behavior;
+			}
+			else {
+				$this->behaviors[] = $behavior;
+			}
 		}
 		else {
 			throw new Exception('Cannot attach behavior that is not an instance of CBehavior class');

@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../CElement.php';
 
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
+use Facebook\WebDriver\Exception\TimeoutException;
 
 /**
  * Multiselect element.
@@ -244,8 +245,11 @@ class CMultiselectElement extends CElement {
 				try {
 					$query->waitUntilPresent();
 				}
-				catch (NoSuchElementException $exception) {
-					if ($i === 1) {
+				catch (TimeoutException $exception) {
+					if ($i === 0) {
+						$input->overwrite($value)->fireEvent('keyup');
+					}
+					else {
 						throw new Exception('Cannot find value with label "'.$value.'" in multiselect element.');
 					}
 				}
