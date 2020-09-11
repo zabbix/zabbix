@@ -136,52 +136,21 @@ class testDiagnosticDataTask extends CIntegrationTest {
 
 		if ($expected_error === null && isset($result['result']['taskids'])) {
 			foreach ($result['result']['taskids'] as $taskid) {
-				$this->waitUntilTaskIsDone($taskid);
-
-				$response = $this->call('task.get', [
+				$params = [
 					'output' => ['status'],
 					'taskids' => $taskid
-				], null);
+				];
 
-				$this->assertTrue((bool) $response['result'], 'Task '.$taskid.' not found.');
-				$this->assertTrue((isset($response['result'][0]['status'])
-						&& $response['result'][0]['status'] > ZBX_TM_STATUS_INPROGRESS),
-					'Task '.$taskid.' is not completed.'
+				$is_done = $this->callUntilDataIsPresent('task.get', $params, null, null,
+					'testDiagnosticDataTask::checkIfTaskIsCompleted'
 				);
+
+				$this->assertTrue((bool) $is_done, 'Task '.$taskid.' is not complete.');
 			}
 		}
 	}
 
-	/**
-	 * Wait for server to complete particular task.
-	 *
-	 * @param int $taskid  Task ID to wait when it's completed.
-	 *
-	 * @throws Exception
-	 */
-	protected function waitUntilTaskIsDone(int $taskid) {
-		$max_wait_time = 60;
-		$idle = 0;
-
-		$params = [
-			'output' => ['status'],
-			'taskids' => $taskid,
-			'preservekeys' => true
-		];
-
-		do {
-			$ret = $this->callUntilDataIsPresent('task.get', $params, 1, 0);
-			$is_done = (isset($ret['result'][$taskid]) && $ret['result'][$taskid]['status'] > ZBX_TM_STATUS_INPROGRESS);
-
-			if (!$is_done) {
-				$idle += 5;
-				sleep(5);
-			}
-		}
-		while (!$is_done && $max_wait_time > $idle);
-
-		if (!$is_done) {
-			throw new Exception('Failed to wait for task '.$taskid.' to be executed.');
-		}
+	public static function checkIfTaskIsCompleted(array $response = []): bool {
+		return (isset($response['result'][0]) && $response['result'][0]['status'] > ZBX_TM_STATUS_INPROGRESS);
 	}
 }

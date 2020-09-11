@@ -747,7 +747,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public function callUntilDataIsPresent($method, $params, $iterations = null, $delay = null) {
+	public function callUntilDataIsPresent($method, $params, $iterations = null, $delay = null, $callback = null) {
 		if ($iterations === null) {
 			$iterations = self::WAIT_ITERATIONS;
 		}
@@ -761,7 +761,8 @@ class CIntegrationTest extends CAPITest {
 			try {
 				$response = $this->call($method, $params);
 
-				if (is_array($response['result']) && count($response['result']) > 0) {
+				if (is_array($response['result']) && count($response['result']) > 0
+						&& ($callback === null || call_user_func($callback, $response))) {
 					return $response;
 				}
 			} catch (Exception $e) {
