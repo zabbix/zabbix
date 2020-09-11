@@ -65,7 +65,7 @@ class CTabFilter extends CBaseComponent {
 				this.setSelectedItem(item);
 				item.setBrowserLocation(item.getFilterParams());
 
-				if (url !== window.location.search) {
+				if (url === window.location.search) {
 					item._src_url = options.src_url;
 					item.updateUnsavedState();
 				}
