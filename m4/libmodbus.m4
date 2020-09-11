@@ -48,6 +48,8 @@ found_libmodbus="31",)
 
 AC_DEFUN([LIBMODBUS_ACCEPT_VERSION],
 [
+    AC_PROG_AWK
+
   _lib_version_parse="eval $AWK '{split(\$NF,A,\".\"); X=256*256*A[[1]]+256*A[[2]]+A[[3]]; print X;}'"
   _lib_version=`echo ifelse([$1],,[0],[$1]) | $_lib_version_parse`
   _lib_wanted=`echo ifelse([$2],,[0],[$2]) | $_lib_version_parse`
@@ -88,7 +90,6 @@ AC_HELP_STRING([--with-libmodbus@<:@=DIR@:>@],[use MODBUS package @<:@default=no
   )
 
   if test "x$want_libmodbus" = "xyes"; then
-    AC_PROG_AWK
     AC_REQUIRE([PKG_PROG_PKG_CONFIG])
     PKG_PROG_PKG_CONFIG()
     test -z "$PKG_CONFIG" && AC_MSG_ERROR([Not found pkg-config library])
