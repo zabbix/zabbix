@@ -26,12 +26,12 @@ Endpoint, SlaveID and Timeout (if certain parameter is not specified for a named
 *Example:*  
 If you have two instances: "MB1" and "MB2", the following options have to be added to the agent configuration:
 
-    Plugins.Mysql.Sessions.MB1.Endpoint=tcp://127.0.0.1:502
-    Plugins.Mysql.Sessions.MB1.SlaveID=20
-    Plugins.Mysql.Sessions.MB1.Timeout=2
-    Plugins.Mysql.Sessions.MB2.Endpoint=rtu://com1:9600:8n1
-    Plugins.Mysql.Sessions.MB2.SlaveID=40
-    Plugins.Mysql.Sessions.MB2.Timeout=4
+    Plugins.Modbus.Sessions.MB1.Endpoint=tcp://127.0.0.1:502
+    Plugins.Modbus.Sessions.MB1.SlaveID=20
+    Plugins.Modbus.Sessions.MB1.Timeout=2
+    Plugins.Modbus.Sessions.MB2.Endpoint=rtu://com1:9600:8n1
+    Plugins.Modbus.Sessions.MB2.SlaveID=40
+    Plugins.Modbus.Sessions.MB2.Timeout=4
     
 Now, these names can be used as connStrings in keys instead of URIs:
 
