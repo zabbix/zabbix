@@ -1807,6 +1807,8 @@ Changes for 4.0.25rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-18188] increased age and duration related macro resolution to seconds (viktors)
+........S. [ZBX-15651] fixed handling of overlapping IP addresses in network discovery received from single Zabbix proxy (vso)
 ..F....... [ZBX-18326] fixed unsupported code for internet explorer (rlataria)
 .......PS. [ZBX-15904] added check of required cache size for vmware event messages (asestakovs)
 .......PS. [ZBX-18121] fixed SSH monitoring when compiled with libssh; thanks to MATSUDA Daiki for the patch (Andris, viktors)
