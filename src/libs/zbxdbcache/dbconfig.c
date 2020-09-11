@@ -3734,7 +3734,8 @@ static void	dc_schedule_new_trigger_timers(zbx_vector_ptr_t *timer_functions, zb
 
 		timer = dc_trigger_timer_create(function);
 
-		if (NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue, &timer->objectid)))
+		if (NULL != trend_queue && NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue,
+				&timer->objectid)))
 		{
 			/* if the trigger was scheduled during next 10 minutes         */
 			/* schedule its evaluation later to reduce server startup load */
@@ -5276,12 +5277,14 @@ void	DCsync_configuration(unsigned char mode)
 
 	zbx_dbsync_init_env(config);
 
-	zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_ptr_create(&timer_functions);
 	zbx_vector_ptr_reserve(&timer_functions, 1000);
 
 	if (ZBX_DBSYNC_INIT == mode)
+	{
+		zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		dc_load_trigger_queue(&trend_queue);
+	}
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
@@ -5639,7 +5642,10 @@ void	DCsync_configuration(unsigned char mode)
 	}
 
 	if (0 != timer_functions.values_num)
-		dc_schedule_new_trigger_timers(&timer_functions, &trend_queue, time(NULL));
+	{
+		dc_schedule_new_trigger_timers(&timer_functions, (ZBX_DBSYNC_INIT == mode ? &trend_queue : NULL),
+				time(NULL));
+	}
 
 	update_sec = zbx_time() - sec;
 
@@ -5938,7 +5944,9 @@ out:
 	zbx_dbsync_clear(&hgroup_host_sync);
 
 	zbx_vector_ptr_destroy(&timer_functions);
-	zbx_hashset_destroy(&trend_queue);
+
+	if (ZBX_DBSYNC_INIT == mode)
+		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
 
