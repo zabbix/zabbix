@@ -451,7 +451,7 @@ class CTemplateScreenConverter {
 				];
 				if ($screen_item['style'] == TIME_TYPE_HOST) {
 					$fields[] = [
-						'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_HOST,
+						'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 						'name' => 'value',
 						'value' => $screen_item['resource']
 					];
