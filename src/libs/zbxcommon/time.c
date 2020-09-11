@@ -174,6 +174,23 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 
 /******************************************************************************
  *                                                                            *
+ * Function: neg_to_pos_wrap                                                  *
+ *                                                                            *
+ * Purpose: convert negative number to postive by wrapping around the base    *
+ *                                                                            *
+ * Parameter: value - [IN/OUT] the value to convert                           *
+ *            base  - [IN] the wrap base                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	neg_to_pos_wrap(int *value, int base)
+{
+	int	reminder = *value % base;
+
+	*value = (0 == reminder ? 0 : base + reminder);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_sub                                                           *
  *                                                                            *
  * Purpose: subtracts time duration without adjusting DST clocks              *
@@ -193,8 +210,10 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 			tm->tm_hour -= multiplier;
 			if (0 > tm->tm_hour)
 			{
-				shift = -tm->tm_hour / 24 + 1;
-				tm->tm_hour = 24 + tm->tm_hour % 24;
+				shift = -tm->tm_hour / 24;
+				neg_to_pos_wrap(&tm->tm_hour, 24);
+				if (0 != tm->tm_hour)
+					shift++;
 				tm_sub(tm, shift, ZBX_TIME_UNIT_DAY);
 			}
 			return;
@@ -212,8 +231,8 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 				tm_sub(tm, 1, ZBX_TIME_UNIT_MONTH);
 			}
 			tm->tm_wday -= multiplier;
-			if (0 < tm->tm_wday)
-				tm->tm_wday = 7 + tm->tm_wday % 7;
+			if (0 > tm->tm_wday)
+				neg_to_pos_wrap(&tm->tm_wday, 7);
 			return;
 		case ZBX_TIME_UNIT_WEEK:
 			tm_sub(tm, multiplier * 7, ZBX_TIME_UNIT_DAY);
@@ -222,8 +241,10 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 			tm->tm_mon -= multiplier;
 			if (0 > tm->tm_mon)
 			{
-				shift = -tm->tm_mon / 12 + 1;
-				tm->tm_mon = 12 + tm->tm_mon % 12;
+				shift = -tm->tm_mon / 12;
+				neg_to_pos_wrap(&tm->tm_mon, 12);
+				if (0 != tm->tm_mon)
+					shift++;
 				tm_sub(tm, shift, ZBX_TIME_UNIT_YEAR);
 			}
 			return;

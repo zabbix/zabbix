@@ -31,6 +31,14 @@ in:
 out:
   time: 2020-02-29 12:00:00 +02:00
 ---
+test case: 2020-03-02 00:00:00 +02:00 - 24h
+in:
+  timezone: :Europe/Riga
+  time: 2020-03-02 00:00:00 +02:00
+  param: 24h
+out:
+  time: 2020-03-01 00:00:00 +02:00
+---
 test case: 2020-09-01 12:00:00 +03:00 - 720h
 in:
   timezone: :Europe/Riga
