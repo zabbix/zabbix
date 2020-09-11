@@ -136,7 +136,7 @@ class testDiagnosticDataTask extends CIntegrationTest {
 
 		if ($expected_error === null && isset($result['result']['taskids'])) {
 			foreach ($result['result']['taskids'] as $taskid) {
-				$this->waitUntilTaskIsDone($taskid, 3);
+				$this->waitUntilTaskIsDone($taskid);
 
 				$response = $this->call('task.get', [
 					'output' => ['status'],
@@ -156,31 +156,32 @@ class testDiagnosticDataTask extends CIntegrationTest {
 	 * Wait for server to complete particular task.
 	 *
 	 * @param int $taskid  Task ID to wait when it's completed.
-	 * @param int $sleep   Seconds to wait before make first check.
-	 *                     First timeout may differ because in most cases task is executed very quickly.
 	 *
 	 * @throws Exception
 	 */
-	protected function waitUntilTaskIsDone(int $taskid, int $sleep = 10) {
-		$max = 150;
+	protected function waitUntilTaskIsDone(int $taskid) {
+		$max_wait_time = 60;
 		$idle = 0;
 
+		$params = [
+			'output' => ['status'],
+			'taskids' => $taskid,
+			'preservekeys' => true
+		];
+
 		do {
-			sleep((int) $sleep);
-			$idle += $sleep;
-			$sleep = 10;
+			$ret = $this->callUntilDataIsPresent('task.get', $params, 1, 0);
+			$is_done = (isset($ret['result'][$taskid]) && $ret['result'][$taskid]['status'] > ZBX_TM_STATUS_INPROGRESS);
 
-			$is_done = (bool) CDBHelper::getCount(
-				'SELECT NULL'.
-				' FROM task'.
-				' WHERE taskid='.$taskid.
-					' AND status > '.ZBX_TM_STATUS_INPROGRESS
-			);
-
-			if (!$is_done && $idle >= $max) {
-				throw new Exception('Failed to wait for task '.$taskid.' to be executed.');
+			if (!$is_done) {
+				$idle += 5;
+				sleep(5);
 			}
 		}
-		while (!$is_done);
+		while (!$is_done && $max_wait_time > $idle);
+
+		if (!$is_done) {
+			throw new Exception('Failed to wait for task '.$taskid.' to be executed.');
+		}
 	}
 }
