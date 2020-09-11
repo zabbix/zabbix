@@ -66,6 +66,7 @@ typedef struct
 	const char	*function;
 	const char	*parameter;
 	unsigned char	type;
+	unsigned char	timer;
 }
 ZBX_DC_FUNCTION;
 

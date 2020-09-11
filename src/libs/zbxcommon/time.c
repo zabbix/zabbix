@@ -19,6 +19,10 @@
 
 #include "common.h"
 
+#if defined(_WINDOWS)
+	#define localtime_r(x, y)	localtime_s(y, x)
+#endif
+
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
@@ -160,7 +164,7 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 
 	if (-1 != (time_new = mktime(&tm_new)))
 	{
-		tm_new = *localtime(&time_new);
+		localtime_r(&time_new, &tm_new);
 		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 		{
 			*tm = tm_new;
@@ -280,7 +284,7 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 
 	if (-1 != (time_new = mktime(&tm_new)))
 	{
-		tm_new = *localtime(&time_new);
+		localtime_r(&time_new, &tm_new);
 
 		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 		{
@@ -356,4 +360,18 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
 	}
 
 	return;
+}
+
+const char	*zbx_timespec_str(const zbx_timespec_t *ts)
+{
+	static ZBX_THREAD_LOCAL char	str[32];
+
+	time_t		ts_time = ts->sec;
+	struct tm	tm;
+
+	localtime_r(&ts_time, &tm);
+	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d %09d", tm.tm_year + 1900, tm.tm_mon + 1,
+			tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns);
+
+	return str;
 }

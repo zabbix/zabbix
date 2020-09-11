@@ -1664,6 +1664,8 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
 
+const char	*zbx_timespec_str(const zbx_timespec_t *ts);
+
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
 int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
 

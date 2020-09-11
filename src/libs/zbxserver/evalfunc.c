@@ -2710,8 +2710,8 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	int		ret;
 	struct tm	*tm = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __func__,
-			item->host.host, item->key_orig, function, parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)' ts:'%s\'", __func__,
+			item->host.host, item->key_orig, function, parameter, zbx_timespec_str(ts));
 
 	if (0 == strcmp(function, "last"))
 	{
