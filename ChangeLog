@@ -1,6 +1,8 @@
 Changes for 5.0.4rc1
 
 New features:
+...G...... [ZBXNEXT-6019] added Oracle Database plugin (vadimipatov)
+.........T [ZBX-18341] removed media_jira_with_CF_example.xml and moved example with custom fields example to readme (tuskov)
 .........T [ZBX-18131] added support of single-select, checkbox and radio button customfield types and "__zbx" tag filter for labels in Jira webhook (tuskov)
 ........S. [ZBXNEXT-6139] added GetHeaders method to CurlHttpRequest javascript object (wiper)
 .........T [ZBXNEXT-6116] added SysAid media type (afayantsev)
@@ -12,6 +14,15 @@ New features:
 .........T [ZBXCTR-10] added iLert media type (roman-ilert)
 
 Bug fixes:
+...G...... [ZBX-18065] add help flag to Zabbix Agent 2 (esneiders)
+.......PS. [ZBX-17906] fixed HTTP agent JSON output when using HTTP/2; thanks to Mike Noordermeer for the patch (viktors)
+..F....... [ZBX-18206] fixed incorrect housekeeping form behaviour (agriscenko)
+..F....... [ZBX-18167] fixed filter block in lld overrides popup (rlataria)
+........S. [ZBX-18174] fixed oracle errors for host macro updates when linking templates (arimdjonoks)
+........S. [ZBX-18188] increased age and duration related macro resolution to seconds (viktors)
+..F....... [ZBX-18152] fixed incorrect selected menu option for template screens page (vmaksimovs)
+.......PS. [ZBX-18340] added runtime command diaginfo option to command line help messages (wiper)
+..F....... [ZBX-18250] changed link to "Web monitoring" page in context menu with filtering parameters (kustalovs)
 ........S. [ZBX-18170] fixed LLD override for applications (viktors, wiper)
 .......PS. [ZBX-15904] added check of required cache size for vmware event messages (asestakovs)
 .......PS. [ZBX-18121] fixed SSH monitoring when compiled with libssh; thanks to MATSUDA Daiki for the patch (Andris, viktors)
