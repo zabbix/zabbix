@@ -3560,14 +3560,14 @@
 			return ret;
 		},
 
-		refreshDynamicWidgets: function(host) {
+		refreshDynamicWidgets: function(hostid) {
 			var	$this = $(this),
 				data = $this.data('dashboardGrid');
 
-			data.dashboard.dynamic_hostid = (host === null) ? null : host.id;
+			data.dashboard.dynamic_hostid = hostid;
 
 			$.each(data['widgets'], function(index, widget) {
-				if (widget.fields.dynamic && widget.fields.dynamic == 1) {
+				if (widget.fields.dynamic == 1) {
 					updateWidgetContent($this, data, widget);
 				}
 			});

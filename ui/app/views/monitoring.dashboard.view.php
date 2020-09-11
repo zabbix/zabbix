@@ -181,13 +181,14 @@ else {
 		(new CScriptTag(
 			// Add event listener to perform dynamic host switch when browser back/previous buttons are pressed.
 			'window.addEventListener("popstate", e => {'.
-				'var data = (e.state && e.state.host) ? [e.state.host] : [];'.
-				'jQuery("#dynamic_hostid").multiSelect("addData", data, false);'.
-				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", data ? data[0] : null);'.
+				'var host = (e.state && e.state.host) ? e.state.host : null,'.
+					'hostid = host ? host.id : null;'.
+				'$("#dynamic_hostid").multiSelect("addData", host ? [host] : [], false);'.
+				'$(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'").dashboardGrid("refreshDynamicWidgets", hostid);'.
 			'});'.
 
 			// Dynamic host selector on-change handler.
-			'jQuery("#dynamic_hostid").on("change", function() {'.
+			'$("#dynamic_hostid").on("change", function() {'.
 				'var hosts = jQuery(this).multiSelect("getData"),'.
 					'host = hosts.length ? hosts[0] : null,'.
 					'url = new Curl("zabbix.php", false);'.
@@ -205,7 +206,7 @@ else {
 				'}'.
 
 				// Refresh dynamic widgets.
-				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", host);'.
+				'$(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", host ? host.id : null);'.
 
 				// Push URL change.
 				'history.pushState({host: host}, "", url.getUrl());'.
