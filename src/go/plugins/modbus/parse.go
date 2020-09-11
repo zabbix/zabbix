@@ -31,10 +31,6 @@ import (
 
 // main parsing
 func parseParams(params *[]string) (*mbParams, error) {
-	if len(*params) == 0 || len(*params) > 8 {
-		return nil, fmt.Errorf("Invalid number of parameters:%d", len(*params))
-	}
-
 	var p mbParams
 	var err error
 
@@ -58,6 +54,7 @@ func parseParams(params *[]string) (*mbParams, error) {
 	if p.SlaveID, err = getSlaveID(params, 1, p.ReqType); err != nil {
 		return nil, err
 	}
+
 	if p.FuncID, err = getFuncID(params, 2); err != nil {
 		return nil, err
 	}
@@ -284,6 +281,7 @@ func getMemAddr(p *[]string, n int, fid uint8) (memAddr uint16, funcID uint8, er
 	if memAddr >= 50000 || memAddr == 0 {
 		return 0, fid, fmt.Errorf("Unsupported modbus address for empty function:%d", memAddr)
 	}
+	funcID = uint8(memAddr / 10000)
 
 	switch funcID {
 	case 0:
