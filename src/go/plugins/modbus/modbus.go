@@ -44,10 +44,25 @@ type Plugin struct {
 	options PluginOptions
 }
 
+//Session struct
+type Session struct {
+	// Endpoint is a connection string consisting of a protocol scheme, a host address and a port or seral port name and attributes.
+	Endpoint string `conf:"optional"`
+
+	// SlaveID of modbus devices.
+	SlaveID string `conf:"optional"`
+
+	// Timeout of modbus devices.
+	Timeout int `conf:"optional"`
+}
+
 // PluginOptions -
 type PluginOptions struct {
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
+
+	// Sessions stores pre-defined named sets of connections settings.
+	Sessions map[string]*Session `conf:"optional"`
 }
 
 type bits8 uint8
@@ -131,11 +146,35 @@ func init() {
 		"modbus.get", "Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianess>,<offset>].")
 }
 
-// Export - interface function of pugin
+// Export - main function of plugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 
 	if key != "modbus.get" {
 		return nil, plugin.UnsupportedMetricError
+	}
+
+	if len(params) == 0 || len(params) > 8 {
+		return nil, fmt.Errorf("Invalid number of parameters:%d", len(params))
+	}
+
+	timeout := p.options.Timeout
+	session, ok := p.options.Sessions[params[0]]
+	if ok {
+		if session.Timeout > 0 {
+			timeout = session.Timeout
+		}
+
+		if len(session.Endpoint) > 0 {
+			params[0] = session.Endpoint
+		}
+
+		if len(session.SlaveID) > 0 {
+			if len(params) == 1 {
+				params = append(params, session.SlaveID)
+			} else if len(params[1]) == 0 {
+				params[1] = session.SlaveID
+			}
+		}
 	}
 
 	var mbparams *mbParams
@@ -144,7 +183,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	var rawVal []byte
-	if rawVal, err = modbusRead(mbparams, p.options.Timeout); err != nil {
+	if rawVal, err = modbusRead(mbparams, timeout); err != nil {
 		return nil, err
 	}
 
@@ -182,6 +221,37 @@ func (p *Plugin) Validate(options interface{}) error {
 	if opts.Timeout > 30 || opts.Timeout < 0 {
 		return fmt.Errorf("Unacceptable Timeout value:%d", opts.Timeout)
 	}
+
+	for _, s := range opts.Sessions {
+		if s.Timeout > 30 || s.Timeout < 0 {
+			return fmt.Errorf("Unacceptable session Timeout value:%d", s.Timeout)
+		}
+
+		var p mbParams
+		var err error
+		if p.ReqType, err = getReqType(s.Endpoint); err != nil {
+			return err
+		}
+
+		switch p.ReqType {
+		case RTU, ASCII:
+			if p.Serial, err = getSerial(s.Endpoint); err != nil {
+				return err
+			}
+		case TCP:
+			if p.NetAddr, err = getNetAddr(s.Endpoint); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("Unsupported modbus protocol")
+		}
+
+		if p.SlaveID, err = getSlaveID(&[]string{s.SlaveID}, 0, p.ReqType); err != nil {
+			return err
+		}
+	}
+
+	p.Debugf("Config is valid")
 
 	return nil
 }
