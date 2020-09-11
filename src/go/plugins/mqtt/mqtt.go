@@ -45,23 +45,28 @@ import (
 
 type mqttClient struct {
 	client    mqtt.Client
-	broker    string
+	broker    broker
 	subs      map[string]*mqttSub
 	opts      *mqtt.ClientOptions
 	connected bool
 }
 
 type mqttSub struct {
-	broker   string
+	broker   broker
 	topic    string
 	wildCard bool
 }
 
+type broker struct {
+	url      string
+	username string
+	password string
+}
 type Plugin struct {
 	plugin.Base
 	options     Options
 	manager     *watch.Manager
-	mqttClients map[string]*mqttClient
+	mqttClients map[broker]*mqttClient
 }
 
 var impl Plugin
@@ -84,8 +89,8 @@ func (p *Plugin) Validate(options interface{}) error {
 	return conf.Unmarshal(options, &o)
 }
 
-func (p *Plugin) createOptions(clientid, username, password, broker string) *mqtt.ClientOptions {
-	opts := mqtt.NewClientOptions().AddBroker(broker).SetClientID(clientid).SetCleanSession(true)
+func (p *Plugin) createOptions(clientid, username, password string, b broker) *mqtt.ClientOptions {
+	opts := mqtt.NewClientOptions().AddBroker(b.url).SetClientID(clientid).SetCleanSession(true)
 	if username != "" {
 		opts.SetUsername(username)
 		if password != "" {
@@ -94,25 +99,25 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	}
 
 	opts.OnConnectionLost = func(client mqtt.Client, reason error) {
-		impl.Warningf("connection lost to [%s]: %s", broker, reason.Error())
+		impl.Warningf("connection lost to [%s]: %s", b.url, reason.Error())
 	}
 
 	opts.OnConnect = func(client mqtt.Client) {
-		impl.Debugf("connected to [%s]", broker)
+		impl.Debugf("connected to [%s]", b.url)
 
 		impl.manager.Lock()
 		defer impl.manager.Unlock()
 
-		mc, ok := p.mqttClients[broker]
+		mc, ok := p.mqttClients[b]
 		if !ok {
-			impl.Warningf("cannot subscribe to [%s]: broker is not connected", broker)
+			impl.Warningf("cannot subscribe to [%s]: broker is not connected", b.url)
 			return
 		}
 
 		mc.connected = true
 		for _, ms := range mc.subs {
 			if err := ms.subscribe(mc); err != nil {
-				impl.Warningf("cannot subscribe topic '%s' to [%s]: %s", ms.topic, broker, err)
+				impl.Warningf("cannot subscribe topic '%s' to [%s]: %s", ms.topic, b.url, err)
 				impl.manager.Notify(ms, err)
 			}
 		}
@@ -144,7 +149,7 @@ func (ms *mqttSub) handler(client mqtt.Client, msg mqtt.Message) {
 }
 
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
-	impl.Tracef("subscribing '%s' to [%s]", ms.topic, ms.broker)
+	impl.Tracef("subscribing '%s' to [%s]", ms.topic, ms.broker.url)
 
 	token := mc.client.Subscribe(ms.topic, 0, ms.handler)
 	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
@@ -155,7 +160,7 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 		return token.Error()
 	}
 
-	impl.Tracef("subscribed '%s' to [%s]", ms.topic, ms.broker)
+	impl.Tracef("subscribed '%s' to [%s]", ms.topic, ms.broker.url)
 	return nil
 }
 
@@ -169,18 +174,18 @@ func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 func (ms *mqttSub) Initialize() (err error) {
 	mc, ok := impl.mqttClients[ms.broker]
 	if !ok {
-		return fmt.Errorf("Cannot connect to [%s]: broker could not be initialized", ms.broker)
+		return fmt.Errorf("Cannot connect to [%s]: broker could not be initialized", ms.broker.url)
 	}
 
 	if mc.client == nil {
-		impl.Debugf("establishing connection to [%s]", ms.broker)
+		impl.Debugf("establishing connection to [%s]", ms.broker.url)
 		mc.client, err = newClient(mc.opts)
 		if err != nil {
-			impl.Warningf("cannot establish connection to [%s]: %s", ms.broker, err)
+			impl.Warningf("cannot establish connection to [%s]: %s", ms.broker.url, err)
 			return
 		}
 
-		impl.Debugf("established connection to [%s]", ms.broker)
+		impl.Debugf("established connection to [%s]", ms.broker.url)
 		return
 	}
 
@@ -194,24 +199,24 @@ func (ms *mqttSub) Initialize() (err error) {
 func (ms *mqttSub) Release() {
 	mc, ok := impl.mqttClients[ms.broker]
 	if !ok || mc == nil || mc.client == nil {
-		impl.Errf("cannot release [%s]: broker was not initialized", ms.broker)
+		impl.Errf("cannot release [%s]: broker was not initialized", ms.broker.url)
 		return
 	}
 
-	impl.Tracef("unsubscribing topic '%s' from [%s]", ms.topic, ms.broker)
+	impl.Tracef("unsubscribing topic '%s' from [%s]", ms.topic, ms.broker.url)
 	token := mc.client.Unsubscribe(ms.topic)
 	if !token.WaitTimeout(time.Duration(impl.options.Timeout) * time.Second) {
-		impl.Errf("cannot unsubscribe topic '%s' from [%s]: timed out", ms.topic, ms.broker)
+		impl.Errf("cannot unsubscribe topic '%s' from [%s]: timed out", ms.topic, ms.broker.url)
 	}
 
 	if token.Error() != nil {
-		impl.Errf("cannot unsubscribe topic '%s' from [%s]: %s", ms.topic, ms.broker, token.Error())
+		impl.Errf("cannot unsubscribe topic '%s' from [%s]: %s", ms.topic, ms.broker.url, token.Error())
 	}
 
 	delete(mc.subs, ms.topic)
-	impl.Tracef("unsubscribed topic '%s' from [%s]", ms.topic, ms.broker)
+	impl.Tracef("unsubscribed topic '%s' from [%s]", ms.topic, ms.broker.url)
 	if len(mc.subs) == 0 {
-		impl.Debugf("disconnecting from [%s]", ms.broker)
+		impl.Debugf("disconnecting from [%s]", ms.broker.url)
 		mc.client.Disconnect(200)
 		delete(impl.mqttClients, mc.broker)
 	}
@@ -253,7 +258,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	if _, params, err = itemutil.ParseKey(key); err != nil {
 		return
 	}
-	if len(params) > 2 {
+	if len(params) > 4 {
 		return nil, fmt.Errorf("Too many parameters.")
 	}
 
@@ -267,21 +272,29 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 		return nil, err
 	}
 
-	broker := url.String()
+	var username, password string
+	if len(params) > 2 {
+		username = params[2]
+	}
+
+	if len(params) > 3 {
+		password = params[3]
+	}
+
+	broker := broker{url.String(), username, password}
 	var client *mqttClient
 	var ok bool
 	if client, ok = p.mqttClients[broker]; !ok {
-		impl.Tracef("creating client for [%s]", broker)
+		impl.Tracef("creating client for [%s]", broker.url)
 
-		client = &mqttClient{
-			nil, broker, make(map[string]*mqttSub), p.createOptions(getClientID(),
-				url.Query().Get("username"), url.Query().Get("password"), broker), false}
+		client = &mqttClient{nil, broker, make(map[string]*mqttSub), p.createOptions(getClientID(), username, password,
+			broker), false}
 		p.mqttClients[broker] = client
 	}
 
 	var sub *mqttSub
 	if sub, ok = client.subs[topic]; !ok {
-		impl.Tracef("creating new subscriber on topic '%s' for [%s]", topic, broker)
+		impl.Tracef("creating new subscriber on topic '%s' for [%s]", topic, broker.url)
 
 		sub = &mqttSub{broker, topic, hasWildCards(topic)}
 		client.subs[topic] = sub
@@ -304,24 +317,30 @@ func hasWildCards(topic string) bool {
 	return strings.HasSuffix(topic, "#") || strings.Contains(topic, "+")
 }
 
-func parseURL(broker string) (out *url.URL, err error) {
-	if len(broker) == 0 {
-		broker = "localhost"
-	} else if broker[0] == ':' {
-		broker = "localhost" + broker
+func parseURL(rawUrl string) (out *url.URL, err error) {
+	if len(rawUrl) == 0 {
+		rawUrl = "localhost"
 	}
 
-	if !strings.Contains(broker, "://") {
-		broker = "tcp://" + broker
+	if !strings.Contains(rawUrl, "://") {
+		rawUrl = "tcp://" + rawUrl
 	}
 
-	out, err = url.Parse(broker)
+	out, err = url.Parse(rawUrl)
 	if err != nil {
 		return
 	}
 
+	if out.Port() != "" && out.Hostname() == "" {
+		return nil, errors.New("Host is required.")
+	}
+
 	if out.Port() == "" {
 		out.Host = fmt.Sprintf("%s:1883", out.Host)
+	}
+
+	if len(out.Query()) > 0 {
+		return nil, errors.New("URL should not contain query parameters.")
 	}
 
 	return
@@ -329,7 +348,7 @@ func parseURL(broker string) (out *url.URL, err error) {
 
 func init() {
 	impl.manager = watch.NewManager(&impl)
-	impl.mqttClients = make(map[string]*mqttClient)
+	impl.mqttClients = make(map[broker]*mqttClient)
 
 	plugin.RegisterMetrics(&impl, "MQTT", "mqtt.get", "Subscribe to MQTT topics for published messages.")
 }
