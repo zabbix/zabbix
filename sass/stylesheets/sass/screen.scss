@@ -2790,6 +2790,15 @@ $form-icon-btn: (
 		margin-bottom: 40px;
 		justify-content: flex-start;
 	}
+
+	#tls-disabled-text {
+		display: none;
+
+		.helper-text {
+			font-style: italic;
+			color: $font-alt-color;
+		}
+	}
 }
 
 .setup-left {
