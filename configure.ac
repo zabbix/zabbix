@@ -1738,11 +1738,10 @@ if test "x$agent" = "xyes"; then
 			have_libmodbus="yes"
 		fi
 	fi
+	LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
+	CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
+	LIBS="$LIBS $LIBMODBUS_LIBS"
 fi
-
-LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
-LIBS="$LIBS $LIBMODBUS_LIBS"
-CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
 
 
 if test "x$agent2" = "xyes"; then
