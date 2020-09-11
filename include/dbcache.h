@@ -1001,8 +1001,9 @@ zbx_trigger_timer_t;
 
 void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now);
 void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit);
-void	zbx_dc_clear_timer_queue(void);
+void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers);
 void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_vector_ptr_t *timers);
+void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
 
 #endif

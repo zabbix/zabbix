@@ -36,6 +36,7 @@
 #include "export.h"
 #include "zbxjson.h"
 #include "zbxhistory.h"
+#include "daemon.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -3023,7 +3024,13 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		if (FAIL != ret)
 		{
-			zbx_dc_get_trigger_timers(&trigger_timers, time(NULL), ZBX_HC_TIMER_SOFT_MAX, ZBX_HC_TIMER_MAX);
+			/* don't process trigger timers when server is shutting down */
+			if (ZBX_IS_RUNNING())
+			{
+				zbx_dc_get_trigger_timers(&trigger_timers, time(NULL), ZBX_HC_TIMER_SOFT_MAX,
+						ZBX_HC_TIMER_MAX);
+			}
+
 			timers_num = trigger_timers.values_num;
 
 			if (ZBX_HC_TIMER_SOFT_MAX <= timers_num)
@@ -3199,9 +3206,6 @@ static void	sync_history_cache_full(void)
 	{
 		/* unlock all triggers before full sync so no items are locked by triggers */
 		DCconfig_unlock_all_triggers();
-
-		/* clear timer trigger queue to avoid processing time triggers at exit */
-		zbx_dc_clear_timer_queue();
 	}
 
 	tmp_history_queue = cache->history_queue;

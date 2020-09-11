@@ -3632,7 +3632,7 @@ static int	dc_function_calculate_nextcheck(zbx_trigger_timer_t *timer, time_t fr
  * Return value:  Created timer or NULL in the case of error.                 *
  *                                                                            *
  ******************************************************************************/
-zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
+static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
 {
 	zbx_trigger_timer_t	*timer;
 	zbx_time_unit_t		trend_base;
@@ -3672,7 +3672,7 @@ zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
  * Purpose: free trigger timer                                                *
  *                                                                            *
  ******************************************************************************/
-void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
+static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
 {
 	__config_mem_free_func(timer);
 }
@@ -8112,21 +8112,47 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_clear_timer_queue                                         *
+ * Function: zbx_dc_get_timer_queue                                           *
  *                                                                            *
  * Purpose: clears timer trigger queue                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_clear_timer_queue(void)
+void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers)
+{
+	int	i;
+
+	zbx_vector_ptr_reserve(timers, config->trigger_queue.elems_num);
+
+	WRLOCK_CACHE;
+
+	for (i = 0; i < config->trigger_queue.elems_num; i++)
+	{
+		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)config->trigger_queue.elems[i].data;
+
+		if (ZBX_FUNCTION_TYPE_TRENDS == timer->type)
+			zbx_vector_ptr_append(timers, timer);
+		else
+			dc_trigger_timer_free(timer);
+	}
+
+	zbx_binary_heap_clear(&config->trigger_queue);
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_free_timers                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_free_timers(zbx_vector_ptr_t *timers)
 {
 	int	i;
 
 	WRLOCK_CACHE;
 
-	for (i = 0; i < config->trigger_queue.elems_num; i++)
-		dc_trigger_timer_free((zbx_trigger_timer_t *)config->trigger_queue.elems[i].data);
-
-	zbx_binary_heap_clear(&config->trigger_queue);
+	for (i = 0; i < timers->values_num; i++)
+		dc_trigger_timer_free(timers->values[i]);
 
 	UNLOCK_CACHE;
 }

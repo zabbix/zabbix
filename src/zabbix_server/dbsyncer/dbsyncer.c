@@ -70,6 +70,43 @@ static	void	unblock_signals(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_db_flush_timer_queue                                         *
+ *                                                                            *
+ * Purpose: flush timer queue to the database                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_flush_timer_queue(void)
+{
+	int			i;
+	zbx_vector_ptr_t	persistent_timers;
+	zbx_db_insert_t		db_insert;
+
+	zbx_vector_ptr_create(&persistent_timers);
+	zbx_dc_clear_timer_queue(&persistent_timers);
+
+	if (0 != persistent_timers.values_num)
+	{
+		zbx_db_insert_prepare(&db_insert, "trigger_queue", "objectid", "type", "clock", "ns", NULL);
+
+		for (i = 0; i < persistent_timers.values_num; i++)
+		{
+			zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)persistent_timers.values[i];
+
+			zbx_db_insert_add_values(&db_insert, timer->objectid, timer->type, timer->eval_ts.sec,
+					timer->eval_ts.ns);
+		}
+
+		zbx_dc_free_timers(&persistent_timers);
+
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+
+	zbx_vector_ptr_destroy(&persistent_timers);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: main_dbsyncer_loop                                               *
  *                                                                            *
  * Purpose: periodically synchronises data in memory cache with database      *
@@ -126,14 +163,15 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		/* clear timer trigger queue to avoid processing time triggers at exit */
 		if (!ZBX_IS_RUNNING())
-		{
-			zbx_dc_clear_timer_queue();
 			zbx_log_sync_history_cache_progress();
-		}
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		block_signals();
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+
+		if (!ZBX_IS_RUNNING())
+			zbx_db_flush_timer_queue();
+
 		unblock_signals();
 
 		total_values_num += values_num;
