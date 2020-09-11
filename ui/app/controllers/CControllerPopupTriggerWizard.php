@@ -29,6 +29,7 @@ class CControllerPopupTriggerWizard extends CController {
 	protected function checkInput() {
 		$fields = [
 			'description' =>	'string',
+			'event_name' =>		'db triggers.event_name',
 			'itemid' =>			'required|db items.itemid',
 			'triggerid' =>		'db triggers.triggerid',
 			'type' =>			'in 0,1',
@@ -89,6 +90,7 @@ class CControllerPopupTriggerWizard extends CController {
 	protected function doAction() {
 		$page_options = [
 			'description' => $this->getInput('description', ''),
+			'event_name' => $this->getInput('event_name', ''),
 			'opdata' => $this->getInput('opdata', ''),
 			'itemid' => $this->getInput('itemid', 0),
 			'type' => $this->getInput('type', 0),
@@ -145,6 +147,7 @@ class CControllerPopupTriggerWizard extends CController {
 					if (array_key_exists('triggerid', $page_options)) {
 						$triggerid = $page_options['triggerid'];
 						$description = $page_options['description'];
+						$event_name = $page_options['event_name'];
 						$opdata = $page_options['opdata'];
 
 						$db_triggers = API::Trigger()->get([
@@ -156,6 +159,7 @@ class CControllerPopupTriggerWizard extends CController {
 							$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers);
 
 							$description = $db_triggers[0]['description'];
+							$event_name = $db_triggers[0]['event_name'];
 							$opdata = $db_triggers[0]['opdata'];
 							$expression = $db_triggers[0]['expression'];
 						}
@@ -164,6 +168,7 @@ class CControllerPopupTriggerWizard extends CController {
 							'triggerid' => $triggerid,
 							'expression' => $expression,
 							'description' => $description,
+							'event_name' => $event_name,
 							'opdata' => $opdata,
 							'type' => TRIGGER_MULT_EVENT_ENABLED,
 							'priority' => $page_options['priority'],
@@ -176,6 +181,7 @@ class CControllerPopupTriggerWizard extends CController {
 						$trigger = [
 							'expression' => $expression,
 							'description' => $page_options['description'],
+							'event_name' => $page_options['event_name'],
 							'opdata' => $page_options['opdata'],
 							'type' => TRIGGER_MULT_EVENT_ENABLED,
 							'priority' => $page_options['priority'],
@@ -245,7 +251,8 @@ class CControllerPopupTriggerWizard extends CController {
 			// Select requested trigger.
 			if (array_key_exists('triggerid', $page_options)) {
 				$result = DBselect(
-					'SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type,t.opdata'.
+					'SELECT t.expression,t.description,t.priority,t.comments,t.url,t.status,t.type,t.opdata,'.
+						't.event_name'.
 					' FROM triggers t'.
 					' WHERE t.triggerid='.zbx_dbstr($page_options['triggerid']).
 						' AND EXISTS ('.
@@ -262,6 +269,7 @@ class CControllerPopupTriggerWizard extends CController {
 				if ($row = DBfetch($result)) {
 					$expression = CMacrosResolverHelper::resolveTriggerExpression($row['expression']);
 					$page_options['description'] = $row['description'];
+					$page_options['event_name'] = $row['event_name'];
 					$page_options['opdata'] = $row['opdata'];
 					$page_options['type'] = $row['type'];
 					$page_options['priority'] = $row['priority'];

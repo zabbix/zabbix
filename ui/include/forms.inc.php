@@ -1732,6 +1732,7 @@ function getTriggerFormData(array $data) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $trigger['description'];
+			$data['event_name'] = $trigger['event_name'];
 			$data['opdata'] = $trigger['opdata'];
 			$data['type'] = $trigger['type'];
 			$data['recovery_mode'] = $trigger['recovery_mode'];

@@ -266,6 +266,50 @@ class CFunctionValidator extends CValidator {
 					['type' => 'fit', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesNum
+			],
+			'trendavg' => [
+				'args' => [
+					['type' => 'period', 'mandat' => true],
+					['type' => 'period_shift', 'mandat' => true]
+				],
+				'value_types' => $valueTypesNum
+			],
+			'trendcount' => [
+				'args' => [
+					['type' => 'period', 'mandat' => true],
+					['type' => 'str'],
+					['type' => 'operation'],
+					['type' => 'period_shift', 'mandat' => true]
+				],
+				'value_types' => $valueTypesAll
+			],
+			'trenddelta' => [
+				'args' => [
+					['type' => 'period', 'mandat' => true],
+					['type' => 'period_shift', 'mandat' => true]
+				],
+				'value_types' => $valueTypesNum
+			],
+			'trendmax' => [
+				'args' => [
+					['type' => 'period', 'mandat' => true],
+					['type' => 'period_shift', 'mandat' => true]
+				],
+				'value_types' => $valueTypesNum
+			],
+			'trendmin' => [
+				'args' => [
+					['type' => 'period', 'mandat' => true],
+					['type' => 'period_shift', 'mandat' => true]
+				],
+				'value_types' => $valueTypesNum
+			],
+			'trendsum' => [
+				'args' => [
+					['type' => 'period', 'mandat' => true],
+					['type' => 'period_shift', 'mandat' => true]
+				],
+				'value_types' => $valueTypesNum
 			]
 		];
 	}
@@ -364,7 +408,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @param string $param
 	 * @param string $type  type of $param ('fit', 'mode', 'num_suffix', 'num_unsigned', 'operation', 'percent',
-	 *                                      'sec_neg', 'sec_num', 'sec_num_zero', 'sec_zero')
+	 *                                      'period', 'period_shift', 'sec_neg', 'sec_num', 'sec_num_zero', 'sec_zero')
 	 *
 	 * @return bool
 	 */
@@ -405,6 +449,12 @@ class CFunctionValidator extends CValidator {
 
 			case 'operation':
 				return $this->validateOperation($param);
+
+			case 'period':
+				return $this->validatePeriod($param);
+
+			case 'period_shift':
+				return $this->validatePeriodShift($param);
 		}
 
 		return true;
@@ -547,5 +597,51 @@ class CFunctionValidator extends CValidator {
 	 */
 	private function validateOperation($param) {
 		return preg_match('/^(eq|ne|gt|ge|lt|le|like|band|regexp|iregexp|)$/', $param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain time unit not less than 1 hour and multiple of an hour.
+	 * Examples: 3600, 7200s, 2h, 1d
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validatePeriod($param) {
+		$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
+		$value = (string) $param;
+
+		if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			$value = timeUnitToSeconds($value, true);
+
+			if ($value >= SEC_PER_HOUR && $value % SEC_PER_HOUR === 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain time range value with precision and multiple of an hour.
+	 * Examples: now/h, now/w, now/M, now/y
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validatePeriodShift($param) {
+		$relative_time_parser = new CRelativeTimeParser();
+
+		if ($relative_time_parser->parse((string) $param) === CParser::PARSE_SUCCESS) {
+			foreach ($relative_time_parser->getTokens() as $token) {
+				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION && $token['suffix'] !== 'm'
+						&& ($relative_time_parser->getDateTime(false)->getTimestamp() + 1) % SEC_PER_HOUR === 0) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }

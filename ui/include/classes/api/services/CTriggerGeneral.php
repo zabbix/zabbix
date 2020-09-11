@@ -1038,7 +1038,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
 				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata', 'discover'
+				'manual_close', 'opdata', 'discover', 'event_name'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -1397,6 +1397,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($trigger['description'] !== $db_trigger['description']) {
 				$upd_trigger['values']['description'] = $trigger['description'];
+			}
+			if (array_key_exists('event_name', $trigger) && $trigger['event_name'] !== $db_trigger['event_name']) {
+				$upd_trigger['values']['event_name'] = $trigger['event_name'];
 			}
 			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== $db_trigger['opdata']) {
 				$upd_trigger['values']['opdata'] = $trigger['opdata'];
@@ -1994,7 +1997,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-			'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name'
 		];
 		if ($this instanceof CTriggerPrototype) {
 			$output[] = 'discover';
