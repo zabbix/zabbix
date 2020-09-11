@@ -79,10 +79,6 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode(array_values($parentHost['interfaces'])).');');
-	zbx_add_post_js('hostInterfaceManager.render();');
-	zbx_add_post_js('HostInterfaceManager.disableEdit();');
-
 	$interface_header = renderInterfaceHeaders();
 
 	$agent_interfaces = (new CDiv())
@@ -106,7 +102,25 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		->setAttribute('data-type', 'ipmi');
 
 	$hostList->addRow(new CLabel(_('Interfaces')),
-		[new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces])]
+		[
+			(new CRadioButtonList('custom_interfaces', (int) $hostPrototype['custom_interfaces']))
+				->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
+				->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
+				->setModern(true),
+			(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
+				->setId('js-interfaces-table'),
+			new CDiv(
+				(new CButton('js-interface-add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setMenuPopup([
+						'type' => 'submenu',
+						'data' => [
+							'submenu' => getAddNewInterfaceSubmenu()
+						]
+					])
+					->setAttribute('aria-label', _('Add new interface'))
+			)
+		]
 	);
 
 	// proxy

@@ -37,6 +37,99 @@
 </script>
 
 <script type="text/javascript">
+	class InterfaceSourceSwitcher extends CBaseComponent {
+		constructor(target, $source_input, $add_button, data) {
+			super(target);
+
+			this._$source_input = $source_input;
+			this._$add_button = $add_button;
+			this._data = data;
+
+			this._target_clone = this._target.cloneNode(true);
+
+			this.register_events();
+		}
+
+		register_events() {
+			var that = this;
+
+			switch (this.getSourceValue()) {
+				case '<?= HOST_PROT_INTERFACES_INHERIT ?>':
+					this.initInherit();
+					break;
+				case '<?= HOST_PROT_INTERFACES_CUSTOM ?>':
+					this.initCustom();
+					break;
+			}
+
+			this._$source_input.on('change', function() {
+				that.switchTo(that.getSourceValue());
+			});
+		}
+
+		getSourceValue() {
+			return $('input[name=custom_interfaces]:checked', this._$source_input).val();
+		}
+
+		initInherit() {
+			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces);
+			hostInterfaceManagerInherit.render();
+			HostInterfaceManager.disableEdit(); // TODO VM: change to class method
+		}
+
+		initCustom() {
+			// This is in global space, as Add functions uses it.
+			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces);
+			hostInterfaceManager.render();
+		}
+
+		switchTo(source) {
+			switch (source) {
+				case '<?= HOST_PROT_INTERFACES_INHERIT ?>':
+					this._$add_button.hide();
+
+					if (!('inheritInterfaces' in this._target)) {
+						this._target.inheritInterfaces = this._target_clone;
+						this.switchToInherit();
+						this.initInherit();
+					}
+					else {
+						this.switchToInherit();
+					}
+					break;
+				case '<?= HOST_PROT_INTERFACES_CUSTOM ?>':
+					if (!('customInterfaces' in this._target)) {
+						this._target.customInterfaces = this._target_clone;
+						this.switchToCustom();
+						this.initCustom();
+					}
+					else {
+						this.switchToCustom();
+					}
+
+					this._$add_button.show();
+
+					break;
+			}
+		}
+
+		switchToInherit() {
+			var obj_inherit = this._target.inheritInterfaces;
+			obj_inherit.customInterfaces = this._target;
+
+			this._target.replaceWith(obj_inherit);
+			this._target = obj_inherit;
+		}
+
+		switchToCustom() {
+			var obj_custom = this._target.customInterfaces;
+			obj_custom.inheritInterfaces = this._target;
+
+			this._target.replaceWith(obj_custom);
+			this._target = obj_custom;
+		}
+	}
+
 	function addGroupPrototypeRow(groupPrototype) {
 		var addButton = jQuery('#group_prototype_add');
 
@@ -48,6 +141,16 @@
 	}
 
 	jQuery(function() {
+		const interface_source_switcher = new InterfaceSourceSwitcher(
+			document.getElementById('js-interfaces-table'),
+			$('#custom_interfaces'),
+			$('#js-interface-add'),
+			<?= json_encode([
+				'inherited_interfaces' => array_values($parentHost['interfaces']),
+				'custom_interfaces' => array_values($hostPrototype['interfaces'])
+			]) ?>
+		);
+
 		jQuery('#group_prototype_add')
 			.data('group-prototype-count', jQuery('#tbl_group_prototypes').find('.group-prototype-remove').length)
 			.click(function() {
