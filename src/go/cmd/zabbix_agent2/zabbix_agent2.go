@@ -351,10 +351,6 @@ func main() {
 		fatalExit("cannot parse the \"ServerActive\" parameter", err)
 	}
 
-	if err = resultcache.Prepare(&agent.Options, addresses); err != nil {
-		fatalExit("cannot prepare result cache", err)
-	}
-
 	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
 		fatalExit("cannot use encryption configuration", err)
 	} else {
@@ -410,13 +406,27 @@ func main() {
 		fatalExit("cannot process configuration", err)
 	}
 
-	serverConnectors = make([]*serverconnector.Connector, len(addresses))
+	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+	if err != nil {
+		fatalExit("cannot parse the \"Hostname\" parameter", err)
+	}
 
-	for i := 0; i < len(serverConnectors); i++ {
-		if serverConnectors[i], err = serverconnector.New(manager, addresses[i], &agent.Options); err != nil {
-			fatalExit("cannot create server connector", err)
+	if err = resultcache.Prepare(&agent.Options, addresses, hostnames); err != nil {
+		fatalExit("cannot prepare result cache", err)
+	}
+
+	serverConnectors = make([]*serverconnector.Connector, len(addresses)*len(hostnames))
+
+	var idx int
+	for i := 0; i < len(addresses); i++ {
+		for j := 0; j < len(hostnames); j++ {
+			if serverConnectors[idx], err = serverconnector.New(manager, addresses[i], hostnames[j], &agent.Options); err != nil {
+				fatalExit("cannot create server connector", err)
+			}
+			serverConnectors[idx].Start()
+			agent.SetHostname(serverConnectors[idx].ClientID(), hostnames[j])
+			idx++
 		}
-		serverConnectors[i].Start()
 	}
 
 	for _, listener := range listeners {
@@ -447,6 +457,7 @@ func main() {
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopConnector()
 	}
+
 	monitor.Wait(monitor.Input)
 
 	manager.Stop()
@@ -458,6 +469,7 @@ func main() {
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopCache()
 	}
+
 	monitor.Wait(monitor.Output)
 
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())

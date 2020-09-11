@@ -50,7 +50,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		Request: "agent data",
 		Data:    c.results,
 		Session: c.token,
-		Host:    agent.Options.Hostname,
+		Host:    u.Hostname(),
 		Version: version.Short(),
 	}
 
@@ -67,14 +67,14 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	}
 	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			c.Warningf("history upload to [%s] started to fail: %s", u.Addr(), err)
+			c.Warningf("history upload to [%s] started to fail: %s %s", u.Addr(), u.Hostname(), err)
 			c.lastError = err
 		}
 		return
 	}
 
 	if c.lastError != nil {
-		c.Warningf("history upload to [%s] is working again", u.Addr())
+		c.Warningf("history upload to [%s %s] is working again", u.Addr(), u.Hostname())
 		c.lastError = nil
 	}
 

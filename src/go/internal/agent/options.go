@@ -46,8 +46,11 @@ func CutAfterN(s string, n int) string {
 	return s
 }
 
-func CheckHostname(s string) error {
+func CheckHostname(s string, multy bool) error {
 	for i := 0; i < len(s); i++ {
+		if multy && s[i] == ',' {
+			continue
+		}
 		if s[i] == '.' || s[i] == ' ' || s[i] == '_' || s[i] == '-' ||
 			(s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= '0' && s[i] <= '9') {
 			continue
@@ -59,8 +62,37 @@ func CheckHostname(s string) error {
 			return fmt.Errorf("character 0x%02x is not allowed in host name", s[i])
 		}
 	}
-
 	return nil
+}
+
+func ValidateHostnames(s string) ([]string, error) {
+	hostnames := ExtractHostnames(s)
+	keys := make(map[string]bool)
+	huniq := []string{}
+	for _, h := range hostnames {
+		if _, value := keys[h]; !value {
+			keys[h] = true
+			huniq = append(huniq, h)
+		}
+	}
+	if len(huniq) != len(hostnames) {
+		return nil, fmt.Errorf("host names are not unique")
+	}
+
+	return hostnames, nil
+}
+
+func ExtractHostnames(s string) []string {
+	hostnames := strings.Split(s, ",")
+	hnum := len(hostnames)
+	if hnum > 1 {
+		hostnames[0] = strings.TrimRight(hostnames[0], " ")
+		hostnames[hnum-1] = strings.TrimLeft(hostnames[hnum-1], " ")
+		for i := 1; i < hnum-1; i++ {
+			hostnames[i] = strings.Trim(hostnames[i], " ")
+		}
+	}
+	return hostnames
 }
 
 func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
@@ -193,7 +225,7 @@ func ValidateOptions(options AgentOptions) error {
 	if len(options.Hostname) > hostNameLen {
 		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", hostNameLen)
 	}
-	if err = CheckHostname(options.Hostname); err != nil {
+	if err = CheckHostname(options.Hostname, true); err != nil {
 		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
 	}
 	if len(options.HostMetadata) > 0 && len(options.HostMetadata) > hostMetadataLen {

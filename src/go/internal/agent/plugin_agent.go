@@ -33,6 +33,15 @@ type Plugin struct {
 }
 
 var impl Plugin
+var hostnames = map[uint64]string{}
+
+func SetHostname(clientID uint64, hostname string) {
+	hostnames[clientID] = hostname
+}
+
+func getHostname(clientID uint64) string {
+	return hostnames[clientID]
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -42,7 +51,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	switch key {
 	case "agent.hostname":
-		return Options.Hostname, nil
+		if ctx.ClientID() > MaxBuiltinClientID {
+			return getHostname(ctx.ClientID()), nil
+		} else {
+			return ExtractHostnames(Options.Hostname)[0], nil
+		}
 	case "agent.ping":
 		return 1, nil
 	case "agent.version":
