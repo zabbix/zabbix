@@ -245,24 +245,40 @@ static int	DBpatch_5010026(void)
 
 static int	DBpatch_5010027(void)
 {
+	const ZBX_FIELD	old_field = {"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"data", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_data", &field, &old_field);
+}
+
+static int	DBpatch_5010028(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
+static int	DBpatch_5010029(void)
+{
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("dashboard", &field);
 }
 
-static int	DBpatch_5010028(void)
+static int	DBpatch_5010030(void)
 {
 	const ZBX_FIELD	field = {"templateid", 0, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("dashboard", 2, &field);
 }
 
-static int	DBpatch_5010029(void)
+static int	DBpatch_5010031(void)
 {
 	return DBcreate_index("dashboard", "c_dashboard_2", "templateid", 0);
 }
 
-static int	DBpatch_5010030(void)
+static int	DBpatch_5010032(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
@@ -306,5 +322,7 @@ DBPATCH_ADD(5010027, 0, 1)
 DBPATCH_ADD(5010028, 0, 1)
 DBPATCH_ADD(5010029, 0, 1)
 DBPATCH_ADD(5010030, 0, 1)
+DBPATCH_ADD(5010031, 0, 1)
+DBPATCH_ADD(5010032, 0, 1)
 
 DBPATCH_END()

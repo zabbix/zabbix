@@ -27,7 +27,8 @@ function httptest_authentications($type = null) {
 		HTTPTEST_AUTH_NONE => _('None'),
 		HTTPTEST_AUTH_BASIC => _('Basic'),
 		HTTPTEST_AUTH_NTLM => _('NTLM'),
-		HTTPTEST_AUTH_KERBEROS => _('Kerberos')
+		HTTPTEST_AUTH_KERBEROS => _('Kerberos'),
+		HTTPTEST_AUTH_DIGEST => _('Digest')
 	];
 
 	if (is_null($type)) {

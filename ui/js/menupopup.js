@@ -182,8 +182,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		else {
 			var web_url = new Curl('zabbix.php', false);
 			web_url.setArgument('action', 'web.view');
-			web_url.setArgument('hostid', options.hostid);
-
+			web_url.setArgument('filter_hostids[]', options.hostid);
+			web_url.setArgument('filter_set', '1');
 			web.url = web_url.getUrl();
 		}
 

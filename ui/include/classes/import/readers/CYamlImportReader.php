@@ -19,14 +19,20 @@
 **/
 
 
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Class for converting YAML data stream to PHP array.
  */
 class CYamlImportReader extends CImportReader {
 
 	/**
-	 * Convert YAML data stream to PHP array. Suppress PHP notices when executing yaml_parse() with custom
-	 * error handler. Display only first error since that is where the syntax in file is incorrect.
+	 * Convert YAML data stream to PHP array.
+	 * Known issues:
+	 *   - Error messages coming from Symfony YAML are not translatable;
+	 *   - Symfony parser incorrectly interprets YAML as JSON;
+	 *   - Symfony parser recognizes patterns (like dates) in unquoted strings which are not supported by Zabbix;
+	 *   - Symfony parser support only one YAML document per file.
 	 *
 	 * @param string $string
 	 *
@@ -35,30 +41,18 @@ class CYamlImportReader extends CImportReader {
 	 * @return array
 	 */
 	public function read($string): array {
-		$error = '';
-
-		set_error_handler(function ($errno, $errstr) use (&$error) {
-			if ($error === '' && $errstr !== '') {
-				$error = str_replace('yaml_parse(): ', '', $errstr);
-			}
-		});
-
-		$data = yaml_parse($string);
-
-		restore_error_handler();
-
-		/*
-		 * Unfortunately yaml_parse() not always returns FALSE. If file is empty, it returns NULL and if file contains
-		 * gibberish and not a "zabbix_export" array, $data contains same input string, but Import Validator expects
-		 * $data to be an array. Create a custom error message for these cases.
-		 */
-		if (!is_array($data) && $data !== false) {
-			$data = false;
-			$error = _('Invalid file content');
+		try {
+			$data = Yaml::parse($string);
+		}
+		catch (Exception $exception) {
+			throw new ErrorException($exception->getMessage());
 		}
 
-		if ($data === false) {
-			throw new ErrorException(_s('Cannot read YAML: %1$s.', $error));
+		if ($data === null) {
+			throw new ErrorException(_s('Cannot read YAML: %1$s.', _('File is empty')));
+		}
+		elseif (!is_array($data)) {
+			throw new ErrorException(_s('Cannot read YAML: %1$s.', _('Invalid YAML file contents')));
 		}
 
 		return $data;

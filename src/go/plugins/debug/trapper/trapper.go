@@ -22,11 +22,13 @@ package trapper
 import (
 	"fmt"
 	"io/ioutil"
+
 	"net"
 	"regexp"
 	"strconv"
 
 	"zabbix.com/pkg/itemutil"
+	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/watch"
 )
@@ -50,6 +52,7 @@ type trapListener struct {
 	port     int
 	listener net.Listener
 	manager  *watch.Manager
+	log      log.Logger
 }
 
 func (t *trapListener) run() {
@@ -64,17 +67,15 @@ func (t *trapListener) run() {
 		if b, err := ioutil.ReadAll(conn); err == nil {
 			t.manager.Lock()
 			t.manager.Notify(t, b)
+			t.manager.Flush(t)
 			t.manager.Unlock()
 		}
 		conn.Close()
 	}
 }
 
-func (t *trapListener) URI() (uri string) {
-	return fmt.Sprintf("%d", t.port)
-}
-
-func (t *trapListener) Subscribe() (err error) {
+func (t *trapListener) Initialize() (err error) {
+	t.log.Debugf("start listening on %d", t.port)
 	if t.listener, err = net.Listen("tcp", fmt.Sprintf(":%d", t.port)); err != nil {
 		return
 	}
@@ -82,7 +83,8 @@ func (t *trapListener) Subscribe() (err error) {
 	return nil
 }
 
-func (t *trapListener) Unsubscribe() {
+func (t *trapListener) Release() {
+	t.log.Debugf("stop listening on %d", t.port)
 	t.listener.Close()
 }
 
@@ -90,7 +92,7 @@ type trapFilter struct {
 	pattern *regexp.Regexp
 }
 
-func (f *trapFilter) Convert(v interface{}) (value *string, err error) {
+func (f *trapFilter) Process(v interface{}) (value *string, err error) {
 	if b, ok := v.([]byte); !ok {
 		err = fmt.Errorf("unexpected traper conversion input type %T", v)
 	} else {
@@ -116,18 +118,6 @@ func (t *trapListener) NewFilter(key string) (filter watch.EventFilter, err erro
 	return &trapFilter{pattern: pattern}, nil
 }
 
-func (p *Plugin) EventSourceByURI(uri string) (es watch.EventSource, err error) {
-	var port int
-	if port, err = strconv.Atoi(uri); err != nil {
-		return
-	}
-	var ok bool
-	if es, ok = p.listeners[port]; !ok {
-		err = fmt.Errorf(`not registered listener URI "%s"`, uri)
-	}
-	return
-}
-
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
 	var params []string
 	if _, params, err = itemutil.ParseKey(key); err != nil {
@@ -140,7 +130,7 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 	var ok bool
 	var listener *trapListener
 	if listener, ok = p.listeners[port]; !ok {
-		listener = &trapListener{port: port, manager: p.manager}
+		listener = &trapListener{port: port, manager: p.manager, log: p}
 		p.listeners[port] = listener
 	}
 	return listener, nil

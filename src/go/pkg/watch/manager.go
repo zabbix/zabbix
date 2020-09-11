@@ -17,6 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+// watch package provides utlity functionality for easier Watcher plugin implementation.
+// Watcher plugin listens for events specified by the item requests and comnverts those
+// events to item values. This package handles event source initialization/deinitialization,
+// event filtering and conversion to item values/errors.
 package watch
 
 import (
@@ -26,74 +30,91 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
-// describes single event source - listen port for traps, file name for file content monitoring etc
+// EventSource generates events by calling Manager.Notify() method and passing arbitrary
+// data. The data is converted to string values by event filter that was created by the
+// event source during Manager update.
 type EventSource interface {
-	// unique event source identifier
-	URI() string
-	// start generating events
-	Subscribe() error
-	// stop generating events
-	Unsubscribe()
-	// create new event writer
+	// initialize event source and start generating events
+	Initialize() error
+	// stop generating events and release internal resources allocated by event source
+	Release()
+	// create new event filter based on item key
 	NewFilter(key string) (filter EventFilter, err error)
 }
 
-// EventProvider interface provides methods to get event source by item key or event source URI.
-// The event source can be either cached by provider or created a new one upon every request.
-// In the second case it would be most like a wrapper to bridge watch Manager with event generator.
+// EventProvider interface provides methods to get event source by item key. An new or existing
+// event source can be returned. EventProvider is required to create Manager instance.
 type EventProvider interface {
 	EventSourceByKey(key string) (EventSource, error)
-	EventSourceByURI(uri string) (EventSource, error)
 }
 
+// EventFilter has two responsibilities. The first is to convert data to a string value.
+// The second is optional - based on internal filter parameters (item key for example)
+// it can make the data to be ignored by returning nil value.
 type EventFilter interface {
-	Convert(data interface{}) (value *string, err error)
+	// Process processes data from event source and returns:
+	//   value - data is valid and matches filter
+	//   error - invalid data
+	//   nothing - data is valid, but does not match the fileter
+	Process(data interface{}) (value *string, err error)
 }
 
-type EventWriter struct {
+// eventWriter links event filter to output sink where the filtered results must be written
+type eventWriter struct {
 	output plugin.ResultWriter
 	filter EventFilter
 }
 
+// Item to monitor
 type Item struct {
 	Key     string
 	Updated time.Time
 }
 
-type Source struct {
+type Subscriber struct {
 	Itemid   uint64
 	Clientid uint64
 }
 
+// Client represents monitoring instance - Zabbix server or proxy
 type Client struct {
-	ID    uint64
+	// the client ID
+	ID uint64
+	// the items monitored by client: itemid->Item
 	Items map[uint64]*Item
 }
 
 type Manager struct {
 	eventProvider EventProvider
 	clients       map[uint64]*Client
-	subscriptions map[string]map[Source]*EventWriter
+	subscriptions map[EventSource]map[Subscriber]*eventWriter
 	mutex         sync.Mutex
 }
 
+// Update updates monitored items for the specified client based on new requests.
 func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests []*plugin.Request) {
 	var client *Client
 	var ok bool
+
+	// find or create client
 	if client, ok = m.clients[clientid]; !ok {
 		client = &Client{ID: clientid, Items: make(map[uint64]*Item)}
 		m.clients[clientid] = client
 	}
 
+	// temporary event source error cache
+	failedEventSources := make(map[EventSource]error)
+
 	now := time.Now()
 	for _, r := range requests {
-		var sub map[Source]*EventWriter
-		source := Source{Clientid: client.ID, Itemid: r.Itemid}
+		var sub map[Subscriber]*eventWriter
+		subscriber := Subscriber{Clientid: client.ID, Itemid: r.Itemid}
 		if item, ok := client.Items[r.Itemid]; ok {
+			// remove existing subscription if item key was changed
 			if item.Key != r.Key {
 				if es, err := m.eventProvider.EventSourceByKey(item.Key); err == nil {
-					if sub, ok := m.subscriptions[es.URI()]; ok {
-						delete(sub, source)
+					if sub, ok := m.subscriptions[es]; ok {
+						delete(sub, subscriber)
 					}
 					item.Key = r.Key
 				} else {
@@ -102,23 +123,35 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 			}
 			item.Updated = now
 		} else {
+			// register new item to be monitored
 			client.Items[r.Itemid] = &Item{Key: r.Key, Updated: now}
 		}
+		// subscribe new or changed item
 		if es, err := m.eventProvider.EventSourceByKey(r.Key); err == nil {
-			if sub, ok = m.subscriptions[es.URI()]; !ok {
-				if err := es.Subscribe(); err == nil {
-					sub = make(map[Source]*EventWriter)
-					m.subscriptions[es.URI()] = sub
-				} else {
+			// initialize new event source
+			if sub, ok = m.subscriptions[es]; !ok {
+				// reuse event source initialization error if the initialization did already
+				// fail for this batch
+				if err, ok = failedEventSources[es]; !ok {
+					if err = es.Initialize(); err == nil {
+						sub = make(map[Subscriber]*eventWriter)
+						m.subscriptions[es] = sub
+					} else {
+						// cache initialization error
+						failedEventSources[es] = err
+					}
+				}
+				if err != nil {
 					output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
 				}
 			}
 			if sub != nil {
-				if _, ok = sub[source]; !ok {
+				if _, ok = sub[subscriber]; !ok {
+					// create subscription
 					if filter, err := es.NewFilter(r.Key); err != nil {
 						output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
 					} else {
-						sub[source] = &EventWriter{output: output, filter: filter}
+						sub[subscriber] = &eventWriter{output: output, filter: filter}
 					}
 				}
 			}
@@ -127,37 +160,57 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 		}
 	}
 
+	// remove unused subscriptions
 	for itemid, item := range client.Items {
 		if !item.Updated.Equal(now) {
-			if sub, ok := m.subscriptions[item.Key]; ok {
-				delete(sub, Source{Clientid: client.ID, Itemid: itemid})
+			if es, err := m.eventProvider.EventSourceByKey(item.Key); err == nil {
+				if sub, ok := m.subscriptions[es]; ok {
+					delete(sub, Subscriber{Clientid: client.ID, Itemid: itemid})
+				}
 			}
 			delete(client.Items, itemid)
 		}
 	}
 
-	for uri, sub := range m.subscriptions {
+	// release unused event sources
+	for es, sub := range m.subscriptions {
 		if len(sub) == 0 {
-			if es, err := m.eventProvider.EventSourceByURI(uri); err != nil {
-				es.Unsubscribe()
-			}
-			delete(m.subscriptions, uri)
+			es.Release()
+			delete(m.subscriptions, es)
 		}
 	}
 }
 
+// Notify method notifies manger about a new event from an event source.
+// Manager checks subscriptions, runs filters and writes the results to the corresponding
+// output sinks.
 func (m *Manager) Notify(es EventSource, data interface{}) {
 	now := time.Now()
-	if sub, ok := m.subscriptions[es.URI()]; ok {
-		outputs := make(map[plugin.ResultWriter]bool)
+	if sub, ok := m.subscriptions[es]; ok {
 		for source, writer := range sub {
-			if value, err := writer.filter.Convert(data); value != nil || err != nil {
+			if value, err := writer.filter.Process(data); value != nil || err != nil {
 				writer.output.Write(&plugin.Result{Itemid: source.Itemid, Ts: now, Value: value, Error: err})
-				outputs[writer.output] = true
 			}
 		}
-		for output := range outputs {
-			output.Flush()
+	}
+}
+
+// Flush method flushes all outputs that are subscribed to the specified event source.
+func (m *Manager) Flush(es EventSource) {
+	if sub, ok := m.subscriptions[es]; ok {
+		outputs := make([]plugin.ResultWriter, 0, len(sub))
+		for _, writer := range sub {
+			found := false
+			for _, output := range outputs {
+				if writer.output == output {
+					found = true
+					break
+				}
+			}
+			if !found {
+				outputs = append(outputs, writer.output)
+				writer.output.Flush()
+			}
 		}
 	}
 }
@@ -173,7 +226,7 @@ func (m *Manager) Unlock() {
 func NewManager(e EventProvider) (manager *Manager) {
 	manager = &Manager{
 		clients:       make(map[uint64]*Client),
-		subscriptions: make(map[string]map[Source]*EventWriter),
+		subscriptions: make(map[EventSource]map[Subscriber]*eventWriter),
 		eventProvider: e,
 	}
 	return

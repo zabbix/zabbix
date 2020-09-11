@@ -33,6 +33,14 @@ typedef struct
 }
 zbx_preproc_result_t;
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		values_num;
+	int		steps_num;
+}
+zbx_preproc_item_stats_t;
+
 /* the following functions are implemented differently for server and proxy */
 
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
@@ -47,4 +55,8 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx
 		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
 		char **preproc_error, char **error);
 
+int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, char **error);
+
+
+int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error);
 #endif /* ZABBIX_PREPROC_H */

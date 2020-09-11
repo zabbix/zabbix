@@ -127,13 +127,13 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 				$data['dynamic'] = [
 					'has_dynamic_widgets' => true,
-					'host' => $hosts
+					'host' => $hosts ? $hosts[0] : null
 				];
 			}
 			else {
 				$data['dynamic'] = [
 					'has_dynamic_widgets' => false,
-					'host' => []
+					'host' => null
 				];
 			}
 
