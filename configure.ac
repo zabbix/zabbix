@@ -1731,10 +1731,12 @@ ZBXJS_LDFLAGS="$ZLIB_LDFLAGS $TLS_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $TLS_LIBS"
 
 dnl Check for libmodbus [by default - skip]
-LIBMODBUS_CHECK_CONFIG([3.0.0])
-if test "x$want_libmodbus" = "xyes"; then
-	if test "x$found_libmodbus" = "xyes"; then
-		have_libmodbus="yes"
+if test "x$agent" = "xyes"; then
+	LIBMODBUS_CHECK_CONFIG([3.0.0])
+	if test "x$want_libmodbus" = "xyes"; then
+		if test "x$found_libmodbus" = "xyes"; then
+			have_libmodbus="yes"
+		fi
 	fi
 fi
 
