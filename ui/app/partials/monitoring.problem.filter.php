@@ -1,5 +1,4 @@
 <?php declare(strict_types = 1);
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * @var CPartial $this
+ */
 
 $left_column = (new CFormList())
 	->addRow(_('Show'),
@@ -276,11 +279,11 @@ $template = (new CForm('get'))
 	->setName('zbx_filter')
 	->addItem($template)
 	->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE))
-	->addVar('filter_name', '#{filter_name}')
-	->addVar('filter_show_counter', '#{filter_show_counter}')
-	->addVar('filter_custom_time', '#{filter_custom_time}')
-	->addVar('sort', '#{sort}')
-	->addVar('sortorder', '#{sortorder}');
+	->addItem((new CInput('hidden', 'filter_name', '#{filter_name}'))->removeId())
+	->addItem((new CInput('hidden', 'filter_show_counter', '#{filter_show_counter}'))->removeId())
+	->addItem((new CInput('hidden', 'filter_custom_time', '#{filter_custom_time}'))->removeId())
+	->addItem((new CInput('hidden', 'sort', '#{sort}'))->removeId())
+	->addItem((new CInput('hidden', 'sortorder', '#{sortorder}'))->removeId());
 
 if (array_key_exists('render_html', $data)) {
 	/**

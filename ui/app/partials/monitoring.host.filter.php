@@ -20,6 +20,10 @@
 **/
 
 
+/**
+ * @var CPartial $this
+ */
+
 $filter_tags_table = (new CTable())
 	->setId('tags_#{uniqid}')
 	->addRow(
@@ -146,11 +150,11 @@ $template = (new CForm('get'))
 	->setName('zbx_filter')
 	->addItem($template)
 	->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE))
-	->addVar('filter_name', '#{filter_name}')
-	->addVar('filter_show_counter', '#{filter_show_counter}')
-	->addVar('filter_custom_time', '#{filter_custom_time}')
-	->addVar('sort', '#{sort}')
-	->addVar('sortorder', '#{sortorder}');
+	->addItem((new CInput('hidden', 'filter_name', '#{filter_name}'))->removeId())
+	->addItem((new CInput('hidden', 'filter_show_counter', '#{filter_show_counter}'))->removeId())
+	->addItem((new CInput('hidden', 'filter_custom_time', '#{filter_custom_time}'))->removeId())
+	->addItem((new CInput('hidden', 'sort', '#{sort}'))->removeId())
+	->addItem((new CInput('hidden', 'sortorder', '#{sortorder}'))->removeId());
 
 if (array_key_exists('render_html', $data)) {
 	/**

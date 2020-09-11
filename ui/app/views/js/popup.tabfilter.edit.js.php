@@ -23,10 +23,11 @@
  * @var CView $this
  */
 ?>
-$('.overlay-dialogue-body #filter_custom_time').on('click', function () {
+
+$('.overlay-dialogue-body #filter_custom_time').on('change', function() {
 	let $calendars = $(this).closest('form').find('.calendar-control');
 
-	$('input,button', $calendars).prop('disabled', $(this).is(':not(:checked)'));
+	$('input,button', $calendars).prop('disabled', !$(this).is(':checked'));
 });
 
 function tabFilterDelete(overlay) {
