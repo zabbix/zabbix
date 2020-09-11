@@ -225,7 +225,8 @@ class CHostPrototype extends CHostBase {
 			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
-			]]
+			]],
+			'custom_interfaces' => ['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), 'default' => HOST_PROT_INTERFACES_INHERIT]
 		]];
 		$api_input_rules['fields'] += $this->getInterfaceRules();
 
@@ -387,23 +388,6 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null) {
-		$host_prototypes = zbx_toArray($host_prototypes);
-
-		$db_host_prototypes = $this->get([
-			'output' => ['hostid', 'host', 'name', 'custom_interfaces', 'status'],
-			'selectDiscoveryRule' => ['itemid'],
-			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
-			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
-			'selectInterfaces' => ['interfaceid'],
-			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
-			['custom_interfaces']
-		);
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
@@ -432,13 +416,25 @@ class CHostPrototype extends CHostBase {
 			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
-			]]
+			]],
+			'custom_interfaces' => ['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM])]
 		]];
 		$api_input_rules['fields'] += $this->getInterfaceRules();
 
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		$db_host_prototypes = $this->get([
+			'output' => ['hostid', 'host', 'name', 'custom_interfaces', 'status'],
+			'selectDiscoveryRule' => ['itemid'],
+			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
+			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
+			'selectInterfaces' => ['interfaceid'],
+			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
 		$hosts_by_ruleid = [];
 		$names_by_ruleid = [];
@@ -529,7 +525,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
-			['host', 'name', 'groupLinks', 'groupPrototypes']
+			['host', 'name', 'custom_interfaces', 'groupLinks', 'groupPrototypes']
 		);
 
 		if ($hosts_by_ruleid) {
@@ -1582,8 +1578,6 @@ class CHostPrototype extends CHostBase {
 	private function validateInterfaces(array $host_prototypes, array $db_host_prototypes = []): void {
 		$interfaces = [];
 
-		//$db_host_prototypes
-
 		foreach ($host_prototypes as $hp_idx => $host_prototype) {
 			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
 				if (array_key_exists('interfaces', $host_prototype) && $host_prototype['interfaces']) {
@@ -1903,8 +1897,7 @@ class CHostPrototype extends CHostBase {
 											]],
 											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
 				]]
-			]],
-			'custom_interfaces' => ['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), 'default' => HOST_PROT_INTERFACES_INHERIT]
+			]]
 		];
 	}
 }
