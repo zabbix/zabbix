@@ -740,10 +740,11 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Request data from API until data is present (@see call).
 	 *
-	 * @param string  $method        API method to be called
-	 * @param mixed   $params        API call params
-	 * @param integer $iterations    iteration count
-	 * @param integer $delay         iteration delay
+	 * @param string   $method        API method to be called
+	 * @param mixed    $params        API call params
+	 * @param integer  $iterations    iteration count
+	 * @param integer  $delay         iteration delay
+	 * @param callable $callback      Callback function to test if API response is valid.
 	 *
 	 * @return array
 	 */
