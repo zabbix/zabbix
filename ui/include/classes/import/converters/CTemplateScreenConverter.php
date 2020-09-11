@@ -55,7 +55,7 @@ class CTemplateScreenConverter {
 	 *
 	 * @return array
 	 */
-	public function convertToTemplateDashboard() {
+	public function convertToTemplateDashboard(): array {
 		$widgets = [];
 
 		$screen_items = $this->screen['screen_items'];
@@ -231,9 +231,7 @@ class CTemplateScreenConverter {
 		$dimensions_y_sum = array_sum($dimensions_y_preferred);
 
 		if ($dimensions_y_sum > DASHBOARD_MAX_ROWS) {
-			$dimensions_y = self::adjustAxisDimensions($dimensions_y_preferred, $dimensions_y_min,
-				DASHBOARD_MAX_ROWS
-			);
+			$dimensions_y = self::adjustAxisDimensions($dimensions_y_preferred, $dimensions_y_min, DASHBOARD_MAX_ROWS);
 		}
 		else {
 			$dimensions_y = $dimensions_y_preferred;
