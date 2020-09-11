@@ -1,5 +1,4 @@
 <?php declare(strict_types = 1);
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -70,9 +69,9 @@ $left_column = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-			->removeId()
+			->setId('name_#{uniqid}')
 	)
-	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
+	->addRow((new CLabel(_('Host groups'), 'groupids_#{uniqid}_ms')),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
@@ -88,28 +87,29 @@ $left_column = (new CFormList())
 				]
 			],
 			'add_post_js' => false
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('groupids_#{uniqid}')
+		]))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->setId('groupids_#{uniqid}')
 	)
 	->addRow(_('IP'),
 		(new CTextBox('ip', $data['ip']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-			->removeId()
+			->setId('ip_#{uniqid}')
 	)
 	->addRow(_('DNS'),
 		(new CTextBox('dns', $data['dns']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-			->removeId()
+			->setId('dns_#{uniqid}')
 	)
 	->addRow(_('Port'),
 		(new CTextBox('port', $data['port']))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
-			->removeId()
+			->setId('port_#{uniqid}')
 	)
 	->addRow(_('Severity'),
 		(new CSeverityCheckBoxList('severities'))
 			->setChecked($data['severities'])
 			->setUniqid('#{uniqid}')
-			->setId('severities_#{uniqid}')
 	);
 
 $right_column = (new CFormList())
@@ -207,7 +207,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.groups_multiselect||[],
+			data: data.groups_multiselect || [],
 			popup: {
 				parameters: {
 					multiselect: '1',

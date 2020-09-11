@@ -32,7 +32,7 @@ $left_column = (new CFormList())
 			->setId('show_#{uniqid}')
 			->setModern(true)
 	)
-	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
+	->addRow((new CLabel(_('Host groups'), 'groupids_#{uniqid}_ms')),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
@@ -47,9 +47,11 @@ $left_column = (new CFormList())
 					'enrich_parent_groups' => true
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('groupids_#{uniqid}')
+		]))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->setId('groupids_#{uniqid}')
 	)
-	->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
+	->addRow((new CLabel(_('Hosts'), 'hostids_#{uniqid}_ms')),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
@@ -65,14 +67,16 @@ $left_column = (new CFormList())
 					'dstfld1' => 'hostids_'
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('hostids_#{uniqid}')
+		]))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->setId('hostids_#{uniqid}')
 	)
 	->addRow(_('Application'), [
 		(new CTextBox('application', $data['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 	])
-	->addRow((new CLabel(_('Triggers'), 'triggerids__ms')),
+	->addRow((new CLabel(_('Triggers'), 'triggerids_#{uniqid}_ms')),
 		(new CMultiSelect([
 			'name' => 'triggerids[]',
 			'object_name' => 'triggers',
@@ -91,15 +95,19 @@ $left_column = (new CFormList())
 					'noempty' => true
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('triggerids_#{uniqid}')
+		]))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->setId('triggerids_#{uniqid}')
 	)
 	->addRow(_('Problem'),
-		(new CTextBox('name', $data['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		(new CTextBox('name', $data['name']))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->setId('name_#{uniqid}')
 	)
 	->addRow(_('Severity'),
 		(new CSeverityCheckBoxList('severities'))
-			->setUniqid('#{uniqid}')
 			->setChecked($data['severities'])
+			->setUniqid('#{uniqid}')
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))
@@ -243,7 +251,7 @@ $right_column = (new CFormList())
 			->setUncheckedValue(0)
 			->setId('compact_view_#{uniqid}'),
 		(new CDiv([
-			(new CLabel(_('Show timeline'), 'show_timeline'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+			(new CLabel(_('Show timeline'), 'show_timeline_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('show_timeline'))
 				->setChecked($data['show_timeline'] == 1)
 				->setEnabled($data['compact_view'] == 0)
@@ -353,8 +361,8 @@ if (array_key_exists('render_html', $data)) {
 			eventHandler = {
 				show: () => {
 					// Dynamically disable hidden input elements to allow correct detection of unsaved changes.
-					var	filter_show = $('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>,
-						disabled = !filter_show || !$('[name="age_state"]:checked', container).length;
+					var	filter_show = ($('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>),
+						disabled = (!filter_show || !$('[name="age_state"]:checked', container).length);
 
 					$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
 					$('[name="age_state"]', container).attr('disabled', !filter_show);
@@ -369,7 +377,9 @@ if (array_key_exists('render_html', $data)) {
 				compact_view: () => {
 					let checked = $('[name="compact_view"]', container).is(':checked');
 
-					$('[name="show_timeline"],[name="details"],[name="show_opdata"]', container).prop('disabled', checked);
+					$('[name="show_timeline"]', container).prop('disabled', checked);
+					$('[name="details"]', container).prop('disabled', checked);
+					$('[name="show_opdata"]', container).prop('disabled', checked);
 					$('[name="highlight_row"]', container).prop('disabled', !checked);
 				},
 				show_tags: () => {
@@ -417,7 +427,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.groups||[],
+			data: data.groups || [],
 			popup: {
 				parameters: {
 					srctbl: 'host_groups',
@@ -470,7 +480,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'triggerids_' + data.uniqid,
 			object_name: 'triggers',
 			name: 'triggerids[]',
-			data: data.triggers||[],
+			data: data.triggers || [],
 			popup: {
 				filter_preselect_fields: {
 					hosts: 'hostids_' + data.uniqid
@@ -522,13 +532,13 @@ if (array_key_exists('render_html', $data)) {
 	}
 
 	// Tab filter item events handlers.
-	template.addEventListener(TABFILTERITEM_EVENT_RENDER, function (ev) {
+	template.addEventListener(TABFILTERITEM_EVENT_RENDER, function(ev) {
 		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
-	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
+	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function(ev) {
 		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
-	template.addEventListener(TABFILTERITEM_EVENT_SELECT, function (ev) {
+	template.addEventListener(TABFILTERITEM_EVENT_SELECT, function(ev) {
 		select.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 </script>
