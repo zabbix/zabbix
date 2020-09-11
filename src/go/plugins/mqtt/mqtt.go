@@ -143,7 +143,7 @@ func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
 
 func (ms *mqttSub) handler(client mqtt.Client, msg mqtt.Message) {
 	impl.manager.Lock()
-	impl.Tracef("received publish from [%s] on topic '%s' got: %s", ms.broker, msg.Topic(), string(msg.Payload()))
+	impl.Tracef("received publish from [%s] on topic '%s' got: %s", ms.broker.url, msg.Topic(), string(msg.Payload()))
 	impl.manager.Notify(ms, msg)
 	impl.manager.Unlock()
 }
