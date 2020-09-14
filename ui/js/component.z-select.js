@@ -305,32 +305,38 @@ class ZSelect extends HTMLElement {
 	}
 
 	_highlight(index) {
-		const {_node: old_node} = this.getOptionByIndex(this._staged_index);
-		const {_node: new_node, disabled} = this.getOptionByIndex(index);
+		if (this._options_map.size) {
+			const {_node: old_node} = this.getOptionByIndex(this._staged_index);
+			const {_node: new_node, disabled} = this.getOptionByIndex(index);
 
-		if (!disabled) {
-			old_node.classList.remove('hover');
-			new_node.classList.add('hover');
+			if (!disabled) {
+				old_node.classList.remove('hover');
+				new_node.classList.add('hover');
 
-			this._expanded && new_node.scrollIntoView({block: 'nearest'});
-			this._staged_index = index;
+				this._expanded && new_node.scrollIntoView({block: 'nearest'});
+				this._staged_index = index;
+			}
 		}
 	}
 
 	_preSelect() {
-		const {label} = this.getOptionByIndex(this._staged_index);
+		if (this._options_map.size) {
+			const {label} = this.getOptionByIndex(this._staged_index);
 
-		this._button.innerText = label;
-		this._preselected_index = this._staged_index;
+			this._button.innerText = label;
+			this._preselected_index = this._staged_index;
+		}
 	}
 
 	_change() {
-		const {value} = this.getOptionByIndex(this._preselected_index);
+		if (this._options_map.size) {
+			const {value} = this.getOptionByIndex(this._preselected_index);
 
-		if (this._input.value != value) {
-			this.setAttribute('value', value);
-			this._input.setAttribute('value', value);
-			this.dispatchEvent(new Event('change'));
+			if (this._input.value != value) {
+				this.setAttribute('value', value);
+				this._input.setAttribute('value', value);
+				this.dispatchEvent(new Event('change'));
+			}
 		}
 	}
 
