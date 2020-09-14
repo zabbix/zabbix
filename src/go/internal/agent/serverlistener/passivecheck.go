@@ -41,9 +41,9 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 	return
 }
 
-func (pc *passiveCheck) handleCheck(data []byte) {
+func (pc *passiveCheck) handleCheck(data []byte, timeout time.Duration) {
 	// direct passive check timeout is handled by the scheduler
-	s, err := pc.scheduler.PerformTask(string(data), time.Minute, agent.PassiveChecksClientID)
+	s, err := pc.scheduler.PerformTask(string(data), timeout, agent.PassiveChecksClientID)
 
 	if err != nil {
 		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())

@@ -27,6 +27,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	_ "zabbix.com/plugins"
 
@@ -131,7 +132,8 @@ func run() (err error) {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	var control *remotecontrol.Conn
-	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
+	if control, err = remotecontrol.New(agent.Options.ControlSocket, time.Duration(agent.Options.Timeout) * time.Second);
+			err != nil {
 		return
 	}
 	control.Start()
@@ -305,7 +307,8 @@ func main() {
 			os.Exit(0)
 		}
 
-		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand); err != nil {
+		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
+				time.Duration(agent.Options.Timeout) * time.Second); err != nil {
 			log.Errf("Cannot send remote command: %s", err)
 		} else {
 			log.Infof(reply)
@@ -454,7 +457,7 @@ func main() {
 
 	// split shutdown in two steps to ensure that result cache is still running while manager is
 	// being stopped, because there might be pending exporters that could block if result cache
-	// is stoppped and its input channel is full.
+	// is stopped and its input channel is full.
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopCache()
 	}

@@ -20,9 +20,6 @@
 package serverlistener
 
 import (
-	"time"
-
-	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/zbxcomms"
 )
 
@@ -31,7 +28,7 @@ type passiveConnection struct {
 }
 
 func (pc *passiveConnection) Write(data []byte) (n int, err error) {
-	if err = pc.conn.Write(data, time.Second*time.Duration(agent.Options.Timeout)); err != nil {
+	if err = pc.conn.Write(data); err != nil {
 		n = len(data)
 	}
 	pc.conn.Close()

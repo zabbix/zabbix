@@ -124,6 +124,10 @@ func (p *Plugin) validateSsh(buf []byte, conn net.Conn) int {
 		sendBuf = fmt.Sprintf("0\n")
 	}
 
+	if err := conn.SetWriteDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
+		log.Debugf("SSH set deadline check error: %s\n", err.Error())
+	}
+
 	if _, err := conn.Write([]byte(sendBuf)); err != nil {
 		log.Debugf("SSH check error: %s\n", err.Error())
 	}
@@ -319,7 +323,7 @@ func (p *Plugin) httpsExpect(ip string, port string) int {
 
 	// does NOT return an error on >=400 status codes same as C agent
 	_, err = web.Get(fmt.Sprintf("%s://%s:%s%s", u.Scheme, u.Hostname(), port, u.Path),
-		time.Second*p.options.Timeout, false)
+		time.Second * p.options.Timeout, false)
 	if err != nil {
 		log.Debugf("https network error: cannot connect to [%s]: %s", u, err.Error())
 		return 0
@@ -353,7 +357,7 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
 
-	if conn, err = net.DialTimeout("tcp", address, time.Second*p.options.Timeout); err != nil {
+	if conn, err = net.DialTimeout("tcp", address, time.Second * p.options.Timeout); err != nil {
 		log.Debugf("TCP expect network error: cannot connect to [%s]: %s", address, err.Error())
 		return
 	}
@@ -361,10 +365,6 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 
 	if service == "http" || service == "tcp" {
 		return 1
-	}
-
-	if err = conn.SetReadDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
-		return
 	}
 
 	if service == "ldap" {
@@ -388,6 +388,11 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var checkResult int
 	buf := make([]byte, 2048)
 	for {
+
+		if err = conn.SetReadDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
+			return
+		}
+
 		if _, err = conn.Read(buf); err == nil {
 			switch service {
 			case "ssh":
@@ -420,6 +425,11 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 
 	if checkResult == tcpExpectOk {
 		if sendToClose != "" {
+
+			if err = conn.SetWriteDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
+				return
+			}
+
 			conn.Write([]byte(sendToClose))
 		}
 		result = 1

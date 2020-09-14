@@ -983,10 +983,15 @@ func (c *tlsConn) ready() bool {
 	return C.tls_ready((*C.tls_t)(c.tls)) == 1
 }
 
-// Note, don't use flushTLS() and recvTLS() concurrently
-func (c *tlsConn) flushTLS() (err error) {
+// Note, don't use WriteTLS() and ReadTLS() concurrently
+func (c *tlsConn) WriteTLS() (err error) {
 	for {
 		if cn := C.tls_recv((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
+
+			if err = c.conn.SetWriteDeadline(time.Now().Add(c.timeout)); err != nil {
+				return
+			}
+
 			if _, err = c.conn.Write(c.buf[:cn]); err != nil {
 				return
 			}
@@ -996,11 +1001,10 @@ func (c *tlsConn) flushTLS() (err error) {
 	}
 }
 
-// Note, don't use flushTLS() and recvTLS() concurrently
-func (c *tlsConn) recvTLS() (err error) {
-
+// Note, don't use WriteTLS() and ReadTLS() concurrently
+func (c *tlsConn) ReadTLS() (err error) {
 	var n int
-	if err = c.conn.SetDeadline(time.Now().Add(c.timeout)); err != nil {
+	if err = c.conn.SetReadDeadline(time.Now().Add(c.timeout)); err != nil {
 		return
 	}
 	if n, err = c.conn.Read(c.buf); err != nil {
@@ -1082,14 +1086,14 @@ func (c *Client) checkConnection() (err error) {
 		if cRet < 0 {
 			return c.Error()
 		}
-		if err = c.flushTLS(); err != nil {
+		if err = c.WriteTLS(); err != nil {
 			return
 		}
-		if err = c.recvTLS(); err != nil {
+		if err = c.ReadTLS(); err != nil {
 			return
 		}
 	}
-	err = c.flushTLS()
+	err = c.WriteTLS()
 	return
 }
 
@@ -1101,7 +1105,7 @@ func (c *Client) Write(b []byte) (n int, err error) {
 	if cRet <= 0 {
 		return 0, c.Error()
 	}
-	if err = c.flushTLS(); err != nil {
+	if err = c.WriteTLS(); err != nil {
 		return
 	}
 	return len(b), nil
@@ -1119,25 +1123,17 @@ func (c *Client) Read(b []byte) (n int, err error) {
 		if cRet < 0 {
 			return 0, c.Error()
 		}
-		if err = c.recvTLS(); err != nil {
+		if err = c.ReadTLS(); err != nil {
 			return
 		}
 	}
 }
 
-// NewClient(connection, tlsConfig, timeoutDuration)
-func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
-	if len(args) == 0 || args[0] == nil {
-		return nc, nil
-	}
+func NewClient(nc net.Conn, cfg *Config, timeout time.Duration) (conn net.Conn, err error) {
 	if !supported {
 		return nil, errors.New(SupportedErrMsg())
 	}
-	var cfg *Config
-	var ok bool
-	if cfg, ok = args[0].(*Config); !ok {
-		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
-	}
+
 	if cfg.Connect == ConnUnencrypted {
 		return nc, nil
 	}
@@ -1153,15 +1149,6 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 			C.free(unsafe.Pointer(cSecret))
 		}()
 		context = pskContext
-	}
-
-	var timeout time.Duration
-	if len(args) > 1 {
-		if timeout, ok = args[1].(time.Duration); !ok {
-			return nil, fmt.Errorf("invalid timeout parameter of type %T", args)
-		}
-	} else {
-		timeout = 3 * time.Second
 	}
 
 	c := &Client{
@@ -1208,14 +1195,14 @@ func (s *Server) checkConnection() (err error) {
 		if cRet < 0 {
 			return s.Error()
 		}
-		if err = s.flushTLS(); err != nil {
+		if err = s.WriteTLS(); err != nil {
 			return
 		}
-		if err = s.recvTLS(); err != nil {
+		if err = s.ReadTLS(); err != nil {
 			return
 		}
 	}
-	err = s.flushTLS()
+	err = s.WriteTLS()
 	return
 }
 
@@ -1227,7 +1214,7 @@ func (s *Server) Write(b []byte) (n int, err error) {
 	if cRet <= 0 {
 		return 0, s.Error()
 	}
-	return len(b), s.flushTLS()
+	return len(b), s.WriteTLS()
 }
 
 func (s *Server) Read(b []byte) (n int, err error) {
@@ -1242,24 +1229,15 @@ func (s *Server) Read(b []byte) (n int, err error) {
 		if cRet < 0 {
 			return 0, s.Error()
 		}
-		if err = s.recvTLS(); err != nil {
+		if err = s.ReadTLS(); err != nil {
 			return
 		}
 	}
 }
 
-// NewServer(connection, tlsConfig, pendingbufer, timeoutSeconds)
-func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
-	if len(args) == 0 || args[0] == nil {
-		return nc, nil
-	}
+func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration) (conn net.Conn, err error) {
 	if !supported {
 		return nil, errors.New(SupportedErrMsg())
-	}
-	var cfg *Config
-	var ok bool
-	if cfg, ok = args[0].(*Config); !ok {
-		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
 	}
 
 	var cUser, cSecret *C.char
@@ -1278,15 +1256,6 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		context = defaultContext
 	}
 
-	var timeout time.Duration
-	if len(args) > 2 {
-		if timeout, ok = args[2].(time.Duration); !ok {
-			return nil, fmt.Errorf("invalid timeout parameter of type %T", args)
-		}
-	} else {
-		timeout = 3 * time.Second
-	}
-
 	s := &Server{
 		tlsConn: tlsConn{
 			conn:    nc,
@@ -1301,13 +1270,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nil, s.Error()
 	}
 
-	if len(args) > 1 {
-		if b, ok := args[1].([]byte); !ok {
-			return nil, fmt.Errorf("invalid pending buffer parameter of type %T", args)
-		} else {
-			C.tls_send((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
-		}
-	}
+	C.tls_send((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 
 	if err = s.checkConnection(); err != nil {
 		s.conn.Close()
