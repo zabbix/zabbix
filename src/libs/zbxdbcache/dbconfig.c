@@ -3741,7 +3741,8 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
 			continue;
 
-		timer = dc_trigger_timer_create(function);
+		if (NULL == (timer = dc_trigger_timer_create(function)))
+			continue;
 
 		if (NULL != trend_queue && NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue,
 				&timer->objectid)))
