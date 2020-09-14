@@ -53,7 +53,7 @@ class CTabFilter extends CBaseComponent {
 		};
 
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
-			item = this.create(title, options.data[index]||{});
+			item = this.create(title, options.data[index] || {});
 
 			if (options.selected === index) {
 				if (!item._expanded) {
@@ -447,7 +447,7 @@ class CTabFilter extends CBaseComponent {
 			buttonSaveAsAction: (ev) => {
 				let data = this._active_item._data;
 
-				this._active_item.openPropertiesForm(ev.target, {
+				this._active_item.openPropertiesDialog({
 					create: 1,
 					idx: this._active_item._idx_namespace,
 					idx2: this._items.length,
@@ -457,7 +457,7 @@ class CTabFilter extends CBaseComponent {
 					tabfilter_from: data.from,
 					tabfilter_to: data.to,
 					support_custom_time: +this._options.support_custom_time
-				});
+				}, ev.target);
 			},
 
 			/**

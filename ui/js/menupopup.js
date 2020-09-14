@@ -1573,7 +1573,7 @@ jQuery(function($) {
 		}
 
 		if ('dataAttributes' in options) {
-			$.each(options.dataAttributes, function (key, value) {
+			$.each(options.dataAttributes, function(key, value) {
 				link.attr((key.substr(0, 5) === 'data-') ? key : 'data-' + key, value);
 			});
 		}

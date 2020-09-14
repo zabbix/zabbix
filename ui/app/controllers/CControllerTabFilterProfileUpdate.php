@@ -19,6 +19,13 @@
 **/
 
 
+/**
+ * Controller to update tab filter. Handles following events:
+ * - select tab;
+ * - expand/collapse active tab;
+ * - update filter properties;
+ * - save tab order.
+ */
 class CControllerTabFilterProfileUpdate extends CController {
 
 	public static $namespaces = [
@@ -53,10 +60,10 @@ class CControllerTabFilterProfileUpdate extends CController {
 			$ret = (in_array($property, $supported) && array_key_exists($idx, static::$namespaces));
 
 			if ($property === 'selected' || $property === 'expanded') {
-				$ret = $ret && $this->hasInput('value_int');
+				$ret = ($ret && $this->hasInput('value_int'));
 			}
 			else if ($property === 'properties' || $property === 'taborder') {
-				$ret = $ret && $this->hasInput('value_str');
+				$ret = ($ret && $this->hasInput('value_str'));
 			}
 		}
 

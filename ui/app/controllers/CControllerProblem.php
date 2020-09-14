@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Base controller for the "Monitoring->Problems" page.
+ */
 abstract class CControllerProblem extends CController {
 
 	// Filter idx prefix.

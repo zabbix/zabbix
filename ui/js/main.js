@@ -766,7 +766,7 @@ function getConditionFormula(conditions, evalType) {
 				disableRow($(this).closest(options.row));
 			});
 
-			if ('forEach' in options.rows) {
+			if (typeof options.rows === 'object') {
 				var before_row = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');

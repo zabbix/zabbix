@@ -27,6 +27,12 @@ const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
 const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter';
 const TABFILTERITEM_EVENT_DELETE = 'delete.tabfilter';
 
+const TABFILTERITEM_STYLE_UNSAVED = 'unsaved';
+const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit';
+const TABFILTERITEM_STYLE_SELECTED = 'selected';
+const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
+const TABFILTERITEM_STYLE_DISABLED = 'disabled';
+
 class CTabFilterItem extends CBaseComponent {
 
 	constructor(target, options) {
@@ -92,42 +98,43 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
-	 * Open tab filter configuration poup.
+	 * Open tab filter configuration popup.
 	 *
-	 * @param {HTMLElement} edit_elm  HTML element to broadcast popup update or delete event.
 	 * @param {object}      params    Object of params to be passed to ajax call when opening popup.
+	 * @param {HTMLElement} edit_elm  HTML element to broadcast popup update or delete event.
 	 */
-	openPropertiesForm(edit_elm, params) {
+	openPropertiesDialog(params, edit_elm) {
 		return PopUp('popup.tabfilter.edit', params, 'tabfilter_dialogue', edit_elm);
 	}
 
 	/**
-	 * Add gear icon and it events to tab filter this._target element.
+	 * Add gear icon and bind click event.
 	 */
 	addActionIcons() {
-		let edit = document.createElement('a');
-
-		if (!this._target.parentNode.querySelector('.icon-edit')) {
-			edit.classList.add('icon-edit');
-			edit.addEventListener('click', (ev) => this.openPropertiesForm(ev.target, {
-				idx: this._idx_namespace,
-				idx2: this._index,
-				filter_name: this._data.filter_name,
-				filter_show_counter: this._data.filter_show_counter,
-				filter_custom_time: this._data.filter_custom_time,
-				tabfilter_from: this._data.from||'',
-				tabfilter_to: this._data.to||'',
-				support_custom_time: +this._support_custom_time
-			}));
-			this._target.parentNode.appendChild(edit);
+		if (this._target.parentNode.querySelector('.' + TABFILTERITEM_STYLE_EDIT_BTN)) {
+			return;
 		}
+
+		let edit = document.createElement('a');
+		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN);
+		edit.addEventListener('click', (ev) => this.openPropertiesDialog({
+			idx: this._idx_namespace,
+			idx2: this._index,
+			filter_name: this._data.filter_name,
+			filter_show_counter: this._data.filter_show_counter,
+			filter_custom_time: this._data.filter_custom_time,
+			tabfilter_from: this._data.from || '',
+			tabfilter_to: this._data.to || '',
+			support_custom_time: +this._support_custom_time
+		}, ev.target));
+		this._target.parentNode.appendChild(edit);
 	}
 
 	/**
 	 * Remove gear icon HTMLElement.
 	 */
 	removeActionIcons() {
-		let icon = this._target.parentNode.querySelector('.icon-edit');
+		let icon = this._target.parentNode.querySelector('.' + TABFILTERITEM_STYLE_EDIT_BTN);
 
 		if (icon) {
 			icon.remove();
@@ -139,7 +146,7 @@ class CTabFilterItem extends CBaseComponent {
 	 */
 	setSelected() {
 		this._target.focus();
-		this._target.parentNode.classList.add('selected');
+		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_SELECTED);
 
 		if (this._data.filter_configurable) {
 			this.addActionIcons();
@@ -154,7 +161,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * Remove selected state of item.
 	 */
 	removeSelected() {
-		this._target.parentNode.classList.remove('selected');
+		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_SELECTED);
 
 		if (this._data.filter_configurable) {
 			this.removeActionIcons();
@@ -169,7 +176,7 @@ class CTabFilterItem extends CBaseComponent {
 		let item_template = this._template||this._content_container.querySelector('[data-template]');
 
 		this._expanded = true;
-		this._target.parentNode.classList.add('expanded');
+		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_EXPANDED);
 
 		if (!this._template_rendered) {
 			this.renderContentTemplate();
@@ -189,7 +196,7 @@ class CTabFilterItem extends CBaseComponent {
 		let item_template = (this._template||this._content_container.querySelector('[data-template]'));
 
 		this._expanded = false;
-		this._target.parentNode.classList.remove('expanded');
+		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_EXPANDED);
 		this._content_container.classList.add('display-none');
 
 		if (item_template instanceof HTMLElement) {
@@ -211,12 +218,12 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {boolean} state  Selectable when true.
 	 */
 	setDisabled(state) {
-		this.toggleClass('disabled', state);
-		this._target.parentNode.classList.toggle('disabled', state);
+		this.toggleClass(TABFILTERITEM_STYLE_DISABLED, state);
+		this._target.parentNode.classList.toggle(TABFILTERITEM_STYLE_DISABLED, state);
 	}
 
 	/**
-	 * Check does item have custom time interval.
+	 * Check if item have custom time interval.
 	 *
 	 * @return {boolean}
 	 */
@@ -337,7 +344,7 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 		search_params.sort();
 		this._unsaved = (src_query.toString() !== search_params.toString());
-		this._target.parentNode.classList.toggle('unsaved', this._unsaved);
+		this._target.parentNode.classList.toggle(TABFILTERITEM_STYLE_UNSAVED, this._unsaved);
 	}
 
 	/**
@@ -361,13 +368,13 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 
 		this._src_url = src_query.toString();
-		this._target.parentNode.classList.remove('unsaved');
+		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_UNSAVED);
 	}
 
 	registerEvents() {
 		this._events = {
 			click: () => {
-				if (this.hasClass('disabled')) {
+				if (this.hasClass(TABFILTERITEM_STYLE_DISABLED)) {
 					return;
 				}
 

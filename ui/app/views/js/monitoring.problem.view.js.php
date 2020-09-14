@@ -22,6 +22,7 @@
 /**
  * @var CView $this
  */
+
 ?>
 <script type="text/javascript">
 	jQuery(function($) {
@@ -36,7 +37,9 @@
 
 		filter.on(TABFILTER_EVENT_URLSET, (ev) => {
 			let url = new Curl(),
-				data = $.extend(<?= json_encode($data['filter_defaults'])?>, global_timerange, url.getArgumentsObject());
+				data = $.extend(<?= json_encode($data['filter_defaults']) ?>,
+					global_timerange, url.getArgumentsObject()
+				);
 
 			data.inventory = data.inventory
 				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class to embed script HTML template.
+ */
 class CScriptTemplate extends CTag {
 
 	/**
@@ -43,7 +46,7 @@ class CScriptTemplate extends CTag {
 		return $this;
 	}
 
-	protected function bodyToString() {
+	protected function bodyToString(): string {
 		return implode("\n", $this->items);
 	}
 }

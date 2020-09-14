@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class to manage tab filters.
+ */
 class CTabFilter extends CDiv {
 
 	const ZBX_STYLE_CLASS = 'tabfilter-container';
@@ -26,6 +29,7 @@ class CTabFilter extends CDiv {
 	const CSS_TAB_EXPANDED = 'expanded';
 	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
+	const CSS_TABFILTER_ICON_HOME = 'icon-home';
 
 	/**
 	 * Array of arrays for tabs data. Single element contains: tab label object, tab content object or null and tab data
@@ -79,22 +83,13 @@ class CTabFilter extends CDiv {
 			->addClass(static::ZBX_STYLE_CLASS);
 
 		$this->buttons = (new CDiv())
+			->addItem([
+				new CSubmitButton(_('Update'), 'filter_update', 1),
+				(new CSubmitButton(_('Save as'), 'filter_new', 1))->addClass(ZBX_STYLE_BTN_ALT),
+				(new CSubmitButton(_('Apply'), 'filter_apply', 1))->addClass(ZBX_STYLE_BTN_ALT),
+				(new CSubmitButton(_('Reset'), 'filter_reset', 1))->addClass(ZBX_STYLE_BTN_ALT)
+			])
 			->addClass(ZBX_STYLE_FILTER_FORMS)
-			->addItem(
-				(new CSubmitButton(_('Save as'), 'filter_new', 1))
-					->addClass(ZBX_STYLE_BTN_ALT)
-			)
-			->addItem(
-				(new CSubmitButton(_('Update'), 'filter_update', 1))
-			)
-			->addItem(
-				(new CSubmitButton(_('Apply'), 'filter_apply', 1))
-					->addClass(ZBX_STYLE_BTN_ALT)
-			)
-			->addItem(
-				(new CSubmitButton(_('Reset'), 'filter_reset', 1))
-					->addClass(ZBX_STYLE_BTN_ALT)
-			)
 			->addClass('form-buttons');
 	}
 
@@ -110,7 +105,7 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Set selected tab uses zero based index for selected tab.
+	 * Set zero based index of selected tab.
 	 *
 	 * @param int $value  Index of selected tab.
 	 */
@@ -132,10 +127,9 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Set status of custom time range support, when disabled will not allow to set customt time range for all
-	 * tab filter tabs.
+	 * Set status of custom time range support.
 	 *
-	 * @param bool $value  Supported when true.
+	 * @param bool $value  Either to enable custom time usage in filter tabs.
 	 */
 	public function setSupportCustomTime(bool $value) {
 		$this->options['support_custom_time'] = $value;
@@ -166,16 +160,16 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Add tab item, is tab dynamic or no is decided by $content.
+	 * Add single tab filter.
 	 *
-	 * @param CTag|string $label    String or CTag as tab label element. Content node if it is not null will have
-	 *                              id attribute equal [data-target] attribute of $label.
-	 * @param CTag|null   $content  Tab content node or null is dynamic tab is added.
-	 * @param array       $data     Array of data used by tab and additional flags:
-	 *                              bool 'filter_sortable'      tab will be sortable in frontend.
-	 *                              bool 'filter_configurable'  tab will have gear icon when activated.
+	 * @param CTag|string $label                          String or CTag as tab label element.
+	 * @param CTag|null   $content                        Tab content node or null if tab is dynamic.
+	 * @param array       $data
+	 * @param bool        $data['filter_sortable']        Make tab sortable.
+	 * @param bool        $data['filter_configurable']    Make tab configurable.
+	 * @param mixed       $data[<any>]                    Tab filter fields.
 	 */
-	public function addTab($label, $content, array $data = []) {
+	public function addTab($label, ?CTag $content, array $data = []) {
 		$tab_index = count($this->labels);
 		$targetid = static::CSS_ID_PREFIX.$tab_index;
 
@@ -185,7 +179,7 @@ class CTabFilter extends CDiv {
 
 		if (!is_a($label, CTag::class)) {
 			if ($tab_index == 0) {
-				$label = (new CLink(''))->addClass('icon-home');
+				$label = (new CLink(''))->addClass(self::CSS_TABFILTER_ICON_HOME);
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false
@@ -213,9 +207,13 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Add time range selector tab. Time range selcetor have static [data-target] equal 'tabfilter_timeselector'.
+	 * Add time range selector tab.
 	 *
-	 * @param array  $timerange    Time range data array, array keys: from, to, idx, idx2
+	 * @param array   $timerange
+	 * @param string  $timerange['from']  Time range start time.
+	 * @param string  $timerange['to']    Time range end time.
+	 * @param string  $timerange['idx']
+	 * @param int     $timerange['idx2']
 	 */
 	public function addTimeselector(array $timerange) {
 		$timerange += [
@@ -246,21 +244,20 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Add tab for render on browser side using passed $data. Selected and expanded tab will be pre-rendered on server
-	 * side to prevent screen flickering during page initial load.
+	 * Add tab for render on browser side using passed $data.
+	 * Selected and expanded tab will be pre-rendered server side to prevent screen flickering during page initial load.
 	 *
 	 * @param string|CTag $label            Tab label.
-	 * @param string      $target_selector  CSS selector for tab content node to be shown/hidden.
 	 * @param array       $data             Tab data associative array.
 	 *
 	 * @return CTabFilter
 	 */
-	public function addTemplatedTab($label, array $data): CTabFilter {
+	public function addTemplatedTab($label, array $data) {
 		return $this->addTab($label, null, $data + ['uniqid' => uniqid()]);
 	}
 
 	/**
-	 * Return top navigation markup.
+	 * Generate tabs navigation layout.
 	 */
 	protected function getNavigation() {
 		$sortable = [];
@@ -278,6 +275,7 @@ class CTabFilter extends CDiv {
 		// Last static tab is timeselector.
 		$timeselector = end($static);
 		$index = key($static);
+
 		// First dynamic tab is 'Home' tab and cannot be sorted.
 		array_unshift($sortable, array_shift($static));
 
@@ -289,32 +287,32 @@ class CTabFilter extends CDiv {
 			$timeselector = null;
 		}
 
-		$nav_list = (new CList([
+		$nav_list = new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
 				->addClass('btn-widget-expand'),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass('btn-iterator-page-next')
-		]));
+		]);
 
 		if ($timeselector) {
 			$timeselector_data = end($this->options['data']);
 			$tab = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
 			$enabled = !$tab['filter_custom_time'] && !$timeselector_data['disabled'];
 			$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
-			array_map([$nav_list, 'addItem'], [
-				$timeselector,
-				(new CSimpleButton())
+
+			$nav_list
+				->addItem($timeselector)
+				->addItem((new CSimpleButton())
 					->setEnabled($enabled)
-					->addClass(ZBX_STYLE_BTN_TIME_LEFT),
-				(new CSimpleButton(_('Zoom out')))
+					->addClass(ZBX_STYLE_BTN_TIME_LEFT))
+				->addItem((new CSimpleButton(_('Zoom out')))
 					->setEnabled($enabled)
-					->addClass(ZBX_STYLE_BTN_TIME_OUT),
-				(new CSimpleButton())
+					->addClass(ZBX_STYLE_BTN_TIME_OUT))
+				->addItem((new CSimpleButton())
 					->setEnabled($enabled)
-					->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
-			]);
+					->addClass(ZBX_STYLE_BTN_TIME_RIGHT));
 		}
 
 		$nav = [
@@ -333,14 +331,12 @@ class CTabFilter extends CDiv {
 		$selected = $this->options['selected'];
 		$this->labels[$selected]->addClass(static::CSS_TAB_SELECTED);
 
-		if ($this->options['expanded']) {
-			if ($this->contents[$selected] === null) {
-				$tab_data = $this->options['data'][$selected];
-				$tab_data['render_html'] = true;
-				$this->labels[$selected]->addClass(static::CSS_TAB_EXPANDED);
-				$this->contents[$selected] = (new CDiv([new CPartial($tab_data['tab_view'], $tab_data)]))
-					->setId($this->labels[$selected]->getAttribute('data-target'));
-			}
+		if ($this->options['expanded'] && $this->contents[$selected] === null) {
+			$tab_data = $this->options['data'][$selected];
+			$tab_data['render_html'] = true;
+			$this->labels[$selected]->addClass(static::CSS_TAB_EXPANDED);
+			$this->contents[$selected] = (new CDiv([new CPartial($tab_data['tab_view'], $tab_data)]))
+				->setId($this->labels[$selected]->getAttribute('data-target'));
 		}
 
 		foreach ($this->contents as $index => $content) {
