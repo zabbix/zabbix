@@ -30,7 +30,7 @@
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"
-#include "mbustype.h"
+#include "modbtype.h"
 
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"

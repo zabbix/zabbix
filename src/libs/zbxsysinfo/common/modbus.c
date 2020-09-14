@@ -18,11 +18,12 @@
 **/
 
 #include "common.h"
-#include "mbustype.h"
+#include "modbtype.h"
 #include "mutexs.h"
 #include "comms.h"
 
 #ifdef HAVE_LIBMODBUS
+#include "modbus.h"
 
 zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 

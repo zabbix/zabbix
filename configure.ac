@@ -1742,7 +1742,7 @@ if test "x$agent" = "xyes"; then
 	CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
 	LIBS="$LIBS $LIBMODBUS_LIBS"
 fi
-
+AM_CONDITIONAL(HAVE_LIBMODBUS, [test "x$have_libmodbus" = "xyes"])
 
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
