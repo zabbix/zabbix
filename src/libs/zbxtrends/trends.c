@@ -115,7 +115,8 @@ out:
  *                                                                            *
  * Purpose: parse trend function period arguments into time range             *
  *                                                                            *
- * Parameters: period       - [IN] the history period                         *
+ * Parameters: from         - [IN] the period parsing time                    *
+ *             period       - [IN] the history period                         *
  *             period_shift - [IN] the history period shift                   *
  *             start        - [OUT] the period start time in seconds since    *
  *                                  Epoch                                     *
@@ -130,12 +131,15 @@ out:
  *           day+ used as period base (now/?).                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trends_parse_range(const char *period, const char *period_shift, int *start, int *end, char **error)
+int	zbx_trends_parse_range(int from, const char *period, const char *period_shift, int *start, int *end,
+		char **error)
 {
 	const char	*ptr;
 	int		period_num;
 	zbx_time_unit_t	period_unit, base;
 	size_t		len;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:%s shift:%s", __func__, period, period_shift);
 
 	/* parse period */
 
@@ -153,9 +157,10 @@ int	zbx_trends_parse_range(const char *period, const char *period_shift, int *st
 	if (FAIL == trends_parse_base(period_shift, &base, error))
 		return FAIL;
 
-	ZBX_UNUSED(start);
-	ZBX_UNUSED(end);
+	/* hardcode to previous hour */
+	*start = *end = from / 3600 * 3600;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:%d end:%d", __func__, *start, *end);
 
 	return SUCCEED;
 }

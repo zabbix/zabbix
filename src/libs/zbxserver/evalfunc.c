@@ -24,6 +24,7 @@
 #include "valuecache.h"
 #include "evalfunc.h"
 #include "zbxregexp.h"
+#include "zbxtrends.h"
 
 typedef enum
 {
@@ -2692,6 +2693,107 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_TREND                                                   *
+ *                                                                            *
+ * Purpose: evaluate trend* functions for the item                            *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function result                         *
+ *             item       - [IN] item (performance metric)                    *
+ *             func       - [IN] the trend function to evaluate               *
+ *                               (avg, sum, count, delta, max, min)           *
+ *             parameters - [IN] function parameters                          *
+ *             ts         - [IN] the historical time when function must be    *
+ *                               evaluated                                    *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_TREND(char **value, DC_ITEM *item, const char *func, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int		ret = FAIL, start, end;
+	char		*period = NULL, *period_shift = NULL;
+	const char	*table;
+	double		value_dbl;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
+	{
+		*error = zbx_strdup(*error, "invalid first parameter");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &period_shift))
+	{
+		*error = zbx_strdup(*error, "invalid first parameter");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_trends_parse_range(ts->sec, period, period_shift, &start, &end, error))
+		goto out;
+
+	switch (item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			table = "trends";
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			table = "trends_uint";
+			break;
+		default:
+			*error = zbx_strdup(*error, "unsupported value type");
+			goto out;
+	}
+
+	if (0 == strcmp(func, "avg"))
+	{
+		ret = zbx_trends_eval_avg(table, item->itemid, start, end, &value_dbl);
+	}
+	else if (0 == strcmp(func, "count"))
+	{
+		ret = zbx_trends_eval_count(table, item->itemid, start, end, &value_dbl);
+	}
+	else if (0 == strcmp(func, "delta"))
+	{
+		ret = zbx_trends_eval_delta(table, item->itemid, start, end, &value_dbl);
+	}
+	else if (0 == strcmp(func, "max"))
+	{
+		ret = zbx_trends_eval_max(table, item->itemid, start, end, &value_dbl);
+	}
+	else if (0 == strcmp(func, "min"))
+	{
+		ret = zbx_trends_eval_min(table, item->itemid, start, end, &value_dbl);
+	}
+	else if (0 == strcmp(func, "sum"))
+	{
+		ret = zbx_trends_eval_sum(table, item->itemid, start, end, &value_dbl);
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "unknown trend function");
+		goto out;
+	}
+
+	if (SUCCEED != ret)
+	{
+		*error = zbx_strdup(*error, "not enough data");
+	}
+	else
+		*value = zbx_dsprintf(*value, ZBX_FS_DBL64, value_dbl);
+out:
+	zbx_free(period);
+	zbx_free(period_shift);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_function                                                *
  *                                                                            *
  * Purpose: evaluate function                                                 *
@@ -2845,6 +2947,10 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	else if (0 == strcmp(function, "timeleft"))
 	{
 		ret = evaluate_TIMELEFT(value, item, parameter, ts, error);
+	}
+	else if (0 == strncmp(function, "trend", 5))
+	{
+		ret = evaluate_TREND(value, item, function + 5, parameter, ts, error);
 	}
 	else
 	{
