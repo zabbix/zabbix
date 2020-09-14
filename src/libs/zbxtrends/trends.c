@@ -18,6 +18,8 @@
 **/
 
 #include "common.h"
+#include "db.h"
+#include "log.h"
 #include "zbxtrends.h"
 
 /******************************************************************************
@@ -154,6 +156,108 @@ int	zbx_trends_parse_range(const char *period, const char *period_shift, int *st
 	ZBX_UNUSED(start);
 	ZBX_UNUSED(end);
 
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: trends_eval                                                      *
+ *                                                                            *
+ * Purpose: evaluate expression with trends data                              *
+ *                                                                            *
+ * Parameters: table       - [IN] the trends table name                       *
+ *             itemid      - [IN] the itemid                                  *
+ *             start       - [OUT] the period start time in seconds since     *
+ *                                  Epoch                                     *
+ *             end         - [OUT] the period end time in seconds since       *
+ *                                  Epoch                                     *
+ *             eval_single - [IN] sql expression to evaluate for single       *
+ *                                 record                                     *
+ *             eval_multi  - [IN] sql expression to evaluate for multiple     *
+ *                                 records                                    *
+ *             value       - [OUT] the evluation result                       *
+ *                                                                            *
+ * Return value: SUCCEED - expression was evaluated and data returned         *
+ *               FAIL    - query returned NULL - no data for the specified    *
+ *                         period                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	trends_eval(const char *table, zbx_uint64_t itemid, int start, int end, const char *eval_single,
+		const char *eval_multi, double *value)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret;
+
+	if (start != end)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select %s from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock>=%d"
+					" and clock<=%d",
+				eval_multi, table, itemid, start, end);
+	}
+	else
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select %s from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock=%d",
+				eval_single, table, itemid, start);
+	}
+
+	result = DBselect("%s", sql);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*value = atof(row[0]);
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	return trends_eval(table, itemid, start, end, "value_avg", "sum(value_avg*num)/sum(num)", value);
+}
+
+int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	if (FAIL == trends_eval(table, itemid, start, end, "num", "sum(num)", value))
+		*value = 0;
+
+	return SUCCEED;
+}
+
+int	zbx_trends_eval_delta(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	return trends_eval(table, itemid, start, end, "value_max-value_min", "max(value_max)-min(value_min)", value);
+}
+
+int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	return trends_eval(table, itemid, start, end, "value_max", "max(value_max)", value);
+}
+
+int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	return trends_eval(table, itemid, start, end, "value_min", "min(value_min)", value);
+}
+
+int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	if (FAIL == trends_eval(table, itemid, start, end, "value_avg*num", "sum(value_avg*num)", value))
+		*value = 0;
 
 	return SUCCEED;
 }
