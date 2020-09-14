@@ -531,7 +531,7 @@ class ZSelect extends HTMLElement {
 			},
 
 			list_mousedown: (e) => {
-				const index = e.target._index;
+				const index = e.target.closest('li')._index;
 
 				if (index !== undefined) {
 					e.preventDefault();
