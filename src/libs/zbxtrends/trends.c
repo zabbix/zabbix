@@ -58,7 +58,7 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
  *                                                                            *
  * Function: trends_parse_base                                                *
  *                                                                            *
- * Purpose: parse period base from function parameters                        *
+ * Purpose: parse largest period base from function parameters                 *
  *                                                                            *
  * Parameters: params - [IN] the function parameters                          *
  *             base   - [OUT] the period shift base (now/?)                   *
@@ -70,21 +70,29 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
  ******************************************************************************/
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error)
 {
-	zbx_time_unit_t	time_unit;
-	char		*period_shift;
+	zbx_time_unit_t	time_unit = ZBX_TIME_UNIT_UNKNOWN;
+	char		*period_shift, *ptr;
 	int		ret = FAIL;
 
 	period_shift = zbx_function_get_param_dyn(params, 2);
 
-	if (0 != strncmp(period_shift, "now/", 4))
+	for (ptr = period_shift; NULL != (ptr = strchr(ptr, '/'));)
 	{
-		*error = zbx_strdup(*error, "invalid period shift expression");
-		goto out;
+		zbx_time_unit_t	tu;
+
+		if (ZBX_TIME_UNIT_UNKNOWN == (tu = zbx_tm_str_to_unit(++ptr)))
+		{
+			*error = zbx_strdup(*error, "invalid period shift cycle");
+			goto out;
+		}
+
+		if (tu > time_unit)
+			time_unit = tu;
 	}
 
-	if (ZBX_TIME_UNIT_UNKNOWN == (time_unit = zbx_tm_str_to_unit(period_shift + 4)))
+	if (ZBX_TIME_UNIT_UNKNOWN == time_unit)
 	{
-		*error = zbx_strdup(*error, "invalid period shift cycle");
+		*error = zbx_strdup(*error, "invalid period shift expression");
 		goto out;
 	}
 
@@ -145,7 +153,3 @@ int	zbx_trends_parse_range(const char *period, const char *period_shift, int *st
 
 	return SUCCEED;
 }
-
-
-
-
