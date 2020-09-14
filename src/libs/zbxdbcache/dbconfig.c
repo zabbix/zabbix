@@ -3769,7 +3769,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 	unsigned char		tag;
 
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_HOST		*host;
 	ZBX_DC_FUNCTION		*function;
 
 	int			found, ret;
@@ -3797,9 +3796,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 			continue;
 		}
-
-		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
-			continue;
 
 		/* process function information */
 
