@@ -38,13 +38,13 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
-			'Graphs', 'Screens', 'Web'];
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking Title, Header and Column names.
 		$this->assertPageTitle('Hosts');
 		$this->assertPageHeader('Hosts');
+		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
+			'Graphs', 'Screens', 'Web'];
 		$this->assertSame($headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
 
 		// Check filter collapse/expand.
@@ -449,7 +449,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => []
 				]
 			],
-			// Won existing tag.
+			// Non-existing tag.
 			[
 				[
 					'tag_options' => [
@@ -495,8 +495,8 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.
-		$this->assertEquals(count(['Empty host']), $table->getRows()->count());
-		$this->assertRowCount(count(['Empty host']));
+		$this->assertEquals(1, $table->getRows()->count());
+		$this->assertRowCount(1);
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$form->query('button:Reset')->one()->click();
@@ -514,11 +514,12 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertFalse($table->findRow('Name', 'Host for suppression')->isPresent());
-		$form->query('id:filter_show_suppressed')->asCheckbox()->one()->check();
-		$form->submit();
-		$this->page->waitUntilReady();
-		$table->findRow('Name', 'Host for suppression')->isPresent();
+		foreach ([true, false] as $show) {
+			$form->query('id:filter_show_suppressed')->asCheckbox()->one()->fill($show);
+			$form->submit();
+			$this->page->waitUntilReady();
+			$this->assertTrue($table->findRow('Name', 'Host for suppression')->isPresent($show));
+		}
 	}
 
 	public static function getEnabledLinksData() {
@@ -571,14 +572,11 @@ class testPageMonitoringHosts extends CWebTest {
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		switch ($data['name']) {
 			case 'Dynamic widgets H1':
-				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
-				$form->checkValue(['Host' => $data['name']]);
-				$form->query('button:Reset')->one()->click();
-				break;
 			case 'Host ZBX6663':
 			case 'Available host':
+				$field = ($data['name'] == 'Dynamic widgets H1') ? 'Host' : 'Hosts';
 				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
-				$form->checkValue(['Hosts' => $data['name']]);
+				$form->checkValue([$field => $data['name']]);
 				$form->query('button:Reset')->one()->click();
 				break;
 			case 'ЗАББИКС Сервер':
@@ -601,70 +599,78 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'name' => 'ЗАББИКС Сервер',
 					'disabled' => ['Web'],
-					'displayed_titles' => ['Inventory',
-										'Latest data',
-										'Problems',
-										'Graphs',
-										'Screens',
-										'Web',
-										'Configuration',
-										'Detect operating system',
-										'Ping',
-										'Reboot',
-										'Selenium script',
-										'Traceroute']
+					'titles' => [
+						'Inventory',
+						'Latest data',
+						'Problems',
+						'Graphs',
+						'Screens',
+						'Web',
+						'Configuration',
+						'Detect operating system',
+						'Ping',
+						'Reboot',
+						'Selenium script',
+						'Traceroute'
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Available host',
 					'disabled' => ['Web', 'Graphs', 'Screens'],
-					'displayed_titles' => ['Inventory',
-										'Latest data',
-										'Problems',
-										'Graphs',
-										'Screens',
-										'Web',
-										'Configuration',
-										'Detect operating system',
-										'Ping',
-										'Selenium script',
-										'Traceroute']
+					'titles' => [
+						'Inventory',
+						'Latest data',
+						'Problems',
+						'Graphs',
+						'Screens',
+						'Web',
+						'Configuration',
+						'Detect operating system',
+						'Ping',
+						'Selenium script',
+						'Traceroute'
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Dynamic widgets H1',
 					'disabled' => ['Screens', 'Web'],
-					'displayed_titles' => ['Inventory',
-										'Latest data',
-										'Problems',
-										'Graphs',
-										'Screens',
-										'Web',
-										'Configuration',
-										'Detect operating system',
-										'Ping',
-										'Selenium script',
-										'Traceroute']
+					'titles' => [
+						'Inventory',
+						'Latest data',
+						'Problems',
+						'Graphs',
+						'Screens',
+						'Web',
+						'Configuration',
+						'Detect operating system',
+						'Ping',
+						'Selenium script',
+						'Traceroute'
+					]
 				]
 			],
 			[
 				[
 					'name' => 'Host ZBX6663',
 					'disabled' => ['Screens'],
-					'displayed_titles' => ['Inventory',
-										'Latest data',
-										'Problems',
-										'Graphs',
-										'Screens',
-										'Web',
-										'Configuration',
-										'Detect operating system',
-										'Ping',
-										'Reboot',
-										'Selenium script',
-										'Traceroute']
+					'titles' => [
+						'Inventory',
+						'Latest data',
+						'Problems',
+						'Graphs',
+						'Screens',
+						'Web',
+						'Configuration',
+						'Detect operating system',
+						'Ping',
+						'Reboot',
+						'Selenium script',
+						'Traceroute'
+					]
 				]
 			]
 		];
@@ -683,7 +689,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-		$this->assertTrue($popup->hasItems($data['displayed_titles']));
+		$this->assertTrue($popup->hasItems($data['titles']));
 		foreach ($data['disabled'] as $disabled) {
 			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '
 				.$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
@@ -723,13 +729,15 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$problem_hosts = ['1_Host_to_check_Monitoring_Overview',
-						'3_Host_to_check_Monitoring_Overview',
-						'4_Host_to_check_Monitoring_Overview',
-						'Host for tag permissions',
-						'Host for triggers filtering',
-						'ЗАББИКС Сервер'];
-		foreach ($problem_hosts as $host) {
+		$hosts = [
+			'1_Host_to_check_Monitoring_Overview',
+			'3_Host_to_check_Monitoring_Overview',
+			'4_Host_to_check_Monitoring_Overview',
+			'Host for tag permissions',
+			'Host for triggers filtering',
+			'ЗАББИКС Сервер'
+		];
+		foreach ($hosts as $host) {
 			$form->fill(['Name' => $host]);
 			$form->submit();
 			$this->page->waitUntilReady();
@@ -741,17 +749,14 @@ class testPageMonitoringHosts extends CWebTest {
 				$result[] = $table->query('xpath://td/div[@class="problem-icon-list"]/span['.$i.']')->one()->getText();
 			}
 
-			// Converting string array to int.
-			$int_result = array_map('intval', $result);
-
 			// Getting problems amount from second Problems column and then comparing with summarized first column.
-			$problem_amount = $table->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
-			$this->assertEquals((int)$problem_amount, array_sum($int_result));
+			$problems = $table->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
+			$this->assertEquals((int)$problems, array_sum(array_map('intval', $result)));
 		}
 	}
 
 	/**
-	 * Get data from choosed column.
+	 * Get data from chosen column.
 	 *
 	 * @param integer $rows_count	Rows amount whom column value should be checked
 	 * @param string $column		Column name, where value should be checked
@@ -779,6 +784,9 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->waitUntilReady();
 		if ($page_header != null) {
 			$this->assertPageHeader($page_header);
+		}
+		if ($host_name == 'Dynamic widgets H1') {
+			$this->query('id:ui-id-2')->one()->click();
 		}
 	}
 }
