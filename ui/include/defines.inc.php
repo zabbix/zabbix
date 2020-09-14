@@ -1922,6 +1922,10 @@ define('ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE', 'interface-btn-remove');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE', 'interface-btn-main-interface');
 define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
 
+// Dashboard list table classes.
+define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
+define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
+
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
 

@@ -5105,7 +5105,6 @@ a.link-action {
 %status {
 	padding: 2px 3px 1px;
 	font-size: $font-h3-size;
-	text-transform: $font-transform;
 	text-align: center;
 	min-width: .7em;
 	line-height: 1em;
@@ -7339,4 +7338,12 @@ table.preprocessing-test-results {
 	.table-col-y-axis-side { width: 85px; }
 	.table-col-colour { width: 105px; }
 	.table-col-action { width: 55px; }
+}
+
+// Dashboard list table.
+.dashboard-list {
+	.dashboard-list-item {
+		display: flex;
+		justify-content: space-between;
+	}
 }
