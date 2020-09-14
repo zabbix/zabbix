@@ -41,7 +41,8 @@
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
 extern int	CONFIG_MAX_LINES_PER_SECOND;
-extern char	*CONFIG_HOSTNAME;
+
+extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *

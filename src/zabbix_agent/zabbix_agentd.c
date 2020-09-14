@@ -27,12 +27,14 @@
 #include "comms.h"
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-char	*CONFIG_HOSTNAME		= NULL;
+char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 char	*CONFIG_HOST_METADATA		= NULL;
 char	*CONFIG_HOST_METADATA_ITEM	= NULL;
 char	*CONFIG_HOST_INTERFACE		= NULL;
 char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
+
+ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
 
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 1;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -553,7 +555,7 @@ static void	set_defaults(void)
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
-	if (NULL == CONFIG_HOSTNAME)
+	if (NULL == CONFIG_HOSTNAMES)
 	{
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
@@ -606,6 +608,41 @@ static void	set_defaults(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_check_hostnames                                              *
+ *                                                                            *
+ * Purpose: checks listed host names                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_check_hostnames(const char *hostnames, char **error)
+{
+	char		*hostname = NULL, *p2;
+	const char	*p1 = hostnames;
+	int		ret = SUCCEED;
+
+	do
+	{
+		if (NULL != (p2 = strchr(p1, ',')))
+		{
+			hostname = zbx_dsprintf(hostname, "%.*s", (int)(p2 - p1), p1);
+			p1 = p2 + 1;
+		}
+		else
+			hostname = zbx_strdup(hostname, p1);
+
+		if (FAIL == zbx_check_hostname(hostname, error))
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+	while (NULL != p2 && '\0' != *p1);
+
+	zbx_free(hostname);
+
+	return ret;
+}
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_validate_config                                              *
  *                                                                            *
  * Purpose: validate configuration parameters                                 *
@@ -632,16 +669,18 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			err = 1;
 		}
 	}
-	if (NULL == CONFIG_HOSTNAME)
+
+	if ((NULL != CONFIG_HOSTNAME && FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error)) ||
+			(NULL != CONFIG_HOSTNAMES && FAIL == zbx_check_hostnames(CONFIG_HOSTNAMES, &ch_error)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
-		err = 1;
-	}
-	else if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s", CONFIG_HOSTNAME,
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s", CONFIG_HOSTNAMES,
 				ch_error);
 		zbx_free(ch_error);
+		err = 1;
+	}
+	else if (NULL == CONFIG_HOSTNAMES && NULL == CONFIG_HOSTNAME)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		err = 1;
 	}
 
@@ -706,7 +745,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 static int	add_serveractive_host_cb(const char *host, unsigned short port)
 {
-	int	i;
+	zbx_vector_str_t	hostnames;
+	int			i;
 
 	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
 	{
@@ -714,12 +754,58 @@ static int	add_serveractive_host_cb(const char *host, unsigned short port)
 			return FAIL;
 	}
 
-	CONFIG_ACTIVE_FORKS++;
+	zbx_vector_str_create(&hostnames);
+
+	if (NULL != CONFIG_HOSTNAMES)
+	{
+		char	*p1 = CONFIG_HOSTNAMES, *p2, *hostname;
+
+		do
+		{
+			if (NULL != (p2 = strchr(p1, ',')))
+			{
+				hostname = zbx_dsprintf(NULL, "%.*s", (int)(p2 - p1), p1);
+				p1 = p2 + 1;
+			}
+			else
+				hostname = zbx_strdup(NULL, p1);
+
+			if (FAIL != zbx_vector_str_search(&hostnames, hostname, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			{
+				zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
+				zbx_vector_str_destroy(&hostnames);
+				zbx_error("error parsing the \"Hostname\" parameter: host \"%s\" specified more than"
+						" once", CONFIG_HOSTNAMES);
+				exit(EXIT_FAILURE);
+			}
+
+			zbx_vector_str_append(&hostnames, hostname);
+		}
+		while (NULL != p2 && '\0' != *p1);
+	}
+	else if (NULL != CONFIG_HOSTNAME)
+	{
+		zbx_vector_str_append(&hostnames, zbx_strdup(NULL, CONFIG_HOSTNAME));
+	}
+	else
+		zbx_vector_str_append(&hostnames, zbx_strdup(NULL, ""));
+
+	CONFIG_ACTIVE_FORKS += hostnames.values_num;
 	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS,
 			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
 
-	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].host = zbx_strdup(NULL, host);
-	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].port = port;
+	for (i = 0; i < hostnames.values_num; i++)
+	{
+		int	num;
+
+		num = CONFIG_ACTIVE_FORKS - hostnames.values_num + i;
+
+		CONFIG_ACTIVE_ARGS[num].host = zbx_strdup(NULL, host);
+		CONFIG_ACTIVE_ARGS[num].port = port;
+		CONFIG_ACTIVE_ARGS[num].hostname = hostnames.values[i];
+	}
+
+	zbx_vector_str_destroy(&hostnames);
 
 	return SUCCEED;
 }
@@ -777,7 +863,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ServerActive",		&active_hosts,				TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
+		{"Hostname",			&CONFIG_HOSTNAMES,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -896,6 +982,9 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #endif
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
+	if (NULL != CONFIG_HOSTNAMES)
+		zbx_trim_str_list(CONFIG_HOSTNAMES, ',');
+
 	finalize_key_access_rules_configuration();
 
 	set_defaults();
@@ -978,7 +1067,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
-				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+				CONFIG_HOSTNAMES, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
@@ -1007,7 +1096,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
-			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+			CONFIG_HOSTNAMES, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
@@ -1277,9 +1366,9 @@ int	main(int argc, char **argv)
 				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
-						APPLICATION_NAME, CONFIG_HOSTNAME);
+						APPLICATION_NAME, CONFIG_HOSTNAMES);
 				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
-						APPLICATION_NAME, CONFIG_HOSTNAME);
+						APPLICATION_NAME, CONFIG_HOSTNAMES);
 			}
 			else
 				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
