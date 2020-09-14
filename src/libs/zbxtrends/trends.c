@@ -74,7 +74,11 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
 	char		*period_shift, *ptr;
 	int		ret = FAIL;
 
-	period_shift = zbx_function_get_param_dyn(params, 2);
+	if (NULL == (period_shift = zbx_function_get_param_dyn(params, 2)))
+	{
+		*error = zbx_strdup(*error, "missing period shift expression");
+		goto out;
+	}
 
 	for (ptr = period_shift; NULL != (ptr = strchr(ptr, '/'));)
 	{
