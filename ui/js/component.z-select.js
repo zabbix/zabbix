@@ -38,19 +38,20 @@ class ZSelect extends HTMLElement {
 			'width', 'onchange'];
 	}
 
-	attributeChangedCallback(name, old_value, new_value) {
+	attributeChangedCallback(name, _old_value, new_value) {
 		switch (name) {
 			case 'name':
 				this._input.setAttribute('name', new_value);
 				break;
 
 			case 'value':
-				this._value = new_value;
-
-				if (this._options_map.has(new_value)) {
-					this._highlight(this._options_map.get(new_value)._index);
-					this._preSelect();
-					this._change();
+				if (this._value != new_value) {
+					this._value = new_value;
+					if (this._options_map.has(new_value)) {
+						this._highlight(this._options_map.get(new_value)._index);
+						this._preSelect();
+						this._change();
+					}
 				}
 				break;
 
@@ -130,6 +131,10 @@ class ZSelect extends HTMLElement {
 
 			container.remove();
 		}
+
+		this._highlight(this._preselected_index);
+		this._preSelect();
+		this._input.setAttribute('value', this._value);
 	}
 
 	getOptionByIndex(index) {
@@ -160,7 +165,7 @@ class ZSelect extends HTMLElement {
 		class_name && li.classList.add(class_name);
 		is_disabled && li.setAttribute('disabled', 'disabled');
 
-		this._options_map.set(value, Object.defineProperties(option, {
+		this._options_map.set(value.toString(), Object.defineProperties(option, {
 			_node: {
 				get: () => li
 			},
@@ -181,7 +186,7 @@ class ZSelect extends HTMLElement {
 
 		// Should accept both integer and string.
 		if (this._value == value) {
-			this.selectedIndex = li._index
+			this._preselected_index = li._index;
 		}
 
 		(container || this._list).appendChild(li);
@@ -323,6 +328,7 @@ class ZSelect extends HTMLElement {
 		const {value} = this.getOptionByIndex(this._preselected_index);
 
 		if (this._input.value != value) {
+			this.setAttribute('value', value);
 			this._input.setAttribute('value', value);
 			this.dispatchEvent(new Event('change'));
 		}
