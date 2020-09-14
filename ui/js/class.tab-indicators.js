@@ -66,7 +66,6 @@ class TabIndicators {
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const GRAPH = document.querySelector('#widget-dialogue-form');
-		const MAINTENANCE = document.querySelector('#maintenance-form');
 
 		switch (true) {
 			case !!TEMPLATE:
@@ -105,8 +104,6 @@ class TabIndicators {
 				return MAP;
 			case !!GRAPH:
 				return GRAPH;
-			case !!MAINTENANCE:
-				return MAINTENANCE;
 			default:
 				throw 'Form not found.';
 		}
@@ -253,8 +250,6 @@ class TabIndicatorFactory {
 				return new GraphProblemsTabIndicatorItem;
 			case 'GraphOverrides':
 				return new GraphOverridesTabIndicatorItem;
-			case 'Periods':
-				return new PeriodsTabIndicatorItem;
 			case 'Permissions':
 				return new PermissionsTabIndicatorItem;
 		}
@@ -1412,43 +1407,6 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(elem) {
 		const target_node = document.querySelector('.overrides-list');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						elem.setAttribute(TAB_INDICATOR_ATTR_COUNT, this.getValue());
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
-	}
-}
-
-class PeriodsTabIndicatorItem extends TabIndicatorItem {
-
-	constructor() {
-		super();
-		this.TYPE = new TabIndicatorNumberType;
-	}
-
-	getValue() {
-		return document
-			.querySelectorAll('#maintenance_periods tbody tr')
-			.length;
-	}
-
-	initObserver(elem) {
-		const target_node = document.querySelector('#maintenance_periods tbody');
 		const observer_options = {
 			childList: true,
 			subtree: true

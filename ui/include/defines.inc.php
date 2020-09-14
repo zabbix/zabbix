@@ -1577,7 +1577,6 @@ define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
 define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
-define('TAB_INDICATOR_PERIODS', 'periods');
 define('TAB_INDICATOR_PERMISSIONS', 'permissions');
 
 // CSS styles
