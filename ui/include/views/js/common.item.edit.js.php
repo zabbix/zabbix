@@ -236,10 +236,12 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 			if (key.substr(0, 8) === 'mqtt.get') {
 				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'delay']) ?>);
 				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'row_delay']) ?>);
+				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'row_flex_intervals']) ?>);
 			}
 			else {
 				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'delay']) ?>);
 				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'row_delay']) ?>);
+				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'row_flex_intervals']) ?>);
 			}
 		}
 	}
