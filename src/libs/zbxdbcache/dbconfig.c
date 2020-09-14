@@ -3640,16 +3640,14 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
 	if (ZBX_FUNCTION_TYPE_TRENDS == function->type)
 	{
 		char		*error = NULL;
-		zbx_time_unit_t	base;
 
-		if (FAIL == zbx_trends_parse_base(function->parameter, &base, &error))
+		if (FAIL == zbx_trends_parse_base(function->parameter, &trend_base, &error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse function " ZBX_FS_UI64 " period base: %s",
 					function->functionid, error);
 			zbx_free(error);
 			return NULL;
 		}
-		trend_base = base;
 	}
 	else
 		trend_base = ZBX_TIME_UNIT_UNKNOWN;
