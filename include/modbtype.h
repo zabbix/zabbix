@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_COMMON_MBUSTYPE_H
-#define ZABBIX_SYSINFO_COMMON_MBUSTYPE_H
+#ifndef ZABBIX_SYSINFO_COMMON_MODBTYPE_H
+#define ZABBIX_SYSINFO_COMMON_MODBTYPE_H
 
 #include "sysinfo.h"
 
@@ -126,4 +126,4 @@ typedef enum
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int 	zbx_init_modbus(char **error);
 
-#endif /* ZABBIX_SYSINFO_COMMON_MBUSTYPE_H */
+#endif /* ZABBIX_SYSINFO_COMMON_MODBTYPE_H */

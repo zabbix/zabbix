@@ -432,9 +432,5 @@
 #	include <float.h>
 #endif
 
-#ifdef HAVE_LIBMODBUS
-#	include "modbus.h"
-#endif
-
 
 #endif
