@@ -3691,7 +3691,8 @@ static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
  *            exec_ts - [IN] the tiemer execution time                        *
  *                                                                            *
  ******************************************************************************/
-static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, zbx_timespec_t *eval_ts, zbx_timespec_t *exec_ts)
+static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, const zbx_timespec_t *eval_ts,
+		const zbx_timespec_t *exec_ts)
 {
 	zbx_binary_heap_elem_t	elem;
 
