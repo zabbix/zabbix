@@ -54,8 +54,8 @@ class CZDropdownElement extends CElement {
 	 */
 	public function select($text) {
 		$this->click();
-		$option = $this->query('xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']')
-				->waitUntilVisible()->one();
+		$xpath = 'xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']';
+		$option = $this->query($xpath)->waitUntilVisible()->one();
 
 		if ($option->isClickable()) {
 			$option->click();
