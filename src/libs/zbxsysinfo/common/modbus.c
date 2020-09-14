@@ -23,6 +23,14 @@
 #include "comms.h"
 
 #ifdef HAVE_LIBMODBUS
+
+#ifdef _WINDOWS
+#	include "inttypes.h"
+#	ifdef HAVE_LIBMODBUS_STATIC
+#		define DLLBUILD
+#	endif
+#endif
+
 #include "modbus.h"
 
 zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
@@ -34,10 +42,6 @@ zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 
 #define ZBX_MODBUS_BAUDRATE_DEFAULT	115200
 #define ZBX_MODBUS_ADDRESS_MAX		65535
-
-#ifdef _WINDOWS
-#pragma comment(lib, "modbus")
-#endif
 
 static struct modbus_datatype_ref
 {

@@ -4,4 +4,3 @@ MODBLIB =	$(MODBLIBDIR)\modbus.lib
 LIBS = 		$(LIBS) "$(MODBLIB)"
 INCS =		$(INCS) /I "$(MODBINCDIR)"
 !ENDIF
-INCS =	$(INCS) /I "..\..\..\src\libs\zbxsysinfo\common"
