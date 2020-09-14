@@ -46,10 +46,6 @@ $item_form_list = (new CFormList('item-form-list'))
 
 // Add interfaces if mass updating item prototypes on host level.
 if ($data['display_interfaces']) {
-	$interfaces_select = getInterfaceSelect($data['hosts']['interfaces'])
-			->setId('interface-select')
-			->setValue($data['interfaceid']);
-
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
