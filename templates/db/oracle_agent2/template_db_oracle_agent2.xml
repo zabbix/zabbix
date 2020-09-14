@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-12T12:45:32Z</date>
+   <date>2020-09-14T15:10:30Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
