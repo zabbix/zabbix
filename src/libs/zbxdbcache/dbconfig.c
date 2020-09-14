@@ -3586,7 +3586,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 #define ZBX_TIMER_DELAY		30
 
-static int	dc_function_calculate_nextcheck(zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed)
+static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed)
 {
 
 	if (ZBX_FUNCTION_TYPE_TIMER == timer->type)
