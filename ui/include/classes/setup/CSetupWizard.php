@@ -211,13 +211,10 @@ class CSetupWizard extends CForm {
 	function stage2() {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
 
-		$table = (new CFormList())
-			->addVar('tls_encryption', '0', 'tls_encryption_off')
-			->addVar('verify_certificate', '0', 'verify_certificate_off')
-			->addVar('verify_host', '0', 'verify_host_off');
+		$table = (new CFormList());
 
 		$table->addRow(_('Database type'),
-			new CComboBox('type', $DB['TYPE'], 'submit()', CFrontendSetup::getSupportedDatabases())
+			new CComboBox('type', $DB['TYPE'], null, CFrontendSetup::getSupportedDatabases())
 		);
 
 		$table->addRow(_('Database host'),
@@ -238,11 +235,12 @@ class CSetupWizard extends CForm {
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-			$table->addRow(_('Database schema'),
-				(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			);
-		}
+		$table->addRow(_('Database schema'),
+			(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			'db_schema_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
 		$table->addRow(_('User'),
 			(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -251,79 +249,54 @@ class CSetupWizard extends CForm {
 			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		$is_db_support_encryption = ($DB['TYPE'] == ZBX_DB_MYSQL || $DB['TYPE'] == ZBX_DB_POSTGRESQL);
-		$is_encryption_disabled = ($is_db_support_encryption && ($DB['TYPE'] == ZBX_DB_MYSQL
-					&& ($this->getConfig('DB_SERVER') === 'localhost' || $this->getConfig('DB_SERVER', '') === ''))
-				|| ($DB['TYPE'] == ZBX_DB_POSTGRESQL && ($this->getConfig('DB_SERVER') === ''
-					|| mb_strpos($this->getConfig('DB_SERVER'), '/') === 0)));
-
-		if ($is_db_support_encryption) {
-			$encryption_checkbox = (new CCheckBox('tls_encryption'))
-				->setChecked($this->getConfig('DB_ENCRYPTION', true))
-				->onChange('submit()');
-
-			if ($is_encryption_disabled) {
-				$encryption_checkbox
-					->setChecked(false)
-					->setEnabled(false);
-			}
-
-			$table->addRow(_('TLS encryption'), $encryption_checkbox);
-			$table->addRow('', (new CTag('p', true,
+		$table->addRow(_('TLS encryption'), [
+				(new CCheckBox('tls_encryption'))->setChecked($this->getConfig('DB_ENCRYPTION', true)),
+				(new CDiv(
 					_('Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows).')
-				))->addClass('helper-text'),
-				'tls-disabled-text'
-			);
-		}
+				))
+					->setId('tls_encryption_hint')
+					->addClass(ZBX_STYLE_DISPLAY_NONE)
+			],
+			'db_encryption_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
-		if ($is_db_support_encryption && !$is_encryption_disabled && $this->getConfig('DB_ENCRYPTION', true)) {
-			$table->addRow(_('Verify certificate'),
-				(new CCheckBox('verify_certificate'))
-					->setChecked($this->getConfig('DB_ENCRYPTION_ADVANCED'))
-					->onChange('submit()')
-			);
-		}
+		$table->addRow(_('Verify certificate'),
+			(new CCheckBox('verify_certificate'))
+				->setChecked($this->getConfig('DB_ENCRYPTION_ADVANCED')),
+			'db_verify_host',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
-		if ($this->getConfig('DB_ENCRYPTION_ADVANCED') && $this->getConfig('DB_ENCRYPTION')) {
-			$table->addRow(_('TLS key file'),
-				(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			);
+		$table->addRow(_('TLS key file'),
+			(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			'db_keyfile_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
-			$table->addRow(_('TLS certificate file'),
-				(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			);
+		$table->addRow(_('TLS certificate file'),
+			(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			'db_certfile_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
-			$table->addRow(_('TLS certificate authority file'),
-				(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			);
+		$table->addRow(_('TLS certificate authority file'),
+			(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			'db_cafile_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
-			$verify_host_box = new CCheckBox('verify_host');
+		$table->addRow(_('With host verification'),
+			(new CCheckBox('verify_host'))->setChecked($this->getConfig('DB_VERIFY_HOST')),
+			'db_verify_host_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
-			if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-				$verify_host_box
-					->setChecked(true)
-					->setAttribute('readonly', true);
-			}
-			else {
-				$verify_host_box->setChecked($this->getConfig('DB_VERIFY_HOST'));
-			}
-
-			$table->addRow(_('With host verification'), $verify_host_box);
-
-			if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-				$table->addRow(_('TLS cipher list'),
-					(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				);
-			}
-		}
-		else {
-			$table
-				->addVar('key_file', '')
-				->addVar('cert_file', '')
-				->addVar('ca_file', '')
-				->addVar('cipher_list', '');
-		}
+		$table->addRow(_('TLS cipher list'),
+			(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			'db_cipher_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
 
 		if ($this->STEP_FAILED) {
 			global $ZBX_MESSAGES;
@@ -334,44 +307,12 @@ class CSetupWizard extends CForm {
 			$message_box = null;
 		}
 
-		$js = "const form_elem = document.querySelector('#setup-form');
-			const text_container = document.querySelector('#tls-disabled-text');
-			const text_elem = text_container.querySelector('.helper-text');
-
-			if (document.querySelector('#tls_encryption').disabled) {
-				text_container.style.display = 'table-row';
-			}
-
-			document
-				.querySelector('#server')
-				.addEventListener('blur', (event) => {
-					const db_type = document.querySelector('#type').value;
-					const checkbox_elem = document.querySelector('#tls_encryption');
-					const value = event.currentTarget.value;
-
-					if ((db_type === '".ZBX_DB_MYSQL."' && (value === 'localhost' || value === ''))
-							|| (db_type === '".ZBX_DB_POSTGRESQL."' && (value.startsWith('/') || value === ''))) {
-						if (!checkbox_elem.disabled) {
-							checkbox_elem.checked = false;
-							checkbox_elem.disabled = true;
-							form_elem.submit();
-						}
-					}
-					else if (checkbox_elem.disabled) {
-						checkbox_elem.disabled = false;
-						text_container.style.display = 'none';
-						text_elem.style.display = 'none';
-					}
-				});
-			";
-
 		return [
 			new CTag('h1', true, _('Configure DB connection')),
 			(new CDiv([
 				new CTag('p', true, _s('Please create database manually, and set the configuration parameters for connection to this database. Press "%1$s" button when done.', _('Next step'))),
 				$message_box,
-				$table,
-				new CJsScript(new CScriptTag($js))
+				$table
 			]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 		];
 	}
@@ -625,13 +566,13 @@ class CSetupWizard extends CForm {
 			$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 			$this->setConfig('DB_SCHEMA', getRequest('schema', $this->getConfig('DB_SCHEMA', '')));
 			$this->setConfig('DB_ENCRYPTION',
-				getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', true))
+				(bool) getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', false))
 			);
 			$this->setConfig('DB_ENCRYPTION_ADVANCED',
-				getRequest('verify_certificate', $this->getConfig('DB_ENCRYPTION_ADVANCED', false))
+				(bool) getRequest('verify_certificate', $this->getConfig('DB_ENCRYPTION_ADVANCED', false))
 			);
 			$this->setConfig('DB_VERIFY_HOST',
-				getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', true))
+				(bool) getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', false))
 			);
 			$this->setConfig('DB_KEY_FILE', getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')));
 			$this->setConfig('DB_CERT_FILE', getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')));

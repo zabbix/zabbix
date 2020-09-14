@@ -2523,11 +2523,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: flex;
     margin-bottom: 40px;
     justify-content: flex-start; }
-  .setup-container #tls-disabled-text {
-    display: none; }
-    .setup-container #tls-disabled-text .helper-text {
-      font-style: italic;
-      color: #333333; }
+  .setup-container #tls_encryption_hint {
+    font-style: italic;
+    color: #333333; }
 
 .setup-left {
   float: left;
