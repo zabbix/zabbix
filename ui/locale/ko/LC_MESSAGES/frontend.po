@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:58+0300\n"
+"POT-Creation-Date: 2020-09-14 11:16+0300\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -430,8 +430,7 @@ msgstr "대응 완료된 해결 이벤트"
 #: app/views/dashboard.sharing.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/popup.lldoperation.php:111 app/views/popup.lldoperation.php:240
-#: app/views/popup.lldoverride.php:93 app/views/popup.triggerwizard.php:47
-#: app/views/popup.triggerwizard.php:117
+#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
 #: app/views/reports.auditlog.list.php:56
 #: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
@@ -524,7 +523,7 @@ msgid_plural "Actions enabled"
 msgstr[0] "액션이 활성화 되었습니다"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:137
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:139
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -542,8 +541,8 @@ msgstr "액션을 갱신하였습니다"
 #: include/classes/screens/CScreenProblem.php:923
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:251
-#: include/forms.inc.php:1199 include/menu.inc.php:114
-#: include/menu.inc.php:144 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1199 include/menu.inc.php:116
+#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
@@ -617,8 +616,8 @@ msgstr "종료시간"
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
-#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
-#: app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:175
+#: app/views/popup.lldoverride.php:194
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
@@ -800,7 +799,7 @@ msgstr "%1$s을 추가했습니다."
 msgid "Admin"
 msgstr "Admin"
 
-#: include/menu.inc.php:150
+#: include/menu.inc.php:152
 msgid "Administration"
 msgstr "관리"
 
@@ -1241,8 +1240,8 @@ msgstr "시도 간격"
 msgid "Attempts"
 msgstr "시도횟수"
 
-#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:133
-#: include/menu.inc.php:136
+#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:135
+#: include/menu.inc.php:138
 msgid "Audit"
 msgstr "감사"
 
@@ -1270,7 +1269,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
-#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:165
+#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
@@ -1383,7 +1382,7 @@ msgstr ""
 msgid "Availability"
 msgstr "상태"
 
-#: include/menu.inc.php:72 include/menu.inc.php:128 report2.php:25
+#: include/menu.inc.php:72 include/menu.inc.php:130 report2.php:25
 #: report2.php:161
 msgid "Availability report"
 msgstr "가동 보고서"
@@ -2798,7 +2797,7 @@ msgstr "인증 설정을 갱신할 수 없습니다"
 #: app/controllers/CControllerGuiUpdate.php:43
 #: app/controllers/CControllerGuiUpdate.php:80
 #: app/controllers/CControllerHousekeepingUpdate.php:57
-#: app/controllers/CControllerHousekeepingUpdate.php:126
+#: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:43
 #: app/controllers/CControllerMiscConfigUpdate.php:80
 #: app/controllers/CControllerTrigDisplayUpdate.php:47
@@ -3430,7 +3429,7 @@ msgid "Concurrent sessions"
 msgstr "동시 세션의 숫자"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:740
-#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:168
+#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:169
 msgid "Condition"
 msgstr "조건"
 
@@ -3487,7 +3486,7 @@ msgstr "조건"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "상관관계 \"%1$s\"의 실행조건이 중복되어 있습니다."
 
-#: include/menu.inc.php:97 include/menu.inc.php:142
+#: include/menu.inc.php:97 include/menu.inc.php:144
 #: include/views/inventory.host.view.php:211 jsLoader.php:275
 msgid "Configuration"
 msgstr "설정"
@@ -5134,7 +5133,7 @@ msgstr "디스커버리된 아이템"
 #: app/views/search.php:88 app/views/search.php:92 app/views/search.php:228
 #: app/views/search.php:278 app/views/search.php:282
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:293
-#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
+#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:118
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
 #: include/views/configuration.template.list.php:156
@@ -5937,7 +5936,7 @@ msgstr "이벤트ID"
 msgid "Event acknowledged"
 msgstr "장애대응 완료"
 
-#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:147
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr "이벤트 상관관계"
@@ -6570,7 +6569,7 @@ msgstr "표시 설정"
 msgid "GUI access disabled."
 msgstr "GUI 액세스를 비활성 하였습니다"
 
-#: include/menu.inc.php:154
+#: include/menu.inc.php:156
 msgid "General"
 msgstr "일반"
 
@@ -6976,7 +6975,7 @@ msgstr "다음에 의한 그루핑"
 msgid "Groups"
 msgstr "그룹"
 
-#: include/menu.inc.php:225
+#: include/menu.inc.php:227
 msgid "Guest user"
 msgstr ""
 
@@ -7074,7 +7073,7 @@ msgstr "히브리어 (he_IL)"
 msgid "Height"
 msgstr "높이"
 
-#: include/menu.inc.php:211 include/menu.inc.php:214
+#: include/menu.inc.php:213 include/menu.inc.php:216
 #: include/views/general.login.php:89
 msgid "Help"
 msgstr "도움말"
@@ -7589,7 +7588,7 @@ msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:207 include/forms.inc.php:644 include/menu.inc.php:37
-#: include/menu.inc.php:65 include/menu.inc.php:106
+#: include/menu.inc.php:65 include/menu.inc.php:108
 #: include/views/configuration.application.list.php:50
 #: include/views/configuration.copy.elements.php:62
 #: include/views/configuration.graph.list.php:87
@@ -10688,7 +10687,7 @@ msgstr "메인 필터"
 msgid "Main navigation"
 msgstr "메인 네비게이션"
 
-#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:114
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -11044,7 +11043,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 미디어 타입은 사용할 수 없습니다."
 
 #: app/views/administration.mediatype.edit.php:30
-#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:174
+#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:176
 #: include/views/conf.import.php:51
 msgid "Media types"
 msgstr "미디어 타입"
@@ -12827,7 +12826,7 @@ msgstr "오퍼레이션 종류"
 msgid "Operational data"
 msgstr ""
 
-#: app/views/popup.lldoverride.php:183
+#: app/views/popup.lldoverride.php:184
 #: include/views/configuration.action.edit.php:306
 #: include/views/configuration.action.edit.php:470
 #: include/views/configuration.action.list.php:90
@@ -13843,7 +13842,7 @@ msgstr "설정된URL \"%1$s\"는 올바르지 않습니다."
 
 #: app/controllers/CControllerPopupGeneric.php:164
 #: app/views/administration.proxy.edit.php:28
-#: app/views/administration.proxy.list.php:31 include/menu.inc.php:162
+#: app/views/administration.proxy.list.php:31 include/menu.inc.php:164
 msgid "Proxies"
 msgstr "프록시"
 
@@ -13945,7 +13944,7 @@ msgstr "공개키 파일"
 msgid "Query fields"
 msgstr "Query필드"
 
-#: include/menu.inc.php:180 queue.php:25
+#: include/menu.inc.php:182 queue.php:25
 msgid "Queue"
 msgstr "큐"
 
@@ -14379,7 +14378,7 @@ msgstr "치환"
 msgid "Replace dependencies"
 msgstr "의존관계를 치환"
 
-#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:126
+#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:128
 #: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "보고서"
@@ -15153,7 +15152,7 @@ msgstr "스크립트를 갱신하였습니다"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
-#: app/views/administration.script.list.php:31 include/menu.inc.php:177
+#: app/views/administration.script.list.php:31 include/menu.inc.php:179
 #: jsLoader.php:303
 msgid "Scripts"
 msgstr "스크립트"
@@ -15461,7 +15460,7 @@ msgid "Service updated"
 msgstr "서비스를 갱신하였습니다"
 
 #: app/views/administration.housekeeping.edit.php:79 include/menu.inc.php:55
-#: include/menu.inc.php:118 include/views/configuration.services.edit.php:30
+#: include/menu.inc.php:120 include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.list.php:27 srv_status.php:26
 #: srv_status.php:161
@@ -15575,7 +15574,7 @@ msgstr "심각도를 올렸습니다"
 msgid "Shape"
 msgstr "도형"
 
-#: include/menu.inc.php:202
+#: include/menu.inc.php:204
 msgid "Share"
 msgstr ""
 
@@ -15756,7 +15755,7 @@ msgstr "HTTP로 로그인"
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/menu.inc.php:240 include/menu.inc.php:243
+#: include/menu.inc.php:242 include/menu.inc.php:245
 msgid "Sign out"
 msgstr "로그 아웃"
 
@@ -16239,7 +16238,7 @@ msgstr "일"
 msgid "Sunday"
 msgstr "일"
 
-#: include/menu.inc.php:195 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:96
 msgid "Support"
 msgstr "지원"
 
@@ -16303,7 +16302,7 @@ msgstr "시스템 호스트 명. string을 리턴"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:29
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:129
+#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:131
 #: include/screens.inc.php:36
 msgid "System information"
 msgstr "시스템 정보"
@@ -17353,7 +17352,7 @@ msgstr "트리거"
 msgid "Triggers deleted"
 msgstr "트리거를 삭제하였습니다"
 
-#: include/menu.inc.php:75 include/menu.inc.php:132
+#: include/menu.inc.php:75 include/menu.inc.php:134
 msgid "Triggers top 100"
 msgstr "상위 100 트리거"
 
@@ -17826,7 +17825,7 @@ msgstr "Up"
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
-#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:194
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
@@ -18096,7 +18095,7 @@ msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
 #: app/controllers/CControllerPopupGeneric.php:228
 #: app/views/administration.usergroup.edit.php:28
 #: app/views/administration.usergroup.list.php:31
-#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:168
+#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:170
 #: include/views/monitoring.screen.edit.php:128
 #: include/views/monitoring.slideconf.edit.php:177
 #: include/views/monitoring.sysmap.edit.php:298
@@ -18148,7 +18147,7 @@ msgstr "유저 세션데이터의 보존기간 \"%1$s\"."
 msgid "User sessions"
 msgstr "유저 세션"
 
-#: include/menu.inc.php:232
+#: include/menu.inc.php:234
 msgid "User settings"
 msgstr ""
 
@@ -18219,7 +18218,7 @@ msgstr ""
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
 #: app/views/dashboard.sharing.edit.php:50
-#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:173
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
@@ -19190,7 +19189,7 @@ msgstr "Zabbix"
 msgid "Zabbix Admin"
 msgstr "ZABBIX 관리자"
 
-#: include/menu.inc.php:205
+#: include/menu.inc.php:207
 msgid "Zabbix Share"
 msgstr "Zabbix Share"
 
@@ -19198,7 +19197,7 @@ msgstr "Zabbix Share"
 msgid "Zabbix Super Admin"
 msgstr "ZABBIX 최고 관리자"
 
-#: include/menu.inc.php:198
+#: include/menu.inc.php:200
 msgid "Zabbix Technical Support"
 msgstr "Zabbix 기술 지원"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:58+0300\n"
+"POT-Creation-Date: 2020-09-14 11:16+0300\n"
 "PO-Revision-Date: 2019-07-31 15:03+0300\n"
 "Last-Translator: Christophe <ctr@pmspos.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -448,8 +448,7 @@ msgstr "Événements RÉSOLUS acquittés"
 #: app/views/dashboard.sharing.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/popup.lldoperation.php:111 app/views/popup.lldoperation.php:240
-#: app/views/popup.lldoverride.php:93 app/views/popup.triggerwizard.php:47
-#: app/views/popup.triggerwizard.php:117
+#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
 #: app/views/reports.auditlog.list.php:56
 #: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
@@ -544,7 +543,7 @@ msgstr[0] "Action activée"
 msgstr[1] "Actions activées"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:137
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:139
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -562,8 +561,8 @@ msgstr "Action mise à jour"
 #: include/classes/screens/CScreenProblem.php:923
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:251
-#: include/forms.inc.php:1199 include/menu.inc.php:114
-#: include/menu.inc.php:144 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1199 include/menu.inc.php:116
+#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
@@ -637,8 +636,8 @@ msgstr "Actif jusqu'à"
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
-#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
-#: app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:175
+#: app/views/popup.lldoverride.php:194
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
@@ -820,7 +819,7 @@ msgstr "Ajouté, %1$s"
 msgid "Admin"
 msgstr "Admin"
 
-#: include/menu.inc.php:150
+#: include/menu.inc.php:152
 msgid "Administration"
 msgstr "Administration"
 
@@ -1264,8 +1263,8 @@ msgstr "Intervalle entre tentatives"
 msgid "Attempts"
 msgstr "Tentatives"
 
-#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:133
-#: include/menu.inc.php:136
+#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:135
+#: include/menu.inc.php:138
 msgid "Audit"
 msgstr "Audit"
 
@@ -1293,7 +1292,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
-#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:165
+#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
@@ -1406,7 +1405,7 @@ msgstr ""
 msgid "Availability"
 msgstr "Disponibilité"
 
-#: include/menu.inc.php:72 include/menu.inc.php:128 report2.php:25
+#: include/menu.inc.php:72 include/menu.inc.php:130 report2.php:25
 #: report2.php:161
 msgid "Availability report"
 msgstr "Rapport de disponibilité"
@@ -2859,7 +2858,7 @@ msgstr "Impossible de mettre à jour l'authentification"
 #: app/controllers/CControllerGuiUpdate.php:43
 #: app/controllers/CControllerGuiUpdate.php:80
 #: app/controllers/CControllerHousekeepingUpdate.php:57
-#: app/controllers/CControllerHousekeepingUpdate.php:126
+#: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:43
 #: app/controllers/CControllerMiscConfigUpdate.php:80
 #: app/controllers/CControllerTrigDisplayUpdate.php:47
@@ -3496,7 +3495,7 @@ msgid "Concurrent sessions"
 msgstr "Sessions concurrentes"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:740
-#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:168
+#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:169
 msgid "Condition"
 msgstr "Condition"
 
@@ -3553,7 +3552,7 @@ msgstr "Conditions"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Conditions en double pour la corrélation \"%1$s\"."
 
-#: include/menu.inc.php:97 include/menu.inc.php:142
+#: include/menu.inc.php:97 include/menu.inc.php:144
 #: include/views/inventory.host.view.php:211 jsLoader.php:275
 msgid "Configuration"
 msgstr "Configuration"
@@ -5204,7 +5203,7 @@ msgstr "Éléments découvert"
 #: app/views/search.php:88 app/views/search.php:92 app/views/search.php:228
 #: app/views/search.php:278 app/views/search.php:282
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:293
-#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
+#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:118
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
 #: include/views/configuration.template.list.php:156
@@ -6008,7 +6007,7 @@ msgstr "ID événement"
 msgid "Event acknowledged"
 msgstr "Événement acquitté"
 
-#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:147
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr "Corrélation d'événement"
@@ -6642,7 +6641,7 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "Accès GUI désactivé."
 
-#: include/menu.inc.php:154
+#: include/menu.inc.php:156
 msgid "General"
 msgstr "Général"
 
@@ -7050,7 +7049,7 @@ msgstr "Groupement par"
 msgid "Groups"
 msgstr "Groupes"
 
-#: include/menu.inc.php:225
+#: include/menu.inc.php:227
 msgid "Guest user"
 msgstr ""
 
@@ -7148,7 +7147,7 @@ msgstr "Hébreu (he_IL)"
 msgid "Height"
 msgstr "Hauteur"
 
-#: include/menu.inc.php:211 include/menu.inc.php:214
+#: include/menu.inc.php:213 include/menu.inc.php:216
 #: include/views/general.login.php:89
 msgid "Help"
 msgstr "Aide"
@@ -7667,7 +7666,7 @@ msgstr "Un hôte ayant le même nom visible \"%1$s\" existe déjà."
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:207 include/forms.inc.php:644 include/menu.inc.php:37
-#: include/menu.inc.php:65 include/menu.inc.php:106
+#: include/menu.inc.php:65 include/menu.inc.php:108
 #: include/views/configuration.application.list.php:50
 #: include/views/configuration.copy.elements.php:62
 #: include/views/configuration.graph.list.php:87
@@ -10776,7 +10775,7 @@ msgstr "Filtre principal"
 msgid "Main navigation"
 msgstr "Navigation principale"
 
-#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:114
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -11136,7 +11135,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Le type de média avec l'IS \"%1$s\" n'est pas disponible."
 
 #: app/views/administration.mediatype.edit.php:30
-#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:174
+#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:176
 #: include/views/conf.import.php:51
 msgid "Media types"
 msgstr "Types de média"
@@ -12925,7 +12924,7 @@ msgstr "Type d'opération"
 msgid "Operational data"
 msgstr ""
 
-#: app/views/popup.lldoverride.php:183
+#: app/views/popup.lldoverride.php:184
 #: include/views/configuration.action.edit.php:306
 #: include/views/configuration.action.edit.php:470
 #: include/views/configuration.action.list.php:90
@@ -13941,7 +13940,7 @@ msgstr "L'URL fourni \"%1$s\" est invalide."
 
 #: app/controllers/CControllerPopupGeneric.php:164
 #: app/views/administration.proxy.edit.php:28
-#: app/views/administration.proxy.list.php:31 include/menu.inc.php:162
+#: app/views/administration.proxy.list.php:31 include/menu.inc.php:164
 msgid "Proxies"
 msgstr "Proxys"
 
@@ -14044,7 +14043,7 @@ msgstr "Fichier de clé publique"
 msgid "Query fields"
 msgstr "Champs de requête"
 
-#: include/menu.inc.php:180 queue.php:25
+#: include/menu.inc.php:182 queue.php:25
 msgid "Queue"
 msgstr "File d'attente"
 
@@ -14479,7 +14478,7 @@ msgstr "Remplacer"
 msgid "Replace dependencies"
 msgstr "Remplacer les dépendances"
 
-#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:126
+#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:128
 #: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "Rapports"
@@ -15254,7 +15253,7 @@ msgstr "Script modifié"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
-#: app/views/administration.script.list.php:31 include/menu.inc.php:177
+#: app/views/administration.script.list.php:31 include/menu.inc.php:179
 #: jsLoader.php:303
 msgid "Scripts"
 msgstr "Scripts"
@@ -15562,7 +15561,7 @@ msgid "Service updated"
 msgstr "Service mis à jour"
 
 #: app/views/administration.housekeeping.edit.php:79 include/menu.inc.php:55
-#: include/menu.inc.php:118 include/views/configuration.services.edit.php:30
+#: include/menu.inc.php:120 include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.list.php:27 srv_status.php:26
 #: srv_status.php:161
@@ -15676,7 +15675,7 @@ msgstr "La criticité a augmenté"
 msgid "Shape"
 msgstr "Forme"
 
-#: include/menu.inc.php:202
+#: include/menu.inc.php:204
 msgid "Share"
 msgstr ""
 
@@ -15857,7 +15856,7 @@ msgstr "Connectez-vous avec HTTP"
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/menu.inc.php:240 include/menu.inc.php:243
+#: include/menu.inc.php:242 include/menu.inc.php:245
 msgid "Sign out"
 msgstr "Déconnexion"
 
@@ -16340,7 +16339,7 @@ msgstr "Dim"
 msgid "Sunday"
 msgstr "Dimanche"
 
-#: include/menu.inc.php:195 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:96
 msgid "Support"
 msgstr "Support"
 
@@ -16404,7 +16403,7 @@ msgstr "Nom d'hôte du système. Retourne une chaîne"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:29
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:129
+#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:131
 #: include/screens.inc.php:36
 msgid "System information"
 msgstr "Information système"
@@ -17460,7 +17459,7 @@ msgstr "Déclencheurs"
 msgid "Triggers deleted"
 msgstr "Déclencheurs supprimés"
 
-#: include/menu.inc.php:75 include/menu.inc.php:132
+#: include/menu.inc.php:75 include/menu.inc.php:134
 msgid "Triggers top 100"
 msgstr "Top 100 des déclencheurs"
 
@@ -17934,7 +17933,7 @@ msgstr "Fonctionne"
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
-#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:194
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
@@ -18207,7 +18206,7 @@ msgstr "Le groupe d'utilisateurs avec l'IS \"%1$s\" n'est pas disponible."
 #: app/controllers/CControllerPopupGeneric.php:228
 #: app/views/administration.usergroup.edit.php:28
 #: app/views/administration.usergroup.list.php:31
-#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:168
+#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:170
 #: include/views/monitoring.screen.edit.php:128
 #: include/views/monitoring.slideconf.edit.php:177
 #: include/views/monitoring.sysmap.edit.php:298
@@ -18259,7 +18258,7 @@ msgstr "Période de stockage des données de session utilisateur \"%1$s\"."
 msgid "User sessions"
 msgstr "Sessions utilisateurs"
 
-#: include/menu.inc.php:232
+#: include/menu.inc.php:234
 msgid "User settings"
 msgstr ""
 
@@ -18331,7 +18330,7 @@ msgstr ""
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
 #: app/views/dashboard.sharing.edit.php:50
-#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:173
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
@@ -19305,7 +19304,7 @@ msgstr "Zabbix"
 msgid "Zabbix Admin"
 msgstr "Administrateur Zabbix"
 
-#: include/menu.inc.php:205
+#: include/menu.inc.php:207
 msgid "Zabbix Share"
 msgstr "Zabbix Share"
 
@@ -19313,7 +19312,7 @@ msgstr "Zabbix Share"
 msgid "Zabbix Super Admin"
 msgstr "Super Administrateur Zabbix"
 
-#: include/menu.inc.php:198
+#: include/menu.inc.php:200
 msgid "Zabbix Technical Support"
 msgstr "Support Technique Zabbix"
 
