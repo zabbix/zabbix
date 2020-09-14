@@ -28,94 +28,11 @@ class testDiagnosticDataTask extends CIntegrationTest {
 
 	public static function dataTask_dataProvider() {
 		return [
-			// Invalid format cases.
-			[
-				'request' => null,
-				'expected_error' => 'Invalid parameter "/1": the parameter "request" is missing.'
-			],
-			[
-				'request' => [
-					'unsupported_key' => null
-				],
-				'expected_error' => 'Invalid parameter "/1/request": unexpected parameter "unsupported_key".'
-			],
-			[
-				'request' => [
-					'historycache' => [
-						'top' => [
-							'extend' => 10
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/request/historycache/top": unexpected parameter "extend".'
-			],
-
-			// Valid cases.
-			[
-				'request' => [
-					'historycache' => [
-						'stats' => ['items', 'values', 'memory', 'memory.data', 'memory.index'],
-						'top' => ['values' => 2]
-					]
-				],
-				'expected_error' => null
-			],
 			[
 				'request' => [
 					'valuecache' => [
 						'stats' => ['items', 'values', 'memory', 'mode'],
 						'top' => ['values' => 2, 'request.values' => 2]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-						'preprocessing' => [
-							'stats' => ['values', 'preproc.values'],
-							'top' => ['values' => 2]
-						]
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'alerting' => [
-						'stats' => ['alerts'],
-						'top' => ['media.alerts' => 2, 'source.alerts' => 2]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'lld' => [
-						'stats' => ['rules', 'values'],
-						'top' => ['values' => 2]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'lld' => [
-						'stats' => ['rules', 'values']
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'lld' => [
-						'top' => ['values' => 2]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'valuecache' => [
-						'stats' => 'extend'
 					]
 				],
 				'expected_error' => null
