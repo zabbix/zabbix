@@ -3611,14 +3611,19 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 
 		tm = *localtime(&from);
 		zbx_tm_round_up(&tm, timer->trend_base);
-		if (-1 == (nextcheck = mktime(&tm)))
+
+		if (-1 = (nextcheck = mktime(&tm)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot calculate trend function schedule:"
-					" internal error when rounding up current time");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64 "\" schedule:"
+					" internal error when rounding up current time", timer->objectid);
+			THIS_SHOULD_NEVER_HAPPEN;
+
 			return 0;
 		}
 		return nextcheck + offsets[timer->trend_base] + seed % periods[timer->trend_base];
 	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
 
 	return 0;
 }
@@ -3756,8 +3761,13 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		}
 		else
 		{
-			ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid);
-			dc_schedule_trigger_timer(timer, NULL, &ts);
+			if (0 == (ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
+			{
+				dc_trigger_timer_free(timer);
+				function->timer = 0;
+			}
+			else
+				dc_schedule_trigger_timer(timer, NULL, &ts);
 		}
 	}
 }
@@ -8083,9 +8093,22 @@ void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 		{
 			zbx_timespec_t	ts;
 
-			ts.ns = 0;
-			ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid);
-			dc_schedule_trigger_timer(timer, NULL, &ts);
+			if (0 == (ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
+			{
+				ZBX_DC_FUNCTION	*function;
+
+				if (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+						&timer->objectid)))
+				{
+					function->timer = 0;
+				}
+				dc_trigger_timer_free(timer);
+			}
+			else
+			{
+				ts.ns = 0;
+				dc_schedule_trigger_timer(timer, NULL, &ts);
+			}
 		}
 		else
 			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->exec_ts);
