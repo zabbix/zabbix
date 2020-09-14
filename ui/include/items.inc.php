@@ -1258,7 +1258,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 			$version = $interface['details']['version'];
-			if ($version == 3) {
+			if ($version == SNMP_V3) {
 				$option->setLabelExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
 					_('Context name'), $interface['details']['contextname']
 				));
