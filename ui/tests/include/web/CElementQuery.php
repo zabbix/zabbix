@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/elements/CTableRowElement.php';
 require_once dirname(__FILE__).'/elements/CWidgetElement.php';
 require_once dirname(__FILE__).'/elements/CDashboardElement.php';
 require_once dirname(__FILE__).'/elements/CDropdownElement.php';
+require_once dirname(__FILE__).'/elements/CZDropdownElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxElement.php';
 require_once dirname(__FILE__).'/elements/COverlayDialogElement.php';
 require_once dirname(__FILE__).'/elements/CMessageElement.php';
@@ -517,6 +518,7 @@ class CElementQuery implements IWaitable {
 				'/textarea[@name]'
 			],
 			'CDropdownElement'			=> '/select[@name]',
+			'CZDropdownElement'			=> '/z-select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
 				'/div[contains(@class, "multiselect-control")]',
