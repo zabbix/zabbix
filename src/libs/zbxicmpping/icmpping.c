@@ -87,8 +87,8 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  *                                                                            *
  * Purpose: detect minimal possible fping packet interval                     *
  *                                                                            *
- * Parameters: fping         - [IN] the the location of fping program         *
- *             dst           - [IN] the the ip address for test               *
+ * Parameters: fping         - [IN] the location of fping program             *
+ *             dst           - [IN] the ip address for test                   *
  *             value         - [OUT] interval between sending ping packets    *
  *                                   (in millisec)                            *
  *             error         - [OUT] error string if function fails           *
@@ -158,8 +158,8 @@ static int	get_interval_option(const char * fping, const char *dst, int *value, 
  *                                                                            *
  * Purpose: check fping supports IPv6                                         *
  *                                                                            *
- * Parameters: fping - [IN] the the location of fping program                 *
- *             dst   - [IN] the the ip address for test                       *
+ * Parameters: fping - [IN] the location of fping program                     *
+ *             dst   - [IN] the ip address for test                           *
  *                                                                            *
  * Return value: SUCCEED - IPv6 is supported                                  *
  *               FAIL    - IPv6 is not supported                              *
