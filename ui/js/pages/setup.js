@@ -59,12 +59,12 @@ function updateElementsAvailability() {
 
 	// TLS encryption checkbox and secure connection hint message.
 	if (encryption_supported && !encryption_allowed) {
-		document.querySelector('[name=tls_encryption]').setAttribute('disabled', 'disabled');
+		document.querySelector('#tls_encryption').setAttribute('disabled', 'disabled');
 		document.querySelector('input + [for=tls_encryption]').classList.add(ZBX_STYLE_DISPLAY_NONE);
 		document.querySelector('#tls_encryption_hint').classList.remove(ZBX_STYLE_DISPLAY_NONE);
 	}
 	else {
-		document.querySelector('[name=tls_encryption]').removeAttribute('disabled');
+		document.querySelector('#tls_encryption').removeAttribute('disabled');
 		document.querySelector('input + [for=tls_encryption]').classList.remove(ZBX_STYLE_DISPLAY_NONE);
 		document.querySelector('#tls_encryption_hint').classList.add(ZBX_STYLE_DISPLAY_NONE);
 	}

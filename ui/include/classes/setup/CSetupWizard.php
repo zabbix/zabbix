@@ -211,7 +211,12 @@ class CSetupWizard extends CForm {
 	function stage2() {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
 
-		$table = (new CFormList());
+		$table = (new CFormList())
+			->addItem([
+				(new CVar('tls_encryption', 0))->removeId(),
+				(new CVar('verify_certificate', 0))->removeId(),
+				(new CVar('tls_encryption', 0))->removeId()
+			]);
 
 		$table->addRow(_('Database type'),
 			new CComboBox('type', $DB['TYPE'], null, CFrontendSetup::getSupportedDatabases())
@@ -262,8 +267,7 @@ class CSetupWizard extends CForm {
 		);
 
 		$table->addRow(_('Verify certificate'),
-			(new CCheckBox('verify_certificate'))
-				->setChecked($this->getConfig('DB_ENCRYPTION_ADVANCED')),
+			(new CCheckBox('verify_certificate'))->setChecked($this->getConfig('DB_ENCRYPTION_ADVANCED')),
 			'db_verify_host',
 			ZBX_STYLE_DISPLAY_NONE
 		);
