@@ -72,57 +72,56 @@ $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid'
 	->setAttribute('maxlength', 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
+$interface_header = renderInterfaceHeaders();
+
+$agent_interfaces = (new CDiv())
+	->setId('agentInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'agent');
+
+$snmp_interfaces = (new CDiv())
+	->setId('SNMPInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
+	->setAttribute('data-type', 'snmp');
+
+$jmx_interfaces = (new CDiv())
+	->setId('JMXInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'jmx');
+
+$ipmi_interfaces = (new CDiv())
+	->setId('IPMIInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'ipmi');
+
+$hostList->addRow(new CLabel(_('Interfaces')),
+	[
+		(new CRadioButtonList('custom_interfaces', (int) $hostPrototype['custom_interfaces']))
+			->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
+			->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
+			->setModern(true),
+		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
+			->setId('interfaces-table'),
+		new CDiv(
+			(new CButton('interface-add', _('Add')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->setMenuPopup([
+					'type' => 'submenu',
+					'data' => [
+						'submenu' => getAddNewInterfaceSubmenu()
+					]
+				])
+				->setAttribute('aria-label', _('Add new interface'))
+				->addStyle(($hostPrototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM)
+					? null
+					: 'display: none'
+				)
+		)
+	]
+);
+
 // Display inherited parameters only for hosts prototypes on hosts.
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
-	$existingInterfaceTypes = [];
-	foreach ($parentHost['interfaces'] as $interface) {
-		$existingInterfaceTypes[$interface['type']] = true;
-	}
-
-	$interface_header = renderInterfaceHeaders();
-
-	$agent_interfaces = (new CDiv())
-		->setId('agentInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'agent');
-
-	$snmp_interfaces = (new CDiv())
-		->setId('SNMPInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
-		->setAttribute('data-type', 'snmp');
-
-	$jmx_interfaces = (new CDiv())
-		->setId('JMXInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'jmx');
-
-	$ipmi_interfaces = (new CDiv())
-		->setId('IPMIInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'ipmi');
-
-	$hostList->addRow(new CLabel(_('Interfaces')),
-		[
-			(new CRadioButtonList('custom_interfaces', (int) $hostPrototype['custom_interfaces']))
-				->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
-				->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
-				->setModern(true),
-			(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
-				->setId('js-interfaces-table'),
-			new CDiv(
-				(new CButton('js-interface-add', _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setMenuPopup([
-						'type' => 'submenu',
-						'data' => [
-							'submenu' => getAddNewInterfaceSubmenu()
-						]
-					])
-					->setAttribute('aria-label', _('Add new interface'))
-			)
-		]
-	);
-
 	// proxy
 	$proxyTb = (new CTextBox('proxy_hostid',
 		$parentHost['proxy_hostid'] != 0 ? $this->data['proxy']['host'] : _('(no proxy)'), true

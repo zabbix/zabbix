@@ -202,6 +202,10 @@
 			return this.interfaces;
 		}
 
+		changeNoInterfaceMsg(msg) {
+			this.$noInterfacesMsg.text(msg);
+		}
+
 		setSnmpFields(elem, iface) {
 			if (iface.type != <?= INTERFACE_TYPE_SNMP ?>) {
 				return elem

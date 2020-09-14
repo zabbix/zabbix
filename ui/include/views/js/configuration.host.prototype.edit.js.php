@@ -38,11 +38,11 @@
 
 <script type="text/javascript">
 	class InterfaceSourceSwitcher extends CBaseComponent {
-		constructor(target, $source_input, $add_button, data) {
+		constructor(target, source_input, add_button, data) {
 			super(target);
 
-			this._$source_input = $source_input;
-			this._$add_button = $add_button;
+			this._source_input = source_input;
+			this._add_button = add_button;
 			this._data = data;
 
 			this._target_clone = this._target.cloneNode(true);
@@ -51,45 +51,60 @@
 		}
 
 		register_events() {
-			var that = this;
-
 			switch (this.getSourceValue()) {
 				case '<?= HOST_PROT_INTERFACES_INHERIT ?>':
 					this.initInherit();
+					this._target.customInterfaces = null;
 					break;
 				case '<?= HOST_PROT_INTERFACES_CUSTOM ?>':
 					this.initCustom();
+					this._target.inheritInterfaces = null;
 					break;
 			}
 
-			this._$source_input.on('change', function() {
-				that.switchTo(that.getSourceValue());
+			this._source_input.addEventListener('change', () => {
+				this.switchTo(this.getSourceValue());
 			});
 		}
 
 		getSourceValue() {
-			return $('input[name=custom_interfaces]:checked', this._$source_input).val();
+			return this._source_input.querySelector('input[name=custom_interfaces]:checked').value;
 		}
 
 		initInherit() {
 			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces);
+
+			if (this._data.parent_is_template) {
+				hostInterfaceManagerInherit.changeNoInterfaceMsg('<?= _('Interfaces will be inherited from host.') ?>');
+			}
+			else {
+				hostInterfaceManagerInherit.changeNoInterfaceMsg(
+					'<?= _('No interfaces are defined for parent host.') ?>'
+				);
+			}
+
 			hostInterfaceManagerInherit.render();
-			HostInterfaceManager.disableEdit(); // TODO VM: change to class method
+			HostInterfaceManager.disableEdit();
 		}
 
 		initCustom() {
 			// This is in global space, as Add functions uses it.
 			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces);
+			hostInterfaceManager.changeNoInterfaceMsg('<?= _('No interfaces are defined for this host prototype.') ?>');
 			hostInterfaceManager.render();
 		}
 
 		switchTo(source) {
 			switch (source) {
 				case '<?= HOST_PROT_INTERFACES_INHERIT ?>':
-					this._$add_button.hide();
+					this._add_button.style.display = 'none';
 
 					if (!('inheritInterfaces' in this._target)) {
+						// Do nothing.
+					}
+					else if (this._target.inheritInterfaces === null) {
 						this._target.inheritInterfaces = this._target_clone;
+						this._target_clone = null;
 						this.switchToInherit();
 						this.initInherit();
 					}
@@ -99,7 +114,11 @@
 					break;
 				case '<?= HOST_PROT_INTERFACES_CUSTOM ?>':
 					if (!('customInterfaces' in this._target)) {
+						// Do nothing.
+					}
+					else if (this._target.customInterfaces === null) {
 						this._target.customInterfaces = this._target_clone;
+						this._target_clone = null;
 						this.switchToCustom();
 						this.initCustom();
 					}
@@ -107,7 +126,7 @@
 						this.switchToCustom();
 					}
 
-					this._$add_button.show();
+					this._add_button.style.display = 'inline-block';
 
 					break;
 			}
@@ -142,10 +161,11 @@
 
 	jQuery(function() {
 		const interface_source_switcher = new InterfaceSourceSwitcher(
-			document.getElementById('js-interfaces-table'),
-			$('#custom_interfaces'),
-			$('#js-interface-add'),
+			document.getElementById('interfaces-table'),
+			document.getElementById('custom_interfaces'),
+			document.getElementById('interface-add'),
 			<?= json_encode([
+				'parent_is_template' => $parentHost['status'] == HOST_STATUS_TEMPLATE,
 				'inherited_interfaces' => array_values($parentHost['interfaces']),
 				'custom_interfaces' => array_values($hostPrototype['interfaces'])
 			]) ?>
