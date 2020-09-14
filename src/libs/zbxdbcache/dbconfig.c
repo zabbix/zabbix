@@ -3612,7 +3612,7 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		tm = *localtime(&from);
 		zbx_tm_round_up(&tm, timer->trend_base);
 
-		if (-1 = (nextcheck = mktime(&tm)))
+		if (-1 == (nextcheck = mktime(&tm)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64 "\" schedule:"
 					" internal error when rounding up current time", timer->objectid);
