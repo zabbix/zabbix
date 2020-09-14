@@ -44,8 +44,6 @@ const hostMetadataLen = 255
 const hostInterfaceLen = 255
 const defaultAgentPort = 10050
 
-var serverConnectors []*Connector
-
 type Connector struct {
 	clientID    uint64
 	input       chan interface{}

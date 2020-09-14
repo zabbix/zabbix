@@ -457,7 +457,6 @@ func main() {
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopConnector()
 	}
-
 	monitor.Wait(monitor.Input)
 
 	manager.Stop()
@@ -469,7 +468,6 @@ func main() {
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopCache()
 	}
-
 	monitor.Wait(monitor.Output)
 
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
