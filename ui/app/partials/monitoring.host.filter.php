@@ -148,13 +148,15 @@ $template = (new CDiv())
 $template = (new CForm('get'))
 	->cleanItems()
 	->setName('zbx_filter')
-	->addItem($template)
-	->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE))
-	->addItem((new CInput('hidden', 'filter_name', '#{filter_name}'))->removeId())
-	->addItem((new CInput('hidden', 'filter_show_counter', '#{filter_show_counter}'))->removeId())
-	->addItem((new CInput('hidden', 'filter_custom_time', '#{filter_custom_time}'))->removeId())
-	->addItem((new CInput('hidden', 'sort', '#{sort}'))->removeId())
-	->addItem((new CInput('hidden', 'sortorder', '#{sortorder}'))->removeId());
+	->addItem([
+		$template,
+		(new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE)
+		(new CVar('filter_name', '#{filter_name}'))->removeId(),
+		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
+		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
+		(new CVar('sort', '#{sort}'))->removeId(),
+		(new CVar('sortorder', '#{sortorder}'))->removeId()
+	]);
 
 if (array_key_exists('render_html', $data)) {
 	/**
