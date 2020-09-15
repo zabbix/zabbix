@@ -112,7 +112,7 @@ abstract class CControllerProblem extends CController {
 				'groupids' => $filter['groupids'],
 				'preservekeys' => true
 			]);
-			$data['host_groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+			$data['groups'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
 		}
 
 		// Triggers multiselect.
