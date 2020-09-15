@@ -302,7 +302,7 @@ class CSetupWizard extends CForm {
 		if ($DB['CREDS_STORAGE'] == DB_STORE_CREDS_VAULT) {
 			$table
 				->addRow(_('Vault API endpoint'),
-					(new CTextBox('vault_host', $this->getConfig('DB_VAULT_HOST') ? : self::VAULT_HOST_DEFAULT))
+					(new CTextBox('vault_host', $this->getConfig('DB_VAULT_HOST', self::VAULT_HOST_DEFAULT)))
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
 				->addRow(_('Vault secret path'),
@@ -629,8 +629,8 @@ class CSetupWizard extends CForm {
 		$DB['SERVER'] = $this->getConfig('DB_SERVER', 'localhost');
 		$DB['PORT'] = $this->getConfig('DB_PORT', '0');
 		$DB['DATABASE'] = $this->getConfig('DB_DATABASE', 'zabbix');
-		$DB['USER'] = $username ? : $this->getConfig('DB_USER', 'root');
-		$DB['PASSWORD'] = $password ? : $this->getConfig('DB_PASSWORD', '');
+		$DB['USER'] = $username ? $username : $this->getConfig('DB_USER', 'root');
+		$DB['PASSWORD'] = $password ? $password : $this->getConfig('DB_PASSWORD', '');
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
 		$DB['ENCRYPTION'] = (bool) $this->getConfig('DB_ENCRYPTION', true);
 		$DB['VERIFY_HOST'] = (bool) $this->getConfig('DB_VERIFY_HOST', true);
