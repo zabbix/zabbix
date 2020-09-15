@@ -82,7 +82,7 @@ func dfHandler(data []byte) (interface{}, error) {
 
 	for _, p := range df.Pools {
 		poolsStat[p.Name] = poolStat{
-			math.Ceil(p.Stats.PercentUsed),
+			math.Round(p.Stats.PercentUsed),
 			p.Stats.Rd,
 			p.Stats.RdBytes,
 			p.Stats.Wr,
