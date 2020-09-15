@@ -23,6 +23,7 @@
 	#define localtime_r(x, y)	localtime_s(y, x)
 #endif
 
+static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
@@ -82,6 +83,37 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 	*len = ptr - period + 1;
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_adjust_dst                                                    *
+ *                                                                            *
+ * Purpose: adjust time by DST hour if it was moved to other from summer time *
+ *          to winter time or the other way around                            *
+ *                                                                            *
+ * Parameter: tm         - [IN/OUT] the time structure                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_adjust_dst(struct tm *tm)
+{
+	time_t		time_new;
+	struct	tm	tm_new;
+
+	tm_new = *tm;
+
+	if (-1 != (time_new = mktime(&tm_new)))
+	{
+		localtime_r(&time_new, &tm_new);
+		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
+		{
+			*tm = tm_new;
+			if (0 == tm->tm_isdst)
+				tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
+			else
+				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
+		}
+	}
 }
 
 /******************************************************************************
@@ -157,23 +189,9 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 	struct	tm	tm_new;
 
 	tm_add(tm, multiplier, base);
+	tm_adjust_dst(tm);
 
-	/* adjust clock if DST changes were in effect */
-
-	tm_new = *tm;
-
-	if (-1 != (time_new = mktime(&tm_new)))
-	{
-		localtime_r(&time_new, &tm_new);
-		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
-		{
-			*tm = tm_new;
-			if (0 == tm->tm_isdst)
-				tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
-			else
-				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
-		}
-	}
+	return;
 }
 
 /******************************************************************************
@@ -277,25 +295,9 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 	struct	tm	tm_new;
 
 	tm_sub(tm, multiplier, base);
+	tm_adjust_dst(tm);
 
-	/* adjust clock if DST changes were in effect */
-
-	tm_new = *tm;
-
-	if (-1 != (time_new = mktime(&tm_new)))
-	{
-		localtime_r(&time_new, &tm_new);
-
-		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
-		{
-			*tm = tm_new;
-			if (0 == tm->tm_isdst)
-				tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
-			else
-				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
-
-		}
-	}
+	return;
 }
 
 /******************************************************************************
@@ -358,6 +360,53 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
 		tm->tm_mon = 0;
 		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_YEAR);
 	}
+
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tm_round_down                                                *
+ *                                                                            *
+ * Purpose: rounds time by the specified unit downwards                       *
+ *                                                                            *
+ * Parameter: tm         - [IN/OUT] the time structure                        *
+ *            base       - [IN] the time unit                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base)
+{
+	switch (base)
+	{
+		case ZBX_TIME_UNIT_WEEK:
+			if (1 != tm->tm_wday)
+			{
+				zbx_tm_sub(tm, (0 == tm->tm_wday ? 6 : tm->tm_wday - 1), ZBX_TIME_UNIT_DAY);
+				tm->tm_wday = 1;
+			}
+
+			tm->tm_hour = 0;
+			tm->tm_min = 0;
+			tm->tm_sec = 0;
+			break;
+		case ZBX_TIME_UNIT_YEAR:
+			tm->tm_mon = 0;
+			ZBX_FALLTHROUGH;
+		case ZBX_TIME_UNIT_MONTH:
+			tm->tm_mday = 1;
+			ZBX_FALLTHROUGH;
+		case ZBX_TIME_UNIT_DAY:
+			tm->tm_hour = 0;
+			ZBX_FALLTHROUGH;
+		case ZBX_TIME_UNIT_HOUR:
+			tm->tm_min = 0;
+			tm->tm_sec = 0;
+			break;
+		default:
+			break;
+	}
+
+	tm_adjust_dst(tm);
 
 	return;
 }

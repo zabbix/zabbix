@@ -22,7 +22,8 @@ SERVER_tests = \
 	zbx_dyn_escape_string \
 	zbx_tm_add \
 	zbx_tm_sub \
-	zbx_tm_round_up
+	zbx_tm_round_up \
+	zbx_tm_round_down
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -418,5 +419,20 @@ zbx_tm_round_up_LDADD += @SERVER_LIBS@
 zbx_tm_round_up_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_tm_round_up_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_tm_round_up
+
+zbx_tm_round_down_SOURCES = \
+	zbx_tm_round_down.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tm_round_down_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tm_round_down_LDADD += @SERVER_LIBS@
+
+zbx_tm_round_down_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_tm_round_down_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

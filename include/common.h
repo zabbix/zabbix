@@ -1663,6 +1663,7 @@ zbx_time_unit_t;
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
+void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
 
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
 
