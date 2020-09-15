@@ -31,6 +31,18 @@ $this->includeJsFile('reports.auditlog.list.js.php');
 
 $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action'])));
 
+$select_filter_resourcetype = (new CSelect('filter_resourcetype'))
+	->setId('resourcetype-select')
+	->setValue($data['resourcetype'])
+	->setFocusableElementId('filter_resourcetype')
+	->addOptions(CSelect::createOptionsFromArray($data['resources']));
+
+$select_filter_action = (new CSelect('filter_action'))
+	->setId('action-select')
+	->setValue($data['auditlog_action'])
+	->setFocusableElementId('filter_action')
+	->addOptions(CSelect::createOptionsFromArray($data['actions']));
+
 $filter_form = (new CFormList())
 	->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
 		(new CMultiSelect([
@@ -49,20 +61,14 @@ $filter_form = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	])
-	->addRow(new CLabel(_('Resource'), 'filter_resourcetype'), (new CSelect('filter_resourcetype'))
-		->setId('resourcetype-select')
-		->setValue($data['resourcetype'])
-		->setFocusableElementId('filter_resourcetype')
-		->addOptions(CSelect::createOptionsFromArray($data['resources']))
+	->addRow(new CLabel(_('Resource'), $select_filter_resourcetype->getFocusableElementId()),
+		$select_filter_resourcetype
 	)
 	->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
 		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(new CLabel(_('Action'), 'filter_action'), (new CSelect('filter_action'))
-		->setId('action-select')
-		->setValue($data['auditlog_action'])
-		->setFocusableElementId('filter_action')
-		->addOptions(CSelect::createOptionsFromArray($data['actions']))
+	->addRow(new CLabel(_('Action'), $select_filter_action->getFocusableElementId()),
+		$select_filter_action
 	);
 
 $widget = (new CWidget())

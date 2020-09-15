@@ -374,19 +374,23 @@ $form_list
 	);
 
 // Append interfaces to form list.
+$select_interface = getInterfaceSelect($data['interfaces'])
+	->setId('interface-select')
+	->setValue($data['interfaceid'])
+	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+	->setFocusableElementId('interfaceid')
+	->setAriaRequired();
+
 if ($data['display_interfaces']) {
-	$form_list->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(), [
-		getInterfaceSelect($data['interfaces'])
-			->setId('interface-select')
-			->setValue($data['interfaceid'])
-			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
-			->setFocusableElementId('interfaceid')
-			->setAriaRequired(),
-		(new CSpan(_('No interface found')))
-			->addClass(ZBX_STYLE_RED)
-			->setId('interface_not_defined')
-			->setAttribute('style', 'display: none;')
-	], 'interface_row');
+	$form_list->addRow(
+		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))->setAsteriskMark(),
+		[
+			$select_interface,
+			(new CSpan(_('No interface found')))
+				->addClass(ZBX_STYLE_RED)
+				->setId('interface_not_defined')
+				->setAttribute('style', 'display: none;')
+		], 'interface_row');
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $form_list

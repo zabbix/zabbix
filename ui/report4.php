@@ -85,30 +85,34 @@ else {
 		$minYear = date('Y');
 	}
 
+	$select_media_type = (new CSelect('media_type'))
+		->setValue($media_type)
+		->setFocusableElementId('media_type')
+		->onChange('$(this).closest("form").submit()')
+		->addOption(new CSelectOption(0, _('all')))
+		->addOptions(CSelect::createOptionsFromArray($media_types));
+
+	$select_period = (new CSelect('period'))
+		->setValue($period)
+		->setFocusableElementId('period')
+		->onChange('$(this).closest("form").submit()')
+		->addOptions(CSelect::createOptionsFromArray([
+			'daily' => _('Daily'),
+			'weekly' => _('Weekly'),
+			'monthly' => _('Monthly'),
+			'yearly' => _('Yearly')
+		]));
+
 	$controls = (new CList())
 		->addItem([
-			new CLabel(_('Media type'), 'media_type'),
+			new CLabel(_('Media type'), $select_media_type->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CSelect('media_type'))
-				->setValue($media_type)
-				->setFocusableElementId('media_type')
-				->onChange('$(this).closest("form").submit()')
-				->addOption(new CSelectOption(0, _('all')))
-				->addOptions(CSelect::createOptionsFromArray($media_types))
+			$select_media_type
 		])
 		->addItem([
-			new CLabel(_('Period'), 'period'),
+			new CLabel(_('Period'), $select_period->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CSelect('period'))
-				->setValue($period)
-				->setFocusableElementId('period')
-				->onChange('$(this).closest("form").submit()')
-				->addOptions(CSelect::createOptionsFromArray([
-					'daily' => _('Daily'),
-					'weekly' => _('Weekly'),
-					'monthly' => _('Monthly'),
-					'yearly' => _('Yearly')
-				]))
+			$select_period
 		]);
 
 	if ($period != 'yearly') {
@@ -122,7 +126,7 @@ else {
 		}
 
 		$controls->addItem([
-			new CLabel(_('Year'), 'year'),
+			new CLabel(_('Year'), $cmb_year->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$cmb_year
 		]);
@@ -149,6 +153,8 @@ else {
 			->setTitle($full_name);
 		$users[] = $user_data['userid'];
 	}
+
+	$intervals = [];
 
 	switch ($period) {
 		case 'yearly':

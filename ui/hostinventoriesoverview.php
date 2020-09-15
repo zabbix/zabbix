@@ -137,6 +137,13 @@ if ($filter['groupby'] !== '') {
 	}
 }
 
+$select_groupby = (new CSelect('filter_groupby'))
+	->setValue($filter['groupby'])
+	->setFocusableElementId('groupby')
+	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+	->addOption(new CSelectOption('', _('not selected')))
+	->addOptions(CSelect::createOptionsFromArray($inventories));
+
 (new CWidget())
 	->setTitle(_('Host inventory overview'))
 	->addItem(
@@ -163,13 +170,7 @@ if ($filter['groupby'] !== '') {
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
-					->addRow(new CLabel(_('Grouping by'), 'groupby'), (new CSelect('filter_groupby'))
-						->setValue($filter['groupby'])
-						->setFocusableElementId('groupby')
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->addOption(new CSelectOption('', _('not selected')))
-						->addOptions(CSelect::createOptionsFromArray($inventories))
-					)
+					->addRow(new CLabel(_('Grouping by'), $select_groupby->getFocusableElementId()), $select_groupby)
 			])
 	)
 	->addItem($table)
