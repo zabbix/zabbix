@@ -191,7 +191,7 @@ class CConfigFile {
 		$hashsum = CDataCacheHelper::getValue('hashsum', '');
 
 		// Changes in any database related parameter causes cache renewal.
-		$current_hashsum = md5(implode('', [
+		$current_hashsum = md5(implode('-', [
 			$this->config['DB']['TYPE'],
 			$this->config['DB']['SERVER'],
 			$this->config['DB']['PORT'],
