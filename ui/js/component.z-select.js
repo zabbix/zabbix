@@ -142,7 +142,7 @@ class ZSelect extends HTMLElement {
 	}
 
 	getOptionByValue(value) {
-		return this._options_map.has(value) ? this._options_map.get(value) : null;
+		return this._options_map.has(value.toString()) ? this._options_map.get(value) : null;
 	}
 
 	getOptions() {
@@ -150,7 +150,7 @@ class ZSelect extends HTMLElement {
 	}
 
 	addOption({value, label, label_extra, class_name, is_disabled}, container, template) {
-		if (this._options_map.has(value)) {
+		if (this._options_map.has(value.toString())) {
 			throw new Error('Duplicate option value: ' + value);
 		}
 
