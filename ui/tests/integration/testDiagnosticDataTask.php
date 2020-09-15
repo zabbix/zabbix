@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
  * Test task.create and task.get API methods with ZBX_TM_TASK_DATA task.
+ *
+ * @required-components server
  */
 class testDiagnosticDataTask extends CIntegrationTest {
 
