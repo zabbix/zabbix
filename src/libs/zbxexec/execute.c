@@ -129,7 +129,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  * Parameters: pid     - [OUT] child process PID                              *
  *             command - [IN] a pointer to a null-terminated string           *
  *                       containing a shell command line                      *
- *             dir     - directory to execute command under,                  *
+ *             dir     - [IN] directory to execute command under,             *
  *                       stay in current directory if NULL                    *
  *                                                                            *
  * Return value: on success, reading file descriptor is returned. On error,   *
@@ -200,7 +200,13 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 	close(fd[1]);
 
 	if (NULL != dir)
-		chdir(dir);
+	{
+		if (0 != chdir(dir))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot to change directory to \"%s\": %s",
+					__func__, dir, zbx_strerror(errno));
+		}
+	}
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
@@ -216,18 +222,6 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 
 	/* execl() returns only when an error occurs, let parent process know about it */
 	exit(EXIT_FAILURE);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_popen                                                        *
- *                                                                            *
- * Purpose: wrapper for zbx_popen_chdir with dir set to NULL                  *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_popen(pid_t *pid, const char *command)
-{
-	zbx_popen_chdir(pid, command, NULL);
 }
 
 /******************************************************************************

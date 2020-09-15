@@ -95,7 +95,7 @@ ZBX_METRIC	parameters_common[] =
 	{NULL}
 };
 
-const char	*user_parameter_path = NULL;
+static const char	*user_parameter_path = NULL;
 
 void	set_user_parameter_path(const char *path)
 {
@@ -150,7 +150,7 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 {
-	execute_str(command, result, NULL);
+	return execute_str(command, result, NULL);
 }
 
 int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
