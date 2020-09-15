@@ -56,7 +56,7 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 			options.Hostname = options.Hostname[:hostNameLen]
 			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", hostnameItem, hostNameLen)
 		}
-		if err = agent.CheckHostname(options.Hostname, true); err != nil {
+		if err = agent.CheckHostname(options.Hostname); err != nil {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
 		}
 	} else {
