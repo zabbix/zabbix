@@ -8056,10 +8056,11 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 			timer->exec_ts.sec = 0;
 		}
 
-		/* remember if the timer locked trigger, so it would unlock it's unlocked during rescheduling */
-		timer->lock = !dc_trigger->locked;
-
-		dc_trigger->locked = 1;
+		/* remember if the timer locked trigger, so it would unlock during rescheduling */
+		if (0 == dc_trigger->locked)
+			dc_trigger->locked = timer->lock = 1;
+		else
+			timer->lock = 0;	/* to be rescheduled */
 
 		if (NULL == first_timer)
 			first_timer = timer;
