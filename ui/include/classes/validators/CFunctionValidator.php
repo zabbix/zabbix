@@ -607,7 +607,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validatePeriod($param) {
+	private function validatePeriod(string $param): bool {
 		$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
 		$value = (string) $param;
 
@@ -630,7 +630,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validatePeriodShift($param) {
+	private function validatePeriodShift(string $param): bool {
 		$relative_time_parser = new CRelativeTimeParser();
 
 		if ($relative_time_parser->parse((string) $param) === CParser::PARSE_SUCCESS) {
