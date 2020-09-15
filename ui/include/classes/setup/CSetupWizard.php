@@ -307,7 +307,7 @@ class CSetupWizard extends CForm {
 				)
 				->addRow(_('Vault secret path'),
 					(new CTextBox('vault_secret', $this->getConfig('DB_VAULT_SECRET')))
-						->setAttribute('placeholder', 'path/to/secret')
+						->setAttribute('placeholder', _('path/to/secret'))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				)
 				->addRow(_('Vault authentication token'),
