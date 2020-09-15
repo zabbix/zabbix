@@ -96,7 +96,8 @@ class CVaultHelper {
 	public static function validateVaultApiEndpoint(string &$api_endpoint): bool {
 		$url_parts = parse_url($api_endpoint);
 
-		if (!array_key_exists('scheme', $url_parts) || !in_array($url_parts['scheme'], ['http', 'https'])
+		if (!$url_parts
+				|| !array_key_exists('scheme', $url_parts) || !in_array($url_parts['scheme'], ['http', 'https'])
 				|| !array_key_exists('port', $url_parts) || !validatePortNumber($url_parts['port'])
 				|| !array_key_exists('host', $url_parts)) {
 			error(_s('Provided URL "%1$s" is invalid.', $api_endpoint));
