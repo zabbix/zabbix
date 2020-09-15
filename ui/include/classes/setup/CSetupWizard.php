@@ -755,7 +755,7 @@ class CSetupWizard extends CForm {
 					$secret = [];
 
 					if (ini_get('allow_url_fopen') != 1) {
-						$db_connected = _('Please enable "allow_url_fopen" directive.');
+						error(_('Please enable "allow_url_fopen" directive.'));
 					}
 					elseif (CVaultHelper::validateVaultApiEndpoint($vault_host)
 							&& CVaultHelper::validateVaultToken($vault_token)
