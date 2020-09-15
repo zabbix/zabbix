@@ -8041,18 +8041,18 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 		zbx_vector_ptr_append(timers, timer);
 
-		/* Normally locked triggers are busy can must be requeued to be evaluated at the same schedule  */
-		/* until triggers are not locked and can be evaluated.                                          */
-		/* However there are exceptions when the required function will be calculated at the required   */
-		/* time when the trigger is evaluated by different process or because of other function:        */
-		/*  1) time functions are always calculated at current time. So if trigger is already being     */
-		/*     the time function will also be calculated and recalculating it does not makes sense.     */
-		/*  2) if trend function for the same trigger and with the same evaluation timestamp is being   */
-		/*     calculated by the same process.                                                          */
-		/* In those cases simply reset scheduled timestamp so it is requeued at next scheduled time.    */
+		/* Trigger expression must be calculated using function evaluation time. If a trigger is locked   */
+		/* keep rescheduling its timer until trigger is unlocked and can be calculated using the required */
+		/* evaluation time. However there are exceptions when evaluation time of a locked trigger is      */
+		/* acceptable to evaluate other functions:                                                        */
+		/*  1) time functions uses current time, so trigger evaluation time does not affect their results */
+		/*  2) trend function of the same trigger with the same evaluation timestamp is being             */
+		/*     evaluated by the same process                                                              */
 		if (0 == dc_trigger->locked || ZBX_FUNCTION_TYPE_TRENDS != timer->type ||
 				(NULL != first_timer && 1 == first_timer->lock))
 		{
+			/* resetting execution timer will cause a new execution time to be set */
+			/* when timer is put back into queue                                   */
 			timer->exec_ts.sec = 0;
 		}
 
@@ -8060,7 +8060,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		if (0 == dc_trigger->locked)
 			dc_trigger->locked = timer->lock = 1;
 		else
-			timer->lock = 0;	/* to be rescheduled */
+			timer->lock = 0;	/* timer could not lock trigger, skip  */
 
 		if (NULL == first_timer)
 			first_timer = timer;
