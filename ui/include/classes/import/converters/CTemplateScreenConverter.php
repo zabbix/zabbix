@@ -180,6 +180,8 @@ class CTemplateScreenConverter {
 	 * @param array $screen_items
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
 	private static function getDashboardDimensions(array $screen_items): array {
 		$items_x_preferred = [];
@@ -356,7 +358,7 @@ class CTemplateScreenConverter {
 	}
 
 	/**
-	 * Get prefered widget size on dashboard for given screen item type and size.
+	 * Get preferred widget size on dashboard for given screen item type and size.
 	 *
 	 * @param array $screen_item
 	 *
@@ -366,8 +368,7 @@ class CTemplateScreenConverter {
 		$width = $screen_item['width'];
 		$height = $screen_item['height'];
 
-		// SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-		if (in_array($screen_item['resourcetype'], [20, 19])) {
+		if (in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH])) {
 			$width *= $screen_item['max_columns'];
 		}
 
@@ -380,25 +381,27 @@ class CTemplateScreenConverter {
 	/**
 	 * Get minimal widget size on dashboard for given screen item type.
 	 *
-	 * @param array $screen_item
+	 * @param int $resourcetype
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
 	private static function getMinWidgetSize(int $resourcetype): array {
 		switch ($resourcetype) {
-			case 7: // SCREEN_RESOURCE_CLOCK
+			case SCREEN_RESOURCE_CLOCK:
 				[$width, $height] = [1, 2];
 				break;
 
-			case 0: // SCREEN_RESOURCE_GRAPH
-			case 1: // SCREEN_RESOURCE_SIMPLE_GRAPH
-			case 20: // SCREEN_RESOURCE_LLD_GRAPH
-			case 19: // SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+			case SCREEN_RESOURCE_GRAPH:
+			case SCREEN_RESOURCE_SIMPLE_GRAPH:
+			case SCREEN_RESOURCE_LLD_GRAPH:
+			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				[$width, $height] = [6, 3];
 				break;
 
-			case 3: // SCREEN_RESOURCE_PLAIN_TEXT
-			case 11: // SCREEN_RESOURCE_URL
+			case SCREEN_RESOURCE_PLAIN_TEXT:
+			case SCREEN_RESOURCE_URL:
 				[$width, $height] = [5, 2];
 				break;
 
@@ -432,6 +435,8 @@ class CTemplateScreenConverter {
 	 * @param array $screen_item
 	 *
 	 * @return array  Full widget definition except the positional data.
+	 *
+	 * @throws Exception
 	 */
 	private function makeWidget(array $screen_item): array {
 		$widget = [
@@ -442,7 +447,7 @@ class CTemplateScreenConverter {
 		$fields = [];
 
 		switch ($screen_item['resourcetype']) {
-			case 7: // SCREEN_RESOURCE_CLOCK
+			case SCREEN_RESOURCE_CLOCK:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_CLOCK;
 				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -458,7 +463,7 @@ class CTemplateScreenConverter {
 				}
 				break;
 
-			case 0: // SCREEN_RESOURCE_GRAPH
+			case SCREEN_RESOURCE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
 				array_push($fields, [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -471,7 +476,7 @@ class CTemplateScreenConverter {
 				]);
 				break;
 
-			case 1: // SCREEN_RESOURCE_SIMPLE_GRAPH
+			case SCREEN_RESOURCE_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
 				array_push($fields, [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -484,7 +489,7 @@ class CTemplateScreenConverter {
 				]);
 				break;
 
-			case 20: // SCREEN_RESOURCE_LLD_GRAPH
+			case SCREEN_RESOURCE_LLD_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
 				array_push($fields, [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -505,7 +510,7 @@ class CTemplateScreenConverter {
 				]);
 				break;
 
-			case 19: // SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
 				array_push($fields, [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -526,7 +531,7 @@ class CTemplateScreenConverter {
 				]);
 				break;
 
-			case 3: // SCREEN_RESOURCE_PLAIN_TEXT
+			case SCREEN_RESOURCE_PLAIN_TEXT:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT;
 				array_push($fields, [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
@@ -543,7 +548,7 @@ class CTemplateScreenConverter {
 				]);
 				break;
 
-			case 11: // SCREEN_RESOURCE_URL
+			case SCREEN_RESOURCE_URL:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_URL;
 				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
