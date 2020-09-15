@@ -573,7 +573,7 @@ static void	set_defaults(void)
 				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
 			}
 
-			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+			CONFIG_HOSTNAMES = zbx_strdup(CONFIG_HOSTNAMES, *value);
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
@@ -581,7 +581,7 @@ static void	set_defaults(void)
 		free_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
-		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAMES);
 
 	if (NULL != CONFIG_HOST_METADATA && NULL != CONFIG_HOST_METADATA_ITEM)
 	{
@@ -670,15 +670,14 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	if ((NULL != CONFIG_HOSTNAME && FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error)) ||
-			(NULL != CONFIG_HOSTNAMES && FAIL == zbx_check_hostnames(CONFIG_HOSTNAMES, &ch_error)))
+	if (NULL != CONFIG_HOSTNAMES && FAIL == zbx_check_hostnames(CONFIG_HOSTNAMES, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s", CONFIG_HOSTNAMES,
 				ch_error);
 		zbx_free(ch_error);
 		err = 1;
 	}
-	else if (NULL == CONFIG_HOSTNAMES && NULL == CONFIG_HOSTNAME)
+	else if (NULL == CONFIG_HOSTNAMES)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		err = 1;
@@ -782,10 +781,6 @@ static int	add_serveractive_host_cb(const char *host, unsigned short port)
 			zbx_vector_str_append(&hostnames, hostname);
 		}
 		while (NULL != p2 && '\0' != *p1);
-	}
-	else if (NULL != CONFIG_HOSTNAME)
-	{
-		zbx_vector_str_append(&hostnames, zbx_strdup(NULL, CONFIG_HOSTNAME));
 	}
 	else
 		zbx_vector_str_append(&hostnames, zbx_strdup(NULL, ""));
@@ -982,12 +977,12 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #endif
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
-	if (NULL != CONFIG_HOSTNAMES)
-		zbx_trim_str_list(CONFIG_HOSTNAMES, ',');
-
 	finalize_key_access_rules_configuration();
 
 	set_defaults();
+
+	if (NULL != CONFIG_HOSTNAMES)
+		zbx_trim_str_list(CONFIG_HOSTNAMES, ',');
 
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
