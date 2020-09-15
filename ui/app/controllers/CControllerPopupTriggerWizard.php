@@ -147,7 +147,6 @@ class CControllerPopupTriggerWizard extends CController {
 					if (array_key_exists('triggerid', $page_options)) {
 						$triggerid = $page_options['triggerid'];
 						$description = $page_options['description'];
-						$event_name = $page_options['event_name'];
 						$opdata = $page_options['opdata'];
 
 						$db_triggers = API::Trigger()->get([
@@ -159,7 +158,6 @@ class CControllerPopupTriggerWizard extends CController {
 							$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers);
 
 							$description = $db_triggers[0]['description'];
-							$event_name = $db_triggers[0]['event_name'];
 							$opdata = $db_triggers[0]['opdata'];
 							$expression = $db_triggers[0]['expression'];
 						}
@@ -168,7 +166,7 @@ class CControllerPopupTriggerWizard extends CController {
 							'triggerid' => $triggerid,
 							'expression' => $expression,
 							'description' => $description,
-							'event_name' => $event_name,
+							'event_name' => $page_options['event_name'],
 							'opdata' => $opdata,
 							'type' => TRIGGER_MULT_EVENT_ENABLED,
 							'priority' => $page_options['priority'],

@@ -33,6 +33,7 @@ $output = [
 $form = (new CForm('post', 'zabbix.php'))
 	->cleanItems()
 	->setName('sform')
+	->setId('trigger-wizard-form')
 	->addVar('action', 'popup.triggerwizard')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
@@ -85,8 +86,8 @@ $form->addItem(
 		)
 		->addRow(
 			new CLabel(_('Event name'), 'event_name'),
-			(new CTextBox('event_name', $options['event_name']))
-				->setAttribute('maxlength', DB::getFieldLength('triggers', 'event_name'))
+			(new CTextAreaFlexible('event_name', $options['event_name']))
+				->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 		->addRow((new CLabel(_('Item'), 'itemid'))->setAsteriskMark(), $ms_itemid)

@@ -119,7 +119,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerids = [];
 
 		$output = ['url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag',
-			'manual_close', 'opdata'
+			'manual_close', 'opdata', 'event_name'
 		];
 		if ($this instanceof CTriggerPrototype) {
 			$output[] = 'discover';
