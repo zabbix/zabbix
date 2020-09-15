@@ -35,7 +35,7 @@ class CSelectOptionGroup {
 	protected $options = [];
 
 	/**
-	 * @var string  Custom template for group options.
+	 * @var string|null  Custom template for group options.
 	 */
 	protected $option_template;
 

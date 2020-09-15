@@ -30,7 +30,7 @@ class CSelectOption {
 	protected $label;
 
 	/**
-	 * @var string
+	 * @var mixed
 	 */
 	protected $value;
 
