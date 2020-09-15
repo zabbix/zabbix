@@ -23,16 +23,12 @@
  * Class is used to validate if given string is valid HashiCorp Vault secret.
  *
  * Valid token must match format:
+ * - <namespace>/<path/to/secret>:<key>
+ * - <namespace>/<secret>:<key>
  * - <path/to/secret>:<key>
  * - <path/to/secret>
  */
 class CVaultSecretParser extends CParser {
-
-	const STATE_NEW = 0;
-	const STATE_AFTER_PATH_NODE_CHAR= 1;
-	const STATE_AFTER_PATH_SEP_CHAR = 2;
-	const STATE_AFTER_COLON = 3;
-	const STATE_AFTER_KEY_CHAR= 4;
 
 	private $options = [
 		'with_key' => true
@@ -41,8 +37,8 @@ class CVaultSecretParser extends CParser {
 	/**
 	 * Parser constructor.
 	 *
-	 * @param array $options
-	 * @param array $options['with_key']  (optional) Validated string must contain key.
+	 * @param array  $options
+	 * @param bool   $options['with_key']  (optional) Validated string must contain key.
 	 */
 	public function __construct(array $options = []) {
 		if (array_key_exists('with_key', $options)) {
@@ -54,91 +50,129 @@ class CVaultSecretParser extends CParser {
 	 * @inheritDoc
 	 */
 	public function parse($source, $pos = 0) {
+		$this->max = strlen($source);
+		$this->start = $pos;
 		$this->length = 0;
 		$this->match = '';
-
-		$slash_symbol = false;
-		$state = self::STATE_NEW;
 		$this->errorClear();
 
-		$p = $pos;
-		for (; isset($source[$p]); $p++) {
-			if (in_array($state, [self::STATE_NEW, self::STATE_AFTER_PATH_NODE_CHAR, self::STATE_AFTER_PATH_SEP_CHAR])
-					&& $this->isPathNodeChar($source[$p])) {
-				$state = self::STATE_AFTER_PATH_NODE_CHAR;
-			}
-			elseif ($state == self::STATE_AFTER_PATH_NODE_CHAR && $source[$p] === '/') {
-				$state = self::STATE_AFTER_PATH_SEP_CHAR;
-				$slash_symbol = true;
-			}
-			elseif ($slash_symbol && $state == self::STATE_AFTER_PATH_NODE_CHAR && $source[$p] === ':') {
-				if (!$this->options['with_key']) {
-					break;
-				}
-
-				$state = self::STATE_AFTER_COLON;
-			}
-			elseif (($state == self::STATE_AFTER_COLON || $state == self::STATE_AFTER_KEY_CHAR)
-					&& $this->isKeyChar($source[$p])) {
-				$state = self::STATE_AFTER_KEY_CHAR;
-			}
-			else {
-				break;
-			}
-		}
-
-		$is_valid = $this->options['with_key']
-			? ($slash_symbol && $state == self::STATE_AFTER_KEY_CHAR)
-			: ($slash_symbol && $state == self::STATE_AFTER_PATH_NODE_CHAR);
-
-		if (!$is_valid) {
-			$this->errorPos($source, $p);
+		$end = $this->parseMountpoint($source, $pos);
+		if ($end == $pos || $source[$end] !== '/') {
+			$this->errorPos($source, $end);
 
 			return self::PARSE_FAIL;
 		}
 
-		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
+		// Cursor to the next char.
+		$pos = $end + 1;
 
-		if (isset($source[$p])) {
-			$this->errorPos(substr($source, $pos), $p - $pos);
+		// Parse secret path. Path is mandatory and it's nodes cannot be empty.
+		$end = $this->parseSecretPath($source, $pos);
+		if ($end == $pos || $source[$pos] === '/' || ($this->max > $end && $source[$end] === '/')) {
+			$this->errorPos($source, ($source[$pos] === '/') ? $pos : $end);
+
+			return self::PARSE_FAIL;
+		}
+
+		// If not expected key it must be exhausted.
+		if (!$this->options['with_key']) {
+			$this->match = substr($source, $this->start, $end);
+			$this->length = $end - $this->start;
+
+			if ($end != $this->max) {
+				$this->errorPos($source, $end);
+
+				return self::PARSE_SUCCESS_CONT;
+			}
+
+			return self::PARSE_SUCCESS;
+		}
+
+		// Expected key seperator.
+		if ($end == $this->max || $source[$end] !== ':') {
+			$this->errorPos($source, $end);
+
+			return self::PARSE_FAIL;
+		}
+
+		// Cursor to next char.
+		$pos = $end + 1;
+
+		// Expected key value.
+		$end = $this->parseKeyPath($source, $pos);
+		if ($end == $pos) {
+			$this->errorPos($source, $end);
+
+			return self::PARSE_FAIL;
+		}
+
+		// Expected parser being exhausted.
+		if ($end != $this->max) {
+			$this->match = substr($source, $this->start, $end);
+			$this->errorPos($source, $end);
+			$this->length = $end - $this->start;
 
 			return self::PARSE_SUCCESS_CONT;
 		}
-		else {
-			return self::PARSE_SUCCESS;
+
+		$this->match = substr($source, $this->start, $end);
+		$this->length = $end - $this->start;
+
+		return self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Parse name-space part of the input string.
+	 *
+	 * @param string  $source String to parse.
+	 * @param int     $start  Position to start parse.
+	 *
+	 * @return int
+	 */
+	protected function parseMountpoint(string $source, int $start = 0): int {
+		while ($start < $this->max && $source[$start] !== '/' && $source[$start] !== ':') {
+			$start++;
 		}
+
+		return $start;
 	}
 
 	/**
-	 * Check if give character can be used in path node.
+	 * Parse secret path part of the input string.
 	 *
-	 * @param string $char  Single character.
+	 * @param string  $source String to parse.
+	 * @param int     $start  Position to start parsing.
 	 *
-	 * @return bool
+	 * @return int
 	 */
-	protected function isPathNodeChar(string $char): bool {
-		return (
-			($char >= 'a' && $char <= 'z')
-			|| ($char >= 'A' && $char <= 'Z')
-			|| ($char >= '0' && $char <= '9')
-			|| $char === '.' || $char === '_' || $char === '-'
-		);
+	protected function parseSecretPath(string $source, int $start = 0): int {
+		$prev_char = null;
+		while ($start < $this->max && (preg_match('/\w/u', $source[$start]) == 1 || $source[$start] === '/')) {
+			$char = $source[$start];
+			if ($char === '/' && $prev_char === '/') {
+				return $start - 1;
+			}
+
+			$prev_char = $char;
+			$start++;
+		}
+
+		return $start;
 	}
 
 	/**
-	 * Check if give character can be used in key.
+	 * Parse key part of the input string.
 	 *
-	 * @param string $char  Single character.
+	 * @param string  $source String to parse.
+	 * @param int     $start  Position to start parsing.
 	 *
 	 * @return bool
 	 */
-	protected function isKeyChar(string $char): bool {
-		return (
-			($char >= 'a' && $char <= 'z')
-			|| ($char >= 'A' && $char <= 'Z')
-			|| ($char >= '0' && $char <= '9')
-			|| $char === '_'
-		);
+	protected function parseKeyPath($source, $start = 0): int {
+		while ($start < $this->max && preg_match('/\w/u', $source[$start]) == 1) {
+			$start++;
+		}
+
+		return $start;
 	}
 }
