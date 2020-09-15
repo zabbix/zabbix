@@ -85,7 +85,9 @@ $form->addItem(
 		)
 		->addRow(
 			new CLabel(_('Event name'), 'event_name'),
-			(new CTextBox('event_name', $options['event_name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox('event_name', $options['event_name']))
+				->setAttribute('maxlength', DB::getFieldLength('triggers', 'event_name'))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 		->addRow((new CLabel(_('Item'), 'itemid'))->setAsteriskMark(), $ms_itemid)
 		->addRow(_('Severity'), new CSeverity([
