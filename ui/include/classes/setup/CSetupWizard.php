@@ -511,7 +511,7 @@ class CSetupWizard extends CForm {
 			'PASSWORD' => ''
 		];
 
-		if ($this->getConfig('DB_CREDS_STORAGE') == DB_STORE_CREDS_VAULT) {
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
 			$vault_config['VAULT_HOST'] = $this->getConfig('DB_VAULT_HOST');
 			$vault_config['VAULT_SECRET'] = $this->getConfig('DB_VAULT_SECRET');
 			$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
@@ -830,7 +830,7 @@ class CSetupWizard extends CForm {
 					'PASSWORD' => ''
 				];
 
-				if ($this->getConfig('DB_CREDS_STORAGE') == DB_STORE_CREDS_VAULT) {
+				if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
 					$vault_config['VAULT_HOST'] = $this->getConfig('DB_VAULT_HOST');
 					$vault_config['VAULT_SECRET'] = $this->getConfig('DB_VAULT_SECRET');
 					$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
