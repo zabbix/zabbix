@@ -25,21 +25,19 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
-func getSwap() (total, avail uint64, err error) {
+func getSwap() (uint64, uint64, error) {
 	m, err := win32.GlobalMemoryStatusEx()
 	if err != nil {
-		return
+		return 0 ,0 nil
 	}
 
+	var total, avail uint64
 	if m.TotalPageFile > m.TotalPhys {
 		total = m.TotalPageFile - m.TotalPhys
 	}
 	if m.AvailPageFile > m.AvailPhys {
 		avail = m.AvailPageFile - m.AvailPhys
 	}
-	if avail > total {
-		avail = total
-	}
 
-	return
+	return total, avail, nil
 }

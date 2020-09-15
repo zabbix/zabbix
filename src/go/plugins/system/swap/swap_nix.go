@@ -23,18 +23,11 @@ package swap
 
 import "syscall"
 
-func getSwap() (total, avail uint64, err error) {
+func getSwap() (uint64, uint64, error) {
 	info := &syscall.Sysinfo_t{}
-	if err = syscall.Sysinfo(info); err != nil {
-		return
+	if err := syscall.Sysinfo(info); err != nil {
+		return 0, 0, err
 	}
 
-	total = info.Totalswap
-	avail = info.Freeswap
-
-	if avail > total {
-		avail = total
-	}
-
-	return
+	return info.Totalswap, info.Freeswap, nil
 }

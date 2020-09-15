@@ -42,11 +42,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("Too many parameters.")
 	}
 
-	var mode string
-	if len(params) == 2 && params[1] != "" {
-		mode = params[1]
-	}
-
 	if len(params) > 0 && params[0] != "" && params[0] != "all" {
 		return nil, errors.New("Invalid first parameter.")
 	}
@@ -54,6 +49,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	total, avail, err := getSwap()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get Swap data:%s", err.Error())
+	}
+
+	if avail > total {
+		avail = total
+	}
+
+	var mode string
+	if len(params) == 2 && params[1] != "" {
+		mode = params[1]
 	}
 
 	switch mode {
