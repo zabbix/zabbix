@@ -21,7 +21,7 @@ package ceph
 
 import (
 	"encoding/json"
-
+	"math"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -34,24 +34,24 @@ type cephDf struct {
 	Pools []struct {
 		Name  string `json:"name"`
 		Stats struct {
-			PercentUsed uint64 `json:"percent_used"`
-			Objects     uint64 `json:"objects"`
-			Rd          uint64 `json:"rd"`
-			RdBytes     uint64 `json:"rd_bytes"`
-			Wr          uint64 `json:"wr"`
-			WrBytes     uint64 `json:"wr_bytes"`
-			StoredRaw   uint64 `json:"stored_raw"`
+			PercentUsed float64 `json:"percent_used"`
+			Objects     uint64  `json:"objects"`
+			Rd          uint64  `json:"rd"`
+			RdBytes     uint64  `json:"rd_bytes"`
+			Wr          uint64  `json:"wr"`
+			WrBytes     uint64  `json:"wr_bytes"`
+			StoredRaw   uint64  `json:"stored_raw"`
 		} `json:"stats"`
 	} `json:"pools"`
 }
 
 type poolStat struct {
-	PercentUsed uint64 `json:"percent_used"`
-	Rd          uint64 `json:"rd_ops"`
-	RdBytes     uint64 `json:"rd_bytes"`
-	Wr          uint64 `json:"wr_ops"`
-	WrBytes     uint64 `json:"wr_bytes"`
-	StoredRaw   uint64 `json:"stored_raw"`
+	PercentUsed float64 `json:"percent_used"`
+	Rd          uint64  `json:"rd_ops"`
+	RdBytes     uint64  `json:"rd_bytes"`
+	Wr          uint64  `json:"wr_ops"`
+	WrBytes     uint64  `json:"wr_bytes"`
+	StoredRaw   uint64  `json:"stored_raw"`
 }
 
 type outDf struct {
@@ -82,7 +82,7 @@ func dfHandler(data []byte) (interface{}, error) {
 
 	for _, p := range df.Pools {
 		poolsStat[p.Name] = poolStat{
-			p.Stats.PercentUsed,
+			math.Ceil(p.Stats.PercentUsed),
 			p.Stats.Rd,
 			p.Stats.RdBytes,
 			p.Stats.Wr,
