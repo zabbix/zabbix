@@ -73,16 +73,7 @@
 
 		initInherit() {
 			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces);
-
-			if (this._data.parent_is_template) {
-				hostInterfaceManagerInherit.changeNoInterfaceMsg('<?= _('Interfaces will be inherited from host.') ?>');
-			}
-			else {
-				hostInterfaceManagerInherit.changeNoInterfaceMsg(
-					'<?= _('No interfaces are defined for parent host.') ?>'
-				);
-			}
-
+			hostInterfaceManagerInherit.setAllowEmptyMessage(!this._data.parent_is_template);
 			hostInterfaceManagerInherit.render();
 			HostInterfaceManager.disableEdit();
 		}
@@ -90,8 +81,11 @@
 		initCustom() {
 			// This is in global space, as Add functions uses it.
 			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces);
-			hostInterfaceManager.changeNoInterfaceMsg('<?= _('No interfaces are defined for this host prototype.') ?>');
 			hostInterfaceManager.render();
+
+			if (this._data.is_templated) {
+				HostInterfaceManager.disableEdit();
+			}
 		}
 
 		switchTo(source) {
@@ -166,6 +160,7 @@
 			document.getElementById('interface-add'),
 			<?= json_encode([
 				'parent_is_template' => $parentHost['status'] == HOST_STATUS_TEMPLATE,
+				'is_templated' => $hostPrototype['templateid'] != 0,
 				'inherited_interfaces' => array_values($parentHost['interfaces']),
 				'custom_interfaces' => array_values($hostPrototype['interfaces'])
 			]) ?>

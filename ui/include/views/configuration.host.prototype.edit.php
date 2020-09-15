@@ -99,7 +99,8 @@ $hostList->addRow(new CLabel(_('Interfaces')),
 		(new CRadioButtonList('custom_interfaces', (int) $hostPrototype['custom_interfaces']))
 			->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
 			->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
-			->setModern(true),
+			->setModern(true)
+			->setReadonly($hostPrototype['templateid'] != 0),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
 			->setId('interfaces-table'),
 		new CDiv(
@@ -116,6 +117,7 @@ $hostList->addRow(new CLabel(_('Interfaces')),
 					? null
 					: 'display: none'
 				)
+				->setEnabled($hostPrototype['templateid'] == 0)
 		)
 	]
 );

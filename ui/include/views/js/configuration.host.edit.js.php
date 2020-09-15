@@ -166,8 +166,9 @@
 				<?= INTERFACE_TYPE_IPMI ?>: '<?= _('IPMI') ?>'
 			};
 
+			this.allow_empty_message = true;
 			this.$noInterfacesMsg = jQuery('<div class="<?= ZBX_STYLE_GREY ?>"></div>')
-				.text('<?= _('No interfaces are defined for this host.') ?>')
+				.text('<?= _('No interfaces are defined.') ?>')
 				.addClass('<?= ZBX_STYLE_GREY ?>')
 				.css('padding', '5px 0px')
 				.insertAfter(jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER ?>'));
@@ -202,8 +203,8 @@
 			return this.interfaces;
 		}
 
-		changeNoInterfaceMsg(msg) {
-			this.$noInterfacesMsg.text(msg);
+		setAllowEmptyMessage(value) {
+			this.allow_empty_message = value;
 		}
 
 		setSnmpFields(elem, iface) {
@@ -534,7 +535,7 @@
 			}
 			else {
 				jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER ?>').hide();
-				this.$noInterfacesMsg.show();
+				this.$noInterfacesMsg.toggle(this.allow_empty_message);
 			}
 		}
 
