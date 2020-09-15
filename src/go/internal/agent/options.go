@@ -67,6 +67,9 @@ func ValidateHostnames(s string) ([]string, error) {
 	keys := make(map[string]bool)
 	huniq := []string{}
 	for _, h := range hostnames {
+		if h == "" {
+			return nil, fmt.Errorf("host names cannot be empty")
+		}
 		if _, value := keys[h]; !value {
 			keys[h] = true
 			huniq = append(huniq, h)
