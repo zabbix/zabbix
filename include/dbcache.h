@@ -1006,4 +1006,7 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t
 		const zbx_vector_ptr_t *timers);
 void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
 
+int	zbx_db_trigger_queue_locked(void);
+void	zbx_db_trigger_queue_unlock(void);
+
 #endif

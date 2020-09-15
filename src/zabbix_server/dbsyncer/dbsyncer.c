@@ -105,6 +105,12 @@ static void	zbx_db_flush_timer_queue(void)
 	zbx_vector_ptr_destroy(&persistent_timers);
 }
 
+static void	db_trigger_queue_cleanup(void)
+{
+	DBexecute("delete from trigger_queue");
+	zbx_db_trigger_queue_unlock();
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: main_dbsyncer_loop                                               *
@@ -147,6 +153,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	unblock_signals();
 
+	if (1 == process_num)
+		db_trigger_queue_cleanup();
+
 	if (SUCCEED == zbx_is_export_enabled())
 	{
 		zbx_history_export_init("history-syncer", process_num);
@@ -169,7 +178,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		block_signals();
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
 
-		if (!ZBX_IS_RUNNING())
+		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();
 
 		unblock_signals();

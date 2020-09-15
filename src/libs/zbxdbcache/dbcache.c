@@ -112,6 +112,8 @@ typedef struct
 	int			trends_last_cleanup_hour;
 	int			history_num_total;
 	int			history_progress_ts;
+
+	unsigned char		db_trigger_queue_lock;
 }
 ZBX_DC_CACHE;
 
@@ -4371,6 +4373,8 @@ int	init_database_cache(char **error)
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
 
+	cache->db_trigger_queue_lock = 1;
+
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 out:
@@ -4619,3 +4623,28 @@ void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
 
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_queue_locked                                      *
+ *                                                                            *
+ * Purpose: checks if database trigger queue table is locked                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_trigger_queue_locked(void)
+{
+	return 0 == cache->db_trigger_queue_lock ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_queue_unlock                                      *
+ *                                                                            *
+ * Purpose: unlocks database trigger queue table                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_queue_unlock(void)
+{
+	cache->db_trigger_queue_lock = 0;
+}
+

@@ -5250,8 +5250,6 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 
 	}
 	DBfree_result(result);
-
-	DBexecute("delete from trigger_queue");
 }
 
 /******************************************************************************
