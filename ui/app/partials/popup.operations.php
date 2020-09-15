@@ -358,13 +358,15 @@ $form_list->addRow(new CLabel(_('Inventory mode'), 'operation_opinventory_invent
 /*
  * Conditions type of calculation row.
  */
-$form_list->addRow(new CLabel(_('Type of calculation'), 'operation-evaltype'), [
-		(new CSelect('operation[evaltype]'))
-			->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
-			->setFocusableElementId('operation-evaltype')
-			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
-			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
-			->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or'))),
+$select_operation_evaltype = (new CSelect('operation[evaltype]'))
+	->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
+	->setFocusableElementId('operation-evaltype')
+	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
+	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
+	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')));
+
+$form_list->addRow(new CLabel(_('Type of calculation'), $select_operation_evaltype->getFocusableElementId()), [
+		$select_operation_evaltype,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('operation-condition-evaltype-formula')
 	],
