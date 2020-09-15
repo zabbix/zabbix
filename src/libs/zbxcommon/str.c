@@ -3627,6 +3627,66 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_token_parse_expression_macro                                 *
+ *                                                                            *
+ * Purpose: parses expression macro token                                     *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the expression macro was parsed successfully       *
+ *               FAIL    - macro does not point at valid expression macro     *
+ *                                                                            *
+ * Comments: If the macro points at valid expression macro in the expression  *
+ *           then the generic token fields are set and the                    *
+ *           token->data.expression_macro structure is filled with expression *
+ *           macro specific data.                                             *
+ *           Contents of macro are not validated because expression macro may *
+ *           contain user macro contexts and item keys with string arguments. *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_expression_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	const char		*ptr;
+	size_t			level;
+	size_t			offset;
+	zbx_token_macro_t	*data;
+
+	/* find the end of expression macro */
+	for (ptr = macro + 2, level = 1; '}' != *ptr || 1 != level; ptr++)
+	{
+		if ('\0' == *ptr)
+			return FAIL;
+
+		if ('{' == *ptr)
+			level++;
+
+		if ('}' == *ptr)
+			level--;
+	}
+
+	/* empty macro */
+	if (ptr == macro + 2)
+		return FAIL;
+
+	offset = macro - expression;
+
+	/* initialize token */
+	token->type = ZBX_TOKEN_EXPRESSION_MACRO;
+	token->loc.l = offset;
+	token->loc.r = offset + (ptr - macro);
+
+	/* initialize token data */
+	data = &token->data.expression_macro;
+	data->name.l = offset + 2;
+	data->name.r = token->loc.r - 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_token_parse_objectid                                         *
  *                                                                            *
  * Purpose: parses object id token                                            *
@@ -4223,7 +4283,9 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 			case '#':
 				ret = zbx_token_parse_lld_macro(expression, ptr, token);
 				break;
-
+			case '?':
+				ret = zbx_token_parse_expression_macro(expression, ptr, token);
+				break;
 			case '{':
 				ret = zbx_token_parse_nested_macro(expression, ptr, token);
 				break;

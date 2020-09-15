@@ -1409,6 +1409,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_SIMPLE_MACRO		0x00020
 #define ZBX_TOKEN_REFERENCE		0x00040
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
+#define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
 
 /* additional token flags */
 #define ZBX_TOKEN_TRIGGER	0x004000
@@ -1489,6 +1490,7 @@ typedef union
 	zbx_token_macro_t		objectid;
 	zbx_token_macro_t		macro;
 	zbx_token_macro_t		lld_macro;
+	zbx_token_macro_t		expression_macro;
 	zbx_token_user_macro_t		user_macro;
 	zbx_token_func_macro_t		func_macro;
 	zbx_token_func_macro_t		lld_func_macro;

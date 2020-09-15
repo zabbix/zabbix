@@ -241,7 +241,7 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 				&event->trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
 		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&event->name, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+				&event->name, MACRO_TYPE_EVENT_NAME, NULL, 0);
 
 		zbx_vector_ptr_create(&event->tags);
 
