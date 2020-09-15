@@ -205,7 +205,7 @@ static char	*result_to_str(uint16_t *buf, modbus_datatype_t type, unsigned short
 				buf += 2;
 				break;
 			case ZBX_MODBUS_DATATYPE_UINT64:
-				list = zbx_dsprintf(list, "%s%s" ZBX_FS_UI64, list, 0 == i ? "" : ",",
+				list = zbx_dsprintf(list, "%s%s%" PRIu64, list, 0 == i ? "" : ",",
 						read_reg_64(buf, endianness));
 				buf += 4;
 				break;
