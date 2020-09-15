@@ -440,6 +440,7 @@
 
 		const $mediatype_default_select = this.$mediatype_default.find('z-select');
 		const $mediatype_only_select = this.$mediatype_only.find('z-select');
+
 		conf.mediatypes.forEach(({mediatypeid, name, status}) => {
 			$mediatype_default_select.get(0).addOption({
 				value: mediatypeid,
@@ -939,7 +940,7 @@
 			this.$select.replaceWith([options[0].name, $hidden_input]);
 		}
 		else {
-			options.forEach(({value, name}) => this.$select.get(0).addOption({value, title: name}));
+			options.forEach(({value, name}) => this.$select.get(0).addOption({value, label: name}));
 			this.$select.val(selected);
 		}
 	};
