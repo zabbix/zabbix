@@ -750,7 +750,7 @@ class CSetupWizard extends CForm {
 
 			if (hasRequest('next') && array_key_exists(2, getRequest('next'))) {
 				if ($creds_storage == DB_STORE_CREDS_VAULT) {
-					$vault_connection_cheched = false;
+					$vault_connection_checked = false;
 					$secret_parser = new CVaultSecretParser(['with_key' => false]);
 					$secret = [];
 
@@ -764,11 +764,11 @@ class CSetupWizard extends CForm {
 						$secret = $vault->loadSecret($vault_secret);
 
 						if ($secret) {
-							$vault_connection_cheched = true;
+							$vault_connection_checked = true;
 						}
 					}
 
-					if (!$vault_connection_cheched) {
+					if (!$vault_connection_checked) {
 						$db_connected = _('Vault connection failed.');
 					}
 					elseif (!array_key_exists('username', $secret)
