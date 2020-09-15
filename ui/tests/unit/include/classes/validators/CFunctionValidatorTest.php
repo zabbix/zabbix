@@ -861,7 +861,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
 
 				$params[$no] = 'now-1h/h/m';
-				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
+				$tests[] = [$func, $params, $valueType, $options, false];
 
 				$params[$no] = 'now/h-1d';
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
@@ -915,7 +915,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
 
 				$params[$no] = 'now-1h/d/m';
-				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
+				$tests[] = [$func, $params, $valueType, $options, false];
 
 				$params[$no] = 'now/d-1d';
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
@@ -969,7 +969,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
 
 				$params[$no] = 'now-1h/w/m';
-				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
+				$tests[] = [$func, $params, $valueType, $options, false];
 
 				$params[$no] = 'now/w-1d';
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
@@ -1026,7 +1026,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
 
 				$params[$no] = 'now-1h/M/m';
-				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
+				$tests[] = [$func, $params, $valueType, $options, false];
 
 				$params[$no] = 'now/M-1d';
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
@@ -1077,7 +1077,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
 
 				$params[$no] = 'now-1h/y/m';
-				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];
+				$tests[] = [$func, $params, $valueType, $options, false];
 
 				$params[$no] = 'now/y-1d';
 				$tests[] = [$func, $params, $valueType, $options, array_key_exists($valueType, $valueTypes)];

@@ -634,9 +634,17 @@ class CFunctionValidator extends CValidator {
 		$relative_time_parser = new CRelativeTimeParser();
 
 		if ($relative_time_parser->parse((string) $param) === CParser::PARSE_SUCCESS) {
-			foreach ($relative_time_parser->getTokens() as $token) {
-				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION && $token['suffix'] !== 'm'
-						&& ($relative_time_parser->getDateTime(false)->getTimestamp() + 1) % SEC_PER_HOUR === 0) {
+			$tokens = $relative_time_parser->getTokens();
+
+			foreach ($tokens as $token) {
+				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION && $token['suffix'] === 'm') {
+					return false;
+				}
+			}
+
+			foreach ($tokens as $token) {
+				if ($token['type'] === CRelativeTimeParser::ZBX_TOKEN_PRECISION
+						&& $relative_time_parser->getDateTime(true)->getTimestamp() % SEC_PER_HOUR === 0) {
 					return true;
 				}
 			}
