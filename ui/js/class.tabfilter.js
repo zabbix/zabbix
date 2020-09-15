@@ -300,13 +300,13 @@ class CTabFilter extends CBaseComponent {
 			 */
 			tabSortChanged: (ev, ui) => {
 				// Update order of this._items array.
-				var from, to, target = ui.item[0].querySelector('[data-target] .tabfilter-item-link');
+				var from, to, item_moved, target = ui.item[0].querySelector('[data-target] .tabfilter-item-link');
 
 				this._items.forEach((item, index) => from = (item._target === target) ? index : from);
 				this._target.querySelectorAll('nav [data-target] .tabfilter-item-link')
 					.forEach((elm, index) => to = (elm === target) ? index : to);
 
-				var item_moved = this._items[from];
+				item_moved = this._items[from];
 				this._items.splice(from, 1);
 				this._items.splice(to, 0, item_moved);
 
