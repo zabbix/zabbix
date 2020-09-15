@@ -523,7 +523,10 @@ class CSetupWizard extends CForm {
 				$this->dbConnect($secret['username'], $secret['password']);
 			}
 			else {
-				return false;
+				error(_('Username and password must be stored in Vault secret keys "username" and "password".'));
+				$this->STEP_FAILED = true;
+				$this->setConfig('step', 2);
+				return $this->stage2();
 			}
 		}
 		else {
