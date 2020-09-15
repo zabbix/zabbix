@@ -23,16 +23,15 @@ const ZBX_DB_POSTGRESQL = 'POSTGRESQL';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 function updateElementsAvailability() {
-	let db_type = document.querySelector('[name=type]').value,
-		host = document.querySelector('[name=server]').value,
-		encryption_supported = (db_type === ZBX_DB_MYSQL || db_type === ZBX_DB_POSTGRESQL),
-		encryption_allowed = (host !== '' && ((db_type === 'MYSQL' && host !== 'localhost')
-			|| (db_type === ZBX_DB_POSTGRESQL && host.substr(0,1) !== '/')
-		)),
-		encryption_enabled = document.querySelector('#tls_encryption').checked,
-		encryption_customizable = (encryption_supported && encryption_allowed && encryption_enabled
-			&& document.querySelector('#verify_certificate').checked),
-		rows = {
+	const db_type = document.querySelector('[name=type]').value;
+	const host = document.querySelector('[name=server]').value;
+	const encryption_enabled = document.querySelector('#tls_encryption').checked;
+	const encryption_supported = (db_type === ZBX_DB_MYSQL || db_type === ZBX_DB_POSTGRESQL);
+	const encryption_allowed = (host !== '' && ((db_type === ZBX_DB_MYSQL && host !== 'localhost')
+		|| (db_type === ZBX_DB_POSTGRESQL && !host.startsWith('/'))));
+	const encryption_customizable = (encryption_supported && encryption_allowed && encryption_enabled
+		&& document.querySelector('#verify_certificate').checked);
+	const rows = {
 			'#db_schema_row': (db_type === ZBX_DB_POSTGRESQL),
 			'#db_encryption_row': encryption_supported,
 			'#db_verify_host': (encryption_supported && encryption_allowed && encryption_enabled),
@@ -44,10 +43,13 @@ function updateElementsAvailability() {
 		};
 
 	for (let selector in rows) {
-		document.querySelector(selector).classList.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[selector]);
-		let inputs = document.querySelector(selector).querySelectorAll('input');
+		const elem = document.querySelector(selector);
 
-		for (let input of inputs) {
+		elem
+			.classList
+			.toggle(ZBX_STYLE_DISPLAY_NONE, !rows[selector]);
+
+		for (let input of elem.querySelectorAll('input')) {
 			if (rows[selector]) {
 				input.removeAttribute('disabled');
 			}
@@ -59,37 +61,61 @@ function updateElementsAvailability() {
 
 	// TLS encryption checkbox and secure connection hint message.
 	if (encryption_supported && !encryption_allowed) {
-		document.querySelector('#tls_encryption').setAttribute('disabled', 'disabled');
-		document.querySelector('input + [for=tls_encryption]').classList.add(ZBX_STYLE_DISPLAY_NONE);
-		document.querySelector('#tls_encryption_hint').classList.remove(ZBX_STYLE_DISPLAY_NONE);
+		document
+			.querySelector('#tls_encryption')
+			.setAttribute('disabled', 'disabled');
+		document
+			.querySelector('input + [for=tls_encryption]')
+			.classList
+			.add(ZBX_STYLE_DISPLAY_NONE);
+		document
+			.querySelector('#tls_encryption_hint')
+			.classList
+			.remove(ZBX_STYLE_DISPLAY_NONE);
 	}
 	else {
-		document.querySelector('#tls_encryption').removeAttribute('disabled');
-		document.querySelector('input + [for=tls_encryption]').classList.remove(ZBX_STYLE_DISPLAY_NONE);
-		document.querySelector('#tls_encryption_hint').classList.add(ZBX_STYLE_DISPLAY_NONE);
+		document
+			.querySelector('#tls_encryption')
+			.removeAttribute('disabled');
+		document
+			.querySelector('input + [for=tls_encryption]')
+			.classList
+			.remove(ZBX_STYLE_DISPLAY_NONE);
+		document
+			.querySelector('#tls_encryption_hint')
+			.classList
+			.add(ZBX_STYLE_DISPLAY_NONE);
 	}
 
 	// Verify host checkbox availability.
 	if (db_type === ZBX_DB_MYSQL) {
-		document.querySelector('#verify_host').checked = true;
-		document.querySelector('#verify_host').setAttribute('checked', true);
-		document.querySelector('#verify_host').setAttribute('disabled', 'disabled');
+		document
+			.querySelector('#verify_host')
+			.checked = true;
+		document
+			.querySelector('#verify_host')
+			.setAttribute('checked', true);
+		document
+			.querySelector('#verify_host')
+			.setAttribute('disabled', 'disabled');
 	}
 	else if (encryption_customizable) {
-		document.querySelector('#verify_host').removeAttribute('disabled');
+		document
+			.querySelector('#verify_host')
+			.removeAttribute('disabled');
 	}
 }
 
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', () => {
 	// Stage 2, database configuration.
 	if (document.querySelector('[name=type]')) {
-		document.querySelectorAll('#type,#server,#tls_encryption,#verify_certificate').forEach(
-			elm => elm.addEventListener('change', updateElementsAvailability)
+		document.querySelectorAll('#type, #server, #tls_encryption, #verify_certificate').forEach(
+			(elem) => elem.addEventListener('change', updateElementsAvailability)
 		);
 
 		updateElementsAvailability();
 	}
-}
+});
 
 // Function is required by 'Database port' input and is copy of validateNumericBox from functions.js file.
 function validateNumericBox(obj, allowempty, allownegative) {

@@ -215,7 +215,8 @@ class CSetupWizard extends CForm {
 			->addItem([
 				(new CVar('tls_encryption', 0))->removeId(),
 				(new CVar('verify_certificate', 0))->removeId(),
-				(new CVar('tls_encryption', 0))->removeId()
+				(new CVar('tls_encryption', 0))->removeId(),
+				(new CVar('verify_host', 0))->removeId()
 			]);
 
 		$table->addRow(_('Database type'),
