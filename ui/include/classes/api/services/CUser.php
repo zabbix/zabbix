@@ -74,6 +74,7 @@ class CUser extends CApiService {
 			'selectUsrgrps'				=> null,
 			'selectMedias'				=> null,
 			'selectMediatypes'			=> null,
+			'selectRole'				=> null,
 			'getAccess'					=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
@@ -275,7 +276,7 @@ class CUser extends CApiService {
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
 			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
@@ -356,7 +357,7 @@ class CUser extends CApiService {
 			}
 
 			// integers
-			foreach (['autologin', 'type', 'rows_per_page'] as $field_name) {
+			foreach (['autologin', 'rows_per_page'] as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] != $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
 				}
@@ -405,7 +406,7 @@ class CUser extends CApiService {
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
 			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
@@ -440,7 +441,7 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'theme', 'type', 'refresh', 'rows_per_page', 'timezone'
+				'theme', 'roleid', 'refresh', 'rows_per_page', 'timezone'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
@@ -765,8 +766,8 @@ class CUser extends CApiService {
 	private function checkHimself(array $users) {
 		foreach ($users as $user) {
 			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
-				if (array_key_exists('type', $user)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their user type.'));
+				if (array_key_exists('roleid', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their user role.'));
 				}
 
 				if (array_key_exists('usrgrps', $user)) {
@@ -1404,7 +1405,7 @@ class CUser extends CApiService {
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone'
+				'roleid', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone'
 			],
 			'userids' => $db_session['userid']
 		]);
@@ -1457,6 +1458,9 @@ class CUser extends CApiService {
 			]);
 		}
 
+		$db_user['role'] = $this->getUserRoleData($db_user['roleid']);
+		$db_user['type'] = $db_user['role']['type'];
+
 		self::$userData = $db_user;
 
 		return $db_user;
@@ -1490,6 +1494,23 @@ class CUser extends CApiService {
 		}
 
 		return $usrgrps;
+	}
+
+	/**
+	 * Returns an array with user role and its rules.
+	 *
+	 * @param string $roleid
+	 *
+	 * @return array
+	 */
+	private function getUserRoleData(string $roleid): array {
+		$db_roles = API::Role()->get([
+			'output' => ['roleid', 'name', 'type', 'readonly'],
+			'selectRules' => ['type', 'name', 'value'],
+			'roleids' => $roleid
+		]);
+
+		return $db_roles[0];
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -1557,6 +1578,17 @@ class CUser extends CApiService {
 			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 
+		// adding user role
+		if ($options['selectRole'] !== null && $options['selectRole'] !== API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'userid', 'roleid');
+			$roles = API::Role()->get([
+				'output' => $options['selectRole'],
+				'roleids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+			$result = $relation_map->mapOne($result, $roles, 'role');
+		}
+
 		return $result;
 	}
 
@@ -1607,8 +1639,8 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
 			GROUP_GUI_ACCESS_DISABLED => $default_auth
 		];
-		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd', 'timezone'
+		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh', 'roleid',
+			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd', 'timezone'
 		];
 
 		if ($case_sensitive) {
@@ -1669,6 +1701,9 @@ class CUser extends CApiService {
 		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($db_user['timezone']);
 		}
+
+		$db_user['role'] = $this->getUserRoleData($db_user['roleid']);
+		$db_user['type'] = $db_user['role']['type'];
 
 		return $db_user;
 	}
