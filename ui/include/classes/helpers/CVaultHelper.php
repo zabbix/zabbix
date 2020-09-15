@@ -40,7 +40,7 @@ class CVaultHelper {
 
 	public function __construct(string $api_endpoint, string $token) {
 		if (self::validateVaultApiEndpoint($api_endpoint)) {
-			$this->api_endpoint = $api_endpoint;
+			$this->api_endpoint = rtrim(trim($api_endpoint), '/');
 		}
 		if (self::validateVaultToken($token)) {
 			$this->token = $token;
@@ -87,13 +87,12 @@ class CVaultHelper {
 
 	/**
 	 * Function validates if given string is valid API endpoint.
-	 * Removes path if given but will not return error in such case.
 	 *
 	 * @param string $api_endpoint
 	 *
 	 * @return bool
 	 */
-	public static function validateVaultApiEndpoint(string &$api_endpoint): bool {
+	public static function validateVaultApiEndpoint(string $api_endpoint): bool {
 		$url_parts = parse_url($api_endpoint);
 
 		if (!$url_parts
@@ -104,8 +103,6 @@ class CVaultHelper {
 
 			return false;
 		}
-
-		$api_endpoint = $url_parts['scheme'].'://'.$url_parts['host'].':'.$url_parts['port'];
 
 		return true;
 	}
