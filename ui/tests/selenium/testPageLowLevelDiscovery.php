@@ -109,7 +109,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertRowCount($start_rows_count);
+		$this->assertTableStats($start_rows_count);
 		$start_contents = $this->getTableData();
 
 		// Filling fields with needed discovery rule info.
@@ -118,7 +118,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check that filtered count mathces expected.
 		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertRowCount(1);
+		$this->assertTableStats(1);
 
 		// Checking that filtered discovery rule matches expected.
 		$this->assertEquals(['Discovery rule 3'], $this->getTableData());
@@ -126,7 +126,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// After pressing reset button, check that previous discovery rules are displayed again.
 		$form->query('button:Reset')->one()->click();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
-		$this->assertRowCount($table->getRows()->count());
+		$this->assertTableStats($table->getRows()->count());
 		$this->assertEquals($start_contents, $this->getTableData());
 	}
 

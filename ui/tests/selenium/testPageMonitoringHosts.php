@@ -486,7 +486,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertRowCount($start_rows_count);
+		$this->assertTableStats($start_rows_count);
 		$start_contents = $this->getTableResult($start_rows_count, 'Name');
 
 		// Filter hosts.
@@ -496,13 +496,13 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertRowCount(1);
+		$this->assertTableStats(1);
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$form->query('button:Reset')->one()->click();
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
-		$this->assertRowCount($reset_rows_count);
+		$this->assertTableStats($reset_rows_count);
 		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count, 'Name'));
 	}
 
@@ -743,14 +743,14 @@ class testPageMonitoringHosts extends CWebTest {
 			$this->page->waitUntilReady();
 
 			// Counting problems icon amount from first Problems column.
-			$icon_count = $table->query('xpath://td/div[@class="problem-icon-list"]/span')->count();
+			$icon_count = $table->findRow('Name', $host)->query('xpath://td/div[@class="problem-icon-list"]/span')->count();
 			$result = [];
 			for ($i = 1; $i <= $icon_count; $i ++) {
 				$result[] = $table->query('xpath://td/div[@class="problem-icon-list"]/span['.$i.']')->one()->getText();
 			}
 
 			// Getting problems amount from second Problems column and then comparing with summarized first column.
-			$problems = $table->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
+			$problems = $table->findRow('Name', $host)->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
 			$this->assertEquals((int)$problems, array_sum(array_map('intval', $result)));
 		}
 	}
@@ -785,7 +785,8 @@ class testPageMonitoringHosts extends CWebTest {
 		if ($page_header != null) {
 			$this->assertPageHeader($page_header);
 		}
-		if ($host_name == 'Dynamic widgets H1') {
+		if ($host_name == 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
+			' and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 	}
