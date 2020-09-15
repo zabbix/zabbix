@@ -129,7 +129,7 @@ static void	tm_adjust_dst(struct tm *tm)
  ******************************************************************************/
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	int		shift;
+	int	shift;
 
 	switch (base)
 	{
@@ -185,9 +185,6 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	time_t		time_new;
-	struct	tm	tm_new;
-
 	tm_add(tm, multiplier, base);
 	tm_adjust_dst(tm);
 
@@ -291,9 +288,6 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	time_t		time_new;
-	struct	tm	tm_new;
-
 	tm_sub(tm, multiplier, base);
 	tm_adjust_dst(tm);
 
