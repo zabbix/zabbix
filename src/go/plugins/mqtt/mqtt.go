@@ -90,7 +90,8 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 func (p *Plugin) createOptions(clientid, username, password string, b broker) *mqtt.ClientOptions {
-	opts := mqtt.NewClientOptions().AddBroker(b.url).SetClientID(clientid).SetCleanSession(true)
+	opts := mqtt.NewClientOptions().AddBroker(b.url).SetClientID(clientid).SetCleanSession(true).SetConnectTimeout(
+		time.Duration(impl.options.Timeout) * time.Second)
 	if username != "" {
 		opts.SetUsername(username)
 		if password != "" {
@@ -109,7 +110,7 @@ func (p *Plugin) createOptions(clientid, username, password string, b broker) *m
 		defer impl.manager.Unlock()
 
 		mc, ok := p.mqttClients[b]
-		if !ok {
+		if !ok || mc == nil || mc.client == nil {
 			impl.Warningf("cannot subscribe to [%s]: broker is not connected", b.url)
 			return
 		}
@@ -173,7 +174,7 @@ func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 
 func (ms *mqttSub) Initialize() (err error) {
 	mc, ok := impl.mqttClients[ms.broker]
-	if !ok {
+	if !ok || mc == nil {
 		return fmt.Errorf("Cannot connect to [%s]: broker could not be initialized", ms.broker.url)
 	}
 
