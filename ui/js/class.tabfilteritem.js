@@ -104,7 +104,18 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {HTMLElement} edit_elm  HTML element to broadcast popup update or delete event.
 	 */
 	openPropertiesDialog(params, edit_elm) {
-		return PopUp('popup.tabfilter.edit', params, 'tabfilter_dialogue', edit_elm);
+		let defaults = {
+			idx: this._idx_namespace,
+			idx2: this._index,
+			filter_name: this._data.filter_name,
+			filter_show_counter: this._data.filter_show_counter,
+			filter_custom_time: this._data.filter_custom_time,
+			tabfilter_from: this._data.from || '',
+			tabfilter_to: this._data.to || '',
+			support_custom_time: +this._support_custom_time
+		};
+
+		return PopUp('popup.tabfilter.edit', {...defaults, ...params}, 'tabfilter_dialogue', edit_elm);
 	}
 
 	/**
@@ -117,16 +128,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		let edit = document.createElement('a');
 		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN);
-		edit.addEventListener('click', (ev) => this.openPropertiesDialog({
-			idx: this._idx_namespace,
-			idx2: this._index,
-			filter_name: this._data.filter_name,
-			filter_show_counter: this._data.filter_show_counter,
-			filter_custom_time: this._data.filter_custom_time,
-			tabfilter_from: this._data.from || '',
-			tabfilter_to: this._data.to || '',
-			support_custom_time: +this._support_custom_time
-		}, ev.target));
+		edit.addEventListener('click', (ev) => this.openPropertiesDialog({}, ev.target));
 		this._target.parentNode.appendChild(edit);
 	}
 

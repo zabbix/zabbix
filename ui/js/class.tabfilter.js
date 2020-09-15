@@ -445,18 +445,9 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Save as' button press, open properties popup.
 			 */
 			buttonSaveAsAction: (ev) => {
-				let data = this._active_item._data;
-
 				this._active_item.openPropertiesDialog({
 					create: 1,
-					idx: this._active_item._idx_namespace,
-					idx2: this._items.length,
-					filter_name: data.filter_name,
-					filter_show_counter: data.filter_show_counter,
-					filter_custom_time: data.filter_custom_time,
-					tabfilter_from: data.from,
-					tabfilter_to: data.to,
-					support_custom_time: +this._options.support_custom_time
+					idx2: this._items.length
 				}, ev.target);
 			},
 

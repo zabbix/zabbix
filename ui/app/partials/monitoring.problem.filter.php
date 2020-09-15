@@ -366,6 +366,7 @@ if (array_key_exists('render_html', $data)) {
 
 					$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
 					$('[name="age_state"]', container).attr('disabled', !filter_show);
+					this._support_custom_time = !filter_show;
 
 					if (this._parent) {
 						this._parent.updateTimeselector(this, filter_show);
@@ -427,7 +428,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.groups || [],
+			data: data.groups||[],
 			popup: {
 				parameters: {
 					srctbl: 'host_groups',
