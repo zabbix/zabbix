@@ -817,7 +817,7 @@ msgstr "高级标签"
 #: include/classes/screens/CScreenHostTriggers.php:215
 #: include/events.inc.php:244
 msgid "Age"
-msgstr "持续时间"
+msgstr "历时"
 
 #: app/partials/common.filter.trigger.php:115
 #: app/views/monitoring.problem.view.php:190
