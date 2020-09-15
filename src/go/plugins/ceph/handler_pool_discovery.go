@@ -17,19 +17,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package ceph
 
 import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"encoding/json"
+
+	"zabbix.com/pkg/zbxerr"
 )
+
+type poolEntity struct {
+	PoolName string `json:"{#POOLNAME}"`
+}
+
+// OSDDiscoveryHandler TODO.
+func poolDiscoveryHandler(data []byte) (interface{}, error) {
+	var pools []string
+
+	err := json.Unmarshal(data, &pools)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotUnmarshalJSON
+	}
+
+	var lld []poolEntity
+
+	for _, pool := range pools {
+		lld = append(lld, poolEntity{pool})
+	}
+
+	jsonLLD, err := json.Marshal(lld)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON
+	}
+
+	return string(jsonLLD), nil
+}

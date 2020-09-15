@@ -17,19 +17,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package ceph
 
 import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"encoding/json"
+
+	"zabbix.com/pkg/zbxerr"
 )
+
+type OSDEntity struct {
+	OSDName string `json:"{#OSDNAME}"`
+}
+
+// OSDDiscoveryHandler TODO.
+func OSDDiscoveryHandler(data []byte) (interface{}, error) {
+	var osds []json.Number
+
+	err := json.Unmarshal(data, &osds)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotUnmarshalJSON
+	}
+
+	var lld []OSDEntity
+
+	for _, osd := range osds {
+		lld = append(lld, OSDEntity{osd.String()})
+	}
+
+	jsonLLD, err := json.Marshal(lld)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON
+	}
+
+	return string(jsonLLD), nil
+}
