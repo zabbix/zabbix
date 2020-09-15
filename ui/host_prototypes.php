@@ -50,9 +50,7 @@ $fields = [
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'tags' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null,
-									IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null
-								],
+	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null, null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null, DB_ID,		null],
 	// actions
@@ -182,8 +180,6 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
-	$custom_interfaces = getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'));
-
 	$newHostPrototype = [
 		'host' => getRequest('host', ''),
 		'name' => (getRequest('name', '') === '') ? getRequest('host', '') : getRequest('name', ''),
@@ -194,7 +190,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'tags' => $tags,
 		'macros' => $macros,
 		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', [])),
-		'custom_interfaces' => $custom_interfaces
+		'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'))
 	];
 
 	if (hasRequest('inventory_mode')) {
@@ -217,7 +213,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
-	if ($custom_interfaces == HOST_PROT_INTERFACES_CUSTOM) {
+	if ($newHostPrototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
 		$interfaces = getRequest('interfaces', []);
 
 		foreach ($interfaces as $key => $interface) {
@@ -488,6 +484,11 @@ if (hasRequest('form')) {
 			}
 
 			$data['tags'] = $data['host_prototype']['tags'];
+
+			foreach ($data['host_prototype']['interfaces'] as &$interface) {
+				$interface['items'] = false;
+			}
+			unset($interface);
 		}
 		else {
 			// Set default values for new host prototype.
