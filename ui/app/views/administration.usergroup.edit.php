@@ -71,7 +71,8 @@ if ($data['can_update_group']) {
 			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
 			GROUP_GUI_ACCESS_LDAP => user_auth_type2str(GROUP_GUI_ACCESS_LDAP),
 			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
-		])));
+		]))
+	);
 	$form_list->addRow(_('Enabled'),
 		(new CCheckBox('users_status', GROUP_STATUS_ENABLED))
 			->setUncheckedValue(GROUP_STATUS_DISABLED)
