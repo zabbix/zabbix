@@ -84,9 +84,9 @@ class CTabFilter extends CDiv {
 
 		$this->buttons = (new CDiv())
 			->addItem([
-				new CSubmitButton(_('Update'), 'filter_update', 1),
+				(new CSubmitButton(_('Update'), 'filter_update', 1))->addClass(ZBX_STYLE_BTN_ALT),
 				(new CSubmitButton(_('Save as'), 'filter_new', 1))->addClass(ZBX_STYLE_BTN_ALT),
-				(new CSubmitButton(_('Apply'), 'filter_apply', 1))->addClass(ZBX_STYLE_BTN_ALT),
+				new CSubmitButton(_('Apply'), 'filter_apply', 1),
 				(new CSubmitButton(_('Reset'), 'filter_reset', 1))->addClass(ZBX_STYLE_BTN_ALT)
 			])
 			->addClass(ZBX_STYLE_FILTER_FORMS)

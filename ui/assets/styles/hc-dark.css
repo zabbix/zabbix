@@ -455,6 +455,9 @@ footer {
   /* tab filter label li element */
   /* tab filter label li clickable a element */
   /* tab filter contents container */ }
+  .filter-container.tabfilter-container .form-buttons [name="filter_new"],
+  .filter-container.tabfilter-container .form-buttons [name="filter_update"] {
+    margin-right: 20px; }
   .filter-container.tabfilter-container .tabfilter-content-container {
     border: 1px solid #444444;
     padding: 10px 0;
@@ -485,8 +488,11 @@ footer {
     background-color: #e0e0e0;
     border-radius: 2px;
     border-top: 1px solid transparent;
-    color: #ffffff;
+    color: #333333;
     margin-right: 2px; }
+    .filter-container.tabfilter-container .tabfilter-item-label:hover {
+      color: #333333;
+      background-color: lightgray; }
     .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link {
       font-style: italic; }
       .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link::before {
@@ -498,6 +504,8 @@ footer {
       border: 1px solid #444444;
       border-radius: 0;
       border-bottom: 0 none; }
+      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .tabfilter-item-link {
+        color: #ffffff; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded::after {
         display: block;
         width: 100%;
@@ -508,10 +516,10 @@ footer {
         margin-left: -1px;
         content: ''; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: transparent;
-      border: 1px solid #333333; }
+      background-color: black;
+      border: 1px solid #e0e0e0; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link {
-        color: #ffffff; }
+        color: #e1e3ed; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label .icon-home.tabfilter-item-link[data-counter]::after {
@@ -539,16 +547,19 @@ footer {
   margin-left: .4em;
   padding: 0.1em 0.4em;
   font-size: 0.917em;
-  background-color: #383838;
-  color: #ffffff;
+  background-color: #000000;
+  border-radius: 2px;
+  color: #e1e3ed;
   content: attr(data-counter); }
 
-.menu-popup-item[data-counter]::after {
+.menu-popup .menu-popup-item[data-counter]::after {
+  display: block;
   position: absolute;
   top: 2px;
-  right: 2px;
-  height: 18px;
+  right: 15px;
   line-height: 18px; }
+.menu-popup .menu-popup-item[data-counter] {
+  padding-right: 35px; }
 
 .icon-home::before {
   display: block;

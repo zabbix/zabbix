@@ -2,9 +2,30 @@
 	float: left;
 }
 
+$tab-label-color: $btn-font-color;
+$tab-label-bg-color: $btn-bg-color;
+$tab-label-selected-color: $form-font-color;
+$tab-label-selected-bg-color: $ui-bg-color;
+$tab-label-selected-border-color: $btn-bg-color;
+$tab-label-expanded-color: $font-color;
+$tab-label-expanded-bg-color: $ui-bg-color;
+$tab-label-expanded-border-color: $ui-border-color;
+$tab-label-hover-color: $btn-font-color;
+$tab-label-hover-bg-color: $btn-bg-color;
+$tab-label-counter-color: $form-font-color;
+$tab-label-counter-bg-color: $form-disabled-bg-color;
+
+
 .filter-container.tabfilter-container {
 	padding: 0;
 	border: 0 none;
+
+	.form-buttons {
+		[name="filter_new"],
+		[name="filter_update"] {
+			margin-right: 20px;
+		}
+	}
 
 	/* All tab filters content container */
 	.tabfilter-content-container {
@@ -52,11 +73,16 @@
 
 	/* tab filter label li element */
 	.tabfilter-item-label {
+		&:hover {
+			color: $tab-label-hover-color;
+			background-color: darken($tab-label-hover-bg-color, 5%);
+		}
+
 		display: inline-block;
-		background-color: $btn-bg-color;
+		background-color: $tab-label-bg-color;
 		border-radius: 2px;
 		border-top: 1px solid transparent;
-		color: $font-color;
+		color: $tab-label-color;
 		margin-right: 2px;
 
 		&.unsaved .tabfilter-item-link {
@@ -72,29 +98,33 @@
 		}
 
 		&.selected.expanded {
-			background-color: $ui-bg-color;
-			border: 1px solid $ui-border-color;
+			background-color: $tab-label-expanded-bg-color;
+			border: 1px solid $tab-label-expanded-border-color;
 			border-radius: 0;
 			border-bottom: 0 none;
+
+			.tabfilter-item-link {
+				color: $tab-label-expanded-color;
+			}
 
 			&::after {
 				display: block;
 				width: 100%;
 				height: 5px;
-				background-color: $ui-bg-color;
-				border-left: 1px solid $ui-border-color;
-				border-right: 1px solid $ui-border-color;
+				background-color: $tab-label-expanded-bg-color;
+				border-left: 1px solid $tab-label-expanded-border-color;
+				border-right: 1px solid $tab-label-expanded-border-color;
 				margin-left: -1px;
 				content: '';
 			}
 		}
 
 		&.selected {
-			background-color: $btn-alt-bg-color;
-			border: 1px solid $btn-border-color;
+			background-color: darken($tab-label-selected-bg-color, 5%);
+			border: 1px solid $tab-label-selected-border-color;
 
 			.tabfilter-item-link {
-				color: $btn-alt-font-color;
+				color: $tab-label-selected-color;
 			}
 
 			.tabfilter-item-link[data-counter]::after {
@@ -110,7 +140,7 @@
 	/* tab filter label li clickable a element */
 	.tabfilter-item-link {
 		display: inline-block;
-		color: $btn-font-color;
+		color: $tab-label-color;
 		border-bottom: 0 none;
 		line-height: 24px;
 		vertical-align: middle;
@@ -143,17 +173,24 @@
 	margin-left: .4em;
 	padding: 0.1em 0.4em;
 	font-size: $font-h3-size;
-	background-color: $form-bg-color;
-	color: $btn-alt-font-color;
+	background-color: $tab-label-counter-bg-color;
+	border-radius: 2px;
+	color: $tab-label-counter-color;
 	content: attr(data-counter);
 }
 
-.menu-popup-item[data-counter]::after {
-	position: absolute;
-	top: 2px;
-	right: 2px;
-	height: 18px;
-	line-height: 18px;
+.menu-popup {
+	.menu-popup-item[data-counter]::after {
+		display: block;
+		position: absolute;
+		top: 2px;
+		right: 15px;
+		line-height: 18px;
+	}
+
+	.menu-popup-item[data-counter] {
+		padding-right: 35px;
+	}
 }
 
 .icon-home::before {
