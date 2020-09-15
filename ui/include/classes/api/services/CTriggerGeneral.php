@@ -317,7 +317,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	private function getHostTriggersByTemplateId(array $tpl_triggerids, array $hostids = null) {
 		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
-			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.templateid,i.hostid';
+			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.templateid,'.
+			't.event_name,i.hostid';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
