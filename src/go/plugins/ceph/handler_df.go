@@ -75,7 +75,7 @@ func dfHandler(data []byte) (interface{}, error) {
 
 	err := json.Unmarshal(data, &df)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON
+		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
 	var totalObjects uint64 = 0
@@ -116,7 +116,7 @@ func dfHandler(data []byte) (interface{}, error) {
 
 	jsonRes, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
 	return string(jsonRes), nil

@@ -61,7 +61,7 @@ type outStatus struct {
 }
 
 var pgStates = []string{"active", "backfill_toofull", "backfill_wait", "backfilling", "clean", "degraded",
-	"inconsistent", "peering", "recovering", "recovery_wait", "remapped", "scrubbing", "undersized"}
+	"inconsistent", "peering", "recovering", "recovery_wait", "remapped", "scrubbing", "undersized", "unknown"}
 
 var healthMap = map[string]int8{
 	"HEALTH_OK":   0,
@@ -75,7 +75,7 @@ func statusHandler(data []byte) (interface{}, error) {
 
 	err := json.Unmarshal(data, &status)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON
+		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
 	var intHealth int8
@@ -115,7 +115,7 @@ func statusHandler(data []byte) (interface{}, error) {
 
 	jsonRes, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
 	return string(jsonRes), nil

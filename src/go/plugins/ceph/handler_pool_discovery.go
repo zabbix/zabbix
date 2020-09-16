@@ -35,7 +35,7 @@ func poolDiscoveryHandler(data []byte) (interface{}, error) {
 
 	err := json.Unmarshal(data, &pools)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON
+		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
 	var lld []poolEntity
@@ -46,7 +46,7 @@ func poolDiscoveryHandler(data []byte) (interface{}, error) {
 
 	jsonLLD, err := json.Marshal(lld)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
 	return string(jsonLLD), nil

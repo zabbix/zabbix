@@ -116,7 +116,7 @@ func OSDHandler(data []byte) (interface{}, error) {
 
 	err := json.Unmarshal(data, &pgDump)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON
+		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
 	log.Infof("%+v", pgDump)
@@ -158,7 +158,7 @@ func OSDHandler(data []byte) (interface{}, error) {
 
 	jsonRes, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
 	return string(jsonRes), nil

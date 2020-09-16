@@ -27,15 +27,15 @@ import (
 )
 
 type cephOsdDump struct {
-	BackfillfullRatio float64 `json:"backfillfull_ratio"`
+	BackfillFullRatio float64 `json:"backfillfull_ratio"`
 	FullRatio         float64 `json:"full_ratio"`
-	NearfullRatio     float64 `json:"nearfull_ratio"`
+	NearFullRatio     float64 `json:"nearfull_ratio"`
 	Osds              []struct {
 		Name json.Number `json:"osd"`
 		In   int8        `json:"in"`
 		Up   int8        `json:"up"`
 	} `json:"osds"`
-	PgTemp []uint64 `json:"pg_temp"`
+	PgTemp []struct{} `json:"pg_temp"`
 }
 
 type osdStatus struct {
@@ -44,9 +44,9 @@ type osdStatus struct {
 }
 
 type outOsdDump struct {
-	BackfillfullRatio float64              `json:"osd_backfillfull_ratio"`
+	BackfillFullRatio float64              `json:"osd_backfillfull_ratio"`
 	FullRatio         float64              `json:"osd_full_ratio"`
-	NearfullRatio     float64              `json:"osd_nearfull_ratio"`
+	NearFullRatio     float64              `json:"osd_nearfull_ratio"`
 	NumPgTemp         int                  `json:"num_pg_temp"`
 	Osds              map[string]osdStatus `json:"osds"`
 }
@@ -57,14 +57,14 @@ func OSDDumpHandler(data []byte) (interface{}, error) {
 
 	err := json.Unmarshal(data, &osdDump)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON
+		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
 	out := outOsdDump{
 		NumPgTemp:         len(osdDump.PgTemp),
-		BackfillfullRatio: math.Round(osdDump.BackfillfullRatio*100) / 100,
+		BackfillFullRatio: math.Round(osdDump.BackfillFullRatio*100) / 100,
 		FullRatio:         math.Round(osdDump.FullRatio*100) / 100,
-		NearfullRatio:     math.Round(osdDump.NearfullRatio*100) / 100,
+		NearFullRatio:     math.Round(osdDump.NearFullRatio*100) / 100,
 		Osds:              make(map[string]osdStatus),
 	}
 
@@ -77,7 +77,7 @@ func OSDDumpHandler(data []byte) (interface{}, error) {
 
 	jsonRes, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
 	return string(jsonRes), nil
