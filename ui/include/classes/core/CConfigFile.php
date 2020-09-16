@@ -186,8 +186,8 @@ class CConfigFile {
 	}
 
 	protected function getCredentialsFromVault(): array {
-		$username = CDataCacheHelper::getValue('username', '');
-		$password = CDataCacheHelper::getValue('password', '');
+		$username = CDataCacheHelper::getValue('db_username', '');
+		$password = CDataCacheHelper::getValue('db_password', '');
 		$hashsum = CDataCacheHelper::getValue('hashsum', '');
 
 		// Changes in any database related parameter causes cache renewal.
@@ -208,13 +208,13 @@ class CConfigFile {
 			if ($username !== '' && $password !== '') {
 				// Update cache.
 				CDataCacheHelper::setValueArray([
-					'username' => $username,
-					'password' => $password,
+					'db_username' => $username,
+					'db_password' => $password,
 					'hashsum' => $current_hashsum
 				]);
 			}
 			else {
-				CDataCacheHelper::clearValues(['username', 'password', 'hashsum']);
+				CDataCacheHelper::clearValues(['db_username', 'db_password', 'hashsum']);
 
 				echo (new CView('general.warning', [
 					'header' => _('Vault connection failed.'),

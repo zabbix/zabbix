@@ -77,7 +77,7 @@ function DBconnect(&$error) {
 
 		if ($DB['VAULT_HOST'] !== '' && $DB['VAULT_SECRET'] !== '' && $DB['VAULT_TOKEN'] !== '') {
 			// Erase cached credentials on failed connection.
-			CDataCacheHelper::clearValues(['username', 'password', 'hashsum']);
+			CDataCacheHelper::clearValues(['db_username', 'db_password', 'hashsum']);
 		}
 
 		$error = $db->getError();
