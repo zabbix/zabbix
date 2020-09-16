@@ -247,6 +247,7 @@ typedef struct _DC_TRIGGER
 	char			*new_error;
 	char			*correlation_tag;
 	char			*opdata;
+	char			*event_name;
 	zbx_timespec_t		timespec;
 	int			lastchange;
 	unsigned char		topoindex;

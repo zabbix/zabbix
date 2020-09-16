@@ -312,6 +312,7 @@ typedef struct
 	char		*comments;
 	char		*correlation_tag;
 	char		*opdata;
+	char		*event_name;
 	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;

@@ -33,6 +33,7 @@ typedef struct
 	const char		*error;
 	const char		*correlation_tag;
 	const char		*opdata;
+	const char		*event_name;
 	int			lastchange;
 	unsigned char		topoindex;
 	unsigned char		priority;

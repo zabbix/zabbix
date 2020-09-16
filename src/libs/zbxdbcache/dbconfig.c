@@ -3377,6 +3377,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &trigger->recovery_expression, row[11]);
 		DCstrpool_replace(found, &trigger->correlation_tag, row[13]);
 		DCstrpool_replace(found, &trigger->opdata, row[14]);
+		DCstrpool_replace(found, &trigger->event_name, row[15]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
@@ -7218,6 +7219,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->correlation_mode = src_trigger->correlation_mode;
 	dst_trigger->correlation_tag = zbx_strdup(NULL, src_trigger->correlation_tag);
 	dst_trigger->opdata = zbx_strdup(NULL, src_trigger->opdata);
+	dst_trigger->event_name = ('\0' != *src_trigger->event_name ? zbx_strdup(NULL, src_trigger->event_name) : NULL);
 	dst_trigger->flags = 0;
 
 	dst_trigger->expression = NULL;
@@ -7272,6 +7274,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->description);
 	zbx_free(trigger->correlation_tag);
 	zbx_free(trigger->opdata);
+	zbx_free(trigger->event_name);
 
 	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)zbx_free_tag);
 	zbx_vector_ptr_destroy(&trigger->tags);
