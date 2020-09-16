@@ -150,7 +150,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 else {
 	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode($data['interfaces']).');');
 	zbx_add_post_js('hostInterfaceManager.render();');
-	zbx_add_post_js('HostInterfaceManager.disableEdit();');
+	zbx_add_post_js('HostInterfaceManager.makeReadonly();');
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 

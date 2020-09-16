@@ -75,7 +75,7 @@
 			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces);
 			hostInterfaceManagerInherit.setAllowEmptyMessage(!this._data.parent_is_template);
 			hostInterfaceManagerInherit.render();
-			HostInterfaceManager.disableEdit();
+			HostInterfaceManager.makeReadonly();
 		}
 
 		initCustom() {
@@ -84,7 +84,7 @@
 			hostInterfaceManager.render();
 
 			if (this._data.is_templated) {
-				HostInterfaceManager.disableEdit();
+				HostInterfaceManager.makeReadonly();
 			}
 		}
 
