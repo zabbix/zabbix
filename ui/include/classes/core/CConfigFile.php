@@ -179,6 +179,10 @@ class CConfigFile {
 				&& $this->config['DB']['VAULT_SECRET'] !== ''
 				&& $this->config['DB']['VAULT_TOKEN'] !== '') {
 			list($this->config['DB']['USER'], $this->config['DB']['PASSWORD']) = $this->getCredentialsFromVault();
+
+			if ($this->config['DB']['USER'] === '' || $this->config['DB']['PASSWORD'] === '') {
+				self::exception(_('Unable to load database credentials from Vault.'), self::CONFIG_VAULT_ERROR);
+			}
 		}
 
 		$this->makeGlobal();
@@ -217,20 +221,6 @@ class CConfigFile {
 			}
 			else {
 				CDataCacheHelper::clearValues(['db_username', 'db_password', 'hashsum']);
-
-				self::exception(
-					_('Username and password must be stored in Vault secret keys "username" and "password".'),
-					self::CONFIG_VAULT_ERROR
-				);
-				echo (new CView('general.warning', [
-					'header' => _('Vault connection failed.'),
-					'messages' => [
-						_('Username and password must be stored in Vault secret keys "username" and "password".')
-					],
-					'theme' => ZBX_DEFAULT_THEME
-				]))->getOutput();
-
-				exit;
 			}
 		}
 
