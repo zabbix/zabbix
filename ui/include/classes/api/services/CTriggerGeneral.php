@@ -373,7 +373,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$recovery_expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
 
 		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
-			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,i.hostid,h.host';
+			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.event_name,i.hostid,'.
+			'h.host';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
