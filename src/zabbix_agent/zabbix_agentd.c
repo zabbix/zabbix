@@ -566,8 +566,10 @@ static void	set_defaults(void)
 				NULL != (value = GET_STR_RESULT(&result)))
 		{
 			assert(*value);
+			zbx_trim_str_list(*value, ',');
 
-			if (MAX_ZBX_HOSTNAME_LEN < strlen(*value))
+			/* TODO: truncate each hostname in list */
+			if (NULL == strchr(*value, ',') && MAX_ZBX_HOSTNAME_LEN < strlen(*value))
 			{
 				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
 				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
@@ -980,9 +982,6 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	finalize_key_access_rules_configuration();
 
 	set_defaults();
-
-	if (NULL != CONFIG_HOSTNAMES)
-		zbx_trim_str_list(CONFIG_HOSTNAMES, ',');
 
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
