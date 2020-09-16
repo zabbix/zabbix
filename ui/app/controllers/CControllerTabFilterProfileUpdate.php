@@ -100,7 +100,6 @@ class CControllerTabFilterProfileUpdate extends CController {
 
 				if ($data['value_int'] >= 0 && $data['value_int'] < $dynamictabs) {
 					$filter->selected = (int) $data['value_int'];
-					$filter->expanded = true;
 				}
 
 				break;

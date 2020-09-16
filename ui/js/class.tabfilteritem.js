@@ -18,7 +18,6 @@
 **/
 
 
-const TABFILTERITEM_EVENT_CLICK = 'click';
 const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.tabfilter';
 const TABFILTERITEM_EVENT_EXPAND = 'expand.tabfilter';
 const TABFILTERITEM_EVENT_SELECT = 'select.tabfilter';
@@ -150,6 +149,11 @@ class CTabFilterItem extends CBaseComponent {
 		this._target.focus();
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_SELECTED);
 
+		if (!this._template_rendered) {
+			this.renderContentTemplate();
+			this._template_rendered = true;
+		}
+
 		if (this._data.filter_configurable) {
 			this.addActionIcons();
 		}
@@ -180,11 +184,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._expanded = true;
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_EXPANDED);
 
-		if (!this._template_rendered) {
-			this.renderContentTemplate();
-			this._template_rendered = true;
-		}
-		else if (item_template instanceof HTMLElement) {
+		if (item_template instanceof HTMLElement) {
 			item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
 		}
 
@@ -381,14 +381,7 @@ class CTabFilterItem extends CBaseComponent {
 					return;
 				}
 
-				this._target.focus();
-
-				if (!this._expanded) {
-					this.fire(TABFILTERITEM_EVENT_EXPAND);
-				}
-				else if (this._can_toggle) {
-					this.fire(TABFILTERITEM_EVENT_COLLAPSE);
-				}
+				this.fire(TABFILTERITEM_EVENT_SELECT);
 			},
 
 			expand: () => {
@@ -414,6 +407,6 @@ class CTabFilterItem extends CBaseComponent {
 		this
 			.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand)
 			.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse)
-			.on(TABFILTERITEM_EVENT_CLICK, this._events.click);
+			.on('click', this._events.click);
 	}
 }

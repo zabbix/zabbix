@@ -252,6 +252,7 @@ class CTabFilter extends CBaseComponent {
 	setSelectedItem(item) {
 		this._active_item = item;
 		item.setSelected();
+		item.setBrowserLocation(item.getFilterParams());
 
 		for (const _item of this._items) {
 			if (_item !== this._active_item) {
@@ -270,12 +271,34 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Event handler on tab content expand.
 			 */
+			select: (ev) => {
+				let item = ev.detail.target;
+
+				if (item != this._active_item) {
+					if (this._active_item._expanded) {
+						item.setExpanded();
+					}
+
+					this.setSelectedItem(item);
+					this.collapseAllItemsExcept(item);
+					this.profileUpdate('selected', {
+						value_int: this._active_item._index
+					});
+				}
+				else if (!item._expanded) {
+					item.fire(TABFILTERITEM_EVENT_EXPAND);
+				}
+				else if (item._can_toggle) {
+					item.fire(TABFILTERITEM_EVENT_COLLAPSE);
+				}
+			},
+
 			expand: (ev) => {
 				if (ev.detail.target != this._timeselector) {
 					this.setSelectedItem(ev.detail.target);
 					this._filters_footer.classList.remove('display-none');
-					this.profileUpdate('selected', {
-						value_int: this._active_item._index
+					this.profileUpdate('expanded', {
+						value_int: 1
 					});
 				}
 				else {
@@ -500,9 +523,11 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		for (const item of this._items) {
-			item.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand);
-			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
-			item.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
+			item
+				.on(TABFILTERITEM_EVENT_SELECT, this._events.select)
+				.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand)
+				.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse)
+				.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
 		}
 
 		$('.ui-sortable-container', this._target).sortable({
