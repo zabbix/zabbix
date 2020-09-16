@@ -23,6 +23,7 @@ class CConfigFile {
 
 	const CONFIG_NOT_FOUND = 1;
 	const CONFIG_ERROR = 2;
+	const CONFIG_VAULT_ERROR = 3;
 
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
@@ -217,6 +218,10 @@ class CConfigFile {
 			else {
 				CDataCacheHelper::clearValues(['db_username', 'db_password', 'hashsum']);
 
+				self::exception(
+					_('Username and password must be stored in Vault secret keys "username" and "password".'),
+					self::CONFIG_VAULT_ERROR
+				);
 				echo (new CView('general.warning', [
 					'header' => _('Vault connection failed.'),
 					'messages' => [
