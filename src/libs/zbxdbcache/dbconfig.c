@@ -5231,25 +5231,22 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_trigger_timer_t	timer_local, *timer;
-		zbx_timespec_t		ts;
 
 		if (ZBX_FUNCTION_TYPE_TRENDS != atoi(row[1]))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
+		}
 
 		ZBX_STR2UINT64(timer_local.objectid, row[0]);
-		ts.sec = atoi(row[2]);
-		ts.ns = atoi(row[3]);
 
-		timer_local.eval_ts.sec = 0;
-		timer_local.eval_ts.ns = 0;
+		timer_local.eval_ts.sec = atoi(row[2]);
+		timer_local.eval_ts.ns =  atoi(row[3]);
 		timer = zbx_hashset_insert(trend_functions, &timer_local, sizeof(timer_local));
 
 		/* in the case function was scheduled multiple times use the latest data */
-		if (0 > zbx_timespec_compare(&timer->eval_ts, &ts))
-		{
-			timer->eval_ts = ts;
-			timer->type = atoi(row[1]);
-		}
+		if (0 > zbx_timespec_compare(&timer->eval_ts, &timer_local.eval_ts))
+			timer->eval_ts = timer_local.eval_ts;
 
 	}
 	DBfree_result(result);
