@@ -57,6 +57,12 @@ class CControllerPopupTabFilterUpdate extends CController {
 	}
 
 	protected function customValidation(): bool {
+		if (trim($this->getInput('filter_name', '')) === '') {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'filter_name', _('cannot be empty')));
+
+			return false;
+		}
+
 		if (!$this->getInput('support_custom_time', 0) || !$this->getInput('filter_custom_time', 0)) {
 			return true;
 		}
