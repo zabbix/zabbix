@@ -400,10 +400,10 @@ func getEndianness(p *[]string, n int, retType bits16) (endianness Endianness, e
 		endianness.order = binary.LittleEndian
 		endianness.middle = 0
 	case "mbe":
-		endianness.order = binary.LittleEndian
+		endianness.order = binary.BigEndian
 		endianness.middle = Mbe
 	case "mle":
-		endianness.order = binary.BigEndian
+		endianness.order = binary.LittleEndian
 		endianness.middle = Mle
 	default:
 		return endianness, fmt.Errorf("Unsupported endianness of data:%s", v)
