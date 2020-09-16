@@ -379,6 +379,8 @@ class ZBase {
 	protected function initDB() {
 		$error = null;
 		if (!DBconnect($error)) {
+			CDataCacheHelper::clearValues(['db_username', 'db_password', 'hashsum']);
+
 			throw new DBException($error);
 		}
 	}

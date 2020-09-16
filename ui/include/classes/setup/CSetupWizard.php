@@ -258,7 +258,7 @@ class CSetupWizard extends CForm {
 
 	function stage2() {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE');
-		$DB['CREDS_STORAGE'] = (int) $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG);
+		$db_creds_storage = (int) $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG);
 
 		$table = (new CFormList())
 			->addVar('tls_encryption', '0', 'tls_encryption_off')
@@ -293,13 +293,13 @@ class CSetupWizard extends CForm {
 		}
 
 		$table->addRow(_('Store credentials in'), [
-			(new CRadioButtonList('creds_storage', $DB['CREDS_STORAGE']))
+			(new CRadioButtonList('creds_storage', $db_creds_storage))
 				->addValue(_('Plain text'), DB_STORE_CREDS_CONFIG, null, 'submit()')
 				->addValue(_('HashiCorp Vault'), DB_STORE_CREDS_VAULT, null, 'submit()')
 				->setModern(true)
 		]);
 
-		if ($DB['CREDS_STORAGE'] == DB_STORE_CREDS_VAULT) {
+		if ($db_creds_storage == DB_STORE_CREDS_VAULT) {
 			$table
 				->addRow(_('Vault API endpoint'),
 					(new CTextBox('vault_host', $this->getConfig('DB_VAULT_HOST', self::VAULT_HOST_DEFAULT)))
@@ -511,6 +511,8 @@ class CSetupWizard extends CForm {
 			'PASSWORD' => ''
 		];
 
+		$db_user = null;
+		$db_pass = null;
 		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
 			$vault_config['VAULT_HOST'] = $this->getConfig('DB_VAULT_HOST');
 			$vault_config['VAULT_SECRET'] = $this->getConfig('DB_VAULT_SECRET');
@@ -520,7 +522,8 @@ class CSetupWizard extends CForm {
 			$secret = $vault->loadSecret($vault_config['VAULT_SECRET']);
 
 			if (array_key_exists('username', $secret) && array_key_exists('password', $secret)) {
-				$this->dbConnect($secret['username'], $secret['password']);
+				$db_user = $secret['username'];
+				$db_pass = $secret['password'];
 			}
 			else {
 				error(_('Username and password must be stored in Vault secret keys "username" and "password".'));
@@ -532,10 +535,9 @@ class CSetupWizard extends CForm {
 		else {
 			$db_creds_config['USER'] = $this->getConfig('DB_USER');
 			$db_creds_config['PASSWORD'] = $this->getConfig('DB_PASSWORD');
-
-			$this->dbConnect();
 		}
 
+		$this->dbConnect($db_user, $db_pass);
 		$update = [];
 		foreach (['default_lang', 'default_timezone', 'default_theme'] as $key) {
 			$update[] = $key.'='.zbx_dbstr($this->getConfig($key));
@@ -570,7 +572,7 @@ class CSetupWizard extends CForm {
 		$error = false;
 
 		// Create session secret key.
-		if (!$this->dbConnect() || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
+		if (!$this->dbConnect($db_user, $db_pass) || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
 			$this->STEP_FAILED = true;
 			$this->setConfig('step', 2);
 			return $this->stage2();
