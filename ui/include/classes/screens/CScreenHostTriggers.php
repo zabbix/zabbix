@@ -162,11 +162,6 @@ class CScreenHostTriggers extends CScreenBase {
 	protected function getProblemsListTable(array $filter) {
 		$config = select_config();
 
-		// If no hostids and groupids defined show recent problems.
-		if ($filter['hostids'] === null && $filter['groupids'] === null) {
-			$filter['show'] = TRIGGERS_OPTION_RECENT_PROBLEM;
-		}
-
 		$filter = $filter + [
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'show_timeline' => 0,
