@@ -5233,6 +5233,9 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 		zbx_trigger_timer_t	timer_local, *timer;
 		zbx_timespec_t		ts;
 
+		if (ZBX_FUNCTION_TYPE_TRENDS != atoi(row[1]))
+			continue;
+
 		ZBX_STR2UINT64(timer_local.objectid, row[0]);
 		ts.sec = atoi(row[2]);
 		ts.ns = atoi(row[3]);
@@ -8059,8 +8062,6 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 		/* remember if the timer locked trigger, so it would unlock during rescheduling */
 		if (0 == dc_trigger->locked)
 			dc_trigger->locked = timer->lock = 1;
-		else
-			timer->lock = 0;	/* timer could not lock trigger, skip  */
 
 		if (NULL == first_timer)
 			first_timer = timer;
@@ -8085,6 +8086,8 @@ void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	for (i = 0; i < timers->values_num; i++)
 	{
 		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+
+		timer->lock = 0;
 
 		/* timers with reseted scheduling must be rescheduled at new time, while other */
 		/* timers must be rescheduled at the old time                                  */
