@@ -22,46 +22,31 @@
 /**
  * Class for converting template screens to template dashboards.
  */
-class CTemplateScreenConverter {
+class CTemplateScreenConverter extends CConverter {
 
 	/**
 	 * Reference display width for widget position and size calculations.
 	 */
-	const DISPLAY_WIDTH = 1920;
+	private const DISPLAY_WIDTH = 1920;
 
 	/**
-	 * Widget row height on dashboards.
+	 * Widget row height on dashboard.
 	 */
-	const WIDGET_ROW_HEIGHT = 70;
-
-	/**
-	 * Template screen definition.
-	 *
-	 * @var array
-	 */
-	private $screen;
-
-	/**
-	 * @param array $screen  Template screen definition.
-	 */
-	public function __construct(array $screen) {
-		$this->screen = $screen;
-	}
+	private const WIDGET_ROW_HEIGHT = 70;
 
 	/**
 	 * Convert template screen definition to template dashboard definition.
 	 *
-	 * @throws Exception whether unknown screen items are provided.
+	 * @param array $screen
 	 *
 	 * @return array
 	 */
-	public function convertToTemplateDashboard(): array {
+	public function convert($screen): array {
 		$widgets = [];
 
-		$screen_items = $this->screen['screen_items'];
-
-		if ($screen_items) {
-			$screen_items = self::normalizePositioning($screen_items);
+		if (array_key_exists('screen_items', $screen)) {
+			$screen_items = self::getValidScreenItems($screen['screen_items']);
+			$screen_items = self::normalizePositions($screen_items);
 
 			[$dimensions_x, $dimensions_y] = self::getDashboardDimensions($screen_items);
 
@@ -107,7 +92,7 @@ class CTemplateScreenConverter {
 		}
 
 		$dashboard = [
-			'name' => $this->screen['name']
+			'name' => $screen['name']
 		];
 
 		if ($widgets) {
@@ -118,25 +103,45 @@ class CTemplateScreenConverter {
 	}
 
 	/**
+	 * Filter screen items by valid resourcetype.
+	 *
+	 * @static
+	 *
+	 * @param array $screen_items
+	 *
+	 * @return array  valid screen items
+	 */
+	private static function getValidScreenItems(array $screen_items): array {
+		return array_filter($screen_items, function (array $screen_item): bool {
+			return in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_GRAPH,
+				SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH,
+				SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_URL
+			]);
+		});
+	}
+
+	/**
 	 * Remove empty rows and columns and simplify rowspan and colspan usage in the screen items.
+	 *
+	 * @static
 	 *
 	 * @param array $screen_items
 	 *
 	 * @return array  Optimized screen items.
 	 */
-	private static function normalizePositioning(array $screen_items): array {
+	private static function normalizePositions(array $screen_items): array {
 		$used_x = [];
 		$used_y = [];
 		$keep_x = [];
 		$keep_y = [];
 
-		foreach ($screen_items as $item) {
-			$used_x += array_fill((int) $item['x'], (int) $item['colspan'], true);
-			$used_y += array_fill((int) $item['y'], (int) $item['rowspan'], true);
-			$keep_x[$item['x']] = true;
-			$keep_x[$item['x'] + $item['colspan']] = true;
-			$keep_y[$item['y']] = true;
-			$keep_y[$item['y'] + $item['rowspan']] = true;
+		foreach ($screen_items as $screen_item) {
+			$used_x += array_fill((int) $screen_item['x'], (int) $screen_item['colspan'], true);
+			$used_y += array_fill((int) $screen_item['y'], (int) $screen_item['rowspan'], true);
+			$keep_x[$screen_item['x']] = true;
+			$keep_x[$screen_item['x'] + $screen_item['colspan']] = true;
+			$keep_y[$screen_item['y']] = true;
+			$keep_y[$screen_item['y'] + $screen_item['rowspan']] = true;
 		}
 
 		for ($x = max(array_keys($keep_x)); $x >= 0; $x--) {
@@ -144,15 +149,16 @@ class CTemplateScreenConverter {
 				continue;
 			}
 
-			foreach ($screen_items as &$item) {
-				if ($x < $item['x']) {
-					$item['x']--;
+			foreach ($screen_items as &$screen_item) {
+				if ($x < $screen_item['x']) {
+					$screen_item['x']--;
 				}
-				if (($x > $item['x']) && ($x < $item['x'] + $item['colspan'])) {
-					$item['colspan']--;
+
+				if ($x > $screen_item['x'] && $x < $screen_item['x'] + $screen_item['colspan']) {
+					$screen_item['colspan']--;
 				}
 			}
-			unset($item);
+			unset($screen_item);
 		}
 
 		for ($y = max(array_keys($keep_y)); $y >= 0; $y--) {
@@ -160,15 +166,16 @@ class CTemplateScreenConverter {
 				continue;
 			}
 
-			foreach ($screen_items as &$item) {
-				if ($y < $item['y']) {
-					$item['y']--;
+			foreach ($screen_items as &$screen_item) {
+				if ($y < $screen_item['y']) {
+					$screen_item['y']--;
 				}
-				if (($y > $item['y']) && ($y < $item['y'] + $item['rowspan'])) {
-					$item['rowspan']--;
+
+				if ($y > $screen_item['y'] && $y < $screen_item['y'] + $screen_item['rowspan']) {
+					$screen_item['rowspan']--;
 				}
 			}
-			unset($item);
+			unset($screen_item);
 		}
 
 		return $screen_items;
@@ -177,11 +184,11 @@ class CTemplateScreenConverter {
 	/**
 	 * Get final dashboard dimensions for screen table rows and columns.
 	 *
+	 * @static
+	 *
 	 * @param array $screen_items
 	 *
-	 * @return array
-	 *
-	 * @throws Exception
+	 * @return array  Dashboard dimensions
 	 */
 	private static function getDashboardDimensions(array $screen_items): array {
 		$items_x_preferred = [];
@@ -217,22 +224,12 @@ class CTemplateScreenConverter {
 
 		$dimensions_x_preferred = self::getAxisDimensions($items_x_preferred);
 		$dimensions_x_min = self::getAxisDimensions($items_x_min);
-		$dimensions_x_sum = array_sum($dimensions_x_preferred);
-
-		if ($dimensions_x_sum <= DASHBOARD_MAX_COLUMNS * .75 || $dimensions_x_sum > DASHBOARD_MAX_COLUMNS) {
-			$dimensions_x = self::adjustAxisDimensions($dimensions_x_preferred, $dimensions_x_min,
-				DASHBOARD_MAX_COLUMNS
-			);
-		}
-		else {
-			$dimensions_x = $dimensions_x_preferred;
-		}
+		$dimensions_x = self::adjustAxisDimensions($dimensions_x_preferred, $dimensions_x_min, DASHBOARD_MAX_COLUMNS);
 
 		$dimensions_y_preferred = self::getAxisDimensions($items_y_preferred);
 		$dimensions_y_min = self::getAxisDimensions($items_y_min);
-		$dimensions_y_sum = array_sum($dimensions_y_preferred);
 
-		if ($dimensions_y_sum > DASHBOARD_MAX_ROWS) {
+		if (array_sum($dimensions_y_preferred) > DASHBOARD_MAX_ROWS) {
 			$dimensions_y = self::adjustAxisDimensions($dimensions_y_preferred, $dimensions_y_min, DASHBOARD_MAX_ROWS);
 		}
 		else {
@@ -245,10 +242,12 @@ class CTemplateScreenConverter {
 	/**
 	 * Get axis dimensions based on prepared items.
 	 *
+	 * @static
+	 *
 	 * @param array $items                Prepared items.
-	 * @param array $items[]['position']  Item starting position.
-	 * @param array $items[]['span']      Item cell span.
-	 * @param array $items[]['size']      Item inner size.
+	 * @param int   $items[]['position']  Item starting position.
+	 * @param int   $items[]['span']      Item cell span.
+	 * @param int   $items[]['size']      Item inner size.
 	 *
 	 * @return array
 	 */
@@ -315,9 +314,11 @@ class CTemplateScreenConverter {
 	/**
 	 * Adjust axis dimensions to the target summary size whether possible.
 	 *
+	 * @static
+	 *
 	 * @param array $dimensions      Prefered axis dimensions.
 	 * @param array $dimensions_min  Minimal axis dimensions.
-	 * @param mixed $target          Target summary size.
+	 * @param int   $target          Target summary size.
 	 *
 	 * @return array
 	 */
@@ -340,7 +341,7 @@ class CTemplateScreenConverter {
 			$index = array_keys($potential)[0];
 
 			// Further shrinking not possible?
-			if (($dimensions_sum > $target) && ($dimensions[$index] == $dimensions_min[$index])) {
+			if ($dimensions_sum > $target && $dimensions[$index] == $dimensions_min[$index]) {
 				break;
 			}
 
@@ -359,6 +360,8 @@ class CTemplateScreenConverter {
 
 	/**
 	 * Get preferred widget size on dashboard for given screen item type and size.
+	 *
+	 * @static
 	 *
 	 * @param array $screen_item
 	 *
@@ -381,44 +384,46 @@ class CTemplateScreenConverter {
 	/**
 	 * Get minimal widget size on dashboard for given screen item type.
 	 *
+	 * @static
+	 *
 	 * @param int $resourcetype
 	 *
 	 * @return array
-	 *
-	 * @throws Exception
 	 */
 	private static function getMinWidgetSize(int $resourcetype): array {
 		switch ($resourcetype) {
 			case SCREEN_RESOURCE_CLOCK:
-				[$width, $height] = [1, 2];
-				break;
+				return [
+					'width' => 1,
+					'height' => 2
+				];
 
 			case SCREEN_RESOURCE_GRAPH:
 			case SCREEN_RESOURCE_SIMPLE_GRAPH:
 			case SCREEN_RESOURCE_LLD_GRAPH:
 			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-				[$width, $height] = [6, 3];
-				break;
+				return [
+					'width' => 4,
+					'height' => 4
+				];
 
 			case SCREEN_RESOURCE_PLAIN_TEXT:
 			case SCREEN_RESOURCE_URL:
-				[$width, $height] = [5, 2];
-				break;
-
-			default:
-				throw new Exception();
+				return [
+					'width' => 4,
+					'height' => 2
+				];
 		}
-
-		return self::limitWidgetSize([
-			'width' => $width,
-			'height' => $height
-		]);
 	}
 
 	/**
 	 * Limit widget size not to exceed the size of dashboard.
 	 *
+	 * @static
+	 *
 	 * @param array $size
+	 * @param int   $size['width']
+	 * @param int   $size['height']
 	 *
 	 * @return array
 	 */
@@ -432,13 +437,13 @@ class CTemplateScreenConverter {
 	/**
 	 * Make widget definition based on screen item.
 	 *
+	 * @static
+	 *
 	 * @param array $screen_item
 	 *
 	 * @return array  Full widget definition except the positional data.
-	 *
-	 * @throws Exception
 	 */
-	private function makeWidget(array $screen_item): array {
+	private static function makeWidget(array $screen_item): array {
 		$widget = [
 			'name' => '',
 			'hide_header' => CXmlConstantName::NO
@@ -465,87 +470,97 @@ class CTemplateScreenConverter {
 
 			case SCREEN_RESOURCE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
-				array_push($fields, [
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_GRAPH
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH,
 					'name' => 'value',
 					'value' => $screen_item['resource']
-				]);
+				];
 				break;
 
 			case SCREEN_RESOURCE_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
-				array_push($fields, [
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 					'name' => 'value',
 					'value' => $screen_item['resource']
-				]);
+				];
 				break;
 
 			case SCREEN_RESOURCE_LLD_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
-				array_push($fields, [
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 					'name' => 'value',
 					'value' => $screen_item['resource']
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'columns',
-					'value' => (string) self::limitGraphPrototypeColumns((int) $screen_item['max_columns'])
-				], [
+					'value' => '1'
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'rows',
 					'value' => '1'
-				]);
+				];
 				break;
 
 			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
-				array_push($fields, [
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
 					'name' => 'value',
 					'value' => $screen_item['resource']
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'columns',
-					'value' => (string) self::limitGraphPrototypeColumns((int) $screen_item['max_columns'])
-				], [
+					'value' => '1'
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'rows',
 					'value' => '1'
-				]);
+				];
 				break;
 
 			case SCREEN_RESOURCE_PLAIN_TEXT:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT;
-				array_push($fields, [
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 					'name' => 'value',
 					'value' => $screen_item['resource']
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'show_as_html',
 					'value' => $screen_item['style']
-				], [
+				];
+				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'show_lines',
 					'value' => $screen_item['elements']
-				]);
+				];
 				break;
 
 			case SCREEN_RESOURCE_URL:
@@ -556,15 +571,12 @@ class CTemplateScreenConverter {
 					'value' => $screen_item['url']
 				];
 				break;
-
-			default:
-				throw new Exception();
 		}
 
 		if ($fields) {
 			$widget['fields'] = [];
 
-			foreach ($fields as $name => $field) {
+			foreach ($fields as $field) {
 				$key = 'field';
 				if (count($widget['fields']) > 0) {
 					$key .= count($widget['fields']);
@@ -575,16 +587,5 @@ class CTemplateScreenConverter {
 		}
 
 		return $widget;
-	}
-
-	/**
-	 * Limit number of columns for graph prototype widget.
-	 *
-	 * @param mixed $columns
-	 *
-	 * @return int
-	 */
-	private static function limitGraphPrototypeColumns(int $columns): int {
-		return min(DASHBOARD_MAX_COLUMNS, max(1, $columns));
 	}
 }
