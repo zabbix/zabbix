@@ -456,16 +456,38 @@ class CSetupWizard extends CForm {
 		$table->addRow((new CSpan(_('Database type')))->addClass(ZBX_STYLE_GREY), $databases[$db_type]);
 
 		$db_port = ($this->getConfig('DB_PORT') == 0) ? _('default') : $this->getConfig('DB_PORT');
-		$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
+
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
+			$db_password = _('Stored in HashiCorp Vault secret');
+			$db_username = _('Stored in HashiCorp Vault secret');
+		}
+		else {
+			$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
+			$db_username = $this->getConfig('DB_USER');
+		}
 
 		$table->addRow((new CSpan(_('Database server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SERVER'));
 		$table->addRow((new CSpan(_('Database port')))->addClass(ZBX_STYLE_GREY), $db_port);
 		$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
-		$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
+		$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $db_username);
 		$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
 		if ($db_type == ZBX_DB_POSTGRESQL) {
 			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
+
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
+			$table
+				->addRow((new CSpan(_('Vault API endpoint')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_HOST')
+				)
+				->addRow((new CSpan(_('Vault secret path')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_SECRET')
+				)
+				->addRow((new CSpan(_('Vault authentication token')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_TOKEN')
+				);
+		}
+
 		$table->addRow((new CSpan(_('TLS encryption')))->addClass(ZBX_STYLE_GREY),
 			$this->getConfig('DB_ENCRYPTION') ? 'true' : 'false');
 		if ($this->getConfig('DB_ENCRYPTION')) {
