@@ -336,8 +336,7 @@ abstract class CItemGeneral extends CApiService {
 
 			// Validate update interval.
 			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-					&& !($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE && array_key_exists('key_', $fullItem)
-						&& strncmp($fullItem['key_'], 'mqtt.get', 8) === 0)
+					&& ($fullItem['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($fullItem['key_'], 'mqtt.get', 8) !== 0)
 					&& !validateDelay($update_interval_parser, 'delay', $fullItem['delay'], $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}

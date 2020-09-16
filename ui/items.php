@@ -516,7 +516,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
 	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
-			&& (!($type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp(getRequest('key'), 'mqtt.get', 8) === 0))
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
 			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
