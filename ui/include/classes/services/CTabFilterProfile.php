@@ -157,9 +157,9 @@ class CTabFilterProfile {
 	}
 
 	/**
-	 * Get unmodified filter as URL string, required to initialize selected tab filter on page refresh.
+	 * Get unmodified filter as URL string, required to initialize selected tab filter unsaved state on page refresh.
 	 *
-	 * @param array $input  Unmodified posted input data.
+	 * @param array $input  User submitted input.
 	 *
 	 * @return string
 	 */
@@ -168,7 +168,24 @@ class CTabFilterProfile {
 			$input = array_merge($input, $this->profile_data[$this->selected]);
 		}
 
-		return http_build_query($input, '', '&', PHP_QUERY_RFC3986);
+		$arg_separator = ini_get('arg_separator.output');
+		$array_params = array_filter($input, 'is_array');
+		$params = [http_build_query(array_diff_key($input, $array_params), '', $arg_separator, PHP_QUERY_RFC3986)];
+
+		foreach ($array_params as $key => $value) {
+			if ($value && array_values($value) === $value && !is_array($value[0])) {
+				// For range type arrays do not add value index to key as it does http_build_query.
+				foreach ($value as $array_value) {
+					$params[] = urlencode($key.'[]').'='.urlencode($array_value);
+				}
+
+				continue;
+			}
+
+			$params[] = http_build_query([$key => $value], '', $arg_separator, PHP_QUERY_RFC3986);
+		}
+
+		return implode($arg_separator, $params);
 	}
 
 	/**
