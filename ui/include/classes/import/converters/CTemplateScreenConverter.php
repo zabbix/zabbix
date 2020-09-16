@@ -44,8 +44,11 @@ class CTemplateScreenConverter extends CConverter {
 	public function convert($screen): array {
 		$widgets = [];
 
-		if (array_key_exists('screen_items', $screen)) {
-			$screen_items = self::getValidScreenItems($screen['screen_items']);
+		$screen_items = array_key_exists('screen_items', $screen)
+			? self::getValidScreenItems($screen['screen_items'])
+			: [];
+
+		if ($screen_items) {
 			$screen_items = self::normalizePositions($screen_items);
 
 			[$dimensions_x, $dimensions_y] = self::getDashboardDimensions($screen_items);
@@ -112,7 +115,7 @@ class CTemplateScreenConverter extends CConverter {
 	 * @return array  valid screen items
 	 */
 	private static function getValidScreenItems(array $screen_items): array {
-		return array_filter($screen_items, function (array $screen_item): bool {
+		return array_filter($screen_items, function(array $screen_item): bool {
 			return in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_GRAPH,
 				SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH,
 				SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_URL
