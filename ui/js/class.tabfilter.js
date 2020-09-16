@@ -102,6 +102,7 @@ class CTabFilter extends CBaseComponent {
 			this._items.forEach((item, index) => {
 				item._index = index;
 			});
+			this._active_item.setBrowserLocation(this._active_item.getFilterParams());
 		}
 	}
 
