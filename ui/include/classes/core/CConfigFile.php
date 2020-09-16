@@ -195,7 +195,8 @@ class CConfigFile {
 			$this->config['DB']['TYPE'],
 			$this->config['DB']['SERVER'],
 			$this->config['DB']['PORT'],
-			$this->config['DB']['DATABASE']
+			$this->config['DB']['DATABASE'],
+			ZABBIX_DB_VERSION
 		]));
 
 		if ($username === '' || $password === '' || $hashsum !== $current_hashsum) {
