@@ -3774,15 +3774,15 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 
 static void	DCsync_functions(zbx_dbsync_t *sync)
 {
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
 
-	ZBX_DC_ITEM		*item;
-	ZBX_DC_FUNCTION		*function;
+	ZBX_DC_ITEM	*item;
+	ZBX_DC_FUNCTION	*function;
 
-	int			found, ret;
-	zbx_uint64_t		itemid, functionid, triggerid;
+	int		found, ret;
+	zbx_uint64_t	itemid, functionid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
