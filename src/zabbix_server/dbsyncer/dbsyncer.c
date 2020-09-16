@@ -151,10 +151,11 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	block_signals();
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	unblock_signals();
 
 	if (1 == process_num)
 		db_trigger_queue_cleanup();
+
+	unblock_signals();
 
 	if (SUCCEED == zbx_is_export_enabled())
 	{
@@ -221,6 +222,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	if (SUCCEED != zbx_db_trigger_queue_locked())
+		zbx_db_flush_timer_queue();
 
 	zbx_log_sync_history_cache_progress();
 
