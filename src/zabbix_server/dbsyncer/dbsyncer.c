@@ -223,13 +223,18 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 
+	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
+	block_signals();
 	if (SUCCEED != zbx_db_trigger_queue_locked())
 		zbx_db_flush_timer_queue();
+
+	DBclose();
+	unblock_signals();
 
 	zbx_log_sync_history_cache_progress();
 
 	zbx_free(stats);
-	DBclose();
+
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
