@@ -109,7 +109,7 @@ class CControllerHostView extends CControllerHost {
 		}
 		unset($filter_tab);
 
-		$refresh_curl = (new CUrl('zabbix.php'));
+		$refresh_curl = new CUrl('zabbix.php');
 		$filter['action'] = 'host.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
 
@@ -125,6 +125,7 @@ class CControllerHostView extends CControllerHost {
 				'selected' => $profile->selected,
 				'support_custom_time' => false,
 				'expanded' => $profile->expanded,
+				'page' => $filter['page'],
 				'src_url' => $profile->getUnmodifiedUrl($input)
 			],
 		] + $this->getData($filter);

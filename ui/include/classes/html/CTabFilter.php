@@ -49,6 +49,7 @@ class CTabFilter extends CDiv {
 		'expanded' => false,
 		'support_custom_time' => true,
 		'data' => [],
+		'page' => null,
 		'src_url' => ''
 	];
 

@@ -150,7 +150,7 @@ $template = (new CForm('get'))
 	->setName('zbx_filter')
 	->addItem([
 		$template,
-		(new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE)
+		(new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
 		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),

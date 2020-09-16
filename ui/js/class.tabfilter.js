@@ -60,10 +60,16 @@ class CTabFilter extends CBaseComponent {
 					item.renderContentTemplate();
 				}
 
-				let url = window.location.search;
+				let url = window.location.search,
+					params = item.getFilterParams();
 
 				this.setSelectedItem(item);
-				item.setBrowserLocation(item.getFilterParams());
+
+				if (options.page !== null) {
+					params.set('page', options.page);
+				}
+
+				item.setBrowserLocation(params);
 
 				if (url === window.location.search) {
 					item._src_url = options.src_url;

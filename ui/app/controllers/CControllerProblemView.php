@@ -149,6 +149,7 @@ class CControllerProblemView extends CControllerProblem {
 				'selected' => $profile->selected,
 				'support_custom_time' => true,
 				'expanded' => $profile->expanded,
+				'page' => $filter['page'],
 				'src_url' => $profile->getUnmodifiedUrl($input)
 			],
 			'filter_tabs' => $filter_tabs,
