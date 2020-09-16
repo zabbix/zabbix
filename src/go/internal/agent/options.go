@@ -34,6 +34,9 @@ import (
 
 var Options AgentOptions
 
+const HostNameLen = 128
+const hostNameListLen = 2048
+
 func CutAfterN(s string, n int) string {
 	var i int
 	for pos := range s {
@@ -69,6 +72,9 @@ func ValidateHostnames(s string) ([]string, error) {
 	for _, h := range hostnames {
 		if h == "" {
 			return nil, fmt.Errorf("host names cannot be empty")
+		}
+		if len(h) > HostNameLen {
+			return nil, fmt.Errorf("host name in list is more than %d symbols", HostNameLen)
 		}
 		if _, value := keys[h]; !value {
 			keys[h] = true
@@ -217,13 +223,19 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 }
 
 func ValidateOptions(options AgentOptions) error {
-	const hostNameLen = 128
 	const hostMetadataLen = 255
 	const hostInterfaceLen = 255
 	var err error
+	var maxLen int
 
-	if len(options.Hostname) > hostNameLen {
-		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", hostNameLen)
+	if len(ExtractHostnames(options.Hostname)) > 1 {
+		maxLen = hostNameListLen
+	} else {
+		maxLen = HostNameLen
+	}
+
+	if len(options.Hostname) > maxLen {
+		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", maxLen)
 	}
 	if err = CheckHostname(options.Hostname); err != nil {
 		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())

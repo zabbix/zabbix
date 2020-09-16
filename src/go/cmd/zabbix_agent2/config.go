@@ -29,7 +29,8 @@ import (
 )
 
 func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions) error {
-	const hostNameLen = 128
+	const hostNameListLen = 512 * 1024
+	var maxLen int
 	var err error
 
 	if len(options.Hostname) == 0 {
@@ -52,10 +53,16 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 		if len(options.Hostname) == 0 {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", hostnameItem)
 		}
-		if len(options.Hostname) > hostNameLen {
-			options.Hostname = options.Hostname[:hostNameLen]
-			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", hostnameItem, hostNameLen)
+		if len(agent.ExtractHostnames(options.Hostname)) > 1 {
+			maxLen = hostNameListLen
+		} else {
+			maxLen = agent.HostNameLen
 		}
+		if len(options.Hostname) > maxLen {
+			options.Hostname = options.Hostname[:maxLen]
+			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", hostnameItem, maxLen)
+		}
+
 		if err = agent.CheckHostname(options.Hostname); err != nil {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
 		}
