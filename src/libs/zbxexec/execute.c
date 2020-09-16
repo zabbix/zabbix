@@ -190,6 +190,15 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 				__func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+	if (NULL != dir)
+	{
+		if (0 != chdir(dir))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "%s(): cannot change directory to \"%s\": %s",
+					__func__, dir, zbx_strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+	}
 	fcntl(stdout_orig, F_SETFD, FD_CLOEXEC);
 	fcntl(stderr_orig, F_SETFD, FD_CLOEXEC);
 
@@ -198,15 +207,6 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 	dup2(fd[1], STDOUT_FILENO);
 	dup2(fd[1], STDERR_FILENO);
 	close(fd[1]);
-
-	if (NULL != dir)
-	{
-		if (0 != chdir(dir))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot to change directory to \"%s\": %s",
-					__func__, dir, zbx_strerror(errno));
-		}
-	}
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
