@@ -179,7 +179,9 @@ class CTabFilter extends CDiv {
 
 		if (!is_a($label, CTag::class)) {
 			if ($tab_index == 0) {
-				$label = (new CLink(''))->addClass(self::CSS_TABFILTER_ICON_HOME);
+				$label = (new CLink(''))
+					->setAttribute('aria-label', _('Home'))
+					->addClass(self::CSS_TABFILTER_ICON_HOME);
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false

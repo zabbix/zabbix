@@ -32,7 +32,7 @@ class CControllerPopupTabFilterEdit extends CController {
 		$rules = [
 			'idx' =>					'string|required',
 			'idx2' =>					'int32|required',
-			'filter_name' =>			'string|not_empty',
+			'filter_name' =>			'string',
 			'filter_show_counter' =>	'in 0,1',
 			'filter_custom_time' =>		'in 0,1',
 			'tabfilter_from' =>			'string',
@@ -95,7 +95,7 @@ class CControllerPopupTabFilterEdit extends CController {
 			'form_action' => '',
 			'idx' => '',
 			'idx2' => '',
-			'filter_name' => '',
+			'filter_name' => _('Untitled'),
 			'filter_show_counter' => 0,
 			'filter_custom_time' => 0,
 			'tabfilter_from' => '',

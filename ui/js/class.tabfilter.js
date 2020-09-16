@@ -399,7 +399,7 @@ class CTabFilter extends CBaseComponent {
 				let dropdown_items = [],
 					dropdown = [{
 						items: [{
-							label: t('Home'),
+							label: this._items[0]._target.getAttribute('aria-label'),
 							clickCallback: () => this._items[0].fire(TABFILTERITEM_EVENT_EXPAND)
 						}]
 					}],
