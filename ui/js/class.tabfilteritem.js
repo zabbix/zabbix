@@ -331,14 +331,15 @@ class CTabFilterItem extends CBaseComponent {
 	 */
 	updateUnsavedState() {
 		let search_params = this.getFilterParams(),
-			src_query = new URLSearchParams(this._src_url);
+			src_query = new URLSearchParams(this._src_url),
+			ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page'];
 
 		if (search_params === null || !this._data.filter_configurable) {
 			// Not templated tabs does not contain form fields, no need to update unsaved state.
 			return;
 		}
 
-		for (const field of ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action']) {
+		for (const field of ignore_fields) {
 			src_query.delete(field);
 			search_params.delete(field);
 		}
