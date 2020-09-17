@@ -3443,6 +3443,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			zbx_strpool_release(trigger->error);
 			zbx_strpool_release(trigger->correlation_tag);
 			zbx_strpool_release(trigger->opdata);
+			zbx_strpool_release(trigger->event_name);
 
 			zbx_vector_ptr_destroy(&trigger->tags);
 
