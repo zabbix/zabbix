@@ -1009,8 +1009,8 @@ class testFormAction extends CLegacyWebTest {
 
 		if ($new_operation_operationtype == 'Send message') {
 			$this->zbxTestTextPresent([
-				'Send to User groups', 'User group', 'Action',
-				'Send to Users'
+				'Send to user groups', 'User group', 'Action',
+				'Send to users'
 			]);
 			$this->zbxTestAssertVisibleXpath('//tr[@id=\'operation-message-user-groups-footer\']//button[@class=\'btn-link\']');
 			$this->zbxTestAssertElementText('//tr[@id=\'operation-message-user-groups-footer\']//button[@class=\'btn-link\']', 'Add');
@@ -1631,6 +1631,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if (isset($data['operations'])) {
+			$this->page->waitUntilReady();
 			$this->zbxTestTabSwitch('Operations');
 
 			foreach ($data['operations'] as $operation) {
@@ -1661,7 +1662,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('operations_0'));
 			}
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay-bg'));
+			COverlayDialogElement::ensureNotPresent();
 		}
 
 		if (isset($data['esc_period'])){
@@ -1768,7 +1769,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestInputType('operation_opcommand_command', 'command');
 		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",

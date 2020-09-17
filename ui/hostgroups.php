@@ -160,7 +160,6 @@ elseif (hasRequest('action')) {
 	elseif (getRequest('action') == 'hostgroup.massenable' || getRequest('action') == 'hostgroup.massdisable') {
 		$enable = (getRequest('action') == 'hostgroup.massenable');
 		$status = $enable ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-		$auditAction = $enable ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 
 		$groupIds = getRequest('groups', []);
 
@@ -180,14 +179,6 @@ elseif (hasRequest('action')) {
 					'hosts' => $hosts,
 					'status' => $status
 				]);
-
-				if ($result) {
-					foreach ($hosts as $host) {
-						add_audit_ext($auditAction, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts',
-							['status' => $host['status']], ['status' => $status]
-						);
-					}
-				}
 			}
 
 			$result = DBend($result);

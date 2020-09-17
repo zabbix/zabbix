@@ -5375,116 +5375,78 @@ class testDiscoveryRule extends CAPITest {
 
 		$this->assertTrue($result['result']);
 
-		$request_lld_overrides = [
-			[
-				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
-				'name' => 'override',
-				'step' => 1,
-				'filter' => [
-					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
-					'formula' => 'A or B or C',
-					'conditions' => [
-						[
-							'macro' => '{#MACRO1}',
-							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => 'd{3}$',
-							'formulaid' => 'A'
-						],
-						[
-							'macro' => '{#MACRO2}',
-							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => 'd{2}$',
-							'formulaid' => 'B'
-						],
-						[
-							'macro' => '{#MACRO3}',
-							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => 'd{1}$',
-							'formulaid' => 'C'
-						]
-					]
-				],
-				'operations' => [
-					[
-						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_NOT_LIKE,
-						'value' => '8',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED]
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-						'value' => 'wW',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_ENABLED],
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
-						'ophistory' => ['history' => '92d'],
-						'opperiod' => ['delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'],
-						'optrends' => ['trends' => '36d']
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_REGEXP,
-						'value' => '^c+$',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED],
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
-						'opseverity' => ['severity' => TRIGGER_SEVERITY_AVERAGE],
-						'optag' => [
-							['tag' => 'tag1', 'value' => 'value1'],
-							['tag' => 'tag2', 'value' => 'value2']
-						]
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_LIKE,
-						'value' => '123',
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER]
-					],
-					[
-						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => '',
-						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED],
-						'optemplate' => [
-							['templateid' => '10264'],
-							['templateid' => '10265'],
-							['templateid' => '50010']
-						],
-						'opinventory' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC],
-						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER]
-					]
-				]
-			],
-			[
-				'name' => 'override 2',
-				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
-				'step' => 2,
-				'operations' => [
-					[
-						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => '',
-						'optrends' => ['trends' => '5d']
-					]
-				]
-			]
-		];
+		$result = $this->call('discoveryrule.get', [
+			'output' => [],
+			'selectOverrides' => 'extend',
+			'itemids' => $itemid
+		]);
 
-		$db_lld_ruleids = array_column(CDBHelper::getAll('SELECT itemid from items WHERE '.
-				dbConditionId('hostid', (array) $hostids)), 'itemid');
-		sort($db_lld_ruleids);
+		$expected_overrides = $result['result'][0]['overrides'];
+		usort($expected_overrides, function ($a, $b) {
+			return $a['step'] <=> $b['step'];
+		});
 
-		foreach ($db_lld_ruleids as $db_lld_ruleid) {
-			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
-				dbConditionId('itemid', (array) $db_lld_ruleid)
-			);
-
-			usort($db_lld_overrides, function ($a, $b) {
-				return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+		foreach ($expected_overrides as &$override) {
+			usort($override['filter']['conditions'], function ($a, $b) {
+				return $a['formulaid'] <=> $b['formulaid'];
 			});
 
-			foreach ($request_lld_overrides as $override_num => $request_lld_override) {
-				$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+			foreach ($override['operations'] as &$operation) {
+				if (array_key_exists('optag', $operation)) {
+					usort($operation['optag'], function ($a, $b) {
+						return $a['tag'] <=> $b['tag'];
+					});
+				}
+
+				if (array_key_exists('optemplate', $operation)) {
+					usort($operation['optemplate'], function ($a, $b) {
+						return $a['templateid'] <=> $b['templateid'];
+					});
+				}
 			}
+			unset($operation);
+		}
+		unset($override);
+
+		$db_lld_ruleids = array_column(CDBHelper::getAll(
+			'SELECT itemid FROM items WHERE flags=1 AND '.dbConditionId('hostid', $hostids).' ORDER BY itemid'
+		), 'itemid');
+		$this->assertSame(count($db_lld_ruleids), count($hostids));
+
+		$result = $this->call('discoveryrule.get', [
+			'output' => [],
+			'selectOverrides' => 'extend',
+			'itemids' => $db_lld_ruleids
+		]);
+
+		foreach ($result['result'] as $lld_rule) {
+			usort($lld_rule['overrides'], function ($a, $b) {
+				return $a['step'] <=> $b['step'];
+			});
+
+			foreach ($lld_rule['overrides'] as &$override) {
+				usort($override['filter']['conditions'], function ($a, $b) {
+					return $a['formulaid'] <=> $b['formulaid'];
+				});
+
+				foreach ($override['operations'] as &$operation) {
+					if (array_key_exists('optag', $operation)) {
+						usort($operation['optag'], function ($a, $b) {
+							return $a['tag'] <=> $b['tag'];
+						});
+					}
+
+					if (array_key_exists('optemplate', $operation)) {
+						usort($operation['optemplate'], function ($a, $b) {
+							return $a['templateid'] <=> $b['templateid'];
+						});
+					}
+				}
+				unset($operation);
+			}
+			unset($override);
+
+			$this->assertSame($expected_overrides, $lld_rule['overrides']);
 		}
 	}
 

@@ -21,26 +21,46 @@
 #define ZABBIX_LLD_PROTOCOL_H
 
 #include "common.h"
+#include "lld_manager.h"
 
 #define ZBX_IPC_SERVICE_LLD	"lld"
 
-/* LLD -> manager */
+/* poller -> manager */
 #define ZBX_IPC_LLD_REGISTER		1000
 #define ZBX_IPC_LLD_DONE		1001
 
-/* manager -> LLD */
+/* manager -> poller */
 #define ZBX_IPC_LLD_TASK		1100
 
-/* manager -> LLD */
+/* manager -> poller */
 #define ZBX_IPC_LLD_REQUEST		1200
 
-/* poller -> LLD */
+/* poller -> poller */
 #define ZBX_IPC_LLD_QUEUE		1300
+
+/* process -> manager */
+#define ZBX_IPC_LLD_DIAG_STATS		1400
+
+/* manager -> process */
+#define ZBX_IPC_LLD_DIAG_STATS_RESULT	1401
+
+/* process -> manager */
+#define ZBX_IPC_LLD_TOP_ITEMS		1402
+
+/* manager -> process */
+#define ZBX_IPC_LLD_TOP_ITEMS_RESULT	1403
+
 
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, const char *value,
 		const zbx_timespec_t *ts, unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error);
 
 void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *itemid, char **value,
 		zbx_timespec_t *ts, unsigned char *meta, zbx_uint64_t *lastlogsize, int *mtime, char **error);
+
+zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t items_num, zbx_uint64_t values_num);
+
+void	zbx_lld_deserialize_top_items_request(const unsigned char *data, int *limit);
+
+zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, zbx_lld_rule_t **items, int items_num);
 
 #endif

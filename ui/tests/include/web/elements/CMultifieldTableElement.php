@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use  \Facebook\WebDriver\Exception\UnrecognizedExceptionException;
+
 /**
  * Multifield table element.
  */
@@ -297,9 +299,21 @@ class CMultifieldTableElement extends CTableElement {
 	 * return $this
 	 */
 	public function updateRow($index, $values) {
-		foreach ($this->getRowControls($this->getRow($index)) as $name => $control) {
-			if (array_key_exists($name, $values)) {
-				$control->fill($values[$name]);
+		$controls = $this->getRowControls($this->getRow($index));
+		foreach ($values as $name => $value) {
+			if (array_key_exists($name, $controls)) {
+				try {
+					$controls[$name]->fill($value);
+				}
+				catch (UnrecognizedExceptionException $e1) {
+					try {
+						$controls = $this->getRowControls($this->getRow($index));
+						$controls[$name]->fill($value);
+					}
+					catch (\Exception $e2) {
+						throw $e1;
+					}
+				}
 				unset($values[$name]);
 			}
 		}
@@ -400,7 +414,7 @@ class CMultifieldTableElement extends CTableElement {
 		}
 
 		$rows = $this->getRows()->count();
-		if (CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
+		if (count($data) >= 1 && CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
 			if ($this->mapping === null) {
 				$this->mapping = $this->detectFieldMapping();
 			}

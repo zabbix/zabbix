@@ -72,7 +72,7 @@ $form_list->addRow('', (new CLabel(_('At least one user or user group must be se
 /*
  * Message recipient (user groups) row.
  */
-$form_list->addRow(_('Send to User groups'), (new CDiv(
+$form_list->addRow(_('Send to user groups'), (new CDiv(
 	(new CTable())
 		->addStyle('width: 100%;')
 		->setHeader([_('User group'), _('Action')])
@@ -92,7 +92,7 @@ $form_list->addRow(_('Send to User groups'), (new CDiv(
 /*
  * Message recipient (users) row.
  */
-$form_list->addRow(_('Send to Users'), (new CDiv(
+$form_list->addRow(_('Send to users'), (new CDiv(
 	(new CTable())
 		->addStyle('width: 100%;')
 		->setHeader([_('User'), _('Action')])

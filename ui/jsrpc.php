@@ -149,15 +149,14 @@ switch ($data['method']) {
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
+					'preservekeys' => true
 				];
 				$hostGroups = API::HostGroup()->get($options);
 
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = enrichParentGroups($hostGroups, [
-							'real_hosts' => null
-						] + $options);
+						$hostGroups = enrichParentGroups($hostGroups);
 					}
 
 					CArrayHelper::sort($hostGroups, [
@@ -550,21 +549,11 @@ switch ($data['method']) {
 				break;
 
 			case 'graphs':
-				if (!array_key_exists('monitored_hosts', $data) && array_key_exists('real_hosts', $data)) {
-					$templated = false;
-				}
-				elseif (array_key_exists('templated_hosts')) {
-					$templated = true;
-				}
-				else {
-					$templated = null;
-				}
-
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
-					'templated' => $templated,
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'limit' => $config['search_limit']
 				];

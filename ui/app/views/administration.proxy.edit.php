@@ -50,8 +50,8 @@ $interfaceTable = (new CTable())
 		(new CTextBox('dns', $data['dns'], false, DB::getFieldLength('interface', 'dns')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
 		(new CRadioButtonList('useip', (int) $data['useip']))
-			->addValue(_('IP'), INTERFACE_USE_IP)
-			->addValue(_('DNS'), INTERFACE_USE_DNS)
+			->addValue('IP', INTERFACE_USE_IP)
+			->addValue('DNS', INTERFACE_USE_DNS)
 			->setModern(true),
 		(new CTextBox('port', $data['port'], false, 64))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)

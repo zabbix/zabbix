@@ -182,8 +182,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		else {
 			var web_url = new Curl('zabbix.php', false);
 			web_url.setArgument('action', 'web.view');
-			web_url.setArgument('hostid', options.hostid);
-
+			web_url.setArgument('filter_hostids[]', options.hostid);
+			web_url.setArgument('filter_set', '1');
 			web.url = web_url.getUrl();
 		}
 
@@ -405,6 +405,7 @@ function getMenuPopupMapElementImage(options) {
 /**
  * Get menu popup refresh section data.
  *
+ * @param {integer}  options['widgetid']	 Widget ID.
  * @param {string}   options['widgetName']   Widget name.
  * @param {string}   options['currentRate']  Current rate value.
  * @param {bool}     options['multiplier']   Multiplier or time mode.
@@ -488,10 +489,11 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							'widgetid': options.widgetName,
+							'widgetid': options.widgetid,
 							'rf_rate': currentRate
-						},
-						success: function() {
+						}
+					})
+						.then(function() {
 							jQuery('a', $obj.closest('.menu-popup')).each(function() {
 								var link = jQuery(this);
 
@@ -513,13 +515,12 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 
 							jQuery('.dashbrd-grid-container')
-								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
-						},
-						error: function() {
+								.dashboardGrid('setWidgetRefreshRate', options.widgetid, parseInt(currentRate));
+						})
+						.fail(function() {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 							// TODO: gentle message about failed saving of widget refresh rate
-						}
-					});
+						});
 				}
 			}
 		};
@@ -554,8 +555,10 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
-		menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
 		widget_actions = [];
+
+	options.widgetid = widgetid;
+	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
 
 	widget_actions.push({
 		label: t('S_COPY'),

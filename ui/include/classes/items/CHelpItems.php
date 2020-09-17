@@ -673,8 +673,20 @@ class CHelpItems {
 			],
 			ITEM_TYPE_AGGREGATE => [
 				[
-					'key' => 'grpfunc[group,key,func,<param>]',
-					'description' => _('Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.')
+					'key' => 'grpavg[group,key,func,<param>]',
+					'description' => _('Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
+				],
+				[
+					'key' => 'grpmin[group,key,func,<param>]',
+					'description' => _('Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
+				],
+				[
+					'key' => 'grpmax[group,key,func,<param>]',
+					'description' => _('Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
+				],
+				[
+					'key' => 'grpsum[group,key,func,<param>]',
+					'description' => _('Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
 				]
 			],
 			ITEM_TYPE_SIMPLE => [
@@ -717,6 +729,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.fullname[<url>]',
 					'description' => _('VMware service full name, <url> - VMware service URL')
+				],
+				[
+					'key' => 'vmware.dc.discovery[<url>]',
+					'description' => _('VMware datacenters and their IDs. Returns JSON')
 				],
 				[
 					'key' => 'vmware.datastore.read[<url>,<datastore>,<mode>]',

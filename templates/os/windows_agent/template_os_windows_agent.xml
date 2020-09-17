@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-17T08:32:23Z</date>
+   <date>2020-07-15T20:19:25Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -307,6 +307,7 @@ and are waiting to be executed.</description>
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
@@ -848,8 +849,8 @@ A typical Event ID 2019 is recorded in the system event log.</description>
          <items>
             <item>
                <name>Network interfaces WMI get</name>
-               <key>wmi.getall[root\cimv2,"select * from win32_networkadapter where PhysicalAdapter=True"]</key>
-               <history>1h</history>
+               <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
+               <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
                <description>Raw data of win32_networkadapter.</description>
@@ -869,17 +870,6 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                <filter>
                   <evaltype>AND</evaltype>
                   <conditions>
-                     <condition>
-                        <macro>{#IFPHYSICALADAPTER}</macro>
-                        <value>{$NET.IF.PHYSICALADAPTER.MATCHES}</value>
-                        <formulaid>A</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#IFPHYSICALADAPTER}</macro>
-                        <value>{$NET.IF.PHYSICALADAPTER.NOT_MATCHES}</value>
-                        <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>B</formulaid>
-                     </condition>
                      <condition>
                         <macro>{#IFNAME}</macro>
                         <value>{$NET.IF.IFNAME.MATCHES}</value>
@@ -912,17 +902,6 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                         <value>{$NET.IF.IFALIAS.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>H</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#IFNETENABLED}</macro>
-                        <value>{$NET.IF.IFNETENABLED.MATCHES}</value>
-                        <formulaid>I</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#IFNETENABLED}</macro>
-                        <value>{$NET.IF.IFNETENABLED.NOT_MATCHES}</value>
-                        <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>J</formulaid>
                      </condition>
                   </conditions>
                </filter>
@@ -1067,9 +1046,14 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
                         </step>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return (value=='9223372036854775807' ? 0 : value)
+</params>
+                        </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select * from win32_networkadapter where PhysicalAdapter=True"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1095,20 +1079,21 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select * from win32_networkadapter where PhysicalAdapter=True"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)</expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}&lt;&gt;2 and {diff()}=1)</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <recovery_expression>{last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>This trigger expression works as follows:&#13;
 1. Can be triggered if operations status is down.&#13;
-2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.&#13;
-3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)&#13;
+2. {$IFCONTROL:\"{#IFNAME}\"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important.&#13;
+    No new trigger will be fired if this interface is down.&#13;
+3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status is different from Connected(2).&#13;
 &#13;
 WARNING: if closed manually - won't fire again on next poll, because of .diff.</description>
                            <manual_close>YES</manual_close>
@@ -1138,10 +1123,11 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>wmi.getall[root\cimv2,"select * from win32_networkadapter where PhysicalAdapter=True"]</key>
+                        <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].change()}&lt;0 and {Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}&gt;0&#13;
@@ -1166,8 +1152,8 @@ and&#13;
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1186,8 +1172,8 @@ and&#13;
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1205,8 +1191,8 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1272,7 +1258,7 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
                   </graph_prototype>
                </graph_prototypes>
                <master_item>
-                  <key>wmi.getall[root\cimv2,"select * from win32_networkadapter where PhysicalAdapter=True"]</key>
+                  <key>wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus&gt;0"]</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -1281,11 +1267,7 @@ and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",erro
     return {
         "{#IFNAME}": net.Name,
         "{#IFDESCR}": net.Description,
-        "{#IFPHYSICALADAPTER}": net.PhysicalAdapter,
-        "{#IFALIAS}" : net.NetConnectionID,
-        "{#IFNETENABLED}": net.NetEnabled,
-        "{#IFNETSTATUS}": net.NetConnectionStatus,
-        "{#IFSPEED}": net.Speed
+        "{#IFALIAS}" : net.NetConnectionID
     }})
 return JSON.stringify({"data": output})</params>
                   </step>
@@ -1337,26 +1319,6 @@ return JSON.stringify({"data": output})</params>
             <macro>
                <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
                <value>Miniport|Virtual|Teredo|Kernel|Loopback|Bluetooth|HTTPS|6to4|QoS|Layer</value>
-               <description>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</description>
-            </macro>
-            <macro>
-               <macro>{$NET.IF.IFNETENABLED.MATCHES}</macro>
-               <value>True</value>
-               <description>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</description>
-            </macro>
-            <macro>
-               <macro>{$NET.IF.IFNETENABLED.NOT_MATCHES}</macro>
-               <value>CHANGE_THIS</value>
-               <description>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</description>
-            </macro>
-            <macro>
-               <macro>{$NET.IF.PHYSICALADAPTER.MATCHES}</macro>
-               <value>True</value>
-               <description>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</description>
-            </macro>
-            <macro>
-               <macro>{$NET.IF.PHYSICALADAPTER.NOT_MATCHES}</macro>
-               <value>CHANGE_THIS</value>
                <description>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</description>
             </macro>
          </macros>
@@ -1491,6 +1453,7 @@ return JSON.stringify({"data": output})</params>
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#DEVNAME}: Disk read/write rates</name>
@@ -1636,6 +1599,7 @@ Template tooling version used: 0.37</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

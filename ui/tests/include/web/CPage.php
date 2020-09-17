@@ -177,12 +177,13 @@ class CPage {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
+		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
 			self::$cookie = [
 				'name' => 'zbx_sessionid',
 				'value' => $sessionid,
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
-				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
+				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
 			$this->driver->get(PHPUNIT_URL);
@@ -210,7 +211,7 @@ class CPage {
 			self::$cookie = null;
 		}
 		catch (\Exception $e) {
-			// Code is not missing here.
+			throw new \Exception('Cannot logout user: '.$e->getTraceAsString());
 		}
 	}
 
@@ -528,5 +529,20 @@ class CPage {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Allows to login with user credentials.
+	 *
+	 * @param string $alias     Username on login screen
+	 * @param string $password  Password on login screen
+	 */
+	public function userLogin($alias, $password) {
+		$this->logout();
+		$this->open('index.php');
+		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
+		$this->query('id:password')->one()->fill($password);
+		$this->query('id:enter')->one()->click();
+		$this->waitUntilReady();
 	}
 }

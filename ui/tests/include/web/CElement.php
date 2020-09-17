@@ -614,6 +614,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asMultiline($options);
 		}
 
+		if (in_array('input-group', $class)) {
+			return $this->asInputGroup($options);
+		}
+
 		CTest::addWarning('No specific element was detected');
 
 		return $this;
@@ -641,6 +645,13 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function checkValue($expected, $raise_exception = true) {
 		$value = $this->getValue();
+		if ($value === null) {
+			if ($raise_exception) {
+				throw new Exception('Cannot get value of the non-interactable element.');
+			}
+
+			return false;
+		}
 
 		if (is_array($value)) {
 			if (!is_array($expected)) {
@@ -660,6 +671,14 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if ($expected != $value && $raise_exception) {
+			if (!is_scalar($value) || is_bool($value)) {
+				$value = json_encode($value);
+			}
+
+			if (!is_scalar($expected) || is_bool($expected)) {
+				$expected = json_encode($expected);
+			}
+
 			throw new Exception('Element value '.$value.' doesn\'t match expected '.$expected.'.');
 		}
 

@@ -136,15 +136,12 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					(new CSeverityCheckBoxList('filter_severities'))->setChecked($data['filter']['severities'])
 				),
 			(new CFormList())
-				->addRow(
-					_('Status'),
-					(new CHorList())
-						->addItem((new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-							->addValue(_('Any'), -1)
-							->addValue(_('Enabled'), HOST_STATUS_MONITORED)
-							->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
-							->setModern(true)
-						)
+				->addRow(_('Status'),
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), -1)
+						->addValue(_('Enabled'), HOST_STATUS_MONITORED)
+						->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
+						->setModern(true)
 				)
 				->addRow(_('Tags'), $filter_tags_table)
 				->addRow(_('Show hosts in maintenance'), [

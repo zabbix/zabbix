@@ -1284,37 +1284,48 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
-		$error_message = _('Cannot clear history');
+		$error_message = _('Cannot clear history: at least one of the selected items doesn\'t belong to any monitored host');
 
 		$itemIds = getRequest('group_itemid');
 
 		$items = API::Item()->get([
 			'output' => ['itemid', 'key_', 'value_type'],
 			'itemids' => $itemIds,
-			'selectHosts' => ['name'],
+			'selectHosts' => ['name', 'status'],
 			'editable' => true
 		]);
 
 		if ($items) {
-			DBstart();
-
-			$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
-
-			if ($result) {
-				foreach ($items as $item) {
-					$host = reset($item['hosts']);
-
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-						_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
-							_('History cleared')
-					);
-				}
+			// Check items belong only to hosts.
+			$hosts_status = [];
+			foreach ($items as $item) {
+				$hosts_status[$item['hosts'][0]['status']] = true;
 			}
 
-			$result = DBend($result);
+			if (array_key_exists(HOST_STATUS_TEMPLATE, $hosts_status)) {
+				$result = false;
+			}
+			else {
+				DBstart();
 
-			if ($result) {
-				uncheckTableRows(getRequest('checkbox_hash'));
+				$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
+
+				if ($result) {
+					foreach ($items as $item) {
+						$host = reset($item['hosts']);
+
+						add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+							_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
+								_('History cleared')
+						);
+					}
+				}
+
+				$result = DBend($result);
+
+				if ($result) {
+					uncheckTableRows(getRequest('checkbox_hash'));
+				}
 			}
 		}
 	}
@@ -1706,7 +1717,8 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => select_config(),
-		'hostid' => $hostid
+		'hostid' => $hostid,
+		'is_template' => true
 	];
 
 	// items
@@ -1993,6 +2005,20 @@ else {
 	}
 	else {
 		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	// Set is_template false, when one of hosts is not template.
+	if ($data['items']) {
+		$hosts_status = [];
+		foreach ($data['items'] as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
+		}
+		foreach ($hosts_status as $key => $value) {
+			if ($key != HOST_STATUS_TEMPLATE) {
+				$data['is_template'] = false;
+				break;
+			}
+		}
 	}
 
 	CPagerHelper::savePage($page['file'], $page_num);

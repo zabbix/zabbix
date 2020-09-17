@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/behaviors/MessageBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup items
@@ -221,8 +221,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'names' => [
 						'Name' => 'Temp Status Discovery'
 					],
-					'message' => 'Cannot send request',
-					'details' => 'Cannot send request: host is not monitored.',
+					'template' => true,
 					'hostid' => 10250
 				]
 			]
@@ -246,8 +245,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 			$this->selectTableRows($data['names']);
 		}
 
-		$this->query('button:Execute now')->one()->click();
-		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
+		if (CTestArrayHelper::get($data, 'template', false)) {
+			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
+		}
+		else {
+			$this->query('button:Execute now')->one()->click();
+			$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
+		}
 	}
 
 	/**
@@ -398,8 +402,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
-						. ' Block devices discovery',
+						'Template Module Linux block devices by Zabbix agent: Block devices discovery',
 						'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
 						'Template Module Linux network interfaces by Zabbix agent: Network interface discovery'
 					]
@@ -412,8 +415,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
-						. ' Block devices discovery'
+						'Template Module Linux block devices by Zabbix agent: Block devices discovery'
 					]
 				]
 			],
@@ -423,18 +425,18 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Operating systems',
 						'Type' => 'Dependent item'
 					],
-					'rows' => 10
+					'rows' => 6
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Type' => 'Database monitor',
-						'Update interval' => '1h'
+						'Type' => 'Zabbix agent',
+						'Update interval' => '15m'
 					],
 					'expected' => [
-						'Databases discovery',
-						'Replication discovery'
+						'Containers discovery',
+						'Images discovery'
 					]
 				]
 			],

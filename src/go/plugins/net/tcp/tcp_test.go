@@ -82,3 +82,27 @@ func Test_encloseIPv6(t *testing.T) {
 		})
 	}
 }
+
+func Test_loginReceived(t *testing.T) {
+	type args struct {
+		buf []byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"+basic", args{[]byte("foobar:            ")}, true},
+		{"+no_trailing_space", args{[]byte("foobar:")}, true},
+		{"+space_in_string", args{[]byte("foo     bar:               ")}, true},
+		{"-not_login", args{[]byte("foobar")}, false},
+		{"-empty", args{[]byte("")}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := loginReceived(tt.args.buf); got != tt.want {
+				t.Errorf("loginReceived() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -192,7 +192,7 @@ func (c *connManager) GetPostgresConnection(connString string) (conn *postgresCo
 		defer c.Unlock()
 		delete(c.connections, connString)
 		c.log.Debugf("removed failed connection %s: %s", connString, err)
-		return nil, fmt.Errorf("Cannot estabilish connection to Postgres server: %s", err)
+		return nil, fmt.Errorf("Cannot establish connection to Postgres server: %s", err)
 	}
 	return
 }

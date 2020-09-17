@@ -75,7 +75,7 @@ class CInputSecret extends CInput {
 		}
 		else {
 			$node->addItem([
-				(new CPassBox($name, ZBX_MACRO_SECRET_MASK))
+				(new CPassBox($name, ZBX_SECRET_MASK))
 					->setAttribute('disabled', 'disabled')
 					->setAttribute('autocomplete', 'off'),
 				(new CButton(null, _('Set new value')))

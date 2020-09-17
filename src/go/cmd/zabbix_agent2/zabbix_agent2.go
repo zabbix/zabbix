@@ -53,49 +53,46 @@ var serverConnectors []*serverconnector.Connector
 var closeChan = make(chan bool)
 var stopChan = make(chan bool)
 
-func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
-	if len(params) != 2 {
-		return errors.New("No 'loglevel' parameter specified")
+func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
+	if log.IncreaseLogLevel() {
+		message := fmt.Sprintf("Increased log level to %s", log.Level())
+		log.Infof(message)
+		err = c.Reply(message)
+		return
 	}
-	switch params[1] {
-	case "increase":
-		if log.IncreaseLogLevel() {
-			message := fmt.Sprintf("Increased log level to %s", log.Level())
-			log.Infof(message)
-			err = c.Reply(message)
-		} else {
-			err = fmt.Errorf("Cannot increase log level above %s", log.Level())
-			log.Infof(err.Error())
-		}
-	case "decrease":
-		if log.DecreaseLogLevel() {
-			message := fmt.Sprintf("Decreased log level to %s", log.Level())
-			log.Infof(message)
-			err = c.Reply(message)
-		} else {
-			err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
-			log.Infof(err.Error())
-		}
-	default:
-		return errors.New("Invalid 'loglevel' parameter")
-	}
+	err = fmt.Errorf("Cannot increase log level above %s", log.Level())
+	log.Infof(err.Error())
+
 	return
 }
 
-func processMetricsCommand(c *remotecontrol.Client, params []string) (err error) {
+func processLoglevelDecreaseCommand(c *remotecontrol.Client) (err error) {
+	if log.DecreaseLogLevel() {
+		message := fmt.Sprintf("Decreased log level to %s", log.Level())
+		log.Infof(message)
+		err = c.Reply(message)
+		return
+	}
+	err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
+	log.Infof(err.Error())
+
+	return
+}
+
+func processMetricsCommand(c *remotecontrol.Client) (err error) {
 	data := manager.Query("metrics")
 	return c.Reply(data)
 }
 
-func processVersionCommand(c *remotecontrol.Client, params []string) (err error) {
+func processVersionCommand(c *remotecontrol.Client) (err error) {
 	data := version.Long()
 	return c.Reply(data)
 }
 
-func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
+func processHelpCommand(c *remotecontrol.Client) (err error) {
 	help := `Remote control interface, available commands:
-	loglevel increase - Increase log level
-	loglevel decrease - Decrease log level
+	log_level_increase - Increase log level
+	log_level_decrease - Decrease log level
 	metrics - List available metrics
 	version - Display Agent version
 	help - Display this help message`
@@ -104,18 +101,25 @@ func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 
 func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
-	if len(params) == 0 {
+	switch len(params) {
+	case 0:
 		return errors.New("Empty command")
+	case 2:
+		return errors.New("Too many commands")
+	default:
 	}
+
 	switch params[0] {
-	case "loglevel":
-		err = processLoglevelCommand(c, params)
+	case "log_level_increase":
+		err = processLoglevelIncreaseCommand(c)
+	case "log_level_decrease":
+		err = processLoglevelDecreaseCommand(c)
 	case "help":
-		err = processHelpCommand(c, params)
+		err = processHelpCommand(c)
 	case "metrics":
-		err = processMetricsCommand(c, params)
+		err = processMetricsCommand(c)
 	case "version":
-		err = processVersionCommand(c, params)
+		err = processVersionCommand(c)
 	default:
 		return errors.New("Unknown command")
 	}
@@ -227,10 +231,24 @@ func main() {
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
-	loadOSDependentFlags()
+	var helpFlag bool
+	const (
+		helpDefault     = false
+		helpDescription = "Display this help message"
+	)
+	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
+	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
 
+	loadOSDependentFlags()
 	flag.Parse()
 	setServiceRun(foregroundFlag)
+
+	if helpFlag {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
@@ -311,8 +329,12 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		var m *scheduler.Manager
 		var err error
+		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
+			fatalExit("cannot initialize user parameters", err)
+		}
+
+		var m *scheduler.Manager
 		if m, err = scheduler.NewManager(&agent.Options); err != nil {
 			fatalExit("cannot create scheduling manager", err)
 		}
