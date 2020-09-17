@@ -35,11 +35,16 @@ class CDnsParser extends CParser {
 	private $lld_macro_parser;
 
 	/**
+	 * @var CLLDMacroFunctionParser
+	 */
+	private $lld_macro_function_parser;
+
+	/**
 	 * Supported options:
 	 *   'usermacros' => true  Enabled support of user macros;
 	 *   'lldmacros' => true   Enabled support of LLD macros;
 	 *   'macros' => true      Enabled support of all macros;
-	 *   'macros' => []        Allows array with list of macros. Empty array means no macros supported.
+	 *   'macros' => []        Allows array with list of macros. Empty array or false means no macros supported.
 	 *
 	 * @var array
 	 */
@@ -55,16 +60,22 @@ class CDnsParser extends CParser {
 	public function __construct(array $options = []) {
 		if (array_key_exists('usermacros', $options)) {
 			$this->options['usermacros'] = $options['usermacros'];
-			$this->user_macro_parser = new CUserMacroParser();
 		}
-
 		if (array_key_exists('lldmacros', $options)) {
 			$this->options['lldmacros'] = $options['lldmacros'];
-			$this->lld_macro_parser = new CLLDMacroParser();
 		}
-
 		if (array_key_exists('macros', $options)) {
 			$this->options['macros'] = $options['macros'];
+		}
+
+		if ($this->options['usermacros']) {
+			$this->user_macro_parser = new CUserMacroParser();
+		}
+		if ($this->options['lldmacros']) {
+			$this->lld_macro_parser = new CLLDMacroParser();
+			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+		}
+		if ($this->options['macros']) {
 			$this->macro_parser = new CMacroParser(['macros' => $this->options['macros']]);
 		}
 	}
@@ -81,7 +92,7 @@ class CDnsParser extends CParser {
 
 		$p = $pos;
 
-		while (strlen($source) != $p) {
+		while (isset($source[$p])) {
 			if (preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*(\.[A-Za-z0-9_-]+)*\.?/', substr($source, $p), $matches)) {
 				$p += strlen($matches[0]);
 			}
@@ -92,6 +103,10 @@ class CDnsParser extends CParser {
 			elseif ($this->options['lldmacros']
 					&& $this->lld_macro_parser->parse(substr($source, $p)) != self::PARSE_FAIL) {
 				$p += $this->lld_macro_parser->getLength();
+			}
+			elseif ($this->options['lldmacros']
+					&& $this->lld_macro_function_parser->parse(substr($source, $p)) != self::PARSE_FAIL) {
+				$p += $this->lld_macro_function_parser->getLength();
 			}
 			elseif ($this->options['macros'] && $this->macro_parser->parse(substr($source, $p)) != self::PARSE_FAIL) {
 				$p += $this->macro_parser->getLength();
@@ -110,6 +125,6 @@ class CDnsParser extends CParser {
 		$this->length = $length;
 		$this->match = substr($source, $pos, $this->length);
 
-		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 }

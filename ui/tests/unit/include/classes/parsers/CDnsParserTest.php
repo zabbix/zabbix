@@ -167,6 +167,13 @@ class CDnsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
+			[
 				'&&&&zabbix.com{#MACRO5}', 4, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -223,6 +230,13 @@ class CDnsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{HOST.HOST}', 0, ['macros' => false],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
 				'{HOST.HOST}', 0, ['macros' => []],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -258,17 +272,17 @@ class CDnsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'testa{HOST.HOST}testb{$MACRO1}{HOST.DNS}testc{$MACRO2}testd{#MACRO3}teste', 0, ['usermacros' => true, 'lldmacros' => true, 'macros' => ['{HOST.HOST}']],
+				'testa{HOST.HOST}testb{$MACRO1}{{#M}.regsub("^([0-9]+)", "{#M}: \1")}{HOST.DNS}testc{$MACRO2}testd{#MACRO3}teste', 0, ['usermacros' => true, 'lldmacros' => true, 'macros' => ['{HOST.HOST}']],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'testa{HOST.HOST}testb{$MACRO1}'
+					'match' => 'testa{HOST.HOST}testb{$MACRO1}{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
 				]
 			],
 			[
-				'testa{HOST.HOST}testb{$MACRO1}{HOST.DNS}testc{$MACRO2}testd{#MACRO3}teste%%%%', 0, ['usermacros' => true, 'lldmacros' => true, 'macros' => ['{HOST.HOST}', '{HOST.DNS}']],
+				'testa{HOST.HOST}testb{$MACRO1}{{#M}.regsub("^([0-9]+)", "{#M}: \1")}{HOST.DNS}testc{$MACRO2}testd{#MACRO3}teste%%%%', 0, ['usermacros' => true, 'lldmacros' => true, 'macros' => ['{HOST.HOST}', '{HOST.DNS}']],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'testa{HOST.HOST}testb{$MACRO1}{HOST.DNS}testc{$MACRO2}testd{#MACRO3}teste'
+					'match' => 'testa{HOST.HOST}testb{$MACRO1}{{#M}.regsub("^([0-9]+)", "{#M}: \1")}{HOST.DNS}testc{$MACRO2}testd{#MACRO3}teste'
 				]
 			]
 		];
