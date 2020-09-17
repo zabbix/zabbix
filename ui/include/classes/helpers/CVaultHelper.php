@@ -70,12 +70,13 @@ class CVaultHelper {
 		];
 
 		try {
-			$secret = file_get_contents($this->getURL($path), false, stream_context_create($options));
+			$url = $this->getURL($path);
 		}
 		catch (Exception $e) {
 			error($e->getMessage());
 		}
 
+		$secret = @file_get_contents($url, false, stream_context_create($options));
 		if ($secret === false) {
 			return [];
 		}
