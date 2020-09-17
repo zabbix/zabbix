@@ -71,9 +71,9 @@ $triggersFormList
 	)
 	->addRow(
 		(new CLabel(_('Event name'), 'event_name')),
-		(new CTextBox('event_name', $data['event_name'], $data['limited'],
-			DB::getFieldLength('triggers', 'event_name')
-		))
+		(new CTextAreaFlexible('event_name', $data['event_name']))
+			->setReadonly($data['limited'])
+			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(
