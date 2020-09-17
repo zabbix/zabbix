@@ -84,7 +84,7 @@ class CVaultHelper {
 
 		$secret = json_decode($secret, true);
 
-		if ($secret !== null && is_array($secret) && array_key_exists('data', $secret) && is_array($secret['data'])
+		if (is_array($secret) && array_key_exists('data', $secret) && is_array($secret['data'])
 				&& array_key_exists('data', $secret['data']) && is_array($secret['data']['data'])) {
 			return $secret['data']['data'];
 		}
