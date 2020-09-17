@@ -692,16 +692,12 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertTrue($popup->hasItems($data['titles']));
 		foreach ($data['disabled'] as $disabled) {
 			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '
-				.$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+					.$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
 		}
 	}
 
 	public function prepareUpdateData() {
-		$response = CDataHelper::call('host.update', [
-			'hostid' => '99013',
-			'status' => 1
-			]);
-
+		$response = CDataHelper::call('host.update', ['hostid' => '99013', 'status' => 1]);
 		$this->assertArrayHasKey('hostids', $response);
 		self::$hostid = $response['hostids'][0];
 	}
@@ -742,15 +738,17 @@ class testPageMonitoringHosts extends CWebTest {
 			$form->submit();
 			$this->page->waitUntilReady();
 
+			$row = $table->findRow('Name', $host);
 			// Counting problems icon amount from first Problems column.
-			$icon_count = $table->findRow('Name', $host)->query('xpath://td/div[@class="problem-icon-list"]/span')->count();
+			$icon_count = $row->query('xpath://td/div[@class="problem-icon-list"]/span')->count();
 			$result = [];
 			for ($i = 1; $i <= $icon_count; $i ++) {
 				$result[] = $table->query('xpath://td/div[@class="problem-icon-list"]/span['.$i.']')->one()->getText();
 			}
 
 			// Getting problems amount from second Problems column and then comparing with summarized first column.
-			$problems = $table->findRow('Name', $host)->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
+			$problems = $row->query('xpath://td/a[text()="Problems"]/following::sup')
+					->one()->getText();
 			$this->assertEquals((int)$problems, array_sum(array_map('intval', $result)));
 		}
 	}
@@ -758,7 +756,7 @@ class testPageMonitoringHosts extends CWebTest {
 	/**
 	 * Get data from chosen column.
 	 *
-	 * @param integer $rows_count	Rows amount whom column value should be checked
+	 * @param integer $rows_count	Amount of rows where column value should be checked
 	 * @param string $column		Column name, where value should be checked
 	 */
 	private function getTableResult($rows_count, $column) {
@@ -786,7 +784,7 @@ class testPageMonitoringHosts extends CWebTest {
 			$this->assertPageHeader($page_header);
 		}
 		if ($host_name == 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
-			' and @aria-selected="false"]')->exists()) {
+				' and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 	}
