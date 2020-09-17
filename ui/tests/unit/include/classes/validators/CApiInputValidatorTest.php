@@ -3115,9 +3115,40 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_IP],
+				[],
+				'/1/ip',
+				'Invalid parameter "/1/ip": a character string is expected.'
+			],
+			[
+				['type' => API_IP],
+				true,
+				'/1/ip',
+				'Invalid parameter "/1/ip": a character string is expected.'
+			],
+			[
+				['type' => API_IP],
+				null,
+				'/1/ip',
+				'Invalid parameter "/1/ip": a character string is expected.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/ip',
+				'Invalid parameter "/1/ip": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: "context"}',
+				'/1/ip',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_IP],
 				'0.0.0.x',
 				'/1/ip',
-				'Invalid IP address "0.0.0.x".'
+				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
 				['type' => API_IP],
@@ -3129,7 +3160,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
 				'{$}',
 				'/1/ip',
-				'Invalid IP address "{$}".'
+				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
@@ -3141,7 +3172,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_IP, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#}',
 				'/1/ip',
-				'Invalid IP address "{#}".'
+				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
 				['type' => API_IP, 'flags' => API_ALLOW_LLD_MACRO],
@@ -3159,13 +3190,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_IP, 'flags' => API_ALLOW_MACRO],
 				'{$MACRO}',
 				'/1/ip',
-				'Invalid IP address "{$MACRO}".'
+				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
 				'{HOST.HOST}',
 				'/1/ip',
-				'Invalid IP address "{HOST.HOST}".'
+				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
 				['type' => API_DNS],
@@ -3181,9 +3212,40 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_DNS],
+				[],
+				'/1/dns',
+				'Invalid parameter "/1/dns": a character string is expected.'
+			],
+			[
+				['type' => API_DNS],
+				true,
+				'/1/dns',
+				'Invalid parameter "/1/dns": a character string is expected.'
+			],
+			[
+				['type' => API_DNS],
+				null,
+				'/1/dns',
+				'Invalid parameter "/1/dns": a character string is expected.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/dns',
+				'Invalid parameter "/1/dns": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: "context"}',
+				'/1/ip',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_DNS],
 				'%%%',
 				'/1/dns',
-				'Incorrect interface DNS parameter "%%%" provided.'
+				'Invalid parameter "/1/dns": a DNS name is expected.'
 			],
 			[
 				['type' => API_DNS],
@@ -3195,7 +3257,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$}',
 				'/1/dns',
-				'Incorrect interface DNS parameter "{$}" provided.'
+				'Invalid parameter "/1/dns": a DNS name is expected.'
 			],
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
@@ -3207,7 +3269,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_DNS, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#}',
 				'/1/dns',
-				'Incorrect interface DNS parameter "{#}" provided.'
+				'Invalid parameter "/1/dns": a DNS name is expected.'
 			],
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_LLD_MACRO],
@@ -3237,13 +3299,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_DNS, 'flags' => API_ALLOW_MACRO],
 				'{$MACRO}',
 				'/1/dns',
-				'Incorrect interface DNS parameter "{$MACRO}" provided.'
+				'Invalid parameter "/1/dns": a DNS name is expected.'
 			],
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
 				'{HOST.HOST}',
 				'/1/dns',
-				'Incorrect interface DNS parameter "{HOST.HOST}" provided.'
+				'Invalid parameter "/1/dns": a DNS name is expected.'
 			],
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO],
@@ -3261,19 +3323,50 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
 				'a{$MACRO7}b{#MACRO6}c{HOST.NAME}d{$MACRO8}',
 				'/1/dns',
-				'Incorrect interface DNS parameter "a{$MACRO7}b{#MACRO6}c{HOST.NAME}d{$MACRO8}" provided.'
+				'Invalid parameter "/1/dns": a DNS name is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				''
 			],
 			[
 				['type' => API_PORT, 'flags' => API_NOT_EMPTY],
 				'',
 				'/1/port',
 				'Invalid parameter "/1/port": cannot be empty.'
+			],
+			[
+				['type' => API_PORT],
+				[],
+				'/1/port',
+				'Invalid parameter "/1/port": a number is expected.'
+			],
+			[
+				['type' => API_PORT],
+				true,
+				'/1/port',
+				'Invalid parameter "/1/port": a number is expected.'
+			],
+			[
+				['type' => API_PORT],
+				null,
+				'/1/port',
+				'Invalid parameter "/1/port": a number is expected.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				// broken UTF-8 byte sequence
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/port',
+				'Invalid parameter "/1/port": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: "context"}',
+				'/1/ip',
+				'{$MACRO: "context"}'
 			],
 			[
 				['type' => API_PORT],
@@ -3331,6 +3424,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_PORT],
+				'-1',
+				'/1/port',
+				'Invalid parameter "/1/port": value must be one of 0-65535.'
+			],
+			[
+				['type' => API_PORT],
 				'9999999999',
 				'/1/port',
 				'Invalid parameter "/1/port": a number is too large.'
@@ -3339,7 +3438,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_PORT],
 				'65536',
 				'/1/port',
-				'Incorrect value "65536" for "/1/port" field: must be between '.ZBX_MIN_PORT_NUMBER.' and '.ZBX_MAX_PORT_NUMBER.'.'
+				'Invalid parameter "/1/port": value must be one of 0-65535.'
 			]
 		];
 	}

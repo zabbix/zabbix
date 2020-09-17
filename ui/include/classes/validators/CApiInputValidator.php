@@ -1816,7 +1816,8 @@ class CApiInputValidator {
 	 * IP address validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                               API_ALLOW_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1842,8 +1843,7 @@ class CApiInputValidator {
 		]);
 
 		if ($ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid IP address "%1$s".', $data);
-
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP address is expected'));
 			return false;
 		}
 
@@ -1854,7 +1854,8 @@ class CApiInputValidator {
 	 * DNS name validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                               API_ALLOW_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1879,8 +1880,7 @@ class CApiInputValidator {
 		]);
 
 		if ($dns_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Incorrect interface DNS parameter "%1$s" provided.', $data);
-
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a DNS name is expected'));
 			return false;
 		}
 
@@ -1903,16 +1903,17 @@ class CApiInputValidator {
 
 		if (!is_int($data) && !is_string($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
-
 			return false;
 		}
 
 		$data = (string) $data;
 
-		if (($flags & API_NOT_EMPTY) && $data === '') {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
-
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
 		}
 
 		if ($flags & API_ALLOW_USER_MACRO) {
@@ -1931,20 +1932,8 @@ class CApiInputValidator {
 			}
 		}
 
-		if (!self::validateInt32([], $data, $path, $error)) {
+		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
 			return false;
-		}
-
-		if ($data < ZBX_MIN_PORT_NUMBER || $data > ZBX_MAX_PORT_NUMBER) {
-			$error = _s(
-				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $data, $path,
-				ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER
-			);
-			return false;
-		}
-
-		if (!is_int($data)) {
-			$data = (int) $data;
 		}
 
 		return true;
