@@ -96,19 +96,17 @@ class CDnsParser extends CParser {
 			if (preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*(\.[A-Za-z0-9_-]+)*\.?/', substr($source, $p), $matches)) {
 				$p += strlen($matches[0]);
 			}
-			elseif ($this->options['usermacros']
-					&& $this->user_macro_parser->parse(substr($source, $p)) != self::PARSE_FAIL) {
+			elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->user_macro_parser->getLength();
 			}
-			elseif ($this->options['lldmacros']
-					&& $this->lld_macro_parser->parse(substr($source, $p)) != self::PARSE_FAIL) {
+			elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->lld_macro_parser->getLength();
 			}
 			elseif ($this->options['lldmacros']
-					&& $this->lld_macro_function_parser->parse(substr($source, $p)) != self::PARSE_FAIL) {
+					&& $this->lld_macro_function_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->lld_macro_function_parser->getLength();
 			}
-			elseif ($this->options['macros'] && $this->macro_parser->parse(substr($source, $p)) != self::PARSE_FAIL) {
+			elseif ($this->options['macros'] && $this->macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 				$p += $this->macro_parser->getLength();
 			}
 			else {
