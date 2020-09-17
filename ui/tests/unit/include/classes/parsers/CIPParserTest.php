@@ -226,6 +226,20 @@ class CIPParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
 				'test{#MACRO}', 4, ['v6' => true, 'lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -248,6 +262,13 @@ class CIPParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{HOST.HOST}', 0, ['v6' => true, 'macros' => []],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{HOST.HOST}', 0, ['v6' => true, 'macros' => false],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
