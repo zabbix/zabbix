@@ -217,6 +217,7 @@ static int	trends_eval(const char *table, zbx_uint64_t itemid, int start, int en
 	}
 
 	result = DBselect("%s", sql);
+	zbx_free(sql);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
@@ -231,7 +232,6 @@ static int	trends_eval(const char *table, zbx_uint64_t itemid, int start, int en
 	}
 
 	DBfree_result(result);
-	zbx_free(sql);
 
 	return ret;
 }
@@ -337,6 +337,7 @@ static int	trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, in
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", start);
 
 	result = DBselect("%s", sql);
+	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 		sum += atof(row[0]) * atof(row[1]);
@@ -346,7 +347,7 @@ static int	trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, in
 	if (ZBX_INFINITY == sum)
 	{
 		if (NULL != error)
-			*error = zbx_strdup(*error, "value too large");
+			*error = zbx_strdup(*error, "value is too large");
 		return FAIL;
 	}
 
