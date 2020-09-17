@@ -281,6 +281,7 @@ class CTabFilter extends CBaseComponent {
 
 					this.setSelectedItem(item);
 					this.collapseAllItemsExcept(item);
+					item.initUnsavedState();
 					this.profileUpdate('selected', {
 						value_int: this._active_item._index
 					});

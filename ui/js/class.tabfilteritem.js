@@ -374,6 +374,15 @@ class CTabFilterItem extends CBaseComponent {
 		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_UNSAVED);
 	}
 
+	/**
+	 * Initialize _src_url property from item rendered form fields values.
+	 */
+	initUnsavedState() {
+		if (this._src_url === null) {
+			this.resetUnsavedState();
+		}
+	}
+
 	registerEvents() {
 		this._events = {
 			click: () => {
