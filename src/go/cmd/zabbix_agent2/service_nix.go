@@ -1,3 +1,5 @@
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,22 +21,24 @@
 
 package main
 
-import (
-	"os"
-	"path/filepath"
-	"strings"
+func loadOSDependentFlags() {}
 
-	"zabbix.com/pkg/pdh"
-)
+func setServiceRun(fourground bool) {}
 
-func loadOSDependentItems() error {
-	return pdh.LocateObjectsAndDefaultCounters(true)
-}
+func openEventLog() error { return nil }
 
-func init() {
+func fatalCloseOSItems() {}
 
-	if path, err := os.Executable(); err == nil {
-		dir, name := filepath.Split(path)
-		confDefault = dir + strings.TrimSuffix(name, filepath.Ext(name)) + ".win.conf"
-	}
-}
+func eventLogInfo(msg string) error { return nil }
+
+func eventLogErr(err error) error { return nil }
+
+func confirmService() {}
+
+func validateExclusiveFlags() error { return nil }
+
+func handleWindowsService(conf string) error { return nil }
+
+func waitServiceClose() {}
+
+func sendServiceStop() {}
