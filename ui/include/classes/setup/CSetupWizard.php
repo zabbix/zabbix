@@ -21,7 +21,7 @@
 
 class CSetupWizard extends CForm {
 
-	const VAULT_HOST_DEFAULT = 'https://localhost:8200';
+	const VAULT_URL_DEFAULT = 'https://localhost:8200';
 
 	function __construct() {
 		$this->DISABLE_CANCEL_BUTTON = false;
@@ -302,11 +302,11 @@ class CSetupWizard extends CForm {
 		if ($db_creds_storage == DB_STORE_CREDS_VAULT) {
 			$table
 				->addRow(_('Vault API endpoint'),
-					(new CTextBox('vault_host', $this->getConfig('DB_VAULT_HOST', self::VAULT_HOST_DEFAULT)))
+					(new CTextBox('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT)))
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
 				->addRow(_('Vault secret path'),
-					(new CTextBox('vault_secret', $this->getConfig('DB_VAULT_SECRET')))
+					(new CTextBox('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH')))
 						->setAttribute('placeholder', _('path/to/secret'))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				)
@@ -326,8 +326,8 @@ class CSetupWizard extends CForm {
 				->addRow(_('Password'),
 					(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				)
-				->addVar('vault_host', '')
-				->addVar('vault_secret', '')
+				->addVar('vault_url', '')
+				->addVar('vault_db_path', '')
 				->addVar('vault_token', '');
 		}
 
@@ -479,10 +479,10 @@ class CSetupWizard extends CForm {
 		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
 			$table
 				->addRow((new CSpan(_('Vault API endpoint')))->addClass(ZBX_STYLE_GREY),
-					$this->getConfig('DB_VAULT_HOST')
+					$this->getConfig('DB_VAULT_URL')
 				)
 				->addRow((new CSpan(_('Vault secret path')))->addClass(ZBX_STYLE_GREY),
-					$this->getConfig('DB_VAULT_SECRET')
+					$this->getConfig('DB_VAULT_DB_PATH')
 				)
 				->addRow((new CSpan(_('Vault authentication token')))->addClass(ZBX_STYLE_GREY),
 					$this->getConfig('DB_VAULT_TOKEN')
@@ -526,8 +526,8 @@ class CSetupWizard extends CForm {
 
 	protected function stage6(): array {
 		$vault_config = [
-			'VAULT_HOST' => '',
-			'VAULT_SECRET' => '',
+			'VAULT_URL' => '',
+			'VAULT_DB_PATH' => '',
 			'VAULT_TOKEN' => ''
 		];
 
@@ -539,12 +539,12 @@ class CSetupWizard extends CForm {
 		$db_user = null;
 		$db_pass = null;
 		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
-			$vault_config['VAULT_HOST'] = $this->getConfig('DB_VAULT_HOST');
-			$vault_config['VAULT_SECRET'] = $this->getConfig('DB_VAULT_SECRET');
+			$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
+			$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
 			$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
 
-			$vault = new CVaultHelper($vault_config['VAULT_HOST'], $vault_config['VAULT_TOKEN']);
-			$secret = $vault->loadSecret($vault_config['VAULT_SECRET']);
+			$vault = new CVaultHelper($vault_config['VAULT_URL'], $vault_config['VAULT_TOKEN']);
+			$secret = $vault->loadSecret($vault_config['VAULT_DB_PATH']);
 
 			if (array_key_exists('username', $secret) && array_key_exists('password', $secret)) {
 				$db_user = $secret['username'];
@@ -760,18 +760,18 @@ class CSetupWizard extends CForm {
 				case DB_STORE_CREDS_CONFIG:
 					$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
 					$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
-					$this->setConfig('DB_VAULT_HOST', '');
-					$this->setConfig('DB_VAULT_SECRET', '');
+					$this->setConfig('DB_VAULT_URL', '');
+					$this->setConfig('DB_VAULT_DB_PATH', '');
 					$this->setConfig('DB_VAULT_TOKEN', '');
 					break;
 
 				case DB_STORE_CREDS_VAULT:
-					$vault_host = getRequest('vault_host', $this->getConfig('DB_VAULT_HOST', self::VAULT_HOST_DEFAULT));
-					$vault_secret = getRequest('vault_secret', $this->getConfig('DB_VAULT_SECRET'));
+					$vault_url = getRequest('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT));
+					$vault_db_path = getRequest('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH'));
 					$vault_token = getRequest('vault_token', $this->getConfig('DB_VAULT_TOKEN'));
 
-					$this->setConfig('DB_VAULT_HOST', $vault_host);
-					$this->setConfig('DB_VAULT_SECRET', $vault_secret);
+					$this->setConfig('DB_VAULT_URL', $vault_url);
+					$this->setConfig('DB_VAULT_DB_PATH', $vault_db_path);
 					$this->setConfig('DB_VAULT_TOKEN', $vault_token);
 					$this->setConfig('DB_USER', '');
 					$this->setConfig('DB_PASSWORD', '');
@@ -787,11 +787,11 @@ class CSetupWizard extends CForm {
 					if (ini_get('allow_url_fopen') != 1) {
 						error(_('Please enable "allow_url_fopen" directive.'));
 					}
-					elseif (CVaultHelper::validateVaultApiEndpoint($vault_host)
-							&& CVaultHelper::validateVaultToken($vault_token)
-							&& $secret_parser->parse($vault_secret) == CParser::PARSE_SUCCESS) {
-						$vault = new CVaultHelper($vault_host, $vault_token);
-						$secret = $vault->loadSecret($vault_secret);
+					elseif (CVaultHelper::validateVaultApiEndpoint($vault_url)
+							&& CVaultHelper::validateVaultToken($vault_db_path)
+							&& $secret_parser->parse($vault_db_path) == CParser::PARSE_SUCCESS) {
+						$vault = new CVaultHelper($vault_url, $vault_token);
+						$secret = $vault->loadSecret($vault_db_path);
 
 						if ($secret) {
 							$vault_connection_checked = true;
@@ -850,8 +850,8 @@ class CSetupWizard extends CForm {
 		elseif ($this->getStep() == 6) {
 			if (hasRequest('save_config')) {
 				$vault_config = [
-					'VAULT_HOST' => '',
-					'VAULT_SECRET' => '',
+					'VAULT_URL' => '',
+					'VAULT_DB_PATH' => '',
 					'VAULT_TOKEN' => ''
 				];
 
@@ -861,8 +861,8 @@ class CSetupWizard extends CForm {
 				];
 
 				if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
-					$vault_config['VAULT_HOST'] = $this->getConfig('DB_VAULT_HOST');
-					$vault_config['VAULT_SECRET'] = $this->getConfig('DB_VAULT_SECRET');
+					$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
+					$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
 					$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
 				}
 				else {

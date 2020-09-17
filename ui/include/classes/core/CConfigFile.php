@@ -141,12 +141,12 @@ class CConfigFile {
 			$this->config['DB']['DOUBLE_IEEE754'] = $DB['DOUBLE_IEEE754'];
 		}
 
-		if (isset($DB['VAULT_HOST'])) {
-			$this->config['DB']['VAULT_HOST'] = $DB['VAULT_HOST'];
+		if (isset($DB['VAULT_URL'])) {
+			$this->config['DB']['VAULT_URL'] = $DB['VAULT_URL'];
 		}
 
-		if (isset($DB['VAULT_SECRET'])) {
-			$this->config['DB']['VAULT_SECRET'] = $DB['VAULT_SECRET'];
+		if (isset($DB['VAULT_DB_PATH'])) {
+			$this->config['DB']['VAULT_DB_PATH'] = $DB['VAULT_DB_PATH'];
 		}
 
 		if (isset($DB['VAULT_TOKEN'])) {
@@ -175,8 +175,8 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
-		if ($this->config['DB']['VAULT_HOST'] !== ''
-				&& $this->config['DB']['VAULT_SECRET'] !== ''
+		if ($this->config['DB']['VAULT_URL'] !== ''
+				&& $this->config['DB']['VAULT_DB_PATH'] !== ''
 				&& $this->config['DB']['VAULT_TOKEN'] !== '') {
 			list($this->config['DB']['USER'], $this->config['DB']['PASSWORD']) = $this->getCredentialsFromVault();
 
@@ -205,8 +205,8 @@ class CConfigFile {
 		]));
 
 		if ($username === '' || $password === '' || $hashsum !== $current_hashsum) {
-			$vault = new CVaultHelper($this->config['DB']['VAULT_HOST'], $this->config['DB']['VAULT_TOKEN']);
-			$secret = $vault->loadSecret($this->config['DB']['VAULT_SECRET']);
+			$vault = new CVaultHelper($this->config['DB']['VAULT_URL'], $this->config['DB']['VAULT_TOKEN']);
+			$secret = $vault->loadSecret($this->config['DB']['VAULT_DB_PATH']);
 
 			$username = array_key_exists('username', $secret) ? $secret['username'] : '';
 			$password = array_key_exists('password', $secret) ? $secret['password'] : '';
@@ -290,8 +290,8 @@ $DB[\'VERIFY_HOST\']		= '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false'
 $DB[\'CIPHER_LIST\']		= \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
 
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.
-$DB[\'VAULT_HOST\']		= \''.addcslashes($this->config['DB']['VAULT_HOST'], "'\\").'\';
-$DB[\'VAULT_SECRET\']		= \''.addcslashes($this->config['DB']['VAULT_SECRET'], "'\\").'\';
+$DB[\'VAULT_URL\']		= \''.addcslashes($this->config['DB']['VAULT_URL'], "'\\").'\';
+$DB[\'VAULT_DB_PATH\']	= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
 $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
 
 // Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
@@ -339,8 +339,8 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 			'VERIFY_HOST' => true,
 			'CIPHER_LIST' => '',
 			'DOUBLE_IEEE754' => false,
-			'VAULT_HOST' => '',
-			'VAULT_SECRET' => '',
+			'VAULT_URL' => '',
+			'VAULT_DB_PATH' => '',
 			'VAULT_TOKEN' => ''
 		];
 		$this->config['ZBX_SERVER'] = 'localhost';
