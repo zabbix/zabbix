@@ -1816,8 +1816,9 @@ class CApiInputValidator {
 	 * IP address validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
-	 *                               API_ALLOW_MACRO
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1833,6 +1834,11 @@ class CApiInputValidator {
 
 		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
 			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
 		}
 
 		$ip_parser = new CIPParser([
@@ -1854,8 +1860,9 @@ class CApiInputValidator {
 	 * DNS name validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
-	 *                               API_ALLOW_MACRO
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1871,6 +1878,11 @@ class CApiInputValidator {
 
 		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
 			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
 		}
 
 		$dns_parser = new CDnsParser([
@@ -1891,7 +1903,8 @@ class CApiInputValidator {
 	 * Port number validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1916,6 +1929,11 @@ class CApiInputValidator {
 			return true;
 		}
 
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
 		if ($flags & API_ALLOW_USER_MACRO) {
 			$user_macro_parser = new CUserMacroParser();
 
@@ -1935,6 +1953,8 @@ class CApiInputValidator {
 		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
 			return false;
 		}
+
+		$data = (string) $data;
 
 		return true;
 	}

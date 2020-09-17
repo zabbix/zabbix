@@ -3157,6 +3157,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'1.1.1.1'
 			],
 			[
+				['type' => API_IP, 'length' => 11],
+				'192.168.3.5',
+				'/1/ip',
+				'192.168.3.5'
+			],
+			[
+				['type' => API_IP, 'length' => 10],
+				'192.168.3.5',
+				'/1/ip',
+				'Invalid parameter "/1/ip": value is too long.'
+			],
+			[
 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO],
 				'{$}',
 				'/1/ip',
@@ -3252,6 +3264,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'3.3.3.3',
 				'/1/dns',
 				'3.3.3.3'
+			],
+			[
+				['type' => API_DNS, 'length' => 15],
+				'www.example.com',
+				'/1/dns',
+				'www.example.com'
+			],
+			[
+				['type' => API_DNS, 'length' => 14],
+				'www.example.com',
+				'/1/dns',
+				'Invalid parameter "/1/dns": value is too long.'
 			],
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
@@ -3378,13 +3402,25 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_PORT],
 				'123',
 				'/1/port',
-				123
+				'123'
 			],
 			[
 				['type' => API_PORT],
 				456,
 				'/1/port',
-				456
+				'456'
+			],
+			[
+				['type' => API_PORT, 'length' => 5],
+				'65535',
+				'/1/port',
+				'65535'
+			],
+			[
+				['type' => API_PORT, 'length' => 4],
+				'65535',
+				'/1/port',
+				'Invalid parameter "/1/port": value is too long.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
