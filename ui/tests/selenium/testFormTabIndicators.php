@@ -19,8 +19,6 @@
 **/
 
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CFormParametersBehavior.php';
-require_once dirname(__FILE__).'/traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
@@ -30,21 +28,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormTabIndicators extends CWebTest {
 
-	/**
-	 * Attach FormParametersBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			[
-				'class' => CFormParametersBehavior::class,
-				'table_selector' => 'id:tags-table'
-			]
-		];
-	}
-
-	use MacrosTrait;
 	use PreprocessingTrait;
 
 	public function getTabData() {
@@ -67,18 +50,19 @@ class testFormTabIndicators extends CWebTest {
 							'name' => 'Tags',
 							'entries' => [
 								[
-									'name' => '!@#$%^&*()_+<>,.\/',
+									'tag' => '!@#$%^&*()_+<>,.\/',
 									'value' => '!@#$%^&*()_+<>,.\/'
 								],
 								[
-									'name' => 'tag1',
+									'tag' => 'tag1',
 									'value' => 'value1'
 								],
 								[
-									'name' => 'tag2'
+									'tag' => 'tag2'
 								]
 							],
-							'field_type' => 'tags_table',
+							'table_selector' => 'id:tags-table',
+							'field_type' => 'multifield_table',
 							'count' => 3
 						],
 						[
@@ -86,18 +70,19 @@ class testFormTabIndicators extends CWebTest {
 							'entries' => [
 								[
 									'macro' => '{$123}',
-									'value' => '123'
+									'Value' => '123'
 								],
 								[
 									'macro' => '{$ABC}'
 								],
 								[
 									'macro' => '{$ABC123}',
-									'value' => 'ABC123',
+									'Value' => 'ABC123',
 									'description' => 'ABC-123'
 								]
 							],
-							'field_type' => 'macros_table',
+							'table_selector' => 'id:tbl_macros',
+							'field_type' => 'multifield_table',
 							'count' => 3
 						]
 					]
@@ -121,21 +106,22 @@ class testFormTabIndicators extends CWebTest {
 							'name' => 'Tags',
 							'entries' => [
 								[
-									'name' => '!@#$%^&*()_+<>,.\/',
+									'tag' => '!@#$%^&*()_+<>,.\/',
 									'value' => '!@#$%^&*()_+<>,.\/'
 								],
 								[
-									'name' => 'tag1',
+									'tag' => 'tag1',
 									'value' => 'value1'
 								],
 								[
-									'name' => 'tag2'
+									'tag' => 'tag2'
 								],
 								[
-									'name' => ' '
+									'tag' => ' '
 								]
 							],
-							'field_type' => 'tags_table',
+							'table_selector' => 'id:tags-table',
+							'field_type' => 'multifield_table',
 							'count' => 4
 						],
 						[
@@ -143,21 +129,22 @@ class testFormTabIndicators extends CWebTest {
 							'entries' => [
 								[
 									'macro' => '{$123}',
-									'value' => '123'
+									'Value' => '123'
 								],
 								[
 									'macro' => '{$ABC}'
 								],
 								[
 									'macro' => '{$ABC123}',
-									'value' => 'ABC123',
+									'Value' => 'ABC123',
 									'description' => 'ABC-123'
 								],
 								[
 									'macro' => ' '
 								]
 							],
-							'field_type' => 'macros_table',
+							'table_selector' => 'id:tbl_macros',
+							'field_type' => 'multifield_table',
 							'count' => 4
 						],
 						[
@@ -207,13 +194,14 @@ class testFormTabIndicators extends CWebTest {
 							'name' => 'Tags',
 							'entries' => [
 								[
-									'name' => 'tag1'
+									'tag' => 'tag1'
 								],
 								[
-									'name' => ' '
+									'tag' => ' '
 								]
 							],
-							'field_type' => 'tags_table',
+							'table_selector' => 'id:tags-table',
+							'field_type' => 'multifield_table',
 							'count' => 2
 						],
 						[
@@ -221,13 +209,14 @@ class testFormTabIndicators extends CWebTest {
 							'entries' => [
 								[
 									'macro' => '{$123}',
-									'value' => '123'
+									'Value' => '123'
 								],
 								[
 									'macro' => ' '
 								]
 							],
-							'field_type' => 'macros_table',
+							'table_selector' => 'id:tbl_macros',
+							'field_type' => 'multifield_table',
 							'count' => 2
 						],
 						[
@@ -306,13 +295,14 @@ class testFormTabIndicators extends CWebTest {
 							'name' => 'Tags',
 							'entries' => [
 								[
-									'name' => 'trigger tag1'
+									'tag' => 'trigger tag1'
 								],
 								[
-									'name' => ' '
+									'tag' => ' '
 								]
 							],
-							'field_type' => 'tags_table',
+							'table_selector' => 'id:tags-table',
+							'field_type' => 'multifield_table',
 							'count' => 2
 						],
 						[
@@ -339,16 +329,17 @@ class testFormTabIndicators extends CWebTest {
 							'name' => 'Tags',
 							'entries' => [
 								[
-									'name' => 'prototype tag1'
+									'tag' => 'prototype tag1'
 								],
 								[
-									'name' => 'prototype tag2'
+									'tag' => 'prototype tag2'
 								],
 								[
-									'name' => ' '
+									'tag' => ' '
 								]
 							],
-							'field_type' => 'tags_table',
+							'table_selector' => 'id:tags-table',
+							'field_type' => 'multifield_table',
 							'count' => 3
 						],
 						[
@@ -742,19 +733,20 @@ class testFormTabIndicators extends CWebTest {
 			}
 
 			$expected = (CTestArrayHelper::get($tab, 'count', false)) ? $initial_count : $original_status;
-			$this->checkIndicatorValue($tab, $form, $expected);
+			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
+			$this->checkIndicatorValue($tab_selector, $expected);
 
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);
 			// Input elements change their attribute values only after focus is removed from the element.
 			$this->page->removeFocus();
 			$expected = (array_key_exists('count', $tab)) ? $count : $new_status;
-			$this->checkIndicatorValue($tab, $form, $expected);
+			$this->checkIndicatorValue($tab_selector, $expected);
 
 			// Clear the popullatedfields and check indicator value.
 			$this->updateTabFields($tab, $form, USER_ACTION_REMOVE);
 			$expected = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $original_status;
-			$this->checkIndicatorValue($tab, $form, $expected);
+			$this->checkIndicatorValue($tab_selector, $expected);
 		}
 	}
 
@@ -765,7 +757,7 @@ class testFormTabIndicators extends CWebTest {
 		$form = $this->query('id:action-form')->asForm()->one();
 		$form->selectTab('Operations');
 		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one();
-		$this->assertEquals(0, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 0);
 
 		// Specify an operation of each type and check indicator value.
 		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
@@ -780,11 +772,11 @@ class testFormTabIndicators extends CWebTest {
 
 			COverlayDialogElement::ensureNotPresent();
 		}
-		$this->assertEquals(3, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 3);
 
 		// Remove the previously created operations and check indicator value.
 		$form->query('button:Remove')->all()->click();
-		$this->assertEquals(0, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 0);
 	}
 
 	public function testFormTabIndicators_CheckUserGroupIndicators() {
@@ -794,39 +786,39 @@ class testFormTabIndicators extends CWebTest {
 		$form = $this->query('id:user-group-form')->asForm()->one();
 		$form->selectTab('Permissions');
 		$tab_selector = $form->query('xpath:.//a[text()="Permissions"]')->one();
-		$this->assertEquals('disabled', $tab_selector->getAttribute('data-indicator-status'));
+		$this->checkIndicatorValue($tab_selector, 'disabled');
 
 		// Add read permissions to Discovered hosts group and check indicator.
 		$group_selector = $form->query('xpath:.//div[@id="new_group_right_groupids_"]/..')->asMultiselect()->one();
 		$group_selector->fill('Discovered hosts');
-		$permission_level = $form->query('id:new_group_right_permission')->one()->asSegmentedRadio();
+		$permission_level = $form->query('id:new_group_right_permission')->asSegmentedRadio()->one();
 		$permission_level->fill('Read');
-		$add_button = $form->query('id:new-group-right-table')->one()->query('button:Add')->one();
+		$add_button = $form->query('id:new-group-right-table')->query('button:Add')->one();
 		$add_button->click();
 		$tab_selector->waitUntilReady();
-		$this->assertEquals('enabled', $tab_selector->getAttribute('data-indicator-status'));
+		$this->checkIndicatorValue($tab_selector, 'enabled');
 
 		// Remove read permissions from Discovered hosts group and check indicator.
 		$group_selector->fill('Discovered hosts');
 		$permission_level->fill('None');
 		$add_button->click();
 		$tab_selector->waitUntilReady();
-		$this->assertEquals('disabled', $tab_selector->getAttribute('data-indicator-status'));
+		$this->checkIndicatorValue($tab_selector, 'disabled');
 
 		// Check status indicator in Tag filter tab.
 		$form->selectTab('Tag filter');
 		$tab_selector = $form->query('xpath:.//a[text()="Tag filter"]')->one();
-		$this->assertEquals('disabled', $tab_selector->getAttribute('data-indicator-status'));
+		$this->checkIndicatorValue($tab_selector, 'disabled');
 
 		// Add tag filter for Discovered hosts group and check indicator.
 		$form->query('xpath:.//div[@id="new_tag_filter_groupids_"]/..')->asMultiselect()->one()->fill('Discovered hosts');
-		$form->query('id:new-tag-filter-table')->one()->query('button:Add')->one()->click();
+		$form->query('id:new-tag-filter-table')->query('button:Add')->one()->click();
 		$tab_selector->waitUntilReady();
-		$this->assertEquals('enabled', $tab_selector->getAttribute('data-indicator-status'));
+		$this->checkIndicatorValue($tab_selector, 'enabled');
 
 		// Remove the tag filter for Discovered hosts group and check indicator.
-		$form->query('id:tag-filter-table')->one()->query('button:Remove')->one()->click();
-		$this->assertEquals('disabled', $tab_selector->getAttribute('data-indicator-status'));
+		$form->query('id:tag-filter-table')->query('button:Remove')->one()->click();
+		$this->checkIndicatorValue($tab_selector, 'disabled');
 	}
 
 	/**
@@ -859,7 +851,7 @@ class testFormTabIndicators extends CWebTest {
 		$form = $this->query('id:services-form')->asForm()->one();
 		$form->selectTab('Dependencies');
 		$tab_selector = $form->query('xpath:.//a[text()="Dependencies"]')->one();
-		$this->assertEquals(0, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 0);
 
 		// Add service ependencies and check dependency count indicator.
 		$dependencies_field = $form->getFieldContainer('Depends on');
@@ -868,25 +860,25 @@ class testFormTabIndicators extends CWebTest {
 		$overlay->query('id:all_services')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
-		$this->assertEquals(2, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 2);
 
 		// Remove all dependencies and check count indicator.
 		$dependencies_field->query('button:Remove')->all()->click();
-		$this->assertEquals(0, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 0);
 
 		// Open Time tab and check count indicator.
 		$form->selectTab('Time');
 		$tab_selector = $form->query('xpath:.//a[text()="Time"]')->one();
-		$this->assertEquals(0, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 0);
 
 		// Add a time period and check count indicator.
 		$form->getField('Period type')->select('One-time downtime');
 		$form->getFieldContainer('New service time')->query('button:Add')->one()->click();
-		$this->assertEquals(1, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 1);
 
 		// Remove the added time period and check count indicator.
 		$form->getFieldContainer('Service times')->query('button:Remove')->one()->click();
-		$this->assertEquals(0, $tab_selector->getAttribute('data-indicator-count'));
+		$this->checkIndicatorValue($tab_selector, 0);
 	}
 
 	/*
@@ -894,18 +886,19 @@ class testFormTabIndicators extends CWebTest {
 	 */
 	private function updateTabFields($tab, $form, $action = USER_ACTION_ADD) {
 		switch ($tab['field_type']) {
-			case 'tags_table':
-				$this->fillParameters($tab['entries'], $action);
-				break;
+			case 'multifield_table':
+				foreach ($tab['entries'] as &$parameter) {
+					$parameter['action'] = CTestArrayHelper::get($parameter, 'action', $action);
+				}
+				unset($parameter);
 
-			case 'macros_table':
-				$this->fillMacros($tab['entries'], $action);
+				$form->query($tab['table_selector'])->asMultifieldTable()->one()->fill($tab['entries']);
+
 				break;
 
 			case 'multiselect':
 				if ($action === USER_ACTION_REMOVE) {
-					$field_names = array_keys($tab['entries']);
-					foreach ($field_names as $field) {
+					foreach (array_keys($tab['entries']) as $field) {
 						$form->getField($field)->clear();
 					}
 				}
@@ -916,14 +909,14 @@ class testFormTabIndicators extends CWebTest {
 
 				// REMOVE this case after DEV-1671 is Merged.
 			case 'DEV-1671':
+				$templates_field = $form->query('xpath:.//div[@id="add_templates_"]/..')->asMultiselect()->one();
 				if ($action === USER_ACTION_REMOVE) {
-					$field_names = array_keys($tab['entries']);
-					foreach ($field_names as $field) {
-						$form->query('xpath:.//div[@id="add_templates_"]/..')->asMultiselect()->one()->clear();
+					foreach (array_keys($tab['entries']) as $field) {
+						$templates_field->clear();
 					}
 				}
 				else {
-					$form->query('xpath:.//div[@id="add_templates_"]/..')->asMultiselect()->one()->fill($tab['entries']);
+					$templates_field->fill($tab['entries']);
 				}
 				break;
 
@@ -934,7 +927,7 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'preprocessing_steps':
 				if ($action === USER_ACTION_REMOVE) {
-					$form->query('id:preprocessing')->one()->query('button:Remove')->all()->click();
+					$form->query('id:preprocessing')->query('button:Remove')->all()->click();
 				}
 				else {
 					$this->addPreprocessingSteps($tab['entries']);
@@ -944,7 +937,7 @@ class testFormTabIndicators extends CWebTest {
 			case 'overlay_dialogue':
 				if ($action === USER_ACTION_REMOVE) {
 					if (array_key_exists('table_selector', $tab)) {
-						$form->query($tab['table_selector'])->one()->query('button:Remove')->all()->click();
+						$form->query($tab['table_selector'])->query('button:Remove')->all()->click();
 					}
 					else {
 						$form->getFieldContainer($tab['name'])->query('button:Remove')->all()->click();
@@ -953,7 +946,7 @@ class testFormTabIndicators extends CWebTest {
 				else {
 					foreach($tab['entries'] as $entry) {
 						if (array_key_exists('table_selector', $tab)) {
-							$form->query($tab['table_selector'])->one()->query('button:Add')->one()->click();
+							$form->query($tab['table_selector'])->query('button:Add')->one()->click();
 						}
 						else {
 							$form->getFieldContainer($tab['name'])->query('button:Add')->one()->click();
@@ -975,23 +968,12 @@ class testFormTabIndicators extends CWebTest {
 				}
 				break;
 
-			case 'multifield_table':
-				if ($action === USER_ACTION_REMOVE) {
-					$form->query($tab['table_selector'])->one()->query('button:Remove')->all()->click();
-				}
-				else {
-					$table = $form->query($tab['table_selector'])->asMultifieldTable()->one();
-					$table->fill($tab['entries']);
-
-				}
-				break;
-
 			case 'data_set':
 				if ($action === USER_ACTION_REMOVE) {
 					$form->query('class:remove-btn')->all()->click();
 				}
 				else {
-					for ($i=0; $i<$tab['new_entries']; $i++) {
+					for ($i = 0; $i < $tab['new_entries']; $i++) {
 						$form->query($tab['button'])->one()->click();
 					}
 				}
@@ -1000,13 +982,10 @@ class testFormTabIndicators extends CWebTest {
 	}
 
 	/*
-	 * Function checks attribute count of status attribute value of the specified tab.
+	 * Function checks count attribute or status attribute value of the specified tab.
 	 */
-	private function checkIndicatorValue($tab, $form, $expected) {
-		$tab_selector = 'xpath:.//a[text()="'.$tab['name'].'"]';
-		$attribute = (CTestArrayHelper::get($tab, 'count', false)) ? 'data-indicator-count' : 'data-indicator-status';
-		$value = $form->query($tab_selector)->one()->getAttribute($attribute);
-
-		$this->assertEquals($expected, $value);
+	private function checkIndicatorValue($element, $expected) {
+		$attribute = (is_int($expected)) ? 'data-indicator-count' : 'data-indicator-status';
+		$this->assertEquals($expected, $element->getAttribute($attribute));
 	}
 }
