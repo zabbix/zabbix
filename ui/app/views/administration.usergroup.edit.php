@@ -65,7 +65,7 @@ $form_list = (new CFormList())
 if ($data['can_update_group']) {
 	$select_gui_access = (new CSelect('gui_access'))
 		->setValue($data['gui_access'])
-		->setFocusableElementId('gui_access')
+		->setFocusableElementId('gui-access')
 		->addOptions(CSelect::createOptionsFromArray([
 			GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
 			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),

@@ -87,7 +87,7 @@ else {
 
 	$select_media_type = (new CSelect('media_type'))
 		->setValue($media_type)
-		->setFocusableElementId('media_type')
+		->setFocusableElementId('media-type')
 		->onChange('$(this).closest("form").submit()')
 		->addOption(new CSelectOption(0, _('all')))
 		->addOptions(CSelect::createOptionsFromArray($media_types));

@@ -34,13 +34,13 @@ $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['ac
 $select_filter_resourcetype = (new CSelect('filter_resourcetype'))
 	->setId('resourcetype-select')
 	->setValue($data['resourcetype'])
-	->setFocusableElementId('filter_resourcetype')
+	->setFocusableElementId('filter-resourcetype')
 	->addOptions(CSelect::createOptionsFromArray($data['resources']));
 
 $select_filter_action = (new CSelect('filter_action'))
 	->setId('action-select')
 	->setValue($data['auditlog_action'])
-	->setFocusableElementId('filter_action')
+	->setFocusableElementId('filter-action')
 	->addOptions(CSelect::createOptionsFromArray($data['actions']));
 
 $filter_form = (new CFormList())

@@ -1016,7 +1016,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertElementText('//tr[@id=\'operation-message-users-footer\']//button[@class=\'btn-link\']', 'Add');
 
 			$this->zbxTestTextPresent('Send only to');
-			$this->zbxTestAssertVisibleId('operation_opmessage_mediatypeid');
+			$this->zbxTestAssertVisibleId('operation-opmessage-mediatypeid');
 			$this->zbxTestDropdownAssertSelected('operation[opmessage][mediatypeid]', '- All -');
 			$this->zbxTestDropdownHasOptions('operation[opmessage][mediatypeid]', [
 					'- All -',

@@ -45,7 +45,7 @@ $select_type = (new CSelect('type'))
 $select_snmpv3_securitylevel = (new CSelect('snmpv3_securitylevel'))
 	->setId('snmpv3-securitylevel')
 	->setValue($data['params']['snmpv3_securitylevel'])
-	->setFocusableElementId('snmpv3_securitylevel')
+	->setFocusableElementId('snmpv3-securitylevel-button')
 	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv'))
 	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv'))
 	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv'));

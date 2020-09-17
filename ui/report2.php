@@ -246,7 +246,7 @@ else {
 
 		$select_filter_hostid = (new CSelect('filter_templateid'))
 			->setValue($data['filter']['hostids'])
-			->setFocusableElementId('filter_templateid')
+			->setFocusableElementId('filter-templateid')
 			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
@@ -290,7 +290,7 @@ else {
 
 		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
 			->setValue($data['filter']['tpl_triggerid'])
-			->setFocusableElementId('tpl_triggerid')
+			->setFocusableElementId('tpl-triggerid')
 			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
@@ -375,7 +375,7 @@ else {
 
 		$select_filter_groupid = (new CSelect('filter_groups'))
 			->setValue($data['filter']['groups'])
-			->setFocusableElementId('filter_groups')
+			->setFocusableElementId('filter-groups')
 			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 

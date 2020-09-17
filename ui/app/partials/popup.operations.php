@@ -34,8 +34,11 @@ $form_list = new CFormList();
 /*
  * Operation type row.
  */
-$form_list->addRow(new CLabel(_('Operation type'), 'operationtype'),
-	(new CSelect('operationtype'))->setFocusableElementId('operationtype'), 'operation-type'
+$select_operationtype = (new CSelect('operationtype'))->setFocusableElementId('operationtype');
+
+$form_list->addRow(new CLabel(_('Operation type'), $select_operationtype->getFocusableElementId()),
+	$select_operationtype,
+	'operation-type'
 );
 
 /*
@@ -114,20 +117,25 @@ $form_list->addRow(_('Send to users'), (new CDiv(
 /*
  * Operation message media type row.
  */
-$form_list->addRow(new CLabel(_('Default media type'), 'operation_opmessage_mediatypeid'),
-	(new CSelect('operation[opmessage][mediatypeid]'))
-		->setFocusableElementId('operation_opmessage_mediatypeid')
-		->addOption(new CSelectOption('0', '- '._('All').' -')),
+$select_operation_opmessage_mediatypeid = (new CSelect('operation[opmessage][mediatypeid]'))
+	->setFocusableElementId('operation-opmessage-mediatypeid')
+	->addOption(new CSelectOption('0', '- '._('All').' -'));
+
+$form_list->addRow(
+	new CLabel(_('Default media type'), $select_operation_opmessage_mediatypeid->getFocusableElementId()),
+	$select_operation_opmessage_mediatypeid,
 	'operation-message-mediatype-default'
 );
 
 /*
  * Operation message media type row (explicit).
  */
-$form_list->addRow(new CLabel(_('Send only to'), 'operation_opmessage_mediatypeid'),
-	(new CSelect('operation[opmessage][mediatypeid]'))
-		->setFocusableElementId('operation_opmessage_mediatypeid')
-		->addOption(new CSelectOption('0', '- '._('All').' -')),
+$select_operation_opmessage_mediatypeid = (new CSelect('operation[opmessage][mediatypeid]'))
+	->setFocusableElementId('operation-opmessage-mediatypeid')
+	->addOption(new CSelectOption('0', '- '._('All').' -'));
+
+$form_list->addRow(new CLabel(_('Send only to'), $select_operation_opmessage_mediatypeid->getFocusableElementId()),
+	$select_operation_opmessage_mediatypeid,
 	'operation-message-mediatype-only'
 );
 
@@ -188,18 +196,20 @@ $form_list->addRow((new CLabel(_('Target list')))->setAsteriskMark(),
 /*
  * Command type row.
  */
-$form_list->addRow(new CLabel(_('Type'), 'operation-opcommand-type'),
-	(new CSelect('operation[opcommand][type]'))
-		->setValue((string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
-		->setFocusableElementId('operation-opcommand-type')
-		->addOptions(CSelect::createOptionsFromArray([
-			ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
-			ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
-			ZBX_SCRIPT_TYPE_SSH => _('SSH'),
-			ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
-			ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
-		]))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+$select_operation_opcommand_type = (new CSelect('operation[opcommand][type]'))
+	->setValue((string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+	->setFocusableElementId('operation-opcommand-type')
+	->addOptions(CSelect::createOptionsFromArray([
+		ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+		ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
+		ZBX_SCRIPT_TYPE_SSH => _('SSH'),
+		ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
+		ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
+	]))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+$form_list->addRow(new CLabel(_('Type'), $select_operation_opcommand_type->getFocusableElementId()),
+	$select_operation_opcommand_type,
 	'operation-command-type'
 );
 
@@ -232,12 +242,15 @@ $form_list->addRow((new CLabel(_('Execute on'), 'operation_opcommand_execute_on'
 /*
  * Command authentication method row.
  */
-$form_list->addRow(new CLabel(_('Authentication method'), 'operation-opcommand-authtype'),
-	(new CSelect('operation[opcommand][authtype]'))
-		->setFocusableElementId('operation-opcommand-authtype')
-		->addOption(new CSelectOption(ITEM_AUTHTYPE_PASSWORD, _('Password')))
-		->addOption(new CSelectOption(ITEM_AUTHTYPE_PUBLICKEY, _('Public key')))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+$select_operation_opcommand_authtype = (new CSelect('operation[opcommand][authtype]'))
+	->setFocusableElementId('operation-opcommand-authtype')
+	->addOption(new CSelectOption(ITEM_AUTHTYPE_PASSWORD, _('Password')))
+	->addOption(new CSelectOption(ITEM_AUTHTYPE_PUBLICKEY, _('Public key')))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+$form_list->addRow(
+	new CLabel(_('Authentication method'), $select_operation_opcommand_authtype->getFocusableElementId()),
+	$select_operation_opcommand_authtype,
 	'operation-command-authtype'
 );
 
