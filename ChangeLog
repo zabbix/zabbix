@@ -79,7 +79,7 @@ A......... [ZBX-17952] fixed compression availability not being checked when del
 Changes for 5.2.0alpha1
 
 New features:
-A.F....PS. [ZBXNEXT-5965] reworked session to cookie (ashubin, MVekslers, rlataria)
+A.F....PS. [ZBXNEXT-5965] added support for load balancing by change user session storage driver from file based to encrypted cookies (ashubin, MVekslers, rlataria)
 ..F.....S. [ZBXNEXT-6073] added item log macros support in trigger names, operational data, descriptions, event tags, event values and trigger URL (rlataria, vso)
 A.F.I..... [ZBXNEXT-82] reworked part of parameters from definitions file to configurable parameters using frontend; added new API for settings, authentication, housekeepeing (vmaksimovs)
 A.F....... [ZBXNEXT-2156] implemented ability to create hosts without interfaces (miks, talbergs)
