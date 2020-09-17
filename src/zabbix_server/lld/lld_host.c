@@ -122,7 +122,7 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 	zbx_free(interface->dns);
 	zbx_free(interface->ip);
 
-	if (INTERFACE_TYPE_SNMP == interface->type)
+	if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE) && INTERFACE_TYPE_SNMP == interface->type)
 	{
 		zbx_free(interface->data.snmp->community);
 		zbx_free(interface->data.snmp->securityname);
@@ -2242,7 +2242,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 
-			if (INTERFACE_TYPE_SNMP == interface->type)
+			if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE) && INTERFACE_TYPE_SNMP ==
+					interface->type)
 			{
 				if (0 == interface->interfaceid)
 					interface->data.snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE;
@@ -2564,7 +2565,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
 			}
 
-			if (INTERFACE_TYPE_SNMP == interface->type)
+			if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE) && INTERFACE_TYPE_SNMP ==
+					interface->type)
 			{
 				if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
 				{
@@ -3054,6 +3056,7 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 		interface->ip = zbx_strdup(NULL, row[4]);
 		interface->dns = zbx_strdup(NULL, row[5]);
 		interface->port = zbx_strdup(NULL, row[6]);
+		interface->flags = 0x00;
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
@@ -3216,6 +3219,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			continue;
 
 		zbx_vector_ptr_reserve(&host->interfaces, interfaces->values_num);
+
 		for (j = 0; j < interfaces->values_num; j++)
 		{
 			interface = (zbx_lld_interface_t *)interfaces->values[j];
