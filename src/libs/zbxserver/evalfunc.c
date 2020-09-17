@@ -2749,27 +2749,27 @@ static int	evaluate_TREND(char **value, DC_ITEM *item, const char *func, const c
 
 	if (0 == strcmp(func, "avg"))
 	{
-		ret = zbx_trends_eval_avg(table, item->itemid, start, end, &value_dbl);
+		ret = zbx_trends_eval_avg(table, item->itemid, start, end, &value_dbl, error);
 	}
 	else if (0 == strcmp(func, "count"))
 	{
-		ret = zbx_trends_eval_count(table, item->itemid, start, end, &value_dbl);
+		ret = zbx_trends_eval_count(table, item->itemid, start, end, &value_dbl, error);
 	}
 	else if (0 == strcmp(func, "delta"))
 	{
-		ret = zbx_trends_eval_delta(table, item->itemid, start, end, &value_dbl);
+		ret = zbx_trends_eval_delta(table, item->itemid, start, end, &value_dbl, error);
 	}
 	else if (0 == strcmp(func, "max"))
 	{
-		ret = zbx_trends_eval_max(table, item->itemid, start, end, &value_dbl);
+		ret = zbx_trends_eval_max(table, item->itemid, start, end, &value_dbl, error);
 	}
 	else if (0 == strcmp(func, "min"))
 	{
-		ret = zbx_trends_eval_min(table, item->itemid, start, end, &value_dbl);
+		ret = zbx_trends_eval_min(table, item->itemid, start, end, &value_dbl, error);
 	}
 	else if (0 == strcmp(func, "sum"))
 	{
-		ret = zbx_trends_eval_sum(table, item->itemid, start, end, &value_dbl);
+		ret = zbx_trends_eval_sum(table, item->itemid, start, end, &value_dbl, error);
 	}
 	else
 	{
@@ -2777,11 +2777,7 @@ static int	evaluate_TREND(char **value, DC_ITEM *item, const char *func, const c
 		goto out;
 	}
 
-	if (SUCCEED != ret)
-	{
-		*error = zbx_strdup(*error, "not enough data");
-	}
-	else
+	if (SUCCEED == ret)
 		*value = zbx_dsprintf(*value, ZBX_FS_DBL64, value_dbl);
 out:
 	zbx_free(period);
