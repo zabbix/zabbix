@@ -3648,10 +3648,10 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
  ******************************************************************************/
 static int	zbx_token_parse_expression_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
-	const char		*ptr;
-	size_t			level;
-	size_t			offset;
-	zbx_token_macro_t	*data;
+	const char			*ptr;
+	size_t				level;
+	size_t				offset;
+	zbx_token_expression_macro_t	*data;
 
 	/* find the end of expression macro */
 	for (ptr = macro + 2, level = 1; '}' != *ptr || 1 != level; ptr++)
@@ -3679,8 +3679,8 @@ static int	zbx_token_parse_expression_macro(const char *expression, const char *
 
 	/* initialize token data */
 	data = &token->data.expression_macro;
-	data->name.l = offset + 2;
-	data->name.r = token->loc.r - 1;
+	data->expression.l = offset + 2;
+	data->expression.r = token->loc.r - 1;
 
 	return SUCCEED;
 }

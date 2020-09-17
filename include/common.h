@@ -1440,6 +1440,13 @@ typedef struct
 }
 zbx_token_macro_t;
 
+/* data used by macros, ldd macros and objectid tokens */
+typedef struct
+{
+	zbx_strloc_t	expression;
+}
+zbx_token_expression_macro_t;
+
 /* data used by user macros */
 typedef struct
 {
@@ -1490,7 +1497,7 @@ typedef union
 	zbx_token_macro_t		objectid;
 	zbx_token_macro_t		macro;
 	zbx_token_macro_t		lld_macro;
-	zbx_token_macro_t		expression_macro;
+	zbx_token_expression_macro_t	expression_macro;
 	zbx_token_user_macro_t		user_macro;
 	zbx_token_func_macro_t		func_macro;
 	zbx_token_func_macro_t		lld_func_macro;

@@ -446,4 +446,31 @@ out:
   token_type: ZBX_TOKEN_MACRO
   macro: 'EVENT.TAGS."1TAG"'
   return: SUCCEED
+---
+test case: 'Success: {?1 + 2}'
+in:
+  expression: '{?1 + 2}'
+out:
+  token: '{?1 + 2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '1 + 2'
+  return: SUCCEED
+---
+test case: 'Success: {?{$VALUE}*2}'
+in:
+  expression: '{?{$VALUE}*2}'
+out:
+  token: '{?{$VALUE}*2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{$VALUE}*2'
+  return: SUCCEED
+---
+test case: 'Success: {?{$VALUE:"context{}"}*2}'
+in:
+  expression: '{?{$VALUE:"context}"}*2}'
+out:
+  token: '{?{$VALUE:"context}"}*2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{$VALUE:"context}"}*2'
+  return: SUCCEED
 ...

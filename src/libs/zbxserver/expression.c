@@ -4146,7 +4146,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					c = (*data)[token.loc.r];
 					(*data)[token.loc.r] = '\0';
 
-					expression = zbx_strdup(expression, *data + token.loc.l + 2);
+					expression = zbx_strdup(expression, *data +
+							token.data.expression_macro.expression.l);
 
 					ret = get_expression_macro_result(event, r_event, alert, ack, &expression,
 							&replace_to, error, maxerrlen);
