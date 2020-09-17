@@ -193,18 +193,8 @@ class CConfigFile {
 	protected function getCredentialsFromVault(): array {
 		$username = CDataCacheHelper::getValue('db_username', '');
 		$password = CDataCacheHelper::getValue('db_password', '');
-		$hashsum = CDataCacheHelper::getValue('hashsum', '');
 
-		// Changes in any database related parameter causes cache renewal.
-		$current_hashsum = md5(json_encode([
-			$this->config['DB']['TYPE'],
-			$this->config['DB']['SERVER'],
-			$this->config['DB']['PORT'],
-			$this->config['DB']['DATABASE'],
-			ZABBIX_DB_VERSION
-		]));
-
-		if ($username === '' || $password === '' || $hashsum !== $current_hashsum) {
+		if ($username === '' || $password === '') {
 			$vault = new CVaultHelper($this->config['DB']['VAULT_URL'], $this->config['DB']['VAULT_TOKEN']);
 			$secret = $vault->loadSecret($this->config['DB']['VAULT_DB_PATH']);
 
@@ -215,12 +205,11 @@ class CConfigFile {
 				// Update cache.
 				CDataCacheHelper::setValueArray([
 					'db_username' => $username,
-					'db_password' => $password,
-					'hashsum' => $current_hashsum
+					'db_password' => $password
 				]);
 			}
 			else {
-				CDataCacheHelper::clearValues(['db_username', 'db_password', 'hashsum']);
+				CDataCacheHelper::clearValues(['db_username', 'db_password']);
 			}
 		}
 

@@ -88,8 +88,8 @@ class CDataCacheHelper {
 		if (count(self::$data) > 0) {
 			self::saveCache();
 		}
-		elseif (is_file(self::getDataCacheFileName())) {
-			unlink(self::getDataCacheFileName());
+		else {
+			self::deleteCacheFile();
 		}
 	}
 
@@ -97,7 +97,7 @@ class CDataCacheHelper {
 	 * Load cached values from file to buffer.
 	 */
 	protected static function loadCache(): void {
-		self::$data = is_file(self::getDataCacheFileName())
+		self::$data = (is_file(self::getDataCacheFileName()) && self::checkCacheTTL())
 			? (array) json_decode(file_get_contents(self::getDataCacheFileName()))
 			: [];
 	}
@@ -106,7 +106,21 @@ class CDataCacheHelper {
 	 * Save values stored in buffer into file.
 	 */
 	protected static function saveCache(): void {
-		file_put_contents(self::getDataCacheFileName(), json_encode(self::$data));
+		if (ZBX_DATA_CACHE_TTL == 0) {
+			self::deleteCacheFile();
+		}
+		else {
+			file_put_contents(self::getDataCacheFileName(), json_encode(self::$data));
+		}
+	}
+
+	/**
+	 * Delete cache file.
+	 */
+	protected static function deleteCacheFile(): void {
+		if (is_file(self::getDataCacheFileName())) {
+			unlink(self::getDataCacheFileName());
+		}
 	}
 
 	/**
@@ -116,5 +130,14 @@ class CDataCacheHelper {
 	 */
 	protected static function getDataCacheFileName(): string {
 		return sys_get_temp_dir().'/'.self::DATA_CACHE_FILE_NAME;
+	}
+
+	/**
+	 * Check if cached data is not expired.
+	 *
+	 * @return bool
+	 */
+	protected static function checkCacheTTL(): bool {
+		return (ZBX_DATA_CACHE_TTL != 0 && filemtime(self::getDataCacheFileName()) + ZBX_DATA_CACHE_TTL > time());
 	}
 }
