@@ -829,9 +829,9 @@ static void	DCdump_triggers(void)
 	{
 		trigger = (ZBX_DC_TRIGGER *)index.values[i];
 
-		zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " description:'%s' type:%u status:%u priority:%u",
-					trigger->triggerid, trigger->description, trigger->type, trigger->status,
-					trigger->priority);
+		zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " description:'%s' event_name:'%s' type:%u"
+				" status:%u priority:%u", trigger->triggerid, trigger->description, trigger->event_name,
+				trigger->type, trigger->status, trigger->priority);
 		zabbix_log(LOG_LEVEL_TRACE, "  expression:'%s' recovery_expression:'%s'", trigger->expression,
 				trigger->recovery_expression);
 		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s' lastchange:%d", trigger->value,
