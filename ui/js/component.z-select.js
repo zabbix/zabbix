@@ -7,9 +7,8 @@ class ZSelect extends HTMLElement {
 
 		this._option_template = "#{label}";
 
-		this._preselected_index = 0;
-		this._staged_index = 0;
-		this._value = null;
+		this._highlighted_index = -1;
+		this._preselected_index = -1;
 
 		this._expanded = false;
 		this._list_hovered = false;
@@ -18,6 +17,7 @@ class ZSelect extends HTMLElement {
 		this._input = document.createElement('input');
 		this._list = document.createElement('ul');
 
+		this._events = {};
 		this.onchange = () => {};
 	}
 
@@ -34,65 +34,40 @@ class ZSelect extends HTMLElement {
 	 * @return {array}
 	 */
 	static get observedAttributes() {
-		return ['name', 'value', 'disabled', 'readonly', 'data-options', 'option-template', 'focusable-element-id',
-			'width', 'onchange'];
+		return ['name', 'value', 'disabled', 'readonly', 'width', 'onchange'];
 	}
 
-	attributeChangedCallback(name, _old_value, new_value) {
+	attributeChangedCallback(name, old_value, new_value) {
 		switch (name) {
 			case 'name':
-				this._input.setAttribute('name', new_value);
+				this._input.name = new_value;
 				break;
 
 			case 'value':
-				if (this._value != new_value) {
-					this._value = new_value;
-					if (this._options_map.has(new_value)) {
-						this._highlight(this._options_map.get(new_value)._index);
-						this._preSelect();
-						this._change();
+				if (old_value !== null && this._input.value !== new_value) {
+					const option = this.getOptionByValue(new_value);
+
+					this._highlight(option ? option._index : -1);
+					this._preselect(this._highlighted_index);
+
+					if (option && !option.disabled) {
+						this._input.value = option.value;
+						this.dispatchEvent(new Event('change'));
+					}
+					else {
+						this._input.value = null;
 					}
 				}
 				break;
 
 			case 'disabled':
-				this._button.toggleAttribute('disabled', new_value !== null);
-				this._input.toggleAttribute('disabled', new_value !== null);
+				this._button.disabled = (new_value !== null);
+				this._input.disabled = (new_value !== null);
 				break;
 
 			case 'readonly':
-				this._button.toggleAttribute('readonly', new_value !== null);
-				this._input.toggleAttribute('readonly', new_value !== null);
-				break;
-
-			case 'data-options':
-				if (new_value !== null) {
-					const options = JSON.parse(new_value);
-
-					for (const option of options) {
-						option.options instanceof Array
-							? this.addOptionGroup(option)
-							: this.addOption(option);
-					}
-
-					this.removeAttribute('data-options');
-				}
-				break;
-
-			case 'option-template':
-				if (new_value !== null) {
-					this._option_template = new_value;
-					this.removeAttribute('option-template');
-				}
-
-				break
-
-			case 'focusable-element-id':
-				if (new_value !== null) {
-					this._button.setAttribute('id', new_value);
-					this.removeAttribute('focusable-element-id');
-				}
-
+				this._button.readOnly = (new_value !== null);
+				this._input.readOnly = (new_value !== null);
 				break;
 
 			case 'width':
@@ -107,50 +82,67 @@ class ZSelect extends HTMLElement {
 	}
 
 	init() {
-		this._button.setAttribute('type', 'button');
+		this._button.type = 'button';
 		this.appendChild(this._button);
 
-		this._input.setAttribute('type', 'hidden');
+		this._input.type = 'hidden';
 		this.appendChild(this._input);
 
 		this._list.classList.add('list');
 		this.appendChild(this._list);
 
-		if (!this.hasAttribute('width')) {
-			const container = document.createElement('div');
-			const list = this._list.cloneNode(true);
-
-			container.classList.add('z-select', 'is-expanded');
-			container.style.position = 'fixed';
-			container.style.left = '-9999px';
-			container.appendChild(list);
-
-			document.body.appendChild(container);
-
-			this.setAttribute('width', Math.ceil(list.scrollWidth) + 24);  // 24 = padding + border width
-
-			container.remove();
+		if (this.hasAttribute('focusable-element-id')) {
+			this._button.id = this.getAttribute('focusable-element-id');
+			this.removeAttribute('focusable-element-id');
 		}
 
-		this._highlight(this._preselected_index);
-		this._preSelect();
-		this._input.setAttribute('value', this._value);
-	}
+		if (this.hasAttribute('option-template')) {
+			this._option_template = this.getAttribute('option-template');
+			this.removeAttribute('option-template');
+		}
 
-	getOptionByIndex(index) {
-		return this.getOptions()[index];
-	}
+		if (this.hasAttribute('data-options')) {
+			const options = JSON.parse(this.getAttribute('data-options'));
 
-	getOptionByValue(value) {
-		return this._options_map.has(value.toString()) ? this._options_map.get(value) : null;
+			for (const option of options) {
+				option.options instanceof Array
+					? this.addOptionGroup(option)
+					: this.addOption(option);
+			}
+
+			this.removeAttribute('data-options');
+		}
+
+		if (!this.hasAttribute('width')) {
+			this.setAttribute('width', this._listWidth());
+		}
+
+		this._preselect(this._highlighted_index >= 0 ? this._highlighted_index : this._first(this._highlighted_index));
+		this._input.value = this.getValueByIndex(this._preselected_index);
 	}
 
 	getOptions() {
 		return [...this._options_map.values()];
 	}
 
+	getOptionByIndex(index) {
+		return this.getOptions()[index] || null;
+	}
+
+	getOptionByValue(value) {
+		return this._options_map.get(value.toString()) || null;
+	}
+
+	getValueByIndex(index) {
+		const option = this.getOptionByIndex(index);
+
+		return option ? option.value : null;
+	}
+
 	addOption({value, label, label_extra, class_name, is_disabled}, container, template) {
-		if (this._options_map.has(value.toString())) {
+		value = value.toString();
+
+		if (this._options_map.has(value)) {
 			throw new Error('Duplicate option value: ' + value);
 		}
 
@@ -165,7 +157,7 @@ class ZSelect extends HTMLElement {
 		class_name && li.classList.add(class_name);
 		is_disabled && li.setAttribute('disabled', 'disabled');
 
-		this._options_map.set(value.toString(), Object.defineProperties(option, {
+		this._options_map.set(value, Object.defineProperties(option, {
 			_node: {
 				get: () => li
 			},
@@ -185,8 +177,8 @@ class ZSelect extends HTMLElement {
 		}));
 
 		// Should accept both integer and string.
-		if (this._value == value) {
-			this._preselected_index = li._index;
+		if ((this.getAttribute('value') || 0) == value) {
+			this._highlighted_index = li._index;
 		}
 
 		(container || this._list).appendChild(li);
@@ -246,10 +238,8 @@ class ZSelect extends HTMLElement {
 		return this._preselected_index;
 	}
 
-	set selectedIndex(value) {
-		this._highlight(value);
-		this._preSelect();
-		this._change();
+	set selectedIndex(index) {
+		this._change(index);
 	}
 
 	_expand() {
@@ -305,43 +295,50 @@ class ZSelect extends HTMLElement {
 	}
 
 	_highlight(index) {
-		if (this._options_map.size) {
-			const {_node: old_node} = this.getOptionByIndex(this._staged_index);
-			const {_node: new_node, disabled} = this.getOptionByIndex(index);
+		const old_option = this.getOptionByIndex(this._highlighted_index);
+		const new_option = this.getOptionByIndex(index);
 
-			if (!disabled) {
-				old_node.classList.remove('hover');
-				new_node.classList.add('hover');
+		if (old_option) {
+			old_option._node.classList.remove('hover');
+		}
 
-				this._expanded && new_node.scrollIntoView({block: 'nearest'});
-				this._staged_index = index;
-			}
+		if (new_option && !new_option.disabled) {
+			new_option._node.classList.add('hover');
+
+			this._expanded && new_option._node.scrollIntoView({block: 'nearest'});
+			this._highlighted_index = index;
+		}
+		else {
+			this._highlighted_index = -1;
 		}
 	}
 
-	_preSelect() {
-		if (this._options_map.size) {
-			const {label} = this.getOptionByIndex(this._staged_index);
+	_preselect(index) {
+		const option = this.getOptionByIndex(index);
 
-			this._button.innerText = label;
-			this._preselected_index = this._staged_index;
+		if (option) {
+			this._button.innerText = option.label;
+			this._input.disabled = this.hasAttribute('disabled');
 		}
+		else {
+			this._button.innerText = '';
+			this._input.disabled = true;
+		}
+
+		this._preselected_index = index;
 	}
 
-	_change() {
-		if (this._options_map.size) {
-			const {value} = this.getOptionByIndex(this._preselected_index);
+	_change(index) {
+		const option = this.getOptionByIndex(index);
 
-			if (this._input.value != value) {
-				this.setAttribute('value', value);
-				this._input.setAttribute('value', value);
-				this.dispatchEvent(new Event('change'));
-			}
+		if (option !== null) {
+			this.value = option.value;
 		}
 	}
 
 	_prev(current_index) {
 		const options = this.getOptions();
+
 		for (let index = current_index - 1; index >= 0; index--) {
 			if (!options[index].disabled) {
 				return index;
@@ -353,6 +350,7 @@ class ZSelect extends HTMLElement {
 
 	_next(current_index) {
 		const options = this.getOptions();
+
 		for (let index = current_index + 1; index < this._options_map.size; index++) {
 			if (!options[index].disabled) {
 				return index;
@@ -397,7 +395,7 @@ class ZSelect extends HTMLElement {
 	_search(char) {
 		const options = this.getOptions();
 		const size = this._options_map.size;
-		let start = this._staged_index - size;
+		let start = this._highlighted_index - size;
 		const end = start + size;
 
 		while (start++ < end) {
@@ -412,15 +410,35 @@ class ZSelect extends HTMLElement {
 		return null;
 	}
 
+	_listWidth() {
+		const container = document.createElement('div');
+		const list = this._list.cloneNode(true);
+
+		container.classList.add('z-select', 'is-expanded');
+		container.style.position = 'fixed';
+		container.style.left = '-9999px';
+		container.appendChild(list);
+
+		document.body.appendChild(container);
+
+		const width = Math.ceil(list.scrollWidth) + 24;  // 24 = padding + border width
+
+		container.remove();
+
+		return width;
+	}
+
 	registerEvents() {
 		this._events = {
-			button_mousedown: () => {
-				if (this._expanded) {
-					this._change();
-					this._collapse();
-				}
-				else {
-					this._expand();
+			button_mousedown: (e) => {
+				if (e.which === 1) {
+					if (this._expanded) {
+						this._change(this._preselected_index);
+						this._collapse();
+					}
+					else {
+						this._expand();
+					}
 				}
 			},
 
@@ -429,8 +447,8 @@ class ZSelect extends HTMLElement {
 					const index = this._search(e.key);
 					if (index !== null) {
 						this._highlight(index);
-						this._preSelect();
-						!this._expanded && this._change();
+						this._preselect(this._highlighted_index);
+						!this._expanded && this._change(this._preselected_index);
 					}
 
 					return;
@@ -449,58 +467,58 @@ class ZSelect extends HTMLElement {
 						let new_index, scroll = 0;
 						switch (e.which) {
 							case KEY_ARROW_UP:
-								new_index = this._prev(this._staged_index);
+								new_index = this._prev(this._highlighted_index);
 								scroll = -48;
 								break;
 
 							case KEY_ARROW_DOWN:
-								new_index = this._next(this._staged_index);
+								new_index = this._next(this._highlighted_index);
 								scroll = 48;
 								break;
 
 							case KEY_PAGE_UP:
-								new_index = this._prevPage(this._staged_index);
+								new_index = this._prevPage(this._highlighted_index);
 								break;
 
 							case KEY_PAGE_DOWN:
-								new_index = this._nextPage(this._staged_index);
+								new_index = this._nextPage(this._highlighted_index);
 								break;
 
 							case KEY_HOME:
-								new_index = this._first(this._staged_index);
+								new_index = this._first(this._highlighted_index);
 								break;
 
 							case KEY_END:
-								new_index = this._last(this._staged_index);
+								new_index = this._last(this._highlighted_index);
 								break;
 						}
 
-						if (scroll !== 0 && this._staged_index === new_index) {
+						if (scroll !== 0 && this._highlighted_index === new_index) {
 							this._list.scrollTop += scroll;
 						}
 						else {
 							this._highlight(new_index);
-							this._preSelect();
-							!this._expanded && this._change();
+							this._preselect(this._highlighted_index);
+							!this._expanded && this._change(this._preselected_index);
 						}
 						break;
 
 					case KEY_ENTER:
-						if (!this._expanded) {
-							this._expand();
+						if (this._expanded) {
+							this._preselect(this._highlighted_index);
+							this._change(this._preselected_index);
+							this._collapse();
 						}
 						else {
-							this._preSelect();
-							this._change();
-							this._collapse();
+							this._expand();
 						}
 						break;
 
 					case KEY_TAB:
 						if (this._expanded) {
 							e.preventDefault();
-							this._preSelect();
-							this._change();
+							this._preselect(this._highlighted_index);
+							this._change(this._preselected_index);
 							this._collapse();
 						}
 						break;
@@ -511,14 +529,14 @@ class ZSelect extends HTMLElement {
 
 					case KEY_ESCAPE:
 						this._expanded && e.stopPropagation();
-						this._change();
+						this._change(this._preselected_index);
 						this._collapse();
 						break;
 				}
 			},
 
 			button_blur: () => {
-				this._change();
+				this._change(this._preselected_index);
 				this._collapse();
 			},
 
@@ -531,36 +549,33 @@ class ZSelect extends HTMLElement {
 			},
 
 			list_mousedown: (e) => {
-				const index = e.target.closest('li')._index;
+				const option = this.getOptionByIndex(e.target.closest('li')._index);
 
-				if (index !== undefined) {
-					e.preventDefault();
-					this._highlight(index);
-					this._preSelect();
-					this._change();
+				if (option && !option.disabled) {
+					this._change(option._index);
 					this._collapse();
 				}
+
+				e.preventDefault();
 			},
 
 			list_mousemove: (e) => {
-				const index = e.target._index;
+				const option = this.getOptionByIndex(e.target.closest('li')._index);
 
-				if (index !== undefined && this._staged_index !== index) {
-					const {disabled} = this.getOptionByIndex(index);
-
-					!disabled && this._highlight(index);
+				if (option && this._highlighted_index !== option._index) {
+					!option.disabled && this._highlight(option._index);
 				}
 			},
 
 			document_wheel: () => {
 				if (!this._list_hovered) {
-					this._change();
+					this._change(this._preselected_index);
 					this._collapse();
 				}
 			},
 
 			window_resize: () => {
-				this._change();
+				this._change(this._preselected_index);
 				this._collapse();
 			}
 		}
