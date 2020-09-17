@@ -261,7 +261,7 @@ static int	trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, in
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-	int		ret = FAIL;
+	int		ret;
 	double		avg, num, num2, avg2;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select value_avg,num from %s where itemid=" ZBX_FS_UI64,
@@ -272,31 +272,32 @@ static int	trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, in
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", start);
 
 	result = DBselect("%s", sql);
+	zbx_free(sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		avg = atof(row[0]);
 		num = atof(row[1]);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			avg2 = atof(row[0]);
+			num2 = atof(row[1]);
+			avg = avg / (num + num2) * num + avg2 / (num + num2) * num2;
+			num += num2;
+		}
+
+		*value = avg;
 		ret = SUCCEED;
 	}
 	else
 	{
 		if (NULL != error)
 			*error = zbx_strdup(*error, "not enough data");
-	}
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		avg2 = atof(row[0]);
-		num2 = atof(row[1]);
-		avg = avg / (num + num2) * num + avg2 / (num + num2) * num2;
-		num += num2;
+		ret = FAIL;
 	}
 
 	DBfree_result(result);
-
-	if (SUCCEED == ret)
-		*value = avg;
 
 	return ret;
 }
