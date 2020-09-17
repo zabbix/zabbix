@@ -109,6 +109,7 @@ $left_column = (new CFormList())
 	->addRow(_('Severity'),
 		(new CSeverityCheckBoxList('severities'))
 			->setChecked($data['severities'])
+			->removeValueIndex()
 			->setUniqid('#{uniqid}')
 	);
 
@@ -249,8 +250,8 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Severities checkboxes.
-		Object.keys(data.severities).forEach((value) => {
-			$('[name="severities[' + value + ']"]', container).attr('checked', true);
+		data.severities.forEach((value) => {
+			$('[name^="severities["][value="' + value + '"]', container).attr('checked', true);
 		});
 	}
 

@@ -65,12 +65,9 @@ class CControllerHostView extends CControllerHost {
 
 		// Validate severity checkbox filter.
 		if ($ret && $this->hasInput('severities')) {
-			foreach ($this->getInput('severities') as $severity) {
-				if (!in_array($severity, range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))) {
-					$ret = false;
-					break;
-				}
-			}
+			$ret = !array_diff($this->getInput('severities'),
+				range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
+			);
 		}
 
 		if (!$ret) {

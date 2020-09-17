@@ -42,6 +42,11 @@ class CCheckBoxList extends CList {
 	protected $uniqid = '';
 
 	/**
+	 * How checkbox name should be presented in HTML, with or without it value as index part in it name.
+	 */
+	protected $value_as_namepart = true;
+
+	/**
 	 * @param string $name
 	 */
 	public function __construct($name) {
@@ -120,6 +125,16 @@ class CCheckBoxList extends CList {
 		return $this;
 	}
 
+	/**
+	 * Remove value from checkbox name.
+	 * All checkboxes will have same name therefore can be distinguished only by it value.
+	 */
+	public function removeValueIndex() {
+		$this->value_as_namepart = false;
+
+		return $this;
+	}
+
 	/*
 	 * @param bool $destroy
 	 *
@@ -127,11 +142,12 @@ class CCheckBoxList extends CList {
 	 */
 	public function toString($destroy = true) {
 		foreach ($this->values as $value) {
-			$checkbox = (new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
+			$index = $this->value_as_namepart ? $value['value'] : '';
+			$checkbox = (new CCheckBox($this->name.'['.$index.']', $value['value']))
 				->setLabel($value['name'])
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
-			$checkbox->setId($checkbox->getId().$this->uniqid);
+			$checkbox->setId($checkbox->getId().$index.$this->uniqid);
 
 			parent::addItem($checkbox);
 		}
