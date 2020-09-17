@@ -33,7 +33,6 @@ class CHostPrototype extends CHostBase {
 	 * @param array         $options['interfaceids']      Select host prototypes by interface IDs.
 	 * @param bool          $options['selectMacros']      Array of macros fields to be selected or string "extend".
 	 * @param string|array  $options['selectInterfaces']  Return an "interfaces" property with host interfaces.
-	 * @param int           $options['limitSelects']      Limits the number of records returned by subselects.
 	 *
 	 * @return array
 	 */
@@ -81,7 +80,6 @@ class CHostPrototype extends CHostBase {
 			'selectTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hostmacro_fields), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
-			'limitSelects' => 			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -1436,7 +1434,7 @@ class CHostPrototype extends CHostBase {
 					$options['selectInterfaces']
 				);
 
-				$result = $relation_map->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
+				$result = $relation_map->mapMany($result, $interfaces, 'interfaces');
 			}
 			else {
 				$interfaces = API::HostInterface()->get([
