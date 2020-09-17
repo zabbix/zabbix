@@ -74,6 +74,7 @@ class CVaultHelper {
 		}
 		catch (Exception $e) {
 			error($e->getMessage());
+			return [];
 		}
 
 		$secret = @file_get_contents($url, false, stream_context_create($options));
