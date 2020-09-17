@@ -227,6 +227,7 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
 	zbx_free(trigger->comments);
 	zbx_free(trigger->url);
 	zbx_free(trigger->opdata);
+	zbx_free(trigger->event_name);
 }
 
 /******************************************************************************
