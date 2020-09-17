@@ -88,7 +88,8 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 			['{HOST.HOST0}', 0, ['macros' => ['{HOST.HOST}'], 'ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
 			['{HOST.HOST.test0}', 0, ['macros' => ['{HOST.HOST}'], 'ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
 			['{5}', 0, ['macros' => ['{HOST.HOST}'], 'ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
-
+			['{EVENT.TAGS}', 0, ['macros' => []], $fail],
+			['{EVENT.TAGS}', 0, ['macros' => false], $fail],
 			['{EVENT.TAGS."Test test"}', 0, ['macros' => ['{EVENT.TAGS}'], 'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{EVENT.TAGS."Test test"}',
@@ -112,6 +113,12 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 				'match' => '{EVENT.TAGS.""}',
 				'macro' => 'EVENT.TAGS',
 				'ref'	=> ''
+			]],
+			['{EVENT.TAGS.TAG}', 0, ['macros' => ['{EVENT.TAGS}'], 'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS.TAG}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> 'TAG'
 			]],
 			['{EVENT.TAGS.test}', 0, ['macros' => ['{EVENT.TAGS}'], 'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
 				'rc' => CParser::PARSE_SUCCESS,
