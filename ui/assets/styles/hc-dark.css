@@ -552,6 +552,9 @@ footer {
   color: #e1e3ed;
   content: attr(data-counter); }
 
+[data-counter=""]::after {
+  display: none; }
+
 .menu-popup .menu-popup-item[data-counter]::after {
   display: block;
   position: absolute;

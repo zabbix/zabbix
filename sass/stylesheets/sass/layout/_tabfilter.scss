@@ -179,6 +179,10 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	content: attr(data-counter);
 }
 
+[data-counter=""]::after {
+	display: none;
+}
+
 .menu-popup {
 	.menu-popup-item[data-counter]::after {
 		display: block;
