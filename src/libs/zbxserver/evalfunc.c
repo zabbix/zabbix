@@ -2959,7 +2959,7 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 	if (SUCCEED == ret)
 		del_zeros(*value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __func__, zbx_result_string(ret), *value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __func__, zbx_result_string(ret), ZBX_NULL2STR(*value));
 
 	return ret;
 }
