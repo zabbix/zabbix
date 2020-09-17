@@ -184,12 +184,14 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 				__func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
 	if (-1 == (stderr_orig = dup(STDERR_FILENO)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to duplicate stderr: %s",
 				__func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
 	if (NULL != dir)
 	{
 		if (0 != chdir(dir))
@@ -199,6 +201,7 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 			exit(EXIT_FAILURE);
 		}
 	}
+
 	fcntl(stdout_orig, F_SETFD, FD_CLOEXEC);
 	fcntl(stderr_orig, F_SETFD, FD_CLOEXEC);
 
