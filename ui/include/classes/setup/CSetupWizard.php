@@ -788,7 +788,7 @@ class CSetupWizard extends CForm {
 						error(_('Please enable "allow_url_fopen" directive.'));
 					}
 					elseif (CVaultHelper::validateVaultApiEndpoint($vault_url)
-							&& CVaultHelper::validateVaultToken($vault_db_path)
+							&& CVaultHelper::validateVaultToken($vault_token)
 							&& $secret_parser->parse($vault_db_path) == CParser::PARSE_SUCCESS) {
 						$vault = new CVaultHelper($vault_url, $vault_token);
 						$secret = $vault->loadSecret($vault_db_path);
