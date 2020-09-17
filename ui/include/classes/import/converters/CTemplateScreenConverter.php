@@ -330,7 +330,7 @@ class CTemplateScreenConverter extends CConverter {
 
 		while ($dimensions_sum != $target) {
 			$potential = [];
-			foreach ($dimensions as $index => $size) {
+			foreach (array_unique($dimensions, SORT_NUMERIC) as $index => $size) {
 				$potential[$index] = $size / $dimensions_min[$index];
 			}
 
