@@ -313,6 +313,7 @@ class CSetupWizard extends CForm {
 				->addRow(_('Vault authentication token'),
 					(new CTextBox('vault_token', $this->getConfig('DB_VAULT_TOKEN')))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAttribute('maxlength', 2048)
 				)
 				->addVar('user', '')
 				->addVar('password', '');
