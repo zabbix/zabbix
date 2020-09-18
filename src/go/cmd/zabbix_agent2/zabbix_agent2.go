@@ -343,7 +343,7 @@ func main() {
 
 	zbxlib.SetLogLevel(logLevel)
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent 2 [%s]. (%s)", agent.Options.Hostname, version.Long())
+	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
 	log.Infof(greeting)
 
 	addresses, err := serverconnector.ParseServerActive()
@@ -397,7 +397,6 @@ func main() {
 		if agent.Options.LogType != "console" {
 			fmt.Println(greeting)
 		}
-		fmt.Println("Press Ctrl+C to exit.")
 	}
 
 	manager.Start()
@@ -409,6 +408,14 @@ func main() {
 	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
 	if err != nil {
 		fatalExit("cannot parse the \"Hostname\" parameter", err)
+	}
+	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", strings.Join(hostnames, ","))
+	log.Infof(hostmessage)
+	if foregroundFlag {
+		if agent.Options.LogType != "console" {
+			fmt.Println(hostmessage)
+		}
+		fmt.Println("Press Ctrl+C to exit.")
 	}
 
 	if err = resultcache.Prepare(&agent.Options, addresses, hostnames); err != nil {
