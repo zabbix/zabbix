@@ -1423,13 +1423,6 @@ class CHostPrototype extends CHostBase {
 
 				$relation_map = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 
-				foreach ($interfaces as &$interface) {
-					if ($interface['type'] != INTERFACE_TYPE_SNMP) {
-						unset($interface['details']);
-					}
-				}
-				unset($interface);
-
 				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid', 'type'],
 					$options['selectInterfaces']
 				);
