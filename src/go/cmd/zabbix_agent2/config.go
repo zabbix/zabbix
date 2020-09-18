@@ -26,10 +26,10 @@ import (
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/zbxcmd"
 )
 
 func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions) error {
-	const hostNameListLen = 512 * 1024
 	var maxLen int
 	var err error
 
@@ -54,7 +54,7 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", hostnameItem)
 		}
 		if len(agent.ExtractHostnames(options.Hostname)) > 1 {
-			maxLen = hostNameListLen
+			maxLen = zbxcmd.MaxExecuteOutputLenB
 		} else {
 			maxLen = agent.HostNameLen
 		}
@@ -63,7 +63,7 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", hostnameItem, maxLen)
 		}
 
-		if err = agent.CheckHostname(options.Hostname); err != nil {
+		if err = agent.CheckHostnameParameter(options.Hostname); err != nil {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
 		}
 	} else {

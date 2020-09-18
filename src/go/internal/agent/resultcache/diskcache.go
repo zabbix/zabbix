@@ -247,7 +247,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 
 	if c.lastError != nil {
-		c.Warningf("history upload to [%s %s] is working again", u.Addr(), u.Hostname)
+		c.Warningf("history upload to [%s %s] is working again", u.Addr(), u.Hostname())
 		c.lastError = nil
 	}
 	if maxDataId != 0 {
@@ -431,7 +431,8 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 		return
 	}
 
-	rows, err := c.database.Query(fmt.Sprintf("SELECT id FROM registry WHERE address = '%s' AND hostname = '%s'", c.uploader.Addr(), c.uploader.Hostname()))
+	rows, err := c.database.Query(fmt.Sprintf("SELECT "+
+		"id FROM registry WHERE address = '%s' AND hostname = '%s'", c.uploader.Addr(), c.uploader.Hostname()))
 
 	if err == nil {
 		defer rows.Close()

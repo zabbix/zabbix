@@ -49,7 +49,7 @@ func CutAfterN(s string, n int) string {
 	return s
 }
 
-func CheckHostname(s string) error {
+func CheckHostnameParameter(s string) error {
 	for i := 0; i < len(s); i++ {
 		if s[i] == '.' || s[i] == ' ' || s[i] == '_' || s[i] == '-' || s[i] == ',' ||
 			(s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= '0' && s[i] <= '9') {
@@ -90,14 +90,11 @@ func ValidateHostnames(s string) ([]string, error) {
 
 func ExtractHostnames(s string) []string {
 	hostnames := strings.Split(s, ",")
-	hnum := len(hostnames)
-	if hnum > 1 {
-		hostnames[0] = strings.TrimRight(hostnames[0], " ")
-		hostnames[hnum-1] = strings.TrimLeft(hostnames[hnum-1], " ")
-		for i := 1; i < hnum-1; i++ {
-			hostnames[i] = strings.Trim(hostnames[i], " ")
-		}
+
+	for i := 0; i < len(hostnames); i++ {
+		hostnames[i] = strings.Trim(hostnames[i], " \t")
 	}
+
 	return hostnames
 }
 
@@ -237,7 +234,7 @@ func ValidateOptions(options AgentOptions) error {
 	if len(options.Hostname) > maxLen {
 		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", maxLen)
 	}
-	if err = CheckHostname(options.Hostname); err != nil {
+	if err = CheckHostnameParameter(options.Hostname); err != nil {
 		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
 	}
 	if len(options.HostMetadata) > 0 && len(options.HostMetadata) > hostMetadataLen {
