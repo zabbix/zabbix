@@ -35,6 +35,8 @@ class CSelectOption {
 	protected $value;
 
 	/**
+	 * Arbitrary data associated with this option.
+	 *
 	 * @var array
 	 */
 	protected $extra = [];
@@ -54,6 +56,8 @@ class CSelectOption {
 	}
 
 	/**
+	 * Add arbitrary data associated with this option.
+	 *
 	 * @param string $key
 	 * @param string $value
 	 *
