@@ -1,8 +1,17 @@
 Changes for 5.2.0beta1
 
 New features:
+...G...... [ZBXNEXT-6171] added UserParameterPath config option to agent and agent2 (yurii)
+...G...... [ZBXNEXT-6090] added modbus support for Zabbix agent 2 (MVekslers)
+...G...... [ZBXNEXT-6023] added Windows service support for Zabbix agent 2 (esneiders)
+.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
 
 Bug fixes:
+...G...... [ZBX-18337] fixed potential crash due to printing NULL pointer (viktors)
+........S. [ZBX-17993] fixed ZabbixWeb Test Item for Admin is not working (arimdjonoks)
+.........T [ZBX-13384] fixed minor template issues to follow guidelines (tuskov)
+.D..I..... [ZBX-18114] fixed documentation for Agent2 PersistentBuffer (akozlovs)
+.......PS. [ZBX-17848] fixed fping interval detection, added log prints of detected options in debug mode, re-detect options every hour (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.0alpha3
