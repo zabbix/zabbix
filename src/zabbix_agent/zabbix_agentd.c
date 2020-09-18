@@ -25,6 +25,7 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "comms.h"
+#include "modbtype.h"
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAMES		= NULL;
@@ -1123,6 +1124,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_free_service_resources(FAIL);
 			exit(EXIT_FAILURE);
 		}
+	}
+
+	if (SUCCEED != zbx_init_modbus(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize modbus: %s", error);
+		zbx_free(error);
+		zbx_free_service_resources(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != init_collector_data(&error))

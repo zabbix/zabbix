@@ -828,7 +828,11 @@ void	zbx_diag_log_info(unsigned int flags)
 	zbx_json_init(&j, 1024);
 
 	diag_prepare_default_request(&j, flags);
-	zbx_json_open(j.buffer, &jp);
+	if (FAIL == zbx_json_open(j.buffer, &jp))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
 
 	if (SUCCEED == zbx_diag_get_info(&jp, &info))
 	{
@@ -836,7 +840,11 @@ void	zbx_diag_log_info(unsigned int flags)
 		struct zbx_json_parse	jp_section;
 		const char		*pnext = NULL;
 
-		zbx_json_open(info, &jp);
+		if (FAIL == zbx_json_open(info, &jp))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+		}
 
 		while (NULL != (pnext = zbx_json_pair_next(&jp, pnext, section, sizeof(section))))
 		{
@@ -860,7 +868,7 @@ void	zbx_diag_log_info(unsigned int flags)
 	}
 	else
 		zabbix_log(LOG_LEVEL_INFORMATION, "cannot obtain diagnostic information: %s", info);
-
+out:
 	zbx_free(info);
 	zbx_json_free(&j);
 }

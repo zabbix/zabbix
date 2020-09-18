@@ -33,7 +33,7 @@ const (
 	ZABBIX_VERSION_MAJOR    = 5
 	ZABBIX_VERSION_MINOR    = 2
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = "alpha3"
+	ZABBIX_VERSION_RC       = "beta1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2020 Zabbix SIA\n" +
@@ -98,8 +98,14 @@ func Revision() string {
 	return ZABBIX_VERSION_REVISION
 }
 
+func CopyrightMessageModbus() (message string) {
+	return "\nWe use the library go-modbus (goburrow/modbus), which is\n" +
+		"distributed under the terms of the 3-Clause BSD License\n" +
+		"available at https://github.com/goburrow/modbus/blob/master/LICENSE\n"
+}
+
 func CopyrightMessage() string {
-	return copyrightMessage + tls.CopyrightMessage()
+	return copyrightMessage + tls.CopyrightMessage() + CopyrightMessageModbus()
 }
 
 func CompileDate() string {

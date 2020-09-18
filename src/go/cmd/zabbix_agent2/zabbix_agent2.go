@@ -50,6 +50,8 @@ import (
 var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
+var closeChan = make(chan bool)
+var stopChan = make(chan bool)
 
 func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
 	if log.IncreaseLogLevel() {
@@ -134,6 +136,7 @@ func run() (err error) {
 	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
 		return
 	}
+	confirmService()
 	control.Start()
 
 loop:
@@ -142,6 +145,7 @@ loop:
 		case sig := <-sigs:
 			switch sig {
 			case syscall.SIGINT, syscall.SIGTERM:
+				sendServiceStop()
 				break loop
 			}
 		case client := <-control.Client():
@@ -150,14 +154,27 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
+			sendServiceStop()
 			client.Close()
+		case serviceStop := <-closeChan:
+			if serviceStop {
+				break loop
+			}
 		}
 	}
 	control.Stop()
 	return nil
 }
 
-var confDefault string
+var (
+	confDefault string
+
+	argConfig  bool
+	argTest    bool
+	argPrint   bool
+	argVersion bool
+	argVerbose bool
+)
 
 func main() {
 	var confFlag string
@@ -214,7 +231,22 @@ func main() {
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
+	var helpFlag bool
+	const (
+		helpDefault     = false
+		helpDescription = "Display this help message"
+	)
+	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
+	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
+
+	loadOSDependentFlags()
 	flag.Parse()
+	setServiceRun(foregroundFlag)
+
+	if helpFlag {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
@@ -240,8 +272,22 @@ func main() {
 		os.Exit(0)
 	}
 
+	if err := openEventLog(); err != nil {
+		fatalExit("", err)
+	}
+
+	if err := validateExclusiveFlags(); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("", err)
+	}
+
 	if err := conf.Load(confFlag, &agent.Options); err != nil {
 		if argConfig || !(argTest || argPrint) {
+			if eerr := eventLogErr(err); eerr != nil {
+				err = fmt.Errorf("%s and %s", err, eerr)
+			}
 			fatalExit("", err)
 		}
 		// create default configuration for testing options
@@ -251,7 +297,17 @@ func main() {
 	}
 
 	if err := agent.ValidateOptions(agent.Options); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
 		fatalExit("cannot validate configuration", err)
+	}
+
+	if err := handleWindowsService(confFlag); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("", err)
 	}
 
 	if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
@@ -392,6 +448,9 @@ func main() {
 			listeners = append(listeners, listener)
 		}
 	}
+	if err = loadOSDependentItems(); err != nil {
+		fatalExit("cannot load os dependent items", err)
+	}
 
 	if foregroundFlag {
 		if agent.Options.LogType != "console" {
@@ -476,16 +535,17 @@ func main() {
 		serverConnectors[i].StopCache()
 	}
 	monitor.Wait(monitor.Output)
-
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
 
 	if foregroundFlag && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
+	waitServiceClose()
 }
 
 func fatalExit(message string, err error) {
+	fatalCloseOSItems()
 	if len(message) == 0 {
 		message = err.Error()
 	} else {
