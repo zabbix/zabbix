@@ -25,11 +25,29 @@
 abstract class CControllerDashboardAbstract extends CController {
 
 	/**
-	 * Prepare editable flag.
+	 * Get owner name.
+	 *
+	 * @param string $userid
+	 *
+	 * @return string
+	 */
+	protected static function getOwnerName($userid) {
+		$users = API::User()->get([
+			'output' => ['name', 'surname', 'alias'],
+			'userids' => $userid
+		]);
+
+		$name = $users ? getUserFullname($users[0]) : _('Inaccessible user');
+
+		return $name;
+	}
+
+	/**
+	 * Update editable flag.
 	 *
 	 * @param array $dashboards  An associative array of the dashboards.
 	 */
-	protected function prepareEditableFlag(array &$dashboards) {
+	protected static function updateEditableFlag(array &$dashboards) {
 		$dashboards_rw = API::Dashboard()->get([
 			'output' => [],
 			'dashboardids' => array_keys($dashboards),
@@ -53,7 +71,7 @@ abstract class CControllerDashboardAbstract extends CController {
 	 *
 	 * @return array
 	 */
-	protected function unsetInaccessibleFields(array $widgets): array {
+	protected static function unsetInaccessibleFields(array $widgets): array {
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],

@@ -97,144 +97,66 @@ else {
 						->setId('dashbrd-actions')
 						->setTitle(_('Actions'))
 						->setAttribute('aria-haspopup', true)
-						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
+						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
+							$data['dashboard']['editable']
+						))
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-			]))->setAttribute('aria-label', _('Content controls'))
-		)
-		->addItem((new CListItem([
-			(new CTag('nav', true, [
-				new CList([
-					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
-					(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
-						->addClass(ZBX_STYLE_BTN_ALT),
-					(new CButton('dashbrd-paste-widget', _('Paste widget')))
-						->addClass(ZBX_STYLE_BTN_ALT)
-						->setEnabled(false),
-					(new CButton('dashbrd-save', _('Save changes'))),
-					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
-					''
-				])
 			]))
 				->setAttribute('aria-label', _('Content controls'))
-				->addClass(ZBX_STYLE_DASHBRD_EDIT)
+			)
+			->addItem((new CListItem([
+				(new CTag('nav', true, [
+					new CList([
+						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
+						(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
+							->addClass(ZBX_STYLE_BTN_ALT),
+						(new CButton('dashbrd-paste-widget', _('Paste widget')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setEnabled(false),
+						(new CButton('dashbrd-save', _('Save changes'))),
+						(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
+						''
+					])
+				]))
+					->setAttribute('aria-label', _('Content controls'))
+					->addClass(ZBX_STYLE_DASHBRD_EDIT)
 			]))
 				->addStyle('display: none')
-	))
-		->setBreadcrumbs((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
-				'dashboard' => $data['dashboard']
-			]))
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
-			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-		);
+			)
+		)
+			->setBreadcrumbs((new CList())
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
+				->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
+					'dashboard' => $data['dashboard']
+				]))
+				->addClass(ZBX_STYLE_OBJECT_GROUP)
+				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+			);
 
-	$timeline = null;
-	if ($data['show_timeselector']) {
-		$timeline = (new CFilter(new CUrl()))
-			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	if ($data['time_selector'] !== null) {
+		$widget->addItem((new CFilter(new CUrl()))
+			->setProfile($data['time_selector']['profileIdx'], $data['time_selector']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
-				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
-		}
+			->addTimeSelector($data['time_selector']['from'], $data['time_selector']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+		);
+	}
 
 	$widget
-		->addItem($timeline)
 		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 		->show();
 
-	// JavaScript
-
-	// Activate blinking.
-	(new CScriptTag('jqBlink.blink();'))->show();
-
-	$dashboard_data = [
-		// Name is required for new dashboard creation.
-		'name' => $data['dashboard']['name'],
-		'userid' => $data['dashboard']['owner']['id'],
-		'dynamic_hostid' => $data['dynamic']['host'] ? $data['dynamic']['host']['id'] : null
-	];
-
-	if (array_key_exists('sharing', $data['dashboard'])) {
-		$dashboard_data['sharing'] = $data['dashboard']['sharing'];
-	}
-
-	$dashboard_options = [
-		'max-rows' => DASHBOARD_MAX_ROWS,
-		'max-columns' => DASHBOARD_MAX_COLUMNS,
-		'widget-min-rows' => DASHBOARD_WIDGET_MIN_ROWS,
-		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
-		'editable' => $data['dashboard']['editable'],
-		'edit_mode' => $data['dashboard_edit_mode'],
-		'kioskmode' => ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE)
-	];
-	if ($data['dashboard']['dashboardid'] != 0) {
-		$dashboard_data['id'] = $data['dashboard']['dashboardid'];
-	}
-	else {
-		$dashboard_options['updated'] = true;
-	}
-
-	if ($data['dynamic']['has_dynamic_widgets']) {
-		(new CScriptTag(
-			// Add event listener to perform dynamic host switch when browser back/previous buttons are pressed.
-			'window.addEventListener("popstate", e => {'.
-				'var host = (e.state && e.state.host) ? e.state.host : null,'.
-					'hostid = host ? host.id : null;'.
-				'$("#dynamic_hostid").multiSelect("addData", host ? [host] : [], false);'.
-				'$(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'").dashboardGrid("refreshDynamicWidgets", hostid);'.
-			'});'.
-
-			// Dynamic host selector on-change handler.
-			'$("#dynamic_hostid").on("change", function() {'.
-				'var hosts = jQuery(this).multiSelect("getData"),'.
-					'host = hosts.length ? hosts[0] : null,'.
-					'url = new Curl("zabbix.php", false);'.
-
-				// Make URL.
-				'url.setArgument("action", "dashboard.view");'.
-				'url.setArgument("dashboardid", '.$data['dashboard']['dashboardid'].');'.
-				($data['show_timeselector']
-					? 'url.setArgument("from", "'.$data['timeline']['from'].'");'.
-						'url.setArgument("to", "'.$data['timeline']['to'].'");'
-					: '').
-
-				'if (host) {'.
-					'url.setArgument("hostid", host.id);'.
-				'}'.
-
-				// Refresh dynamic widgets.
-				'$(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", host ? host.id : null);'.
-
-				// Push URL change.
-				'history.pushState({host: host}, "", url.getUrl());'.
-
-				// Update user profile.
-				'var hostid = host ? host.id : 1;'.
-				'updateUserProfile("'.CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY.'", hostid);'.
-			'});'
-		))->show();
-	}
-
-	// Process objects before adding widgets, not to cause dashboard to resize.
-	if ($data['show_timeselector']) {
-		(new CScriptTag(
-			'timeControl.addObject("scrollbar", '.json_encode($data['timeline']).', '.
-				json_encode($data['timeControlData']).
-			');'.
-			'timeControl.processObjects();'
-		))->show();
-	}
-
-	// Initialize dashboard grid.
 	(new CScriptTag(
-		'$(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
-			'.dashboardGrid('.json_encode($dashboard_options).')'.
-			'.dashboardGrid("setDashboardData", '.json_encode($dashboard_data).')'.
-			'.dashboardGrid("setWidgetDefaults", '.json_encode($data['widget_defaults']).')'.
-			'.dashboardGrid("addWidgets", '.json_encode($data['grid_widgets']).
+		'initializeDashboard('.
+			json_encode($data['dashboard']).','.
+			json_encode($data['widget_defaults']).','.
+			json_encode($data['time_selector']).','.
+			json_encode($data['dynamic']).','.
+			json_encode($web_layout_mode).
 		');'
-	))->show();
+	))
+		->setOnDocumentReady()
+		->show();
 }

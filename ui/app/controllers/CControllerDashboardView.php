@@ -23,23 +23,19 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardView extends CControllerDashboardAbstract {
 
-	const DYNAMIC_ITEM_HOST_PROFILE_KEY = 'web.dashbrd.hostid';
-
-	private $dashboard;
-
 	protected function init() {
 		$this->disableSIDValidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>		'db dashboard.dashboardid',
-			'source_dashboardid' =>	'db dashboard.dashboardid',
-			'hostid' =>				'db hosts.hostid',
-			'new' =>				'in 1',
-			'cancel' =>				'in 1',
-			'from' =>				'range_time',
-			'to' =>					'range_time'
+			'dashboardid' => 'db dashboard.dashboardid',
+			'source_dashboardid' => 'db dashboard.dashboardid',
+			'hostid' => 'db hosts.hostid',
+			'new' => 'in 1',
+			'cancel' => 'in 1',
+			'from' => 'range_time',
+			'to' => 'range_time'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -71,14 +67,15 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-		list($this->dashboard, $error) = $this->getDashboard();
+		[$dashboard, $error] = $this->getDashboard();
 
 		if ($error !== null) {
 			$this->setResponse(new CControllerResponseData(['error' => $error]));
 
 			return;
 		}
-		elseif ($this->dashboard === null) {
+
+		if ($dashboard === null) {
 			$this->setResponse(new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
 				->setArgument('page', $this->hasInput('cancel') ? CPagerHelper::loadPage('dashboard.list', null) : null)
@@ -86,74 +83,72 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 			return;
 		}
-		else {
-			$dashboard = $this->dashboard;
-			unset($dashboard['widgets']);
 
-			$timeselector_options = [
-				'profileIdx' => 'web.dashbrd.filter',
-				'profileIdx2' => $this->dashboard['dashboardid'],
-				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-				'to' => $this->hasInput('to') ? $this->getInput('to') : null
+		$time_selector_options = [
+			'profileIdx' => 'web.dashbrd.filter',
+			'profileIdx2' => $dashboard['dashboardid'],
+			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+			'to' => $this->hasInput('to') ? $this->getInput('to') : null
+		];
+
+		updateTimeSelectorPeriod($time_selector_options);
+
+		$data = [
+			'dashboard' => $dashboard,
+			'widget_defaults' => CWidgetConfig::getDefaults(),
+			'time_selector' => self::hasTimeSelector($dashboard['widgets'])
+				? getTimeSelectorPeriod($time_selector_options)
+				: null,
+			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+		];
+
+		if (self::hasDynamicWidgets($dashboard['widgets'])) {
+			$hostid = $this->getInput('hostid', CProfile::get('web.dashbrd.hostid', 0));
+
+			$hosts = ($hostid > 0)
+				? CArrayHelper::renameObjectsKeys(API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'hostids' => [$hostid]
+				]), ['hostid' => 'id'])
+				: [];
+
+			$data['dynamic'] = [
+				'has_dynamic_widgets' => true,
+				'host' => $hosts ? $hosts[0] : null
 			];
-			updateTimeSelectorPeriod($timeselector_options);
-
-			$widgets = self::getWidgets($this->dashboard['widgets']);
-
-			$data = [
-				'dashboard_edit_mode' => ($dashboard['dashboardid'] == 0),
-				'dashboard' => $dashboard,
-				'grid_widgets' => $widgets,
-				'widget_defaults' => CWidgetConfig::getDefaults(),
-				'show_timeselector' => self::showTimeSelector($widgets),
-				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
-				'timeline' => getTimeSelectorPeriod($timeselector_options)
-			];
-
-			$data['timeControlData'] = [
-				'mainObject' => 1,
-				'onDashboard' => 1
-			];
-
-			if (self::hasDynamicWidgets($data['grid_widgets'])) {
-				$hostid = $this->getInput('hostid', CProfile::get(self::DYNAMIC_ITEM_HOST_PROFILE_KEY, 0));
-
-				$hosts = ($hostid > 0)
-					? CArrayHelper::renameObjectsKeys(API::Host()->get([
-						'output' => ['hostid', 'name'],
-						'hostids' => [$hostid]
-					]), ['hostid' => 'id'])
-					: [];
-
-				$data['dynamic'] = [
-					'has_dynamic_widgets' => true,
-					'host' => $hosts ? $hosts[0] : null
-				];
-			}
-			else {
-				$data['dynamic'] = [
-					'has_dynamic_widgets' => false,
-					'host' => null
-				];
-			}
-
-			$response = new CControllerResponseData($data);
-			$response->setTitle(_('Dashboard'));
-			$this->setResponse($response);
 		}
+		else {
+			$data['dynamic'] = [
+				'has_dynamic_widgets' => false,
+				'host' => null
+			];
+		}
+
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Dashboard'));
+		$this->setResponse($response);
 	}
 
 	/**
 	 * Get dashboard data from API.
 	 *
-	 * @return array|null
+	 * @return array
 	 */
 	private function getDashboard() {
 		$dashboard = null;
 		$error = null;
 
 		if ($this->hasInput('new')) {
-			$dashboard = self::getNewDashboard();
+			$dashboard = [
+				'dashboardid' => 0,
+				'name' => _('New dashboard'),
+				'editable' => true,
+				'widgets' => [],
+				'owner' => [
+					'id' => CWebUser::$data['userid'],
+					'name' => self::getOwnerName(CWebUser::$data['userid'])
+				]
+			];
 		}
 		elseif ($this->hasInput('source_dashboardid')) {
 			// Clone dashboard and show as new.
@@ -166,13 +161,20 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			]);
 
 			if ($dashboards) {
-				$dashboard = self::getNewDashboard();
-				$dashboard['name'] = $dashboards[0]['name'];
-				$dashboard['widgets'] = $this->unsetInaccessibleFields($dashboards[0]['widgets']);
-				$dashboard['sharing'] = [
-					'private' => $dashboards[0]['private'],
-					'users' => $dashboards[0]['users'],
-					'userGroups' => $dashboards[0]['userGroups']
+				$dashboard = [
+					'dashboardid' => 0,
+					'name' => $dashboards[0]['name'],
+					'editable' => true,
+					'widgets' => self::prepareWidgetsForGrid(self::unsetInaccessibleFields($dashboards[0]['widgets'])),
+					'owner' => [
+						'id' => CWebUser::$data['userid'],
+						'name' => self::getOwnerName(CWebUser::$data['userid'])
+					],
+					'sharing' => [
+						'private' => $dashboards[0]['private'],
+						'users' => $dashboards[0]['users'],
+						'userGroups' => $dashboards[0]['userGroups']
+					]
 				];
 			}
 			else {
@@ -205,9 +207,14 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				]);
 
 				if ($dashboards) {
-					$this->prepareEditableFlag($dashboards);
+					self::updateEditableFlag($dashboards);
+
 					$dashboard = array_shift($dashboards);
-					$dashboard['owner'] = self::getOwnerData($dashboard['userid']);
+					$dashboard['widgets'] = self::prepareWidgetsForGrid($dashboard['widgets']);
+					$dashboard['owner'] = [
+						'id' => $dashboard['userid'],
+						'name' => self::getOwnerName($dashboard['userid'])
+					];
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
@@ -224,49 +231,13 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Get new dashboard.
-	 *
-	 * @return array
-	 */
-	public static function getNewDashboard() {
-		return [
-			'dashboardid' => 0,
-			'name' => _('New dashboard'),
-			'editable' => true,
-			'widgets' => [],
-			'owner' => self::getOwnerData(CWebUser::$data['userid'])
-		];
-	}
-
-	/**
-	 * Get owner details.
-	 *
-	 * @param string $userid
-	 *
-	 * @return array
-	 */
-	public static function getOwnerData($userid) {
-		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
-
-		$users = API::User()->get([
-			'output' => ['name', 'surname', 'alias'],
-			'userids' => $userid
-		]);
-		if ($users) {
-			$owner['name'] = getUserFullname($users[0]);
-		}
-
-		return $owner;
-	}
-
-	/**
-	 * Get widgets for dashboard.
+	 * Prepare widgets for dashboard grid.
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	private static function getWidgets($widgets) {
+	private static function prepareWidgetsForGrid($widgets) {
 		$grid_widgets = [];
 
 		if ($widgets) {
@@ -362,7 +333,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return bool
 	 */
-	private static function showTimeSelector(array $widgets) {
+	private static function hasTimeSelector(array $widgets) {
 		foreach ($widgets as $widget) {
 			if (CWidgetConfig::usesTimeSelector($widget)) {
 				return true;

@@ -93,9 +93,7 @@ class CControllerDashboardShareUpdate extends CController {
 			$result = false;
 		}
 
-		$response = [
-			'result' => $result
-		];
+		$response = [];
 
 		if (($messages = getMessages($result, $msg_box_title)) !== null) {
 			$response[$result ? 'messages' : 'errors'] = $messages->toString();

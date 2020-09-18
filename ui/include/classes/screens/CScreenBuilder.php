@@ -619,22 +619,6 @@ class CScreenBuilder {
 	}
 
 	/**
-	 * Insert javascript to create scroll in time control.
-	 *
-	 * @static
-	 *
-	 * @param array $timeline
-	 */
-	private static function insertScreenScrollJs(array $timeline) {
-		$obj_data = [
-			'id' => 'scrollbar',
-			'mainObject' => 1
-		];
-
-		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($obj_data).');');
-	}
-
-	/**
 	 * Insert javascript to init screens.
 	 *
 	 * @static
@@ -671,7 +655,6 @@ class CScreenBuilder {
 	 * @static
 	 */
 	public static function insertScreenStandardJs(array $timeline) {
-		CScreenBuilder::insertScreenScrollJs($timeline);
 		CScreenBuilder::insertProcessObjectsJs();
 	}
 

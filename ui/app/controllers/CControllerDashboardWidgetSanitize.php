@@ -52,7 +52,7 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 
 	protected function doAction() {
 		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'));
-		$widget_fields = $this->unsetInaccessibleFields([['fields' => $form->fieldsToApi()]]);
+		$widget_fields = self::unsetInaccessibleFields([['fields' => $form->fieldsToApi()]]);
 
 		$output = [
 			'fields' => []

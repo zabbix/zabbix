@@ -113,9 +113,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		if ($data['dashboards']) {
-			$this->prepareEditableFlag($data['dashboards']);
-		}
+		self::updateEditableFlag($data['dashboards']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));

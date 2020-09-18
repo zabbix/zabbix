@@ -572,7 +572,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	if (editMode) {
 		widget_actions.push({
 			label: t('S_PASTE'),
-			disabled: !$dashboard.dashboardGrid('isWidgetCopied'),
+			disabled: !$dashboard.dashboardGrid('hasCopiedWidget'),
 			clickCallback: function() {
 				$dashboard.dashboardGrid('pasteWidget', widget, widget.pos);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
@@ -651,10 +651,10 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 			{
 				label: t('Sharing'),
 				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
 					var popup_options = {'dashboardid': options.dashboardid};
 					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
-
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 				},
 				disabled: !options.editable
 			},
@@ -668,12 +668,8 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 			},
 			{
 				label: t('Delete'),
-				url: 'javascript:void(0)',
 				clickCallback: function () {
-					var	obj = jQuery(this);
-
-					// hide menu
-					obj.closest('.menu-popup').hide();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
 					if (!confirm(t('Delete dashboard?'))) {
 						return false;

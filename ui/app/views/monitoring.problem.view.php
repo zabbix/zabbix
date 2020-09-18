@@ -382,8 +382,7 @@ if ($data['action'] === 'problem.view') {
 			'id' => 'timeline_1',
 			'loadSBox' => 0,
 			'loadImage' => 0,
-			'dynamic' => 0,
-			'mainObject' => 1
+			'dynamic' => 0
 		];
 
 		(new CScriptTag(

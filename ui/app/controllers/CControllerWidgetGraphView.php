@@ -87,8 +87,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'objDims' => $graph_dims,
 			'loadSBox' => 0,
 			'loadImage' => 1,
-			'reloadOnAdd' => 1,
-			'onDashboard' => 1
+			'reloadOnAdd' => 1
 		];
 
 		// data for flickerscreen

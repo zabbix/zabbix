@@ -105,7 +105,7 @@
 								'title': t('Edit')
 							}).on('click', function() {
 								if (!methods.isEditMode.call($obj)) {
-									showEditMode();
+									methods.editDashboard.call($obj);
 								}
 								doAction('beforeConfigLoad', $obj, data, widget);
 								methods.editWidget.call($obj, widget, this);
@@ -1385,8 +1385,7 @@
 				}
 			});
 
-			if (changed === true) {
-				// mark dashboard as updated
+			if (changed) {
 				data['options']['updated'] = true;
 				this['pos'] = this['current_pos'];
 			}
@@ -2471,7 +2470,6 @@
 					updateWidgetContent($obj, data, widget);
 				}
 
-				// Mark dashboard as updated.
 				data['options']['updated'] = true;
 			})
 			.always(function() {
@@ -2571,7 +2569,7 @@
 		data.dialogue.div = overlay.$dialogue;
 		data.dialogue.body = overlay.$dialogue.$body;
 
-		updateWidgetConfigDialogue();
+		methods.updateWidgetConfigDialogue.call($obj);
 	}
 
 	/**
@@ -2751,7 +2749,7 @@
 		return this;
 	};
 
-	function setModeEditDashboard($obj, data) {
+	function editDashboard($obj, data) {
 		$obj.addClass('dashbrd-mode-edit');
 
 		// Recalculate minimal height and expand dashboard to the whole screen.
@@ -2788,7 +2786,7 @@
 			data['pos-action'] = 'addmodal';
 			setResizableState('enable', data.widgets, '');
 
-			if (isWidgetCopied($obj)) {
+			if (getCopiedWidget(data) !== null) {
 				var menu = getDashboardWidgetActionMenu(dimension),
 					options = {
 						position: {
@@ -3116,82 +3114,6 @@
 		}
 	}
 
-	function saveChanges($obj, data) {
-		var	url = new Curl('zabbix.php'),
-			ajax_widgets = [];
-
-		// Remove previous messages.
-		dashboardRemoveMessages();
-
-		url.setArgument('action', 'dashboard.update');
-
-		$.each(data['widgets'], function(index, widget) {
-			var	ajax_widget = {};
-
-			if (widget['widgetid'] !== '') {
-				ajax_widget['widgetid'] = widget['widgetid'];
-			}
-			ajax_widget['pos'] = widget['pos'];
-			ajax_widget['type'] = widget['type'];
-			ajax_widget['name'] = widget['header'];
-			ajax_widget['view_mode'] = widget['view_mode'];
-			if (Object.keys(widget['fields']).length != 0) {
-				ajax_widget['fields'] = JSON.stringify(widget['fields']);
-			}
-
-			ajax_widgets.push(ajax_widget);
-		});
-
-		var ajax_data = {
-				// Can be undefined if dashboard is new.
-				dashboardid: data['dashboard']['id'],
-				name: data['dashboard']['name'],
-				userid: data['dashboard']['userid'],
-				widgets: ajax_widgets
-			};
-
-		if (isset('sharing', data['dashboard'])) {
-			ajax_data['sharing'] = data['dashboard']['sharing'];
-		}
-
-		setDashboardBusy(data, 'saveChanges', null);
-
-		$.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			dataType: 'json',
-			data: ajax_data
-		})
-			.then(function(response) {
-				if ('redirect' in response) {
-					// Prevent from asking to navigate away from the current page.
-					data['options']['updated'] = false;
-
-					if ('system-message-ok' in response) {
-						postMessageOk(response['system-message-ok']);
-					}
-
-					/*
-					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
-					 * It allows to use back browser button more user-friendly.
-					 */
-					window.location.replace(response.redirect);
-				}
-				else if ('errors' in response) {
-					dashboardAddMessages(response.errors);
-				}
-			})
-			.always(function() {
-				clearDashboardBusy(data, 'saveChanges', null);
-			});
-	}
-
-	function confirmExit($obj, data) {
-		if (data['options']['updated'] === true) {
-			return t('You have unsaved changes.') + "\n" + t('Are you sure, you want to leave this page?');
-		}
-	}
-
 	function generateUniqueId($obj, data) {
 		var ref = false;
 
@@ -3377,15 +3299,14 @@
 	}
 
 	/**
-	 * Check if widget is copied.
+	 * Get copied widget.
 	 *
-	 * @param {type} $obj  Dashboard object.
+	 * @param {object} data  Dashboard data and options object.
 	 *
-	 * @returns {boolean}
+	 * @returns {object}  Copied widget or null.
 	 */
-	function isWidgetCopied($obj) {
-		var buffer = $obj.data('dashboardGrid').storage.readKey('dashboard.copied_widget');
-		return (typeof buffer === 'object' && buffer !== null);
+	function getCopiedWidget(data) {
+		return data.storage.readKey('dashboard.copied_widget', null);
 	}
 
 	/**
@@ -3451,20 +3372,19 @@
 	}
 
 	var	methods = {
-		init: function(options) {
-			options = $.extend({
-				'widget-height': 70,
-				'rows': 0,
-				'updated': false
-			}, options);
-
-			options['widget-width'] = 100 / options['max-columns'];
+		init: function(data) {
+			var dashboard = data.dashboard,
+				options = $.extend(data.options, {
+					'rows': 0,
+					'updated': false,
+					'widget-width': 100 / data.options['max-columns']
+				});
 
 			return this.each(function() {
 				var	$this = $(this),
 					add_new_widget_callback = function(e) {
 						if (!methods.isEditMode.call($this)) {
-							showEditMode();
+							methods.editDashboard.call($this);
 						}
 						methods.addNewWidget.call($this, e.target);
 
@@ -3493,7 +3413,7 @@
 				new_widget_placeholder.showAtDefaultPosition();
 
 				$this.data('dashboardGrid', {
-					dashboard: {},
+					dashboard: dashboard,
 					options: options,
 					widget_defaults: {},
 					widgets: [],
@@ -3515,29 +3435,20 @@
 				var	data = $this.data('dashboardGrid'),
 					resize_timeout;
 
-				$(window)
-					.on('beforeunload', function() {
-						var	res = confirmExit($this, data);
+				$(window).on('resize', function() {
+					clearTimeout(resize_timeout);
+					resize_timeout = setTimeout(function() {
+						data.widgets.forEach(function(widget) {
+							resizeWidget($this, data, widget);
+						});
+					}, 200);
 
-						// Return value only if we need confirmation window, return nothing otherwise.
-						if (typeof res !== 'undefined') {
-							return res;
-						}
-					})
-					.on('resize', function() {
-						clearTimeout(resize_timeout);
-						resize_timeout = setTimeout(function() {
-							data.widgets.forEach(function(widget) {
-								resizeWidget($this, data, widget);
-							});
-						}, 200);
-
-						// Recalculate dashboard container minimal required height.
-						data.minimalHeight = calculateGridMinHeight($this);
-						data['cell-width'] = getCurrentCellWidth(data);
-						data.new_widget_placeholder.resize();
-						resizeDashboardGrid($this, data);
-					});
+					// Recalculate dashboard container minimal required height.
+					data.minimalHeight = calculateGridMinHeight($this);
+					data['cell-width'] = getCurrentCellWidth(data);
+					data.new_widget_placeholder.resize();
+					resizeDashboardGrid($this, data);
+				});
 
 				['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition'].forEach(action => {
 					methods.addAction.call($this, action, () => hideMessageExhausted(data), null, {});
@@ -3546,21 +3457,18 @@
 		},
 
 		/**
-		 * Check if widget is copied.
+		 * Check if the dashboard has copied widget.
 		 *
 		 * @returns {boolean}
 		 */
-		isWidgetCopied: function() {
-			var ret = false;
+		hasCopiedWidget: function() {
+			var	$this = this.first(),
+				data = $this.data('dashboardGrid');
 
-			this.each(function() {
-				ret = isWidgetCopied($(this));
-			});
-
-			return ret;
+			return (getCopiedWidget(data) !== null);
 		},
 
-		refreshDynamicWidgets: function(hostid) {
+		updateDynamicHost: function(hostid) {
 			var	$this = $(this),
 				data = $this.data('dashboardGrid');
 
@@ -3570,21 +3478,6 @@
 				if (widget.fields.dynamic == 1) {
 					updateWidgetContent($this, data, widget);
 				}
-			});
-		},
-
-		setDashboardData: function(dashboard) {
-			return this.each(function() {
-				var	$this = $(this),
-					data = $this.data('dashboardGrid');
-
-				if (!$.isEmptyObject(data['dashboard']) && (data['dashboard']['name'] !== dashboard['name']
-						|| data['dashboard']['userid'] !== dashboard['userid'])) {
-					data['options']['updated'] = true;
-				}
-
-				dashboard = $.extend({}, data['dashboard'], dashboard);
-				data['dashboard'] = dashboard;
 			});
 		},
 
@@ -3768,54 +3661,33 @@
 			});
 		},
 
-		// Make widgets editable - Header icons, Resizeable, Draggable.
-		setModeEditDashboard: function() {
+		editDashboard: function() {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
 				data['options']['edit_mode'] = true;
 				doAction('onEditStart', $this, data, null);
-				dashboardRemoveMessages();
-				setModeEditDashboard($this, data);
+				editDashboard($this, data);
+
+				$.publish('dashboard.grid.editDashboard');
 			});
 		},
 
-		// Save changes and remove editable elements from widget - Header icons, Resizeable, Draggable.
-		saveDashboardChanges: function() {
+		isDashboardUpdated: function() {
+			var	$this = this.first(),
+				data = $this.data('dashboardGrid');
+
+			return data.options.updated;
+		},
+
+		saveDashboard: function(callback) {
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
 				doAction('beforeDashboardSave', $this, data, null);
-				saveChanges($this, data);
-			});
-		},
-
-		// Discard changes and remove editable elements from widget - Header icons, Resizeable, Draggable.
-		cancelEditDashboard: function() {
-			return this.each(function() {
-				var	$this = $(this),
-					data = $this.data('dashboardGrid'),
-					current_url = new Curl(),
-					url = new Curl('zabbix.php', false);
-
-				// Don't show warning about existing updates.
-				data['options']['updated'] = false;
-
-				url.setArgument('action', 'dashboard.view');
-				if (current_url.getArgument('dashboardid')) {
-					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
-				}
-				else {
-					url.setArgument('cancel', '1');
-				}
-
-				// Redirect to last active dashboard.
-				// (1) In case of New Dashboard from list, it will open list
-				// (2) In case of New Dashboard or Clone Dashboard from other dashboard, it will open that dashboard
-				// (3) In case of simple editing of current dashboard, it will reload same dashboard
-				location.replace(url.getUrl());
+				callback(data.widgets);
 			});
 		},
 
@@ -3843,7 +3715,7 @@
 
 				doAction('onWidgetCopy', $this, data, widget);
 
-				var w = {
+				data.storage.writeKey('dashboard.copied_widget', {
 					type: widget.type,
 					pos: {
 						width: widget.pos.width,
@@ -3854,9 +3726,9 @@
 					rf_rate: widget.rf_rate,
 					fields: widget.fields,
 					configuration: widget.configuration
-				};
+				});
 
-				$(this).data('dashboardGrid').storage.writeKey('dashboard.copied_widget', w);
+				$.publish('dashboard.grid.copyWidget');
 			});
 		},
 
@@ -3875,7 +3747,7 @@
 
 				hideMessageExhausted(data);
 
-				var new_widget = data.storage.readKey('dashboard.copied_widget');
+				var new_widget = getCopiedWidget(data);
 
 				// Regenerate reference field values.
 				if ('reference' in new_widget.fields) {
@@ -3968,14 +3840,13 @@
 						new_widget['update_paused'] = false;
 						enableWidgetControls(new_widget);
 						updateWidgetContent($this, data, new_widget);
+
+						data['options']['updated'] = true;
 					})
 					.fail(function() {
 						deleteWidget($this, data, new_widget);
 					})
 					.always(function() {
-						// Mark dashboard as updated.
-						data['options']['updated'] = true;
-
 						clearDashboardBusy(data, 'pasteWidget', dashboard_busy_item);
 					});
 			});
@@ -4110,16 +3981,14 @@
 
 		// Returns list of widgets filterd by key=>value pair
 		getWidgetsBy: function(key, value) {
-			var widgets_found = [];
-			this.each(function() {
-				var	$this = $(this),
-					data = $this.data('dashboardGrid');
+			var	$this = this.first(),
+				data = $this.data('dashboardGrid'),
+				widgets_found = [];
 
-				$.each(data['widgets'], function(index, widget) {
-					if (typeof widget[key] !== 'undefined' && widget[key] === value) {
-						widgets_found.push(widget);
-					}
-				});
+			$.each(data['widgets'], function(index, widget) {
+				if (widget[key] === value) {
+					widgets_found.push(widget);
+				}
 			});
 
 			return widgets_found;
@@ -4334,13 +4203,10 @@
 		},
 
 		isEditMode: function() {
-			var response = false;
+			var	$this = this.first(),
+				data = $this.data('dashboardGrid');
 
-			this.each(function() {
-				response = $(this).data('dashboardGrid')['options']['edit_mode'];
-			});
-
-			return response;
+			return data.options.edit_mode;
 		},
 
 		/**
