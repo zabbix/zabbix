@@ -278,6 +278,12 @@
 			add_templates = <?= json_encode($data['macros_tab']['add_templates']) ?>,
 			macros_initialized = false;
 
+		$('#host, #template_name')
+			.on('input keydown paste', function() {
+				$('#visiblename').attr('placeholder', $(this).val());
+			})
+			.trigger('input');
+
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
 			var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 

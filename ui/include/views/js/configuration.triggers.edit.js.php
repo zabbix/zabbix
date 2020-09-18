@@ -26,6 +26,12 @@
 
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
+		$('#description')
+			.on('input keydown paste', function() {
+				$('#event_name').attr('placeholder', $(this).val());
+			})
+			.trigger('input');
+
 		// Refresh field visibility on document load.
 		changeRecoveryMode();
 		changeCorrelationMode();
@@ -83,6 +89,8 @@
 				triggers_initialized = true;
 			}
 		});
+
+
 	});
 
 	/**
