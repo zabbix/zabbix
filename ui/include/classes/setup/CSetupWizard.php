@@ -19,14 +19,23 @@
 **/
 
 
+/**
+ * Setup wizzard form.
+ */
 class CSetupWizard extends CForm {
 
-	function __construct() {
-		$this->DISABLE_CANCEL_BUTTON = false;
-		$this->DISABLE_BACK_BUTTON = false;
-		$this->SHOW_RETRY_BUTTON = false;
-		$this->STEP_FAILED = false;
-		$this->frontendSetup = new CFrontendSetup();
+	protected $DISABLE_CANCEL_BUTTON = false;
+
+	protected $DISABLE_BACK_BUTTON = false;
+
+	protected $SHOW_RETRY_BUTTON = false;
+
+	protected $STEP_FAILED = false;
+
+	protected $frontend_setup;
+
+	public function __construct() {
+		$this->frontend_setup = new CFrontendSetup();
 
 		$this->stage = [
 			0 => [
@@ -61,19 +70,19 @@ class CSetupWizard extends CForm {
 		parent::setId('setup-form');
 	}
 
-	function getConfig($name, $default = null) {
+	private function getConfig(string $name, $default = null) {
 		return CSession::keyExists($name) ? CSession::getValue($name) : $default;
 	}
 
-	function setConfig($name, $value) {
+	private function setConfig(string $name, $value) {
 		CSession::setValue($name, $value);
 	}
 
-	function getStep() {
+	private function getStep(): int {
 		return $this->getConfig('step', 0);
 	}
 
-	function doNext() {
+	private function doNext(): bool {
 		if (isset($this->stage[$this->getStep() + 1])) {
 			$this->setConfig('step', $this->getStep('step') + 1);
 
@@ -83,7 +92,7 @@ class CSetupWizard extends CForm {
 		return false;
 	}
 
-	function doBack() {
+	private function doBack(): bool {
 		if (isset($this->stage[$this->getStep() - 1])) {
 			$this->setConfig('step', $this->getStep('step') - 1);
 
@@ -93,7 +102,7 @@ class CSetupWizard extends CForm {
 		return false;
 	}
 
-	protected function bodyToString($destroy = true) {
+	protected function bodyToString(bool $destroy = true): string {
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
 			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
@@ -136,7 +145,7 @@ class CSetupWizard extends CForm {
 		return parent::bodyToString($destroy).$setup_container->toString();
 	}
 
-	function getList() {
+	private function getList(): CList {
 		$list = new CList();
 
 		foreach ($this->stage as $id => $data) {
@@ -146,19 +155,19 @@ class CSetupWizard extends CForm {
 		return $list;
 	}
 
-	function getStage() {
+	private function getStage(): array {
 		$function = $this->stage[$this->getStep()]['fnc'];
 		return $this->$function();
 	}
 
-	function stage0() {
+	private function stage0(): array {
 		preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version);
 		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix '.$version[0]]))->addClass(ZBX_STYLE_SETUP_TITLE);
 
-		return (new CDiv($setup_title))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY);
+		return [(new CDiv($setup_title))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)];
 	}
 
-	function stage1() {
+	private function stage1(): array {
 		$table = (new CTable())
 			->addClass(ZBX_STYLE_LIST_TABLE)
 			->setHeader(['', _('Current value'), _('Required'), '']);
@@ -166,7 +175,7 @@ class CSetupWizard extends CForm {
 		$messages = [];
 		$finalResult = CFrontendSetup::CHECK_OK;
 
-		foreach ($this->frontendSetup->checkRequirements() as $req) {
+		foreach ($this->frontend_setup->checkRequirements() as $req) {
 			if ($req['result'] == CFrontendSetup::CHECK_OK) {
 				$class = ZBX_STYLE_GREEN;
 				$result = 'OK';
@@ -208,7 +217,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage2() {
+	private function stage2(): array {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
 
 		$table = (new CFormList())
@@ -322,7 +331,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage3() {
+	private function stage3(): array {
 		$table = new CFormList();
 
 		$table->addRow(_('Host'),
@@ -350,7 +359,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage4() {
+	private function stage4(): array {
 		$db_type = $this->getConfig('DB_TYPE');
 		$databases = CFrontendSetup::getSupportedDatabases();
 
@@ -401,7 +410,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function stage5() {
+	private function stage5(): array {
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
 		$config_file_name = APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
@@ -470,7 +479,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function dbConnect() {
+	private function dbConnect() {
 		global $DB;
 
 		if (!$this->getConfig('check_fields_result')) {
@@ -478,7 +487,7 @@ class CSetupWizard extends CForm {
 		}
 
 		$DB['TYPE'] = $this->getConfig('DB_TYPE');
-		if (is_null($DB['TYPE'])) {
+		if ($DB['TYPE'] === null) {
 			return false;
 		}
 
@@ -497,6 +506,23 @@ class CSetupWizard extends CForm {
 
 		$error = '';
 
+		// Check certificate files exists.
+		if ($DB['ENCRYPTION'] && ($DB['TYPE'] === ZBX_DB_MYSQL || $DB['TYPE'] === ZBX_DB_POSTGRESQL)) {
+			if (($this->getConfig('DB_ENCRYPTION_ADVANCED') || $DB['CA_FILE'] !== '') && !file_exists($DB['CA_FILE'])) {
+				return _s('Incorrect file path for "%1$s": %2$s.', _('Database TLS CA file'), $DB['CA_FILE']);
+			}
+
+			if ($DB['KEY_FILE'] !== '' && !file_exists($DB['KEY_FILE'])) {
+				return _s('Incorrect file path for "%1$s": %2$s.', _('Database TLS key file'), $DB['KEY_FILE']);
+			}
+
+			if ($DB['CERT_FILE'] !== '' && !file_exists($DB['CERT_FILE'])) {
+				return _s('Incorrect file path for "%1$s": %2$s.', _('Database TLS certificate file'),
+					$DB['CERT_FILE']
+				);
+			}
+		}
+
 		// During setup set debug to false to avoid displaying unwanted PHP errors in messages.
 		if (DBconnect($error)) {
 			return true;
@@ -506,7 +532,7 @@ class CSetupWizard extends CForm {
 		}
 	}
 
-	function dbClose() {
+	private function dbClose(): void {
 		global $DB;
 
 		DBclose();
@@ -514,7 +540,7 @@ class CSetupWizard extends CForm {
 		$DB = null;
 	}
 
-	function checkConnection() {
+	private function checkConnection() {
 		global $DB;
 
 		$result = true;
@@ -539,7 +565,7 @@ class CSetupWizard extends CForm {
 		return $result;
 	}
 
-	function eventHandler() {
+	private function eventHandler(): void {
 		if (hasRequest('back') && array_key_exists($this->getStep(), getRequest('back'))) {
 			$this->doBack();
 		}
@@ -547,7 +573,7 @@ class CSetupWizard extends CForm {
 		if ($this->getStep() == 1) {
 			if (hasRequest('next') && array_key_exists(1, getRequest('next'))) {
 				$finalResult = CFrontendSetup::CHECK_OK;
-				foreach ($this->frontendSetup->checkRequirements() as $req) {
+				foreach ($this->frontend_setup->checkRequirements() as $req) {
 					if ($req['result'] > $finalResult) {
 						$finalResult = $req['result'];
 					}
