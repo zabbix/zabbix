@@ -139,20 +139,20 @@ class ZSelect extends HTMLElement {
 		return option ? option.value : null;
 	}
 
-	addOption({value, label, label_extra, class_name, is_disabled}, container, template) {
+	addOption({value, label, extra, class_name, is_disabled}, container, template) {
 		value = value.toString();
 
 		if (this._options_map.has(value)) {
 			throw new Error('Duplicate option value: ' + value);
 		}
 
-		const option = {value, label, label_extra, class_name, is_disabled, template};
+		const option = {value, label, extra, class_name, is_disabled, template};
 		const li = document.createElement('li');
 
 		li._index = this._options_map.size;
 		li.setAttribute('value', value);
 		li.innerHTML = new Template(template || this._option_template).evaluate(
-			Object.assign({label: label.trim()}, label_extra || {})
+			Object.assign({label: label.trim()}, extra || {})
 		);
 		class_name && li.classList.add(class_name);
 		is_disabled && li.setAttribute('disabled', 'disabled');

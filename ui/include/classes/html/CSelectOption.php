@@ -37,7 +37,7 @@ class CSelectOption {
 	/**
 	 * @var array
 	 */
-	protected $label_extra = [];
+	protected $extra = [];
 
 	/**
 	 * @var bool
@@ -59,8 +59,8 @@ class CSelectOption {
 	 *
 	 * @return self
 	 */
-	public function setLabelExtra(string $key, string $value): self {
-		$this->label_extra[$key] = $value;
+	public function setExtra(string $key, string $value): self {
+		$this->extra[$key] = $value;
 
 		return $this;
 	}
@@ -85,8 +85,8 @@ class CSelectOption {
 			'label' => $this->label
 		];
 
-		if ($this->label_extra) {
-			$option['label_extra'] = $this->label_extra;
+		if ($this->extra) {
+			$option['extra'] = $this->extra;
 		}
 
 		if ($this->disabled) {
