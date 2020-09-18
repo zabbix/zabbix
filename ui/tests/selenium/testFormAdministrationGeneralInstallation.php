@@ -48,7 +48,6 @@ class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 		'PHP gd JPEG support',
 		'PHP gd GIF support',
 		'PHP gd FreeType support',
-		'PHP LibYAML',
 		'PHP libxml',
 		'PHP xmlwriter',
 		'PHP xmlreader',

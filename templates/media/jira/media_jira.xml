@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-03T02:19:33Z</date>
+    <date>2020-09-01T14:39:51Z</date>
     <media_types>
         <media_type>
             <name>Jira</name>
@@ -108,7 +108,8 @@
                 Jira.labels = [];&#13;
 &#13;
                 tags.forEach(function (tag) {&#13;
-                    if (typeof tag.tag !== 'undefined' &amp;&amp; typeof tag.value !== 'undefined' ) {&#13;
+                    if (typeof tag.tag !== 'undefined' &amp;&amp; typeof tag.value !== 'undefined'&#13;
+                        &amp;&amp; !tag.tag.startsWith('__zbx')) {&#13;
                         label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');&#13;
                         if (label.length &lt; 256) {&#13;
                             Jira.labels.push(label);&#13;
@@ -153,10 +154,7 @@
             if (schema) {&#13;
                 Object.keys(fields)&#13;
                     .forEach(function(field) {&#13;
-                        data.fields[field] = fields[field];&#13;
-&#13;
-                        if (typeof schema[field] === 'object' &amp;&amp; typeof schema[field].schema === 'object'&#13;
-                            &amp;&amp; (schema[field].schema.type === 'number' || schema[field].schema.type === 'datetime')) {&#13;
+                        if (typeof schema[field] === 'object' &amp;&amp; typeof schema[field].schema === 'object') {&#13;
                             switch (schema[field].schema.type) {&#13;
                                 case 'number':&#13;
                                     data.fields[field] = parseInt(fields[field]);&#13;
@@ -166,10 +164,23 @@
                                     if (fields[field].match(/\d+[.-]\d+[.-]\d+T\d+:\d+:\d+/) !== null) {&#13;
                                         data.fields[field] = fields[field].replace(/\./g, '-');&#13;
                                     }&#13;
+                                    break;&#13;
+&#13;
+                                case 'option':&#13;
+                                    data.fields[field] = {value: fields[field]};&#13;
+                                    break;&#13;
+&#13;
+                                case 'array':&#13;
+                                    if (schema[field].schema.items === 'option') {&#13;
+                                        data.fields[field] = [{value: fields[field]}];&#13;
+                                    }&#13;
                                     else {&#13;
-                                        delete data.fields[field];&#13;
+                                        data.fields[field] = [fields[field]];&#13;
                                     }&#13;
                                     break;&#13;
+&#13;
+                                default:&#13;
+                                    data.fields[field] = fields[field];&#13;
                             }&#13;
                         }&#13;
                     });&#13;
@@ -259,7 +270,8 @@
 &#13;
     getSchema: function() {&#13;
         var result = Jira.request('get', 'issue/createmeta?expand=projects.issuetypes.fields&amp;projectKeys=' +&#13;
-                Jira.params.project_key + '&amp;issuetypeNames=' + Jira.params.issue_type);&#13;
+            encodeURIComponent(Jira.params.project_key) + '&amp;issuetypeNames=' +&#13;
+            encodeURIComponent(Jira.params.issue_type));&#13;
 &#13;
         return result.response;&#13;
     },&#13;
@@ -297,7 +309,7 @@
             data.fields.summary = summary;&#13;
         }&#13;
 &#13;
-        Jira.request('put', 'issue/' + Jira.params.issue_key, Jira.addCustomFields(data, fields));&#13;
+        Jira.request('put', 'issue/' + encodeURIComponent(Jira.params.issue_key), Jira.addCustomFields(data, fields));&#13;
         Jira.commentIssue(update);&#13;
     },&#13;
 &#13;
@@ -306,7 +318,7 @@
 &#13;
         if (typeof update === 'string') {&#13;
             data.body = update;&#13;
-            Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
+            Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);&#13;
         }&#13;
         else if (update.status === '1') {&#13;
             data.body = update.user + ' ' + update.action + '.';&#13;
@@ -315,7 +327,7 @@
                 data.body += '\nMessage: {quote}' + Jira.escapeMarkup(update.message) + '{quote}';&#13;
             }&#13;
 &#13;
-            Jira.request('post', 'issue/' + Jira.params.issue_key + '/comment', data);&#13;
+            Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);&#13;
         }&#13;
     }&#13;
 };&#13;

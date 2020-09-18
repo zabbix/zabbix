@@ -1032,7 +1032,7 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	foreach ($items_by_name as $name => $hostid_to_itemids) {
+	foreach ($items_by_name as $hostid_to_itemids) {
 		foreach ($db_hosts as $host) {
 			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
 				continue;
@@ -1175,10 +1175,10 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	$db_items = getDataOverviewItems($groupids, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name'], $items_by_name)) {
-			$items_by_name[$db_item['name']] = [];
+		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
+			$items_by_name[$db_item['name_expanded']] = [];
 		}
-		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
 	}
 
 	$hidden_items_cnt = count(array_splice($items_by_name, (int) CSettingsHelper::get(
@@ -1220,10 +1220,10 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$db_items = getDataOverviewItems(null, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name'], $items_by_name)) {
-			$items_by_name[$db_item['name']] = [];
+		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
+			$items_by_name[$db_item['name_expanded']] = [];
 		}
-		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
 	}
 
 	$items_by_name_ctn = count($items_by_name);

@@ -5389,7 +5389,22 @@ class testDiscoveryRule extends CAPITest {
 		foreach ($expected_overrides as &$override) {
 			usort($override['filter']['conditions'], function ($a, $b) {
 				return $a['formulaid'] <=> $b['formulaid'];
-			});;
+			});
+
+			foreach ($override['operations'] as &$operation) {
+				if (array_key_exists('optag', $operation)) {
+					usort($operation['optag'], function ($a, $b) {
+						return $a['tag'] <=> $b['tag'];
+					});
+				}
+
+				if (array_key_exists('optemplate', $operation)) {
+					usort($operation['optemplate'], function ($a, $b) {
+						return $a['templateid'] <=> $b['templateid'];
+					});
+				}
+			}
+			unset($operation);
 		}
 		unset($override);
 
@@ -5412,7 +5427,22 @@ class testDiscoveryRule extends CAPITest {
 			foreach ($lld_rule['overrides'] as &$override) {
 				usort($override['filter']['conditions'], function ($a, $b) {
 					return $a['formulaid'] <=> $b['formulaid'];
-				});;
+				});
+
+				foreach ($override['operations'] as &$operation) {
+					if (array_key_exists('optag', $operation)) {
+						usort($operation['optag'], function ($a, $b) {
+							return $a['tag'] <=> $b['tag'];
+						});
+					}
+
+					if (array_key_exists('optemplate', $operation)) {
+						usort($operation['optemplate'], function ($a, $b) {
+							return $a['templateid'] <=> $b['templateid'];
+						});
+					}
+				}
+				unset($operation);
 			}
 			unset($override);
 

@@ -23,6 +23,12 @@
 #include "common.h"
 #include "mutexs.h"
 
+#define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
+
+#define MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
+#define MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
+#define MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - MEM_MIN_BUCKET_SIZE) / 8 + 1)
+
 typedef struct
 {
 	void		**buckets;
@@ -44,6 +50,19 @@ typedef struct
 }
 zbx_mem_info_t;
 
+typedef struct
+{
+	zbx_uint64_t	free_size;
+	zbx_uint64_t	used_size;
+	zbx_uint64_t	min_chunk_size;
+	zbx_uint64_t	max_chunk_size;
+	zbx_uint64_t	overhead;
+	unsigned int	chunks_num[MEM_BUCKET_COUNT];
+	unsigned int	free_chunks;
+	unsigned int	used_chunks;
+}
+zbx_mem_stats_t;
+
 int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param, int allow_oom,
 		char **error);
 
@@ -64,9 +83,11 @@ void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 
 void	zbx_mem_clear(zbx_mem_info_t *info);
 
+void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats);
 void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info);
 
 size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param);
+zbx_uint64_t	zbx_mem_required_chunk_size(zbx_uint64_t size);
 
 #define ZBX_MEM_FUNC1_DECL_MALLOC(__prefix)				\
 static void	*__prefix ## _mem_malloc_func(void *old, size_t size)

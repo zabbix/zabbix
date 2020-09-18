@@ -30,6 +30,7 @@ if (!empty($data['hostid'])) {
 }
 
 $form = (new CForm())
+	->setId('item-prototype-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -303,12 +304,8 @@ $form_list
 		new CLabel(_('HTTP authentication'), 'http_authtype'),
 		[
 			$readonly ? new CVar('http_authtype', $data['http_authtype']) : null,
-			(new CComboBox($readonly ? '' : 'http_authtype', $data['http_authtype'], null, [
-				HTTPTEST_AUTH_NONE => _('None'),
-				HTTPTEST_AUTH_BASIC => _('Basic'),
-				HTTPTEST_AUTH_NTLM => _('NTLM'),
-				HTTPTEST_AUTH_KERBEROS => _('Kerberos')
-			]))->setEnabled(!$readonly)
+			(new CComboBox($readonly ? '' : 'http_authtype', $data['http_authtype'], null, httptest_authentications()))
+				->setEnabled(!$readonly)
 		],
 		'http_authtype_row'
 	)
@@ -709,7 +706,8 @@ $tab = (new CTabView())
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
 				getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
-			)
+			),
+		TAB_INDICATOR_PREPROCESSING
 	);
 
 if (!hasRequest('form_refresh')) {

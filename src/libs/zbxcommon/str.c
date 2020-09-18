@@ -1171,19 +1171,22 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
 char	*zbx_age2str(int age)
 {
 	size_t		offset = 0;
-	int		days, hours, minutes;
+	int		days, hours, minutes, seconds;
 	static char	buffer[32];
 
 	days = (int)((double)age / SEC_PER_DAY);
 	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
-	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
+	minutes = (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
+	seconds = (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR - minutes * SEC_PER_MIN));
 
 	if (0 != days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
 	if (0 != days || 0 != hours)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
+	if (0 != days || 0 != hours || 0 != minutes)
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm ", minutes);
 
-	zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm", minutes);
+	zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%ds", seconds);
 
 	return buffer;
 }

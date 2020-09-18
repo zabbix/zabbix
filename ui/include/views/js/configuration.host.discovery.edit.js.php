@@ -137,6 +137,9 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 						updateExpression();
 					}
+
+					// Change value attribute to trigger MutationObserver event for tab indicator.
+					$(this).attr('value', $(this).val());
 				})
 				.ready(function() {
 					$('#conditionRow').toggle($('.form_row', $('#conditions')).length > 1);

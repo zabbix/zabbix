@@ -26,7 +26,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js',
+	'class.tab-indicators.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -198,7 +200,7 @@ $fields = [
 									],
 	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-											HTTPTEST_AUTH_KERBEROS
+											HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
 										]),
 										null
 									],
@@ -206,14 +208,18 @@ $fields = [
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
+												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											')',
 										_('Username')
 									],
 	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
+												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+											')',
 										_('Password')
 									],
 	// actions
@@ -1295,8 +1301,12 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 
 		if ($items) {
 			// Check items belong only to hosts.
-			$hosts_status = array_unique(array_column(array_column(array_column($items, 'hosts'), 0), 'status'));
-			if (in_array(HOST_STATUS_TEMPLATE, $hosts_status)) {
+			$hosts_status = [];
+			foreach ($items as $item) {
+				$hosts_status[$item['hosts'][0]['status']] = true;
+			}
+
+			if (array_key_exists(HOST_STATUS_TEMPLATE, $hosts_status)) {
 				$result = false;
 			}
 			else {
@@ -2012,9 +2022,12 @@ else {
 
 	// Set is_template false, when one of hosts is not template.
 	if ($data['items']) {
-		$hosts_status = array_unique(array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status'));
-		foreach ($hosts_status as $value) {
-			if ($value != HOST_STATUS_TEMPLATE) {
+		$hosts_status = [];
+		foreach ($data['items'] as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
+		}
+		foreach ($hosts_status as $key => $value) {
+			if ($key != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;
 				break;
 			}

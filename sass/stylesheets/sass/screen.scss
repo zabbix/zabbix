@@ -16,6 +16,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "base/typography";
 @import "base/common";
 
+@import "utils/indicator";
 @import "utils/scrollable";
 
 @import "layout/grid";
