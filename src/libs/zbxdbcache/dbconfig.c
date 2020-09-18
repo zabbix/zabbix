@@ -3607,21 +3607,69 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 	{
 		struct tm	tm;
 		int		nextcheck;
-		int		offsets[] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR, SEC_PER_HOUR, SEC_PER_HOUR, SEC_PER_HOUR};
+		int		offsets[] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
+				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
+				SEC_PER_HOUR + SEC_PER_MIN * 10};
 		int		periods[] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR, SEC_PER_HOUR * 11,
 					SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR};
 
-		tm = *localtime(&from);
-		zbx_tm_round_up(&tm, timer->trend_base);
-
-		if (-1 == (nextcheck = mktime(&tm)))
+		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64 "\" schedule:"
-					" internal error when rounding up current time", timer->objectid);
-			THIS_SHOULD_NEVER_HAPPEN;
+			localtime_r(&from, &tm);
+			zbx_tm_round_up(&tm, timer->trend_base);
 
-			return 0;
+			if (-1 == (nextcheck = mktime(&tm)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
+						"\" schedule: %s", timer->objectid, zbx_strerror(errno));
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				return 0;
+			}
 		}
+		else
+		{
+			int	start, end, ret = FAIL;
+			char	*error = NULL, *period, *period_shift;
+			time_t	next = from;
+
+			period = zbx_function_get_param_dyn(timer->parameter, 1);
+			period_shift = zbx_function_get_param_dyn(timer->parameter, 2);
+
+			if (NULL != period && NULL != period_shift)
+			{
+				localtime_r(&from, &tm);
+
+				while (SUCCEED == (ret = zbx_trends_parse_range(next, period, period_shift, &start,
+						&end, &error)) && end <= from)
+				{
+					zbx_tm_add(&tm, 1, timer->trend_base);
+					if (-1 == (next = mktime(&tm)))
+					{
+						error = zbx_strdup(NULL, zbx_strerror(errno));
+						break;
+					}
+				}
+			}
+			else
+				error = zbx_strdup(NULL, "invalid parameters");
+
+			zbx_free(period);
+			zbx_free(period_shift);
+
+			if (FAIL == ret)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
+						"\" schedule: %s", timer->objectid, error);
+				zbx_free(error);
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				return 0;
+			}
+
+			nextcheck = end;
+		}
+
 		return nextcheck + offsets[timer->trend_base] + seed % periods[timer->trend_base];
 	}
 
@@ -3668,6 +3716,11 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
 
 	function->timer = 1;
 
+	if (ZBX_FUNCTION_TYPE_TRENDS == function->type)
+		DCstrpool_replace(0, &timer->parameter, function->parameter);
+	else
+		timer->parameter = NULL;
+
 	return timer;
 }
 
@@ -3681,6 +3734,9 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
  ******************************************************************************/
 static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
 {
+	if (NULL != timer->parameter)
+		zbx_strpool_release(timer->parameter);
+
 	__config_mem_free_func(timer);
 }
 
@@ -13254,4 +13310,5 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
+#	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
 #endif

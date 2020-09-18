@@ -201,12 +201,6 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
 	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR);
 	*end = mktime(&tm_end);
 
-	if (*end >= from - from % 60)
-	{
-		*error = zbx_dsprintf(*error, "period \"%s\" refers to the future", period_shift);
-		return FAIL;
-	}
-
 	zbx_tm_sub(&tm_start, period_num, period_unit);
 	*start = mktime(&tm_start);
 

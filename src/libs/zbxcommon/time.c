@@ -418,3 +418,11 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 
 	return str;
 }
+
+#ifdef _WINDOWS
+struct tm	*localtime_r(const time_t *timep, struct tm *result)
+{
+	localtime_s(result, timep);
+	return tm;
+}
+#endif

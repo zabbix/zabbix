@@ -1690,4 +1690,8 @@ zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
 
+#ifdef _WINDOWS
+struct tm	*localtime_r(const time_t *timep, struct tm *result);
+#endif
+
 #endif
