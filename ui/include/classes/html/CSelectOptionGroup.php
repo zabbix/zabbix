@@ -89,16 +89,19 @@ class CSelectOptionGroup {
 	 * @return array
 	 */
 	public function toArray(): array {
-		$optgroup = [
+		$option_group = [
 			'label' => $this->label,
-			'option_template' => $this->option_template,
 			'options' => []
 		];
 
-		foreach ($this->options as $option) {
-			$optgroup['options'][] = $option->toArray();
+		if ($this->option_template) {
+			$option_group['option_template'] = $this->option_template;
 		}
 
-		return $optgroup;
+		foreach ($this->options as $option) {
+			$option_group['options'][] = $option->toArray();
+		}
+
+		return $option_group;
 	}
 }

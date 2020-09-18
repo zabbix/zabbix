@@ -80,19 +80,19 @@ class CSelectOption {
 	 * @return array
 	 */
 	public function toArray(): array {
-		$option_fmt = [
+		$option = [
 			'value' => $this->value,
 			'label' => $this->label
 		];
 
 		if ($this->label_extra) {
-			$option_fmt['label_extra'] = $this->label_extra;
+			$option['label_extra'] = $this->label_extra;
 		}
 
 		if ($this->disabled) {
-			$option_fmt['is_disabled'] = true;
+			$option['is_disabled'] = true;
 		}
 
-		return $option_fmt;
+		return $option;
 	}
 }
