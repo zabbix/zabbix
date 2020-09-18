@@ -39,8 +39,8 @@ class testItem extends CAPITest {
 					'name' => 'Test mqtt key',
 					'key_' => 'mqtt.get[0]',
 					'interfaceid' => '50022',
-					'value_type' => '4',
-					'type' => '0',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '30s'
 				],
 				'expected_error' => null
@@ -51,8 +51,8 @@ class testItem extends CAPITest {
 					'name' => 'Test mqtt key without delay',
 					'key_' => 'mqtt.get[1]',
 					'interfaceid' => '50022',
-					'value_type' => '4',
-					'type' => '0'
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_ZABBIX
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
 			],
@@ -62,8 +62,8 @@ class testItem extends CAPITest {
 					'name' => 'Test mqtt key with 0 delay',
 					'key_' => 'mqtt.get[2]',
 					'interfaceid' => '50022',
-					'value_type' => '4',
-					'type' => '0',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '0'
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
@@ -75,8 +75,8 @@ class testItem extends CAPITest {
 					'name' => 'Test mqtt key for active agent',
 					'key_' => 'mqtt.get[3]',
 					'interfaceid' => '50022',
-					'value_type' => '4',
-					'type' => '7'
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
 				'expected_error' => null
 			],
@@ -86,8 +86,8 @@ class testItem extends CAPITest {
 					'name' => 'Test mqtt key with 0 delay for active agent',
 					'key_' => 'mqtt.get[4]',
 					'interfaceid' => '50022',
-					'value_type' => '4',
-					'type' => '7',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
 				],
 				'expected_error' => null
@@ -98,8 +98,8 @@ class testItem extends CAPITest {
 					'name' => 'Test mqtt with wrong key and 0 delay',
 					'key_' => 'mqt.get[5]',
 					'interfaceid' => '50022',
-					'value_type' => '4',
-					'type' => '7',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
@@ -114,7 +114,7 @@ class testItem extends CAPITest {
 		$result = $this->call('item.create', $request_data, $expected_error);
 
 		if ($expected_error === null) {
-			if ($request_data['type'] === '7' && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
+			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
 			}
 
@@ -122,7 +122,7 @@ class testItem extends CAPITest {
 				$db_item = CDBHelper::getRow('SELECT hostid, name, key_, type, delay FROM items WHERE itemid='.zbx_dbstr($id));
 
 				foreach (['hostid', 'name', 'key_', 'type', 'delay'] as $field) {
-					$this->assertSame($db_item[$field], $request_data[$field]);
+					$this->assertSame($db_item[$field], strval($request_data[$field]));
 				}
 			}
 		}
@@ -190,7 +190,7 @@ class testItem extends CAPITest {
 				'request_data' => [
 					'item' => 'testItem_Update:agent.ping',
 					'key_' => 'mqt.get[11]',
-					'type' => '7',
+					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '0'
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
@@ -200,7 +200,7 @@ class testItem extends CAPITest {
 				'request_data' => [
 					'item' => 'testItem_Update:agent.ping',
 					'key_' => 'mqtt.get[22]',
-					'type' => '7',
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
 				],
 				'expected_error' => null
@@ -210,7 +210,7 @@ class testItem extends CAPITest {
 					'item' => 'testItem_Update:agent.version',
 					'name' => 'Test mqtt key for active agent',
 					'key_' => 'mqtt.get[33]',
-					'type' => '7'
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
 				'expected_error' => null
 			]
@@ -227,7 +227,7 @@ class testItem extends CAPITest {
 		$result = $this->call('item.update', $request_data, $expected_error);
 
 		if ($expected_error === null) {
-			if ($request_data['type'] === '7' && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
+			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
 			}
 
@@ -235,7 +235,7 @@ class testItem extends CAPITest {
 				$db_item = CDBHelper::getRow('SELECT key_, type, delay FROM items WHERE itemid='.zbx_dbstr($id));
 
 				foreach (['key_', 'type', 'delay'] as $field) {
-					$this->assertSame($db_item[$field], $request_data[$field]);
+					$this->assertSame($db_item[$field], strval($request_data[$field]));
 				}
 			}
 		}

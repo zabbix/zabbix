@@ -34,7 +34,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API LLD rule invalid permissions',
 					'key_' => 'apilldruleinvalidpermissions',
 					'hostid' => '1',
-					'type' => '0',
+					'type' => ITEM_TYPE_ZABBIX,
 					'interfaceid' => '50022',
 					'delay' => '30s'
 				],
@@ -45,7 +45,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API LLD rule invalid interface',
 					'key_' => 'apilldruleinvalidinterface',
 					'hostid' => '50009',
-					'type' => '0',
+					'type' => ITEM_TYPE_ZABBIX,
 					'interfaceid' => '1',
 					'delay' => '30s'
 				],
@@ -56,7 +56,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API LLD rule 4',
 					'key_' => 'apilldrule4',
 					'hostid' => '50009',
-					'type' => '0',
+					'type' => ITEM_TYPE_ZABBIX,
 					'interfaceid' => '50022',
 					'delay' => '30s'
 				],
@@ -67,7 +67,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API mqtt.get',
 					'key_' => 'mqtt.get[test]',
 					'hostid' => '50009',
-					'type' => '0',
+					'type' => ITEM_TYPE_ZABBIX,
 					'interfaceid' => '50022'
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
@@ -77,7 +77,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API mqtt.get',
 					'key_' => 'mqtt.get[test]',
 					'hostid' => '50009',
-					'type' => '0',
+					'type' => ITEM_TYPE_ZABBIX,
 					'interfaceid' => '50022',
 					'delay' => '0'
 				],
@@ -88,7 +88,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API mqtt.get',
 					'key_' => 'mqt.get[test]',
 					'hostid' => '50009',
-					'type' => '7',
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
@@ -105,7 +105,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API LLD rule default',
 					'key_' => 'apilldruledefault',
 					'hostid' => '50009',
-					'type' => '0',
+					'type' => ITEM_TYPE_ZABBIX,
 					'interfaceid' => '50022',
 					'delay' => '30s'
 				],
@@ -116,7 +116,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API LLD rule mqtt',
 					'key_' => 'mqtt.get[0]',
 					'hostid' => '50009',
-					'type' => '7',
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
 				],
 				'expected_error' => null
@@ -126,7 +126,7 @@ class testDiscoveryRule extends CAPITest {
 					'name' => 'API LLD rule mqtt',
 					'key_' => 'mqtt.get[1]',
 					'hostid' => '50009',
-					'type' => '7'
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
 				'expected_error' => null
 			],
@@ -155,13 +155,13 @@ class testDiscoveryRule extends CAPITest {
 					' WHERE i.itemid='.zbx_dbstr($id)
 				);
 
-				if ($discoveryrules[$num]['type'] === '7' && substr($discoveryrules[$num]['key_'], 0, 8) === 'mqtt.get') {
+				if ($discoveryrules[$num]['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($discoveryrules[$num]['key_'], 0, 8) === 'mqtt.get') {
 					$discoveryrules[$num]['delay'] = CTestArrayHelper::get($discoveryrules[$num], 'delay', '0');
 				}
 				$this->assertSame($db_discoveryrule['hostid'], $discoveryrules[$num]['hostid']);
 				$this->assertSame($db_discoveryrule['name'], $discoveryrules[$num]['name']);
 				$this->assertSame($db_discoveryrule['key_'], $discoveryrules[$num]['key_']);
-				$this->assertSame($db_discoveryrule['type'], $discoveryrules[$num]['type']);
+				$this->assertSame($db_discoveryrule['type'], strval($discoveryrules[$num]['type']));
 				$this->assertSame($db_discoveryrule['delay'], $discoveryrules[$num]['delay']);
 			}
 		}
