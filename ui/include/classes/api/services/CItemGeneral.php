@@ -2304,4 +2304,70 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 	}
+
+	/**
+	 * Remove NCLOB value type fields from resulting query SELECT part if DISTINCT will be used.
+	 *
+	 * @param string $table_name     Table name.
+	 * @param string $table_alias    Table alias value.
+	 * @param array  $options        Array of query options.
+	 * @param array  $sql_parts      Array of query parts already initialized from $options.
+	 *
+	 * @return array    The resulting SQL parts array.
+	 */
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
+		if (!$options['countOutput'] && self::dbDistinct($sql_parts)) {
+			$nclob_requested = [];
+
+			foreach(['description', 'headers', 'params', 'posts'] as $field) {
+				if ($this->outputIsRequested($field, $options['output'])) {
+					$nclob_requested[] = $field;
+				}
+			}
+
+			if ($nclob_requested) {
+				$output = ($options['output'] === API_OUTPUT_EXTEND)
+					? array_keys(DB::getSchema('items')['fields'])
+					: $options['output'];
+
+				$options['output'] = array_diff($output, $nclob_requested);
+			}
+		}
+
+		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+	}
+
+	/**
+	 * Add NCLOB type fields if there was DISTINCT in query.
+	 *
+	 * @param array $options    Array of query options.
+	 * @param array $result     Query results.
+	 *
+	 * @return array    The result array with added NCLOB fields.
+	 */
+	protected function addNclobFieldValues(array $options, array $result): array {
+		$nclob_requested = [];
+
+		foreach(['description', 'headers', 'params', 'posts'] as $field) {
+			if ($this->outputIsRequested($field, $options['output'])) {
+				$nclob_requested[] = $field;
+			}
+		}
+
+		if (!$nclob_requested) {
+			return $result;
+		}
+
+		$nclob_values = DB::select('items', [
+			'output' => $nclob_requested,
+			'itemids' => array_keys($result),
+			'preservekeys' => true,
+		]);
+
+		foreach ($nclob_values as $pk => $row) {
+			$result[$pk] += $row;
+		}
+
+		return $result;
+	}
 }
