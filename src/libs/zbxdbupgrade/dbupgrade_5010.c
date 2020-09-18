@@ -420,6 +420,35 @@ static int	DBpatch_5010041(void)
 	return DBadd_foreign_key("role_rule", 2, &field);
 }
 
+static int	DBpatch_5010042(void)
+{
+	int	i;
+
+	/* 1 - USER TYPE / USER ROLE */
+	/* 2 - ADMIN TYPE / ADMIN ROLE */
+	/* 3 - SUPER ADMIN TYPE / SUPER ADMIN ROLE */
+	const char      *values[] = {
+			"1",
+			"2",
+			"3",
+			NULL
+		};
+
+	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	{
+		for (i = 0; NULL != values[i]; i++)
+		{
+			if (ZBX_DB_OK > DBexecute("update profiles set value_id=%s,type=1,value_int=0 where idx='web.user.filter_type' and value_int=%s", values[i], values[i]))
+				return FAIL;
+		}
+
+		/* -1 - ANY PROFILE */
+		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.user.filter_type' and value_int=-1"))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5010)
@@ -468,5 +497,6 @@ DBPATCH_ADD(5010038, 0, 1)
 DBPATCH_ADD(5010039, 0, 1)
 DBPATCH_ADD(5010040, 0, 1)
 DBPATCH_ADD(5010041, 0, 1)
+DBPATCH_ADD(5010042, 0, 1)
 
 DBPATCH_END()
