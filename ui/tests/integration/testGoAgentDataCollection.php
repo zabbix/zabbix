@@ -219,100 +219,100 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.cpu.util[,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 0.5
+			'threshold' => 0.5
 		],
 		[
 			'key' => 'system.cpu.load[,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 0.5
+			'threshold' => 0.5
 		],
 		[
 			'key' => 'vfs.dev.read[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 10
+			'threshold' => 10
 		],
 		[
 			'key' => 'vfs.dev.write[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 20
+			'threshold' => 20
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 10.0,
+			'threshold' => 10.0,
 			'compareType' => COMPARE_AVERAGE
 		],
 		[
 			'key' => 'system.swap.in[,pages]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 100
+			'threshold' => 100
 		],
 		[
 			'key' => 'system.swap.out[,pages]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 100
+			'threshold' => 100
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 100.0
+			'threshold' => 100.0
 		],
 		[
 			'key' => 'web.page.perf[http://localhost]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 1.0,
+			'threshold' => 1.0,
 			'compareType' => COMPARE_AVERAGE
 		],
 		[
 			'key' => 'net.tcp.service.perf[ssh]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 0.05
+			'threshold' => 0.05
 		],
 		[
 			'key' => 'net.udp.service.perf[ntp]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 0.05
+			'threshold' => 0.05
 		],
 		[
 			'key' => 'system.swap.size[,total]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 100
+			'threshold' => 100
 		],
 		[
 			'key' => 'vfs.fs.inode[/,pfree]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 0.1
+			'threshold' => 0.1
 		],
 		[
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 16384
+			'threshold' => 16384
 		],
 		[
 			'key' => 'vm.memory.size[free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 10000000
+			'threshold' => 10000000
 		],
 		[// Should be treated as a special case, since this metric returns JSON object.
 			// Maybe, it should e pulled to separate test suite. At this point we just compare it as string.
 			'key' => 'zabbix.stats[127.0.0.1,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'treshold' => 50
+			'threshold' => 50
 		]
 	];
 
@@ -536,9 +536,9 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				$a = end($values[self::COMPONENT_AGENT]);
 				$b = end($values[self::COMPONENT_AGENT2]);
 
-				if (array_key_exists('treshold', $item) && $item['treshold'] !== 0) {
-					$a = substr($a, 0, $item['treshold']);
-					$b = substr($b, 0, $item['treshold']);
+				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
+					$a = substr($a, 0, $item['threshold']);
+					$b = substr($b, 0, $item['threshold']);
 				}
 
 				$this->assertEquals($a, $b, 'Strings do not match for '.$item['key']);
@@ -566,8 +566,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				}
 
 				$diff = abs(abs($a) - abs($b));
-				$this->assertTrue($diff < $item['treshold'], 'Difference for '.$item['key'].
-						' is more than defined treshold '.$diff.' > '.$item['treshold']
+				$this->assertTrue($diff < $item['threshold'], 'Difference for '.$item['key'].
+						' is more than defined threshold '.$diff.' > '.$item['threshold']
 				);
 				break;
 		}

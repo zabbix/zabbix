@@ -506,7 +506,7 @@ class XMLSecurityKey
      * Verifies the given data (string) belonging to the given signature using the openssl-extension
      *
      * Returns:
-     *  1 on succesful signature verification,
+     *  1 on successful signature verification,
      *  0 when signature verification failed,
      *  -1 if an error occurred during processing.
      *
@@ -528,7 +528,7 @@ class XMLSecurityKey
     }
 
     /**
-     * Encrypts the given data (string) using the regarding php-extension, depending on the library assigned to algorithm in the contructor.
+     * Encrypts the given data (string) using the regarding php-extension, depending on the library assigned to algorithm in the constructor.
      *
      * @param string $data
      * @return mixed|string
@@ -548,7 +548,7 @@ class XMLSecurityKey
     }
 
     /**
-     * Decrypts the given data (string) using the regarding php-extension, depending on the library assigned to algorithm in the contructor.
+     * Decrypts the given data (string) using the regarding php-extension, depending on the library assigned to algorithm in the constructor.
      *
      * @param string $data
      * @return mixed|string
@@ -587,7 +587,7 @@ class XMLSecurityKey
      * Verifies the data (string) against the given signature using the extension assigned to the type in the constructor.
      *
      * Returns in case of openSSL:
-     *  1 on succesful signature verification,
+     *  1 on successful signature verification,
      *  0 when signature verification failed,
      *  -1 if an error occurred during processing.
      *

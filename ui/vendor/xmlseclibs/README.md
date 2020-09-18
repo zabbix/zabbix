@@ -8,7 +8,7 @@ The author of xmlseclibs is Rob Richards.
 Master is currently the only actively maintained branch.
 * master: Removes mcrypt usage requiring 5.4+ (5.6.24+ recommended for security reasons)
 * 2.0: Contains namespace support requiring 5.3+
-* 1.4: Contains auto-loader support while also maintaining backwards compatiblity with the older 1.3 version using the xmlseclibs.php file. Supports PHP 5.2+
+* 1.4: Contains auto-loader support while also maintaining backwards compatibility with the older 1.3 version using the xmlseclibs.php file. Supports PHP 5.2+
 
 # Requirements
 

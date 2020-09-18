@@ -174,7 +174,7 @@ class ZBase {
 
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
 
-				// Start sesion only after DB initilized.
+				// Start sesion only after DB initialized.
 				new CEncryptedCookieSession();
 
 				$this->authenticateUser();

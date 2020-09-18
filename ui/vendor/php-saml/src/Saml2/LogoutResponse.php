@@ -162,7 +162,7 @@ class LogoutResponse
                     }
                 }
 
-                // Check if the InResponseTo of the Logout Response matchs the ID of the Logout Request (requestId) if provided
+                // Check if the InResponseTo of the Logout Response matches the ID of the Logout Request (requestId) if provided
                 if (isset($requestId) && $this->document->documentElement->hasAttribute('InResponseTo')) {
                     $inResponseTo = $this->document->documentElement->getAttribute('InResponseTo');
                     if ($requestId != $inResponseTo) {

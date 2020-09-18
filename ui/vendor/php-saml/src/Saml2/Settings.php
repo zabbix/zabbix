@@ -730,7 +730,7 @@ class Settings
 
     /**
      * Returns the x509 public of the SP that is
-     * planed to be used soon instead the other
+     * planned to be used soon instead the other
      * public cert
      *
      * @return string SP public cert New
@@ -989,7 +989,7 @@ class Settings
     }
 
     /**
-     * Formats the Multple IdP certs.
+     * Formats the Multiple IdP certs.
      */
     public function formatIdPCertMulti()
     {

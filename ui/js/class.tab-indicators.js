@@ -324,7 +324,7 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 		const observer_options = {
 			childList: true,
 			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 			subtree: true
 		};
 
@@ -417,7 +417,7 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 		const observer_options = {
 			childList: true,
 			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 			subtree: true
 		};
 
@@ -730,7 +730,7 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 		const observer_options = {
 			childList: true,
 			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 			subtree: true
 		};
 

@@ -420,7 +420,7 @@ abstract class testFormMacros extends CWebTest {
 
 		// Switch to tab with inherited and instance macros and verify that the value is secret but is still accessible.
 		$this->checkInheritedTab($data['macro_fields'], true);
-		// Check that macro value is hidden but is still accessible after swithing back to instance macros list.
+		// Check that macro value is hidden but is still accessible after switching back to instance macros list.
 		$value_field = $this->getValueField($data['macro_fields']['macro']);
 		$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
 
