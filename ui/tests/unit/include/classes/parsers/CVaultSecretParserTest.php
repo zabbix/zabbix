@@ -29,101 +29,48 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 			// PARSE_SUCCESS
 			['path/to/secret:key', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS,
-				'match' => 'path/to/secret:key',
 				'error' => ''
 			]],
 			['path/to/secret', 0, ['with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS,
-				'match' => 'path/to/secret',
 				'error' => ''
 			]],
 			['mount%2Fpoint/to/secret:key', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS,
-				'match' => 'mount%2Fpoint/to/secret:key',
 				'error' => ''
 			]],
 			['mount%2Fpoint/secret:key', 0, [], [
 				'rc' => CParser::PARSE_SUCCESS,
-				'match' => 'mount%2Fpoint/secret:key',
 				'error' => ''
 			]],
 			['mount%2Fpoint/secret', 0, ['with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS,
-				'match' => 'mount%2Fpoint/secret',
 				'error' => ''
-			]],
-
-			// PARSE_SUCCESS_CONT
-			['path/to/secret:key', 0, ['with_key' => false], [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => 'path/to/secret',
-				'error' => 'incorrect syntax near ":key"'
-			]],
-			['path/to/secret:key something unrelated', 0, [], [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => 'path/to/secret:key',
-				'error' => 'incorrect syntax near " something unrelated"'
-			]],
-			['mount%2Fpoint/path/to/secret:key', 0, ['with_key' => false], [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => 'mount%2Fpoint/path/to/secret',
-				'error' => 'incorrect syntax near ":key"'
-			]],
-			['mount%2Fpoint/path/to/secret:key something unrelated', 0, [], [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => 'mount%2Fpoint/path/to/secret:key',
-				'error' => 'incorrect syntax near " something unrelated"'
-			]],
-			['mount%2Fpoint/secret:key', 0, ['with_key' => false], [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => 'mount%2Fpoint/secret',
-				'error' => 'incorrect syntax near ":key"'
-			]],
-			['mount%2Fpoint/secret:key something unrelated', 0, [], [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => 'mount%2Fpoint/secret:key',
-				'error' => 'incorrect syntax near " something unrelated"'
 			]],
 
 			// PARSE_FAIL
 			['pathtosecret/:key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
 				'error' => 'incorrect syntax near ":key"'
 			]],
 			['/mount%2Fpoint/pathtosecret:key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
 				'error' => 'incorrect syntax near "/mount%2Fpoint/pathtosecret:key"'
-			]],
-			['mou/nt%2Fpoint/pathtosecret:key', 0, [], [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'error' => 'incorrect syntax near "%2Fpoint/pathtosecret:key"'
 			]],
 			['/pathtosecret:key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
 				'error' => 'incorrect syntax near "/pathtosecret:key"'
 			]],
 			['pathtosecret:key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'error' => 'incorrect syntax near ":key"'
+				'error' => 'incorrect syntax near "pathtosecret:key"'
 			]],
 			[':key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
 				'error' => 'incorrect syntax near ":key"'
-			]],
-			['path/to/{$MACRO}:key', 0, [], [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'error' => 'incorrect syntax near "{$MACRO}:key"'
 			]],
 			['/path/to/secret:key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
 				'error' => 'incorrect syntax near "/path/to/secret:key"'
 			]]
 		];
@@ -143,9 +90,7 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertSame($expected, [
 			'rc' => $vault_secret_parser->parse($source, $pos),
-			'match' => $vault_secret_parser->getMatch(),
 			'error' => $vault_secret_parser->getError()
 		]);
-		$this->assertSame(strlen($expected['match']), $vault_secret_parser->getLength());
 	}
 }
