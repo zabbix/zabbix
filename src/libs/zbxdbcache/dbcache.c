@@ -1530,7 +1530,7 @@ static void	DCsync_trends(void)
  *             timers_num        - [OUT] processed timer triggers             *
  *                                                                            *
  ******************************************************************************/
-static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num, const zbx_vector_ptr_t *timers,\
+static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num, const zbx_vector_ptr_t *timers,
 		zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, item_num = 0, timers_num = 0;
