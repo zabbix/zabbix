@@ -28,7 +28,7 @@ import (
 func getSwap() (uint64, uint64, error) {
 	m, err := win32.GlobalMemoryStatusEx()
 	if err != nil {
-		return 0 ,0 nil
+		return 0, 0, nil
 	}
 
 	var total, avail uint64
