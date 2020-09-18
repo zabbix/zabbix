@@ -145,7 +145,7 @@
 
 	$('#event_name')
 		.textareaFlexible()
-		.on('input keydown paste', function(e) {
+		.on('input keydown paste', function() {
 			overlays_stack.end().centerDialog();
 		});
 })(jQuery);

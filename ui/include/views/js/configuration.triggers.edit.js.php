@@ -89,8 +89,6 @@
 				triggers_initialized = true;
 			}
 		});
-
-
 	});
 
 	/**

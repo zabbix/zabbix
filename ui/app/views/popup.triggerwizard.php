@@ -33,7 +33,6 @@ $output = [
 $form = (new CForm('post', 'zabbix.php'))
 	->cleanItems()
 	->setName('sform')
-	->setId('trigger-wizard-form')
 	->addVar('action', 'popup.triggerwizard')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
