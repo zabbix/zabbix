@@ -49,6 +49,7 @@ type cephDf struct {
 
 type poolStat struct {
 	PercentUsed float64 `json:"percent_used"`
+	Objects     uint64  `json:"objects"`
 	BytesUsed   uint64  `json:"bytes_used"`
 	Rd          uint64  `json:"rd_ops"`
 	RdBytes     uint64  `json:"rd_bytes"`
@@ -89,6 +90,7 @@ func dfHandler(data map[command][]byte) (interface{}, error) {
 	for _, p := range df.Pools {
 		poolsStat[p.Name] = poolStat{
 			PercentUsed: math.Round(p.Stats.PercentUsed),
+			Objects:     p.Stats.Objects,
 			BytesUsed:   p.Stats.BytesUsed,
 			Rd:          p.Stats.Rd,
 			RdBytes:     p.Stats.RdBytes,
