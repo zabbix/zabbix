@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-14 11:16+0300\n"
+"POT-Creation-Date: 2020-09-18 19:53+0300\n"
 "PO-Revision-Date: 2020-08-30 00:06+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2133,7 +2133,7 @@ msgstr "Не удалось удалить прототип элементов �
 msgid "Cannot delete item prototypes"
 msgstr "Не удалось удалить прототипы элементов данных"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Cannot delete items"
 msgstr "Не удалось удалить элементы данных"
 
@@ -2704,7 +2704,7 @@ msgstr "Не удалось сохранить виджет \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Не удалось отправить команду, проверьте соединение с Zabbix сервером \"%1$s\"."
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Cannot send request"
 msgstr "Не удалось отправить запрос"
 
@@ -7312,7 +7312,7 @@ msgid "History cleanup is not supported if compression is enabled"
 msgstr "При включенном сжатии очистка истории не поддерживается"
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:491 httpconf.php:503
-#: items.php:893 items.php:901 items.php:1315 items.php:1329
+#: items.php:893 items.php:901 items.php:1319 items.php:1333
 msgid "History cleared"
 msgstr "История очищена"
 
@@ -7398,7 +7398,7 @@ msgstr "Выравнивание по горизонтали"
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:64
 #: include/views/monitoring.slides.php:76
-#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1314
+#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1318
 #: jsLoader.php:199 jsLoader.php:292 queue.php:221 report2.php:482
 msgid "Host"
 msgid_plural "Hosts"
@@ -9914,7 +9914,7 @@ msgstr "Итальянский (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:245
 #: include/views/monitoring.screen.constructor.edit.php:414
 #: include/views/monitoring.screen.constructor.edit.php:725 items.php:892
-#: items.php:1314
+#: items.php:1318
 msgid "Item"
 msgstr "Элемент данных"
 
@@ -10151,11 +10151,11 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
-#: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
+#: include/views/inventory.host.view.php:204 items.php:1694 queue.php:110
 msgid "Items"
 msgstr "Элементы данных"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Items deleted"
 msgstr "Элементы данных удалены"
 
@@ -12379,7 +12379,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
 #: include/classes/screens/CScreenLldGraph.php:51 include/func.inc.php:1507
-#: items.php:1443 items.php:1647 services.php:84
+#: items.php:1447 items.php:1651 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нет прав доступа к запрашиваемому объекту или он не существует!"
 
@@ -14611,7 +14611,7 @@ msgstr "Запрос тела"
 msgid "Request body type"
 msgstr "Типа запроса тела"
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Request sent successfully"
 msgstr "Запрос успешно отправлен"
 
