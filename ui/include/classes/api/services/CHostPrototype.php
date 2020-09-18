@@ -202,17 +202,44 @@ class CHostPrototype extends CHostBase {
 			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
+			'custom_interfaces' =>	['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), 'default' => HOST_PROT_INTERFACES_INHERIT],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
 			'discover' =>			['type' => API_INT32, 'in' => implode(',', [HOST_DISCOVER, HOST_NO_DISCOVER])],
+			'interfaces' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
+				'useip' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
+				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+				'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
+				'main' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
+				'details' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_SNMP])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'version' =>				['type' => API_INT32, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
+					'bulk' =>					['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
+					'community' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'community')],
+					'securityname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
+					'securitylevel' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
+					'authpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
+					'privpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
+					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA])],
+					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES])],
+					'contextname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')]
+											]],
+											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
+				]]
+			]],
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]],
 			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 				'macro' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
@@ -220,13 +247,8 @@ class CHostPrototype extends CHostBase {
 				'type' =>				['type' => API_INT32, 'flag' => API_REQUIRED, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])],
 				'description' => 		['type' => API_STRING_UTF8]
 			]],
-			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
-			]],
-			'custom_interfaces' => ['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), 'default' => HOST_PROT_INTERFACES_INHERIT]
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
-		$api_input_rules['fields'] += $this->getInterfaceRules();
 
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -390,8 +412,32 @@ class CHostPrototype extends CHostBase {
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
+			'custom_interfaces' =>	['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM])],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
 			'discover' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])],
+			'interfaces' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
+				'useip' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
+				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
+				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
+				'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
+				'main' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
+				'details' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_SNMP])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+					'version' =>				['type' => API_INT32, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
+					'bulk' =>					['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
+					'community' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'community')],
+					'securityname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
+					'securitylevel' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
+					'authpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
+					'privpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
+					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA])],
+					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES])],
+					'contextname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')]
+											]],
+											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
+				]]
+			]],
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['group_prototypeid'], ['groupid']], 'fields' => [
 				'group_prototypeid' =>	['type' => API_ID],
 				'groupid' =>			['type' => API_ID]
@@ -400,9 +446,12 @@ class CHostPrototype extends CHostBase {
 				'group_prototypeid' =>	['type' => API_ID],
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]],
 			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 				'hostmacroid' =>		['type' => API_ID],
@@ -411,13 +460,8 @@ class CHostPrototype extends CHostBase {
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])],
 				'description' => 		['type' => API_STRING_UTF8]
 			]],
-			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
-			]],
-			'custom_interfaces' => ['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM])]
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
-		$api_input_rules['fields'] += $this->getInterfaceRules();
 
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1857,38 +1901,5 @@ class CHostPrototype extends CHostBase {
 		}
 
 		return $interfaces;
-	}
-
-	/**
-	 * Get validation rules of Host Prototype interfaces. Both create and update use the same validation rules.
-	 *
-	 * @return array
-	 */
-	private function getInterfaceRules(): array {
-		return [
-			'interfaces' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
-				'useip' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
-				'ip' => 				['type' => API_IP, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'ip')],
-				'dns' =>				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO, 'length' => DB::getFieldLength('interface', 'dns')],
-				'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
-				'main' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
-				'details' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_SNMP])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-					'version' =>				['type' => API_INT32, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
-					'bulk' =>					['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
-					'community' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'community')],
-					'securityname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
-					'securitylevel' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
-					'authpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
-					'privpassphrase' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-					'authprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA])],
-					'privprotocol' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES])],
-					'contextname' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')]
-											]],
-											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
-				]]
-			]]
-		];
 	}
 }
