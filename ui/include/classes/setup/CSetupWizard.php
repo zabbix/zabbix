@@ -254,7 +254,7 @@ class CSetupWizard extends CForm {
 			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		$table->addRow(_('TLS encryption'), [
+		$table->addRow(_('Database TLS encryption'), [
 				(new CCheckBox('tls_encryption'))->setChecked($this->getConfig('DB_ENCRYPTION', true)),
 				(new CDiv(
 					_('Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows).')
@@ -266,37 +266,38 @@ class CSetupWizard extends CForm {
 			ZBX_STYLE_DISPLAY_NONE
 		);
 
-		$table->addRow(_('Verify certificate'),
+		$table->addRow(_('Verify database certificate'),
 			(new CCheckBox('verify_certificate'))->setChecked($this->getConfig('DB_ENCRYPTION_ADVANCED')),
 			'db_verify_host',
 			ZBX_STYLE_DISPLAY_NONE
 		);
 
-		$table->addRow(_('TLS key file'),
-			(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			'db_keyfile_row',
-			ZBX_STYLE_DISPLAY_NONE
-		);
-
-		$table->addRow(_('TLS certificate file'),
-			(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			'db_certfile_row',
-			ZBX_STYLE_DISPLAY_NONE
-		);
-
-		$table->addRow(_('TLS certificate authority file'),
+		$table->addRow(_('Database TLS CA file'),
 			(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			'db_cafile_row',
 			ZBX_STYLE_DISPLAY_NONE
 		);
 
-		$table->addRow(_('With host verification'),
+		$table->addRow(_('Database TLS key file'),
+			(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			'db_keyfile_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
+
+		$table->addRow(_('Database TLS certificate file'),
+			(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			'db_certfile_row',
+			ZBX_STYLE_DISPLAY_NONE
+		);
+
+
+		$table->addRow(_('Database host verification'),
 			(new CCheckBox('verify_host'))->setChecked($this->getConfig('DB_VERIFY_HOST')),
 			'db_verify_host_row',
 			ZBX_STYLE_DISPLAY_NONE
 		);
 
-		$table->addRow(_('TLS cipher list'),
+		$table->addRow(_('Database TLS cipher list'),
 			(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			'db_cipher_row',
 			ZBX_STYLE_DISPLAY_NONE
