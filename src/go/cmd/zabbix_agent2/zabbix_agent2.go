@@ -468,6 +468,7 @@ func main() {
 	if err != nil {
 		fatalExit("cannot parse the \"Hostname\" parameter", err)
 	}
+	agent.FirstHostname = hostnames[0]
 	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", strings.Join(hostnames, ","))
 	log.Infof(hostmessage)
 	if foregroundFlag {

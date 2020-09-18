@@ -34,6 +34,7 @@ type Plugin struct {
 
 var impl Plugin
 var hostnames = map[uint64]string{}
+var FirstHostname string
 
 func SetHostname(clientID uint64, hostname string) {
 	hostnames[clientID] = hostname
@@ -53,9 +54,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "agent.hostname":
 		if ctx.ClientID() > MaxBuiltinClientID {
 			return getHostname(ctx.ClientID()), nil
-		} else {
-			return ExtractHostnames(Options.Hostname)[0], nil
 		}
+		return FirstHostname, nil
 	case "agent.ping":
 		return 1, nil
 	case "agent.version":
