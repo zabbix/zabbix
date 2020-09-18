@@ -98,6 +98,9 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #  include <net/if.h>
 #endif
 ])
+
+saved_CFLAGS="$CFLAGS"
+CFLAGS="-Werror $CFLAGS"
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -106,6 +109,8 @@ AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #  include <sys/param.h>
 #endif
 ])
+CFLAGS="$saved_CFLAGS"
+
 AC_CHECK_HEADERS(sys/swap.h, [], [], [
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
