@@ -4,7 +4,7 @@ in:
   period: 
   shift: now/h
   timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +00:00
+  time: 2020-09-01 00:00:00.000000000 +03:00
 out:
   return: FAIL
 ---
@@ -13,7 +13,7 @@ in:
   period: h
   shift: now/h
   timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +00:00
+  time: 2020-09-01 00:00:00.000000000 +03:00
 out:
   return: FAIL
 ---
@@ -22,7 +22,7 @@ in:
   period: 1
   shift: now/h
   timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +00:00
+  time: 2020-09-01 00:00:00.000000000 +03:00
 out:
   return: FAIL
 ---
@@ -31,7 +31,7 @@ in:
   period: 1H
   shift: now/h
   timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +00:00
+  time: 2020-09-01 00:00:00.000000000 +03:00
 out:
   return: FAIL
 ---
@@ -40,7 +40,7 @@ in:
   period: 0h
   shift: now/h
   timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +00:00
+  time: 2020-09-01 00:00:00.000000000 +03:00
 out:
   return: FAIL
 ---
@@ -49,7 +49,7 @@ in:
   period: 12345678901234567890h
   shift: now/h
   timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +00:00
+  time: 2020-09-01 00:00:00.000000000 +03:00
 out:
   return: FAIL
 ---
@@ -58,7 +58,224 @@ in:
   period: 1h
   shift: now/h
   timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +00:00
+  time: 2020-09-01 00:00:00.000000000 +03:00
 out:
+  start: 2020-08-31 23:00:00.000000000 +03:00
+  end:   2020-08-31 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Invalid period shift '/h'
+in:
+  period: 1h
+  shift: /h
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period shift 'now-1'
+in:
+  period: 1h
+  shift: now-1
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period shift 'now/h - 1'
+in:
+  period: 1h
+  shift: now/h - 1
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period shift 'now/h-1'
+in:
+  period: 1h
+  shift: now/h-1
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period shift 'now/h - 1h'
+in:
+  period: 1h
+  shift: now/h - 1h
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period shift 'now/m-1m'
+in:
+  period: 1h
+  shift: now/m-1m
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period shift 'now/h+1h'
+in:
+  period: 1h
+  shift: now/h+1h
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Valid parameters '1h,now/h-1h'
+in:
+  period: 1h
+  shift: now/h-1h
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  start: 2020-08-31 22:00:00.000000000 +03:00
+  end:   2020-08-31 22:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1h,now/d'
+in:
+  period: 1h
+  shift: now/d
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  start: 2020-08-31 23:00:00.000000000 +03:00
+  end:   2020-08-31 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1h,now/h' from 2020-09-01 10:00:00.000000000 +03:00
+in:
+  period: 1h
+  shift: now/h
+  timezone: :Europe/Riga
+  time: 2020-09-01 10:00:00.000000000 +03:00
+out:
+  start: 2020-09-01 09:00:00.000000000 +03:00
+  end:   2020-09-01 09:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1h,now/d' from 2020-09-01 10:00:00.000000000 +03:00
+in:
+  period: 1h
+  shift: now/d
+  timezone: :Europe/Riga
+  time: 2020-09-01 10:00:00.000000000 +03:00
+out:
+  start: 2020-08-31 23:00:00.000000000 +03:00
+  end:   2020-08-31 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1h,now/h-1d' from 2020-09-01 10:00:00.000000000 +03:00
+in:
+  period: 1h
+  shift: now/h-1d
+  timezone: :Europe/Riga
+  time: 2020-09-01 10:00:00.000000000 +03:00
+out:
+  start: 2020-08-31 09:00:00.000000000 +03:00
+  end:   2020-08-31 09:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1d,now/w-6d' from 2020-09-01 10:00:00.000000000 +03:00
+in:
+  period: 1d
+  shift: now/w-6d
+  timezone: :Europe/Riga
+  time: 2020-09-01 10:00:00.000000000 +03:00
+out:
+  start: 2020-08-24 00:00:00.000000000 +03:00
+  end:   2020-08-24 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1d,now/M-1M+6d/w' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1d
+  shift: now/M-1M+6d/w
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  start: 2020-08-03 00:00:00.000000000 +03:00
+  end:   2020-08-03 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1w,now/M' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1w
+  shift: now/M
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  start: 2020-08-25 00:00:00.000000000 +03:00
+  end:   2020-08-31 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1M,now/M' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1M
+  shift: now/M
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  start: 2020-08-01 00:00:00.000000000 +03:00
+  end:   2020-08-31 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1M,now/M-1M' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1M
+  shift: now/M-1M
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  start: 2020-07-01 00:00:00.000000000 +03:00
+  end:   2020-07-31 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Valid parameters '1M,now/M-2M' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1M
+  shift: now/M-2M
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  start: 2020-06-01 00:00:00.000000000 +03:00
+  end:   2020-06-30 23:00:00.000000000 +03:00
+  return: SUCCEED
+---
+test case: Invalid parameters '1M,now/h' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1M
+  shift: now/h
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid parameters '1M,now/M-1d' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1M
+  shift: now/M-1d
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Valid parameters '1d,now/y' from 2020-09-18 10:00:00.000000000 +03:00
+in:
+  period: 1d
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2020-09-18 10:00:00.000000000 +03:00
+out:
+  start: 2019-12-31 00:00:00.000000000 +02:00
+  end:   2019-12-31 23:00:00.000000000 +02:00
   return: SUCCEED
 ...
+
+

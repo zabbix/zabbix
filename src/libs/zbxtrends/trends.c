@@ -105,14 +105,13 @@ out:
  *             now-1d/h                                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trends_parse_range(int now, const char *period, const char *period_shift, int *start, int *end,
+int	zbx_trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
 		char **error)
 {
 	int		period_num;
 	zbx_time_unit_t	period_unit;
 	size_t		len;
-	struct tm	tm;
-	time_t		time;
+	struct tm	tm_end, tm_start;
 	const char	*p;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:%s shift:%s", __func__, period, period_shift);
@@ -140,8 +139,7 @@ int	zbx_trends_parse_range(int now, const char *period, const char *period_shift
 
 	p += ZBX_CONST_STRLEN("now");
 
-	time = now;
-	tm = *localtime(&time);
+	localtime_r(&from, &tm_end);
 
 	while ('\0' != *p)
 	{
@@ -151,11 +149,18 @@ int	zbx_trends_parse_range(int now, const char *period, const char *period_shift
 		{
 			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
 			{
-				*error = zbx_dsprintf(*error, "unexpected character \"%s\"", p);
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
 				return FAIL;
 			}
 
-			zbx_tm_round_down(&tm, unit);
+			if (unit < period_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
+			zbx_tm_round_down(&tm_end, unit);
 
 			/* unit is single character */
 			p++;
@@ -168,37 +173,42 @@ int	zbx_trends_parse_range(int now, const char *period, const char *period_shift
 			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
 				return FAIL;
 
+			if (unit < period_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
 			if ('+' == op)
-				zbx_tm_add(&tm, num, unit);
+				zbx_tm_add(&tm_end, num, unit);
 			else
-				zbx_tm_sub(&tm, num, unit);
+				zbx_tm_sub(&tm_end, num, unit);
 
 			p += len;
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "unexpected character \"%s\"", p);
+			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
 			return FAIL;
 		}
 	}
 
-	*start = mktime(&tm);
+	tm_start = tm_end;
 
-	if (*start > now)
+	/* trends clock refers to the beginning of the hourly interval - subtract */
+	/* one hour to get the trends clock for the last hourly interval          */
+	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR);
+	*end = mktime(&tm_end);
+
+	if (*end >= from - from % 60)
 	{
-		*error = zbx_dsprintf(*error, "period shift \"%s\" is in the future", period_shift);
+		*error = zbx_dsprintf(*error, "period \"%s\" refers to the future", period_shift);
 		return FAIL;
 	}
 
-	zbx_tm_add(&tm, period_num, period_unit);
-	*end  = mktime(&tm) - 1;
-
-	if (*end > now)
-	{
-		*error = zbx_dsprintf(*error, "the period specified by \"%s, %s\" is in the future",
-				period, period_shift);
-		return FAIL;
-	}
+	zbx_tm_sub(&tm_start, period_num, period_unit);
+	*start = mktime(&tm_start);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:%d end:%d", __func__, *start, *end);
 

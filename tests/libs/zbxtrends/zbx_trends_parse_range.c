@@ -50,7 +50,7 @@ void	zbx_mock_test_entry(void **state)
 	const char	*period, *shift;
 	int		expected_ret, returned_ret, start, end;
 	char		*error = NULL;
-	zbx_timespec_t	ts_now;
+	zbx_timespec_t	ts_from, ts_start, ts_end, ts;
 
 	ZBX_UNUSED(state);
 
@@ -59,14 +59,14 @@ void	zbx_mock_test_entry(void **state)
 
 	tzset();
 
-	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts_now))
+	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts_from))
 		fail_msg("Invalid input time format");
 
 	period = zbx_mock_get_parameter_string("in.period");
 	shift = zbx_mock_get_parameter_string("in.shift");
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	returned_ret = zbx_trends_parse_range(ts_now.sec, period, shift, &start, &end, &error);
+	returned_ret = zbx_trends_parse_range(ts_from.sec, period, shift, &start, &end, &error);
 
 	if (FAIL == returned_ret)
 	{
@@ -75,4 +75,19 @@ void	zbx_mock_test_entry(void **state)
 	}
 	zbx_mock_assert_result_eq("zbx_trends_parse_range()", expected_ret, returned_ret);
 
+	if (SUCCEED == returned_ret)
+	{
+		if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.start"), &ts_start))
+			fail_msg("Invalid start time format");
+
+		if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.end"), &ts_end))
+			fail_msg("Invalid end time format");
+
+		ts.ns = 0;
+		ts.sec = start;
+		zbx_mock_assert_timespec_eq("start time", &ts_start, &ts);
+
+		ts.sec = end;
+		zbx_mock_assert_timespec_eq("end time", &ts_end, &ts);
+	}
 }
