@@ -428,6 +428,11 @@ class ZSelect extends HTMLElement {
 		return width;
 	}
 
+	_isVisible() {
+		const {bottom, top} = this.getBoundingClientRect();
+		return !(bottom < 0 || top - Math.max(document.documentElement.clientHeight, window.innerHeight) >= 0);
+	}
+
 	registerEvents() {
 		this._events = {
 			button_mousedown: (e) => {
@@ -443,6 +448,8 @@ class ZSelect extends HTMLElement {
 			},
 
 			button_keydown: (e) => {
+				!this._isVisible() && this.scrollIntoView({block: 'nearest'})
+
 				if (e.which !== KEY_SPACE && !e.metaKey && !e.ctrlKey && e.key.length === 1) {
 					const index = this._search(e.key);
 					if (index !== null) {
@@ -510,7 +517,7 @@ class ZSelect extends HTMLElement {
 							this._collapse();
 						}
 						else {
-							this._expand();
+							this._isVisible() && this._expand();
 						}
 						break;
 
@@ -524,7 +531,7 @@ class ZSelect extends HTMLElement {
 						break;
 
 					case KEY_SPACE:
-						!this._expanded && this._expand();
+						!this._expanded && this._isVisible() && this._expand();
 						break;
 
 					case KEY_ESCAPE:
