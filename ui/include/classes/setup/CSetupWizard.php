@@ -377,20 +377,22 @@ class CSetupWizard extends CForm {
 		if ($db_type == ZBX_DB_POSTGRESQL) {
 			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
-		$table->addRow((new CSpan(_('TLS encryption')))->addClass(ZBX_STYLE_GREY),
+		$table->addRow((new CSpan(_('Database TLS encryption')))->addClass(ZBX_STYLE_GREY),
 			$this->getConfig('DB_ENCRYPTION') ? 'true' : 'false');
 		if ($this->getConfig('DB_ENCRYPTION')) {
-			$table->addRow((new CSpan(_('TLS key file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_KEY_FILE'));
-			$table->addRow((new CSpan(_('TLS certificate file')))->addClass(ZBX_STYLE_GREY),
-				$this->getConfig('DB_CERT_FILE')
-			);
-			$table->addRow((new CSpan(_('TLS certificate authority file')))->addClass(ZBX_STYLE_GREY),
+			$table->addRow((new CSpan(_('Database TLS CA file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CA_FILE')
 			);
-			$table->addRow((new CSpan(_('With host verification')))->addClass(ZBX_STYLE_GREY),
+			$table->addRow((new CSpan(_('Database TLS key file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_KEY_FILE')
+			);
+			$table->addRow((new CSpan(_('Database TLS certificate file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_CERT_FILE')
+			);
+			$table->addRow((new CSpan(_('Database host verification')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_VERIFY_HOST') ? 'true' : 'false'
 			);
-			$table->addRow((new CSpan(_('TLS cipher list')))->addClass(ZBX_STYLE_GREY),
+			$table->addRow((new CSpan(_('Database TLS cipher list')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CIPHER_LIST')
 			);
 		}
@@ -398,8 +400,12 @@ class CSetupWizard extends CForm {
 		$table->addRow(null, null);
 
 		$table->addRow((new CSpan(_('Zabbix server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER'));
-		$table->addRow((new CSpan(_('Zabbix server port')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_PORT'));
-		$table->addRow((new CSpan(_('Zabbix server name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_NAME'));
+		$table->addRow((new CSpan(_('Zabbix server port')))->addClass(ZBX_STYLE_GREY),
+			$this->getConfig('ZBX_SERVER_PORT')
+		);
+		$table->addRow((new CSpan(_('Zabbix server name')))->addClass(ZBX_STYLE_GREY),
+			$this->getConfig('ZBX_SERVER_NAME')
+		);
 
 		return [
 			new CTag('h1', true, _('Pre-installation summary')),
