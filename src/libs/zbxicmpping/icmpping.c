@@ -106,7 +106,7 @@ static int	get_interval_option(const char * fping, const char *dst, int *value, 
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i0 %s", fping, dst);
 
-	if (SUCCEED == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1, ZBX_EXIT_CODE_CHECKS_DISABLED)) &&
+	if (SUCCEED == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1, ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)) &&
 			ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst))
 	{
 		*value = 0;
@@ -126,7 +126,7 @@ static int	get_interval_option(const char * fping, const char *dst, int *value, 
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i1 %s", fping, dst);
 
-	if (SUCCEED == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1, ZBX_EXIT_CODE_CHECKS_DISABLED))
+	if (SUCCEED == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1, ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			&& ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst))
 	{
 		*value = 1;
@@ -172,7 +172,7 @@ static int	get_ipv6_support(const char * fping, const char *dst)
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50 %s", fping, dst);
 
-	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED)) &&
+	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)) &&
 				ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst)) || TIMEOUT_ERROR == ret)
 	{
 		ret = SUCCEED;
