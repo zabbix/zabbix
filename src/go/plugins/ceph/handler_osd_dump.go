@@ -52,10 +52,10 @@ type outOsdDump struct {
 }
 
 // OSDDumpHandler TODO.
-func OSDDumpHandler(data []byte) (interface{}, error) {
+func OSDDumpHandler(data ...[]byte) (interface{}, error) {
 	var osdDump cephOsdDump
 
-	err := json.Unmarshal(data, &osdDump)
+	err := json.Unmarshal(data[0], &osdDump)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}

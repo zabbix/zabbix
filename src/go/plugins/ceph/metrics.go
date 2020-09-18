@@ -24,11 +24,11 @@ import (
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(data []byte) (res interface{}, err error)
+type handlerFunc func(data ...[]byte) (res interface{}, err error)
 
 type metricParams struct {
 	description string
-	cmd         string
+	cmd         []string
 	params      map[string]string
 	handler     handlerFunc
 }
@@ -39,8 +39,8 @@ var (
 )
 
 // Handle TODO.
-func (mp *metricParams) Handle(data []byte) (res interface{}, err error) {
-	return mp.handler(data)
+func (mp *metricParams) Handle(data ...[]byte) (res interface{}, err error) {
+	return mp.handler(data...)
 }
 
 type pluginMetrics map[string]metricParams
@@ -48,43 +48,43 @@ type pluginMetrics map[string]metricParams
 var metrics = pluginMetrics{
 	keyDf: metricParams{
 		description: "TODO.",
-		cmd:         "df",
+		cmd:         []string{"df"},
 		params:      extraParamDetails,
 		handler:     dfHandler,
 	},
 	keyOSD: metricParams{
 		description: "TODO.",
-		cmd:         "pg dump",
+		cmd:         []string{"pg dump"},
 		params:      nil,
 		handler:     OSDHandler,
 	},
 	keyOSDDiscovery: metricParams{
 		description: "TODO.",
-		cmd:         "osd ls",
+		cmd:         []string{"osd crush rule dump", "osd crush tree"},
 		params:      nil,
 		handler:     OSDDiscoveryHandler,
 	},
 	keyOSDDump: metricParams{
 		description: "TODO.",
-		cmd:         "osd dump",
+		cmd:         []string{"osd dump"},
 		params:      nil,
 		handler:     OSDDumpHandler,
 	},
 	keyPing: metricParams{
 		description: "TODO.",
-		cmd:         "health",
+		cmd:         []string{"health"},
 		params:      nil,
 		handler:     pingHandler,
 	},
 	keyPoolDiscovery: metricParams{
 		description: "TODO.",
-		cmd:         "osd pool ls",
+		cmd:         []string{"osd dump", "osd crush rule dump"},
 		params:      nil,
 		handler:     poolDiscoveryHandler,
 	},
 	keyStatus: metricParams{
 		description: "Returns status of cluster.",
-		cmd:         "status",
+		cmd:         []string{"status"},
 		params:      nil,
 		handler:     statusHandler,
 	},

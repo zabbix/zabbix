@@ -34,6 +34,7 @@ type aggDataInt struct {
 	Avg float64 `json:"avg"`
 }
 
+// newAggDataInt TODO.
 func newAggDataInt(v []uint64) aggDataInt {
 	if len(v) == 0 {
 		return aggDataInt{0, 0, 0}
@@ -54,12 +55,14 @@ func newAggDataInt(v []uint64) aggDataInt {
 	}
 }
 
+// aggDataFloat TODO.
 type aggDataFloat struct {
 	Min float64 `json:"min"`
 	Max float64 `json:"max"`
 	Avg float64 `json:"avg"`
 }
 
+// newAggDataFloat TODO.
 func newAggDataFloat(v []float64) aggDataFloat {
 	if len(v) == 0 {
 		return aggDataFloat{0, 0, 0}
@@ -111,10 +114,10 @@ type outOsdStats struct {
 }
 
 // OSDHandler TODO.
-func OSDHandler(data []byte) (interface{}, error) {
+func OSDHandler(data ...[]byte) (interface{}, error) {
 	var pgDump cephPgDump
 
-	err := json.Unmarshal(data, &pgDump)
+	err := json.Unmarshal(data[0], &pgDump)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}

@@ -91,18 +91,22 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 
 	metric := metrics[key]
 
-	response, err := request(p.client, uri.String(), metric.cmd, metric.params)
-	if err != nil {
-		// Special logic of processing connection errors is used if keyPing is requested
-		// because it must return pingFailed if any error occurred.
-		if key == keyPing {
-			return pingFailed, nil
-		}
+	responses := make([][]byte, len(metric.cmd))
 
-		return nil, err
+	for i, cmd := range metric.cmd {
+		responses[i], err = request(p.client, uri.String(), cmd, metric.params)
+		if err != nil {
+			// Special logic of processing connection errors is used if keyPing is requested
+			// because it must return pingFailed if any error occurred.
+			if key == keyPing {
+				return pingFailed, nil
+			}
+
+			return nil, err
+		}
 	}
 
-	result, err = metric.Handle(response)
+	result, err = metric.Handle(responses...)
 	if err != nil {
 		p.Errf(err.Error())
 	}

@@ -70,10 +70,10 @@ var healthMap = map[string]int8{
 }
 
 // statusHandler TODO.
-func statusHandler(data []byte) (interface{}, error) {
+func statusHandler(data ...[]byte) (interface{}, error) {
 	var status cephStatus
 
-	err := json.Unmarshal(data, &status)
+	err := json.Unmarshal(data[0], &status)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}

@@ -70,10 +70,10 @@ type outDf struct {
 }
 
 // dfHandler TODO.
-func dfHandler(data []byte) (interface{}, error) {
+func dfHandler(data ...[]byte) (interface{}, error) {
 	var df cephDf
 
-	err := json.Unmarshal(data, &df)
+	err := json.Unmarshal(data[0], &df)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
