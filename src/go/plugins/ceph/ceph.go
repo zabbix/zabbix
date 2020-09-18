@@ -20,6 +20,7 @@
 package ceph
 
 import (
+	"context"
 	"crypto/tls"
 	"net/http"
 	"time"
@@ -71,7 +72,7 @@ func whereToConnect(params []string, sessions map[string]*Session, defaultURI st
 			// Use a pre-defined session
 			uri = sessions[params[0]].URI
 			user = sessions[params[0]].User
-			apikey = sessions[params[0]].ApiKey
+			apikey = sessions[params[0]].APIKey
 		}
 	}
 
@@ -89,29 +90,41 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
-	metric := metrics[key]
+	m := metrics[key]
+	responses := make(map[command][]byte)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	resCh := asyncRequest(ctx, cancel, p.client, uri.String(), m)
 
-	responses := make([][]byte, len(metric.cmd))
-
-	for i, cmd := range metric.cmd {
-		responses[i], err = request(p.client, uri.String(), cmd, metric.params)
-		if err != nil {
-			// Special logic of processing connection errors is used if keyPing is requested
-			// because it must return pingFailed if any error occurred.
-			if key == keyPing {
-				return pingFailed, nil
+	for range m.commands {
+		r := <-resCh
+		if r.err != nil {
+			if err == nil {
+				err = r.err
 			}
 
-			return nil, err
+			break
 		}
+
+		responses[command(r.cmd)] = r.data
 	}
 
-	result, err = metric.Handle(responses...)
+	if err != nil {
+		// Special logic of processing connection errors is used if keyPing is requested
+		// because it must return pingFailed if any error occurred.
+		if key == keyPing {
+			return pingFailed, nil
+		}
+
+		return nil, err
+	}
+
+	result, err = m.Handle(responses)
 	if err != nil {
 		p.Errf(err.Error())
 	}
 
-	return
+	return result, err
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.

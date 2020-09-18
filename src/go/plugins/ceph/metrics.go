@@ -23,72 +23,28 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(data ...[]byte) (res interface{}, err error)
+type command string
 
-type metricParams struct {
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(data map[command][]byte) (res interface{}, err error)
+
+type metric struct {
 	description string
-	cmd         []string
+	commands    []command
 	params      map[string]string
 	handler     handlerFunc
 }
 
 var (
 	extraParamDetails = map[string]string{"details": "details"}
-	//extraParamOsd     = map[string]string{"dumpcontents": "osds"}
 )
 
 // Handle TODO.
-func (mp *metricParams) Handle(data ...[]byte) (res interface{}, err error) {
-	return mp.handler(data...)
+func (m *metric) Handle(data map[command][]byte) (res interface{}, err error) {
+	return m.handler(data)
 }
 
-type pluginMetrics map[string]metricParams
-
-var metrics = pluginMetrics{
-	keyDf: metricParams{
-		description: "TODO.",
-		cmd:         []string{"df"},
-		params:      extraParamDetails,
-		handler:     dfHandler,
-	},
-	keyOSD: metricParams{
-		description: "TODO.",
-		cmd:         []string{"pg dump"},
-		params:      nil,
-		handler:     OSDHandler,
-	},
-	keyOSDDiscovery: metricParams{
-		description: "TODO.",
-		cmd:         []string{"osd crush rule dump", "osd crush tree"},
-		params:      nil,
-		handler:     OSDDiscoveryHandler,
-	},
-	keyOSDDump: metricParams{
-		description: "TODO.",
-		cmd:         []string{"osd dump"},
-		params:      nil,
-		handler:     OSDDumpHandler,
-	},
-	keyPing: metricParams{
-		description: "TODO.",
-		cmd:         []string{"health"},
-		params:      nil,
-		handler:     pingHandler,
-	},
-	keyPoolDiscovery: metricParams{
-		description: "TODO.",
-		cmd:         []string{"osd dump", "osd crush rule dump"},
-		params:      nil,
-		handler:     poolDiscoveryHandler,
-	},
-	keyStatus: metricParams{
-		description: "Returns status of cluster.",
-		cmd:         []string{"status"},
-		params:      nil,
-		handler:     statusHandler,
-	},
-}
+type pluginMetrics map[string]metric
 
 const (
 	keyDf            = "ceph.df.details"
@@ -99,6 +55,61 @@ const (
 	keyPoolDiscovery = "ceph.pool.discovery"
 	keyStatus        = "ceph.status"
 )
+
+const (
+	cmdDf               = "df"
+	cmdPgDump           = "pg dump"
+	cmdOSDCrushRuleDump = "osd crush rule dump"
+	cmdOSDCrushTree     = "osd crush tree"
+	cmdOSDDump          = "osd dump"
+	cmdHealth           = "health"
+	cmdStatus           = "status"
+)
+
+var metrics = pluginMetrics{
+	keyDf: metric{
+		description: "TODO.",
+		commands:    []command{cmdDf},
+		params:      extraParamDetails,
+		handler:     dfHandler,
+	},
+	keyOSD: metric{
+		description: "TODO.",
+		commands:    []command{cmdPgDump},
+		params:      nil,
+		handler:     osdHandler,
+	},
+	keyOSDDiscovery: metric{
+		description: "TODO.",
+		commands:    []command{cmdOSDCrushRuleDump, cmdOSDCrushTree},
+		params:      nil,
+		handler:     OSDDiscoveryHandler,
+	},
+	keyOSDDump: metric{
+		description: "TODO.",
+		commands:    []command{cmdOSDDump},
+		params:      nil,
+		handler:     osdDumpHandler,
+	},
+	keyPing: metric{
+		description: "TODO.",
+		commands:    []command{cmdHealth},
+		params:      nil,
+		handler:     pingHandler,
+	},
+	keyPoolDiscovery: metric{
+		description: "TODO.",
+		commands:    []command{cmdOSDDump, cmdOSDCrushRuleDump},
+		params:      nil,
+		handler:     poolDiscoveryHandler,
+	},
+	keyStatus: metric{
+		description: "Returns status of cluster.",
+		commands:    []command{cmdStatus},
+		params:      nil,
+		handler:     statusHandler,
+	},
+}
 
 // Metrics TODO
 func (pm pluginMetrics) Metrics() (res []string) {

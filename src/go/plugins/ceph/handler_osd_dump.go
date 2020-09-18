@@ -51,11 +51,11 @@ type outOsdDump struct {
 	Osds              map[string]osdStatus `json:"osds"`
 }
 
-// OSDDumpHandler TODO.
-func OSDDumpHandler(data ...[]byte) (interface{}, error) {
+// osdDumpHandler TODO.
+func osdDumpHandler(data map[command][]byte) (interface{}, error) {
 	var osdDump cephOsdDump
 
-	err := json.Unmarshal(data[0], &osdDump)
+	err := json.Unmarshal(data[cmdOSDDump], &osdDump)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}

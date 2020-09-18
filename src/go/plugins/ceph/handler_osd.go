@@ -113,11 +113,11 @@ type outOsdStats struct {
 	Osds          map[string]osdStat `json:"osds"`
 }
 
-// OSDHandler TODO.
-func OSDHandler(data ...[]byte) (interface{}, error) {
+// osdHandler TODO.
+func osdHandler(data map[command][]byte) (interface{}, error) {
 	var pgDump cephPgDump
 
-	err := json.Unmarshal(data[0], &pgDump)
+	err := json.Unmarshal(data[cmdPgDump], &pgDump)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
@@ -125,7 +125,7 @@ func OSDHandler(data ...[]byte) (interface{}, error) {
 	log.Infof("%+v", pgDump)
 
 	var (
-		fill              float64 = 0
+		fill              float64
 		latencyApplyList  []uint64
 		latencyCommitList []uint64
 		fillList          []float64

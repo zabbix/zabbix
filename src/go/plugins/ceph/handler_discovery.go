@@ -22,55 +22,56 @@ package ceph
 import (
 	"encoding/json"
 	"fmt"
+
 	"zabbix.com/pkg/log"
 
 	"zabbix.com/pkg/zbxerr"
 )
 
-type Step struct {
+type step struct {
 	Op       string `json:"op"`
 	Item     int64  `json:"item"`
 	ItemName string `json:"item_name"`
 }
 
-type OSDCrushRule struct {
-	Id    int64  `json:"rule_id"`
+type crushRule struct {
+	ID    int64  `json:"rule_id"`
 	Name  string `json:"rule_name"`
-	Steps []Step `json:"steps"`
+	Steps []step `json:"steps"`
 }
 
-type Node struct {
-	Id       int64   `json:"id"`
-	Name     string  `json:"name"`
+type node struct {
+	ID int64 `json:"id"`
+	//Name     string  `json:"name"`
 	Type     string  `json:"type"`
 	Children []int64 `json:"children"`
 }
 
-type OSDCrushTree struct {
-	Nodes []Node `json:"nodes"`
+type crushTree struct {
+	Nodes []node `json:"nodes"`
 }
 
-type OSDEntity struct {
+type osdEntity struct {
 	OSDName   string `json:"{#OSDNAME}"`
 	CrushRule string `json:"{#CRUSHRULE}"`
 }
 
 // getNode TODO.
-func getNode(tree []Node, nodeId int64) (*Node, error) {
-	for _, node := range tree {
-		if node.Id == nodeId {
-			return &node, nil
+func getNode(tree []node, nodeID int64) (*node, error) {
+	for _, n := range tree {
+		if n.ID == nodeID {
+			return &n, nil
 		}
 	}
 
-	return nil, fmt.Errorf(`cannot find node "%d"`, nodeId)
+	return nil, fmt.Errorf(`cannot find node "%d"`, nodeID)
 }
 
 // getStepOpTake TODO.
-func getStepOpTake(rule OSDCrushRule) (*Step, error) {
-	for _, step := range rule.Steps {
-		if step.Op == "take" {
-			return &step, nil
+func getStepOpTake(rule crushRule) (*step, error) {
+	for _, s := range rule.Steps {
+		if s.Op == "take" {
+			return &s, nil
 		}
 	}
 
@@ -78,18 +79,18 @@ func getStepOpTake(rule OSDCrushRule) (*Step, error) {
 }
 
 // walkCrushTree TODO.
-func walkCrushTree(tree []Node, rootNodeId int64) (res []*Node, err error) {
-	rootNode, err := getNode(tree, rootNodeId)
+func walkCrushTree(tree []node, rootNodeID int64) (res []*node, err error) {
+	rootNode, err := getNode(tree, rootNodeID)
 	if err != nil {
 		return nil, err
 	}
 
 	if rootNode.Type == "osd" {
-		return []*Node{rootNode}, nil
+		return []*node{rootNode}, nil
 	}
 
-	for _, childId := range rootNode.Children {
-		childNodes, err := walkCrushTree(tree, childId)
+	for _, childID := range rootNode.Children {
+		childNodes, err := walkCrushTree(tree, childID)
 		if err != nil {
 			return nil, err
 		}
@@ -103,21 +104,21 @@ func walkCrushTree(tree []Node, rootNodeId int64) (res []*Node, err error) {
 }
 
 // OSDDiscoveryHandler TODO.
-func OSDDiscoveryHandler(data ...[]byte) (interface{}, error) {
+func OSDDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
-		crushRules []OSDCrushRule
-		crushTree  OSDCrushTree
-		lld        []OSDEntity
+		crushRules []crushRule
+		tree       crushTree
+		lld        []osdEntity
 	)
 
-	roundCache := make(map[int64][]*Node)
+	roundCache := make(map[int64][]*node)
 
-	err := json.Unmarshal(data[0], &crushRules)
+	err := json.Unmarshal(data[cmdOSDCrushRuleDump], &crushRules)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
-	err = json.Unmarshal(data[1], &crushTree)
+	err = json.Unmarshal(data[cmdOSDCrushTree], &tree)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
@@ -129,7 +130,7 @@ func OSDDiscoveryHandler(data ...[]byte) (interface{}, error) {
 		}
 
 		if _, ok := roundCache[step.Item]; !ok {
-			rootNode, err := getNode(crushTree.Nodes, step.Item)
+			rootNode, err := getNode(tree.Nodes, step.Item)
 			if err != nil {
 				return nil, zbxerr.ErrorCannotParseResult.Wrap(err)
 			}
@@ -138,14 +139,14 @@ func OSDDiscoveryHandler(data ...[]byte) (interface{}, error) {
 				continue
 			}
 
-			roundCache[step.Item], err = walkCrushTree(crushTree.Nodes, step.Item)
+			roundCache[step.Item], err = walkCrushTree(tree.Nodes, step.Item)
 			if err != nil {
 				log.Errf(err.Error())
 			}
 
-			for _, node := range roundCache[step.Item] {
-				lld = append(lld, OSDEntity{
-					OSDName:   node.Name,
+			for _, n := range roundCache[step.Item] {
+				lld = append(lld, osdEntity{
+					OSDName:   fmt.Sprintf("%d", n.ID),
 					CrushRule: step.ItemName,
 				})
 			}
@@ -160,7 +161,7 @@ func OSDDiscoveryHandler(data ...[]byte) (interface{}, error) {
 	return string(jsonLLD), nil
 }
 
-type cephOsdDumpPool struct {
+type osdDumpPool struct {
 	Pools []struct {
 		Name      string `json:"pool_name"`
 		CrushRule int64  `json:"crush_rule"`
@@ -173,34 +174,34 @@ type poolEntity struct {
 }
 
 // OSDDiscoveryHandler TODO.
-func poolDiscoveryHandler(data ...[]byte) (interface{}, error) {
+func poolDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
-		poolsDump  cephOsdDumpPool
-		crushRules []OSDCrushRule
+		poolsDump  osdDumpPool
+		crushRules []crushRule
 		lld        []poolEntity
 	)
 
-	err := json.Unmarshal(data[0], &poolsDump)
+	err := json.Unmarshal(data[cmdOSDDump], &poolsDump)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
-	err = json.Unmarshal(data[1], &crushRules)
+	err = json.Unmarshal(data[cmdOSDCrushRuleDump], &crushRules)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
 	for _, pool := range poolsDump.Pools {
 		for _, rule := range crushRules {
-			if pool.CrushRule == rule.Id {
-				step, err := getStepOpTake(rule)
+			if pool.CrushRule == rule.ID {
+				s, err := getStepOpTake(rule)
 				if err != nil {
 					return nil, zbxerr.ErrorCannotParseResult.Wrap(err)
 				}
 
 				lld = append(lld, poolEntity{
 					PoolName:  pool.Name,
-					CrushRule: step.ItemName,
+					CrushRule: s.ItemName,
 				})
 
 				break

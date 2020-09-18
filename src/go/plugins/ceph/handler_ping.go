@@ -33,10 +33,10 @@ const (
 )
 
 // pingHandler TODO.
-func pingHandler(data ...[]byte) (interface{}, error) {
+func pingHandler(data map[command][]byte) (interface{}, error) {
 	var health cephHealth
 
-	err := json.Unmarshal(data[0], &health)
+	err := json.Unmarshal(data[cmdHealth], &health)
 	if err != nil {
 		return pingFailed, nil
 	}

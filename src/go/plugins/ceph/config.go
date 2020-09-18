@@ -30,7 +30,7 @@ type Session struct {
 	// URI defines an endpoint to REST API.
 	URI string `conf:"name=Uri,optional"`
 
-	ApiKey string `conf:"name=ApiKey"`
+	APIKey string `conf:"name=ApiKey"`
 
 	User string `conf:"name=User"`
 }

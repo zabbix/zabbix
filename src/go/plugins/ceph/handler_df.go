@@ -22,6 +22,7 @@ package ceph
 import (
 	"encoding/json"
 	"math"
+
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -70,17 +71,20 @@ type outDf struct {
 }
 
 // dfHandler TODO.
-func dfHandler(data ...[]byte) (interface{}, error) {
+func dfHandler(data map[command][]byte) (interface{}, error) {
 	var df cephDf
 
-	err := json.Unmarshal(data[0], &df)
+	err := json.Unmarshal(data[cmdDf], &df)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
-	var totalObjects uint64 = 0
-	var poolsStat = make(map[string]poolStat)
-	var totalPool poolStat
+	var (
+		totalObjects uint64
+		totalPool    poolStat
+	)
+
+	poolsStat := make(map[string]poolStat)
 
 	for _, p := range df.Pools {
 		poolsStat[p.Name] = poolStat{
