@@ -433,6 +433,14 @@ class ZSelect extends HTMLElement {
 		return !(bottom < 0 || top - Math.max(document.documentElement.clientHeight, window.innerHeight) >= 0);
 	}
 
+	_closestIndex(node) {
+		while (node !== null && node._index === undefined) {
+			node = node.parentNode.closest('li');
+		}
+
+		return node ? node._index : null;
+	}
+
 	registerEvents() {
 		this._events = {
 			button_mousedown: (e) => {
@@ -556,7 +564,7 @@ class ZSelect extends HTMLElement {
 			},
 
 			list_mousedown: (e) => {
-				const option = this.getOptionByIndex(e.target.closest('li')._index);
+				const option = this.getOptionByIndex(this._closestIndex(e.target));
 
 				if (option && !option.disabled) {
 					this._change(option._index);
@@ -567,7 +575,7 @@ class ZSelect extends HTMLElement {
 			},
 
 			list_mousemove: (e) => {
-				const option = this.getOptionByIndex(e.target.closest('li')._index);
+				const option = this.getOptionByIndex(this._closestIndex(e.target));
 
 				if (option && this._highlighted_index !== option._index) {
 					!option.disabled && this._highlight(option._index);

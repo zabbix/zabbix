@@ -1277,7 +1277,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 			$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
 
 			if ($interface_type == INTERFACE_TYPE_SNMP) {
-				$interface_group->setOptionTemplate('#{label}' . (new CDiv('#{description}'))->addClass('description'));
+				$interface_group->setOptionTemplate('#{label}'.(new CDiv('#{description}'))->addClass('description'));
 			}
 
 			$interface_group->addOptions($options_by_type[$interface_type]);
