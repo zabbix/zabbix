@@ -174,6 +174,8 @@ class CRole extends CApiService {
 		}
 		unset($role);
 
+		$this->updateRules($roles, __FUNCTION__);
+
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_ROLE, $roles);
 
 		return ['roleids' => $roleids];
@@ -192,7 +194,7 @@ class CRole extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>			['type' => API_SCRIPT_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role', 'name')],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'rules' =>			['type' => API_OBJECTS, 'fields' => [
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::RULE_VALUE_TYPE_INT32, self::RULE_VALUE_TYPE_STR, self::RULE_VALUE_TYPE_MODULE])],
@@ -248,6 +250,8 @@ class CRole extends CApiService {
 			DB::update('role', $upd_roles);
 		}
 
+		$this->updateRules($roles, __FUNCTION__);
+
 		foreach ($db_roles as &$db_role) {
 			unset($db_role['rules']);
 		}
@@ -268,7 +272,7 @@ class CRole extends CApiService {
 	private function validateUpdate(array $roles): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>			['type' => API_SCRIPT_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role', 'name')],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'rules' =>			['type' => API_OBJECTS, 'fields' => [
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::RULE_VALUE_TYPE_INT32, self::RULE_VALUE_TYPE_STR, self::RULE_VALUE_TYPE_MODULE])],
@@ -402,6 +406,108 @@ class CRole extends CApiService {
 					);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Update table "role_rule".
+	 *
+	 * @param array  $roles
+	 * @param string $method
+	 */
+	private function updateRules(array $roles, string $method): void {
+		$roles_rules = [];
+		$def_values = [];
+		foreach (self::RULE_VALUE_TYPES as $field_name) {
+			$default = DB::getDefault('role_rule', $field_name);
+			$def_values[$field_name] = ($default !== null) ? $default : 0;
+		}
+
+		foreach ($roles as $role) {
+			if (array_key_exists('rules', $role)) {
+				CArrayHelper::sort($role['rules'], ['type', 'name']);
+				$roles_rules[$role['roleid']] = $role['rules'];
+			}
+		}
+
+		foreach ($roles_rules as &$rules) {
+			foreach ($rules as &$rule) {
+				$rule[self::RULE_VALUE_TYPES[$rule['type']]] = $rule['value'];
+				unset($rule['value']);
+				$rule += $def_values;
+			}
+			unset($rule);
+		}
+		unset($rules);
+
+		$db_rules = ($method === 'update')
+			? DB::select('role_rule', [
+				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
+				'filter' => ['roleid' => array_keys(array_flip(array_column($roles, 'roleid')))],
+				'sortfield' => ['roleid', 'type', 'name']
+			])
+			: [];
+
+		$ins_rules = [];
+		$upd_rules = [];
+		$del_ruleids = [];
+
+		$field_names = [
+			'str' => ['name', 'value_str'],
+			'int' => ['type', 'value_int'],
+			'ids' => ['value_moduleid']
+		];
+
+		foreach ($db_rules as $db_rule) {
+			if ($roles_rules[$db_rule['roleid']]) {
+				$rule = array_shift($roles_rules[$db_rule['roleid']]);
+
+				$upd_rule = [];
+
+				foreach ($field_names['str'] as $field_name) {
+					if (array_key_exists($field_name, $rule) && $rule[$field_name] !== $db_rule[$field_name]) {
+						$upd_rule[$field_name] = $rule[$field_name];
+					}
+				}
+				foreach ($field_names['int'] as $field_name) {
+					if (array_key_exists($field_name, $rule) && $rule[$field_name] != $db_rule[$field_name]) {
+						$upd_rule[$field_name] = $rule[$field_name];
+					}
+				}
+				foreach ($field_names['ids'] as $field_name) {
+					if (array_key_exists($field_name, $rule) && $rule[$field_name] != $db_rule[$field_name]) {
+						$upd_rule[$field_name] = $rule[$field_name];
+					}
+				}
+
+				if ($upd_rule) {
+					$upd_rules[] = [
+						'values' => $upd_rule,
+						'where' => ['role_ruleid' => $db_rule['role_ruleid']]
+					];
+				}
+			}
+			else {
+				$del_ruleids[] = $db_rule['role_ruleid'];
+			}
+		}
+
+		foreach ($roles_rules as $ruleid => $rules) {
+			foreach ($rules as $rule) {
+				$ins_rules[] = ['ruleid' => $ruleid] + $rule;
+			}
+		}
+
+		if ($ins_rules) {
+			DB::insert('role_rule', $ins_rules);
+		}
+
+		if ($upd_rules) {
+			DB::update('role_rule', $upd_rules);
+		}
+
+		if ($del_ruleids) {
+			DB::delete('role_rule', ['role_ruleid' => $del_ruleids]);
 		}
 	}
 
