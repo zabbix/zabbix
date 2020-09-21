@@ -191,9 +191,9 @@ dc_expand_user_macros_in_calcitem_LDFLAGS = @SERVER_LDFLAGS@
 dc_function_calculate_nextcheck_CFLAGS = \
 	-I@top_srcdir@/tests
 dc_function_calculate_nextcheck_SOURCES = \
-	dc_function_calculate_nextcheck.c 
+	dc_function_calculate_nextcheck.c
 dc_function_calculate_nextcheck_LDADD = \
-	$(CACHE_LIBS) @SERVER_LIBS@ 
+	$(CACHE_LIBS) @SERVER_LIBS@
 dc_function_calculate_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 endif

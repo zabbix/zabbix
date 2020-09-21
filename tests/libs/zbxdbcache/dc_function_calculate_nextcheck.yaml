@@ -1,8 +1,8 @@
 ---
 test case: Schedule time based trigger from 2020-09-01 00:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TIMER 
-  params: 
+  type: ZBX_FUNCTION_TYPE_TIMER
+  params:
   timezone: :Europe/Riga
   time: 2020-09-01 00:00:00.000000000 +03:00
 out:
@@ -10,8 +10,8 @@ out:
 ---
 test case: Schedule time based trigger from 2020-09-01 00:00:15.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TIMER 
-  params: 
+  type: ZBX_FUNCTION_TYPE_TIMER
+  params:
   timezone: :Europe/Riga
   time: 2020-09-01 00:00:15.000000000 +03:00
 out:
@@ -19,8 +19,8 @@ out:
 ---
 test case: Schedule time based trigger from 2020-09-01 00:00:30.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TIMER 
-  params: 
+  type: ZBX_FUNCTION_TYPE_TIMER
+  params:
   timezone: :Europe/Riga
   time: 2020-09-01 00:00:30.000000000 +03:00
 out:
@@ -28,7 +28,7 @@ out:
 ---
 test case: Schedule 1h,now/h 2020-09-01 10:30:30.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/h
   timezone: :Europe/Riga
   time: 2020-09-01 10:30:30.000000000 +03:00
@@ -37,7 +37,7 @@ out:
 ---
 test case: Schedule 1h,now/h 2020-09-01 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/h
   timezone: :Europe/Riga
   time: 2020-09-01 10:00:00.000000000 +03:00
@@ -46,7 +46,7 @@ out:
 ---
 test case: Schedule 1h,now/h 2020-09-01 10:59:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/h
   timezone: :Europe/Riga
   time: 2020-09-01 10:59:00.000000000 +03:00
@@ -55,7 +55,7 @@ out:
 ---
 test case: Schedule 1h,now/d 2020-09-01 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/d
   timezone: :Europe/Riga
   time: 2020-09-01 10:00:00.000000000 +03:00
@@ -64,7 +64,7 @@ out:
 ---
 test case: Schedule 1h,now/M+1h 2020-09-01 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/M+1h
   timezone: :Europe/Riga
   time: 2020-09-01 10:00:00.000000000 +03:00
@@ -73,7 +73,7 @@ out:
 ---
 test case: Schedule 1h,now/M+1d 2020-09-01 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/M+1d
   timezone: :Europe/Riga
   time: 2020-09-01 10:00:00.000000000 +03:00
@@ -82,7 +82,7 @@ out:
 ---
 test case: Schedule 1h,now/M+1d 2020-09-02 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/M+1d
   timezone: :Europe/Riga
   time: 2020-09-02 10:00:00.000000000 +03:00
@@ -91,7 +91,7 @@ out:
 ---
 test case: Schedule 1d,now/M+6d/w+1d 2020-09-01 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/M+6d/w+1d
   timezone: :Europe/Riga
   time: 2020-09-01 10:00:00.000000000 +03:00
@@ -100,7 +100,7 @@ out:
 ---
 test case: Schedule 1d,now/M+6d/w+1d 2020-09-09 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 1h,now/M+6d/w+1d
   timezone: :Europe/Riga
   time: 2020-09-09 10:00:00.000000000 +03:00
@@ -109,7 +109,7 @@ out:
 ---
 test case: Schedule 8h,now/d+17h 2020-09-01 10:00:00.000000000 +03:00
 in:
-  type: ZBX_FUNCTION_TYPE_TRENDS 
+  type: ZBX_FUNCTION_TYPE_TRENDS
   params: 8h,now/d+17h
   timezone: :Europe/Riga
   time: 2020-09-01 10:00:00.000000000 +03:00
