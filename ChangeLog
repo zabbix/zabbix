@@ -2,7 +2,6 @@ Changes for 5.0.4rc1
 
 New features:
 ...G...... [ZBXNEXT-6023] added Windows service support for Zabbix agent 2 (esneiders)
-.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
 ...G...... [ZBXNEXT-6019] added Oracle Database plugin (vadimipatov)
 ........S. [ZBXNEXT-6139] added GetHeaders method to CurlHttpRequest javascript object (wiper)
 .........T [ZBXNEXT-6116] added SysAid media type (afayantsev)
@@ -17,6 +16,7 @@ Bug fixes:
 ........S. [ZBX-17993] fixed ZabbixWeb Test Item for Admin is not working (arimdjonoks)
 .........T [ZBX-13384] fixed minor template issues to follow guidelines (tuskov)
 .D..I..... [ZBX-18114] fixed documentation for Agent2 PersistentBuffer (akozlovs)
+.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
 .......PS. [ZBX-17848] fixed fping interval detection, added log prints of detected options in debug mode, re-detect options every hour (dimir)
 .........T [ZBX-18341] removed media_jira_with_CF_example.xml and moved example with custom fields example to readme (tuskov)
 .........T [ZBX-18131] added support of single-select, checkbox and radio button customfield types and "__zbx" tag filter for labels in Jira webhook (tuskov)
@@ -1741,10 +1741,8 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.25rc1
 
-New features:
-.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
-
 Bug fixes:
+.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
 .......PS. [ZBX-17848] fixed fping interval detection, added log prints of detected options in debug mode, re-detect options every hour (dimir)
 ........S. [ZBX-18188] increased age and duration related macro resolution to seconds (viktors)
 ........S. [ZBX-15651] fixed handling of overlapping IP addresses in network discovery received from single Zabbix proxy (vso)
