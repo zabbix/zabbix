@@ -473,4 +473,85 @@ out:
   token_type: ZBX_TOKEN_EXPRESSION_MACRO
   expression: '{$VALUE:"context}"}*2'
   return: SUCCEED
+---
+test case: 'Failure: {?}'
+in:
+  expression: '{?}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {?"}'
+in:
+  expression: '{?"}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {?"\"}'
+in:
+  expression: '{?"\"}'
+out:
+  return: FAIL
+---
+test case: 'Success: {?"abc"}'
+in:
+  expression: '{?"abc"}'
+out:
+  token: '{?"abc"}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '"abc"'
+  return: SUCCEED
+---
+test case: 'Success: {?"a\"b\"c"}'
+in:
+  expression: '{?"a\"b\"c"}'
+out:
+  token: '{?"a\"b\"c"}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '"a\"b\"c"'
+  return: SUCCEED
+---
+test case: 'Success: {?"}"}'
+in:
+  expression: '{?"}"}'
+out:
+  token: '{?"}"}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '"}"'
+  return: SUCCEED
+---
+test case: 'Success: {?{?}}'
+in:
+  expression: '{?{?}}'
+out:
+  token: '{?{?}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{?'
+  return: SUCCEED
+---
+test case: 'Success: {?{host:key.func()}}'
+in:
+  expression: '{?{host:key.func()}}'
+out:
+  token: '{?{host:key.func()}}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{host:key.func()}'
+  return: SUCCEED
+---
+test case: 'Success: {?{HOST.HOST}}'
+in:
+  expression: '{?{HOST.HOST}}'
+out:
+  token: '{?{HOST.HOST}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{HOST.HOST'
+  return: SUCCEED
+---
+test case: 'Success: {?{$MACRO}}'
+in:
+  expression: '{?{$MACRO}}'
+out:
+  token: '{?{$MACRO}}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{$MACRO}'
+  return: SUCCEED
 ...

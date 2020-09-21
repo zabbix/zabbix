@@ -118,15 +118,6 @@ in:
 out:
   return: FAIL
 ---
-test case: Invalid period shift 'now/h+1h'
-in:
-  period: 1h
-  shift: now/h+1h
-  timezone: :Europe/Riga
-  time: 2020-09-01 00:00:00.000000000 +03:00
-out:
-  return: FAIL
----
 test case: Valid parameters '1h,now/h-1h'
 in:
   period: 1h

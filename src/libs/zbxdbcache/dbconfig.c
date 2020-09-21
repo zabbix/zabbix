@@ -8135,7 +8135,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
  * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
  *                                                                            *
  ******************************************************************************/
-void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
+static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 {
 	int	i;
 

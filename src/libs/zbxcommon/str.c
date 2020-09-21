@@ -3649,40 +3649,78 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
 static int	zbx_token_parse_expression_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
 	const char			*ptr;
-	size_t				level;
 	size_t				offset;
 	zbx_token_expression_macro_t	*data;
+	int				quoted = 0;
 
-	/* find the end of expression macro */
-	for (ptr = macro + 2, level = 1; '}' != *ptr || 1 != level; ptr++)
+	for (ptr = macro + 2; '\0' != *ptr ; ptr++)
 	{
-		if ('\0' == *ptr)
-			return FAIL;
+		if (0 != quoted)
+		{
+			if ('\\' == *ptr)
+			{
+				if ('\0' == *(++ptr))
+					break;
+				continue;
+			}
+
+			if ('"' == *ptr)
+				quoted = 0;
+
+			continue;
+		}
 
 		if ('{' == *ptr)
-			level++;
+		{
+			zbx_token_t	tmp;
 
-		if ('}' == *ptr)
-			level--;
+			/* nested expression macros are not supported */
+			if ('?' == ptr[1])
+				continue;
+
+			if (SUCCEED == zbx_token_find(ptr, 0, &tmp, ZBX_TOKEN_SEARCH_BASIC))
+			{
+				switch (tmp.type)
+				{
+					case ZBX_TOKEN_LLD_MACRO:
+						ZBX_FALLTHROUGH;
+					case ZBX_TOKEN_LLD_FUNC_MACRO:
+						ZBX_FALLTHROUGH;
+					case ZBX_TOKEN_USER_MACRO:
+						ZBX_FALLTHROUGH;
+					case ZBX_TOKEN_SIMPLE_MACRO:
+						ptr += tmp.loc.r;
+						break;
+				}
+			}
+		}
+		else if ('}' == *ptr)
+		{
+
+			/* empty macro */
+			if (ptr == macro + 2)
+				return FAIL;
+
+			offset = macro - expression;
+
+			/* initialize token */
+			token->type = ZBX_TOKEN_EXPRESSION_MACRO;
+			token->loc.l = offset;
+			token->loc.r = offset + (ptr - macro);
+
+			/* initialize token data */
+			data = &token->data.expression_macro;
+			data->expression.l = offset + 2;
+			data->expression.r = token->loc.r - 1;
+
+			return SUCCEED;
+		}
+		else if ('"' == *ptr)
+			quoted = 1;
+
 	}
 
-	/* empty macro */
-	if (ptr == macro + 2)
-		return FAIL;
-
-	offset = macro - expression;
-
-	/* initialize token */
-	token->type = ZBX_TOKEN_EXPRESSION_MACRO;
-	token->loc.l = offset;
-	token->loc.r = offset + (ptr - macro);
-
-	/* initialize token data */
-	data = &token->data.expression_macro;
-	data->expression.l = offset + 2;
-	data->expression.r = token->loc.r - 1;
-
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
