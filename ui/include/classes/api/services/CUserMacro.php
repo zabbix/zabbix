@@ -370,7 +370,7 @@ class CUserMacro extends CApiService {
 
 		$macros = [];
 
-		foreach ($globalmacros as $globalmacro) {
+		foreach ($globalmacros as $index => &$globalmacro) {
 			if (!array_key_exists($globalmacro['globalmacroid'], $db_globalmacros)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
@@ -379,11 +379,21 @@ class CUserMacro extends CApiService {
 
 			$db_globalmacro = $db_globalmacros[$globalmacro['globalmacroid']];
 
+			if (!array_key_exists('type', $globalmacro)) {
+				$globalmacro['type'] = $db_globalmacro['type'];
+			}
+
+			// Use database value to bypass Vault macro validation in case if no value is given.
+			if ($globalmacro['type'] == ZBX_MACRO_TYPE_VAULT && !array_key_exists('value', $globalmacro)) {
+				$globalmacro['value'] = $db_globalmacro['value'];
+			}
+
 			if (array_key_exists('macro', $globalmacro)
 					&& $this->trimMacro($globalmacro['macro']) !== $this->trimMacro($db_globalmacro['macro'])) {
 				$macros[] = $globalmacro['macro'];
 			}
 		}
+		unset($globalmacro);
 
 		if ($macros) {
 			$this->checkDuplicates($macros);
