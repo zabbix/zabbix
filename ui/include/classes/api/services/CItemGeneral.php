@@ -2317,20 +2317,22 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		if (!$options['countOutput'] && self::dbDistinct($sql_parts)) {
-			$nclob_requested = [];
+			$schema = $this->getTableSchema();
+			$nclob_fields = [];
 
-			foreach(['description', 'headers', 'params', 'posts'] as $field) {
-				if ($this->outputIsRequested($field, $options['output'])) {
-					$nclob_requested[] = $field;
+			foreach ($schema['fields'] as $field_name => $field) {
+				if ($field['type'] == DB::FIELD_TYPE_NCLOB
+						&& $this->outputIsRequested($field_name, $options['output'])) {
+					$nclob_fields[] = $field_name;
 				}
 			}
 
-			if ($nclob_requested) {
+			if ($nclob_fields) {
 				$output = ($options['output'] === API_OUTPUT_EXTEND)
-					? array_keys(DB::getSchema('items')['fields'])
+					? array_keys($schema['fields'])
 					: $options['output'];
 
-				$options['output'] = array_diff($output, $nclob_requested);
+				$options['output'] = array_diff($output, $nclob_fields);
 			}
 		}
 
@@ -2346,26 +2348,29 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array    The result array with added NCLOB fields.
 	 */
 	protected function addNclobFieldValues(array $options, array $result): array {
-		$nclob_requested = [];
+		$schema = $this->getTableSchema();
+		$nclob_fields = [];
 
-		foreach(['description', 'headers', 'params', 'posts'] as $field) {
-			if ($this->outputIsRequested($field, $options['output'])) {
-				$nclob_requested[] = $field;
+		foreach ($schema['fields'] as $field_name => $field) {
+			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
+				$nclob_fields[] = $field_name;
 			}
 		}
 
-		if (!$nclob_requested) {
+		if (!$nclob_fields) {
 			return $result;
 		}
 
-		$nclob_values = DB::select('items', [
-			'output' => $nclob_requested,
-			'itemids' => array_keys($result),
-			'preservekeys' => true,
-		]);
+		$pk = $schema['key'];
+		$options = [
+			'output' => $nclob_fields,
+			'filter' => [$pk => array_keys($result)]
+		];
 
-		foreach ($nclob_values as $pk => $row) {
-			$result[$pk] += $row;
+		$db_items = DBselect(DB::makeSql($this->tableName, $options));
+
+		while ($db_item = DBfetch($db_items)) {
+			$result[$db_item[$pk]] += $db_item;
 		}
 
 		return $result;
