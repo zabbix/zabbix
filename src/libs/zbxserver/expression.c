@@ -5764,6 +5764,14 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 		zbx_free(replace_to);
 		replace_to = replace_to_esc;
 	}
+	else if (0 != (flags & ZBX_TOKEN_STRING))
+	{
+		char	*replace_to_esc;
+
+		replace_to_esc = zbx_dyn_escape_string(replace_to, "\\\"");
+		zbx_free(replace_to);
+		replace_to = replace_to_esc;
+	}
 	else if (0 != (flags & ZBX_TOKEN_STR_REPLACE))
 	{
 		char	*replace_to_esc;
@@ -5856,6 +5864,80 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
 
 	zbx_free(context_esc);
 	zbx_free(context);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_expression_macro_token                                   *
+ *                                                                            *
+ * Purpose: expand discovery macro in expression macro                        *
+ *                                                                            *
+ * Parameters: data            - [IN/OUT] the expression containing lld macro *
+ *             token           - [IN/OUT] the token with user macro location data   *
+ *             jp_row          - [IN] discovery data                                *
+ *             lld_macro_paths - [IN] discovery data                                   *
+ *             error  - [OUT] error message                                   *
+ *             max_error_len - [IN] the size of error buffer                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_expression_macro_token(char **data, zbx_token_t *token,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char *error,
+		size_t error_len)
+{
+	zbx_token_t	cur_token, tmp_token;
+	int		pos, quoted = 0, last_pos;
+	size_t		i;
+
+	last_pos = pos = token->data.expression_macro.expression.l;
+
+	while (SUCCEED == zbx_token_find(*data, pos, &cur_token, ZBX_TOKEN_SEARCH_BASIC) &&
+			cur_token.loc.l < token->loc.r)
+	{
+		for (i = last_pos + 1; i < cur_token.loc.l; i++)
+		{
+			switch ((*data)[i])
+			{
+				case '\\':
+					if (0 != quoted)
+						i++;
+					break;
+				case '"':
+					quoted = !quoted;
+					break;
+			}
+		}
+
+		tmp_token = cur_token;
+
+		switch (cur_token.type)
+		{
+			case ZBX_TOKEN_LLD_MACRO:
+			case ZBX_TOKEN_LLD_FUNC_MACRO:
+				if (FAIL == process_lld_macro_token(data, &cur_token, ZBX_TOKEN_STRING, jp_row,
+						lld_macro_paths, error, error_len, quoted))
+				{
+					return FAIL;
+				}
+				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
+				pos = cur_token.loc.r;
+				break;
+			case ZBX_TOKEN_USER_MACRO:
+				process_user_macro_token(data, &cur_token, jp_row, lld_macro_paths);
+				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
+				pos = cur_token.loc.r;
+				break;
+			case ZBX_TOKEN_SIMPLE_MACRO:
+				process_simple_macro_token(data, &cur_token, jp_row, lld_macro_paths, error,
+						error_len);
+				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
+				pos = cur_token.loc.r;
+				break;
+		}
+
+		last_pos = ++pos;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -5978,6 +6060,11 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 								error, max_error_len);
 						pos = token.loc.r;
 					}
+					break;
+				case ZBX_TOKEN_EXPRESSION_MACRO:
+					process_expression_macro_token(data, &token, jp_row, lld_macro_paths, error,
+							max_error_len);
+					pos = token.loc.r;
 					break;
 			}
 		}

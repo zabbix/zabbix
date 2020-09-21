@@ -224,4 +224,48 @@ in:
 out:
   expression: '{2} <> {$M:"context:\"\\/\""} and {1} < "x"'
   return: SUCCEED
+---
+test case: Expand '={?{{HOST.KEY}:key[{#A}].last()}}=' with {#A}=[]
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"[]"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{{HOST.HOST}:key[{#A}].last()}}='
+out:
+  expression: '={?{{HOST.HOST}:key["[]"].last()}}='
+  return: SUCCEED
+---
+test case: Expand 'Expression:{?{host:key.last()} = "{#A}" }.' with {#A}=value:"xyz"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"value:\"xyz\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: 'Expression:{?{host:key.last()} = "{#A}" }.'
+out:
+  expression: 'Expression:{?{host:key.last()} = "value:\"xyz\"" }.'
+  return: SUCCEED
+---
+test case: Expand '={?{host:key[{#A}].last({#A})}}=' with {#A}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"()"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{host:key[{#A}].last({#A})}}='
+out:
+  expression: '={?{host:key[()].last("()")}}='
+  return: SUCCEED
+---
+test case: Expand '={?{$MACRO:"{#A}"}=' with {#A}=x"z
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"x\"z"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '={?{$MACRO:"{#A}"}='
+out:
+  expression: '={?{$MACRO:"x\"z"}='
+  return: SUCCEED
 ...
