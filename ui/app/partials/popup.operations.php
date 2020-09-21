@@ -117,25 +117,25 @@ $form_list->addRow(_('Send to users'), (new CDiv(
 /*
  * Operation message media type row.
  */
-$select_operation_opmessage_mediatypeid = (new CSelect('operation[opmessage][mediatypeid]'))
+$select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
 	->setFocusableElementId('operation-opmessage-mediatypeid')
 	->addOption(new CSelectOption('0', '- '._('All').' -'));
 
 $form_list->addRow(
-	new CLabel(_('Default media type'), $select_operation_opmessage_mediatypeid->getFocusableElementId()),
-	$select_operation_opmessage_mediatypeid,
+	new CLabel(_('Default media type'), $select_opmessage_mediatype_default->getFocusableElementId()),
+	$select_opmessage_mediatype_default,
 	'operation-message-mediatype-default'
 );
 
 /*
  * Operation message media type row (explicit).
  */
-$select_operation_opmessage_mediatypeid = (new CSelect('operation[opmessage][mediatypeid]'))
+$select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->setFocusableElementId('operation-opmessage-mediatypeid')
 	->addOption(new CSelectOption('0', '- '._('All').' -'));
 
-$form_list->addRow(new CLabel(_('Send only to'), $select_operation_opmessage_mediatypeid->getFocusableElementId()),
-	$select_operation_opmessage_mediatypeid,
+$form_list->addRow(new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()),
+	$select_opmessage_mediatype,
 	'operation-message-mediatype-only'
 );
 
