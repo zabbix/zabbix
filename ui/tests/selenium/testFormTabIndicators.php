@@ -693,38 +693,36 @@ class testFormTabIndicators extends CWebTest {
 		foreach ($data['tabs'] as $tab) {
 			$form->selectTab($tab['name']);
 
-			if (CTestArrayHelper::get($tab, 'initial_count', false)) {
-				$initial_count = $tab['initial_count'];
-				$count = $tab['count'];
-			}
-			elseif (CTestArrayHelper::get($tab, 'count', false)) {
-				$initial_count = 0;
-				$count = $tab['count'];
-			}
-			elseif (CTestArrayHelper::get($tab, 'set by default', false)) {
-				$original_status = 'enabled';
-				$new_status = 'disabled';
+			if (array_key_exists('count', $tab)) {
+				$data_indicator = 'count';
+				$new_value = $tab['count'];
+				$old_value = (array_key_exists('initial_count', $tab)) ? $tab['initial_count'] : 0;
 			}
 			else {
-				$original_status = 'disabled';
-				$new_status = 'enabled';
+				$data_indicator = 'mark';
+				if (CTestArrayHelper::get($tab, 'set by default', false)) {
+					$new_value = false;
+					$old_value = true;
+				}
+				else {
+					$new_value = true;
+					$old_value = false;
+				}
 			}
 
-			$expected = (CTestArrayHelper::get($tab, 'count', false)) ? $initial_count : $original_status;
 			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
-			$this->checkIndicatorValue($tab_selector, $expected);
+			$this->checkIndicatorValue($tab_selector, $old_value);
 
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);
 			// Input elements change their attribute values only after focus is removed from the element.
 			$this->page->removeFocus();
-			$expected = (array_key_exists('count', $tab)) ? $count : $new_status;
-			$this->checkIndicatorValue($tab_selector, $expected);
+			$this->checkIndicatorValue($tab_selector, $new_value);
 
 			// Clear the popullatedfields and check indicator value.
 			$this->updateTabFields($tab, $form, USER_ACTION_REMOVE);
-			$expected = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $original_status;
-			$this->checkIndicatorValue($tab_selector, $expected);
+			$old_value = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $old_value;
+			$this->checkIndicatorValue($tab_selector, $old_value);
 		}
 	}
 
@@ -764,7 +762,7 @@ class testFormTabIndicators extends CWebTest {
 		$form = $this->query('id:user-group-form')->asForm()->one();
 		$form->selectTab('Permissions');
 		$tab_selector = $form->query('xpath:.//a[text()="Permissions"]')->one();
-		$this->checkIndicatorValue($tab_selector, 'disabled');
+		$this->checkIndicatorValue($tab_selector, false);
 
 		// Add read permissions to Discovered hosts group and check indicator.
 		$group_selector = $form->query('xpath:.//div[@id="new_group_right_groupids_"]/..')->asMultiselect()->one();
@@ -774,29 +772,29 @@ class testFormTabIndicators extends CWebTest {
 		$add_button = $form->query('id:new-group-right-table')->query('button:Add')->one();
 		$add_button->click();
 		$tab_selector->waitUntilReady();
-		$this->checkIndicatorValue($tab_selector, 'enabled');
+		$this->checkIndicatorValue($tab_selector, true);
 
 		// Remove read permissions from Discovered hosts group and check indicator.
 		$group_selector->fill('Discovered hosts');
 		$permission_level->fill('None');
 		$add_button->click();
 		$tab_selector->waitUntilReady();
-		$this->checkIndicatorValue($tab_selector, 'disabled');
+		$this->checkIndicatorValue($tab_selector, false);
 
 		// Check status indicator in Tag filter tab.
 		$form->selectTab('Tag filter');
 		$tab_selector = $form->query('xpath:.//a[text()="Tag filter"]')->one();
-		$this->checkIndicatorValue($tab_selector, 'disabled');
+		$this->checkIndicatorValue($tab_selector, false);
 
 		// Add tag filter for Discovered hosts group and check indicator.
 		$form->query('xpath:.//div[@id="new_tag_filter_groupids_"]/..')->asMultiselect()->one()->fill('Discovered hosts');
 		$form->query('id:new-tag-filter-table')->query('button:Add')->one()->click();
 		$tab_selector->waitUntilReady();
-		$this->checkIndicatorValue($tab_selector, 'enabled');
+		$this->checkIndicatorValue($tab_selector, true);
 
 		// Remove the tag filter for Discovered hosts group and check indicator.
 		$form->query('id:tag-filter-table')->query('button:Remove')->one()->click();
-		$this->checkIndicatorValue($tab_selector, 'disabled');
+		$this->checkIndicatorValue($tab_selector, false);
 	}
 
 	/**
@@ -963,7 +961,16 @@ class testFormTabIndicators extends CWebTest {
 	 * Function checks count attribute or status attribute value of the specified tab.
 	 */
 	private function checkIndicatorValue($element, $expected) {
-		$attribute = (is_int($expected)) ? 'data-indicator-count' : 'data-indicator-status';
-		$this->assertEquals($expected, $element->getAttribute($attribute));
+		if (is_bool($expected)) {
+			$value = (bool) $element->getAttribute('data-indicator-value');
+			$indicator = 'mark';
+		}
+		else {
+			$value = $element->getAttribute('data-indicator-value');
+			$indicator = 'count';
+		}
+
+		$this->assertEquals($indicator, $element->getAttribute('data-indicator'));
+		$this->assertEquals($expected, $value);
 	}
 }
