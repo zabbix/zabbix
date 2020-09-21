@@ -4143,11 +4143,12 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type &&
 							0 != (macro_type & MACRO_TYPE_EVENT_NAME))
 				{
-					c = (*data)[token.loc.r];
-					(*data)[token.loc.r] = '\0';
+					size_t	exp_alloc = 0, exp_offset = 0;
+					zbx_strloc_t	*loc = &token.data.expression_macro.expression;
 
-					expression = zbx_strdup(expression, *data +
-							token.data.expression_macro.expression.l);
+					zbx_free(expression);
+					zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, *data + loc->l,
+							loc->r - loc->l + 1);
 
 					ret = get_expression_macro_result(event, r_event, alert, ack, &expression,
 							&replace_to, error, maxerrlen);
