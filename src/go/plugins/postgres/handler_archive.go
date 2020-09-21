@@ -31,9 +31,12 @@ const (
 )
 
 // archiveHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) archiveHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var archiveCountJSON, archiveSizeJSON string
-	var err error
+func (p *Plugin) archiveHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		archiveCountJSON, archiveSizeJSON string
+		err                               error
+		row                               pgx.Row
+	)
 	queryArchiveCount := `SELECT row_to_json(T)
 							FROM (
 									SELECT archived_count, failed_count
@@ -51,7 +54,13 @@ func (p *Plugin) archiveHandler(conn *postgresConn, key string, params []string)
 										 ) ready
 								) T;`
 
-	err = conn.postgresPool.QueryRow(context.Background(), queryArchiveCount).Scan(&archiveCountJSON)
+	row, err = conn.QueryRow(ctx, queryArchiveCount)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&archiveCountJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())
@@ -60,7 +69,14 @@ func (p *Plugin) archiveHandler(conn *postgresConn, key string, params []string)
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData
 	}
-	err = conn.postgresPool.QueryRow(context.Background(), queryArchiveSize).Scan(&archiveSizeJSON)
+
+	row, err = conn.QueryRow(ctx, queryArchiveSize)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&archiveSizeJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

@@ -30,23 +30,32 @@ const (
 )
 
 // databasesAgeHandler gets age of each database respectively or nil otherwise.
-func (p *Plugin) databasesAgeHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var countAge int64
+func (p *Plugin) databasesAgeHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		countAge int64
+		err      error
+		row      pgx.Row
+	)
+
 	// for now we are expecting only database name as a param
 	if len(params) == 0 {
-		return nil, errorFourthParamEmpty
+		return nil, errorFourthParamEmptyDatabaseName
 	}
 	if len(params[0]) == 0 {
-		return nil, errorFourthParamLen
+		return nil, errorFourthParamLenDatabaseName
 	}
 
-	err := conn.postgresPool.QueryRow(context.Background(),
-		`SELECT age(datfrozenxid)
+	query := `SELECT age(datfrozenxid)
 		FROM pg_catalog.pg_database
    		WHERE datistemplate = false
-			 AND datname = $1;`,
-		params[0]).Scan(&countAge)
+			 AND datname = $1;`
+	row, err = conn.QueryRow(ctx, query, params[0])
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
 
+	err = row.Scan(&countAge)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

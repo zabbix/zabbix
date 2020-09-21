@@ -32,9 +32,9 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-var sharedConn *postgresConn
+var sharedConn *PostgresConn
 
-func getConnPool(t testing.TB) (*postgresConn, error) {
+func getConnPool(t testing.TB) (*PostgresConn, error) {
 	return sharedConn, nil
 }
 
@@ -55,6 +55,6 @@ func сreateConnection() error {
 		log.Critf("[сreateConnection] invalid Postgres version: %s", err.Error())
 		return err
 	}
-	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version, connString: connString, timeout: 30}
+	sharedConn = &PostgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version, connString: connString, timeout: 30}
 	return nil
 }

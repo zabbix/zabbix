@@ -32,9 +32,12 @@ const (
 )
 
 // dbStatHandler executes select from pg_catalog.pg_stat_database command for each database and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var statJSON, query string
-	var err error
+func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		statJSON, query string
+		err             error
+		row             pgx.Row
+	)
 
 	switch key {
 	case keyPostgresStatSum:
@@ -61,7 +64,7 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) 
       , sum(blk_write_time) as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.version >= 120000 {
+		if conn.PostgresVersion() >= 120000 {
 			query = fmt.Sprintf(query, "sum(checksum_failures)")
 		} else {
 			query = fmt.Sprintf(query, "null")
@@ -92,14 +95,20 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) 
       , blk_write_time as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.version >= 120000 {
+		if conn.PostgresVersion() >= 120000 {
 			query = fmt.Sprintf(query, "checksum_failures")
 		} else {
 			query = fmt.Sprintf(query, "null")
 		}
 	}
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&statJSON)
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&statJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

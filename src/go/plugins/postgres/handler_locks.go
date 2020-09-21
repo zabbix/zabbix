@@ -21,6 +21,8 @@ package postgres
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -28,9 +30,13 @@ const (
 )
 
 // locksHandler executes select from pg_stat_database command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) locksHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var locksJSON string
-	var err error
+func (p *Plugin) locksHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		locksJSON string
+		err       error
+		row       pgx.Row
+	)
+
 	query := `
 WITH T AS
 	(SELECT db.datname dbname,
@@ -79,7 +85,13 @@ FROM
 	FROM T
 	GROUP BY dbname) T2`
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&locksJSON)
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&locksJSON)
 	if err != nil {
 		p.Errf(err.Error())
 		return nil, errorCannotFetchData

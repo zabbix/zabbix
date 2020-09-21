@@ -48,14 +48,22 @@ type PluginOptions struct {
 	// Database is the default DB name.
 	Database string `conf:"default=postgres"`
 
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout which is 3.
-	Timeout int `conf:"optional,range=1:30"`
+	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
+	// Default value equals to the global timeout.
+	ConnectTimeout int `conf:"optional,range=1:30"`
+
+	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
+	// Default value equals to the global timeout.
+	CallTimeout int `conf:"optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int64 `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]*Session `conf:"optional"`
+
+	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
+	CustomQueriesPath string `conf:"optional"`
 }
 
 const MaxAuthPassLen = 512
@@ -68,9 +76,12 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	// if no Timeout was given throught options interface
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.ConnectTimeout == 0 {
+		p.options.ConnectTimeout = global.Timeout
+	}
+
+	if p.options.CallTimeout == 0 {
+		p.options.CallTimeout = global.Timeout
 	}
 
 	for _, session := range p.options.Sessions {

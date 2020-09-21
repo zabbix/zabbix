@@ -30,23 +30,33 @@ const (
 )
 
 // databasesSizeHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) databasesSizeHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var countSize int64
+func (p *Plugin) databasesSizeHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		countSize int64
+		err       error
+		row       pgx.Row
+	)
+
 	// for now we are expecting only database name as a param
 	if len(params) == 0 {
-		return nil, errorFourthParamEmpty
+		return nil, errorFourthParamEmptyDatabaseName
 	}
 	if len(params[0]) == 0 {
-		return nil, errorFourthParamLen
+		return nil, errorFourthParamLenDatabaseName
 	}
 
-	err := conn.postgresPool.QueryRow(context.Background(),
-		`SELECT pg_database_size(datname::text)
+	query := `SELECT pg_database_size(datname::text)
 		FROM pg_catalog.pg_database
    		WHERE datistemplate = false
-			 AND datname = $1;`,
-		params[0]).Scan(&countSize)
+			 AND datname = $1;`
 
+	row, err = conn.QueryRow(ctx, query, params[0])
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&countSize)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

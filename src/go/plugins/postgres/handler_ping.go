@@ -22,6 +22,8 @@ package postgres
 import (
 	"context"
 	"fmt"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -32,10 +34,12 @@ const (
 )
 
 // pingHandler executes 'SELECT 1 as pingOk' commands and returns pingOK if a connection is alive or postgresPingFailed otherwise.
-func (p *Plugin) pingHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+func (p *Plugin) pingHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
 	var pingOK int64 = postgresPingUnknown
+	var row pgx.Row
 
-	_ = conn.postgresPool.QueryRow(context.Background(), fmt.Sprintf("SELECT %d as pingOk", postgresPingOk)).Scan(&pingOK)
+	row, _ = conn.QueryRow(ctx, fmt.Sprintf("SELECT %d as pingOk", postgresPingOk))
+	_ = row.Scan(&pingOK)
 	if pingOK != postgresPingOk {
 		p.Errf(string(errorPostgresPing))
 		return postgresPingFailed, nil

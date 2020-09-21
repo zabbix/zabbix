@@ -30,9 +30,12 @@ const (
 )
 
 // connectionsHandler executes select from pg_stat_activity command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) connectionsHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var connectionsJSON string
-	var err error
+func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		connectionsJSON string
+		err             error
+		row             pgx.Row
+	)
 	query := `SELECT row_to_json(T)
 	FROM (
 		SELECT
@@ -48,8 +51,13 @@ func (p *Plugin) connectionsHandler(conn *postgresConn, key string, params []str
 			(SELECT count(*) FROM pg_prepared_xacts) AS prepared
 		FROM pg_stat_activity WHERE datid is not NULL) T;`
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&connectionsJSON)
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
 
+	err = row.Scan(&connectionsJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

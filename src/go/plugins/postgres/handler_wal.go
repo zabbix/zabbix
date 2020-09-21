@@ -30,8 +30,13 @@ const (
 )
 
 // walHandler executes select from directory which contains wal files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) walHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var walJSON string
+func (p *Plugin) walHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		walJSON string
+		err     error
+		row     pgx.Row
+	)
+
 	query := `SELECT row_to_json(T)
 			    FROM (
 					SELECT
@@ -40,7 +45,13 @@ func (p *Plugin) walHandler(conn *postgresConn, key string, params []string) (in
 					FROM pg_ls_waldir() AS COUNT
 					) T;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&walJSON)
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&walJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

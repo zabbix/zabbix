@@ -30,12 +30,21 @@ const (
 )
 
 // cacheHandler finds cache hit percent and returns int64 if all is OK or nil otherwise.
-func (p *Plugin) cacheHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var cache float64
+func (p *Plugin) cacheHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		cache float64
+		err   error
+		row   pgx.Row
+	)
 	query := `SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2) FROM pg_catalog.pg_stat_database;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&cache)
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
 
+	err = row.Scan(&cache)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

@@ -30,8 +30,13 @@ const (
 )
 
 // bgwriterHandler executes select  with statistics from pg_stat_bgwriter and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) bgwriterHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var bgwriterJSON string
+func (p *Plugin) bgwriterHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		bgwriterJSON string
+		err          error
+		row          pgx.Row
+	)
+
 	query := `
   SELECT row_to_json (T)
     FROM (
@@ -47,8 +52,15 @@ func (p *Plugin) bgwriterHandler(conn *postgresConn, key string, params []string
             , buffers_backend_fsync
             , buffers_alloc
           FROM pg_catalog.pg_stat_bgwriter
-          ) T ;`
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&bgwriterJSON)
+		  ) T ;`
+
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&bgwriterJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

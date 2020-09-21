@@ -36,23 +36,37 @@ const (
 )
 
 // replicationHandler gets info about recovery state if all is OK or nil otherwise.
-func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var replicationResult int64
-	var status int
-	var query, stringResult string
-	var inRecovery bool
-	var err error
+func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		replicationResult   int64
+		status              int
+		query, stringResult string
+		inRecovery          bool
+		err                 error
+		row                 pgx.Row
+	)
 
 	switch key {
 	case keyPostgresReplicationStatus:
+		row, err = conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
+		if err != nil {
+			p.Errf(err.Error())
+			return nil, errorCannotFetchData
+		}
 
-		err = conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
+		err = row.Scan(&inRecovery)
 		if err != nil {
 			p.Errf(err.Error())
 			return nil, errorCannotFetchData
 		}
 		if inRecovery {
-			err = conn.postgresPool.QueryRow(context.Background(), `SELECT COUNT(*) FROM pg_stat_wal_receiver`).Scan(&status)
+			row, err = conn.QueryRow(ctx, `SELECT COUNT(*) FROM pg_stat_wal_receiver`)
+			if err != nil {
+				p.Errf(err.Error())
+				return nil, errorCannotFetchData
+			}
+
+			err = row.Scan(&status)
 			if err != nil {
 				if err == pgx.ErrNoRows {
 					p.Errf(err.Error())
@@ -73,7 +87,13 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
 						ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
   					END as lag`
 	case keyPostgresReplicationLagB:
-		err = conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
+		row, err = conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
+		if err != nil {
+			p.Errf(err.Error())
+			return nil, errorCannotFetchData
+		}
+
+		err = row.Scan(&inRecovery)
 		if err != nil {
 			if err == pgx.ErrNoRows {
 				p.Errf(err.Error())
@@ -85,7 +105,13 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
 		if inRecovery {
 			query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
 						   FROM pg_stat_wal_receiver;`
-			err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
+			row, err = conn.QueryRow(ctx, query)
+			if err != nil {
+				p.Errf(err.Error())
+				return nil, errorCannotFetchData
+			}
+
+			err = row.Scan(&replicationResult)
 			if err != nil {
 				if err == pgx.ErrNoRows {
 					p.Errf(err.Error())
@@ -114,7 +140,13 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
         					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), sent_lsn) AS master_replication_lag
 						FROM pg_stat_replication
 					) T`
-		err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&stringResult)
+		row, err = conn.QueryRow(ctx, query)
+		if err != nil {
+			p.Errf(err.Error())
+			return nil, errorCannotFetchData
+		}
+
+		err = row.Scan(&stringResult)
 		if err != nil {
 			if err == pgx.ErrNoRows {
 				p.Errf(err.Error())
@@ -125,8 +157,13 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
 		}
 		return stringResult, nil
 	}
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
 
-	err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
+	err = row.Scan(&replicationResult)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

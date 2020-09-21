@@ -30,15 +30,25 @@ const (
 )
 
 // databasesDiscoveryHandler gets names of all databases and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) databasesDiscoveryHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var databasesJSON string
+func (p *Plugin) databasesDiscoveryHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		databasesJSON string
+		err           error
+		row           pgx.Row
+	)
 
 	query := `SELECT json_build_object ('data',json_agg(json_build_object('{#DBNAME}',d.datname)))
 				FROM pg_database d
 			   WHERE NOT datistemplate
 				 AND datallowconn;`
 
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&databasesJSON)
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+
+	err = row.Scan(&databasesJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

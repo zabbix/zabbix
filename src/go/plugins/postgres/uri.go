@@ -60,7 +60,7 @@ func (u *URI) User() string {
 	return u.user
 }
 
-// URI() creates connection uri string as
+// URI creates connection uri string as
 // https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 // postgresql://[user[:password]@][netloc][:port][,...][/dbname][?param1=value1&...]
 // for unix socket host=socket_name as param
@@ -96,6 +96,12 @@ const DefaultPort = "5432"
 // It ignores embedded credentials according to https://www.ietf.org/rfc/rfc3986.txt.
 func parseURI(uri string) (res *URI, err error) {
 	res = &URI{}
+
+	// https://tools.ietf.org/html/rfc6874#section-2
+	// %25 is allowed to escape a percent sign in IPv6 scoped-address literals
+	if !strings.Contains(uri, "%25") {
+		uri = strings.Replace(uri, "%", "%25", -1)
+	}
 
 	if u, err := url.Parse(uri); err == nil {
 		switch strings.ToLower(u.Scheme) {

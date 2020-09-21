@@ -30,11 +30,20 @@ const (
 )
 
 // uptimeHandler finds difference btw current time and postmaster start time and returns int64 if all is OK or nil otherwise.
-func (p *Plugin) uptimeHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var uptime float64
-	query := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
+func (p *Plugin) uptimeHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+	var (
+		uptime float64
+		err    error
+		row    pgx.Row
+	)
 
-	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&uptime)
+	query := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
+	row, err = conn.QueryRow(ctx, query)
+	if err != nil {
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+	err = row.Scan(&uptime)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			p.Errf(err.Error())

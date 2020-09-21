@@ -36,9 +36,12 @@ const (
 	errorUnsupportedMetric               = zabbixError("Unsupported metric.")
 	errorEmptyResult                     = zabbixError("Empty result.")
 	errorCannotConvertPostgresVersionInt = zabbixError("Cannot convert Postgres version to integer.")
-	errorFourthParamEmpty                = zabbixError("The key requires database name as fourth parameter")
-	errorFourthParamLen                  = zabbixError("Expected database name as fourth parameter for the key, got empty string")
+	errorFourthParamEmptyDatabaseName    = zabbixError("The key requires database name as fourth parameter")
+	errorFourthParamLenDatabaseName      = zabbixError("Expected database name as fourth parameter for the key, got empty string")
+	errorFourthParamEmptyCustomQueryName = zabbixError("The key requires custom query name as fourth parameter")
+	errorFourthParamLenCustomQueryName   = zabbixError("Expected custon query name as fourth parameter for the key, got empty string")
 	errorUnknownSession                  = zabbixError("Unknown session")
+	errorTimeout                         = zabbixError("timeout exceeded")
 )
 
 // formatZabbixError formats a given error text. It capitalizes the first letter and adds a dot to the end.
@@ -74,5 +77,5 @@ func sanitizeError(errText, connString string) (err error) {
 		// should never happen
 		sanitizedErrorString = errText[len(connString):]
 	}
-	return fmt.Errorf("invalid connection string: %s:", sanitizedErrorString)
+	return fmt.Errorf("Invalid connection string: %s:", sanitizedErrorString)
 }
