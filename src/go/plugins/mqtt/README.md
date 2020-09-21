@@ -1,7 +1,7 @@
 # MQTT plugin
 This plugin provides a native solution for monitoring MQTT brokers published messages. 
 The plugin can monitor several broker instances simultaneously via Zabbix agent 2. Proxy and websocket connections are 
-supported. The plugin keeps all subscription to a single broker in one connection to reduce network strain. The plugin 
+supported. The plugin keeps all subscriptions to a single broker in one connection to reduce network strain. The plugin 
 supports active checks only.
 
 
@@ -11,7 +11,7 @@ supports active checks only.
 
 ## Installation
 The plugin is supplied as part of the Zabbix Agent 2 and does not require any special installation steps. Once 
-Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make sure that a MQTT broker is available.
+Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make sure that an MQTT broker is available.
 
 ## Configuration
 Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the required parameters.
@@ -29,8 +29,8 @@ If broker URI is left empty the default value of "localhost" is used.
 If broker URI does not contain a scheme the default value of "tcp://" is used.
 If broker URI does not contain a port the default value of "1883" is used. 
 
-Topic may contain wildcards ("+","#").
-If topic contains a wildcard the response will be a json containing the topic and value.
+The topic may contain wildcards ("+","#").
+If the topic contains a wildcard the response will be a json containing the topic and value.
 
 For example:
 - mqtt.get["","path/to/topic"]
@@ -39,7 +39,7 @@ For example:
 - mqtt.get["tcp://host:1885","path/to/#"]
 - mqtt.get["tcp://host:1885","path/+/topic"]
 
-**Note!** Broker URI should not contain query parameters. If scheme or port are provided the host should also be provided.
+**Note!** Broker URI should not contain query parameters. If scheme or port is provided the host should also be provided.
   
 ## Supported keys
 
@@ -48,7 +48,7 @@ and waits for publications.
 *Returns:*
 - "example publish"
 - {"path/to/topic":"example one"}
-- error message (is there was an error connecting to the broker or topic)
+- error message (if there was an error connecting to the broker or topic)
 
 ## Troubleshooting
 The plugin uses Zabbix agent 2 logs. To receive more detailed information about logged events, consider increasing a debug level 
