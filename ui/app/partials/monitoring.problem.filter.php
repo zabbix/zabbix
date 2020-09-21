@@ -503,16 +503,9 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		$('#show_' + data.uniqid, container).change(eventHandler.show);
-		eventHandler.show();
-
-		$('[name="age_state"]').change(eventHandler.age_state);
-		eventHandler.age_state();
-
-		$('[name="compact_view"]', container).change(eventHandler.compact_view);
-		eventHandler.compact_view();
-
-		$('[name="show_tags"]', container).change(eventHandler.show_tags);
-		eventHandler.show_tags();
+		$('[name="age_state"]').change(eventHandler.age_state).trigger('change');
+		$('[name="compact_view"]', container).change(eventHandler.compact_view).trigger('change');
+		$('[name="show_tags"]', container).change(eventHandler.show_tags).trigger('change');
 	}
 
 	function expand(data, container) {
