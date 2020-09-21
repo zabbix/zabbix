@@ -207,7 +207,7 @@ class Response
                     );
                 }
 
-                // Check if the InResponseTo of the Response matches the ID of the AuthNRequest (requestId) if provided
+                // Check if the InResponseTo of the Response matchs the ID of the AuthNRequest (requestId) if provided
                 if (isset($requestId) && $requestId != $responseInResponseTo) {
                     if ($responseInResponseTo == null) {
                         throw new ValidationError(
@@ -994,9 +994,9 @@ class Response
         $responseTag = '{'.Constants::NS_SAMLP.'}Response';
         $assertionTag = '{'.Constants::NS_SAML.'}Assertion';
 
-        $occurrence = array_count_values($signedElements);
-        if ((in_array($responseTag, $signedElements) && $occurrence[$responseTag] > 1)
-            || (in_array($assertionTag, $signedElements) && $occurrence[$assertionTag] > 1)
+        $ocurrence = array_count_values($signedElements);
+        if ((in_array($responseTag, $signedElements) && $ocurrence[$responseTag] > 1)
+            || (in_array($assertionTag, $signedElements) && $ocurrence[$assertionTag] > 1)
             || !in_array($responseTag, $signedElements) && !in_array($assertionTag, $signedElements)
         ) {
             return false;

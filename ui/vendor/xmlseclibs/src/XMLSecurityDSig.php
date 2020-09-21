@@ -797,7 +797,7 @@ class XMLSecurityDSig
      * Returns:
      *  Bool when verifying HMAC_SHA1;
      *  Int otherwise, with following meanings:
-     *    1 on successful signature verification,
+     *    1 on succesful signature verification,
      *    0 when signature verification failed,
      *   -1 if an error occurred during processing.
      *

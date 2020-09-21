@@ -345,7 +345,7 @@ LOGOUTREQUEST;
     }
 
     /**
-     * Checks if the Logout Request received is valid.
+     * Checks if the Logout Request recieved is valid.
      *
      * @param bool $retrieveParametersFromServer True if we want to use parameters from $_SERVER to validate the signature
      *

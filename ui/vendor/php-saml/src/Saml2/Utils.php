@@ -204,7 +204,7 @@ class Utils
     /**
      * Returns a x509 cert (adding header & footer if required).
      *
-     * @param string $cert  A x509 unformatted cert
+     * @param string $cert  A x509 unformated cert
      * @param bool   $heads True if we want to include head and footer
      *
      * @return string $x509 Formatted cert
@@ -1025,7 +1025,7 @@ class Utils
     }
 
     /**
-     * Formats a fingerprint.
+     * Formates a fingerprint.
      *
      * @param string $fingerprint fingerprint
      *
@@ -1545,7 +1545,7 @@ class Utils
                     $objKey = Utils::castKey($objKey, $signAlg, 'public');
                 } catch (Exception $e) {
                     $ex = new ValidationError(
-                        "Invalid signAlg in the received ".$strMessageType,
+                        "Invalid signAlg in the recieved ".$strMessageType,
                         ValidationError::INVALID_SIGNATURE
                     );
                     if (count($multiCerts) == 1) {

@@ -129,7 +129,7 @@ $advancedSettings = array(
         ),
     ),
 
-    // Organization information template, the info in en_US lang is recommended, add more if required
+    // Organization information template, the info in en_US lang is recomended, add more if required
     'organization' => array(
         'en-US' => array(
             'name' => '',

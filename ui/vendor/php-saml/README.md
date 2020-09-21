@@ -528,7 +528,7 @@ $advancedSettings = array(
     ),
 
     // Organization information template, the info in en_US lang is
-    // recommended, add more if required.
+    // recomended, add more if required.
     'organization' => array(
         'en-US' => array(
             'name' => '',
@@ -1076,7 +1076,7 @@ if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the I
         echo '<p>' . implode(', ', $errors) . '</p>';
     }
                                           // This check if the response was
-    if (!$auth->isAuthenticated()) {      // successfully validated and the user
+    if (!$auth->isAuthenticated()) {      // sucessfully validated and the user
         echo '<p>Not authenticated</p>';  // data retrieved or not
         exit();
     }
@@ -1089,7 +1089,7 @@ if (isset($_GET['sso'])) {    // SSO action.  Will send an AuthNRequest to the I
     $auth->processSLO();            // Process the Logout Request & Logout Response
     $errors = $auth->getErrors(); // Retrieves possible validation errors
     if (empty($errors)) {
-        echo '<p>Successfully logged out</p>';
+        echo '<p>Sucessfully logged out</p>';
     } else {
         echo '<p>' . implode(', ', $errors) . '</p>';
     }
