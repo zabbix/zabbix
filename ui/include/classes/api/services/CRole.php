@@ -143,6 +143,7 @@ class CRole extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['roleid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$result = array_values($result);
@@ -158,7 +159,7 @@ class CRole extends CApiService {
 	 * @return array
 	 */
 	public function create(array $roles): array {
-		$roles = $this->validateCreate($roles);
+		$this->validateCreate($roles);
 
 		$ins_roles = [];
 
@@ -169,10 +170,9 @@ class CRole extends CApiService {
 
 		$roleids = DB::insert('role', $ins_roles);
 
-		foreach ($roles as $index => &$role) {
-			$role['roleid'] = $roleids[$index];
+		foreach ($roles as $index => $role) {
+			$roles[$index]['roleid'] = $roleids[$index];
 		}
-		unset($role);
 
 		$this->updateRules($roles, __FUNCTION__);
 
@@ -185,10 +185,8 @@ class CRole extends CApiService {
 	 * @param array $roles
 	 *
 	 * @throws APIException if no permissions or the input is invalid.
-	 *
-	 * @return array
 	 */
-	protected function validateCreate(array $roles): array {
+	protected function validateCreate(array &$roles) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permissions to create user roles.'));
 		}
@@ -200,7 +198,7 @@ class CRole extends CApiService {
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::RULE_VALUE_TYPE_INT32, self::RULE_VALUE_TYPE_STR, self::RULE_VALUE_TYPE_MODULE])],
 				'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'name'), 'default' => DB::getDefault('role_rule', 'name')],
 				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_INT32], 'type' => API_INT32],
+										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_INT32], 'type' => API_INT32, 'in' => '0,1'],
 										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_STR], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_MODULE], 'type' => API_ID]
 				]]
@@ -212,8 +210,6 @@ class CRole extends CApiService {
 
 		$this->checkDuplicates(array_keys(array_flip(array_column($roles, 'name'))));
 		$this->checkRules($roles, __FUNCTION__);
-
-		return $roles;
 	}
 
 	/**
@@ -222,7 +218,7 @@ class CRole extends CApiService {
 	 * @return array
 	 */
 	public function update(array $roles): array {
-		[$roles, $db_roles] = $this->validateUpdate($roles);
+		$this->validateUpdate($roles, $db_roles);
 
 		$upd_roles = [];
 
@@ -264,12 +260,11 @@ class CRole extends CApiService {
 
 	/**
 	 * @param array $roles
+	 * @param array $db_roles
 	 *
 	 * @throws APIException if input is invalid.
-	 *
-	 * @return array
 	 */
-	private function validateUpdate(array $roles): array {
+	private function validateUpdate(array &$roles, ?array &$db_roles) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
@@ -278,7 +273,7 @@ class CRole extends CApiService {
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::RULE_VALUE_TYPE_INT32, self::RULE_VALUE_TYPE_STR, self::RULE_VALUE_TYPE_MODULE])],
 				'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'name'), 'default' => DB::getDefault('role_rule', 'name')],
 				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_INT32], 'type' => API_INT32],
+										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_INT32], 'type' => API_INT32, 'in' => '0,1'],
 										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_STR], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 										['if' => ['field' => 'type', 'in' => self::RULE_VALUE_TYPE_MODULE], 'type' => API_ID]
 				]]
@@ -315,8 +310,6 @@ class CRole extends CApiService {
 		}
 
 		$this->checkRules($roles, __FUNCTION__);
-
-		return [$roles, $db_roles];
 	}
 
 	/**
@@ -492,9 +485,9 @@ class CRole extends CApiService {
 			}
 		}
 
-		foreach ($roles_rules as $ruleid => $rules) {
+		foreach ($roles_rules as $roleid => $rules) {
 			foreach ($rules as $rule) {
-				$ins_rules[] = ['ruleid' => $ruleid] + $rule;
+				$ins_rules[] = ['roleid' => $roleid] + $rule;
 			}
 		}
 
@@ -563,29 +556,33 @@ class CRole extends CApiService {
 
 		// adding role rules
 		if ($options['selectRules'] !== null && $options['selectRules'] !== API_OUTPUT_COUNT) {
-			$db_rules = DB::select('role_rule', [
+			$rules_options = [
 				'output' => ['roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
 				'filter' => ['roleid' => $roleids]
-			]);
+			];
+			$db_rules = DBselect(DB::makeSql('role_rule', $rules_options));
 
-			foreach ($result as &$role) {
-				$role['rules'] = [];
+			$rules = [];
+			while ($db_rule = DBfetch($db_rules)) {
+				$rules[] = [
+					'roleid' => $db_rule['roleid'],
+					'type' => $db_rule['type'],
+					'name' => $db_rule['name'],
+					'value' => $db_rule[self::RULE_VALUE_TYPES[$db_rule['type']]]
+				];
 			}
-			unset($role);
 
-			foreach ($db_rules as &$db_rule) {
-				$db_rule['value'] = $db_rule[self::RULE_VALUE_TYPES[$db_rule['type']]];
-				unset($db_rule['value_int'], $db_rule['value_str'], $db_rule['value_moduleid']);
+			foreach ($result as $roleid => $role) {
+				$result[$roleid]['rules'] = [];
 			}
-			unset($db_rule);
 
-			$db_rules = $this->unsetExtraFields($db_rules, ['type', 'name', 'value'], $options['selectRules']);
+			$rules = $this->unsetExtraFields($rules, ['type', 'name', 'value'], $options['selectRules']);
 
-			foreach ($db_rules as $db_rule) {
-				$roleid = $db_rule['roleid'];
-				unset($db_rule['roleid']);
+			foreach ($rules as $rule) {
+				$roleid = $rule['roleid'];
+				unset($rule['roleid']);
 
-				$result[$roleid]['rules'][] = $db_rule;
+				$result[$roleid]['rules'][] = $rule;
 			}
 		}
 
