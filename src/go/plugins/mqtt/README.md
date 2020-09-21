@@ -22,15 +22,15 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 
 ### Connection and authentication
 The plugin uses broker URI, topic, username and password from item key parameters.
-The first two parameters in all plugin keys are broker and topic, the topic parameter is mandatory.
-The username and password need to be provided only if required.
+The first two parameters broker and topic, broker URI can be empty, but the topic parameter is mandatory.
+The last two parameters username and password need to be provided only if required.
 
-If broker is left empty the default value of "localhost" is used.
-If broker does not contain a scheme the default value of "tcp://" is used.
-If broker does not contain a port the default value of "1883" is used. 
+If broker URI is left empty the default value of "localhost" is used.
+If broker URI does not contain a scheme the default value of "tcp://" is used.
+If broker URI does not contain a port the default value of "1883" is used. 
 
 Topic may contain wildcards ("+","#").
-If Topic contains a wildcard the response will be a json containing the topic and value.
+If topic contains a wildcard the response will be a json containing the topic and value.
 
 For example:
 - mqtt.get["","path/to/topic"]
