@@ -219,13 +219,16 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
-func ValidateOptions(options AgentOptions) error {
+func ValidateOptions(options *AgentOptions) error {
 	const hostMetadataLen = 255
 	const hostInterfaceLen = 255
 	var err error
 	var maxLen int
 
-	if len(ExtractHostnames(options.Hostname)) > 1 {
+	hosts := ExtractHostnames(options.Hostname)
+	options.Hostname = strings.Join(hosts, ",")
+
+	if len(hosts) > 1 {
 		maxLen = hostNameListLen
 	} else {
 		maxLen = HostNameLen

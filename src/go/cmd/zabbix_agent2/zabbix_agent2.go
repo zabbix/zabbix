@@ -296,7 +296,7 @@ func main() {
 		}
 	}
 
-	if err := agent.ValidateOptions(agent.Options); err != nil {
+	if err := agent.ValidateOptions(&agent.Options); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
