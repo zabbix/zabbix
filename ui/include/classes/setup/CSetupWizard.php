@@ -766,7 +766,11 @@ class CSetupWizard extends CForm {
 					break;
 
 				case DB_STORE_CREDS_VAULT:
-					$vault_url = getRequest('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT));
+					$vault_url = getRequest('vault_url', $this->getConfig('DB_VAULT_URL'));
+					if (!$vault_url) {
+						$vault_url = self::VAULT_URL_DEFAULT;
+					}
+
 					$vault_db_path = getRequest('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH'));
 					$vault_token = getRequest('vault_token', $this->getConfig('DB_VAULT_TOKEN'));
 
