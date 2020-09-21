@@ -72,6 +72,11 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 			['/path/to/secret:key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/path/to/secret:key"'
+			]],
+			// Path is empty.
+			['namespace/', 0, ['with_key' => false], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "namespace/"'
 			]]
 		];
 	}

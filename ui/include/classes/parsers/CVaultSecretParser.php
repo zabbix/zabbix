@@ -50,7 +50,7 @@ class CVaultSecretParser extends CParser {
 		$this->errorClear();
 
 		$namespace_sep = strpos($source, '/');
-		if ($namespace_sep === false || $namespace_sep == 0) {
+		if ($namespace_sep === false || $namespace_sep == 0 || $namespace_sep == strlen($source) - 1) {
 			$this->errorPos($source, 0);
 
 			return self::PARSE_FAIL;
