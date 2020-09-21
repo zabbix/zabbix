@@ -298,8 +298,6 @@ char	*opt = NULL;
 void	zbx_co_uninitialize();
 #endif
 
-char	*first_hostname = NULL;
-
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 void	zbx_free_service_resources(int ret);
 
@@ -970,9 +968,6 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_vector_str_create(&hostnames);
 	parse_hostnames(CONFIG_HOSTNAMES, &hostnames);
 
-	if (0 < hostnames.values_num)
-		first_hostname = zbx_strdup(first_hostname, hostnames.values[0]);
-
 	if (NULL != active_hosts && '\0' != *active_hosts)
 		zbx_set_data_destination_hosts(active_hosts, add_serveractive_host_cb, &hostnames);
 
@@ -1356,12 +1351,18 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_STOP_SERVICE:
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
 			{
+				char	*p, *first_hostname;
+
 				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 
+				first_hostname = NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ? zbx_dsprintf(NULL,
+						"%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
+						zbx_strdup(NULL, CONFIG_HOSTNAMES);
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
 				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
+				zbx_free(first_hostname);
 			}
 			else
 				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
