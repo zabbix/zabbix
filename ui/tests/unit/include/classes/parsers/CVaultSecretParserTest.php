@@ -47,6 +47,16 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
+			// Double slash in key is allowed.
+			['namespace/secret:key/'.'/key', 0, [], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
+			// Multibyte support.
+			['bā/āb:ā', 0, [], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
 
 			// PARSE_FAIL
 			['pathtosecret/:key', 0, [], [
@@ -77,6 +87,29 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 			['namespace/', 0, ['with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "namespace/"'
+			]],
+			// Path has trailing slash.
+			['namespace/path/', 0, ['with_key' => false], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "path/"'
+			]],
+			['namespace/path/:key', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "path/:key"'
+			]],
+			// Path begins with slash.
+			['namespace/'.'/path', 0, ['with_key' => false], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "/path"'
+			]],
+			// Path has empty segment.
+			['namespace/path/'.'/to', 0, ['with_key' => false], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "path//to"'
+			]],
+			['namespace/path/'.'/to:key', 0, [], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "path//to:key"'
 			]]
 		];
 	}
