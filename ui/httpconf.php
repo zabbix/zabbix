@@ -50,19 +50,30 @@ $fields = [
 	],
 	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    null],
 	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    'isset({add}) || isset({update})', _('Steps')],
-	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2,3'),             'isset({add}) || isset({update})'],
-	'http_user'       => [T_ZBX_STR, O_OPT, null,  null,
-		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
-			' || {authentication}=='.HTTPTEST_AUTH_NTLM.' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
-		')',
-		_('User')
-	],
-	'http_password'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,
-		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
-			' || {authentication}=='.HTTPTEST_AUTH_NTLM.' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
-		')',
-		_('Password')
-	],
+	'authentication' =>		[T_ZBX_INT, O_OPT, null,
+								IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
+									HTTPTEST_AUTH_DIGEST
+								]),
+								'isset({add}) || isset({update})'
+							],
+	'http_user' =>			[T_ZBX_STR, O_OPT, null,  null,
+								'(isset({add}) || isset({update})) && isset({authentication})'.
+									' && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+										' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+										' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
+										' || {authentication} == '.HTTPTEST_AUTH_DIGEST.
+									')',
+								_('User')
+							],
+	'http_password' =>		[T_ZBX_STR, O_OPT, P_NO_TRIM, null,
+								'(isset({add}) || isset({update})) && isset({authentication})'.
+									' && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+										' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+										' || {authentication}=='.HTTPTEST_AUTH_KERBEROS.
+										' || {authentication} == '.HTTPTEST_AUTH_DIGEST.
+									')',
+								_('Password')
+							],
 	'http_proxy'		=> [T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
 	'new_application'	=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'hostname'			=> [T_ZBX_STR, O_OPT, null,	null,				null],

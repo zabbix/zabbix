@@ -654,8 +654,9 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_INIT		0
 /* update sync, get changed data */
 #define ZBX_DBSYNC_UPDATE	1
+#define ZBX_SYNC_SECRETS	2
 
-void	DCsync_configuration(unsigned char mode);
+void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 
@@ -747,6 +748,7 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 
 #define ZBX_MACRO_VALUE_TEXT	0
 #define ZBX_MACRO_VALUE_SECRET	1
+#define ZBX_MACRO_VALUE_VAULT	2
 
 #define ZBX_MACRO_SECRET_MASK	"******"
 

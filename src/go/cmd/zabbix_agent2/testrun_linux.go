@@ -96,6 +96,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`net.tcp.service.perf[ssh,127.0.0.1,22]`,
 		`net.udp.service[ntp,127.0.0.1,123]`,
 		`net.udp.service.perf[ntp,127.0.0.1,123]`,
+		`modbus.get[tcp://localhost]`,
 		`system.hostname`,
 	}
 
