@@ -498,7 +498,7 @@ class CSetupWizard extends CForm {
 			$table->addRow((new CSpan(_('Database TLS certificate file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CERT_FILE')
 			);
-			$table->addRow((new CSpan(_('TLS certificate authority file')))->addClass(ZBX_STYLE_GREY),
+			$table->addRow((new CSpan(_('Database TLS CA file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CA_FILE')
 			);
 			$table->addRow((new CSpan(_('Database host verification')))->addClass(ZBX_STYLE_GREY),
