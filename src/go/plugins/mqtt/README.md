@@ -1,0 +1,55 @@
+# MQTT plugin
+This plugin provides a native solution for monitoring MQTT brokers published messages. 
+The plugin can monitor several broker instances simultaneously via Zabbix agent 2. Proxy and websocket connections are 
+supported. The plugin keeps all subscription to a single broker in one connection to reduce network strain. The plugin 
+supports active checks only.
+
+
+## Requirements
+- Zabbix Agent 2
+- Go >= 1.12 (required only to build from source)
+
+## Installation
+The plugin is supplied as part of the Zabbix Agent 2 and does not require any special installation steps. Once 
+Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make sure that a MQTT broker is available.
+
+## Configuration
+Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the required parameters.
+
+**Plugins.MQTT.Timeout** — connection timeout (how long to wait for a connection to respond before shutting it down).  
+*Default value:* equals the global 'Timeout' (configuration parameter set in zabbix_agent2.conf).  
+*Limits:* 1-30
+
+### Connection and authentication
+The plugin uses broker URI, topic, username and password from item key parameters.
+The first two parameters in all plugin keys are broker and topic, the topic parameter is mandatory.
+The username and password need to be provided only if required.
+
+If broker is left empty the default value of "localhost" is used.
+If broker does not contain a scheme the default value of "tcp://" is used.
+If broker does not contain a port the default value of "1883" is used. 
+
+Topic may contain wildcards ("+","#").
+If Topic contains a wildcard the response will be a json containing the topic and value.
+
+For example:
+- mqtt.get["","path/to/topic"]
+- mqtt.get["localhost","path/to/topic"]
+- mqtt.get["tcp://host:1885","path/to/topic"]
+- mqtt.get["tcp://host:1885","path/to/#"]
+- mqtt.get["tcp://host:1885","path/+/topic"]
+
+**Note!** Broker URI should not contain query parameters. If scheme or port are provided the host should also be provided.
+  
+## Supported keys
+
+**mqtt.get[broker,topic,username,password]** — subscribes to a specific topic or topics (with wildcards) of the provided broker
+and waits for publications.
+*Returns:*
+- "example publish"
+- {"path/to/topic":"example one"}
+- error message (is there was an error connecting to the broker or topic)
+
+## Troubleshooting
+The plugin uses Zabbix agent 2 logs. To receive more detailed information about logged events, consider increasing a debug level 
+of Zabbix agent 2.
