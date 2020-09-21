@@ -20,61 +20,61 @@
 package postgres
 
 import (
+	"context"
 	"errors"
+	"net/http"
 	"time"
 
+	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/plugin"
 )
 
-const pluginName = "Postgres"
+var (
+	opts     PluginOptions
+	err      error
+	database string
+)
 
-var maxParams = map[string]int{
-
-	keyPostgresPing:                                      4,
-	keyPostgresConnections:                               4,
-	keyPostgresWal:                                       4,
-	keyPostgresStat:                                      4,
-	keyPostgresStatSum:                                   4,
-	keyPostgresReplicationCount:                          4,
-	keyPostgresReplicationStatus:                         4,
-	keyPostgresReplicationLagSec:                         4,
-	keyPostgresReplicationRecoveryRole:                   4,
-	keyPostgresReplicationLagB:                           4,
-	keyPostgresReplicationMasterDiscoveryApplicationName: 4,
-	keyPostgresLocks:                                     4,
-	keyPostgresOldestXid:                                 4,
-	keyPostgresUptime:                                    4,
-	keyPostgresCache:                                     4,
-	keyPostgresSizeArchive:                               4,
-	keyPostgresDiscoveryDatabases:                        4,
-	keyPostgresDatabasesBloating:                         4,
-	keyPostgresDatabasesSize:                             4,
-	keyPostgresDatabasesAge:                              4,
-	keyPostgresBgwriter:                                  4,
-	keyPostgresAutovacuum:                                4,
-}
+const (
+	pluginName = "Postgres"
+	sqlExt     = ".sql"
+	hkInterval = 10
+	// Common params: [connString][,user][,password][,database]
+	commonParamsNum = 4
+)
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
-	connMgr *connManager
+	connMgr *ConnManager
 	options PluginOptions
 }
 
-type requestHandler func(conn *postgresConn, key string, params []string) (res interface{}, err error)
+type requestHandler func(ctx context.Context, conn PostgresClient, key string, params []string) (res interface{}, err error)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
 
+// Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
+	queryStorage, err := yarn.New(http.Dir(p.options.CustomQueriesPath), "*"+sqlExt)
+	if err != nil {
+		p.Errf(err.Error())
+		// create empty storage if error occurred
+		queryStorage = yarn.NewFromMap(map[string]string{})
+	}
 	p.connMgr = p.NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second,
+		time.Duration(p.options.ConnectTimeout)*time.Second,
+		time.Duration(p.options.CallTimeout)*time.Second,
+		hkInterval*time.Second,
+		queryStorage,
 	)
 }
 
+// Stop implements the Runner interface and frees resources when plugin is deactivated.
 func (p *Plugin) Stop() {
-	p.connMgr.stop()
+	p.connMgr.Destroy()
 	p.connMgr = nil
 }
 
@@ -122,7 +122,7 @@ func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (u *UR
 }
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (result interface{}, err error) {
 	var (
 		handler       requestHandler
 		handlerParams []string
@@ -132,6 +132,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if err != nil {
 		return nil, err
 	}
+
 	// get connection string for PostgreSQL
 	connString := u.URI()
 	switch key {
@@ -169,6 +170,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyPostgresBgwriter:
 		handler = p.bgwriterHandler // postgres.bgwriter[[connString]]
 
+	case keyPostgresCustom:
+		handler = p.customQueryHandler // postgres.custom.query[[connString][,section]]
+
 	case keyPostgresUptime:
 		handler = p.uptimeHandler // postgres.uptime[[connString]]
 
@@ -193,7 +197,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errorUnsupportedMetric
 	}
 
-	if len(params) > maxParams[key] {
+	if len(params) > commonParamsNum && key != keyPostgresCustom {
 		return nil, errorTooManyParameters
 	}
 
@@ -208,12 +212,17 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New(formatZabbixError(err.Error()))
 	}
 
+	ctx, cancel := context.WithTimeout(conn.ctx, conn.timeout)
+	defer cancel()
+
 	if key == keyPostgresDatabasesSize || key == keyPostgresDatabasesAge {
 		handlerParams = []string{u.Database()}
+	} else if key == keyPostgresCustom {
+		handlerParams = params[commonParamsNum:]
 	} else {
 		handlerParams = make([]string, 0)
 	}
-	return handler(conn, key, handlerParams)
+	return handler(ctx, conn, key, handlerParams)
 }
 
 // init registers metrics.
@@ -239,6 +248,7 @@ func init() {
 		keyPostgresReplicationRecoveryRole, "Returns postgreSQL recovery role.",
 		keyPostgresLocks, "Returns collect all metrics from pg_locks.",
 		keyPostgresOldestXid, "Returns age of oldest xid.",
+		keyPostgresCustom, "Returns results for custom queries from files.",
 		keyPostgresAutovacuum, "Returns count of autovacuum workers.",
 		keyPostgresReplicationMasterDiscoveryApplicationName, "Returns JSON discovery with application name from pg_stat_replication.",
 	)
