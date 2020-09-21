@@ -153,6 +153,8 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * @deprecated
+	 *
 	 * @param string $onchange
 	 *
 	 * @return self
