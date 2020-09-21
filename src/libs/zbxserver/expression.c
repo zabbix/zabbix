@@ -2545,7 +2545,7 @@ static int	get_expression_macro_result(const DB_EVENT *event, const DB_EVENT *r_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, *expression);
 
 	substitute_simple_macros_impl(NULL, event, r_event, NULL, NULL, NULL, NULL, alert, ack, NULL, expression,
-			MACRO_TYPE_MESSAGE_NORMAL, error, maxerrlen);
+			MACRO_TYPE_EXPRESSION, error, maxerrlen);
 
 	zbx_vector_ptr_create(&unknown_msgs);
 
@@ -2736,7 +2736,7 @@ static const char	*macro_in_list(const char *str, zbx_strloc_t strloc, const cha
  *                                                                            *
  ******************************************************************************/
 static int	get_trigger_function_value(const char *expression, char **replace_to, char *data,
-		const zbx_token_simple_macro_t *simple_macro)
+		const zbx_token_simple_macro_t *simple_macro, zbx_output_format_t format)
 {
 	char	*host = NULL, *key = NULL;
 	int	N_functionid, ret = FAIL;
@@ -2760,7 +2760,7 @@ static int	get_trigger_function_value(const char *expression, char **replace_to,
 
 	ret = evaluate_macro_function(replace_to, (NULL == host ? data + simple_macro->host.l : host),
 			(NULL == key ? data + simple_macro->key.l : key), data + simple_macro->func.l,
-			data + simple_macro->func_param.l + 1);
+			data + simple_macro->func_param.l + 1, format);
 
 	data[simple_macro->host.r + 1] = ':';
 	data[simple_macro->key.r + 1] = '.';
@@ -3055,7 +3055,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				break;
 			case ZBX_TOKEN_SIMPLE_MACRO:
 				if (0 == (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
-							MACRO_TYPE_MESSAGE_ACK)) ||
+							MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_EXPRESSION)) ||
 						EVENT_SOURCE_TRIGGERS != ((NULL != r_event) ? r_event : event)->source)
 				{
 					pos++;
@@ -3098,7 +3098,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				else if (ZBX_TOKEN_SIMPLE_MACRO == token.type)
 				{
 					ret = get_trigger_function_value(c_event->trigger.expression, &replace_to,
-							*data, &token.data.simple_macro);
+							*data, &token.data.simple_macro, ZBX_FORMAT_HUMAN);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
@@ -4719,6 +4719,25 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 				}
+			}
+		}
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_EXPRESSION))
+		{
+			const DB_EVENT	*c_event;
+
+			c_event = ((NULL != r_event) ? r_event : event);
+
+			if (ZBX_TOKEN_USER_MACRO == token.type)
+			{
+				cache_trigger_hostids(&hostids, c_event->trigger.expression,
+						c_event->trigger.recovery_expression);
+				DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+				pos = token.loc.r;
+			}
+			else if (ZBX_TOKEN_SIMPLE_MACRO == token.type)
+			{
+				ret = get_trigger_function_value(c_event->trigger.expression, &replace_to,
+						*data, &token.data.simple_macro, ZBX_FORMAT_RAW);
 			}
 		}
 

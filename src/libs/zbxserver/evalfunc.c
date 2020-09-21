@@ -3384,7 +3384,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
  *                                                                            *
  ******************************************************************************/
 int	evaluate_macro_function(char **result, const char *host, const char *key, const char *function,
-		const char *parameter)
+		const char *parameter, zbx_output_format_t format)
 {
 	zbx_host_key_t	host_key = {(char *)host, (char *)key};
 	DC_ITEM		item;
@@ -3411,47 +3411,50 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	}
 	else
 	{
-		size_t	len;
-
-		len = strlen(value) + 1 + MAX_BUFFER_LEN;
-		value = (char *)zbx_realloc(value, len);
-
-		if (SUCCEED == str_in_list("last,prev", function, ','))
+		if (ZBX_FORMAT_HUMAN == format)
 		{
-			/* last, prev functions can return quoted and escaped string values */
-			/* which must be unquoted and unescaped before further processing   */
-			if ('"' == *value)
-			{
-				char	*src, *dst;
+			size_t	len;
 
-				for (dst = value, src = dst + 1; '"' != *src; )
+			len = strlen(value) + 1 + MAX_BUFFER_LEN;
+			value = (char *)zbx_realloc(value, len);
+
+			if (SUCCEED == str_in_list("last,prev", function, ','))
+			{
+				/* last, prev functions can return quoted and escaped string values */
+				/* which must be unquoted and unescaped before further processing   */
+				if ('"' == *value)
 				{
-					if ('\\' == *src)
-						src++;
-					if ('\0' == *src)
-						break;
-					*dst++ = *src++;
+					char	*src, *dst;
+
+					for (dst = value, src = dst + 1; '"' != *src; )
+					{
+						if ('\\' == *src)
+							src++;
+						if ('\0' == *src)
+							break;
+						*dst++ = *src++;
+					}
+					*dst = '\0';
 				}
-				*dst = '\0';
+				zbx_format_value(value, len, item.valuemapid, item.units, item.value_type);
 			}
-			zbx_format_value(value, len, item.valuemapid, item.units, item.value_type);
-		}
-		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,
-				','))
-		{
-			switch (item.value_type)
+			else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,
+					','))
 			{
-				case ITEM_VALUE_TYPE_FLOAT:
-				case ITEM_VALUE_TYPE_UINT64:
-					add_value_suffix(value, len, item.units, item.value_type);
-					break;
-				default:
-					;
+				switch (item.value_type)
+				{
+					case ITEM_VALUE_TYPE_FLOAT:
+					case ITEM_VALUE_TYPE_UINT64:
+						add_value_suffix(value, len, item.units, item.value_type);
+						break;
+					default:
+						;
+				}
 			}
-		}
-		else if (SUCCEED == str_in_list("timeleft", function, ','))
-		{
-			add_value_suffix(value, len, "s", ITEM_VALUE_TYPE_FLOAT);
+			else if (SUCCEED == str_in_list("timeleft", function, ','))
+			{
+				add_value_suffix(value, len, "s", ITEM_VALUE_TYPE_FLOAT);
+			}
 		}
 
 		*result = zbx_strdup(NULL, value);
