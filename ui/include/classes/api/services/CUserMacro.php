@@ -530,7 +530,7 @@ class CUserMacro extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$hostmacros) {
+	protected function validateUpdate(array $hostmacros) {
 		$required_fields = ['hostmacroid'];
 
 		foreach ($hostmacros as $hostmacro) {
@@ -601,7 +601,8 @@ class CUserMacro extends CApiService {
 		foreach ($hostmacros as $macro) {
 			$db_macro = $db_macros[$macro['hostmacroid']];
 
-			if ($macro['type'] != $db_macro['type'] && $db_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+			if (array_key_exists('type', $macro) && $macro['type'] != $db_macro['type']
+					&& $db_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 				$macro += ['value' => ''];
 			}
 
