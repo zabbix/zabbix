@@ -612,11 +612,14 @@ class CSetupWizard extends CForm {
 				'DB_CIPHER_LIST' => getRequest('cipher_list', $this->getConfig('DB_CIPHER_LIST', ''))
 			];
 
-			if (!$input['DB_VERIFY_HOST']) {
+			if (!$input['DB_ENCRYPTION_ADVANCED']) {
 				$input['DB_KEY_FILE'] = '';
 				$input['DB_CERT_FILE'] = '';
 				$input['DB_CA_FILE'] = '';
 				$input['DB_CIPHER_LIST'] = '';
+			}
+			else if ($input['DB_TYPE'] === ZBX_DB_MYSQL) {
+				$input['DB_VERIFY_HOST'] = true;
 			}
 
 			if ($input['DB_TYPE'] !== ZBX_DB_POSTGRESQL) {
