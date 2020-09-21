@@ -281,7 +281,7 @@ class CSetupWizard extends CForm {
 			ZBX_STYLE_DISPLAY_NONE
 		);
 
-		$table->addRow(_('Database TLS CA file'),
+		$table->addRow((new CLabel(_('Database TLS CA file')))->setAsteriskMark(),
 			(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 			'db_cafile_row',
 			ZBX_STYLE_DISPLAY_NONE
@@ -298,7 +298,6 @@ class CSetupWizard extends CForm {
 			'db_certfile_row',
 			ZBX_STYLE_DISPLAY_NONE
 		);
-
 
 		$table->addRow(_('Database host verification'),
 			(new CCheckBox('verify_host'))->setChecked($this->getConfig('DB_VERIFY_HOST')),
@@ -374,12 +373,13 @@ class CSetupWizard extends CForm {
 		$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
 		$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
 		$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
-		if ($db_type == ZBX_DB_POSTGRESQL) {
+		if ($db_type === ZBX_DB_POSTGRESQL) {
 			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
 		$table->addRow((new CSpan(_('Database TLS encryption')))->addClass(ZBX_STYLE_GREY),
-			$this->getConfig('DB_ENCRYPTION') ? 'true' : 'false');
-		if ($this->getConfig('DB_ENCRYPTION')) {
+			$this->getConfig('DB_ENCRYPTION') ? 'true' : 'false'
+		);
+		if ($this->getConfig('DB_ENCRYPTION_ADVANCED')) {
 			$table->addRow((new CSpan(_('Database TLS CA file')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_CA_FILE')
 			);
@@ -392,9 +392,11 @@ class CSetupWizard extends CForm {
 			$table->addRow((new CSpan(_('Database host verification')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_VERIFY_HOST') ? 'true' : 'false'
 			);
-			$table->addRow((new CSpan(_('Database TLS cipher list')))->addClass(ZBX_STYLE_GREY),
-				$this->getConfig('DB_CIPHER_LIST')
-			);
+			if ($db_type === ZBX_DB_MYSQL) {
+				$table->addRow((new CSpan(_('Database TLS cipher list')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_CIPHER_LIST')
+				);
+			}
 		}
 
 		$table->addRow(null, null);
