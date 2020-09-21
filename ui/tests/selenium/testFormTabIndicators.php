@@ -455,28 +455,6 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Maintenance configuration form tab data.
-			[
-				[
-					'url' => 'maintenance.php?form=create',
-					'form' => 'name:maintenanceForm',
-					'tabs' => [
-						[
-							'name' => 'Periods',
-							'entries' => [
-								[
-									'Period type' => 'One time only'
-								],
-								[
-									'Period type' => 'Daily'
-								]
-							],
-							'field_type' => 'overlay_dialogue',
-							'count' => 2
-						]
-					]
-				]
-			],
 			// Proxy configuration form tab data.
 			[
 				[
