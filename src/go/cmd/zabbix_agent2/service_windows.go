@@ -208,7 +208,7 @@ func handleWindowsService(confPath string) error {
 		}
 		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
 		if err != nil {
-			return fmt.Errorf("cannot parse the \"Hostname\" parameter %s", err)
+			return fmt.Errorf("cannot parse the \"Hostname\" parameter: %s", err)
 		}
 		agent.FirstHostname = hostnames[0]
 		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.FirstHostname)
