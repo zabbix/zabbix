@@ -24,8 +24,7 @@
  *
  * Valid token must match format:
  * - <namespace>/<path/to/secret>:<key>
- * - <namespace>/<secret>:<key>
- * - <path/to/secret>:<key>
+ * - <namespace>/<path/to/secret>
  */
 class CVaultSecretParser extends CParser {
 
