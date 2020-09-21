@@ -439,7 +439,10 @@
 		conf.users.forEach(user => this.addUser(user));
 
 		const $mediatype_default_select = this.$mediatype_default.find('z-select');
+		$mediatype_default_select.get(0).addOption({value: 0, label: '- <?= _('All') ?> -'});
+
 		const $mediatype_only_select = this.$mediatype_only.find('z-select');
+		$mediatype_only_select.get(0).addOption({value: 0, label: '- <?= _('All') ?> -'});
 
 		conf.mediatypes.forEach(({mediatypeid, name, status}) => {
 			$mediatype_default_select.get(0).addOption({
