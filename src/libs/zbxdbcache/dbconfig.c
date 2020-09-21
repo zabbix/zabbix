@@ -71,8 +71,6 @@ int	sync_in_progress = 0;
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
 
-void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now);
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_value_validator_func_t                                       *
@@ -8136,7 +8134,7 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
  * Comments: Triggers are unlocked by DCconfig_unlock_triggers()              *
  *                                                                            *
  ******************************************************************************/
-void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
+void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 {
 	int	i;
 
@@ -8146,28 +8144,17 @@ void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 
 		timer->lock = 0;
 
-		/* timers with reseted scheduling must be rescheduled at new time, while other */
-		/* timers must be rescheduled at the old time                                  */
+		/* schedule calculation error can result in 0 execution time */
 		if (0 == timer->exec_ts.sec)
 		{
-			zbx_timespec_t	ts;
+			ZBX_DC_FUNCTION	*function;
 
-			if (0 == (ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
+			if (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+					&timer->objectid)))
 			{
-				ZBX_DC_FUNCTION	*function;
-
-				if (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
-						&timer->objectid)))
-				{
-					function->timer = 0;
-				}
-				dc_trigger_timer_free(timer);
+				function->timer = 0;
 			}
-			else
-			{
-				ts.ns = 0;
-				dc_schedule_trigger_timer(timer, NULL, &ts);
-			}
+			dc_trigger_timer_free(timer);
 		}
 		else
 			dc_schedule_trigger_timer(timer, &timer->eval_ts, &timer->exec_ts);
@@ -8185,8 +8172,23 @@ void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
  ******************************************************************************/
 void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 {
+	int	i;
+
+	/* calculate new execution/evaluation time for the evaluated triggers */
+	/* (timers with reseted execution time)                               */
+	for (i = 0; i < timers->values_num; i++)
+	{
+		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+
+		if (0 == timer->exec_ts.sec)
+		{
+			if (0 != (timer->exec_ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
+				timer->eval_ts = timer->exec_ts;
+		}
+	}
+
 	WRLOCK_CACHE;
-	dc_reschedule_trigger_timers(timers, now);
+	dc_reschedule_trigger_timers(timers);
 	UNLOCK_CACHE;
 }
 
