@@ -21,7 +21,7 @@
 'use strict';
 
 const TAB_INDICATOR_ATTR_TYPE    = 'data-indicator';
-const TAB_INDICATOR_ATTR_VALUE   = 'data-value';
+const TAB_INDICATOR_ATTR_VALUE   = 'data-indicator-value';
 
 const TAB_INDICATOR_TYPE_COUNT   = 'count';
 const TAB_INDICATOR_TYPE_MARK    = 'mark';
@@ -269,7 +269,7 @@ class TabIndicatorItem {
 	 * @return {boolean|number} Boolean for mark indicator and number for count indicator
 	 */
 	getValue() {
-		throw 'Fatal error: can not call abstract class.';
+		throw 'Fatal error: can not call abstract method.';
 	}
 
 	/**
@@ -278,7 +278,7 @@ class TabIndicatorItem {
 	 * @param {HTMLElement} element
 	 */
 	initObserver(element) {
-		throw 'Fatal error: can not call abstract class.';
+		throw 'Fatal error: can not call abstract method.';
 	}
 
 	/**
