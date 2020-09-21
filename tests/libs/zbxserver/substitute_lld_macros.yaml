@@ -270,4 +270,28 @@ in:
 out:
   expression: '{?{$MACRO:"x\"z"} {?{host:key["[]",()].last([],"()")}}'
   return: SUCCEED
+---
+test case: Expand '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {host:key[{#B1},{#B2}].last({#B1},{#B2})}' with {#B1}=[], {#B2}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"b1":"[]", "b2":"()"}'
+  macros:
+    - {macro: '{#B1}', path: $.b1}
+    - {macro: '{#B2}', path: $.b2}
+  expression: '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {host:key[{#B1},{#B2}].last({#B1},{#B2})}'
+out:
+  expression: '{?{host:key["[]",()].last([],"()")}} {host:key[[],()].last([],())}'
+  return: SUCCEED
+---
+test case: Expand '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {?{host:key[{#B2},{#B1}].last({#B2},{#B1})}}' with {#B1}=[], {#B2}=()
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"b1":"[]", "b2":"()"}'
+  macros:
+    - {macro: '{#B1}', path: $.b1}
+    - {macro: '{#B2}', path: $.b2}
+  expression: '{?{host:key[{#B1},{#B2}].last({#B1},{#B2})}} {?{host:key[{#B2},{#B1}].last({#B2},{#B1})}}'
+out:
+  expression: '{?{host:key["[]",()].last([],"()")}} {?{host:key[(),"[]"].last("()",[])}}'
+  return: SUCCEED
 ...
