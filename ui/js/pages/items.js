@@ -40,8 +40,9 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		return;
 	}
 
-	const iterface_type = item_interface_types[item_type];
-	const available_interfaceids = interface_ids_by_types[iterface_type];
+	const iterface_type = item_interface_types[item_type],
+		available_interfaceids = interface_ids_by_types[iterface_type]
+		select_options = interface_select_node.getOptions();
 
 	// If no interface is required.
 	if (iterface_type === undefined) {
@@ -50,9 +51,9 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		$('#interface_not_defined').html(t('Item type does not use interface')).show();
 	}
 	// If any interface type allowed, enable all options.
-	else if (iterface_type == -1) {
+	else if (iterface_type == -1 && select_options.length) {
 		interface_select_node.disabled = false;
-		interface_select_node.getOptions().map(opt => opt.disabled = false)
+		select_options.map(opt => opt.disabled = false);
 		$interface_select.show();
 		$('#interface_not_defined').hide();
 	}
@@ -65,7 +66,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 	// Enable required interfaces, disable other interfaces.
 	else {
 		interface_select_node.disabled = false;
-		interface_select_node.getOptions().map(opt => opt.disabled = !available_interfaceids.includes(opt.value))
+		select_options.map(opt => opt.disabled = !available_interfaceids.includes(opt.value));
 		$interface_select.show();
 		$('#interface_not_defined').hide();
 	}
@@ -74,7 +75,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 	// If value current option is disabled, select first available interface.
 	const selected_option = interface_select_node.getOptionByValue(interface_select_node.value);
 	if (!selected_option || selected_option.disabled) {
-		for (let opt of interface_select_node.getOptions()) {
+		for (let opt of select_options) {
 			if (!opt.disabled) {
 				interface_select_node.value = opt.value;
 				break;
