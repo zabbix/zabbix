@@ -3710,10 +3710,11 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
 	timer->type = function->type;
 	timer->objectid = function->functionid;
 	timer->triggerid = function->triggerid;
+	timer->revision = function->revision;
 	timer->trend_base = trend_base;
 	timer->lock = 0;
 
-	function->timer = 1;
+	function->timer_revision = function->revision;
 
 	if (ZBX_FUNCTION_TYPE_TRENDS == function->type)
 		DCstrpool_replace(0, &timer->parameter, function->parameter);
@@ -3792,7 +3793,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (ZBX_FUNCTION_TYPE_TIMER != function->type && ZBX_FUNCTION_TYPE_TRENDS != function->type)
 			continue;
 
-		if (0 != function->timer)
+		if (0 != function->timer_revision && function->timer_revision == function->revision)
 			continue;
 
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
@@ -3821,7 +3822,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 			if (0 == (ts.sec = dc_function_calculate_nextcheck(timer, now, timer->triggerid)))
 			{
 				dc_trigger_timer_free(timer);
-				function->timer = 0;
+				function->timer_revision = 0;
 			}
 			else
 				dc_schedule_trigger_timer(timer, NULL, &ts);
@@ -3886,7 +3887,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 			}
 		}
 		else
-			function->timer = 0;
+			function->timer_revision = 0;
 
 		function->triggerid = triggerid;
 		function->itemid = itemid;
@@ -3894,6 +3895,9 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &function->parameter, row[3]);
 
 		function->type = zbx_get_function_type(function->function);
+
+		/* while not perfect the configuration cache last sync can be used as function revision */
+		function->revision = config->sync_ts;
 
 		item->update_triggers = 1;
 		if (NULL != item->triggers)
@@ -8086,13 +8090,14 @@ void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit
 
 		/* check if function exists and trigger should be calculated */
 		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &timer->objectid)) ||
+				dc_function->revision > timer->revision ||
 				NULL == (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
 						&timer->triggerid)) ||
 				TRIGGER_STATUS_ENABLED != dc_trigger->status ||
 				TRIGGER_FUNCTIONAL_TRUE != dc_trigger->functional)
 		{
-			if (NULL != dc_function)
-				dc_function->timer = 0;
+			if (NULL != dc_function && dc_function->revision == timer->revision)
+				dc_function->timer_revision = 0;
 
 			dc_trigger_timer_free(timer);
 			continue;
@@ -8153,7 +8158,7 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 			if (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
 					&timer->objectid)))
 			{
-				function->timer = 0;
+				function->timer_revision = 0;
 			}
 			dc_trigger_timer_free(timer);
 		}

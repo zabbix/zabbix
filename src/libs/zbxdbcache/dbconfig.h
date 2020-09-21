@@ -66,8 +66,9 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
+	int		revision;
+	int		timer_revision;
 	unsigned char	type;
-	unsigned char	timer;
 }
 ZBX_DC_FUNCTION;
 
