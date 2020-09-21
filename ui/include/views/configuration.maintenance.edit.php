@@ -27,15 +27,14 @@ require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
-// create form
 $maintenance_form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $this->data['form']);
+	->addVar('form', $data['form']);
 
-if (array_key_exists('maintenanceid', $this->data)) {
-	$maintenance_form->addVar('maintenanceid', $this->data['maintenanceid']);
+if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
+	$maintenance_form->addVar('maintenanceid', $data['maintenanceid']);
 }
 
 /*
@@ -87,10 +86,10 @@ $periods_container = (new CDiv($maintenance_period_table))
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
-$maintenance_formlist = (new CFormList('maintenanceFormList'))
+$table = (new CFormList('maintenanceFormList'))
 	->addRow(
 		(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
-		(new CTextBox('mname', $this->data['mname']))
+		(new CTextBox('mname', $data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -194,7 +193,7 @@ $tag_table->addRow(
 	))->setColSpan(3)
 );
 
-$maintenance_formlist
+$table
 	->addRow(new CLabel(_('Host groups'), 'groupids__ms'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
@@ -236,14 +235,14 @@ $maintenance_formlist
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	)
 	->addRow(_('Description'),
-		(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 // Append tabs to form.
-$maintenance_tab = (new CTabView())->addTab('maintenanceTab', _('Maintenance'), $maintenance_formlist);
+$maintenance_tab = (new CTabView())->addTab('maintenanceTab', _('Maintenance'), $table);
 
 // append buttons to form
-if (array_key_exists('maintenanceid', $this->data)) {
+if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
 	$maintenance_tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
