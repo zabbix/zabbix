@@ -59,10 +59,13 @@ function tabFilterDelete(overlay) {
 
 function tabFilterUpdate(overlay) {
 	var $form = overlay.$dialogue.find('form'),
-		url = new Curl($form.attr('action'));
+		url = new Curl($form.attr('action')),
+		form_data = $form.serializeJSON();
+
+	form_data.filter_name = form_data.filter_name.trim();
 
 	overlay.setLoading();
-	overlay.xhr = $.post(url.getUrl(), $form.serialize(), 'json')
+	overlay.xhr = $.post(url.getUrl(), form_data, 'json')
 		.done((response) => {
 			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
