@@ -469,7 +469,7 @@ func main() {
 		fatalExit("cannot parse the \"Hostname\" parameter", err)
 	}
 	agent.FirstHostname = hostnames[0]
-	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", strings.Join(hostnames, ","))
+	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
 	log.Infof(hostmessage)
 	if foregroundFlag {
 		if agent.Options.LogType != "console" {

@@ -21,6 +21,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"zabbix.com/internal/agent"
@@ -53,7 +54,9 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 		if len(options.Hostname) == 0 {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", hostnameItem)
 		}
-		if len(agent.ExtractHostnames(options.Hostname)) > 1 {
+		hosts := agent.ExtractHostnames(options.Hostname)
+		options.Hostname = strings.Join(hosts, ",")
+		if len(hosts) > 1 {
 			maxLen = zbxcmd.MaxExecuteOutputLenB
 		} else {
 			maxLen = agent.HostNameLen

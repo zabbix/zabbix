@@ -194,11 +194,6 @@ func setHostname() error {
 	if err = configUpdateItemParameters(m, &agent.Options); err != nil {
 		return fmt.Errorf("cannot process configuration: %s", err)
 	}
-	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
-	if err != nil {
-		return fmt.Errorf("cannot parse the \"Hostname\" parameter", err)
-	}
-	agent.FirstHostname = hostnames[0]
 	m.Stop()
 	monitor.Wait(monitor.Scheduler)
 	return nil
@@ -211,6 +206,11 @@ func handleWindowsService(confPath string) error {
 				return err
 			}
 		}
+		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+		if err != nil {
+			return fmt.Errorf("cannot parse the \"Hostname\" parameter", err)
+		}
+		agent.FirstHostname = hostnames[0]
 		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.FirstHostname)
 	}
 
