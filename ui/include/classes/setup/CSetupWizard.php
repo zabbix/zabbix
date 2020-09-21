@@ -595,26 +595,35 @@ class CSetupWizard extends CForm {
 			}
 		}
 		elseif ($this->getStep() == 2) {
-			$this->setConfig('DB_TYPE', getRequest('type', $this->getConfig('DB_TYPE')));
-			$this->setConfig('DB_SERVER', getRequest('server', $this->getConfig('DB_SERVER', 'localhost')));
-			$this->setConfig('DB_PORT', getRequest('port', $this->getConfig('DB_PORT', '0')));
-			$this->setConfig('DB_DATABASE', getRequest('database', $this->getConfig('DB_DATABASE', 'zabbix')));
-			$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
-			$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
-			$this->setConfig('DB_SCHEMA', getRequest('schema', $this->getConfig('DB_SCHEMA', '')));
-			$this->setConfig('DB_ENCRYPTION',
-				(bool) getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', false))
-			);
-			$this->setConfig('DB_ENCRYPTION_ADVANCED',
-				(bool) getRequest('verify_certificate', $this->getConfig('DB_ENCRYPTION_ADVANCED', false))
-			);
-			$this->setConfig('DB_VERIFY_HOST',
-				(bool) getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', false))
-			);
-			$this->setConfig('DB_KEY_FILE', getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')));
-			$this->setConfig('DB_CERT_FILE', getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')));
-			$this->setConfig('DB_CA_FILE', getRequest('ca_file', $this->getConfig('DB_CA_FILE', '')));
-			$this->setConfig('DB_CIPHER_LIST', getRequest('cipher_list', $this->getConfig('DB_CIPHER_LIST', '')));
+			$input = [
+				'DB_TYPE' => getRequest('type', $this->getConfig('DB_TYPE')),
+				'DB_SERVER' => getRequest('server', $this->getConfig('DB_SERVER', 'localhost')),
+				'DB_PORT' => getRequest('port', $this->getConfig('DB_PORT', '0')),
+				'DB_DATABASE' => getRequest('database', $this->getConfig('DB_DATABASE', 'zabbix')),
+				'DB_USER' => getRequest('user', $this->getConfig('DB_USER', 'root')),
+				'DB_PASSWORD' => getRequest('password', $this->getConfig('DB_PASSWORD', '')),
+				'DB_SCHEMA' => getRequest('schema', $this->getConfig('DB_SCHEMA', '')),
+				'DB_ENCRYPTION' => (bool) getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', false)),
+				'DB_ENCRYPTION_ADVANCED' => (bool) getRequest('verify_certificate', $this->getConfig('DB_ENCRYPTION_ADVANCED', false)),
+				'DB_VERIFY_HOST' => (bool) getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', false)),
+				'DB_KEY_FILE' => getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')),
+				'DB_CERT_FILE' => getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')),
+				'DB_CA_FILE' => getRequest('ca_file', $this->getConfig('DB_CA_FILE', '')),
+				'DB_CIPHER_LIST' => getRequest('cipher_list', $this->getConfig('DB_CIPHER_LIST', ''))
+			];
+
+			if (!$input['DB_VERIFY_HOST']) {
+				$input['DB_KEY_FILE'] = '';
+				$input['DB_CERT_FILE'] = '';
+				$input['DB_CA_FILE'] = '';
+				$input['DB_CIPHER_LIST'] = '';
+			}
+
+			if ($input['DB_TYPE'] !== ZBX_DB_POSTGRESQL) {
+				$input['DB_SCHEMA'] = '';
+			}
+
+			array_map([$this, 'setConfig'], array_keys($input), $input);
 
 			if (hasRequest('next') && array_key_exists(2, getRequest('next'))) {
 				$db_connected = $this->dbConnect();
