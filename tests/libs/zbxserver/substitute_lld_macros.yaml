@@ -258,14 +258,16 @@ out:
   expression: '={?{host:key[()].last("()")}}='
   return: SUCCEED
 ---
-test case: Expand '={?{$MACRO:"{#A}"}=' with {#A}=x"z
+test case: Expand '{?{$MACRO:"{#A}"} {?{host:key[{#B1},{#B2}].last({#B1},{#B2})}}' with {#A}=x"z, {#B1}=[], {#B2}=()
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
-  lld: '{"a":"x\"z"}'
+  lld: '{"a":"x\"z", "b1":"[]", "b2":"()"}'
   macros:
     - {macro: '{#A}', path: $.a}
-  expression: '={?{$MACRO:"{#A}"}='
+    - {macro: '{#B1}', path: $.b1}
+    - {macro: '{#B2}', path: $.b2}
+  expression: '{?{$MACRO:"{#A}"} {?{host:key[{#B1},{#B2}].last({#B1},{#B2})}}'
 out:
-  expression: '={?{$MACRO:"x\"z"}='
+  expression: '{?{$MACRO:"x\"z"} {?{host:key["[]",()].last([],"()")}}'
   return: SUCCEED
 ...
