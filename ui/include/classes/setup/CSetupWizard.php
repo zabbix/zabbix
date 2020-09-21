@@ -604,7 +604,9 @@ class CSetupWizard extends CForm {
 				'DB_PASSWORD' => getRequest('password', $this->getConfig('DB_PASSWORD', '')),
 				'DB_SCHEMA' => getRequest('schema', $this->getConfig('DB_SCHEMA', '')),
 				'DB_ENCRYPTION' => (bool) getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', false)),
-				'DB_ENCRYPTION_ADVANCED' => (bool) getRequest('verify_certificate', $this->getConfig('DB_ENCRYPTION_ADVANCED', false)),
+				'DB_ENCRYPTION_ADVANCED' => (bool) getRequest('verify_certificate',
+					$this->getConfig('DB_ENCRYPTION_ADVANCED', false)
+				),
 				'DB_VERIFY_HOST' => (bool) getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', false)),
 				'DB_KEY_FILE' => getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')),
 				'DB_CERT_FILE' => getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')),
