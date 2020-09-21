@@ -3644,6 +3644,7 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 					zbx_tm_add(&tm, 1, timer->trend_base);
 					if (-1 == (next = mktime(&tm)))
 					{
+						ret = FAIL;
 						error = zbx_strdup(NULL, zbx_strerror(errno));
 						break;
 					}
