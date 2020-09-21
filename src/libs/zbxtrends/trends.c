@@ -81,7 +81,8 @@ out:
  *                                                                            *
  * Purpose: parse trend function period arguments into time range             *
  *                                                                            *
- * Parameters: now          - [IN] the period parsing time                    *
+ * Parameters: from         - [IN] the time the period shift is calculated    *
+ *                                 from                                       *
  *             period       - [IN] the history period                         *
  *             period_shift - [IN] the history period shift                   *
  *             start        - [OUT] the period start time in seconds since    *
