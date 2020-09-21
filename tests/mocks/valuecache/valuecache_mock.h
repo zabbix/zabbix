@@ -52,7 +52,7 @@ void	zbx_vcmock_set_available_mem(size_t size);
 size_t	zbx_vcmock_get_available_mem(void);
 
 void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key);
-zbx_timespec_t	zbx_vcmock_get_ts();
+zbx_timespec_t	zbx_vcmock_get_ts(void);
 void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key);
 void	zbx_vcmock_get_request_params(zbx_mock_handle_t handle, zbx_uint64_t *itemid, unsigned char *value_type,
 		int *seconds, int *count, zbx_timespec_t *end);

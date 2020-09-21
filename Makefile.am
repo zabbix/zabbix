@@ -169,6 +169,10 @@ tests_build:
 
 tests: tests_build
 	tests/tests_run.pl
+
+tests_clean: clean-recursive
+	cd tests && \
+	find . -type f -name '*.o' -delete
 endif
 
 .PHONY: test tests

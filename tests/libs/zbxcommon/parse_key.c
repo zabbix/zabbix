@@ -37,6 +37,7 @@ void	zbx_mock_test_entry(void **state)
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(mh, &key)))
 	{
 		fail_msg("Cannot get 'key' from test case data: %s", zbx_mock_error_string(error));
+		goto out;
 	}
 
 	/* mandatory output parameter "return" */
@@ -108,4 +109,6 @@ void	zbx_mock_test_entry(void **state)
 
 	if (0 != strcmp(expected_invalid_part, key_moving_pointer))
 		fail_msg("Got '%s' instead of '%s' as the invalid_part.", key_moving_pointer, expected_invalid_part);
+out:
+	return;
 }

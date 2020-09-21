@@ -43,6 +43,7 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 	ZBX_UNUSED(dc_item);
 	ZBX_UNUSED(alert);
 	ZBX_UNUSED(ack);
+	ZBX_UNUSED(tz);
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(macro_type);
 	ZBX_UNUSED(error);
@@ -96,7 +97,6 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == expected_ret)
 	{
-		zbx_mock_handle_t	handle;
 		const char		*expected_value;
 		char			*ptr;
 		double			expected_dbl;

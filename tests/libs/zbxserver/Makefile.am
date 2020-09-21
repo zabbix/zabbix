@@ -115,7 +115,7 @@ evaluate_function_LDADD += $(COMMON_LIB_FILES)
 
 evaluate_function_LDADD += @SERVER_LIBS@
 
-evaluate_function_LDFLAGS = @SERVER_LDFLAGS@
+evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 
 VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
@@ -137,7 +137,6 @@ VALUECACHE_WRAP_FUNCS = \
 evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
-	-I@top_srcdir@/src/libs/zbxhistory \
-	$(VALUECACHE_WRAP_FUNCS)
+	-I@top_srcdir@/src/libs/zbxhistory
 endif
 
