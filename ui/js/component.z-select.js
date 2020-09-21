@@ -19,9 +19,13 @@ class ZSelect extends HTMLElement {
 
 		this._events = {};
 		this.onchange = () => {};
+
+		this._is_connected = false;
 	}
 
 	connectedCallback() {
+		this._is_connected = true;
+
 		this.init();
 		this.registerEvents();
 	}
@@ -44,7 +48,7 @@ class ZSelect extends HTMLElement {
 				break;
 
 			case 'value':
-				if (old_value !== null && this._input.value !== new_value) {
+				if (!this._is_connected || this._input.value !== new_value) {
 					const option = this.getOptionByValue(new_value);
 
 					this._highlight(option ? option._index : -1);
