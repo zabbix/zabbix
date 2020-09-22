@@ -39,8 +39,8 @@ var (
 	extraParamDetails = map[string]string{"details": "details"}
 )
 
-// Handle TODO.
-func (m *metric) Handle(data map[command][]byte) (res interface{}, err error) {
+// handle TODO.
+func (m *metric) handle(data map[command][]byte) (res interface{}, err error) {
 	return m.handler(data)
 }
 
@@ -68,51 +68,51 @@ const (
 
 var metrics = pluginMetrics{
 	keyDf: metric{
-		description: "TODO.",
+		description: "Returns statistics provided by \"df details\" command.",
 		commands:    []command{cmdDf},
 		params:      extraParamDetails,
 		handler:     dfHandler,
 	},
 	keyOSD: metric{
-		description: "TODO.",
+		description: "Returns OSDs statistics provided by \"pg dump\" command.",
 		commands:    []command{cmdPgDump},
 		params:      nil,
 		handler:     osdHandler,
 	},
 	keyOSDDiscovery: metric{
-		description: "TODO.",
+		description: "Returns list of OSDs in LLD format.",
 		commands:    []command{cmdOSDCrushRuleDump, cmdOSDCrushTree},
 		params:      nil,
 		handler:     osdDiscoveryHandler,
 	},
 	keyOSDDump: metric{
-		description: "TODO.",
+		description: "Returns OSDs dump provided by \"osd dump\" command.",
 		commands:    []command{cmdOSDDump},
 		params:      nil,
 		handler:     osdDumpHandler,
 	},
 	keyPing: metric{
-		description: "TODO.",
+		description: "Test if a connection is alive or not.",
 		commands:    []command{cmdHealth},
 		params:      nil,
 		handler:     pingHandler,
 	},
 	keyPoolDiscovery: metric{
-		description: "TODO.",
+		description: "Returns list of pools in LLD format.",
 		commands:    []command{cmdOSDDump, cmdOSDCrushRuleDump},
 		params:      nil,
 		handler:     poolDiscoveryHandler,
 	},
 	keyStatus: metric{
-		description: "Returns status of cluster.",
+		description: "Returns data provided by \"status\" command.",
 		commands:    []command{cmdStatus},
 		params:      nil,
 		handler:     statusHandler,
 	},
 }
 
-// Metrics TODO
-func (pm pluginMetrics) Metrics() (res []string) {
+// metrics TODO.
+func (pm pluginMetrics) metrics() (res []string) {
 	for key, params := range pm {
 		res = append(res, key, params.description)
 	}
@@ -121,5 +121,5 @@ func (pm pluginMetrics) Metrics() (res []string) {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.Metrics()...)
+	plugin.RegisterMetrics(&impl, pluginName, metrics.metrics()...)
 }

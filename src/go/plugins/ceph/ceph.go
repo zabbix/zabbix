@@ -119,7 +119,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		return nil, err
 	}
 
-	result, err = m.Handle(responses)
+	result, err = m.handle(responses)
 	if err != nil {
 		p.Errf(err.Error())
 	}

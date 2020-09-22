@@ -1,3 +1,22 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 package ceph
 
 import (
@@ -21,6 +40,7 @@ type cephResponse struct {
 	Message   string `json:"message"`
 }
 
+// request TODO.
 func request(ctx context.Context, client *http.Client, uri, cmd string, extraParams map[string]string) ([]byte, error) {
 	var resp cephResponse
 
@@ -84,6 +104,7 @@ type response struct {
 	err  error
 }
 
+// asyncRequest TODO.
 func asyncRequest(ctx context.Context, cancel context.CancelFunc, client *http.Client, uri string, m metric) <-chan *response {
 	ch := make(chan *response, len(m.commands))
 
