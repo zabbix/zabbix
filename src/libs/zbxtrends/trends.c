@@ -109,7 +109,7 @@ out:
 int	zbx_trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
 		char **error)
 {
-	int		period_num, period_hours[] = {0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
+	int		period_num, period_hours[ZBX_TIME_UNIT_COUNT] = {0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
 	zbx_time_unit_t	period_unit;
 	size_t		len;
 	struct tm	tm_end, tm_start;
