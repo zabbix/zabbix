@@ -71,7 +71,9 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		$('#interface_not_defined').hide();
 	}
 
-	interface_select_node.value = selected_interfaceid;
+	if (selected_interfaceid) {
+		interface_select_node.value = selected_interfaceid;
+	}
 	// If value current option is disabled, select first available interface.
 	const selected_option = interface_select_node.getOptionByValue(interface_select_node.value);
 	if (!selected_option || selected_option.disabled) {
