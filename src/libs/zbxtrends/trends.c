@@ -24,6 +24,50 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: trends_parse_base                                                *
+ *                                                                            *
+ * Purpose: parse largest period base from function parameters                *
+ *                                                                            *
+ * Parameters: shift  - [IN] the period shift parameter                       *
+ *             base   - [OUT] the period shift base (now/?)                   *
+ *             error  - [OUT] the error message if parsing failed             *
+ *                                                                            *
+ * Return value: SUCCEED - period was parsed successfully                     *
+ *               FAIL    - invalid time period was specified                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, char **error)
+{
+	zbx_time_unit_t	time_unit = ZBX_TIME_UNIT_UNKNOWN;
+	const char	*ptr;
+
+	for (ptr = period_shift; NULL != (ptr = strchr(ptr, '/'));)
+	{
+		zbx_time_unit_t	tu;
+
+		if (ZBX_TIME_UNIT_UNKNOWN == (tu = zbx_tm_str_to_unit(++ptr)))
+		{
+			*error = zbx_strdup(*error, "invalid period shift cycle");
+			return FAIL;
+		}
+
+		if (tu > time_unit)
+			time_unit = tu;
+	}
+
+	if (ZBX_TIME_UNIT_UNKNOWN == time_unit)
+	{
+		*error = zbx_strdup(*error, "invalid period shift expression");
+		return FAIL;
+	}
+
+	*base = time_unit;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_trends_parse_base                                            *
  *                                                                            *
  * Purpose: parse largest period base from function parameters                *
@@ -38,40 +82,18 @@
  ******************************************************************************/
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error)
 {
-	zbx_time_unit_t	time_unit = ZBX_TIME_UNIT_UNKNOWN;
-	char		*period_shift, *ptr;
+	char		*period_shift;
 	int		ret = FAIL;
 
 	if (NULL == (period_shift = zbx_function_get_param_dyn(params, 2)))
 	{
-		*error = zbx_strdup(*error, "missing period shift expression");
-		goto out;
+		*error = zbx_strdup(*error, "missing period shift parameter");
+		return FAIL;
 	}
 
-	for (ptr = period_shift; NULL != (ptr = strchr(ptr, '/'));)
-	{
-		zbx_time_unit_t	tu;
-
-		if (ZBX_TIME_UNIT_UNKNOWN == (tu = zbx_tm_str_to_unit(++ptr)))
-		{
-			*error = zbx_strdup(*error, "invalid period shift cycle");
-			goto out;
-		}
-
-		if (tu > time_unit)
-			time_unit = tu;
-	}
-
-	if (ZBX_TIME_UNIT_UNKNOWN == time_unit)
-	{
-		*error = zbx_strdup(*error, "invalid period shift expression");
-		goto out;
-	}
-
-	*base = time_unit;
-	ret = SUCCEED;
-out:
+	ret = trends_parse_base(period_shift, base, error);
 	zbx_free(period_shift);
+
 	return ret;
 }
 
@@ -227,6 +249,107 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:%d end:%d", __func__, *start, *end);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trends_parse_nextcheck                                       *
+ *                                                                            *
+ * Purpose: calculate possible nextcheck based on trend function parameters   *
+ *                                                                            *
+ * Parameters: from         - [IN] the time the period shift is calculated    *
+ *                                 from                                       *
+ *             period_shift - [IN] the history period shift                   *
+ *             nextcheck    - [OUT] the time starting from which the period   *
+ *                                  will end in future                        *
+ *             error        - [OUT] the error message if parsing failed       *
+ *                                                                            *
+ * Return value: SUCCEED - period was parsed successfully                     *
+ *               FAIL    - invalid time period was specified                  *
+ *                                                                            *
+ * Comments: Daylight saving changes are applied when parsing ranges with     *
+ *           day+ used as period base (now/?).                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *nextcheck, char **error)
+{
+	struct tm	tm;
+	const char	*p;
+	zbx_time_unit_t	base;
+	size_t		len;
+
+	if (SUCCEED != trends_parse_base(period_shift, &base, error))
+		return FAIL;
+
+	/* parse period shift */
+
+	p = period_shift;
+
+	if (0 != strncmp(p, "now", ZBX_CONST_STRLEN("now")))
+	{
+		*error = zbx_strdup(*error, "period shift must begin with \"now\"");
+		return FAIL;
+	}
+
+	p += ZBX_CONST_STRLEN("now");
+
+	localtime_r(&from, &tm);
+
+	while ('\0' != *p)
+	{
+		zbx_time_unit_t	unit;
+
+		if ('/' == *p)
+		{
+			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
+			{
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+				return FAIL;
+			}
+
+			zbx_tm_round_down(&tm, unit);
+
+			/* unit is single character */
+			p++;
+		}
+		else if ('+' == *p || '-' == *p)
+		{
+			int	num;
+			char	op = *(p++);
+
+			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
+				return FAIL;
+
+			/* nextcheck calculation is based on the largest rounding unit, */
+			/* so shifting larger or equal time units will not affect it    */
+			if (unit < base)
+			{
+				if ('+' == op)
+					zbx_tm_add(&tm, num, unit);
+				else
+					zbx_tm_sub(&tm, num, unit);
+			}
+
+			p += len;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+			return FAIL;
+		}
+	}
+
+	/* trends clock refers to the beginning of the hourly interval - subtract */
+	/* one hour to get the trends clock for the last hourly interval          */
+	zbx_tm_sub(&tm, 1, ZBX_TIME_UNIT_HOUR);
+
+	if (-1 == (*nextcheck = mktime(&tm)))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate the period start time: %s", zbx_strerror(errno));
+		return FAIL;
+	}
 
 	return SUCCEED;
 }

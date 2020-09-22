@@ -27,6 +27,7 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
 
 int	zbx_trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
 		char **error);
+int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *nextcheck, char **error);
 
 int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);

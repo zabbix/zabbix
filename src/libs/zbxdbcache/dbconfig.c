@@ -3586,9 +3586,32 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 #define ZBX_TIMER_DELAY		30
 
+static int	dc_function_calculate_trends_nextcheck(time_t from, const char *period_shift, zbx_time_unit_t base,
+		time_t *nextcheck, char **error)
+{
+	time_t		next = from;
+	struct tm	tm;
+
+	localtime_r(&next, &tm);
+
+	while (SUCCEED == zbx_trends_parse_nextcheck(next, period_shift, nextcheck, error))
+	{
+		if (*nextcheck > from)
+			return SUCCEED;
+
+		zbx_tm_add(&tm, 1, base);
+		if (-1 == (next = mktime(&tm)))
+		{
+			*error = zbx_strdup(*error, zbx_strerror(errno));
+			return FAIL;
+		}
+	}
+
+	return FAIL;
+}
+
 static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed)
 {
-
 	if (ZBX_FUNCTION_TYPE_TIMER == timer->type)
 	{
 		int	nextcheck;
@@ -3604,11 +3627,11 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 	else if (ZBX_FUNCTION_TYPE_TRENDS == timer->type)
 	{
 		struct tm	tm;
-		int		nextcheck;
-		int		offsets[ZBX_TIME_UNIT_COUNT] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
+		time_t		nextcheck;
+		int		offsets[] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
 				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
 				SEC_PER_HOUR + SEC_PER_MIN * 10};
-		int		periods[ZBX_TIME_UNIT_COUNT] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR, SEC_PER_HOUR * 11,
+		int		periods[] = {0, SEC_PER_MIN * 10, SEC_PER_HOUR, SEC_PER_HOUR * 11,
 					SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR};
 
 		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
@@ -3627,33 +3650,14 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		}
 		else
 		{
-			int	start, end, ret = FAIL;
-			char	*error = NULL, *period, *period_shift;
-			time_t	next = from;
+			int	ret = FAIL;
+			char	*error = NULL, *period_shift;
 
-			period = zbx_function_get_param_dyn(timer->parameter, 1);
 			period_shift = zbx_function_get_param_dyn(timer->parameter, 2);
 
-			if (NULL != period && NULL != period_shift)
-			{
-				localtime_r(&from, &tm);
+			ret = dc_function_calculate_trends_nextcheck(from, period_shift, timer->trend_base, &nextcheck,
+					&error);
 
-				while (SUCCEED == (ret = zbx_trends_parse_range(next, period, period_shift, &start,
-						&end, &error)) && end <= from)
-				{
-					zbx_tm_add(&tm, 1, timer->trend_base);
-					if (-1 == (next = mktime(&tm)))
-					{
-						ret = FAIL;
-						error = zbx_strdup(NULL, zbx_strerror(errno));
-						break;
-					}
-				}
-			}
-			else
-				error = zbx_strdup(NULL, "invalid parameters");
-
-			zbx_free(period);
 			zbx_free(period_shift);
 
 			if (FAIL == ret)
@@ -3661,11 +3665,10 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 				zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
 						"\" schedule: %s", timer->objectid, error);
 				zbx_free(error);
+				THIS_SHOULD_NEVER_HAPPEN;
 
 				return 0;
 			}
-
-			nextcheck = end;
 		}
 
 		return nextcheck + offsets[timer->trend_base] + seed % periods[timer->trend_base];
