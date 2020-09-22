@@ -55,37 +55,23 @@ class CTabFilter extends CBaseComponent {
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			item = this.create(title, options.data[index] || {});
 
-			if (options.selected === index) {
-				if (!item._expanded) {
-					item.renderContentTemplate();
-				}
-
-				let url = window.location.search,
-					params = item.getFilterParams();
-
+			if (options.selected == index) {
+				item._src_url = options.src_url;
 				this.setSelectedItem(item);
 
+				if (options.expanded) {
+					item.setExpanded();
+				}
+
 				if (options.page !== null) {
+					let params = item.getFilterParams();
+
 					params.set('page', options.page);
+					item.setBrowserLocation(params);
 				}
-
-				item.setBrowserLocation(params);
-
-				if (url === window.location.search) {
-					item._src_url = options.src_url;
-					item.updateUnsavedState();
-				}
-			}
-
-			if (item._expanded) {
-				item.setExpanded();
 			}
 
 			index++;
-		}
-
-		if (this._active_item) {
-			this._active_item._target.parentNode.scrollIntoView();
 		}
 	}
 
@@ -245,20 +231,38 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Set item object as current selected item, also ensures that only one selected item exists.
+	 * Set item object as current selected item, also ensures that only one selected item with filters form exists.
 	 *
 	 * @param {CTabFilterItem} item  Item object to be set as selected item.
 	 */
 	setSelectedItem(item) {
 		this._active_item = item;
 		item.setSelected();
-		item.setBrowserLocation(item.getFilterParams());
+
+		if (item !== this._timeselector) {
+			item.setBrowserLocation(item.getFilterParams());
+		}
 
 		for (const _item of this._items) {
-			if (_item !== this._active_item) {
+			if (_item !== this._active_item && this._timeselector !== this._active_item) {
 				_item.removeSelected();
 			}
 		}
+	}
+
+	/**
+	 * Get first selected item. If there are no selected item will return null.
+	 *
+	 * @return {CTabFilterItem}
+	 */
+	getSelectedItem() {
+		for (const item of this._items) {
+			if (item.isSelected()) {
+				return item;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -272,19 +276,32 @@ class CTabFilter extends CBaseComponent {
 			 * Event handler on tab content expand.
 			 */
 			select: (ev) => {
-				let item = ev.detail.target;
+				let item = ev.detail.target,
+					expand = (this._active_item._expanded
+						|| (item === this._timeselector && this._active_item !== this._timeselector)
+					);
 
-				if (item != this._active_item) {
-					if (this._active_item._expanded) {
-						item.setExpanded();
+				if (item !== this._timeselector) {
+					if (item.isSelected()) {
+						this.profileUpdate('expanded', {
+							value_int: item._expanded ? 0 : 1
+						});
 					}
+					else {
+						item.initUnsavedState();
+						this.profileUpdate('selected', {
+							value_int: item._index
+						});
+					}
+				}
 
+				if (item !== this._active_item) {
 					this.setSelectedItem(item);
 					this.collapseAllItemsExcept(item);
-					item.initUnsavedState();
-					this.profileUpdate('selected', {
-						value_int: this._active_item._index
-					});
+
+					if (expand) {
+						item.fire(TABFILTERITEM_EVENT_EXPAND);
+					}
 				}
 				else if (!item._expanded) {
 					item.fire(TABFILTERITEM_EVENT_EXPAND);
@@ -295,18 +312,16 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			expand: (ev) => {
-				if (ev.detail.target != this._timeselector) {
-					this.setSelectedItem(ev.detail.target);
+				let item = ev.detail.target;
+
+				if (item !== this._timeselector) {
 					this._filters_footer.classList.remove('display-none');
-					this.profileUpdate('expanded', {
-						value_int: 1
-					});
 				}
 				else {
 					this._filters_footer.classList.add('display-none');
 				}
 
-				this.collapseAllItemsExcept(ev.detail.target);
+				item.setExpanded();
 				this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
 			},
 
@@ -316,14 +331,12 @@ class CTabFilter extends CBaseComponent {
 			collapse: (ev) => {
 				let item = ev.detail.target;
 
-				if (item === this._active_item) {
-					this._target.querySelector('.tabfilter-content-container').classList.add('display-none');
-					this.profileUpdate('expanded', {
-						value_int: 0
-					});
+				if (item !== this._timeselector) {
+					item.updateUnsavedState();
 				}
 
-				item.updateUnsavedState();
+				item.removeExpanded();
+				this._target.querySelector('.tabfilter-content-container').classList.add('display-none');
 			},
 
 			/**
@@ -361,12 +374,14 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
-			 * Event handler for 'Save as' button
+			 * Event handler for 'Save as' button and on filter modal close.
 			 */
 			updateActiveFilterTab: (ev) => {
-				var item = (ev.detail.create == '1')
-					? this.create(this._active_item._target.parentNode.cloneNode(true), {})
-					: this._active_item;
+				var item = this.getSelectedItem();
+
+				if (ev.detail.create == '1') {
+					item = this.create(item._target.parentNode.cloneNode(true), {});
+				}
 
 				item.update(ev.detail);
 				var params = item.getFilterParams();

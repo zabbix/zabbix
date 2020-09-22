@@ -90,7 +90,8 @@ class CTabFilterItem extends CBaseComponent {
 	 * Render tab template with data. Fire TABFILTERITEM_EVENT_RENDER on template container binding this as event this.
 	 */
 	renderContentTemplate() {
-		if (this._template) {
+		if (this._template && !this._template_rendered) {
+			this._template_rendered = true;
 			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
 			this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_RENDER, {detail: this}));
 		}
@@ -143,16 +144,21 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Get selected state of item.
+	 *
+	 * @return {boolean}
+	 */
+	isSelected() {
+		return this._target.parentNode.classList.contains(TABFILTERITEM_STYLE_SELECTED);
+	}
+
+	/**
 	 * Set selected state of item.
 	 */
 	setSelected() {
 		this._target.focus();
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_SELECTED);
-
-		if (!this._template_rendered) {
-			this.renderContentTemplate();
-			this._template_rendered = true;
-		}
+		this.renderContentTemplate();
 
 		if (this._data.filter_configurable) {
 			this.addActionIcons();
@@ -181,13 +187,13 @@ class CTabFilterItem extends CBaseComponent {
 	setExpanded() {
 		let item_template = this._template||this._content_container.querySelector('[data-template]');
 
-		this._expanded = true;
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_EXPANDED);
 
-		if (item_template instanceof HTMLElement) {
+		if (item_template instanceof HTMLElement && !this._expanded) {
 			item_template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this}));
 		}
 
+		this._expanded = true;
 		this._content_container.classList.remove('display-none');
 	}
 
@@ -239,9 +245,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {object} data  Updated tab properties object.
 	 */
 	update(data) {
-		if (!this._template_rendered) {
-			this.renderContentTemplate();
-		}
+		this.renderContentTemplate();
 
 		var form = this._content_container.querySelector('form'),
 			fields = {
@@ -357,8 +361,6 @@ class CTabFilterItem extends CBaseComponent {
 		let src_query = this.getFilterParams();
 
 		if (src_query ===  null) {
-			this._src_url = '';
-
 			return;
 		}
 
@@ -394,7 +396,6 @@ class CTabFilterItem extends CBaseComponent {
 			},
 
 			expand: () => {
-				this.setSelected();
 				this.setExpanded();
 
 				let search_params = this.getFilterParams();
