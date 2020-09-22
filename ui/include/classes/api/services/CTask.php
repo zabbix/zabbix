@@ -88,24 +88,30 @@ class CTask extends CApiService {
 
 		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
-		while ($row = DBfetch($result)) {
+		while ($row = DBfetch($result, false)) {
 			if ($this->outputIsRequested('request', $options['output'])) {
 				$row['request'] = json_decode($row['request_data']);
 				unset($row['request_data']);
 			}
 
 			if ($this->outputIsRequested('result', $options['output'])) {
-				if ($row['result_status'] == self::RESULT_STATUS_ERROR) {
-					$result_data = $row['result_info'];
+				if ($row['result_status'] === null) {
+					$row['result'] = null;
 				}
 				else {
-					$result_data = $row['result_info'] ? json_decode($row['result_info']) : [];
+					if ($row['result_status'] == self::RESULT_STATUS_ERROR) {
+						$result_data = $row['result_info'];
+					}
+					else {
+						$result_data = $row['result_info'] ? json_decode($row['result_info']) : [];
+					}
+
+					$row['result'] = [
+						'data' => $result_data,
+						'status' => $row['result_status']
+					];
 				}
 
-				$row['result'] = [
-					'data' => $result_data,
-					'status' => $row['result_status']
-				];
 				unset($row['result_info'], $row['result_status']);
 			}
 
