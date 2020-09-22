@@ -103,8 +103,8 @@ func walkCrushTree(tree []node, rootNodeID int64) (res []*node, err error) {
 	return
 }
 
-// OSDDiscoveryHandler TODO.
-func OSDDiscoveryHandler(data map[command][]byte) (interface{}, error) {
+// osdDiscoveryHandler TODO.
+func osdDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
 		crushRules []crushRule
 		tree       crushTree
@@ -173,7 +173,7 @@ type poolEntity struct {
 	CrushRule string `json:"{#CRUSHRULE}"`
 }
 
-// OSDDiscoveryHandler TODO.
+// osdDiscoveryHandler TODO.
 func poolDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
 		poolsDump  osdDumpPool

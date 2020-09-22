@@ -32,8 +32,7 @@ type cephOsdDump struct {
 	NearFullRatio     float64 `json:"nearfull_ratio"`
 	Osds              []struct {
 		Name json.Number `json:"osd"`
-		In   int8        `json:"in"`
-		Up   int8        `json:"up"`
+		osdStatus
 	} `json:"osds"`
 	PgTemp []struct{} `json:"pg_temp"`
 }

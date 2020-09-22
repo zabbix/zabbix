@@ -83,7 +83,7 @@ var metrics = pluginMetrics{
 		description: "TODO.",
 		commands:    []command{cmdOSDCrushRuleDump, cmdOSDCrushTree},
 		params:      nil,
-		handler:     OSDDiscoveryHandler,
+		handler:     osdDiscoveryHandler,
 	},
 	keyOSDDump: metric{
 		description: "TODO.",

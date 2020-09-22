@@ -24,7 +24,6 @@ import (
 	"math"
 	"sort"
 
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -121,8 +120,6 @@ func osdHandler(data map[command][]byte) (interface{}, error) {
 	if err != nil {
 		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
-
-	log.Infof("%+v", pgDump)
 
 	var (
 		fill              float64

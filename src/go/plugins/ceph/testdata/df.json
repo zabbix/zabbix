@@ -1,0 +1,71 @@
+{
+  "stats": {
+    "total_bytes": 12872318976,
+    "total_avail_bytes": 6903169024,
+    "total_used_bytes": 2747924480,
+    "total_used_raw_bytes": 5969149952,
+    "total_used_raw_ratio": 0.4637198746204376,
+    "num_osds": 3,
+    "num_per_pool_osds": 3,
+    "num_per_pool_omap_osds": 3
+  },
+  "stats_by_class": {
+    "hdd": {
+      "total_bytes": 12872318976,
+      "total_avail_bytes": 6903169024,
+      "total_used_bytes": 2747924480,
+      "total_used_raw_bytes": 5969149952,
+      "total_used_raw_ratio": 0.4637198746204376
+    }
+  },
+  "pools": [
+    {
+      "name": "device_health_metrics",
+      "id": 1,
+      "stats": {
+        "stored": 0,
+        "objects": 0,
+        "kb_used": 0,
+        "bytes_used": 0,
+        "percent_used": 0,
+        "max_avail": 1390997120
+      }
+    },
+    {
+      "name": "test_zabbix",
+      "id": 4,
+      "stats": {
+        "stored": 22206,
+        "objects": 4,
+        "kb_used": 768,
+        "bytes_used": 786432,
+        "percent_used": 0.0001884220982901752,
+        "max_avail": 1390997120
+      }
+    },
+    {
+      "name": "zabbix",
+      "id": 5,
+      "stats": {
+        "stored": 0,
+        "objects": 0,
+        "kb_used": 0,
+        "bytes_used": 0,
+        "percent_used": 0,
+        "max_avail": 1390997120
+      }
+    },
+    {
+      "name": "new_pool",
+      "id": 6,
+      "stats": {
+        "stored": 0,
+        "objects": 0,
+        "kb_used": 0,
+        "bytes_used": 0,
+        "percent_used": 0,
+        "max_avail": 695520448
+      }
+    }
+  ]
+}
