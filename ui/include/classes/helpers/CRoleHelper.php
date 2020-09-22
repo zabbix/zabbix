@@ -104,14 +104,14 @@ class CRoleHelper {
 		self::loadRoleRules($roleid);
 
 		$role_rules = self::$roles[$roleid]['rules'];
-		$all_rules = self::getAllRules(self::$roles[$roleid]['type']);
 		$default_access_name = explode('.', $rule_name, 2)[0].'.default_access';
-		$default_access_allowed = in_array($default_access_name,
-				[self::UI_DEFAULT_ACCESS, self::MODULES_DEFAULT_ACCESS, self::PRIVILEGES_DEFAULT_ACCESS]
-			) && (!array_key_exists($default_access_name, $role_rules) || $role_rules[$default_access_name]);
 
-		return in_array($rule_name, $all_rules)
-				&& ((!array_key_exists($rule_name, $role_rules) && $default_access_allowed)
+		return in_array($rule_name, self::getAllRules(self::$roles[$roleid]['type']))
+				&& ((!array_key_exists($rule_name, $role_rules)
+					&& (in_array($default_access_name, [self::UI_DEFAULT_ACCESS, self::MODULES_DEFAULT_ACCESS,
+						self::PRIVILEGES_DEFAULT_ACCESS
+					])
+						&& (!array_key_exists($default_access_name, $role_rules) || $role_rules[$default_access_name])))
 					|| $role_rules[$rule_name]);
 	}
 
@@ -119,6 +119,8 @@ class CRoleHelper {
 	 * Loads once all rules of specified Role API object by ID and converts rule data to one format.
 	 *
 	 * @static
+	 *
+	 * @throws Exception
 	 *
 	 * @param string $roleid  Role ID.
 	 */
@@ -172,7 +174,7 @@ class CRoleHelper {
 	 *                     returns array of rules for all user types where key is user type value and values is rule
 	 *                     names.
 	 */
-	public static function getAllRules(int $user_type = null): array {
+	public static function getAllRules(?int $user_type = null): array {
 		self::loadAllRules();
 
 		return (array_key_exists($user_type, self::$all_rules)) ? self::$all_rules[$user_type] : self::$all_rules;
