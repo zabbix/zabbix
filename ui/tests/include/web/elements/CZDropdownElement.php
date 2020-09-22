@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * Custom dropdown (z-select) element.
  */
@@ -53,9 +55,21 @@ class CZDropdownElement extends CElement {
 	 * @return $this
 	 */
 	public function select($text) {
-		$this->click();
 		$xpath = 'xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']';
-		$option = $this->query($xpath)->waitUntilVisible()->one();
+
+		for ($i = 0; $i < 2; $i++) {
+			try {
+				$this->click();
+				$option = $this->query($xpath)->waitUntilVisible()->one();
+
+				break;
+			}
+			catch (TimeoutException $exception) {
+				if ($i === 1) {
+					throw new Exception('Failed to wait for the dropdown options to be present.');
+				}
+			}
+		}
 
 		if ($option->isClickable()) {
 			$option->click();
