@@ -696,33 +696,27 @@ class testFormTabIndicators extends CWebTest {
 			if (array_key_exists('count', $tab)) {
 				$data_indicator = 'count';
 				$new_value = $tab['count'];
-				$old_value = (array_key_exists('initial_count', $tab)) ? $tab['initial_count'] : 0;
+				$old_value = CTestArrayHelper::get($tab, 'initial_count', 0);
 			}
 			else {
 				$data_indicator = 'mark';
-				if (CTestArrayHelper::get($tab, 'set by default', false)) {
-					$new_value = false;
-					$old_value = true;
-				}
-				else {
-					$new_value = true;
-					$old_value = false;
-				}
+				$old_value = CTestArrayHelper::get($tab, 'set by default', false);
+				$new_value = !$old_value;
 			}
 
 			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
-			$this->checkIndicatorValue($tab_selector, $old_value);
+			$this->assertTabIndicator($tab_selector, $old_value);
 
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);
 			// Input elements change their attribute values only after focus is removed from the element.
 			$this->page->removeFocus();
-			$this->checkIndicatorValue($tab_selector, $new_value);
+			$this->assertTabIndicator($tab_selector, $new_value);
 
 			// Clear the popullatedfields and check indicator value.
 			$this->updateTabFields($tab, $form, USER_ACTION_REMOVE);
 			$old_value = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $old_value;
-			$this->checkIndicatorValue($tab_selector, $old_value);
+			$this->assertTabIndicator($tab_selector, $old_value);
 		}
 	}
 
@@ -733,7 +727,7 @@ class testFormTabIndicators extends CWebTest {
 		$form = $this->query('id:action-form')->asForm()->one();
 		$form->selectTab('Operations');
 		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one();
-		$this->checkIndicatorValue($tab_selector, 0);
+		$this->assertTabIndicator($tab_selector, 0);
 
 		// Specify an operation of each type and check indicator value.
 		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
@@ -748,11 +742,11 @@ class testFormTabIndicators extends CWebTest {
 
 			COverlayDialogElement::ensureNotPresent();
 		}
-		$this->checkIndicatorValue($tab_selector, 3);
+		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the previously created operations and check indicator value.
 		$form->query('button:Remove')->all()->click();
-		$this->checkIndicatorValue($tab_selector, 0);
+		$this->assertTabIndicator($tab_selector, 0);
 	}
 
 	public function testFormTabIndicators_CheckUserGroupIndicators() {
@@ -762,7 +756,7 @@ class testFormTabIndicators extends CWebTest {
 		$form = $this->query('id:user-group-form')->asForm()->one();
 		$form->selectTab('Permissions');
 		$tab_selector = $form->query('xpath:.//a[text()="Permissions"]')->one();
-		$this->checkIndicatorValue($tab_selector, false);
+		$this->assertTabIndicator($tab_selector, false);
 
 		// Add read permissions to Discovered hosts group and check indicator.
 		$group_selector = $form->query('xpath:.//div[@id="new_group_right_groupids_"]/..')->asMultiselect()->one();
@@ -772,29 +766,29 @@ class testFormTabIndicators extends CWebTest {
 		$add_button = $form->query('id:new-group-right-table')->query('button:Add')->one();
 		$add_button->click();
 		$tab_selector->waitUntilReady();
-		$this->checkIndicatorValue($tab_selector, true);
+		$this->assertTabIndicator($tab_selector, true);
 
 		// Remove read permissions from Discovered hosts group and check indicator.
 		$group_selector->fill('Discovered hosts');
 		$permission_level->fill('None');
 		$add_button->click();
 		$tab_selector->waitUntilReady();
-		$this->checkIndicatorValue($tab_selector, false);
+		$this->assertTabIndicator($tab_selector, false);
 
 		// Check status indicator in Tag filter tab.
 		$form->selectTab('Tag filter');
 		$tab_selector = $form->query('xpath:.//a[text()="Tag filter"]')->one();
-		$this->checkIndicatorValue($tab_selector, false);
+		$this->assertTabIndicator($tab_selector, false);
 
 		// Add tag filter for Discovered hosts group and check indicator.
 		$form->query('xpath:.//div[@id="new_tag_filter_groupids_"]/..')->asMultiselect()->one()->fill('Discovered hosts');
 		$form->query('id:new-tag-filter-table')->query('button:Add')->one()->click();
 		$tab_selector->waitUntilReady();
-		$this->checkIndicatorValue($tab_selector, true);
+		$this->assertTabIndicator($tab_selector, true);
 
 		// Remove the tag filter for Discovered hosts group and check indicator.
 		$form->query('id:tag-filter-table')->query('button:Remove')->one()->click();
-		$this->checkIndicatorValue($tab_selector, false);
+		$this->assertTabIndicator($tab_selector, false);
 	}
 
 	/**
@@ -827,7 +821,7 @@ class testFormTabIndicators extends CWebTest {
 		$form = $this->query('id:services-form')->asForm()->one();
 		$form->selectTab('Dependencies');
 		$tab_selector = $form->query('xpath:.//a[text()="Dependencies"]')->one();
-		$this->checkIndicatorValue($tab_selector, 0);
+		$this->assertTabIndicator($tab_selector, 0);
 
 		// Add service ependencies and check dependency count indicator.
 		$dependencies_field = $form->getFieldContainer('Depends on');
@@ -836,25 +830,25 @@ class testFormTabIndicators extends CWebTest {
 		$overlay->query('id:all_services')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
-		$this->checkIndicatorValue($tab_selector, 2);
+		$this->assertTabIndicator($tab_selector, 2);
 
 		// Remove all dependencies and check count indicator.
 		$dependencies_field->query('button:Remove')->all()->click();
-		$this->checkIndicatorValue($tab_selector, 0);
+		$this->assertTabIndicator($tab_selector, 0);
 
 		// Open Time tab and check count indicator.
 		$form->selectTab('Time');
 		$tab_selector = $form->query('xpath:.//a[text()="Time"]')->one();
-		$this->checkIndicatorValue($tab_selector, 0);
+		$this->assertTabIndicator($tab_selector, 0);
 
 		// Add a time period and check count indicator.
 		$form->getField('Period type')->select('One-time downtime');
 		$form->getFieldContainer('New service time')->query('button:Add')->one()->click();
-		$this->checkIndicatorValue($tab_selector, 1);
+		$this->assertTabIndicator($tab_selector, 1);
 
 		// Remove the added time period and check count indicator.
 		$form->getFieldContainer('Service times')->query('button:Remove')->one()->click();
-		$this->checkIndicatorValue($tab_selector, 0);
+		$this->assertTabIndicator($tab_selector, 0);
 	}
 
 	/*
@@ -960,7 +954,7 @@ class testFormTabIndicators extends CWebTest {
 	/*
 	 * Function checks count attribute or status attribute value of the specified tab.
 	 */
-	private function checkIndicatorValue($element, $expected) {
+	private function assertTabIndicator($element, $expected) {
 		if (is_bool($expected)) {
 			$value = (bool) $element->getAttribute('data-indicator-value');
 			$indicator = 'mark';
