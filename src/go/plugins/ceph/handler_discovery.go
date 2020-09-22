@@ -108,7 +108,7 @@ func osdDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
 		crushRules []crushRule
 		tree       crushTree
-		lld        []osdEntity
+		lld        = []osdEntity{}
 	)
 
 	roundCache := make(map[int64][]*node)
@@ -178,7 +178,7 @@ func poolDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
 		poolsDump  osdDumpPool
 		crushRules []crushRule
-		lld        []poolEntity
+		lld        = []poolEntity{}
 	)
 
 	err := json.Unmarshal(data[cmdOSDDump], &poolsDump)
