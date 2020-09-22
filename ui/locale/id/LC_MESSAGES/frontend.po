@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:58+0300\n"
+"POT-Creation-Date: 2020-09-18 19:53+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -429,8 +429,7 @@ msgstr ""
 #: app/views/dashboard.sharing.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/popup.lldoperation.php:111 app/views/popup.lldoperation.php:240
-#: app/views/popup.lldoverride.php:93 app/views/popup.triggerwizard.php:47
-#: app/views/popup.triggerwizard.php:117
+#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
 #: app/views/reports.auditlog.list.php:56
 #: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
@@ -523,7 +522,7 @@ msgid_plural "Actions enabled"
 msgstr[0] ""
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:137
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:139
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -541,8 +540,8 @@ msgstr "Aksi diperbarui"
 #: include/classes/screens/CScreenProblem.php:923
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:251
-#: include/forms.inc.php:1199 include/menu.inc.php:114
-#: include/menu.inc.php:144 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1199 include/menu.inc.php:116
+#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
@@ -616,8 +615,8 @@ msgstr "Aktif sampai"
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
-#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
-#: app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:175
+#: app/views/popup.lldoverride.php:194
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
@@ -799,7 +798,7 @@ msgstr ""
 msgid "Admin"
 msgstr "Admin"
 
-#: include/menu.inc.php:150
+#: include/menu.inc.php:152
 msgid "Administration"
 msgstr "Administrasi"
 
@@ -1241,8 +1240,8 @@ msgstr ""
 msgid "Attempts"
 msgstr ""
 
-#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:133
-#: include/menu.inc.php:136
+#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:135
+#: include/menu.inc.php:138
 msgid "Audit"
 msgstr "Audit"
 
@@ -1270,7 +1269,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
-#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:165
+#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
@@ -1383,7 +1382,7 @@ msgstr ""
 msgid "Availability"
 msgstr "Ketersediaan"
 
-#: include/menu.inc.php:72 include/menu.inc.php:128 report2.php:25
+#: include/menu.inc.php:72 include/menu.inc.php:130 report2.php:25
 #: report2.php:161
 msgid "Availability report"
 msgstr "Laporan ketersediaan"
@@ -2072,7 +2071,7 @@ msgstr ""
 msgid "Cannot delete item prototypes"
 msgstr ""
 
-#: items.php:1339
+#: items.php:1343
 msgid "Cannot delete items"
 msgstr "Tidak dapat menghapus item"
 
@@ -2589,7 +2588,7 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Cannot send request"
 msgstr ""
 
@@ -2802,7 +2801,7 @@ msgstr ""
 #: app/controllers/CControllerGuiUpdate.php:43
 #: app/controllers/CControllerGuiUpdate.php:80
 #: app/controllers/CControllerHousekeepingUpdate.php:57
-#: app/controllers/CControllerHousekeepingUpdate.php:126
+#: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:43
 #: app/controllers/CControllerMiscConfigUpdate.php:80
 #: app/controllers/CControllerTrigDisplayUpdate.php:47
@@ -3434,7 +3433,7 @@ msgid "Concurrent sessions"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:740
-#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:168
+#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:169
 msgid "Condition"
 msgstr "Kondisi"
 
@@ -3491,7 +3490,7 @@ msgstr "Kondisi"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr ""
 
-#: include/menu.inc.php:97 include/menu.inc.php:142
+#: include/menu.inc.php:97 include/menu.inc.php:144
 #: include/views/inventory.host.view.php:211 jsLoader.php:275
 msgid "Configuration"
 msgstr "Konfigurasi"
@@ -5138,7 +5137,7 @@ msgstr ""
 #: app/views/search.php:88 app/views/search.php:92 app/views/search.php:228
 #: app/views/search.php:278 app/views/search.php:282
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:293
-#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
+#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:118
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
 #: include/views/configuration.template.list.php:156
@@ -5941,7 +5940,7 @@ msgstr "Event ID"
 msgid "Event acknowledged"
 msgstr "Pemberitahuan event"
 
-#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:147
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr ""
@@ -6574,7 +6573,7 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "Akses GUI non-aktif."
 
-#: include/menu.inc.php:154
+#: include/menu.inc.php:156
 msgid "General"
 msgstr "Umum"
 
@@ -6981,7 +6980,7 @@ msgstr "Grup berdasarkan"
 msgid "Groups"
 msgstr "Grup"
 
-#: include/menu.inc.php:225
+#: include/menu.inc.php:227
 msgid "Guest user"
 msgstr ""
 
@@ -7079,7 +7078,7 @@ msgstr ""
 msgid "Height"
 msgstr "Tinggi"
 
-#: include/menu.inc.php:211 include/menu.inc.php:214
+#: include/menu.inc.php:213 include/menu.inc.php:216
 #: include/views/general.login.php:89
 msgid "Help"
 msgstr "Bantuan"
@@ -7158,7 +7157,7 @@ msgid "History cleanup is not supported if compression is enabled"
 msgstr ""
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:491 httpconf.php:503
-#: items.php:893 items.php:901 items.php:1315 items.php:1329
+#: items.php:893 items.php:901 items.php:1319 items.php:1333
 msgid "History cleared"
 msgstr "Riwayat dibersihkan"
 
@@ -7244,7 +7243,7 @@ msgstr "Luruskan horisontal"
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:64
 #: include/views/monitoring.slides.php:76
-#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1314
+#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1318
 #: jsLoader.php:199 jsLoader.php:292 queue.php:221 report2.php:482
 msgid "Host"
 msgid_plural "Hosts"
@@ -7594,7 +7593,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:207 include/forms.inc.php:644 include/menu.inc.php:37
-#: include/menu.inc.php:65 include/menu.inc.php:106
+#: include/menu.inc.php:65 include/menu.inc.php:108
 #: include/views/configuration.application.list.php:50
 #: include/views/configuration.copy.elements.php:62
 #: include/views/configuration.graph.list.php:87
@@ -9752,7 +9751,7 @@ msgstr "Italian (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:245
 #: include/views/monitoring.screen.constructor.edit.php:414
 #: include/views/monitoring.screen.constructor.edit.php:725 items.php:892
-#: items.php:1314
+#: items.php:1318
 msgid "Item"
 msgstr "Item"
 
@@ -9981,11 +9980,11 @@ msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\"."
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
-#: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
+#: include/views/inventory.host.view.php:204 items.php:1694 queue.php:110
 msgid "Items"
 msgstr "Item"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Items deleted"
 msgstr "Item dihapus"
 
@@ -10693,7 +10692,7 @@ msgstr ""
 msgid "Main navigation"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:114
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -11051,7 +11050,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:30
-#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:174
+#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:176
 #: include/views/conf.import.php:51
 msgid "Media types"
 msgstr "Tipe media"
@@ -12181,7 +12180,7 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
 #: include/classes/screens/CScreenLldGraph.php:51 include/func.inc.php:1507
-#: items.php:1443 items.php:1647 services.php:84
+#: items.php:1447 items.php:1651 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Tidak ada izin untuk objek yang dirujuk atau objek tidak ada!"
 
@@ -12834,7 +12833,7 @@ msgstr "Tipe operasi"
 msgid "Operational data"
 msgstr ""
 
-#: app/views/popup.lldoverride.php:183
+#: app/views/popup.lldoverride.php:184
 #: include/views/configuration.action.edit.php:306
 #: include/views/configuration.action.edit.php:470
 #: include/views/configuration.action.list.php:90
@@ -13850,7 +13849,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:164
 #: app/views/administration.proxy.edit.php:28
-#: app/views/administration.proxy.list.php:31 include/menu.inc.php:162
+#: app/views/administration.proxy.list.php:31 include/menu.inc.php:164
 msgid "Proxies"
 msgstr "Proxy"
 
@@ -13952,7 +13951,7 @@ msgstr "File kunci publik"
 msgid "Query fields"
 msgstr ""
 
-#: include/menu.inc.php:180 queue.php:25
+#: include/menu.inc.php:182 queue.php:25
 msgid "Queue"
 msgstr "Antrian"
 
@@ -14386,7 +14385,7 @@ msgstr "Gantikan"
 msgid "Replace dependencies"
 msgstr "Gantikan dependensi"
 
-#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:126
+#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:128
 #: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "Laporan"
@@ -14407,7 +14406,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Request sent successfully"
 msgstr ""
 
@@ -15160,7 +15159,7 @@ msgstr "Skrip diperbarui"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
-#: app/views/administration.script.list.php:31 include/menu.inc.php:177
+#: app/views/administration.script.list.php:31 include/menu.inc.php:179
 #: jsLoader.php:303
 msgid "Scripts"
 msgstr "Skrip"
@@ -15468,7 +15467,7 @@ msgid "Service updated"
 msgstr "Service diperbarui"
 
 #: app/views/administration.housekeeping.edit.php:79 include/menu.inc.php:55
-#: include/menu.inc.php:118 include/views/configuration.services.edit.php:30
+#: include/menu.inc.php:120 include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.list.php:27 srv_status.php:26
 #: srv_status.php:161
@@ -15582,7 +15581,7 @@ msgstr ""
 msgid "Shape"
 msgstr ""
 
-#: include/menu.inc.php:202
+#: include/menu.inc.php:204
 msgid "Share"
 msgstr ""
 
@@ -15763,7 +15762,7 @@ msgstr ""
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/menu.inc.php:240 include/menu.inc.php:243
+#: include/menu.inc.php:242 include/menu.inc.php:245
 msgid "Sign out"
 msgstr ""
 
@@ -16246,7 +16245,7 @@ msgstr "Sen"
 msgid "Sunday"
 msgstr "Senin"
 
-#: include/menu.inc.php:195 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:96
 msgid "Support"
 msgstr "Dukungan"
 
@@ -16310,7 +16309,7 @@ msgstr ""
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:29
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:129
+#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:131
 #: include/screens.inc.php:36
 msgid "System information"
 msgstr ""
@@ -17360,7 +17359,7 @@ msgstr "Trigger"
 msgid "Triggers deleted"
 msgstr "Trigger dihapus"
 
-#: include/menu.inc.php:75 include/menu.inc.php:132
+#: include/menu.inc.php:75 include/menu.inc.php:134
 msgid "Triggers top 100"
 msgstr "Trigger 100 teratas"
 
@@ -17833,7 +17832,7 @@ msgstr "Nyala"
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
-#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:194
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
@@ -18103,7 +18102,7 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:228
 #: app/views/administration.usergroup.edit.php:28
 #: app/views/administration.usergroup.list.php:31
-#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:168
+#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:170
 #: include/views/monitoring.screen.edit.php:128
 #: include/views/monitoring.slideconf.edit.php:177
 #: include/views/monitoring.sysmap.edit.php:298
@@ -18155,7 +18154,7 @@ msgstr ""
 msgid "User sessions"
 msgstr ""
 
-#: include/menu.inc.php:232
+#: include/menu.inc.php:234
 msgid "User settings"
 msgstr ""
 
@@ -18226,7 +18225,7 @@ msgstr ""
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
 #: app/views/dashboard.sharing.edit.php:50
-#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:173
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
@@ -19197,7 +19196,7 @@ msgstr "Zabbix"
 msgid "Zabbix Admin"
 msgstr "Admin Zabbix"
 
-#: include/menu.inc.php:205
+#: include/menu.inc.php:207
 msgid "Zabbix Share"
 msgstr ""
 
@@ -19205,7 +19204,7 @@ msgstr ""
 msgid "Zabbix Super Admin"
 msgstr "Super Admin Zabbix"
 
-#: include/menu.inc.php:198
+#: include/menu.inc.php:200
 msgid "Zabbix Technical Support"
 msgstr ""
 

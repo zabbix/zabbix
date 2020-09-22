@@ -2107,7 +2107,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template OS Solaris:vfs.fs.size[{#FSNAME},pfree].last(0)}&lt;20</expression>
+                            <expression>{Template OS Solaris:vfs.fs.size[{#FSNAME},pfree].last()}&lt;20</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Free disk space is less than 20% on volume {#FSNAME}</name>
@@ -2123,7 +2123,7 @@
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template OS Solaris:vfs.fs.inode[{#FSNAME},pfree].last(0)}&lt;20</expression>
+                            <expression>{Template OS Solaris:vfs.fs.inode[{#FSNAME},pfree].last()}&lt;20</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Free inodes is less than 20% on volume {#FSNAME}</name>
@@ -2374,7 +2374,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Solaris:kernel.maxproc.last(0)}&lt;256</expression>
+            <expression>{Template OS Solaris:kernel.maxproc.last()}&lt;256</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Configured max number of processes is too low on {HOST.NAME}</name>
@@ -2438,7 +2438,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Solaris:vm.memory.size[available].last(0)}&lt;20M</expression>
+            <expression>{Template OS Solaris:vm.memory.size[available].last()}&lt;20M</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Lack of available memory on server {HOST.NAME}</name>
@@ -2454,7 +2454,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Solaris:system.swap.size[,pfree].last(0)}&lt;50</expression>
+            <expression>{Template OS Solaris:system.swap.size[,pfree].last()}&lt;50</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Lack of free swap space on {HOST.NAME}</name>

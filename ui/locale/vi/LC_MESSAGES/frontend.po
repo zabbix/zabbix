@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:58+0300\n"
-"PO-Revision-Date: 2020-05-25 09:44+0300\n"
+"POT-Creation-Date: 2020-09-18 19:53+0300\n"
+"PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: vi\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1590392691.000000\n"
+"X-POOTLE-MTIME: 1600063970.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -74,7 +74,7 @@ msgstr "Kí tự %1$d vượt quá độ dài tối đa của kí tự %2$d"
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
+msgstr[0] "%1$d ngày%1$d ngày"
 
 #: jsLoader.php:269
 #, c-format
@@ -87,7 +87,7 @@ msgstr "%1$d khớp với %2$s được tìm thấy"
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
+msgstr[0] "%1$d of %3$d%2$s vấn đề%1$d of %3$d%2$s vấn đề"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
@@ -108,7 +108,7 @@ msgstr "%1$s - phát bởi mô đun nằm ở %2$s."
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
+msgstr[0] "%1$s mục%1$s mục"
 
 #: include/classes/api/services/CItemGeneral.php:2262
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -121,34 +121,34 @@ msgstr "%1$s [Dòng: %2$s | Cột: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
+msgstr[0] "%1$s hành động%1$s hành động"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
+msgstr[0] "%1$s sự kiện"
 
 #: include/maps.inc.php:405
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
+msgstr[0] "%1$s thiết bị đang bảo trì"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:119
 #: include/views/monitoring.history.php:31
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
+msgstr[0] "%1$s mục"
 
 #: include/actions.inc.php:1733
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
+msgstr[0] "%1$s thông điệp"
 
 #: include/classes/widgets/CWidgetConfig.php:162
 #: include/classes/widgets/CWidgetConfig.php:163
@@ -158,13 +158,13 @@ msgstr[0] ""
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
+msgstr[0] "%1$s phút"
 
 #: include/classes/helpers/CMapHelper.php:313
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
+msgstr[0] "%1$s of %2$s yếu tố có vấn đề"
 
 #: jsLoader.php:270
 #, c-format
@@ -177,13 +177,13 @@ msgstr "%1$s được chọn trước, sử dụng phím down,up và enter để
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
+msgstr[0] "%1$s vấn đề"
 
 #: include/classes/helpers/CMapHelper.php:316
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
+msgstr[0] "%1$s vấn đề trên tổng"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2171 include/classes/screens/CScreenActions.php:129
@@ -191,7 +191,7 @@ msgstr[0] ""
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
+msgstr[0] "còn %1$s lần thử"
 
 #: app/views/administration.user.edit.php:377
 #: include/classes/widgets/CWidgetConfig.php:160
@@ -200,7 +200,7 @@ msgstr[0] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
+msgstr[0] "%1$s giây"
 
 #: jsLoader.php:251
 #, c-format
@@ -212,7 +212,7 @@ msgstr "%1$s biểu tượng còn lại"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
+msgstr[0] "%1$s vấn đề chưa xác nhận"
 
 #: app/views/monitoring.widget.problems.view.php:276
 #, c-format
@@ -243,13 +243,13 @@ msgstr "%1$s, chọn"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
+msgstr[0] "%4$s đăng nhập sai ghi nhận. Đăng nhập sai cuối cùng từ %1$s vào %2$s lúc %3$s."
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
+msgstr[0] "%d thiết bị"
 
 #: include/users.inc.php:158
 #, c-format
@@ -300,11 +300,11 @@ msgstr "100 trigger cảnh báo nhiều nhất"
 
 #: tests/selenium/modules/module_number_1/Module.php:21
 msgid "1st Module"
-msgstr ""
+msgstr "Mô-đun thứ nhất"
 
 #: tests/selenium/modules/module_number_2/Module.php:21
 msgid "2nd Module"
-msgstr ""
+msgstr "Mô-đun thứ hai"
 
 #: queue.php:113 queue.php:168
 msgid "30 seconds"
@@ -316,7 +316,7 @@ msgstr "xem 3D"
 
 #: tests/selenium/modules/module_number_4/Module.php:21
 msgid "4th Module"
-msgstr ""
+msgstr "Mô-đun thứ tư"
 
 #: queue.php:115 queue.php:170
 msgid "5 minutes"
@@ -385,7 +385,7 @@ msgstr "Truy cập bị từ chối!"
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
-msgstr[0] ""
+msgstr[0] "Tài khoản bị khóa trong %1$s giây."
 
 #: app/views/monitoring.widget.problems.view.php:64
 #: include/actions.inc.php:157 include/blocks.inc.php:768
@@ -430,8 +430,7 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 #: app/views/dashboard.sharing.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/popup.lldoperation.php:111 app/views/popup.lldoperation.php:240
-#: app/views/popup.lldoverride.php:93 app/views/popup.triggerwizard.php:47
-#: app/views/popup.triggerwizard.php:117
+#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
 #: app/views/reports.auditlog.list.php:56
 #: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
@@ -516,15 +515,15 @@ msgstr "Hành động đã được xóa"
 #: actionconf.php:381
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
+msgstr[0] "Hành động bị vô hiệu"
 
 #: actionconf.php:380
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
+msgstr[0] "Hành động được kích hoạt"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:137
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:139
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -542,8 +541,8 @@ msgstr "Hành động đã cập nhật"
 #: include/classes/screens/CScreenProblem.php:923
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:251
-#: include/forms.inc.php:1199 include/menu.inc.php:114
-#: include/menu.inc.php:144 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1199 include/menu.inc.php:116
+#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
@@ -617,8 +616,8 @@ msgstr "Kích hoạt"
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
-#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
-#: app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:175
+#: app/views/popup.lldoverride.php:194
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
@@ -800,7 +799,7 @@ msgstr "Đã thêm, %1$s"
 msgid "Admin"
 msgstr "Quản trị"
 
-#: include/menu.inc.php:150
+#: include/menu.inc.php:152
 msgid "Administration"
 msgstr "Quản trị"
 
@@ -1040,7 +1039,7 @@ msgstr "Ứng dụng đã được thêm vào"
 #: applications.php:189 applications.php:200
 msgid "Application deleted"
 msgid_plural "Applications deleted"
-msgstr[0] ""
+msgstr[0] "Ứng dụng đã được xóa"
 
 #: include/classes/core/CJsonRpc.php:213
 msgid "Application error."
@@ -1241,8 +1240,8 @@ msgstr "Khoảng thời gian thử nghiệm"
 msgid "Attempts"
 msgstr "Thử nghiệm"
 
-#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:133
-#: include/menu.inc.php:136
+#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:135
+#: include/menu.inc.php:138
 msgid "Audit"
 msgstr "Kiểm tra"
 
@@ -1270,7 +1269,7 @@ msgstr "Yêu cầu xác thực"
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
-#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:165
+#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
@@ -1383,7 +1382,7 @@ msgstr "Sự kiện tự động và thời gian lưu trữ dữ liệu cảnh b
 msgid "Availability"
 msgstr "Tính sẵn sàng"
 
-#: include/menu.inc.php:72 include/menu.inc.php:128 report2.php:25
+#: include/menu.inc.php:72 include/menu.inc.php:130 report2.php:25
 #: report2.php:161
 msgid "Availability report"
 msgstr "Thông báo tính sẵn sàng"
@@ -1582,19 +1581,19 @@ msgstr "Tính toán"
 
 #: include/classes/items/CHelpItems.php:677
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Tính giá trị trung bình, dựa trên nhiều tham số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
 #: include/classes/items/CHelpItems.php:685
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Tính giá trị cực đại, dựa trên các thông số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
 #: include/classes/items/CHelpItems.php:681
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Tính giá trị cực tiêu, dựa trên các thông số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
 #: include/classes/items/CHelpItems.php:689
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Tính tổng, dựa trên các thông số. Máy chủ thu thập giá trị qua truy vấn trực tiếp database."
 
 #: jsLoader.php:166
 msgid "Calendar"
@@ -1750,7 +1749,7 @@ msgstr "Không thể thêm kiểu phương tiện"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
+msgstr[0] "Không thể thêm mô-đun: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -1860,7 +1859,7 @@ msgstr "Không thể xóa lịch sử"
 
 #: items.php:1287
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr ""
+msgstr "Không thể xóa lịch sử: ít nhất 1 mục không thuộc thiết bị được giám sát"
 
 #: include/classes/api/services/CDiscoveryRule.php:2434
 msgid "Cannot clone graph prototypes."
@@ -1900,17 +1899,17 @@ msgstr "Không thể chuyển đổi dữ liệu POST:"
 #: graphs.php:400
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
+msgstr[0] "Không thể sao chép đồ thị"
 
 #: items.php:1270
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
+msgstr[0] "Không thể sao chép mục"
 
 #: triggers.php:601
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
+msgstr[0] "Không thể sao chép trigger"
 
 #: include/triggers.inc.php:409
 #, c-format
@@ -1976,7 +1975,7 @@ msgstr "Không thể xóa hành động"
 #: applications.php:189 applications.php:201
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
-msgstr[0] ""
+msgstr[0] "Không thể xóa ứng dụng"
 
 #: correlation.php:160
 msgid "Cannot delete correlation"
@@ -1985,7 +1984,7 @@ msgstr "Không thế xóa sự tương quan"
 #: app/controllers/CControllerDashboardDelete.php:62
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
+msgstr[0] "Không thể xóa dashboard"
 
 #: include/classes/api/services/CTrigger.php:862
 #: include/classes/api/services/CTriggerPrototype.php:581
@@ -2024,7 +2023,7 @@ msgstr "Không thể xóa các biểu đồ"
 #: hostgroups.php:134 hostgroups.php:156
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
-msgstr[0] ""
+msgstr[0] "Không thể xóa nhóm"
 
 #: hosts.php:959 hosts.php:980
 msgid "Cannot delete host"
@@ -2034,13 +2033,13 @@ msgstr "Không thể xóa host"
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
+msgstr[0] "Không thể xóa thiết bị đang bảo trì \"%1$s\" phải chứa ít nhất 1 hoặc 1 nhóm thiết bị."
 
 #: include/classes/api/services/CHostGroup.php:1532
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
+msgstr[0] "Không thể xóa nhóm thiết bị đang bảo trì \"%1$s\" phải chứa ít nhất 1 hoặc 1 nhóm thiết bị. "
 
 #: host_prototypes.php:132 host_prototypes.php:303
 msgid "Cannot delete host prototypes"
@@ -2070,7 +2069,7 @@ msgstr "Không thể xóa loại item"
 msgid "Cannot delete item prototypes"
 msgstr "Không thể xóa các loại item"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Cannot delete items"
 msgstr "Không thể xóa các item"
 
@@ -2081,13 +2080,13 @@ msgstr "Không thể xóa bảo trì"
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] ""
+msgstr[0] "Không thể xóa phương tiện"
 
 #: app/controllers/CControllerModuleScan.php:122
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
+msgstr[0] "Không thể xóa mô-đun: %1$s."
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
@@ -2096,12 +2095,12 @@ msgstr "Không thể xóa sơ đồ mạng"
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] ""
+msgstr[0] "Không thể xóa proxy"
 
 #: app/controllers/CControllerRegExDelete.php:83
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] ""
+msgstr[0] "Không thể xóa regular expression"
 
 #: screenconf.php:283
 msgid "Cannot delete screen"
@@ -2110,7 +2109,7 @@ msgstr "Không thể xóa màn hình"
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
-msgstr[0] ""
+msgstr[0] "Không thể xóa script"
 
 #: include/classes/api/services/CScript.php:594
 #, c-format
@@ -2199,17 +2198,17 @@ msgstr "Không thể xóa các trigger"
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
-msgstr[0] ""
+msgstr[0] "Không thể xóa người dùng"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
+msgstr[0] "Không thể xóa nhóm người dùng"
 
 #: app/controllers/CControllerValuemapDelete.php:70
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
-msgstr[0] ""
+msgstr[0] "Không thể xóa giá trị bản đồ"
 
 #: httpconf.php:150 httpconf.php:512
 msgid "Cannot delete web scenario"
@@ -2218,49 +2217,49 @@ msgstr "Không thể xóa web scenario"
 #: actionconf.php:389
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu hành động"
 
 #: correlation.php:318
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu quan hệ"
 
 #: discoveryconf.php:184 host_discovery.php:685
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu quy tắc khám phá"
 
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 #: hosts.php:1012
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu thiết bị"
 
 #: applications.php:231 items.php:1230
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu mục"
 
 #: app/controllers/CControllerMediatypeDisable.php:75
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu phương tiện"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu mô-đun: %1$s."
 
 #: triggers.php:553
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu trigger"
 
 #: httpconf.php:456
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
-msgstr[0] ""
+msgstr[0] "Không thể vô hiệu web scenario"
 
 #: queue.php:60
 msgid "Cannot display item queue."
@@ -2273,49 +2272,49 @@ msgstr "Không thể hiển thị nhiều hơn một item với kiểu \"G
 #: actionconf.php:388
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt hành động"
 
 #: correlation.php:317
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt quan hệ"
 
 #: discoveryconf.php:183 host_discovery.php:684
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt quy tắc khám phá"
 
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
 #: hosts.php:1011
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt thiết bị"
 
 #: applications.php:230 items.php:1229
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt mục"
 
 #: app/controllers/CControllerMediatypeEnable.php:75
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt phương tiện"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt mô-đun: %1$s."
 
 #: triggers.php:552
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt trigger"
 
 #: httpconf.php:455
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
+msgstr[0] "Không thể kích hoạt web scenario"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:213
 msgid "Cannot evaluate expression"
@@ -2385,17 +2384,17 @@ msgstr "Không thể tìm thấp biểu tượng sơ đồ \"%1$s\" đươ
 #: include/classes/import/CConfigurationImport.php:972
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Không tìm thấy interface \"%1$s\" được dùng cho quy tắc khám phá \"%2$s\" trên \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Không tìm thấy interface \"%1$s\" được dùng cho mục \"%2$s\" trên \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Không thấy interface \"%1$s\" được dùng cho prototype mục \"%2$s\" của quy tắc khám phá \"%3$s\" trên \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1636
 #, c-format
@@ -2484,7 +2483,7 @@ msgstr "Không thể để trống tên mẫu."
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] ""
+msgstr[0] "Không thể nhập \"%1$s\", mẫu đã liên kết \"%2$s\" không tồn tại."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:717
 msgid "Cannot insert trigger expression"
@@ -2504,7 +2503,7 @@ msgstr "Không thể kết nối mẫu."
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
+msgstr[0] "Không thể tải mô-đun tại: %1$s."
 
 #: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
@@ -2585,7 +2584,7 @@ msgstr "Không thể lưu ô điều khiển \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Không thể gửi lệnh, kiểm tra kết nối đến Zabbix server \"%1$s\"."
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Cannot send request"
 msgstr "Không thể gửi yêu cầu"
 
@@ -2671,7 +2670,7 @@ msgstr "Không thể kiểm tra loại phương tiện bị vô hiệu hóa."
 #: app/controllers/CControllerUserUnblock.php:78
 msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
-msgstr[0] ""
+msgstr[0] "Không thể bỏ chặn người dùng"
 
 #: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
@@ -2798,7 +2797,7 @@ msgstr "Không thể cập nhật xác thực"
 #: app/controllers/CControllerGuiUpdate.php:43
 #: app/controllers/CControllerGuiUpdate.php:80
 #: app/controllers/CControllerHousekeepingUpdate.php:57
-#: app/controllers/CControllerHousekeepingUpdate.php:126
+#: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:43
 #: app/controllers/CControllerMiscConfigUpdate.php:80
 #: app/controllers/CControllerTrigDisplayUpdate.php:47
@@ -2826,7 +2825,7 @@ msgstr "Không thể cập nhật quy tắc phát hiện"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:156
 msgid "Cannot update event"
 msgid_plural "Cannot update events"
-msgstr[0] ""
+msgstr[0] "Không thể cập nhật sự kiện"
 
 #: graphs.php:242 graphs.php:304
 msgid "Cannot update graph"
@@ -2858,7 +2857,7 @@ msgstr "Không thể cập nhật cài đặt mật mã máy chủ. Cài đặt 
 #: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:288
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
-msgstr[0] ""
+msgstr[0] "Không thể cập nhật prototype thiết bị"
 
 #: hosts.php:693
 msgid "Cannot update hosts"
@@ -2886,7 +2885,7 @@ msgstr "Không thể cập nhật item"
 #: disc_prototypes.php:641 disc_prototypes.php:668
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
-msgstr[0] ""
+msgstr[0] "Không thể cập nhật prototype mục"
 
 #: disc_prototypes.php:1115
 msgid "Cannot update item prototypes"
@@ -2912,7 +2911,7 @@ msgstr "Không thể cập nhật kiểu media"
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
-msgstr ""
+msgstr "Không thể cập nhật mô-đun: %1$s."
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -2988,7 +2987,7 @@ msgstr "Không thể cập nhật trigger \"%1$s\": %2$s."
 #: trigger_prototypes.php:350 trigger_prototypes.php:509
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] ""
+msgstr[0] "Không thể cập nhật prototype trigger"
 
 #: include/classes/api/services/CTriggerGeneral.php:1836
 #, c-format
@@ -3011,7 +3010,7 @@ msgstr "Không thể cập nhật người dùng"
 #: app/controllers/CControllerUsergroupUpdate.php:105
 msgid "Cannot update user group"
 msgid_plural "Cannot update user groups"
-msgstr[0] ""
+msgstr[0] "Không thể cập nhật nhóm người dùng"
 
 #: app/controllers/CControllerValuemapUpdate.php:44
 #: app/controllers/CControllerValuemapUpdate.php:102
@@ -3430,7 +3429,7 @@ msgid "Concurrent sessions"
 msgstr "Các phiên làm việc đồng thời"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:740
-#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:168
+#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:169
 msgid "Condition"
 msgstr "Điều kiện"
 
@@ -3487,7 +3486,7 @@ msgstr "Các điều kiện"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Điều kiện trùng lặp cho tương quan \"%1$s\"."
 
-#: include/menu.inc.php:97 include/menu.inc.php:142
+#: include/menu.inc.php:97 include/menu.inc.php:144
 #: include/views/inventory.host.view.php:211 jsLoader.php:275
 msgid "Configuration"
 msgstr "Cấu hình"
@@ -3902,12 +3901,12 @@ msgstr "Liên kết đã xóa"
 #: correlation.php:315
 msgid "Correlation disabled"
 msgid_plural "Correlations disabled"
-msgstr[0] ""
+msgstr[0] "Quan hệ đã bị vô hiệu"
 
 #: correlation.php:314
 msgid "Correlation enabled"
 msgid_plural "Correlations enabled"
-msgstr[0] ""
+msgstr[0] "Quan hệ được kích hoạt"
 
 #: include/classes/api/services/CCorrelation.php:532
 #, c-format
@@ -4298,7 +4297,7 @@ msgstr "Bảng điều khiển đã tạo"
 #: app/controllers/CControllerDashboardDelete.php:59
 msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
-msgstr[0] ""
+msgstr[0] "Dashboard đã được xóa"
 
 #: app/views/dashboard.properties.edit.php:64
 msgid "Dashboard properties"
@@ -4810,7 +4809,7 @@ msgstr "Xóa giá trị bản đồ được chọn?"
 #, c-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
-msgstr[0] ""
+msgstr[0] "Xóa giá trị ánh xạ? Nó được dùng cho %d mục!"
 
 #: app/views/administration.valuemap.list.php:99
 msgid "Delete selected value maps?"
@@ -5145,7 +5144,7 @@ msgstr "Item được dò tìm"
 #: app/views/search.php:88 app/views/search.php:92 app/views/search.php:228
 #: app/views/search.php:278 app/views/search.php:282
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:293
-#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
+#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:118
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
 #: include/views/configuration.template.list.php:156
@@ -5228,12 +5227,12 @@ msgstr "Quy tắc phát hiện đã xóa"
 #: discoveryconf.php:181 host_discovery.php:682
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
-msgstr[0] ""
+msgstr[0] "Quy tắc khám phá đã bị vô hiệu"
 
 #: discoveryconf.php:180 host_discovery.php:681
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
-msgstr[0] ""
+msgstr[0] "Quy tắc khám phá đã được kích hoạt"
 
 #: discoveryconf.php:125 host_discovery.php:655
 msgid "Discovery rule updated"
@@ -5382,7 +5381,7 @@ msgstr "Kiểu dáng thiết kế"
 
 #: tests/selenium/modules/module_number_3/Module.php:21
 msgid "Dummy module"
-msgstr ""
+msgstr "Mô-đun giả mạo"
 
 #: include/classes/api/services/CCorrelation.php:1169
 #: include/classes/api/services/CCorrelation.php:1321
@@ -5947,7 +5946,7 @@ msgstr "ID sự kiện"
 msgid "Event acknowledged"
 msgstr "Sự kiện được tiếp nhận"
 
-#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:147
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr "Liên kết sự kiện"
@@ -5991,7 +5990,7 @@ msgstr "Kiểu sự kiện"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:151
 msgid "Event updated"
 msgid_plural "Events updated"
-msgstr[0] ""
+msgstr[0] "Sự kiện đã được cập nhật"
 
 #: app/views/administration.housekeeping.edit.php:41
 msgid "Events and alerts"
@@ -6580,7 +6579,7 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "Truy cập GUI bị vô hiệu hóa."
 
-#: include/menu.inc.php:154
+#: include/menu.inc.php:156
 msgid "General"
 msgstr "Chung"
 
@@ -6761,7 +6760,7 @@ msgstr "Đồ thị được thêm vào"
 #: graphs.php:399
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
+msgstr[0] "Đồ thị đã được sao chép"
 
 #: graphs.php:291
 msgid "Graph deleted"
@@ -6943,7 +6942,7 @@ msgstr "Nhóm đã được thêm"
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
 msgid_plural "Groups deleted"
-msgstr[0] ""
+msgstr[0] "Nhóm đã bị xóa"
 
 #: app/views/administration.miscconfig.edit.php:50
 msgid "Group for discovered hosts"
@@ -6986,7 +6985,7 @@ msgstr "Gộp nhóm theo"
 msgid "Groups"
 msgstr "Các nhóm"
 
-#: include/menu.inc.php:225
+#: include/menu.inc.php:227
 msgid "Guest user"
 msgstr "Tài khoản khách"
 
@@ -7084,7 +7083,7 @@ msgstr "Hebrew (he_IL)"
 msgid "Height"
 msgstr "Độ cao"
 
-#: include/menu.inc.php:211 include/menu.inc.php:214
+#: include/menu.inc.php:213 include/menu.inc.php:216
 #: include/views/general.login.php:89
 msgid "Help"
 msgstr "Trợ giúp"
@@ -7163,7 +7162,7 @@ msgid "History cleanup is not supported if compression is enabled"
 msgstr "Lịch sử dọn dẹp không được hỗ trợ nếu nén được kích hoạt"
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:491 httpconf.php:503
-#: items.php:893 items.php:901 items.php:1315 items.php:1329
+#: items.php:893 items.php:901 items.php:1319 items.php:1333
 msgid "History cleared"
 msgstr "Lịch sử bị xóa"
 
@@ -7249,11 +7248,11 @@ msgstr "Sắp xếp theo chiều ngang"
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:64
 #: include/views/monitoring.slides.php:76
-#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1314
+#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1318
 #: jsLoader.php:199 jsLoader.php:292 queue.php:221 report2.php:482
 msgid "Host"
 msgid_plural "Hosts"
-msgstr[0] ""
+msgstr[0] "Thiết bị"
 
 #: include/classes/api/services/CHost.php:1068
 #: include/classes/api/services/CTemplate.php:467
@@ -7317,13 +7316,13 @@ msgstr "Host đã xóa"
 #: hosts.php:1009
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
-msgstr[0] ""
+msgstr[0] "Thiết bị đã bị vô hiệu"
 
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
 #: hosts.php:1008
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
-msgstr[0] ""
+msgstr[0] "Thiết bị đã được kích hoạt"
 
 #: app/controllers/CControllerAuditLogList.php:198
 #: app/partials/administration.usergroup.grouprights.html.php:29
@@ -7509,7 +7508,7 @@ msgstr "Máy chủ macro nguyên mẫu"
 #: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:287
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
-msgstr[0] ""
+msgstr[0] "Prototype thiết bị đã được cập nhật"
 
 #: include/classes/api/services/CHostPrototype.php:176
 #, c-format
@@ -7599,7 +7598,7 @@ msgstr "Host với cùng một tên hiển thị \"%1$s\" đã tồn tại
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:207 include/forms.inc.php:644 include/menu.inc.php:37
-#: include/menu.inc.php:65 include/menu.inc.php:106
+#: include/menu.inc.php:65 include/menu.inc.php:108
 #: include/views/configuration.application.list.php:50
 #: include/views/configuration.copy.elements.php:62
 #: include/views/configuration.graph.list.php:87
@@ -9757,7 +9756,7 @@ msgstr "Italian (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:245
 #: include/views/monitoring.screen.constructor.edit.php:414
 #: include/views/monitoring.screen.constructor.edit.php:725 items.php:892
-#: items.php:1314
+#: items.php:1318
 msgid "Item"
 msgstr "Item"
 
@@ -9804,12 +9803,12 @@ msgstr "Item đã được thêm vào"
 
 #: app/views/popup.itemtestedit.view.php:298
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
-msgstr ""
+msgstr "Mục chứa macro người dùng định nghĩa loại \"Secret text\". Giá trị của macro phải được nhập thủ công."
 
 #: items.php:1269
 msgid "Item copied"
 msgid_plural "Items copied"
-msgstr[0] ""
+msgstr[0] "Mục đã được sao chép"
 
 #: app/views/administration.proxy.list.php:78
 msgid "Item count"
@@ -9822,12 +9821,12 @@ msgstr "Item đã bị xóa"
 #: applications.php:228 items.php:1227
 msgid "Item disabled"
 msgid_plural "Items disabled"
-msgstr[0] ""
+msgstr[0] "Mục đã bị vô hiệu hóa"
 
 #: applications.php:227 items.php:1226
 msgid "Item enabled"
 msgid_plural "Items enabled"
-msgstr[0] ""
+msgstr[0] "Mục đã được kích hoạt"
 
 #: include/actions.inc.php:1288
 msgid "Item in \"not supported\" state"
@@ -9878,7 +9877,7 @@ msgstr "Kiểu item đã bị xóa"
 #: disc_prototypes.php:641 disc_prototypes.php:667
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
-msgstr[0] ""
+msgstr[0] "Prototype của mục đã được cập nhật"
 
 #: include/classes/api/services/CDashboard.php:747
 #, c-format
@@ -9986,11 +9985,11 @@ msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
-#: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
+#: include/views/inventory.host.view.php:204 items.php:1694 queue.php:110
 msgid "Items"
 msgstr "Các item"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Items deleted"
 msgstr "Các item đã bị xóa"
 
@@ -10222,37 +10221,37 @@ msgstr "Giá trị cuối cùng"
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
-msgstr[0] ""
+msgstr[0] "%1$d ngày cuối"
 
 #: include/func.inc.php:2568
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
-msgstr[0] ""
+msgstr[0] "%1$d giờ cuối"
 
 #: include/func.inc.php:2561
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
-msgstr[0] ""
+msgstr[0] "%1$d phút cuối"
 
 #: include/func.inc.php:2577
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
-msgstr[0] ""
+msgstr[0] "%1$d tháng cuối"
 
 #: include/func.inc.php:2554
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
-msgstr[0] ""
+msgstr[0] "%1$d giây cuối"
 
 #: include/func.inc.php:2580
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
-msgstr[0] ""
+msgstr[0] "%1$d năm cuối"
 
 #: srv_status.php:42
 msgid "Last 24 hours"
@@ -10463,7 +10462,7 @@ msgstr "Các template đã liên kết"
 
 #: include/views/configuration.template.list.php:159
 msgid "Linked to templates"
-msgstr ""
+msgstr "Đã liên kết tới mẫu"
 
 #: include/views/js/monitoring.sysmaps.js.php:682
 #: include/views/js/monitoring.sysmaps.js.php:693
@@ -10698,7 +10697,7 @@ msgstr "Bộ lọc chính"
 msgid "Main navigation"
 msgstr "Điều hướng chính"
 
-#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:114
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -10972,7 +10971,7 @@ msgstr "Số lượng tiến trình tối thiểu được hỗ trợ bởi HĐH
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
-msgstr[0] ""
+msgstr[0] "Thời gian cực đại hiển thị là %1$s ngày."
 
 #: include/classes/api/services/CUser.php:696
 #, c-format
@@ -11014,17 +11013,17 @@ msgstr "Loại phương tiện đã được thêm vào"
 #: app/controllers/CControllerMediatypeDelete.php:66
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
-msgstr[0] ""
+msgstr[0] "Phương tiện đã được xóa"
 
 #: app/controllers/CControllerMediatypeDisable.php:72
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
-msgstr[0] ""
+msgstr[0] "Phương tiện đã bị vô hiệu hóa"
 
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
-msgstr[0] ""
+msgstr[0] "Phương tiện đã được kích hoạt"
 
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
@@ -11054,7 +11053,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Kiểu phương tiện với ID \"%1$s\" là không sẵn sàng."
 
 #: app/views/administration.mediatype.edit.php:30
-#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:174
+#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:176
 #: include/views/conf.import.php:51
 msgid "Media types"
 msgstr "Các loại phương tiện"
@@ -11202,7 +11201,7 @@ msgstr "Sự quan trọng tối thiểu"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
+msgstr[0] "Khoảng thời gian nhỏ nhất là %1$s phút."
 
 #: app/views/popup.maintenance.period.php:160
 msgid "Minutes"
@@ -11271,36 +11270,36 @@ msgstr "Mô-đun"
 #: tests/selenium/modules/module_number_5/Module.php:18
 #: tests/selenium/modules/module_number_5/Module.php:26
 msgid "Module 5 menu"
-msgstr ""
+msgstr "Danh mục mô-đun 5"
 
 #: app/controllers/CControllerModuleScan.php:102
 #, c-format
 msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
-msgstr[0] ""
+msgstr[0] "Mô-đun được thêm: %1$s."
 
 #: app/controllers/CControllerModuleScan.php:117
 #, c-format
 msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
-msgstr[0] ""
+msgstr[0] "Mô-đun bị xóa: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
-msgstr[0] ""
+msgstr[0] "Mô-đun bị vô hiệu hóa: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
-msgstr[0] ""
+msgstr[0] "Mô-đun được kích hoạt: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
 msgid "Module updated: %1$s."
-msgstr ""
+msgstr "Mô-đun được cập nhật: %1$s."
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -12184,7 +12183,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
 #: include/classes/screens/CScreenLldGraph.php:51 include/func.inc.php:1507
-#: items.php:1443 items.php:1647 services.php:84
+#: items.php:1447 items.php:1651 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Không có quyền truy cập vào đối tượng được gọi hoặc nó không tồn tại!"
 
@@ -12396,7 +12395,7 @@ msgstr "Số lượng item kích hoạt trên máy chủ."
 
 #: include/blocks.inc.php:628
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Số lượng thiết bị (kích hoạt/vô hiệu)"
 
 #: include/blocks.inc.php:641
 msgid "Number of items (enabled/disabled/not supported)"
@@ -12468,7 +12467,7 @@ msgstr "Số bước"
 
 #: include/blocks.inc.php:637
 msgid "Number of templates"
-msgstr ""
+msgstr "Số lượng mẫu"
 
 #: include/blocks.inc.php:652
 msgid "Number of triggers (enabled/disabled [problem/ok])"
@@ -12758,7 +12757,7 @@ msgstr "Chỉ một bước tiết lưu được cho phép."
 #: app/views/popup.acknowledge.edit.php:57
 msgid "Only selected problem"
 msgid_plural "Only selected problems"
-msgstr[0] ""
+msgstr[0] "Chỉ các vấn đề được lựa chọn"
 
 #: include/classes/api/services/CCorrelation.php:512
 msgid "Only super admins can create correlations."
@@ -12837,7 +12836,7 @@ msgstr "Kiểu thao tác"
 msgid "Operational data"
 msgstr "Dữ liệu hoạt động"
 
-#: app/views/popup.lldoverride.php:183
+#: app/views/popup.lldoverride.php:184
 #: include/views/configuration.action.edit.php:306
 #: include/views/configuration.action.edit.php:470
 #: include/views/configuration.action.list.php:90
@@ -13066,11 +13065,11 @@ msgstr "Thiếu phần mở rộng PHP LDAP."
 
 #: include/classes/setup/CFrontendSetup.php:565
 msgid "PHP OpenSSL"
-msgstr ""
+msgstr "PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:569
 msgid "PHP OpenSSL extension missing."
-msgstr ""
+msgstr "Thiếu PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:308
 msgid "PHP bcmath"
@@ -13853,7 +13852,7 @@ msgstr "URL \"%1$s\" được cung cấp không hợp lệ."
 
 #: app/controllers/CControllerPopupGeneric.php:164
 #: app/views/administration.proxy.edit.php:28
-#: app/views/administration.proxy.list.php:31 include/menu.inc.php:162
+#: app/views/administration.proxy.list.php:31 include/menu.inc.php:164
 msgid "Proxies"
 msgstr "Proxies"
 
@@ -13901,7 +13900,7 @@ msgstr "Địa chỉ proxy"
 #: app/controllers/CControllerProxyDelete.php:66
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
-msgstr[0] ""
+msgstr[0] "Proxy đã được xóa"
 
 #: include/classes/api/services/CProxy.php:234
 msgid "Proxy interface creation failed."
@@ -13955,7 +13954,7 @@ msgstr "Key file công khai"
 msgid "Query fields"
 msgstr "Trường truy vấn"
 
-#: include/menu.inc.php:180 queue.php:25
+#: include/menu.inc.php:182 queue.php:25
 msgid "Queue"
 msgstr "Hàng đợi"
 
@@ -14065,7 +14064,7 @@ msgstr "Người nhận (giảm dần)"
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
-msgstr ""
+msgstr "Người nhận"
 
 #: app/views/administration.user.edit.php:388
 #: include/classes/screens/CScreenProblem.php:1083
@@ -14151,7 +14150,7 @@ msgstr "Biểu thức chính quy đã được thêm vào"
 #: app/controllers/CControllerRegExDelete.php:78
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
-msgstr[0] ""
+msgstr[0] "Regular expression đã được xóa"
 
 #: include/regexp.inc.php:83
 msgid "Regular expression does not exist."
@@ -14389,7 +14388,7 @@ msgstr "Thay thế"
 msgid "Replace dependencies"
 msgstr "Thay thế quan hệ phụ thuộc"
 
-#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:126
+#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:128
 #: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "Các thông báo"
@@ -14410,7 +14409,7 @@ msgstr "Yêu cầu nội dung"
 msgid "Request body type"
 msgstr "Yêu cầu kiểu nội dung"
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Request sent successfully"
 msgstr "Yêu cầu gửi thành công"
 
@@ -14521,7 +14520,7 @@ msgstr "Tài nguyên"
 
 #: app/views/reports.auditlog.list.php:53
 msgid "Resource ID"
-msgstr ""
+msgstr "Resource ID"
 
 #: app/views/popup.mediatypetest.edit.php:46
 msgid "Response"
@@ -15163,7 +15162,7 @@ msgstr "Script đã được cập nhật"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
-#: app/views/administration.script.list.php:31 include/menu.inc.php:177
+#: app/views/administration.script.list.php:31 include/menu.inc.php:179
 #: jsLoader.php:303
 msgid "Scripts"
 msgstr "Các Script"
@@ -15334,11 +15333,11 @@ msgstr "Gửi lại"
 
 #: app/partials/popup.operations.php:75
 msgid "Send to user groups"
-msgstr ""
+msgstr "Gửi tới nhóm người dùng"
 
 #: app/partials/popup.operations.php:95
 msgid "Send to users"
-msgstr ""
+msgstr "Gửi tới người dùng"
 
 #: include/actions.inc.php:2127
 #: include/views/administration.auditacts.list.php:76
@@ -15471,7 +15470,7 @@ msgid "Service updated"
 msgstr "Dịch vụ được cập nhật"
 
 #: app/views/administration.housekeeping.edit.php:79 include/menu.inc.php:55
-#: include/menu.inc.php:118 include/views/configuration.services.edit.php:30
+#: include/menu.inc.php:120 include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.list.php:27 srv_status.php:26
 #: srv_status.php:161
@@ -15585,7 +15584,7 @@ msgstr "Mức độ nghiêm trọng đã tăng"
 msgid "Shape"
 msgstr "Hình dạng"
 
-#: include/menu.inc.php:202
+#: include/menu.inc.php:204
 msgid "Share"
 msgstr "Chia sẽ"
 
@@ -15766,7 +15765,7 @@ msgstr "Đăng nhập với HTTP"
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr "Đăng nhập với SSO (SAML)"
 
-#: include/menu.inc.php:240 include/menu.inc.php:243
+#: include/menu.inc.php:242 include/menu.inc.php:245
 msgid "Sign out"
 msgstr "Đăng xuất"
 
@@ -16249,7 +16248,7 @@ msgstr "Chủ nhật"
 msgid "Sunday"
 msgstr "Chủ nhật"
 
-#: include/menu.inc.php:195 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:96
 msgid "Support"
 msgstr "Hỗ trợ"
 
@@ -16313,7 +16312,7 @@ msgstr "Tên máy chủ hệ thống. Trả về kiểu string"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:29
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:129
+#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:131
 #: include/screens.inc.php:36
 msgid "System information"
 msgstr "Thông tin hệ thống"
@@ -16721,7 +16720,7 @@ msgstr "Tọa độ Y của phần tử screen đặt tại X - %1$s và Y 
 #: include/classes/db/DbBackend.php:130
 #, c-format
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
-msgstr ""
+msgstr "Phiên bản database không phù hợp. Phiên bản hiện tại: %1$s. Phiên bản yêu cầu: %2$s. Vui lòng liên hệ quản trị."
 
 #: include/html.inc.php:701
 #, c-format
@@ -16775,13 +16774,13 @@ msgstr "Máy chủ không được dò tìm nữa và sẽ bị xóa trong lần
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
-msgstr[0] ""
+msgstr[0] "Hình ảnh đã sử dụng trong icon bản đồ %1$s."
 
 #: include/classes/api/services/CImage.php:392
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
-msgstr[0] ""
+msgstr[0] "Hình ảnh đã sử dụng trong bản đồ %1$s."
 
 #: include/html.inc.php:782
 #, c-format
@@ -17164,7 +17163,7 @@ msgstr "Trigger không thể phụ thuộc vào một trigger mà được
 #: triggers.php:600
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
-msgstr[0] ""
+msgstr[0] "Trigger được sao chép"
 
 #: app/views/administration.housekeeping.edit.php:49
 msgid "Trigger data storage period"
@@ -17181,7 +17180,7 @@ msgstr "Chi tiết trigger"
 #: triggers.php:550
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
-msgstr[0] ""
+msgstr[0] "Trigger đã bị vô hiệu"
 
 #: app/views/administration.trigdisplay.edit.php:31
 #: app/views/administration.trigdisplay.edit.php:106 include/html.inc.php:906
@@ -17191,7 +17190,7 @@ msgstr "Tùy chọn hiển thị trigger"
 #: triggers.php:549
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
-msgstr[0] ""
+msgstr[0] "Trigger đã được kích hoạt"
 
 #: include/profiles.inc.php:219
 #, c-format
@@ -17285,7 +17284,7 @@ msgstr "Kiểu trigger đã bị xóa"
 #: trigger_prototypes.php:350 trigger_prototypes.php:508
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
-msgstr[0] ""
+msgstr[0] "Prototype của trigger đã cập nhật"
 
 #: app/controllers/CControllerPopupGeneric.php:214 include/html.inc.php:473
 #: include/views/configuration.host.discovery.list.php:254
@@ -17363,7 +17362,7 @@ msgstr "Các trigger"
 msgid "Triggers deleted"
 msgstr "Các trigger đã bị xóa"
 
-#: include/menu.inc.php:75 include/menu.inc.php:132
+#: include/menu.inc.php:75 include/menu.inc.php:134
 msgid "Triggers top 100"
 msgstr "Các trigger trong top 100"
 
@@ -17573,7 +17572,7 @@ msgstr "Không thể tạo tập tin cấu hình."
 #: include/classes/db/PostgresqlDbBackend.php:61
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
-msgstr ""
+msgstr "Không thể xác định phiên bản database hiện tại: %1$s."
 
 #: include/classes/core/CConfigFile.php:193
 msgid "Unable to overwrite the existing configuration file."
@@ -17765,7 +17764,7 @@ msgstr "Bật tiếng"
 #, c-format
 msgid "Unsupported charset or collation for table: %1$s."
 msgid_plural "Unsupported charset or collation for tables: %1$s."
-msgstr[0] ""
+msgstr[0] "Không hỗ trợ charset hoặc collation cho bảng: %1$s."
 
 #: include/classes/import/readers/CImportReaderFactory.php:65
 #, c-format
@@ -17779,7 +17778,7 @@ msgstr "Không hỗ trợ import có dạng thức \"%1$s\"."
 
 #: app/controllers/CControllerActionOperationGet.php:53
 msgid "Unsupported operation."
-msgstr ""
+msgstr "Hành động không được hỗ trợ."
 
 #: include/classes/api/services/CAction.php:2770
 #, c-format
@@ -17836,7 +17835,7 @@ msgstr "Up"
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
-#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:194
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
@@ -18029,7 +18028,7 @@ msgstr "Người dùng không thể thay đổi quyền của người dùng."
 #: app/controllers/CControllerUserDelete.php:56
 msgid "User deleted"
 msgid_plural "Users deleted"
-msgstr[0] ""
+msgstr[0] "Người dùng đã được xóa"
 
 #: app/controllers/CControllerAuditLogList.php:194
 #: app/partials/popup.operations.php:78
@@ -18067,7 +18066,7 @@ msgstr "Đã thêm nhóm người dùng"
 #: app/controllers/CControllerUsergroupDelete.php:56
 msgid "User group deleted"
 msgid_plural "User groups deleted"
-msgstr[0] ""
+msgstr[0] "Nhóm người dùng đã được xóa"
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "User group for database down message"
@@ -18094,7 +18093,7 @@ msgstr "Chia sẻ nhóm người dùng bị thiếu tham số: %1$s cho screen \
 #: app/controllers/CControllerUsergroupUpdate.php:98
 msgid "User group updated"
 msgid_plural "User groups updated"
-msgstr[0] ""
+msgstr[0] "Người dùng đã được cập nhật"
 
 #: include/classes/api/services/CDashboard.php:530
 #: include/classes/api/services/CScript.php:423
@@ -18106,7 +18105,7 @@ msgstr "Nhóm người dùng với ID \"%1$s\" không sẵn sàng."
 #: app/controllers/CControllerPopupGeneric.php:228
 #: app/views/administration.usergroup.edit.php:28
 #: app/views/administration.usergroup.list.php:31
-#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:168
+#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:170
 #: include/views/monitoring.screen.edit.php:128
 #: include/views/monitoring.slideconf.edit.php:177
 #: include/views/monitoring.sysmap.edit.php:298
@@ -18158,7 +18157,7 @@ msgstr "Chu kỳ lưu trữ phiên dữ liệu người dùng \"%1$s\"."
 msgid "User sessions"
 msgstr "Các phiên làm việc của người dùng"
 
-#: include/menu.inc.php:232
+#: include/menu.inc.php:234
 msgid "User settings"
 msgstr "Thiết lập người dùng"
 
@@ -18184,7 +18183,7 @@ msgstr "Kiểu người dùng"
 #: app/controllers/CControllerUserUnblock.php:75
 msgid "User unblocked"
 msgid_plural "Users unblocked"
-msgstr[0] ""
+msgstr[0] "Người dùng đã được mở khóa"
 
 #: app/controllers/CControllerUserProfileUpdate.php:114
 #: app/controllers/CControllerUserUpdate.php:122
@@ -18229,7 +18228,7 @@ msgstr "Thuộc tính tài khoản"
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
 #: app/views/dashboard.sharing.edit.php:50
-#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:173
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
@@ -18246,7 +18245,7 @@ msgstr "Trạng thái VMware cluster, <url> - Dịch vụ VMware URL, <name> - 
 
 #: include/classes/items/CHelpItems.php:735
 msgid "VMware datacenters and their IDs. Returns JSON"
-msgstr ""
+msgstr "VMware datacenters và IDs. Trả về JSON"
 
 #: include/classes/items/CHelpItems.php:743
 #: include/classes/items/CHelpItems.php:767
@@ -18549,7 +18548,7 @@ msgstr "Giá trị bản đồ đã được thêm vào"
 #: app/controllers/CControllerValuemapDelete.php:67
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
-msgstr[0] ""
+msgstr[0] "Giá trị bản đồ đã được xóa"
 
 #: app/controllers/CControllerValuemapUpdate.php:95
 msgid "Value map updated"
@@ -18754,12 +18753,12 @@ msgstr "Web scenario đã bị xóa"
 #: httpconf.php:453
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
-msgstr[0] ""
+msgstr[0] "Web scenario đã bị vô hiệu hóa"
 
 #: httpconf.php:452
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
-msgstr[0] ""
+msgstr[0] "Web scenario đã được kích hoạt"
 
 #: httpconf.php:194
 msgid "Web scenario updated"
@@ -19200,7 +19199,7 @@ msgstr "Zabbix"
 msgid "Zabbix Admin"
 msgstr "Zabbix Admin"
 
-#: include/menu.inc.php:205
+#: include/menu.inc.php:207
 msgid "Zabbix Share"
 msgstr "Chia sẻ zabbix"
 
@@ -19208,7 +19207,7 @@ msgstr "Chia sẻ zabbix"
 msgid "Zabbix Super Admin"
 msgstr "Zabbix Super Admin"
 
-#: include/menu.inc.php:198
+#: include/menu.inc.php:200
 msgid "Zabbix Technical Support"
 msgstr "Hỗ trợ kỹ thuật zabbix"
 
@@ -19821,7 +19820,7 @@ msgstr "quy tắc dò tìm bị vô hiệu hóa"
 #: app/partials/monitoring.latest.view.html.php:126
 #, c-format
 msgid "displaying %1$s to %2$s of %3$s Items"
-msgstr ""
+msgstr "Hiển thị %1$s đến %2$s của %3$s mục"
 
 #: app/views/popup.lldoperation.php:61 include/actions.inc.php:27
 #: include/correlation.inc.php:34
@@ -19960,12 +19959,12 @@ msgstr "bao gồm các nhóm nhỏ"
 
 #: include/classes/parsers/CTriggerExpression.php:494
 msgid "incorrect calculated item formula"
-msgstr ""
+msgstr "Công thức tính toán sai"
 
 #: include/classes/parsers/CTriggerExpression.php:503
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
-msgstr ""
+msgstr "Công thức tính toán sai từ \"%1$s\""
 
 #: include/classes/validators/CEventCorrCondValidator.php:47
 msgid "incorrect condition type"
@@ -20552,7 +20551,7 @@ msgstr "tham số \"%1$s\" bị thiếu"
 #: include/classes/db/PostgresqlDbBackend.php:62
 #, c-format
 msgid "the table \"%1$s\" was not found"
-msgstr ""
+msgstr "Không tìm thấy bảng \"%1$s\""
 
 #: include/classes/export/CConfigurationExportBuilder.php:77
 #: include/classes/import/validators/C44XmlValidator.php:2039

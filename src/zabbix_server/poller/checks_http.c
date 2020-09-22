@@ -168,8 +168,8 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 
 	while (NULL != (line = zbx_http_get_header(&headers)))
 	{
-		if (0 == json_content && 0 == strncmp(line, "Content-Type:",
-				ZBX_CONST_STRLEN("Content-Type:")) &&
+		if (0 == json_content &&
+				0 == zbx_strncasecmp(line, "Content-Type:", ZBX_CONST_STRLEN("Content-Type:")) &&
 				NULL != strstr(line, "application/json"))
 		{
 			json_content = 1;

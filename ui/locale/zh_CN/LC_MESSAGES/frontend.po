@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-28 19:58+0300\n"
+"POT-Creation-Date: 2020-09-18 19:53+0300\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -436,8 +436,7 @@ msgstr "确认已解决的事件"
 #: app/views/dashboard.sharing.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/popup.lldoperation.php:111 app/views/popup.lldoperation.php:240
-#: app/views/popup.lldoverride.php:93 app/views/popup.triggerwizard.php:47
-#: app/views/popup.triggerwizard.php:117
+#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
 #: app/views/reports.auditlog.list.php:56
 #: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
@@ -530,7 +529,7 @@ msgid_plural "Actions enabled"
 msgstr[0] "激活 启用激活 启用"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:137
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:139
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -548,8 +547,8 @@ msgstr "动作已更新"
 #: include/classes/screens/CScreenProblem.php:923
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:251
-#: include/forms.inc.php:1199 include/menu.inc.php:114
-#: include/menu.inc.php:144 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1199 include/menu.inc.php:116
+#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
@@ -623,8 +622,8 @@ msgstr "启用直到"
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
-#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
-#: app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:175
+#: app/views/popup.lldoverride.php:194
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
@@ -806,7 +805,7 @@ msgstr "%1$s，已添加"
 msgid "Admin"
 msgstr "管理者"
 
-#: include/menu.inc.php:150
+#: include/menu.inc.php:152
 msgid "Administration"
 msgstr "管理"
 
@@ -1247,8 +1246,8 @@ msgstr "尝试间隔"
 msgid "Attempts"
 msgstr "尝试次数"
 
-#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:133
-#: include/menu.inc.php:136
+#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:135
+#: include/menu.inc.php:138
 msgid "Audit"
 msgstr "审计"
 
@@ -1276,7 +1275,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
-#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:165
+#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
@@ -1389,7 +1388,7 @@ msgstr ""
 msgid "Availability"
 msgstr "可用性"
 
-#: include/menu.inc.php:72 include/menu.inc.php:128 report2.php:25
+#: include/menu.inc.php:72 include/menu.inc.php:130 report2.php:25
 #: report2.php:161
 msgid "Availability report"
 msgstr "可用性报表"
@@ -2076,7 +2075,7 @@ msgstr "无法删除监控项目模板"
 msgid "Cannot delete item prototypes"
 msgstr "无法删除监控项目模板"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Cannot delete items"
 msgstr "无法删除监控项"
 
@@ -2591,7 +2590,7 @@ msgstr "无法保存小构件 \"%1$s\" 。"
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "无法发送命令, 检查于Zabbix 服务器 \"%1$s\" 的连接."
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Cannot send request"
 msgstr "无法发送请求"
 
@@ -2804,7 +2803,7 @@ msgstr "无法更新验证信息"
 #: app/controllers/CControllerGuiUpdate.php:43
 #: app/controllers/CControllerGuiUpdate.php:80
 #: app/controllers/CControllerHousekeepingUpdate.php:57
-#: app/controllers/CControllerHousekeepingUpdate.php:126
+#: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:43
 #: app/controllers/CControllerMiscConfigUpdate.php:80
 #: app/controllers/CControllerTrigDisplayUpdate.php:47
@@ -3436,7 +3435,7 @@ msgid "Concurrent sessions"
 msgstr "并发会话"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:740
-#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:168
+#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:169
 msgid "Condition"
 msgstr "条件"
 
@@ -3493,7 +3492,7 @@ msgstr "条件"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "条件复制关联项 \"%1$s\"。"
 
-#: include/menu.inc.php:97 include/menu.inc.php:142
+#: include/menu.inc.php:97 include/menu.inc.php:144
 #: include/views/inventory.host.view.php:211 jsLoader.php:275
 msgid "Configuration"
 msgstr "配置"
@@ -5140,7 +5139,7 @@ msgstr "已发现的监控项"
 #: app/views/search.php:88 app/views/search.php:92 app/views/search.php:228
 #: app/views/search.php:278 app/views/search.php:282
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:293
-#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
+#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:118
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
 #: include/views/configuration.template.list.php:156
@@ -5942,7 +5941,7 @@ msgstr "事件ID"
 msgid "Event acknowledged"
 msgstr "事件已确认"
 
-#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:147
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr "关联项事件"
@@ -6576,7 +6575,7 @@ msgstr "界面设置"
 msgid "GUI access disabled."
 msgstr "图形化界面已经被禁用。"
 
-#: include/menu.inc.php:154
+#: include/menu.inc.php:156
 msgid "General"
 msgstr "一般"
 
@@ -6983,7 +6982,7 @@ msgstr "群组化之于"
 msgid "Groups"
 msgstr "群组"
 
-#: include/menu.inc.php:225
+#: include/menu.inc.php:227
 msgid "Guest user"
 msgstr ""
 
@@ -7081,7 +7080,7 @@ msgstr "希伯来语（he_IL）"
 msgid "Height"
 msgstr "高"
 
-#: include/menu.inc.php:211 include/menu.inc.php:214
+#: include/menu.inc.php:213 include/menu.inc.php:216
 #: include/views/general.login.php:89
 msgid "Help"
 msgstr "帮助"
@@ -7161,7 +7160,7 @@ msgid "History cleanup is not supported if compression is enabled"
 msgstr ""
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:491 httpconf.php:503
-#: items.php:893 items.php:901 items.php:1315 items.php:1329
+#: items.php:893 items.php:901 items.php:1319 items.php:1333
 msgid "History cleared"
 msgstr "历史已清除"
 
@@ -7247,7 +7246,7 @@ msgstr "横向对齐"
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:64
 #: include/views/monitoring.slides.php:76
-#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1314
+#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1318
 #: jsLoader.php:199 jsLoader.php:292 queue.php:221 report2.php:482
 msgid "Host"
 msgid_plural "Hosts"
@@ -7597,7 +7596,7 @@ msgstr "显示名称为\"%1$s\" 的主机已经存在"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:207 include/forms.inc.php:644 include/menu.inc.php:37
-#: include/menu.inc.php:65 include/menu.inc.php:106
+#: include/menu.inc.php:65 include/menu.inc.php:108
 #: include/views/configuration.application.list.php:50
 #: include/views/configuration.copy.elements.php:62
 #: include/views/configuration.graph.list.php:87
@@ -9755,7 +9754,7 @@ msgstr "意大利语 (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:245
 #: include/views/monitoring.screen.constructor.edit.php:414
 #: include/views/monitoring.screen.constructor.edit.php:725 items.php:892
-#: items.php:1314
+#: items.php:1318
 msgid "Item"
 msgstr "监控项"
 
@@ -9984,11 +9983,11 @@ msgstr "键值为 \"%1$s\"的监控项已存在于\"%2$s\" ."
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
-#: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
+#: include/views/inventory.host.view.php:204 items.php:1694 queue.php:110
 msgid "Items"
 msgstr "监控项"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Items deleted"
 msgstr "监控项已删除"
 
@@ -10697,7 +10696,7 @@ msgstr "主过滤器"
 msgid "Main navigation"
 msgstr "主导航栏"
 
-#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:114
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -11053,7 +11052,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
 
 #: app/views/administration.mediatype.edit.php:30
-#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:174
+#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:176
 #: include/views/conf.import.php:51
 msgid "Media types"
 msgstr "报警媒介类型"
@@ -12183,7 +12182,7 @@ msgstr "没有系统访问权限。"
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
 #: include/classes/screens/CScreenLldGraph.php:51 include/func.inc.php:1507
-#: items.php:1443 items.php:1647 services.php:84
+#: items.php:1447 items.php:1651 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "没有权限退回物件的或其不存在!"
 
@@ -12836,7 +12835,7 @@ msgstr "操作类型"
 msgid "Operational data"
 msgstr ""
 
-#: app/views/popup.lldoverride.php:183
+#: app/views/popup.lldoverride.php:184
 #: include/views/configuration.action.edit.php:306
 #: include/views/configuration.action.edit.php:470
 #: include/views/configuration.action.list.php:90
@@ -13853,7 +13852,7 @@ msgstr "提供的 URL \"%1$s\" 无效。"
 
 #: app/controllers/CControllerPopupGeneric.php:164
 #: app/views/administration.proxy.edit.php:28
-#: app/views/administration.proxy.list.php:31 include/menu.inc.php:162
+#: app/views/administration.proxy.list.php:31 include/menu.inc.php:164
 msgid "Proxies"
 msgstr "agent代理程序"
 
@@ -13955,7 +13954,7 @@ msgstr "公钥文件"
 msgid "Query fields"
 msgstr "查询字段"
 
-#: include/menu.inc.php:180 queue.php:25
+#: include/menu.inc.php:182 queue.php:25
 msgid "Queue"
 msgstr "队列"
 
@@ -14389,7 +14388,7 @@ msgstr "替换"
 msgid "Replace dependencies"
 msgstr "替换依赖关系"
 
-#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:126
+#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:128
 #: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "报表"
@@ -14412,7 +14411,7 @@ msgstr "请求正文"
 msgid "Request body type"
 msgstr "请求 body 类型"
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Request sent successfully"
 msgstr "请求发送成功"
 
@@ -15166,7 +15165,7 @@ msgstr "脚本已更新"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
-#: app/views/administration.script.list.php:31 include/menu.inc.php:177
+#: app/views/administration.script.list.php:31 include/menu.inc.php:179
 #: jsLoader.php:303
 msgid "Scripts"
 msgstr "脚本"
@@ -15474,7 +15473,7 @@ msgid "Service updated"
 msgstr "服务已更新"
 
 #: app/views/administration.housekeeping.edit.php:79 include/menu.inc.php:55
-#: include/menu.inc.php:118 include/views/configuration.services.edit.php:30
+#: include/menu.inc.php:120 include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.list.php:27 srv_status.php:26
 #: srv_status.php:161
@@ -15588,7 +15587,7 @@ msgstr "严重性提升"
 msgid "Shape"
 msgstr "形"
 
-#: include/menu.inc.php:202
+#: include/menu.inc.php:204
 msgid "Share"
 msgstr ""
 
@@ -15769,7 +15768,7 @@ msgstr "使用 HTTP 登录"
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/menu.inc.php:240 include/menu.inc.php:243
+#: include/menu.inc.php:242 include/menu.inc.php:245
 msgid "Sign out"
 msgstr "退出"
 
@@ -16252,7 +16251,7 @@ msgstr "日"
 msgid "Sunday"
 msgstr "日"
 
-#: include/menu.inc.php:195 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:96
 msgid "Support"
 msgstr "支持"
 
@@ -16316,7 +16315,7 @@ msgstr "系统主机名。返回字符串"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:29
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:129
+#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:131
 #: include/screens.inc.php:36
 msgid "System information"
 msgstr "系统信息"
@@ -17367,7 +17366,7 @@ msgstr "触发器"
 msgid "Triggers deleted"
 msgstr "触发器已删除"
 
-#: include/menu.inc.php:75 include/menu.inc.php:132
+#: include/menu.inc.php:75 include/menu.inc.php:134
 msgid "Triggers top 100"
 msgstr "触发器 Top 100"
 
@@ -17840,7 +17839,7 @@ msgstr "上"
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
-#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:194
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
@@ -18110,7 +18109,7 @@ msgstr "ID为\"%1$s\" 的用户组不可用。"
 #: app/controllers/CControllerPopupGeneric.php:228
 #: app/views/administration.usergroup.edit.php:28
 #: app/views/administration.usergroup.list.php:31
-#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:168
+#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:170
 #: include/views/monitoring.screen.edit.php:128
 #: include/views/monitoring.slideconf.edit.php:177
 #: include/views/monitoring.sysmap.edit.php:298
@@ -18162,7 +18161,7 @@ msgstr "用户会话数据存储期间 \"%1$s\"。"
 msgid "User sessions"
 msgstr "用户会话"
 
-#: include/menu.inc.php:232
+#: include/menu.inc.php:234
 msgid "User settings"
 msgstr ""
 
@@ -18233,7 +18232,7 @@ msgstr ""
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
 #: app/views/dashboard.sharing.edit.php:50
-#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:173
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
@@ -19204,7 +19203,7 @@ msgstr "Zabbix"
 msgid "Zabbix Admin"
 msgstr "管理员"
 
-#: include/menu.inc.php:205
+#: include/menu.inc.php:207
 msgid "Zabbix Share"
 msgstr "zabbix 共享"
 
@@ -19212,7 +19211,7 @@ msgstr "zabbix 共享"
 msgid "Zabbix Super Admin"
 msgstr "超级管理员"
 
-#: include/menu.inc.php:198
+#: include/menu.inc.php:200
 msgid "Zabbix Technical Support"
 msgstr "Zabbix 技术支持"
 

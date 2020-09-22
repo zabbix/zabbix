@@ -196,9 +196,9 @@ The current measurement of the test point being instrumented.</description>
                   <trigger_prototype>
                      <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPVALUE}"}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPVALUE}"}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"{#SNMPVALUE}"}</name>
@@ -209,7 +209,7 @@ or&#13;
                   <trigger_prototype>
                      <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"{#SNMPVALUE}"}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"{#SNMPVALUE}"}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"{#SNMPVALUE}"}</name>
@@ -221,9 +221,9 @@ or&#13;
                            <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"{#SNMPVALUE}"}</name>
                            <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPVALUE}"}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                            <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPVALUE}"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
