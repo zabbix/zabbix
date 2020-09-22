@@ -213,7 +213,7 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
 		return FAIL;
 	}
 
-	if (abs((int)from - *end) > SEC_PER_YEAR * 5)
+	if (abs(from - *end) > SEC_PER_YEAR * 26)
 	{
 		*error = zbx_strdup(*error, "period shift is too large");
 		return FAIL;

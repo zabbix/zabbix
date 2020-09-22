@@ -267,4 +267,104 @@ out:
   start: 2019-12-31 00:00:00.000000000 +02:00
   end:   2019-12-31 23:00:00.000000000 +02:00
   return: SUCCEED
+---
+test case: Valid period '1y'
+in:
+  period: 1y
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  start: 2019-01-01 00:00:00.000000000 +02:00
+  end:   2019-12-31 23:00:00.000000000 +02:00
+  return: SUCCEED
+---
+test case: Valid period '12M'
+in:
+  period: 12M
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  start: 2019-01-01 00:00:00.000000000 +02:00
+  end:   2019-12-31 23:00:00.000000000 +02:00
+  return: SUCCEED
+---
+test case: Valid period '366d'
+in:
+  period: 366d
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2021-09-01 00:00:00.000000000 +03:00
+out:
+  start: 2020-01-01 00:00:00.000000000 +02:00
+  end:   2020-12-31 23:00:00.000000000 +02:00
+  return: SUCCEED
+---
+test case: Valid period '8784h'
+in:
+  period: 8784h
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2021-09-01 00:00:00.000000000 +03:00
+out:
+  start: 2020-01-01 00:00:00.000000000 +02:00
+  end:   2020-12-31 23:00:00.000000000 +02:00
+  return: SUCCEED
+---
+test case: Invalid period '2y'
+in:
+  period: 2y
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period '13M'
+in:
+  period: 13M
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period '367d'
+in:
+  period: 367d
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid period '8785h'
+in:
+  period: 8785h
+  shift: now/y
+  timezone: :Europe/Riga
+  time: 2021-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Invalid shift '26y'
+in:
+  period: 1h
+  shift: now/y-26y
+  timezone: :Europe/Riga
+  time: 2021-09-01 00:00:00.000000000 +03:00
+out:
+  return: FAIL
+---
+test case: Valid shift '25y'
+in:
+  period: 1h
+  shift: now/y-25y
+  timezone: :Europe/Riga
+  time: 2021-09-01 00:00:00.000000000 +03:00
+out:
+  start: 1995-12-31 23:00:00.000000000 +02:00
+  end:   1995-12-31 23:00:00.000000000 +02:00
+  return: SUCCEED
 ...
