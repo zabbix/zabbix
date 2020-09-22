@@ -28,6 +28,7 @@ class CTask extends CApiService {
 	protected $tableAlias = 't';
 	protected $sortColumns = ['taskid'];
 
+	const RESULT_STATUS_ERROR = -1;
 	/**
 	 * Get results of requested ZBX_TM_TASK_DATA task.
 	 *
@@ -94,8 +95,15 @@ class CTask extends CApiService {
 			}
 
 			if ($this->outputIsRequested('result', $options['output'])) {
+				if ($row['result_status'] == self::RESULT_STATUS_ERROR) {
+					$result_data = $row['result_info'];
+				}
+				else {
+					$result_data = $row['result_info'] ? json_decode($row['result_info']) : [];
+				}
+
 				$row['result'] = [
-					'data' => $row['result_info'] ? json_decode($row['result_info']) : [],
+					'data' => $result_data,
 					'status' => $row['result_status']
 				];
 				unset($row['result_info'], $row['result_status']);
