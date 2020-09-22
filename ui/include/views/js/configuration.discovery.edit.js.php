@@ -313,7 +313,7 @@
 	 * @return {object}
 	 */
 	function setDCheckDefaultPort() {
-		return jQuery('#ports').val(getDCheckDefaultPort(jQuery('#type').val()));
+		return jQuery('#ports').val(getDCheckDefaultPort(jQuery('#type-select').val()));
 	}
 
 	/**
