@@ -294,4 +294,15 @@ in:
 out:
   expression: '{?{host:key["[]",()].last([],"()")}} {?{host:key[(),"[]"].last("()",[])}}'
   return: SUCCEED
+---
+test case: Expand 'Expression:{?{host:key.last()} = "{#A}" }.' with {#A}='= "xyz"'
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"= \"xyz\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: 'Expression:{?{host:key.last()} {#A} }.'
+out:
+  expression: 'Expression:{?{host:key.last()} = "xyz" }.'
+  return: SUCCEED
 ...
