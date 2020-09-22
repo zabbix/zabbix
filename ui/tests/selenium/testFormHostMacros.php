@@ -623,7 +623,7 @@ class testFormHostMacros extends testFormMacros {
 					],
 					'result' => TEST_BAD,
 					'title' => 'Cannot update host',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": unexpected end of string.'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": incorrect syntax near "path:".'
 				]
 			],
 			[
@@ -653,7 +653,7 @@ class testFormHostMacros extends testFormMacros {
 					],
 					'result' => TEST_BAD,
 					'title' => 'Cannot update host',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near ":key".'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "path:key".'
 				]
 			],
 			[
@@ -683,7 +683,7 @@ class testFormHostMacros extends testFormMacros {
 					],
 					'result' => TEST_BAD,
 					'title' => 'Cannot update host',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": unexpected end of string.'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near "path".'
 				]
 			],
 			[

@@ -878,7 +878,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 					],
 					'result' => TEST_BAD,
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": unexpected end of string.'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": incorrect syntax near "path:".'
 				]
 			],
 			[
@@ -908,7 +908,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 					],
 					'result' => TEST_BAD,
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near ":key".'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "path:key".'
 				]
 			],
 			[
@@ -938,7 +938,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 					],
 					'result' => TEST_BAD,
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": unexpected end of string.'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near "path".'
 				]
 			],
 			[
