@@ -541,11 +541,193 @@ class testFormTemplateMacros extends testFormMacros {
 		$this->updateSecretMacros($data, 'templates.php?form=update&templateid=99137', 'templates');
 	}
 
-	public function testFormHostMacros_SecretMacroResolution() {
+	public function testFormTemplateMacros_SecretMacroResolution() {
 		$macro = [
 			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
 		];
 		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+	}
+
+		public function getCreateVaultMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO}',
+						'value' => [
+							'text' => 'secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description'
+					],
+					'result' => TEST_GOOD,
+					'title' => 'Template updated'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO2}',
+						'value' => [
+							'text' => 'secret/path:',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description2'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update template',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": unexpected end of string.'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO3}',
+						'value' => [
+							'text' => '/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description3'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update template',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "/path:key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO4}',
+						'value' => [
+							'text' => 'path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description4'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update template',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near ":key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO5}',
+						'value' => [
+							'text' => ':key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description5'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update template',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near ":key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO6}',
+						'value' => [
+							'text' => 'secret/path',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description6'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update template',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": unexpected end of string.'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO7}',
+						'value' => [
+							'text' => 'one/two/three/four/five/six:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description7'
+					],
+					'result' => TEST_GOOD,
+					'title' => 'Template updated'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO8}',
+						'value' => [
+							'text' => '/secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description8'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update template',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO9}',
+						'value' => [
+							'text' => '',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description9'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update template',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateVaultMacrosData
+	 */
+	public function testFormTemplateMacros_CreateVaultMacros($data) {
+		$this->createVaultMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
+	}
+
+	public function getUpdateVaultMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 0,
+					'macro' => '{$VAULT_HOST_MACRO_CHANGED}'
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 0,
+					'macro' => '{$VAULT_HOST_MACRO_CHANGED}',
+					'description' => 'Changing description'
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 0,
+					'macro' => '{$VAULT_HOST_MACRO_CHANGED}',
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateVaultMacrosData
+	 */
+	public function testFormTemplateMacros_UpdateVaultMacros($data) {
+		$this->updateVaultMacros($data, 'templates.php?form=update&templateid=99014', 'templates');
 	}
 }

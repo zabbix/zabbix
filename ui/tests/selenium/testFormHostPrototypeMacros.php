@@ -542,4 +542,186 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	public function testFormHostPrototypeMacros_RevertSecretMacroChanges($data) {
 		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'host-prototype');
 	}
+
+	public function getCreateVaultMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO}',
+						'value' => [
+							'text' => 'secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description'
+					],
+					'result' => TEST_GOOD,
+					'title' => 'Host prototype updated'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO2}',
+						'value' => [
+							'text' => 'secret/path:',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description2'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update host prototype',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": incorrect syntax near "path:".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO3}',
+						'value' => [
+							'text' => '/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description3'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update host prototype',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "/path:key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO4}',
+						'value' => [
+							'text' => 'path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description4'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update host prototype',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "path:key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO5}',
+						'value' => [
+							'text' => ':key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description5'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update host prototype',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near ":key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO6}',
+						'value' => [
+							'text' => 'secret/path',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description6'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update host prototype',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near "path".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO7}',
+						'value' => [
+							'text' => 'one/two/three/four/five/six:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description7'
+					],
+					'result' => TEST_GOOD,
+					'title' => 'Host prototype updated'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO8}',
+						'value' => [
+							'text' => '/secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description8'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update host prototype',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO9}',
+						'value' => [
+							'text' => '',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description9'
+					],
+					'result' => TEST_BAD,
+					'title' => 'Cannot update host prototype',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateVaultMacrosData
+	 */
+	public function testFormHostPrototypeMacros_CreateVaultMacros($data) {
+		$this->createVaultMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99205', 'host-prototype');
+	}
+
+	public function getUpdateVaultMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 0,
+					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}'
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 0,
+					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
+					'description' => 'Changing description'
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 0,
+					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateVaultMacrosData
+	 */
+	public function testFormHostPrototypeMacros_UpdateVaultMacros($data) {
+		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90003&hostid=90008', 'host-prototype');
+	}
 }
