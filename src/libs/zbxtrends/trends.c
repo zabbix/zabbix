@@ -206,16 +206,25 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
 	/* trends clock refers to the beginning of the hourly interval - subtract */
 	/* one hour to get the trends clock for the last hourly interval          */
 	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR);
-	*end = mktime(&tm_end);
 
-	if (abs(from - *end) > SEC_PER_YEAR * 5)
+	if (-1 == (*end = mktime(&tm_end)))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate the period end time: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (abs((int)from - *end) > SEC_PER_YEAR * 5)
 	{
 		*error = zbx_strdup(*error, "period shift is too large");
 		return FAIL;
 	}
 
 	zbx_tm_sub(&tm_start, period_num, period_unit);
-	*start = mktime(&tm_start);
+	if (-1 == (*start = mktime(&tm_start)))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate the period start time: %s", zbx_strerror(errno));
+		return FAIL;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:%d end:%d", __func__, *start, *end);
 
