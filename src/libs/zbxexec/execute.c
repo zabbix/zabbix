@@ -203,7 +203,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 
 	if (NULL != dir && 0 != chdir(dir))
 	{
-		fprintf(stderr, "cannot change directory to UserParameterPath \"%s\": %s\n", dir, zbx_strerror(errno));
+		fprintf(stderr, "cannot change directory to UserParameterDir \"%s\": %s\n", dir, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
