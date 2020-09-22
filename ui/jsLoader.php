@@ -350,6 +350,9 @@ $tranStrings = [
 	],
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value')
+	],
+	'component.z-select.js' => [
+		'All' => _('All')
 	]
 ];
 
