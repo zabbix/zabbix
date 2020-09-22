@@ -188,9 +188,7 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
 						ret = SUCCEED;
 				}
 				else
-				{
 					THIS_SHOULD_NEVER_HAPPEN;
-				}
 			}
 			else if (ROLE_PERM_ALLOW == default_access)
 				ret = SUCCEED;
