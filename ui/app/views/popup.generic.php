@@ -172,6 +172,7 @@ switch ($data['popup_type']) {
 	case 'applications':
 	case 'application_prototypes':
 	case 'drules':
+	case 'roles':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])

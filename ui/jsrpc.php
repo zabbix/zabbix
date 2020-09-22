@@ -509,6 +509,25 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'roles':
+				$roles = API::Role()->get([
+					'output' => ['roleid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($roles) {
+					CArrayHelper::sort($roles, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$roles = array_slice($roles, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($roles, ['roleid' => 'id']);
+				}
+				break;
 		}
 		break;
 

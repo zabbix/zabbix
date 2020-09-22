@@ -373,6 +373,18 @@ class CControllerPopupGeneric extends CController {
 					_('Execute on'),
 					_('Commands')
 				]
+			],
+			'roles' => [
+				'title' => _('User roles'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'roleid,name',
+				'form' => [
+					'name' => 'rolesform',
+					'id' => 'roles'
+				],
+				'table_columns' => [
+					_('Name')
+				]
 			]
 		];
 	}
@@ -1275,6 +1287,16 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'roles':
+				$options += [
+					'output' => ['roleid', 'name']
+				];
+
+				$records = API::Role()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
 		}
 
