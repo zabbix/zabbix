@@ -3661,7 +3661,6 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 				zabbix_log(LOG_LEVEL_WARNING, "cannot calculate trend function \"" ZBX_FS_UI64
 						"\" schedule: %s", timer->objectid, error);
 				zbx_free(error);
-				THIS_SHOULD_NEVER_HAPPEN;
 
 				return 0;
 			}
