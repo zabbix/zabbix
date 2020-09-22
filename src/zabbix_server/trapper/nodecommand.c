@@ -161,33 +161,47 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		default_access;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
 
-	result = DBselect("select value_int from role_rule where roleid=" ZBX_FS_UI64 " and name='%s'", user->roleid,
-			role_rule);
+	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
+			" and (name='%s' or name='%s')", user->roleid, role_rule,
+			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		if (ROLE_PERM_ALLOW == atoi(row[0]))
-			ret = SUCCEED;
-	}
-	else
-	{
-		DBfree_result(result);
-		result = DBselect("select value_int from role_rule where roleid=" ZBX_FS_UI64 " and name='%s'",
-				user->roleid, ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS);
-
-		if (NULL != (row = DBfetch(result)))
+		if (0 == strcmp(role_rule, row[1]))
 		{
 			if (ROLE_PERM_ALLOW == atoi(row[0]))
 				ret = SUCCEED;
 		}
-		else
+		else if (0 == strcmp(ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS, row[1]))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot read default access rule database for actions");
-			ret = FAIL;
+			default_access = atoi(row[0]);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				if (0 == strcmp(role_rule, row[1]))
+				{
+					if (ROLE_PERM_ALLOW == atoi(row[0]))
+						ret = SUCCEED;
+				}
+				else
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
+			}
+			else if (ROLE_PERM_ALLOW == default_access)
+				ret = SUCCEED;
 		}
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read default access rule database for actions");
+		ret = FAIL;
 	}
 
 	DBfree_result(result);
