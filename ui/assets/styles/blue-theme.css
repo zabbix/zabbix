@@ -2586,10 +2586,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow-y: auto; }
   .setup-right-body .list-table {
     border: 0; }
-  .setup-right-body .table-forms-td-left {
-    width: auto; }
-  .setup-right-body .table-forms-td-right {
-    width: 100%; }
   .setup-right-body h1 {
     margin: 25% 0 .4em; }
 
