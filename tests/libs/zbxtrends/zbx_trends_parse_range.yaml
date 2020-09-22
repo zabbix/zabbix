@@ -184,10 +184,10 @@ out:
   end:   2020-08-24 23:00:00.000000000 +03:00
   return: SUCCEED
 ---
-test case: Valid parameters '1d,now/M-1M+6d/w' from 2020-09-18 10:00:00.000000000 +03:00
+test case: Valid parameters '1d,now/M-1M+6d/w+1d' from 2020-09-18 10:00:00.000000000 +03:00
 in:
   period: 1d
-  shift: now/M-1M+6d/w
+  shift: now/M-1M+6d/w+1d
   timezone: :Europe/Riga
   time: 2020-09-18 10:00:00.000000000 +03:00
 out:
@@ -366,5 +366,16 @@ in:
 out:
   start: 1995-12-31 23:00:00.000000000 +02:00
   end:   1995-12-31 23:00:00.000000000 +02:00
+  return: SUCCEED
+---
+test case: Valid parameters '1h,now/M+6d/w+1h' from 2020-09-23 00:59:46.000000000 +03:00
+in:
+  period: 1h
+  shift: now/M+6d/w+1h
+  timezone: :Europe/Riga
+  time: 2020-09-23 00:59:46.000000000 +03:00
+out:
+  start: 2020-09-07 00:00:00.000000000 +03:00
+  end:   2020-09-07 00:00:00.000000000 +03:00
   return: SUCCEED
 ...

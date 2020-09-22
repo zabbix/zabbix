@@ -105,6 +105,8 @@ static void	tm_adjust_dst(struct tm *tm)
 	if (-1 != (time_new = mktime(&tm_new)))
 	{
 		localtime_r(&time_new, &tm_new);
+		tm->tm_wday = tm_new.tm_wday;
+
 		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 		{
 			*tm = tm_new;
