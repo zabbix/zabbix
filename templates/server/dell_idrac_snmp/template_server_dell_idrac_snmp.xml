@@ -805,9 +805,9 @@ Possible values:&#13;
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
@@ -818,7 +818,7 @@ or&#13;
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"Ambient"}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
@@ -830,9 +830,9 @@ or&#13;
                            <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
                            <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                            <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
@@ -916,9 +916,9 @@ or&#13;
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
@@ -929,7 +929,7 @@ or&#13;
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"CPU"}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
@@ -941,9 +941,9 @@ or&#13;
                            <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
                            <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                            <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
