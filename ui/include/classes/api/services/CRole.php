@@ -556,45 +556,91 @@ class CRole extends CApiService {
 
 		// adding role rules
 		if ($options['selectRules'] !== null && $options['selectRules'] !== API_OUTPUT_COUNT) {
-			$rules_options = [
-				'output' => ['roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
-				'filter' => ['roleid' => $roleids]
-			];
-			$db_rules = DBselect(DB::makeSql('role_rule', $rules_options));
+			$fields = ['roleid'];
 
-			$rules = [];
-			while ($db_rule = DBfetch($db_rules)) {
-				$rules[] = [
-					'roleid' => $db_rule['roleid'],
-					'type' => $db_rule['type'],
-					'name' => $db_rule['name'],
-					'value' => $db_rule[self::RULE_VALUE_TYPES[$db_rule['type']]]
-				];
+			if ($options['selectRules'] === API_OUTPUT_EXTEND) {
+				array_push($fields, 'type', 'name', 'value_int', 'value_str', 'value_moduleid');
+				$type_requested = true;
+				$name_requested = true;
+				$value_requested = true;
 			}
+			else {
+				$name_requested = in_array('name', $options['selectRules']);
+				$value_requested = in_array('value', $options['selectRules']);
+				$type_requested = $value_requested || in_array('type', $options['selectRules']);
+
+				if ($type_requested) {
+					$fields[] = 'type';
+				}
+				if ($name_requested) {
+					$fields[] = 'name';
+				}
+				if ($value_requested) {
+					array_push($fields, 'value_int', 'value_str', 'value_moduleid');
+				}
+			}
+
+			$db_rules = DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM role_rule'.
+				' WHERE '.dbConditionInt('roleid', $roleids)
+			);
 
 			foreach ($result as $roleid => $role) {
 				$result[$roleid]['rules'] = [];
 			}
 
-			$rules = $this->unsetExtraFields($rules, ['type', 'name', 'value'], $options['selectRules']);
+			while ($db_rule = DBfetch($db_rules)) {
+				$rule = [];
+				if ($type_requested) {
+					$rule['type'] = $db_rule['type'];
+				}
+				if ($name_requested) {
+					$rule['name'] = $db_rule['name'];
+				}
+				if ($value_requested) {
+					$rule['value'] = $db_rule[self::RULE_VALUE_TYPES[$db_rule['type']]];
+				}
 
-			foreach ($rules as $rule) {
-				$roleid = $rule['roleid'];
-				unset($rule['roleid']);
-
-				$result[$roleid]['rules'][] = $rule;
+				$result[$db_rule['roleid']]['rules'][] = $rule;
 			}
 		}
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectRules'] !== API_OUTPUT_COUNT) {
-			$relation_map = $this->createRelationMap($result, 'roleid', 'userid', 'users');
-			$db_users = API::User()->get([
-				'output' => $options['selectUsers'],
-				'filter' => ['roleid' => $roleids],
-				'preservekeys' => true
-			]);
-			$result = $relation_map->mapMany($result, $db_users, 'users');
+			if ($options['selectUsers'] === API_OUTPUT_EXTEND) {
+				$options['selectUsers'] = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout',
+					'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page',
+					'timezone', 'roleid'
+				];
+			}
+
+			if (in_array('roleid', $options['selectUsers'])) {
+				$roleid_requested = true;
+			}
+			else {
+				$roleid_requested = false;
+				$options['selectUsers'][] = 'roleid';
+			}
+
+			$db_users = DBselect(
+				'SELECT '.implode(',', $options['selectUsers']).
+				' FROM users'.
+				' WHERE '.dbConditionInt('roleid', $roleids)
+			);
+
+			foreach ($result as $roleid => $role) {
+				$result[$roleid]['users'] = [];
+			}
+
+			while ($db_user = DBfetch($db_users)) {
+				$roleid = $db_user['roleid'];
+				if (!$roleid_requested) {
+					unset($db_user['roleid']);
+				}
+
+				$result[$roleid]['users'][] = $db_user;
+			}
 		}
 
 		return $result;

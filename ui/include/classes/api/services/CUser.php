@@ -1580,13 +1580,27 @@ class CUser extends CApiService {
 
 		// adding user role
 		if ($options['selectRole'] !== null && $options['selectRole'] !== API_OUTPUT_COUNT) {
-			$relation_map = $this->createRelationMap($result, 'userid', 'roleid');
-			$roles = API::Role()->get([
-				'output' => $options['selectRole'],
-				'roleids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relation_map->mapOne($result, $roles, 'role');
+			if ($options['selectRole'] === API_OUTPUT_EXTEND) {
+				$options['selectRole'] = ['roleid', 'name', 'type', 'readonly'];
+			}
+
+			$db_roles = DBselect(
+				'SELECT u.userid'.($options['selectRole'] ? ',r.'.implode(',r.', $options['selectRole']) : '').
+				' FROM users u,role r'.
+				' WHERE u.roleid=r.roleid'.
+				' AND '.dbConditionInt('u.userid', $userIds)
+			);
+
+			foreach ($result as $userid => $user) {
+				$result[$userid]['role'] = [];
+			}
+
+			while ($db_role = DBfetch($db_roles)) {
+				$userid = $db_role['userid'];
+				unset($db_role['userid']);
+
+				$result[$userid]['role'] = $db_role;
+			}
 		}
 
 		return $result;
