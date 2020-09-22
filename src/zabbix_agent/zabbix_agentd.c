@@ -748,8 +748,8 @@ static int	add_serveractive_host_cb(const char *host, unsigned short port, zbx_v
 	{
 		CONFIG_ACTIVE_ARGS[forks].host = zbx_strdup(NULL, host);
 		CONFIG_ACTIVE_ARGS[forks].port = port;
-		CONFIG_ACTIVE_ARGS[forks].hostname = 0 < hostnames->values_num ? hostnames->values[i] :
-				zbx_strdup(NULL, "");
+		CONFIG_ACTIVE_ARGS[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
+				hostnames->values[i] : "");
 	}
 
 	return SUCCEED;
@@ -982,6 +982,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #endif
 	}
 
+	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
 }
 
