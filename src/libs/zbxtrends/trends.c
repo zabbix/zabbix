@@ -109,7 +109,7 @@ out:
 int	zbx_trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
 		char **error)
 {
-	int		period_num;
+	int		period_num, period_hours[] = {0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
 	zbx_time_unit_t	period_unit;
 	size_t		len;
 	struct tm	tm_end, tm_start;
@@ -125,6 +125,12 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
 	if ('\0' != period[len])
 	{
 		*error = zbx_dsprintf(*error, "unexpected character[s] in period \"%s\"", period + len);
+		return FAIL;
+	}
+
+	if (period_hours[period_unit] * period_num > 24 * 366)
+	{
+		*error = zbx_strdup(*error, "period is too large");
 		return FAIL;
 	}
 
@@ -201,6 +207,12 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
 	/* one hour to get the trends clock for the last hourly interval          */
 	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR);
 	*end = mktime(&tm_end);
+
+	if (abs(from - *end) > SEC_PER_YEAR * 5)
+	{
+		*error = zbx_strdup(*error, "period shift is too large");
+		return FAIL;
+	}
 
 	zbx_tm_sub(&tm_start, period_num, period_unit);
 	*start = mktime(&tm_start);
