@@ -53,27 +53,33 @@ abstract class CControllerPopupItemTest extends CController {
 	protected $items_require_interface = [
 		ITEM_TYPE_ZABBIX => [
 			'address' => true,
-			'port' => true
+			'port' => true,
+			'details' => false
 		],
 		ITEM_TYPE_IPMI => [
 			'address' => true,
-			'port' => true
+			'port' => true,
+			'details' => false
 		],
 		ITEM_TYPE_SIMPLE => [
 			'address' => true,
-			'port' => false
+			'port' => false,
+			'details' => false
 		],
 		ITEM_TYPE_SNMP => [
 			'address' => true,
-			'port' => true
+			'port' => true,
+			'details' => true
 		],
 		ITEM_TYPE_SSH => [
 			'address' => true,
-			'port' => false
+			'port' => false,
+			'details' => false
 		],
 		ITEM_TYPE_TELNET => [
 			'address' => true,
-			'port' => false
+			'port' => false,
+			'details' => false
 		]
 	];
 
