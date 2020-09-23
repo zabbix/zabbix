@@ -655,14 +655,14 @@ static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, c
 		{
 			const char	*pnext;
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "  buckets:");
+			zabbix_log(LOG_LEVEL_INFORMATION, "    buckets:");
 
 			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp_buckets, pnext));)
 			{
 				if (SUCCEED == zbx_json_brackets_open(pnext, &jp_bucket))
 				{
 					diag_get_simple_values(&jp_bucket, &msg);
-					zabbix_log(LOG_LEVEL_INFORMATION, "    %s", msg);
+					zabbix_log(LOG_LEVEL_INFORMATION, "      %s", msg);
 					zbx_free(msg);
 				}
 			}
