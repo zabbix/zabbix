@@ -37,7 +37,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_CALCULATED
+		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP
 	];
 
 	/**
@@ -243,7 +243,6 @@ abstract class CControllerPopupItemTest extends CController {
 	public static function getTestableItemTypes(string $hostid = '0'): array {
 		if ($hostid != 0 && self::isItemTypeTestable($hostid)) {
 			self::$testable_item_types[] = ITEM_TYPE_IPMI;
-			self::$testable_item_types[] = ITEM_TYPE_SNMP;
 		}
 
 		return self::$testable_item_types;
