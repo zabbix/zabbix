@@ -775,9 +775,9 @@ static void	parse_hostnames(const char *hostname_param, zbx_vector_str_t *hostna
 
 		if (FAIL != zbx_vector_str_search(hostnames, hostname, ZBX_DEFAULT_STR_COMPARE_FUNC))
 		{
-			zbx_free(hostname);
 			zbx_error("error parsing the \"Hostname\" parameter: host \"%s\" specified more than"
-					" once", hostname_param);
+					" once", hostname);
+			zbx_free(hostname);
 			exit(EXIT_FAILURE);
 		}
 
