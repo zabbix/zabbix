@@ -67,16 +67,22 @@ class CTabFilterProfile {
 	public $tabfilters;
 
 	/**
+	 * Array of tabs filter arrays with default data but without user modified input.
+	 * Tab filter properties:
+	 * @property string []['filter_name']          Tab label.
+	 * @property int    []['filter_show_counter']  Show count of results within tab label when tab is collapsed.
+	 * @property int    []['filter_custom_time']   Use custom time range.
+	 *
+	 * @var array
+	 */
+	public $db_tabfilters;
+
+	/**
 	 * Array of filter field default values.
 	 *
 	 * @var array
 	 */
 	public $filter_defaults;
-
-	/**
-	 * Is selected tab modified by user input.
-	 */
-	public $modified = false;
 
 	public function __construct($idx, array $filter_defaults) {
 		$this->namespace = $idx;
@@ -153,39 +159,13 @@ class CTabFilterProfile {
 			$tabfilters[] = $tabfilter + $this->filter_defaults;
 		}
 
+		if (array_key_exists($this->selected, $this->db_tabfilters)) {
+			$tabfilters[$this->selected] += [
+				'filter_src' => $this->db_tabfilters[$this->selected] + $this->filter_defaults
+			];
+		}
+
 		return $tabfilters;
-	}
-
-	/**
-	 * Get unmodified filter as URL string, required to initialize selected tab filter unsaved state on page refresh.
-	 *
-	 * @param array $input  User submitted input.
-	 *
-	 * @return string
-	 */
-	public function getUnmodifiedUrl(array $input): string {
-		if (array_key_exists($this->selected, $this->profile_data)) {
-			$input = array_merge($input, $this->profile_data[$this->selected]);
-		}
-
-		$arg_separator = ini_get('arg_separator.output');
-		$array_params = array_filter($input, 'is_array');
-		$params = [http_build_query(array_diff_key($input, $array_params), '', $arg_separator, PHP_QUERY_RFC3986)];
-
-		foreach ($array_params as $key => $value) {
-			if ($value && array_values($value) === $value && !is_array($value[0])) {
-				// For range type arrays do not add value index to key as it does http_build_query.
-				foreach ($value as $array_value) {
-					$params[] = urlencode($key.'[]').'='.urlencode($array_value);
-				}
-
-				continue;
-			}
-
-			$params[] = http_build_query([$key => $value], '', $arg_separator, PHP_QUERY_RFC3986);
-		}
-
-		return implode($arg_separator, $params);
 	}
 
 	/**
@@ -294,7 +274,8 @@ class CTabFilterProfile {
 			]);
 		}
 
-		$this->profile_data = $this->tabfilters;
+		$this->db_tabfilters = $this->tabfilters;
+
 		return $this;
 	}
 

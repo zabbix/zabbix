@@ -231,6 +231,10 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table
+		if (data.tags.length == 0) {
+			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>});
+		}
+
 		$('#tags_' + data.uniqid, container).dynamicRows({
 			template: '#filter-tag-row-tmpl',
 			rows: data.tags,

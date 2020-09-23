@@ -116,12 +116,8 @@ class CControllerProblemView extends CControllerProblem {
 		foreach ($filter_tabs as &$filter_tab) {
 			$filter_tab += $this->getAdditionalData($filter_tab);
 
-			if (!$filter_tab['tags']) {
-				$filter_tab['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-			}
-
-			if (!$filter_tab['inventory']) {
-				$filter_tab['inventory'] = [['field' => '', 'value' => '']];
+			if (array_key_exists('filter_src', $filter_tab)) {
+				$filter_tab['filter_src'] += $this->getAdditionalData($filter_tab);
 			}
 		}
 		unset($filter_tab);
@@ -133,7 +129,7 @@ class CControllerProblemView extends CControllerProblem {
 		$data = [
 			'action' => $this->getAction(),
 			'tabfilter_idx' => static::FILTER_IDX,
-			'filter' => $filter,
+			'filter' => $filter_tabs[$profile->selected],
 			'filter_view' => 'monitoring.problem.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'timerange' => [
@@ -149,8 +145,7 @@ class CControllerProblemView extends CControllerProblem {
 				'selected' => $profile->selected,
 				'support_custom_time' => true,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page'],
-				'src_url' => $profile->getUnmodifiedUrl($input)
+				'page' => $filter['page']
 			],
 			'filter_tabs' => $filter_tabs,
 			'refresh_url' => $refresh_curl->getUrl(),

@@ -100,8 +100,8 @@ class CControllerHostView extends CControllerHost {
 		foreach ($filter_tabs as &$filter_tab) {
 			$filter_tab += $this->getAdditionalData($filter_tab);
 
-			if (!$filter_tab['tags']) {
-				$filter_tab['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+			if (array_key_exists('filter_src', $filter_tab)) {
+				$filter_tab['filter_src'] += $this->getAdditionalData($filter_tab);
 			}
 		}
 		unset($filter_tab);
@@ -122,8 +122,7 @@ class CControllerHostView extends CControllerHost {
 				'selected' => $profile->selected,
 				'support_custom_time' => false,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page'],
-				'src_url' => $profile->getUnmodifiedUrl($input)
+				'page' => $filter['page']
 			],
 		] + $this->getData($filter);
 

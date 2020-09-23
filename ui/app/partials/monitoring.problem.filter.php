@@ -412,6 +412,9 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Inventory table.
+		if (data.inventory.length == 0) {
+			data.inventory.push({'field': '', 'value': ''});
+		}
 		$('#filter-inventory_' + data.uniqid, container).dynamicRows({
 			template: '#filter-inventory-row',
 			rows: data.inventory,
@@ -419,11 +422,15 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table.
+		if (data.tags.length == 0) {
+			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>});
+		}
+
 		$('#filter-tags_' + data.uniqid, container).dynamicRows({
 			template: '#filter-tag-row-tmpl',
 			rows: data.tags,
 			counter: 0,
-			dataCallback: tag => tag.uniqid = data.uniqid
+			dataCallback: (tag) => tag.uniqid = data.uniqid
 		});
 
 		// Host groups multiselect.

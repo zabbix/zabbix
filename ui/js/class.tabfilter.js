@@ -37,6 +37,10 @@ class CTabFilter extends CBaseComponent {
 
 		this.init(options);
 		this.registerEvents(options);
+
+		if ('filter_src' in this._active_item._data) {
+			this.initItemUnsavedState(this._active_item, this._active_item._data);
+		}
 	}
 
 	init(options) {
@@ -56,7 +60,8 @@ class CTabFilter extends CBaseComponent {
 			item = this.create(title, options.data[index] || {});
 
 			if (options.selected == index) {
-				item._src_url = options.src_url;
+				item._target.focus();
+				item.renderContentTemplate();
 				this.setSelectedItem(item);
 
 				if (options.expanded) {
@@ -73,6 +78,26 @@ class CTabFilter extends CBaseComponent {
 
 			index++;
 		}
+	}
+
+	/**
+	 * Render filter with profiles stored data to hidden container to get source url for unsaved state comparison.
+	 *
+	 * @param {CTabfilterItem} item    Selected filter object.
+	 * @param {object} filter_data     Selected filter object filter data.
+	 */
+	initItemUnsavedState(item, filter_data) {
+		let filter_src = {...{tab_view: filter_data.tab_view}, ...filter_data.filter_src},
+			target = item._target.parentNode.cloneNode(true),
+			clone_item;
+
+		filter_src.uniqid = filter_data.uniqid + '__clone';
+		target.setAttribute('data-target', target.getAttribute('data-target') + '__clone');
+		clone_item = this.create(target, filter_src);
+
+		clone_item.renderContentTemplate();
+		item._src_url = clone_item.getFilterParams().toString();
+		item.updateUnsavedState();
 	}
 
 	/**
