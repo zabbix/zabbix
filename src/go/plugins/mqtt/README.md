@@ -33,7 +33,7 @@ If the Zabbix agent 2 is running behind a http/https proxy then the following en
 'TP_PROXY', 'HTTPS_PROXY' and 'NO_PROXY', when this plugin establishes a connection.
 
 Although not supported, TLS encryption certificates can be used, by saving them in default locations.
-Example for ubuntu it is "/etc/ssl/certs/ directory".
+For example in ubuntu it is "/etc/ssl/certs/ directory".
 
 If broker URI is left empty the default value of "localhost" is used.
 If broker URI does not contain a scheme the default value of "tcp://" is used.
