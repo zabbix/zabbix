@@ -22,6 +22,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -33,9 +34,10 @@ func TestPlugin_dbStatHandler(t *testing.T) {
 	}
 
 	type args struct {
-		conn   *postgresConn
+		conn   *PostgresConn
 		key    string
 		params []string
+		ctx    context.Context
 	}
 	tests := []struct {
 		name    string
@@ -46,20 +48,20 @@ func TestPlugin_dbStatHandler(t *testing.T) {
 		{
 			fmt.Sprintf("dbStatHandler should return json with data for pgsql.dbstat.sum key if OK"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.dbstat.sum"},
+			args{conn: sharedPool, key: "pgsql.dbstat.sum", ctx: context.Background()},
 			false,
 		},
 		{
 			fmt.Sprintf("dbStatHandler should return json with data for pgsql.dbstat key if OK"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.dbstat"},
+			args{conn: sharedPool, key: "pgsql.dbstat", ctx: context.Background()},
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.dbStatHandler(tt.args.conn, tt.args.key, []string{})
+			_, err := tt.p.dbStatHandler(tt.args.ctx, tt.args.conn, tt.args.key, []string{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.statHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -22,14 +22,45 @@
 package postgres
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
+	"github.com/omeid/go-yarn"
+	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
 )
 
-func TestPostgres(t *testing.T) {
-	return
+// TestMain does the before and after setup
+func TestMain(m *testing.M) {
+	var code int
+
+	_ = log.Open(log.Console, log.Debug, "", 0)
+
+	log.Infof("[TestMain] Start connecting to PostgreSQL...")
+	if err := сreateConnection(); err != nil {
+		log.Infof("failed to create connection to PostgreSQL for tests")
+		os.Exit(code)
+	}
+	// initialize plugin
+	impl.Init(pluginName)
+	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
+
+	code = m.Run()
+	if code != 0 {
+		log.Critf("failed to run PostgreSQL tests")
+		os.Exit(code)
+	}
+	log.Infof("[TestMain] Cleaning up...")
+	os.Exit(code)
+}
+func TestPlugin_Start(t *testing.T) {
+	t.Run("Connection manager must be initialized", func(t *testing.T) {
+		impl.Start()
+		if impl.connMgr == nil {
+			t.Error("Connection manager is not initialized")
+		}
+	})
 }
 
 func TestPlugin_Export(t *testing.T) {
@@ -41,8 +72,10 @@ func TestPlugin_Export(t *testing.T) {
 
 	var pingOK int64 = 1
 
-	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
-	impl.Start()
+	//impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
+	impl.connMgr.queryStorage = yarn.NewFromMap(map[string]string{
+		"TestQuery.sql": "SELECT 1::text AS res",
+	})
 
 	tests := []struct {
 		name       string
@@ -73,10 +106,17 @@ func TestPlugin_Export(t *testing.T) {
 			true,
 		},
 		{
-			"Check PG Wal",
+			"Check wal handler",
 			&impl,
 			args{keyPostgresWal, []string{"tcp://localhost:5432", "postgres", "postgres"}, nil},
 			nil,
+			false,
+		},
+		{
+			"Check custom queries handler. Should return 1 as text",
+			&impl,
+			args{keyPostgresCustom, []string{"tcp://localhost:5432", "postgres", "postgres", "postgres", "TestQuery"}, nil},
+			"[{\"res\":\"1\"}]",
 			false,
 		},
 	}
@@ -95,5 +135,14 @@ func TestPlugin_Export(t *testing.T) {
 			}
 		})
 	}
-	impl.Stop()
+
+}
+
+func TestPlugin_Stop(t *testing.T) {
+	t.Run("Connection manager must be deinitialized", func(t *testing.T) {
+		impl.Stop()
+		if impl.connMgr != nil {
+			t.Error("Connection manager is not deinitialized")
+		}
+	})
 }

@@ -22,6 +22,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -35,8 +36,9 @@ func TestPlugin_locksHandler(t *testing.T) {
 	}
 
 	type args struct {
-		conn   *postgresConn
+		conn   *PostgresConn
 		params []string
+		ctx    context.Context
 	}
 	tests := []struct {
 		name    string
@@ -47,13 +49,14 @@ func TestPlugin_locksHandler(t *testing.T) {
 		{
 			fmt.Sprintf("Plugin.locksHandler() should return ptr to Pool for Plugin.locksHandler()"),
 			&impl,
-			args{conn: sharedPool},
+			args{conn: sharedPool, ctx: context.Background()},
+
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.locksHandler(tt.args.conn, keyPostgresLocks, tt.args.params)
+			got, err := tt.p.locksHandler(tt.args.ctx, tt.args.conn, keyPostgresLocks, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.locksHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

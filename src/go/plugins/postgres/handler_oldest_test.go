@@ -22,6 +22,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -35,8 +36,9 @@ func TestPlugin_oldestHandler(t *testing.T) {
 	}
 
 	type args struct {
-		conn   *postgresConn
+		conn   *PostgresConn
 		params []string
+		ctx    context.Context
 	}
 	tests := []struct {
 		name    string
@@ -47,13 +49,14 @@ func TestPlugin_oldestHandler(t *testing.T) {
 		{
 			fmt.Sprintf("oldestHandler() should return ptr to Pool for oldestHandler()"),
 			&impl,
-			args{conn: sharedPool},
+			args{conn: sharedPool, ctx: context.Background()},
+
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.p.oldestHandler(tt.args.conn, keyPostgresOldestXid, tt.args.params)
+			_, err := tt.p.oldestHandler(tt.args.ctx, tt.args.conn, keyPostgresOldestXid, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.oldestHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

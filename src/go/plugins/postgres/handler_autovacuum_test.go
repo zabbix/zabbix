@@ -22,6 +22,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -33,8 +34,9 @@ func TestPlugin_autovacuumHandler(t *testing.T) {
 	}
 
 	type args struct {
-		conn   *postgresConn
+		conn   *PostgresConn
 		params []string
+		ctx    context.Context
 	}
 	tests := []struct {
 		name    string
@@ -45,14 +47,14 @@ func TestPlugin_autovacuumHandler(t *testing.T) {
 		{
 			fmt.Sprintf("autovacuumHandler should return count of autovacuum workers if OK "),
 			&impl,
-			args{conn: sharedPool},
+			args{conn: sharedPool, ctx: context.Background()},
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.autovacuumHandler(tt.args.conn, keyPostgresAutovacuum, tt.args.params)
+			_, err := tt.p.autovacuumHandler(tt.args.ctx, tt.args.conn, keyPostgresAutovacuum, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.autovacuumHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

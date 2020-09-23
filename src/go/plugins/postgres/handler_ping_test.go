@@ -22,38 +22,11 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
-	"os"
 	"reflect"
 	"testing"
-
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
-
-// TestMain does the before and after setup
-func TestMain(m *testing.M) {
-	var code int
-
-	_ = log.Open(log.Console, log.Debug, "", 0)
-
-	log.Infof("[TestMain] Start connecting to PostgreSQL...")
-	if err := сreateConnection(); err != nil {
-		log.Infof("failed to create connection to PostgreSQL for tests")
-		os.Exit(code)
-	}
-	// initialize plugin
-	impl.Init(pluginName)
-	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
-
-	code = m.Run()
-	if code != 0 {
-		log.Critf("failed to run PostgreSQL tests")
-		os.Exit(code)
-	}
-	log.Infof("[TestMain] Cleaning up...")
-	os.Exit(code)
-}
 
 func TestPlugin_pingHandler(t *testing.T) {
 	var pingOK int64 = 1
@@ -64,8 +37,9 @@ func TestPlugin_pingHandler(t *testing.T) {
 	}
 
 	type args struct {
-		conn   *postgresConn
+		conn   *PostgresConn
 		params []string
+		ctx    context.Context
 	}
 	tests := []struct {
 		name    string
@@ -77,14 +51,16 @@ func TestPlugin_pingHandler(t *testing.T) {
 		{
 			fmt.Sprintf("pingHandler should return %d if connection is ok", postgresPingOk),
 			&impl,
-			args{conn: sharedPool},
+			args{conn: sharedPool, ctx: context.Background()},
+
 			pingOK,
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.pingHandler(tt.args.conn, keyPostgresPing, tt.args.params)
+			got, err := tt.p.pingHandler(tt.args.ctx,
+				tt.args.conn, keyPostgresPing, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.pingHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

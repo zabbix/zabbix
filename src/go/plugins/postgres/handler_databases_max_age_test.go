@@ -22,6 +22,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -33,8 +34,9 @@ func TestPlugin_databasesAgeHandler(t *testing.T) {
 	}
 
 	type args struct {
-		conn   *postgresConn
+		conn   *PostgresConn
 		params []string
+		ctx    context.Context
 	}
 	tests := []struct {
 		name    string
@@ -45,14 +47,14 @@ func TestPlugin_databasesAgeHandler(t *testing.T) {
 		{
 			fmt.Sprintf("databasesAgeHandler should return age of each database "),
 			&impl,
-			args{conn: sharedPool, params: []string{"postgres"}},
+			args{conn: sharedPool, ctx: context.Background(), params: []string{"postgres"}},
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.databasesAgeHandler(tt.args.conn, keyPostgresDatabasesAge, tt.args.params)
+			_, err := tt.p.databasesAgeHandler(tt.args.ctx, tt.args.conn, keyPostgresDatabasesAge, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.databaseAgeHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

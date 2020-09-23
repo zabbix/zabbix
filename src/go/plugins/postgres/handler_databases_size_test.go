@@ -22,6 +22,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
@@ -33,8 +34,9 @@ func TestPlugin_databasesSizeHandler(t *testing.T) {
 	}
 
 	type args struct {
-		conn   *postgresConn
+		conn   *PostgresConn
 		params []string
+		ctx    context.Context
 	}
 	tests := []struct {
 		name    string
@@ -45,14 +47,15 @@ func TestPlugin_databasesSizeHandler(t *testing.T) {
 		{
 			fmt.Sprintf("databasesSizeHandler should return size of each database "),
 			&impl,
-			args{conn: sharedPool, params: []string{"postgres"}},
+			args{conn: sharedPool, ctx: context.Background(), params: []string{"postgres"}},
+
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			_, err := tt.p.databasesSizeHandler(tt.args.conn, keyPostgresDatabasesSize, tt.args.params)
+			_, err := tt.p.databasesSizeHandler(tt.args.ctx, tt.args.conn, keyPostgresDatabasesSize, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.databaseSizeHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
