@@ -331,7 +331,7 @@ func main() {
 
 		var err error
 		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
-				agent.Options.UserParameterPath); err != nil {
+				agent.Options.UserParameterDir); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
 
@@ -435,7 +435,7 @@ func main() {
 	}
 
 	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
-			agent.Options.UserParameterPath); err != nil {
+			agent.Options.UserParameterDir); err != nil {
 		fatalExit("cannot initialize user parameters", err)
 	}
 

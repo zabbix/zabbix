@@ -41,7 +41,7 @@ type UserParameterPlugin struct {
 	plugin.Base
 	parameters           map[string]*parameterInfo
 	unsafeUserParameters int
-	userParameterPath    string
+	userParameterDir    string
 }
 
 var userParameter UserParameterPlugin
@@ -104,7 +104,7 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 
 	p.Debugf("executing command:'%s'", s)
 
-	stdoutStderr, err := zbxcmd.Execute(s, time.Second*time.Duration(Options.Timeout), p.userParameterPath)
+	stdoutStderr, err := zbxcmd.Execute(s, time.Second*time.Duration(Options.Timeout), p.userParameterDir)
 	if err != nil {
 		return nil, err
 	}
@@ -114,10 +114,10 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 	return stdoutStderr, nil
 }
 
-func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters int, userParameterPath string) error {
+func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters int, userParameterDir string) error {
 	userParameter.parameters = make(map[string]*parameterInfo)
 	userParameter.unsafeUserParameters = unsafeUserParameters
-	userParameter.userParameterPath = userParameterPath
+	userParameter.userParameterDir = userParameterDir
 
 	for i := 0; i < len(userParameterConfig); i++ {
 		s := strings.SplitN(userParameterConfig[i], ",", 2)

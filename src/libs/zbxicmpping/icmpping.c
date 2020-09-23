@@ -133,7 +133,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 
 		/* call fping, ignore its exit code but mind execution failures */
 		if (TIMEOUT_ERROR == (ret_exec = zbx_execute(tmp, &out, err, sizeof(err), 1,
-				ZBX_EXIT_CODE_CHECKS_DISABLED)))
+				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 		{
 			zbx_snprintf(error, max_error_len, "Timeout while executing \"%s\"", tmp);
 			goto out;
@@ -230,7 +230,7 @@ static int	get_ipv6_support(const char * fping, const char *dst)
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50 %s", fping, dst);
 
-	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED)) &&
+	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)) &&
 				ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst)) || TIMEOUT_ERROR == ret)
 	{
 		ret = SUCCEED;

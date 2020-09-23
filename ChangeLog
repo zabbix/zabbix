@@ -1,7 +1,7 @@
 Changes for 5.2.0beta1
 
 New features:
-...G...... [ZBXNEXT-6171] added UserParameterPath config option to agent and agent2 (yurii)
+...G...... [ZBXNEXT-6171] added UserParameterDir config option to agent and agent2 (dimir, yurii)
 ...G...... [ZBXNEXT-6090] added modbus support for Zabbix agent 2 (MVekslers)
 ...G...... [ZBXNEXT-6023] added Windows service support for Zabbix agent 2 (esneiders)
 
