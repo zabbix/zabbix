@@ -28,14 +28,12 @@ class CWidgetFieldMsItem extends CWidgetFieldMs {
 
 		if ($hostid === null) {
 			$this->filter_parameters += [
-				'real_hosts' => true,
-				'webitems' => true
+				'real_hosts' => true
 			];
 		}
 		else {
 			$this->filter_parameters += [
-				'hostid' => $hostid,
-				'webitems' => true
+				'hostid' => $hostid
 			];
 		}
 	}

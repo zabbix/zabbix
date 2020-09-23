@@ -48,62 +48,49 @@ class CControllerTemplateDashboardList extends CController {
 			return false;
 		}
 
-		return true;
+		return isWritableHostTemplates((array) $this->getInput('templateid'));
 	}
 
 	protected function doAction() {
-		$sort_field = $this->getInput('sort', CProfile::get('web.dashboards.php.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.dashboards.php.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.dashbrd.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.dashbrd.list.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.dashboards.php.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.dashboards.php.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$data = [
-			'paging' => null,
-			'dashboards' => [],
-			'sort' => $sort_field,
-			'templateid' => $this->getInput('templateid', null),
-			'uncheck' => $this->hasInput('uncheck'),
-			'sortorder' => $sort_order
-		];
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
-		$data['dashboards'] = $this->fetchDashboards($sort_field, $sort_order);
+		$dashboards = API::TemplateDashboard()->get([
+			'output' => ['name', 'templateid'],
+			'templateids' => [$this->getInput('templateid')],
+			'sortfield' => $sort_field,
+			'limit' => $limit,
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		$page_num = $this->getInput('page', 1);
+		CArrayHelper::sort($dashboards, [['field' => $sort_field, 'order' => $sort_order]]);
+
+		// pager
+		$page_num = getRequest('page', 1);
 		CPagerHelper::savePage('template.dashboard.list', $page_num);
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['dashboards'], $sort_order,
+		$paging = CPagerHelper::paginate($page_num, $dashboards, $sort_order,
 			(new CUrl('zabbix.php'))
 				->setArgument('action', $this->getAction())
 				->setArgument('templateid', $this->getInput('templateid'))
 		);
 
+		$data = [
+			'templateid' => $this->getInput('templateid'),
+			'uncheck' => $this->hasInput('uncheck'),
+			'sort' => $sort_field,
+			'sortorder' => $sort_order,
+			'dashboards' => $dashboards,
+			'paging' => $paging
+		];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of dashboards'));
 		$this->setResponse($response);
-	}
-
-	/**
-	 * Get list of dashboards.
-	 *
-	 * @param string $sort_field
-	 * @param string $sort_order
-	 *
-	 * @return array
-	 */
-	private function fetchDashboards(string $sort_field, string $sort_order): array {
-
-		// Get applications.
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$dashboards = API::TemplateDashboard()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'templateids' => [$this->getInput('templateid', null)],
-			'editable' => true,
-			'sortfield' => $sort_field,
-			'limit' => $limit
-		]);
-
-		CArrayHelper::sort($dashboards, [['field' => $sort_field, 'order' => $sort_order]]);
-
-		return $dashboards;
 	}
 }

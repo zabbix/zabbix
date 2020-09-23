@@ -23,6 +23,7 @@ class CControllerTemplateDashboardDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'templateid' => 'required|db dashboard.templateid',
 			'dashboardids' => 'required|array_db dashboard.dashboardid'
 		];
 
@@ -36,32 +37,19 @@ class CControllerTemplateDashboardDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_ADMIN) {
-			return false;
-		}
-
-		return count($this->getInput('dashboardids')) == API::TemplateDashboard()->get([
-			'countOutput' => true,
-			'dashboardids' => $this->getInput('dashboardids'),
-			'editable' => true
-		]);
+		return true;
 	}
 
 	protected function doAction() {
 		$dashboardids = $this->getInput('dashboardids');
 
-		$db_dashboards = API::TemplateDashboard()->get([
-			'output' => ['templateid'],
-			'dashboardids' => $dashboardids,
-			'limit' => 1
-		]);
-		$result = API::TemplateDashboard()->delete($dashboardids);
+		$result = (bool) API::TemplateDashboard()->delete($dashboardids);
 
 		$deleted = count($dashboardids);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'template.dashboard.list')
-			->setArgument('templateid', $db_dashboards[0]['templateid'])
+			->setArgument('templateid', $this->getInput('templateid'))
 			->setArgument('page', CPagerHelper::loadPage('template.dashboard.list', null))
 		);
 

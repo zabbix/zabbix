@@ -281,7 +281,8 @@ class CWidgetHelper {
 	public static function getItem($field, $captions, $form_name) {
 		return self::getMultiselectField($field, $captions, $form_name, 'items', [
 			'srctbl' => 'items',
-			'srcfld1' => 'itemid'
+			'srcfld1' => 'itemid',
+			'webitems' => true
 		] + $field->getFilterParameters());
 	}
 

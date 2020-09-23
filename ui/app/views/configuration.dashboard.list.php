@@ -23,12 +23,15 @@
  * @var CView $this
  */
 
-$checkbox_hash = 'dashboard'.crc32(json_encode([]));
+$checkbox_hash = 'dashboard_'.$data['templateid'];
+
 if ($data['uncheck']) {
 	uncheckTableRows($checkbox_hash);
 }
 
-$form = (new CForm())->setName('application_form');
+$form = (new CForm())
+	->setName('dashboard_form')
+	->addVar('templateid', $data['templateid']);
 
 $table = (new CTableInfo())
 	->setHeader([
@@ -36,45 +39,46 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_dashboards'))
 				->onClick("checkAll('".$form->getName()."', 'all_dashboards', 'dashboardids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Dashboards'), 'name', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'template.dashboard.list')
 				->setArgument('templateid', $data['templateid'])
 				->getUrl()
 		)
 	]);
 
-foreach ($data['dashboards'] as $dashboard) {
-	$name = new CLink($dashboard['name'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'template.dashboard.edit')
-			->setArgument('dashboardid', $dashboard['dashboardid'])
-			->getUrl()
-	);
-
-	$checkBox = new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']);
-
-	$table->addRow([$checkBox, $name]);
+foreach ($data['dashboards'] as $dashboardid => $dashboard) {
+	$table->addRow([
+		new CCheckBox('dashboardids['.$dashboardid.']', $dashboardid),
+		new CLink($dashboard['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'template.dashboard.edit')
+				->setArgument('dashboardid', $dashboardid)
+				->getUrl()
+		)
+	]);
 }
 
-// Append table to form.
 $form->addItem([
 	$table,
 	$data['paging'],
-	new CActionButtonList('action', 'dashboardids',
-		['template.dashboard.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected dashboards?')]],
-		$checkbox_hash
-	)
+	new CActionButtonList('action', 'dashboardids', [
+		'template.dashboard.delete' => [
+			'name' => _('Delete'),
+			'confirm' => _('Delete selected dashboards?')
+		]
+	], $checkbox_hash)
 ]);
 
-// Make widget.
 (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setControls(
-		(new CTag('nav', true, new CRedirectButton(_('Create dashboard'), (new CUrl('zabbix.php'))
+		(new CTag('nav', true, new CRedirectButton(_('Create dashboard'),
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'template.dashboard.edit')
 				->setArgument('templateid', $data['templateid'])
 				->getUrl()
-			)
-		))->setAttribute('aria-label', _('Content controls'))
+		)))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(get_header_host_table('dashboards', $data['templateid']))
 	->addItem($form)
