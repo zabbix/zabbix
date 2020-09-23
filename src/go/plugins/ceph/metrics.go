@@ -36,7 +36,7 @@ type metric struct {
 }
 
 var (
-	extraParamDetails = map[string]string{"details": "details"}
+	extraParamDetails = map[string]string{"detail": "detail"}
 )
 
 // handle TODO.
@@ -68,7 +68,7 @@ const (
 
 var metrics = pluginMetrics{
 	keyDf: metric{
-		description: "Returns statistics provided by \"df details\" command.",
+		description: "Returns statistics provided by \"df detail\" command.",
 		commands:    []command{cmdDf},
 		params:      extraParamDetails,
 		handler:     dfHandler,

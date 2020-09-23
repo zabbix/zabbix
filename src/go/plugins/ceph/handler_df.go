@@ -43,6 +43,7 @@ type cephDf struct {
 			Wr          uint64  `json:"wr"`
 			WrBytes     uint64  `json:"wr_bytes"`
 			StoredRaw   uint64  `json:"stored_raw"`
+			MaxAvail    uint64  `json:"max_avail"`
 		} `json:"stats"`
 	} `json:"pools"`
 }
@@ -56,6 +57,7 @@ type poolStat struct {
 	Wr          uint64  `json:"wr_ops"`
 	WrBytes     uint64  `json:"wr_bytes"`
 	StoredRaw   uint64  `json:"stored_raw"`
+	MaxAvail    uint64  `json:"max_avail"`
 }
 
 type outDf struct {
@@ -97,6 +99,7 @@ func dfHandler(data map[command][]byte) (interface{}, error) {
 			Wr:          p.Stats.Wr,
 			WrBytes:     p.Stats.WrBytes,
 			StoredRaw:   p.Stats.StoredRaw,
+			MaxAvail:    p.Stats.MaxAvail,
 		}
 
 		totalObjects += p.Stats.Objects

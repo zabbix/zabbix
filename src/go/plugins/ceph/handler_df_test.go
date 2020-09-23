@@ -27,18 +27,23 @@ import (
 
 func Test_dfHandler(t *testing.T) {
 	out := outDf{Pools: map[string]poolStat{
-		"device_health_metrics": {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0, StoredRaw: 0},
-		"new_pool":              {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0, StoredRaw: 0},
-		"test_zabbix":           {PercentUsed: 0, Objects: 4, BytesUsed: 786432, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0, StoredRaw: 0},
-		"zabbix":                {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0, StoredRaw: 0}},
+		"device_health_metrics": {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0,
+			StoredRaw: 0, MaxAvail: 1390298112},
+		"new_pool": {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0,
+			StoredRaw: 0, MaxAvail: 695170880},
+		"test_zabbix": {PercentUsed: 0, Objects: 4, BytesUsed: 786432, Rd: 0, RdBytes: 0, Wr: 4, WrBytes: 24576,
+			StoredRaw: 66618, MaxAvail: 1390298112},
+		"zabbix": {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0,
+			StoredRaw: 0, MaxAvail: 1390298112},
+	},
 		Rd:              0,
 		RdBytes:         0,
-		Wr:              0,
-		WrBytes:         0,
+		Wr:              4,
+		WrBytes:         24576,
 		NumPools:        4,
 		TotalBytes:      12872318976,
-		TotalAvailBytes: 6903169024,
-		TotalUsedBytes:  2747924480,
+		TotalAvailBytes: 6900023296,
+		TotalUsedBytes:  2751070208,
 		TotalObjects:    4,
 	}
 
