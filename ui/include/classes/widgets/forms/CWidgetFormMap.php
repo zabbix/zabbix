@@ -24,8 +24,8 @@
  */
 class CWidgetFormMap extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_MAP);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_MAP);
 
 		// Widget reference field.
 		$field_reference = (new CWidgetFieldReference())->setDefault('');

@@ -41,11 +41,9 @@ class CControllerDashboardPropertiesCheck extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
-				]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseData([
+				'main_block' => json_encode(['errors' => getMessages()->toString()])
+			]));
 		}
 
 		return $ret;
@@ -58,6 +56,6 @@ class CControllerDashboardPropertiesCheck extends CController {
 	protected function doAction() {
 		$data = [];
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($data)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }

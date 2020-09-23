@@ -104,10 +104,6 @@
 								'class': 'btn-widget-edit',
 								'title': t('Edit')
 							}).on('click', function() {
-								if (!methods.isEditMode.call($obj)) {
-									methods.editDashboard.call($obj);
-								}
-								doAction('beforeConfigLoad', $obj, data, widget);
 								methods.editWidget.call($obj, widget, this);
 							})
 						)
@@ -2122,34 +2118,29 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		var ajax_data = {
-				'dashboardid': data['dashboard']['id'],
-				'uniqueid': widget['uniqueid'],
-				'initial_load': widget['initial_load'] ? 1 : 0,
-				'edit_mode': data['options']['edit_mode'] ? 1 : 0,
-				'storage': widget['storage'],
-				'view_mode': widget['view_mode']
-			};
+			'templateid': (data.dashboard.templateid !== null) ? data.dashboard.templateid : undefined,
+			'dashboardid': (data.dashboard.dashboardid !== null) ? data.dashboard.dashboardid : undefined,
+			'dynamic_hostid': (data.dashboard.dynamic_hostid !== null) ? data.dashboard.dynamic_hostid : undefined,
+			'widgetid': (widget.widgetid !== '') ? widget.widgetid : undefined,
+			'uniqueid': widget.uniqueid,
+			'name': (widget.header !== '') ? widget.header : undefined,
+			'initial_load': widget.initial_load ? 1 : 0,
+			'edit_mode': data.options.edit_mode ? 1 : 0,
+			'storage': widget.storage,
+			'view_mode': widget.view_mode
+		};
 
 		widget['content_size'] = getWidgetContentSize(widget);
 
 		if (widget['iterator']) {
-			ajax_data['page'] = widget['page'];
+			ajax_data.page = widget['page'];
 		}
 		else {
 			$.extend(ajax_data, widget['content_size']);
 		};
 
-		if (widget['widgetid'] !== '') {
-			ajax_data['widgetid'] = widget['widgetid'];
-		}
-		if (widget['header'] !== '') {
-			ajax_data['name'] = widget['header'];
-		}
-		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
-			ajax_data['fields'] = JSON.stringify(widget['fields']);
-		}
-		if (data.dashboard.dynamic_hostid !== null) {
-			ajax_data['dynamic_hostid'] = data.dashboard.dynamic_hostid;
+		if ('fields' in widget && Object.keys(widget.fields).length != 0) {
+			ajax_data.fields = JSON.stringify(widget.fields);
 		}
 
 		setDashboardBusy(data, 'updateWidgetContent', widget.uniqueid);
@@ -2305,6 +2296,7 @@
 		url.setArgument('action', 'dashboard.widget.check');
 
 		var ajax_data = {
+				templateid: data.dashboard.templateid || undefined,
 				type: type,
 				name: name,
 				view_mode: view_mode
@@ -2329,11 +2321,15 @@
 
 		overlay.xhr
 			.then(function(response) {
-				if (typeof(response.errors) !== 'undefined') {
+				if ('errors' in response) {
 					// Error returned. Remove previous errors.
 
-					$('.msg-bad', data.dialogue['body']).remove();
-					data.dialogue['body'].prepend(response.errors);
+					$('.msg-bad', data.dialogue.body).remove();
+
+					if (response.errors !== '') {
+						data.dialogue.body.prepend(response.errors);
+					}
+
 					$save_btn.prop('disabled', false);
 
 					return $.Deferred().reject();
@@ -2355,6 +2351,7 @@
 				url.setArgument('action', 'dashboard.widget.configure');
 
 				var ajax_data = {
+						templateid: data.dashboard.templateid || undefined,
 						type: type,
 						view_mode: view_mode
 					};
@@ -2526,6 +2523,8 @@
 	}
 
 	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
+		doAction('beforeConfigLoad', $obj, data, widget);
+
 		data['options']['config_dialogue_active'] = true;
 
 		var config_dialogue_close = function() {
@@ -2751,6 +2750,8 @@
 
 	function editDashboard($obj, data) {
 		$obj.addClass('dashbrd-mode-edit');
+
+		data['options']['edit_mode'] = true;
 
 		// Recalculate minimal height and expand dashboard to the whole screen.
 		data.minimalHeight = calculateGridMinHeight($obj);
@@ -3299,14 +3300,21 @@
 	}
 
 	/**
-	 * Get copied widget.
+	 * Get copied widget (if compatible with the current dashboard) or null otherwise.
 	 *
 	 * @param {object} data  Dashboard data and options object.
 	 *
-	 * @returns {object}  Copied widget or null.
+	 * @returns {object|null}  Copied widget or null.
 	 */
 	function getCopiedWidget(data) {
-		return data.storage.readKey('dashboard.copied_widget', null);
+		var copied_widget = data.storage.readKey('dashboard.copied_widget', null);
+
+		if (copied_widget !== null && copied_widget.dashboard.templateid === data.dashboard.templateid) {
+			return copied_widget.widget;
+		}
+		else {
+			return null;
+		}
 	}
 
 	/**
@@ -3373,8 +3381,12 @@
 
 	var	methods = {
 		init: function(data) {
-			var dashboard = data.dashboard,
-				options = $.extend(data.options, {
+			var dashboard = $.extend({
+					templateid: null,
+					dashboardid: null,
+					dynamic_hostid: null
+				}, data.dashboard),
+				options = $.extend({}, data.options, {
 					'rows': 0,
 					'updated': false,
 					'widget-width': 100 / data.options['max-columns']
@@ -3413,8 +3425,8 @@
 				new_widget_placeholder.showAtDefaultPosition();
 
 				$this.data('dashboardGrid', {
-					dashboard: dashboard,
-					options: options,
+					dashboard: $.extend({}, dashboard),
+					options: $.extend({}, options),
 					widget_defaults: {},
 					widgets: [],
 					triggers: {},
@@ -3434,6 +3446,10 @@
 
 				var	data = $this.data('dashboardGrid'),
 					resize_timeout;
+
+				if (data.options.edit_mode) {
+					editDashboard($this, data);
+				}
 
 				$(window).on('resize', function() {
 					clearTimeout(resize_timeout);
@@ -3456,16 +3472,17 @@
 			});
 		},
 
+
 		/**
-		 * Check if the dashboard has copied widget.
+		 * Get copied widget (if compatible with the current dashboard) or null otherwise.
 		 *
-		 * @returns {boolean}
+		 * @returns {object|null}  Copied widget or null.
 		 */
-		hasCopiedWidget: function() {
+		getCopiedWidget: function() {
 			var	$this = this.first(),
 				data = $this.data('dashboardGrid');
 
-			return (getCopiedWidget(data) !== null);
+			return getCopiedWidget(data);
 		},
 
 		updateDynamicHost: function(hostid) {
@@ -3572,7 +3589,12 @@
 					});
 				}
 
-				doAction('onWidgetAdd', $this, data, widget);
+				if (data.options.edit_mode) {
+					widget_local['rf_rate'] = 0;
+					setWidgetModeEdit($this, data, widget_local);
+				};
+
+				doAction('onWidgetAdd', $this, data, widget_local);
 			});
 		},
 
@@ -3666,7 +3688,6 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				data['options']['edit_mode'] = true;
 				doAction('onEditStart', $this, data, null);
 				editDashboard($this, data);
 
@@ -3697,6 +3718,10 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				if (!methods.isEditMode.call($this)) {
+					methods.editDashboard.call($this);
+				}
+
 				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},
@@ -3716,16 +3741,21 @@
 				doAction('onWidgetCopy', $this, data, widget);
 
 				data.storage.writeKey('dashboard.copied_widget', {
-					type: widget.type,
-					pos: {
-						width: widget.pos.width,
-						height: widget.pos.height
+					dashboard: {
+						templateid: data.dashboard.templateid
 					},
-					header: widget.header,
-					view_mode: widget.view_mode,
-					rf_rate: widget.rf_rate,
-					fields: widget.fields,
-					configuration: widget.configuration
+					widget: {
+						type: widget.type,
+						pos: {
+							width: widget.pos.width,
+							height: widget.pos.height
+						},
+						header: widget.header,
+						view_mode: widget.view_mode,
+						rf_rate: widget.rf_rate,
+						fields: widget.fields,
+						configuration: widget.configuration
+					}
 				});
 
 				$.publish('dashboard.grid.copyWidget');
@@ -3880,6 +3910,10 @@
 					fields;
 
 				url.setArgument('action', 'dashboard.widget.edit');
+
+				if (data.dashboard.templateid !== null) {
+					ajax_data.templateid = data.dashboard.templateid;
+				}
 
 				if (form.length) {
 					// Take values from form.

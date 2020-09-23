@@ -21,36 +21,48 @@
 
 class CControllerDashboardWidgetEdit extends CController {
 
+	private $context;
+
 	protected function checkInput() {
 		$fields = [
-			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'templateid' => 'db dashboard.templateid',
+			'type' => 'string',
 			'name' => 'string',
 			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
-			'prev_type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'prev_type' => 'string',
 			'fields' => 'json'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			/*
-			 * @var string fields[<name>]  (optional)
-			 */
+			$this->context = $this->hasInput('templateid')
+				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+				: CWidgetConfig::CONTEXT_DASHBOARD;
+
+			if ($this->hasInput('type')) {
+				if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+					$ret = false;
+				}
+			}
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['body' => json_encode('')]));
+			$this->setResponse((new CControllerResponseData([]))->disableView());
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->hasInput('templateid')
+			? ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN)
+			: ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
-		$known_widget_types = CWidgetConfig::getKnownWidgetTypes();
+		$known_widget_types = CWidgetConfig::getKnownWidgetTypes($this->context);
+
 		natsort($known_widget_types);
 
 		if ($this->hasInput('type') && $this->hasInput('prev_type')
@@ -61,7 +73,13 @@ class CControllerDashboardWidgetEdit extends CController {
 		$type = $this->getInput('type',
 			CProfile::get('web.dashbrd.last_widget_type', array_keys($known_widget_types)[0])
 		);
-		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+
+		$templateid = ($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)
+			? $this->getInput('templateid')
+			: null;
+
+		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'), $templateid);
+
 		// Transforms corrupted data to default values.
 		$form->validate();
 
@@ -78,6 +96,7 @@ class CControllerDashboardWidgetEdit extends CController {
 					'stick_to_top' => CWidgetConfig::getDialogueStickToTop($type)
 				]
 			],
+			'templateid' => $templateid,
 			'known_widget_types' => $known_widget_types,
 			'captions' => $this->getCaptions($form)
 		]));

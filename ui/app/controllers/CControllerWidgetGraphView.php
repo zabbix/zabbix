@@ -100,6 +100,13 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'profileIdx2' => $profileIdx2
 		];
 
+		// Editing template dashboard?
+		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_host')) {
+			// TODO: Work in progress here, template-capable widgets will be reworked.
+
+			$fields['dynamic'] = WIDGET_SIMPLE_ITEM;
+		}
+
 		// Replace graph item by particular host item if dynamic items are used.
 		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.

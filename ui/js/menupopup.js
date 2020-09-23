@@ -572,7 +572,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	if (editMode) {
 		widget_actions.push({
 			label: t('S_PASTE'),
-			disabled: !$dashboard.dashboardGrid('hasCopiedWidget'),
+			disabled: ($dashboard.dashboardGrid('getCopiedWidget') === null),
 			clickCallback: function() {
 				$dashboard.dashboardGrid('pasteWidget', widget, widget.pos);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);

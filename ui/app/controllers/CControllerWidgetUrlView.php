@@ -35,25 +35,32 @@ class CControllerWidgetUrlView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 		$error = null;
-		$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
 
-		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid == 0) {
-			$error = _('No host selected.');
+		// Editing template dashboard?
+		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_host')) {
+			$error = _('No data.');
 		}
 		else {
-			$resolveHostMacros = ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+			$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
 
-			$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
-				'config' => $resolveHostMacros ? 'widgetURL' : 'widgetURLUser',
-				'url' => $fields['url'],
-				'hostid' => $resolveHostMacros ? $dynamic_hostid : '0'
-			]);
+			if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid == 0) {
+				$error = _('No host selected.');
+			}
+			else {
+				$resolveHostMacros = ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
-			$fields['url'] = $resolved_url ? $resolved_url : $fields['url'];
-		}
+				$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
+					'config' => $resolveHostMacros ? 'widgetURL' : 'widgetURLUser',
+					'url' => $fields['url'],
+					'hostid' => $resolveHostMacros ? $dynamic_hostid : '0'
+				]);
 
-		if (!$error && !CHtmlUrlValidator::validate($fields['url'], ['allow_user_macro' => false])) {
-			$error = _s('Provided URL "%1$s" is invalid.', $fields['url']);
+				$fields['url'] = $resolved_url ? $resolved_url : $fields['url'];
+			}
+
+			if (!$error && !CHtmlUrlValidator::validate($fields['url'], ['allow_user_macro' => false])) {
+				$error = _s('Provided URL "%1$s" is invalid.', $fields['url']);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData([

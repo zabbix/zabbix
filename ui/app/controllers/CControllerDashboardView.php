@@ -52,7 +52,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return false;
 		}
 
-		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0) {
+		if ($this->hasInput('hostid')) {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'hostids' => [$this->getInput('hostid')]
@@ -86,7 +86,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashbrd.filter',
-			'profileIdx2' => $dashboard['dashboardid'],
+			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		];
@@ -95,7 +95,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => CWidgetConfig::getDefaults(),
+			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
 			'time_selector' => self::hasTimeSelector($dashboard['widgets'])
 				? getTimeSelectorPeriod($time_selector_options)
 				: null,
@@ -105,7 +105,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		if (self::hasDynamicWidgets($dashboard['widgets'])) {
 			$hostid = $this->getInput('hostid', CProfile::get('web.dashbrd.hostid', 0));
 
-			$hosts = ($hostid > 0)
+			$hosts = ($hostid != 0)
 				? CArrayHelper::renameObjectsKeys(API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'hostids' => [$hostid]
@@ -140,7 +140,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 		if ($this->hasInput('new')) {
 			$dashboard = [
-				'dashboardid' => 0,
+				'dashboardid' => null,
 				'name' => _('New dashboard'),
 				'editable' => true,
 				'widgets' => [],
@@ -162,7 +162,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 			if ($dashboards) {
 				$dashboard = [
-					'dashboardid' => 0,
+					'dashboardid' => null,
 					'name' => $dashboards[0]['name'],
 					'editable' => true,
 					'widgets' => self::prepareWidgetsForGrid(self::unsetInaccessibleFields($dashboards[0]['widgets'])),
@@ -183,9 +183,11 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		}
 		else {
 			// Getting existing dashboard.
-			$dashboardid = $this->getInput('dashboardid', CProfile::get('web.dashbrd.dashboardid', 0));
+			$dashboardid = $this->hasInput('dashboardid')
+				? $this->getInput('dashboardid')
+				: CProfile::get('web.dashbrd.dashboardid');
 
-			if ($dashboardid == 0 && CProfile::get('web.dashbrd.list_was_opened') != 1) {
+			if ($dashboardid === null && CProfile::get('web.dashbrd.list_was_opened') != 1) {
 				// Get first available dashboard that user has read permissions.
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid'],
@@ -198,7 +200,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				}
 			}
 
-			if ($dashboardid != 0) {
+			if ($dashboardid !== null) {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid'],
 					'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
@@ -243,8 +245,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		if ($widgets) {
 			CArrayHelper::sort($widgets, ['y', 'x']);
 
+			$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes(CWidgetConfig::CONTEXT_DASHBOARD));
+
 			foreach ($widgets as $widget) {
-				if (!in_array($widget['type'], array_keys(CWidgetConfig::getKnownWidgetTypes()))) {
+				if (!in_array($widget['type'], $known_widget_types)) {
 					continue;
 				}
 
@@ -252,7 +256,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				$fields_orig = self::convertWidgetFields($widget['fields']);
 
 				// Transforms corrupted data to default values.
-				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig));
+				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig), null);
 				$widget_form->validate();
 				$fields = $widget_form->getFieldsData();
 

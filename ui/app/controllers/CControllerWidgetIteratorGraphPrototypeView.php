@@ -34,20 +34,31 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	}
 
 	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
-
-		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
-			$return = $this->doGraphPrototype($fields);
-		}
-		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-			$return = $this->doSimpleGraphPrototype($fields);
+		// Editing template dashboard?
+		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_host')) {
+			$return = [
+				'header' => $this->getInput('name', _('Graph prototype')),
+				'children' => [],
+				'page' => 1,
+				'page_count' => 1
+			];
 		}
 		else {
-			error(_('Page received incorrect data'));
-		}
+			$fields = $this->getForm()->getFieldsData();
 
-		if (($messages = getMessages()) !== null) {
-			$return = ['messages' => $messages->toString()];
+			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
+				$return = $this->doGraphPrototype($fields);
+			}
+			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+				$return = $this->doSimpleGraphPrototype($fields);
+			}
+			else {
+				error(_('Page received incorrect data'));
+			}
+
+			if (($messages = getMessages()) !== null) {
+				$return = ['messages' => $messages->toString()];
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($return)]));

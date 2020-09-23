@@ -70,10 +70,11 @@ class CControllerTemplateDashboardList extends CController {
 		$data['dashboards'] = $this->fetchDashboards($sort_field, $sort_order);
 
 		$page_num = $this->getInput('page', 1);
-		CPagerHelper::savePage('dashboards.list', $page_num);
-
+		CPagerHelper::savePage('template.dashboard.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['dashboards'], $sort_order,
-			(new CUrl('zabbix.php'))->setArgument('action', 'template.dashboard.list')
+			(new CUrl('zabbix.php'))
+				->setArgument('action', $this->getAction())
+				->setArgument('templateid', $this->getInput('templateid'))
 		);
 
 		$response = new CControllerResponseData($data);

@@ -25,22 +25,19 @@
 ?>
 
 <script>
-	function initializeDashboard(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
-		window.dashboard = new dashboardSingleton(data, widget_defaults, time_selector, dynamic, web_layout_mode);
+	function initializeDashboard(data, widget_defaults, page) {
+		window.dashboard = new dashboardSingleton(data, widget_defaults, page);
 		window.dashboard.live();
 	}
 
-	function dashboardSingleton(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
+	function dashboardSingleton(data, widget_defaults, page) {
 		this.$target = $('.<?= ZBX_STYLE_DASHBRD_GRID_CONTAINER ?>');
 
 		this.data = data;
 		this.widget_defaults = widget_defaults;
-		this.time_selector = time_selector;
-		this.dynamic = dynamic;
-		this.web_layout_mode = web_layout_mode;
+		this.page = page;
 
 		this.original_name = data.name;
-		this.original_owner_id = data.owner.id;
 
 		this.is_busy = false;
 		this.is_busy_saving = false;
@@ -49,93 +46,25 @@
 	}
 
 	dashboardSingleton.prototype.live = function() {
-		// Prevent page reloading on time selector events.
-		timeControl.refreshPage = false;
-
 		this.$target
 			.dashboardGrid({
-				dashboard: {
-					dashboardid: this.data.dashboardid,
-					dynamic_hostid: this.dynamic.host ? this.dynamic.host.id : null
+				'dashboard': {
+					templateid: this.data.templateid,
+					dashboardid: this.data.dashboardid
 				},
-				options: {
+				'options': {
 					'widget-height': 70,
 					'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
 					'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
 					'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 					'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-					'editable': this.data.editable,
-					'edit_mode': (this.data.dashboardid === null),
-					'kioskmode': (this.web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
+					'editable': true,
+					'edit_mode': true,
+					'kioskmode': false
 				}
 			})
 			.dashboardGrid('setWidgetDefaults', this.widget_defaults)
 			.dashboardGrid('addWidgets', this.data.widgets);
-
-		if (this.dynamic.has_dynamic_widgets) {
-			this.liveDynamicHost();
-		}
-
-		jqBlink.blink();
-
-		if (this.data.dashboardid === null) {
-			this.edit();
-			this.openProperties();
-		}
-		else {
-			$('#dashbrd-edit').click(() => this.$target.dashboardGrid('editDashboard'));
-		}
-
-		$.subscribe('dashboard.grid.editDashboard', () => this.edit());
-	};
-
-	dashboardSingleton.prototype.liveDynamicHost = function() {
-		// Perform dynamic host switch when browser back/previous buttons are pressed.
-		window.addEventListener('popstate', e => {
-			var host = (e.state && e.state.host) ? e.state.host : null,
-				hostid = host ? host.id : null;
-
-			$('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
-
-			this.$target.dashboardGrid('updateDynamicHost', hostid);
-		});
-
-		$('#dynamic_hostid').on('change', e => {
-			var hosts = $('#dynamic_hostid').multiSelect('getData'),
-				host = hosts.length ? hosts[0] : null,
-				url = new Curl('zabbix.php', false);
-
-			url.setArgument('action', 'dashboard.view');
-
-			if (this.data.dashboardid !== null) {
-				url.setArgument('dashboardid', this.data.dashboardid);
-			}
-
-			if (this.time_selector) {
-				url.setArgument('from', this.time_selector.from);
-				url.setArgument('to', this.time_selector.to);
-			}
-
-			if (host) {
-				url.setArgument('hostid', host.id);
-			}
-
-			this.$target.dashboardGrid('updateDynamicHost', host ? host.id : null);
-
-			history.pushState({host: host}, '', url.getUrl());
-
-			updateUserProfile('web.dashbrd.hostid', host ? host.id : 1);
-		});
-	}
-
-	dashboardSingleton.prototype.edit = function() {
-		timeControl.disableAllSBox();
-
-		$('.filter-space').hide();
-
-		clearMessages();
-
-		$('#dashbrd-control > li').hide().last().show();
 
 		$('#dashbrd-config').on('click', () => this.openProperties());
 		$('#dashbrd-add-widget').on('click', () => this.$target.dashboardGrid('addNewWidget', this));
@@ -146,6 +75,8 @@
 
 			return false;
 		});
+
+		var $copied_widget = this.$target.dashboardGrid('getCopiedWidget');
 
 		if (this.$target.dashboardGrid('getCopiedWidget') !== null) {
 			$('#dashbrd-paste-widget').attr('disabled', false);
@@ -162,16 +93,19 @@
 		});
 
 		this.enableNavigationWarning();
+
+		if (this.data.dashboardid === null) {
+			this.openProperties();
+		}
 	};
 
 	dashboardSingleton.prototype.save = function(widgets) {
 		var url = new Curl('zabbix.php'),
 			ajax_data = {
+				templateid: this.data.templateid,
 				dashboardid: (this.data.dashboardid !== null) ? this.data.dashboardid : undefined,
-				userid: this.data.owner.id,
 				name: this.data.name,
-				widgets: [],
-				sharing: this.data.sharing
+				widgets: []
 			};
 
 		clearMessages();
@@ -196,7 +130,7 @@
 		this.is_busy_saving = true;
 		this.updateBusy();
 
-		url.setArgument('action', 'dashboard.update');
+		url.setArgument('action', 'template.dashboard.update');
 
 		$.ajax({
 			url: url.getUrl(),
@@ -209,20 +143,17 @@
 				this.updateBusy();
 			})
 			.then(response => {
-				if ('redirect' in response) {
+				if ('errors' in response) {
+					addMessage(response.errors);
+				}
+				else {
 					if ('system-message-ok' in response) {
 						postMessageOk(response['system-message-ok']);
 					}
 
-					this.disableNavigationWarning();
-
-					location.replace(response.redirect);
-				}
-				else if ('errors' in response) {
-					addMessage(response.errors);
+					this.cancelEditing();
 				}
 			});
-
 	};
 
 	dashboardSingleton.prototype.updateBusy = function() {
@@ -232,23 +163,15 @@
 	dashboardSingleton.prototype.cancelEditing = function() {
 		var url = new Curl('zabbix.php', false);
 
-		url.setArgument('action', 'dashboard.view');
+		url.setArgument('action', 'template.dashboard.list');
+		url.setArgument('templateid', this.data.templateid);
 
-		if (this.data.dashboardid !== null) {
-			url.setArgument('dashboardid', this.data.dashboardid);
-		}
-		else {
-			url.setArgument('cancel', '1');
+		if (this.page !== null) {
+			url.setArgument('page', this.page);
 		}
 
 		this.disableNavigationWarning();
 
-		/**
-		 * Redirect to last active dashboard.
-		 * (1) In case of New Dashboard from list, it will open the list.
-		 * (2) In case of New Dashboard or Clone Dashboard from another dashboard, it will open that dashboard.
-		 * (3) In case of editing of the current dashboard, it will reload the same dashboard.
-		 */
 		location.replace(url.getUrl());
 	};
 
@@ -268,7 +191,7 @@
 
 	dashboardSingleton.prototype.openProperties = function() {
 		var options = {
-				userid: this.data.owner.id,
+				template: '1',
 				name: this.data.name
 			};
 
@@ -284,7 +207,9 @@
 			form_data;
 
 		$form.trimValues(['#name']);
-		form_data = $form.serializeJSON();
+		form_data = $.extend({
+			template: '1'
+		}, $form.serializeJSON());
 
 		url.setArgument('action', 'dashboard.properties.check');
 
@@ -305,14 +230,9 @@
 					$(response.errors).insertBefore($form);
 				}
 				else {
-					this.has_properties_modified =
-						(form_data.userid !== this.original_owner_id || form_data.name !== this.original_name);
+					this.has_properties_modified = (form_data.name !== this.original_name);
 
-					this.data.owner.id = form_data.userid;
 					this.data.name = form_data.name;
-
-					$('#<?= ZBX_STYLE_PAGE_TITLE ?>').text(form_data.name);
-					$('#dashboard-direct-link').text(form_data.name);
 
 					overlayDialogueDestroy(overlay.dialogueid);
 				}
@@ -324,51 +244,5 @@
 	 */
 	function updateWidgetConfigDialogue() {
 		window.dashboard.$target.dashboardGrid('updateWidgetConfigDialogue');
-	}
-
-	/**
-	 * Find and refresh widget responsible for launching the "Update problem" popup after it was submitted.
-	 *
-	 * @param {String} type      Widget type to search for.
-	 * @param {object} response  The response object from the "acknowledge.create" action.
-	 * @param {object} overlay   The overlay object of the "Update problem" popup form.
-	 */
-	function refreshWidgetOnAcknowledgeCreate(type, response, overlay) {
-		var handle_selector = '.dashbrd-grid-widget-content',
-			handle = overlay.trigger_parents.filter(handle_selector).get(0);
-
-		if (!handle) {
-			var dialogue = overlay.trigger_parents.filter('.overlay-dialogue');
-
-			if (dialogue.length) {
-				var dialogue_overlay = overlays_stack.getById(dialogue.data('hintboxid'));
-				if (dialogue_overlay && dialogue_overlay.type === 'hintbox') {
-					handle = dialogue_overlay.element.closest(handle_selector);
-				}
-			}
-		}
-
-		if (handle) {
-			var widgets = window.dashboard.$target.dashboardGrid('getWidgetsBy', 'type', type);
-
-			widgets.forEach(widget => {
-				if ($.contains(widget.container[0], handle)) {
-					for (var i = overlays_stack.length - 1; i >= 0; i--) {
-						var hintbox = overlays_stack.getById(overlays_stack.stack[i]);
-						if (hintbox.type === 'hintbox') {
-							hintbox_handle = hintbox.element.closest(handle_selector);
-							if ($.contains(widget.container[0], hintbox_handle)) {
-								hintBox.hideHint(hintbox.element, true);
-							}
-						}
-					}
-
-					clearMessages();
-					addMessage(makeMessageBox('good', [], response.message, true, false));
-
-					window.dashboard.$target.dashboardGrid('refreshWidget', widget.uniqueid);
-				}
-			});
-		}
 	}
 </script>
