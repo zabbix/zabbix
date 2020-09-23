@@ -3808,7 +3808,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 			continue;
 
 		if (NULL != trend_queue && NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue,
-				&timer->objectid)))
+				&timer->objectid)) && old->eval_ts.sec < now + 10 * SEC_PER_MIN)
 		{
 			/* if the trigger was scheduled during next 10 minutes         */
 			/* schedule its evaluation later to reduce server startup load */
