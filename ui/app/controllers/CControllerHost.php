@@ -52,40 +52,39 @@ abstract class CControllerHost extends CController {
 		// Multiselect host groups.
 		$multiselect_hostgroup_data = [];
 		if ($filter['groupids']) {
-			$filter_groups = API::HostGroup()->get([
+			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groupids'],
 				'preservekeys' => true
 			]);
 
-			if ($filter_groups) {
-				foreach ($filter_groups as $group) {
+			if ($groups) {
+				$subgroup_names = [];
+
+				foreach ($groups as $group) {
+					$subgroup_names[] = $group['name'].'/';
+
 					$multiselect_hostgroup_data[] = [
 						'id' => $group['groupid'],
 						'name' => $group['name']
 					];
-
-					$child_groups[] = $group['name'].'/';
 				}
+
+				$groups += API::HostGroup()->get([
+					'output' => ['groupid'],
+					'search' => ['name' => $subgroup_names],
+					'startSearch' => true,
+					'searchByAny' => true,
+					'preservekeys' => true
+				]);
 			}
-			else {
-				$filter['groupids'] = [];
-			}
+
+			$groupids = array_keys($groups);
+		}
+		else {
+			$groupids = null;
 		}
 
-		$groupids = null;
-
-		if ($child_groups) {
-			$filter_groups += API::HostGroup()->get([
-				'output' => ['groupid'],
-				'search' => ['name' => $child_groups],
-				'startSearch' => true,
-				'searchByAny' => true,
-				'preservekeys' => true
-			]);
-
-			$groupids = array_keys($filter_groups);
-		}
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status'],
