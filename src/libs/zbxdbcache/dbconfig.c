@@ -3795,7 +3795,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (ZBX_FUNCTION_TYPE_TIMER != function->type && ZBX_FUNCTION_TYPE_TRENDS != function->type)
 			continue;
 
-		if (0 != function->timer_revision && function->timer_revision == function->revision)
+		if (function->timer_revision == function->revision)
 			continue;
 
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
@@ -3897,9 +3897,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &function->parameter, row[3]);
 
 		function->type = zbx_get_function_type(function->function);
-
-		/* while not perfect the configuration cache last sync can be used as function revision */
-		function->revision = config->sync_ts;
+		function->revision = config->sync_start_ts;
 
 		item->update_triggers = 1;
 		if (NULL != item->triggers)
@@ -5350,6 +5348,8 @@ void	DCsync_configuration(unsigned char mode)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	config->sync_start_ts = time(NULL);
+
 	zbx_dbsync_init_env(config);
 
 	if (ZBX_DBSYNC_INIT == mode)
@@ -6490,6 +6490,7 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
+	config->sync_start_ts = 0;
 
 	config->internal_actions = 0;
 

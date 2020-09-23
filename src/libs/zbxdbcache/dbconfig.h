@@ -748,6 +748,7 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
+	int			sync_start_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 
