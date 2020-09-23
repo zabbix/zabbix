@@ -458,7 +458,7 @@ jQuery(document).ready(function($) {
 
 	<?php if ($data['is_item_testable']): ?>
 		$('#get_value').on('change', function() {
-			var $rows = $('#host_address_row, #proxy_hostid_row, #get_value_row, [id^=row_snmp]'),
+			var $rows = $('#host_address_row, #proxy_hostid_row, #get_value_row, [id^=popup_row_snmp]'),
 				$form = $('#preprocessing-test-form'),
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit;
 
@@ -491,16 +491,16 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['show_snmp_form']): ?>
 					new CViewSwitcher('interface_details_version', 'change', {
-						<?= SNMP_V1 ?>: ['row_snmp_community'],
-						<?= SNMP_V2C ?>: ['row_snmp_community'],
+						<?= SNMP_V1 ?>: ['popup_row_snmp_community'],
+						<?= SNMP_V2C ?>: ['popup_row_snmp_community'],
 						<?= SNMP_V3 ?>: [
-							'row_snmpv3_contextname',
-							'row_snmpv3_securityname',
-							'row_snmpv3_securitylevel',
-							'row_snmpv3_authprotocol',
-							'row_snmpv3_authpassphrase',
-							'row_snmpv3_privprotocol',
-							'row_snmpv3_privpassphrase'
+							'popup_row_snmpv3_contextname',
+							'popup_row_snmpv3_securityname',
+							'popup_row_snmpv3_securitylevel',
+							'popup_row_snmpv3_authprotocol',
+							'popup_row_snmpv3_authpassphrase',
+							'popup_row_snmpv3_privprotocol',
+							'popup_row_snmpv3_privpassphrase'
 						]
 					});
 
@@ -510,14 +510,14 @@ jQuery(document).ready(function($) {
 							new CViewSwitcher('interface_details_securitylevel', 'change', {
 								<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>: [],
 								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>: [
-									'row_snmpv3_authprotocol',
-									'row_snmpv3_authpassphrase'
+									'popup_row_snmpv3_authprotocol',
+									'popup_row_snmpv3_authpassphrase'
 								],
 								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>: [
-									'row_snmpv3_authprotocol',
-									'row_snmpv3_authpassphrase',
-									'row_snmpv3_privprotocol',
-									'row_snmpv3_privpassphrase'
+									'popup_row_snmpv3_authprotocol',
+									'popup_row_snmpv3_authpassphrase',
+									'popup_row_snmpv3_privprotocol',
+									'popup_row_snmpv3_privpassphrase'
 								]
 							});
 						}
