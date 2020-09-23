@@ -397,6 +397,39 @@ abstract class CControllerPopupItemTest extends CController {
 			$interface_input['address'] = $input['address'];
 		}
 
+		if (array_key_exists('interface', $input) && array_key_exists('details', $input['interface'])) {
+			if (array_key_exists('version', $input['interface']['details'])) {
+				$interface_input['details']['version'] = $input['interface']['details']['version'];
+			}
+			if (array_key_exists('bulk', $input['interface']['details'])) {
+				$interface_input['details']['bulk'] = $input['interface']['details']['bulk'];
+			}
+			if (array_key_exists('community', $input['interface']['details'])) {
+				$interface_input['details']['community'] = $input['interface']['details']['community'];
+			}
+			if (array_key_exists('contextname', $input['interface']['details'])) {
+				$interface_input['details']['contextname'] = $input['interface']['details']['contextname'];
+			}
+			if (array_key_exists('securityname', $input['interface']['details'])) {
+				$interface_input['details']['securityname'] = $input['interface']['details']['securityname'];
+			}
+			if (array_key_exists('securitylevel', $input['interface']['details'])) {
+				$interface_input['details']['securitylevel'] = $input['interface']['details']['securitylevel'];
+			}
+			if (array_key_exists('authprotocol', $input['interface']['details'])) {
+				$interface_input['details']['authprotocol'] = $input['interface']['details']['authprotocol'];
+			}
+			if (array_key_exists('authpassphrase', $input['interface']['details'])) {
+				$interface_input['details']['authpassphrase'] = $input['interface']['details']['authpassphrase'];
+			}
+			if (array_key_exists('privprotocol', $input['interface']['details'])) {
+				$interface_input['details']['privprotocol'] = $input['interface']['details']['privprotocol'];
+			}
+			if (array_key_exists('privpassphrase', $input['interface']['details'])) {
+				$interface_input['details']['privpassphrase'] = $input['interface']['details']['privpassphrase'];
+			}
+		}
+
 		// Set proxy.
 		if (in_array($this->item_type, $this->items_support_proxy)) {
 			if (array_key_exists('data', $input) && array_key_exists('proxy_hostid', $input['data'])) {
@@ -659,9 +692,21 @@ abstract class CControllerPopupItemTest extends CController {
 			'address' => '',
 			'port' => '',
 			'interfaceid' => 0,
+			'type' => INTERFACE_TYPE_UNKNOWN,
 			'ip' => '',
 			'dns' => '',
-			'useip' => INTERFACE_USE_DNS
+			'useip' => INTERFACE_USE_DNS,
+			'details' => [
+				'community' => '',
+				'version' => SNMP_V2C,
+				'securityname' => '',
+				'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
+				'authpassphrase' => '',
+				'privpassphrase' => '',
+				'authprotocol' => ITEM_AUTHPROTOCOL_MD5,
+				'privprotocol' => ITEM_PRIVPROTOCOL_DES,
+				'contextname' => ''
+			]
 		];
 
 		// Get values from database; resolve macros.
@@ -677,24 +722,30 @@ abstract class CControllerPopupItemTest extends CController {
 
 			if (count($interfaces) > 0) {
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
-
+				$details = $interfaces[0]['details'] + $interface_data['details'];
 				$interface_data = [
 					'address' => ($interfaces[0]['useip'] == INTERFACE_USE_IP)
 						? $interfaces[0]['ip']
 						: $interfaces[0]['dns'],
 					'port' => $interfaces[0]['port'],
 					'useip' => $interfaces[0]['useip'],
+					'type' => $interfaces[0]['type'],
 					'ip' => $interfaces[0]['ip'],
 					'dns' => $interfaces[0]['dns'],
 					'interfaceid' => $interfaces[0]['interfaceid'],
-					'details' => $interfaces[0]['details']
+					'details' => $details
 				];
 			}
 		}
 
 		// Apply client side cache.
 		foreach ($inputs as $key => $value) {
-			$interface_data[$key] = $value;
+			if (is_array($value)) {
+				$interface_data[$key] = $value + $interface_data[$key];
+			}
+			else {
+				$interface_data[$key] = $value;
+			}
 		}
 
 		return $interface_data;
@@ -742,7 +793,33 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 			}
 			elseif ($key === 'interface') {
-				continue;
+				if ($data['interface']['type'] == INTERFACE_TYPE_SNMP) {
+					if ($data['interface']['details']['version'] == SNMP_V3) {
+						unset($data['interface']['details']['community']);
+
+						if ($data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+							unset($data['interface']['details']['authprotocol'],
+								$data['interface']['details']['authpassphrase'],
+								$data['interface']['details']['privprotocol'],
+								$data['interface']['details']['privpassphrase']);
+						}
+						elseif (
+							$data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
+						) {
+							unset($data['interface']['details']['privprotocol'],
+								$data['interface']['details']['privpassphrase']);
+						}
+					}
+					else {
+						unset($data['interface']['details']['contextname'],
+							$data['interface']['details']['securityname'],
+							$data['interface']['details']['securitylevel'],
+							$data['interface']['details']['authprotocol'],
+							$data['interface']['details']['authpassphrase'],
+							$data['interface']['details']['privprotocol'],
+							$data['interface']['details']['privpassphrase']);
+					}
+				}
 			}
 			elseif ($key === 'query_fields') {
 				if ($value === '[]') {

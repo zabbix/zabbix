@@ -213,15 +213,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 		}
 
-		// Check if if there is an interface and its details (SNMP) have macros and add them to list of macros.
-		if (array_key_exists('interface', $inputs) && array_key_exists('details', $inputs['interface'])) {
-			foreach ($inputs['interface']['details'] as $field) {
-				if (strstr($field, '{') !== false) {
-					$texts_support_user_macros[] = $field;
-				}
-			}
-		}
-
 		// Unset duplicate macros.
 		foreach ($supported_macros as &$item_macros_type) {
 			$item_macros_type = array_unique($item_macros_type);
@@ -253,6 +244,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			if (array_key_exists('port', $inputs['interface']) && $inputs['interface']['port'] === ZBX_SECRET_MASK) {
 				$inputs['interface']['port'] = '';
 				$show_warning = true;
+			}
+
+			if (array_key_exists('details', $inputs['interface'])) {
+				foreach ($inputs['interface']['details'] as $field => $value) {
+					if ($value === ZBX_SECRET_MASK) {
+						$inputs['interface']['details'][$field] = '';
+						$show_warning = true;
+					}
+				}
 			}
 		}
 
@@ -303,6 +303,14 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 		unset($step);
 
+		$show_snmp_form = false;
+		if ($inputs['interface']['type'] == INTERFACE_TYPE_SNMP) {
+			$show_snmp_form = true;
+		}
+		elseif ($inputs['type'] == ITEM_TYPE_SNMP) {
+			$show_snmp_form = true;
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test item'),
 			'steps' => $preprocessing_steps,
@@ -331,6 +339,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interface_port_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['port']
 			),
+			'show_snmp_form' => $show_snmp_form,
 			'show_warning' => $show_warning,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

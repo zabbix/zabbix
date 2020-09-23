@@ -154,7 +154,8 @@ function itemGetValueTest(overlay) {
 			address: interface ? interface['address'].trim() : '',
 			port: (interface && interface['port']) ? interface['port'].trim() : '',
 			interfaceid: interface ? interface['interfaceid'] : null,
-			useip: interface ? interface['useip'] : null
+			useip: interface ? interface['useip'] : null,
+			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
 		proxy_hostid: form_data['proxy_hostid'],
@@ -236,7 +237,8 @@ function itemCompleteTest(overlay) {
 			address: interface ? interface['address'].trim() : '',
 			port: (interface && interface['port']) ? interface['port'].trim() : '',
 			interfaceid: interface ? interface['interfaceid'] : null,
-			useip: interface ? interface['useip'] : null
+			useip: interface ? interface['useip'] : null,
+			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
 		proxy_hostid: form_data['proxy_hostid'],
@@ -456,9 +458,7 @@ jQuery(document).ready(function($) {
 
 	<?php if ($data['is_item_testable']): ?>
 		$('#get_value').on('change', function() {
-			var $rows = $('#host_address_row, #proxy_hostid_row, #get_value_row, #empty_row_1, #empty_row_2,'
-					+ ' #host_port_row'
-				),
+			var $rows = $('#host_address_row, #proxy_hostid_row, #get_value_row, [id^=row_snmp]'),
 				$form = $('#preprocessing-test-form'),
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit;
 
@@ -484,6 +484,45 @@ jQuery(document).ready(function($) {
 
 				$submit_btn.html('<?= _('Get value and test') ?>');
 				$rows.show();
+
+				<?php if ($data['show_snmp_form']): ?>
+					$('#interface_details_version').change();
+				<?php endif ?>
+
+				<?php if ($data['show_snmp_form']): ?>
+					new CViewSwitcher('interface_details_version', 'change', {
+						<?= SNMP_V1 ?>: ['row_snmp_community'],
+						<?= SNMP_V2C ?>: ['row_snmp_community'],
+						<?= SNMP_V3 ?>: [
+							'row_snmpv3_contextname',
+							'row_snmpv3_securityname',
+							'row_snmpv3_securitylevel',
+							'row_snmpv3_authprotocol',
+							'row_snmpv3_authpassphrase',
+							'row_snmpv3_privprotocol',
+							'row_snmpv3_privpassphrase'
+						]
+					});
+
+					$('#interface_details_version').on('change', function(e) {
+						$('#interface_details_securitylevel').off('change');
+						if (e.target.value == <?= SNMP_V3 ?>) {
+							new CViewSwitcher('interface_details_securitylevel', 'change', {
+								<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>: [],
+								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>: [
+									'row_snmpv3_authprotocol',
+									'row_snmpv3_authpassphrase'
+								],
+								<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>: [
+									'row_snmpv3_authprotocol',
+									'row_snmpv3_authpassphrase',
+									'row_snmpv3_privprotocol',
+									'row_snmpv3_privpassphrase'
+								]
+							});
+						}
+					}).trigger('change');
+				<?php endif ?>
 			}
 			else {
 				$('#value', $form).multilineInput('unsetReadOnly');

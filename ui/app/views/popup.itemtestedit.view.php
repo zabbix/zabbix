@@ -85,101 +85,152 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 	]);
 }
 
-$form_list_left = new CFormList();
-$form_list_right = new CFormList();
+$form_list = new CFormList();
+$r_label_style_dev = 'width:60px;display:block;text-align:right;';
 
 if ($data['is_item_testable']) {
-	$form_list_left
-		->addRow(
-			new CLabel(_('Get value from host'), 'get_value'),
+	$form_list
+		->addRow(new CLabel(_('Get value from host'), 'get_value'),
 			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
 		)
-		->addRow(
-			new CLabel(_('Host address'), 'host_address'),
+		->addRow(new CLabel(_('Host address'), 'interface_address'), (new CHorList([
 			$data['interface_address_enabled']
 				? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				: (new CTextBox('interface[address]'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setEnabled(false),
-			'host_address_row'
-		)
-		->addRow(
-			new CLabel(_('Proxy'), 'proxy_hostid'),
-			$data['proxies_enabled']
-				? (new CComboBox('proxy_hostid',
-						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
-						[0 => _('(no proxy)')] + $data['proxies']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				: (new CTextBox(null, _('(no proxy)'), true))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setId('proxy_hostid'), // Automated tests need this.
-			'proxy_hostid_row'
-		)
-		->addRow(null, null, 'empty_row_1');
-
-	$form_list_right
-		->addRow((new CDiv())->addStyle('height: 24px'))
-		->addRow(
-			new CLabel(_('Port'), 'port'),
+			(new CLabel(_('Port'), 'interface_port'))->addStyle($r_label_style_dev),
 			$data['interface_port_enabled']
 				? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				: (new CTextBox('interface[port]'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setEnabled(false),
-			'host_port_row'
-		)
-		->addRow(null, null, 'empty_row_2')
-		->addRow(
-			null,
-			(new CSimpleButton(_('Get value')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->setId('get_value_btn')
-				->addStyle('float: right'),
-			'get_value_row'
-		);
+					->setEnabled(false)
+		])),
+		'host_address_row'
+	);
+
+	if ($data['show_snmp_form']) {
+		$form_list
+			->addRow((new CLabel(_('SNMP version'), 'interface[details][version]'))->setAsteriskMark(),
+				new CComboBox('interface[details][version]', $data['inputs']['interface']['details']['version'], null,
+					[SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]
+				), 'row_snmp_version'
+			)
+			->addRow((new CLabel(_('SNMP community'), 'interface[details][community]'))->setAsteriskMark(),
+				(new CTextBox('interface[details][community]', $data['inputs']['interface']['details']['community'],
+						false, DB::getFieldLength('interface_snmp', 'community')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAriaRequired(),
+				'row_snmp_community'
+			)
+			->addRow(new CLabel(_('Context name'), 'interface[details][contextname]'),
+				(new CTextBox('interface[details][contextname]', $data['inputs']['interface']['details']['contextname'],
+						false, DB::getFieldLength('interface_snmp', 'contextname')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				'row_snmpv3_contextname'
+			)
+			->addRow(new CLabel(_('Security name'), 'interface[details][securityname]'),
+				(new CTextBox('interface[details][securityname]',
+						$data['inputs']['interface']['details']['securityname'], false,
+						DB::getFieldLength('interface_snmp', 'securityname')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				'row_snmpv3_securityname'
+			)
+			->addRow(new CLabel(_('Security level'), 'interface[details][securitylevel]'),
+				new CComboBox('interface[details][securitylevel]',
+						$data['inputs']['interface']['details']['securitylevel'], null, [
+							ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+						]
+				),
+				'row_snmpv3_securitylevel'
+			)
+			->addRow(new CLabel(_('Authentication protocol'), 'interface[details][authprotocol]'),
+				(new CRadioButtonList('interface[details][authprotocol]',
+						(int) $data['inputs']['interface']['details']['authprotocol']
+				))
+					->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
+					->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
+					->setModern(true),
+				'row_snmpv3_authprotocol'
+			)
+			->addRow(new CLabel(_('Authentication passphrase'), 'interface[details][authpassphrase]'),
+				(new CTextBox('interface[details][authpassphrase]',
+						$data['inputs']['interface']['details']['authpassphrase'], false,
+						DB::getFieldLength('interface_snmp', 'authpassphrase')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				'row_snmpv3_authpassphrase'
+			)
+			->addRow(new CLabel(_('Privacy protocol'), 'interface[details][privprotocol]'),
+				(new CRadioButtonList('interface[details][privprotocol]',
+						(int) $data['inputs']['interface']['details']['privprotocol']
+				))
+					->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
+					->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
+					->setModern(true),
+				'row_snmpv3_privprotocol'
+			)
+			->addRow(new CLabel(_('Privacy passphrase'), 'interface[details][privpassphrase]'),
+				(new CTextBox('interface[details][privpassphrase]',
+						$data['inputs']['interface']['details']['privpassphrase'], false,
+						DB::getFieldLength('interface_snmp', 'privpassphrase')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				'row_snmpv3_privpassphrase'
+			);
+	}
+
+	$form_list->addRow(
+		new CLabel(_('Proxy'), 'proxy_hostid'),
+		$data['proxies_enabled']
+			? (new CComboBox('proxy_hostid',
+					array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
+					[0 => _('(no proxy)')] + $data['proxies']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			: (new CTextBox(null, _('(no proxy)'), true))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setId('proxy_hostid'),
+		'proxy_hostid_row'
+	);
+
+	$form_list->addRow('', (new CDiv((new CSimpleButton(_('Get value')))
+		->setId('get_value_btn')
+		->addClass(ZBX_STYLE_BTN_ALT)
+	))->addStyle('text-align: right;'), 'get_value_row');
 }
 
-$form_list_left
-	->addRow(
-		new CLabel(_('Value'), 'value'),
-		(new CMultilineInput('value', '', [
-			'disabled' => false,
-			'readonly' => false
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$form_list
+	->addRow(new CLabel(_('Value'), 'value'), new CHorList([
+			(new CMultilineInput('value', '', [
+				'disabled' => false,
+				'readonly' => false
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CLabel(_('Time'), 'time'))->addStyle($r_label_style_dev),
+			(new CTextBox(null, 'now', true))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setId('time')
+		]),
 		'preproc-test-popup-value-row'
 	)
-	->addRow(
-		new CLabel(_('Previous value'), 'prev_item_value'),
+	->addRow(new CLabel(_('Previous value'), 'prev_item_value'), new CHorList([
 			(new CMultilineInput('prev_value', '', [
 				'disabled' => !$data['show_prev']
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CLabel(_('Prev. time'), 'prev_time'))->addStyle($r_label_style_dev),
+			(new CTextBox('prev_time', $data['prev_time']))
+				->setEnabled($data['show_prev'])
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		]),
 		'preproc-test-popup-prev-value-row'
 	)
-	->addRow(
-		new CLabel(_('End of line sequence'), 'eol'),
-		(new CRadioButtonList('eol', $data['eol']))
+	->addRow(new CLabel(_('End of line sequence'), 'eol'), (new CRadioButtonList('eol', $data['eol']))
 			->addValue(_('LF'), ZBX_EOL_LF)
 			->addValue(_('CRLF'), ZBX_EOL_CRLF)
 			->setModern(true)
 	);
-
-$form_list_right
-	->addRow(
-		new CLabel(_('Time'), 'time'),
-		(new CTextBox(null, 'now', true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setId('time')
-	)
-	->addRow(
-		new CLabel(_('Prev. time'), 'prev_time'),
-		(new CTextBox('prev_time', $data['prev_time']))
-			->setEnabled($data['show_prev'])
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-
-$form_list = new CFormList();
 
 if ($macros_table) {
 	$form_list->addRow(
@@ -237,15 +288,7 @@ if ($data['show_final_result']) {
 	$form_list->addRow(_('Result'), false, 'final-result');
 }
 
-$container = (new CDiv())
-	->addClass(ZBX_STYLE_ROW)
-	->addItem([
-		(new CDiv($form_list_left))->addClass(ZBX_STYLE_CELL),
-		(new CDiv($form_list_right))->addClass(ZBX_STYLE_CELL)
-	]);
-
 $form
-	->addItem($container)
 	->addItem($form_list)
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
