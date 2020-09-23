@@ -3650,7 +3650,7 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		}
 		else
 		{
-			int	ret = FAIL;
+			int	ret;
 			char	*error = NULL, *period_shift;
 
 			period_shift = zbx_function_get_param_dyn(timer->parameter, 2);
