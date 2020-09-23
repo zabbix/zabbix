@@ -8210,7 +8210,8 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
  ******************************************************************************/
 void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers)
 {
-	int	i;
+	ZBX_DC_FUNCTION	*function;
+	int		i;
 
 	zbx_vector_ptr_reserve(timers, config->trigger_queue.elems_num);
 
@@ -8220,8 +8221,13 @@ void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers)
 	{
 		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)config->trigger_queue.elems[i].data;
 
-		if (ZBX_FUNCTION_TYPE_TRENDS == timer->type)
+		if (ZBX_FUNCTION_TYPE_TRENDS == timer->type &&
+				NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+						&timer->objectid)) &&
+				function->timer_revision == timer->revision)
+		{
 			zbx_vector_ptr_append(timers, timer);
+		}
 		else
 			dc_trigger_timer_free(timer);
 	}
