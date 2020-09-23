@@ -93,7 +93,7 @@ if ($data['is_item_testable']) {
 		->addRow(new CLabel(_('Get value from host'), 'get_value'),
 			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
 		)
-		->addRow(new CLabel(_('Host address'), 'interface_address'), (new CHorList([
+		->addRow((new CLabel(_('Host address'), 'interface_address'))->setAsteriskMark(), (new CHorList([
 			$data['interface_address_enabled']
 				? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
