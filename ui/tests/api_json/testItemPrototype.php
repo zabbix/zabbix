@@ -129,4 +129,3 @@ class testItemPrototype extends CAPITest {
 		}
 	}
 }
-
