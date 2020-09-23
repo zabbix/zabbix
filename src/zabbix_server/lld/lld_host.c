@@ -3551,7 +3551,6 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		interface->dns = NULL;
 		interface->port = NULL;
 		interface->data.snmp = NULL;
-
 		interface->flags = ZBX_FLAG_LLD_INTERFACE_REMOVE;
 
 		zbx_vector_ptr_append(interfaces, interface);
