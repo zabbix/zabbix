@@ -21,6 +21,7 @@ package scheduler
 
 import (
 	"errors"
+	"fmt"
 	"hash/fnv"
 	"sync/atomic"
 	"time"
@@ -211,6 +212,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			log.Debugf("[%d] created direct exporter task for plugin '%s' itemid:%d key '%s'",
 				c.id, p.name(), task.item.itemid, task.item.key)
 		}
+	} else if c.id <= agent.MaxBuiltinClientID {
+		return fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, r.Key)
 	}
 
 	// handle runner interface for inactive plugins

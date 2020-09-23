@@ -256,7 +256,8 @@ int	zbx_is_counted_in_item_queue(unsigned char type, const char *key)
 		case ITEM_TYPE_ZABBIX_ACTIVE:
 			if (0 == strncmp(key, "log[", 4) ||
 					0 == strncmp(key, "logrt[", 6) ||
-					0 == strncmp(key, "eventlog[", 9))
+					0 == strncmp(key, "eventlog[", 9) ||
+					0 == strncmp(key, "mqtt.get[", ZBX_CONST_STRLEN("mqtt.get[")))
 			{
 				return FAIL;
 			}
