@@ -4,6 +4,8 @@ The plugin can monitor several broker instances simultaneously via Zabbix agent 
 supported. The plugin keeps all subscriptions to a single broker in one connection to reduce network strain. The plugin 
 supports active checks only.
 
+This plugin works using "Eclipse Paho MQTT Go client library" (https://github.com/eclipse/paho.mqtt.golang)
+
 
 ## Requirements
 - Zabbix Agent 2
@@ -25,6 +27,14 @@ The plugin uses broker URI, topic, username and password from item key parameter
 The first two parameters broker and topic, broker URI can be empty, but the topic parameter is mandatory.
 The last two parameters username and password need to be provided only if required.
 
+Websocket connection is supported using "ws://" scheme.
+
+If the Zabbix agent 2 is running behind a http/https proxy then the following environment variables are used 
+'TP_PROXY', 'HTTPS_PROXY' and 'NO_PROXY', when this plugin establishes a connection.
+
+Although not supported, TLS encryption certificates can be used, by saving them in default locations.
+Example for ubuntu it is "/etc/ssl/certs/ directory".
+
 If broker URI is left empty the default value of "localhost" is used.
 If broker URI does not contain a scheme the default value of "tcp://" is used.
 If broker URI does not contain a port the default value of "1883" is used. 
@@ -38,6 +48,8 @@ For example:
 - mqtt.get["tcp://host:1885","path/to/topic"]
 - mqtt.get["tcp://host:1885","path/to/#"]
 - mqtt.get["tcp://host:1885","path/+/topic"]
+- mqtt.get["ws://host:1883","path/to/topic"]
+
 
 **Note!** Broker URI should not contain query parameters. If scheme or port is provided the host should also be provided.
   
