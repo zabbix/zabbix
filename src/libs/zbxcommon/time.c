@@ -26,6 +26,8 @@
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
+static	int	time_unit_seconds[ZBX_TIME_UNIT_WEEK + 1] = {0, SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_DAY * 7};
+
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
 {
 	switch (*text)
@@ -132,30 +134,22 @@ static void	tm_adjust_dst(struct tm *tm)
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
 	int	shift;
+	time_t	tm_time;
 
 	switch (base)
 	{
 		case ZBX_TIME_UNIT_HOUR:
-			tm->tm_hour += multiplier;
-			if (24 <= tm->tm_hour)
-			{
-				shift = tm->tm_hour / 24;
-				tm->tm_hour %= 24;
-				tm_add(tm, shift, ZBX_TIME_UNIT_DAY);
-			}
-			break;
+			ZBX_FALLTHROUGH;
 		case ZBX_TIME_UNIT_DAY:
-			tm->tm_mday += multiplier;
-			while (tm->tm_mday > (shift = zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1)))
-			{
-				tm->tm_mday -= shift;
-				tm_add(tm, 1, ZBX_TIME_UNIT_MONTH);
-			}
-			tm->tm_wday += multiplier;
-			tm->tm_wday %= 7;
-			break;
+			ZBX_FALLTHROUGH;
 		case ZBX_TIME_UNIT_WEEK:
-			tm_add(tm, multiplier * 7, ZBX_TIME_UNIT_DAY);
+			if (-1 != (tm_time = mktime(tm)))
+			{
+				tm_time += multiplier * time_unit_seconds[base];
+				localtime_r(&tm_time, tm);
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
 			break;
 		case ZBX_TIME_UNIT_MONTH:
 			tm->tm_mon += multiplier;
@@ -224,40 +218,23 @@ static void	neg_to_pos_wrap(int *value, int base)
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
 	int	shift;
+	time_t	tm_time;
 
 	switch (base)
 	{
 		case ZBX_TIME_UNIT_HOUR:
-			tm->tm_hour -= multiplier;
-			if (0 > tm->tm_hour)
-			{
-				shift = -tm->tm_hour / 24;
-				neg_to_pos_wrap(&tm->tm_hour, 24);
-				if (0 != tm->tm_hour)
-					shift++;
-				tm_sub(tm, shift, ZBX_TIME_UNIT_DAY);
-			}
-			return;
+			ZBX_FALLTHROUGH;
 		case ZBX_TIME_UNIT_DAY:
-			tm->tm_mday -= multiplier;
-			while (0 >= tm->tm_mday)
-			{
-				int	prev_mon;
-
-				if (0 > (prev_mon = tm->tm_mon - 1))
-					prev_mon = 11;
-				prev_mon++;
-
-				tm->tm_mday += zbx_day_in_month(tm->tm_year + 1900, prev_mon);
-				tm_sub(tm, 1, ZBX_TIME_UNIT_MONTH);
-			}
-			tm->tm_wday -= multiplier;
-			if (0 > tm->tm_wday)
-				neg_to_pos_wrap(&tm->tm_wday, 7);
-			return;
+			ZBX_FALLTHROUGH;
 		case ZBX_TIME_UNIT_WEEK:
-			tm_sub(tm, multiplier * 7, ZBX_TIME_UNIT_DAY);
-			return;
+			if (-1 != (tm_time = mktime(tm)))
+			{
+				tm_time += multiplier * time_unit_seconds[base];
+				localtime_r(&tm_time, tm);
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+			break;
 		case ZBX_TIME_UNIT_MONTH:
 			tm->tm_mon -= multiplier;
 			if (0 > tm->tm_mon)
@@ -268,12 +245,12 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 					shift++;
 				tm_sub(tm, shift, ZBX_TIME_UNIT_YEAR);
 			}
-			return;
+			break;
 		case ZBX_TIME_UNIT_YEAR:
 			tm->tm_year -= multiplier;
-			return;
+			break;
 		default:
-			return;
+			break;
 	}
 }
 
