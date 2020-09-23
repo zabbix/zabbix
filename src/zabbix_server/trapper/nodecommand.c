@@ -186,7 +186,6 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
 		else
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
