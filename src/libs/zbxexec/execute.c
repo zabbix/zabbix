@@ -204,7 +204,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 	if (NULL != dir && 0 != chdir(dir))
 	{
 		fprintf(stderr, "cannot change directory to UserParameterDir: %s\n", zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		exit(127);
 	}
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
@@ -494,6 +494,10 @@ close:
 		{
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+		}
+		else if (127 == WEXITSTATUS(status))
+		{
+			zbx_snprintf(error, max_error_len, "cannot change directory to \"%s\"", dir);
 		}
 		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != WEXITSTATUS(status)))
 		{
