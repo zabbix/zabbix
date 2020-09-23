@@ -113,7 +113,7 @@ if ($data['is_item_testable']) {
 
 	if ($data['show_snmp_form']) {
 		$form_list
-			->addRow((new CLabel(_('SNMP version'), 'interface[details][version]'))->setAsteriskMark(),
+			->addRow(new CLabel(_('SNMP version'), 'interface[details][version]'),
 				new CComboBox('interface[details][version]', $data['inputs']['interface']['details']['version'], null,
 					[SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]
 				), 'row_snmp_version'
