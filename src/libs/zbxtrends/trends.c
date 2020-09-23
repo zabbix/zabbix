@@ -261,7 +261,7 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
  *                                                                            *
  * Parameters: from         - [IN] the time the period shift is calculated    *
  *                                 from                                       *
- *             period_shift - [IN] the history period shift                   *
+ *             p            - [IN] the history period shift                   *
  *             nextcheck    - [OUT] the time starting from which the period   *
  *                                  will end in future                        *
  *             error        - [OUT] the error message if parsing failed       *
@@ -273,19 +273,15 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
  *           day+ used as period base (now/?).                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *nextcheck, char **error)
+int	zbx_trends_parse_nextcheck(time_t from, const char *p, time_t *nextcheck, char **error)
 {
 	struct tm	tm;
-	const char	*p;
 	zbx_time_unit_t	base;
-	size_t		len;
 
-	if (SUCCEED != trends_parse_base(period_shift, &base, error))
+	if (SUCCEED != trends_parse_base(p, &base, error))
 		return FAIL;
 
 	/* parse period shift */
-
-	p = period_shift;
 
 	if (0 != strncmp(p, "now", ZBX_CONST_STRLEN("now")))
 	{
@@ -318,6 +314,7 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 		{
 			int	num;
 			char	op = *(p++);
+			size_t	len;
 
 			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
 				return FAIL;
