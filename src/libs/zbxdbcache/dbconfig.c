@@ -3699,7 +3699,7 @@ static zbx_trigger_timer_t	*dc_trigger_timer_create(ZBX_DC_FUNCTION *function)
 
 		if (FAIL == zbx_trends_parse_base(function->parameter, &trend_base, &error))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse function " ZBX_FS_UI64 " period base: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse function " ZBX_FS_UI64 " period base: %s",
 					function->functionid, error);
 			zbx_free(error);
 			return NULL;
