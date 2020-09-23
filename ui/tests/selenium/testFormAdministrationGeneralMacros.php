@@ -1010,14 +1010,14 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 15,
+					'index' => 20,
 					'macro' => '{$_VAULT_MACRO_CHANGED}'
 				]
 			],
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 15,
+					'index' => 20,
 					'macro' => '{$_VAULT_MACRO_CHANGED}',
 					'description' => 'Changing description'
 				]
@@ -1025,7 +1025,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 15,
+					'index' => 20,
 					'macro' => '{$_VAULT_MACRO_CHANGED}',
 					'value' => [
 						'text' => 'new/path/to/secret:key'
