@@ -40,7 +40,7 @@ type cephResponse struct {
 	Message   string `json:"message"`
 }
 
-// request TODO.
+// request makes an http request to Ceph RESTful API Module with a given command and extra parameters.
 func request(ctx context.Context, client *http.Client, uri, cmd string, extraParams map[string]string) ([]byte, error) {
 	var resp cephResponse
 
@@ -104,13 +104,13 @@ type response struct {
 	err  error
 }
 
-// asyncRequest TODO.
+// asyncRequest makes asynchronous https requests to Ceph RESTful API Module for each metric's command and sends
+// results to the channel.
 func asyncRequest(ctx context.Context, cancel context.CancelFunc, client *http.Client, uri string, m metric) <-chan *response {
 	ch := make(chan *response, len(m.commands))
 
 	for _, cmd := range m.commands {
 		go func(cmd string) {
-			// TODO: add context
 			data, err := request(ctx, client, uri, cmd, m.params)
 			if err != nil {
 				cancel()

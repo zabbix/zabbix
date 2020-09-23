@@ -73,7 +73,7 @@ type outDf struct {
 	TotalObjects    uint64              `json:"total_objects"`
 }
 
-// dfHandler TODO.
+// dfHandler returns statistics provided by "df detail" command.
 func dfHandler(data map[command][]byte) (interface{}, error) {
 	var df cephDf
 

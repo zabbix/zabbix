@@ -69,7 +69,7 @@ var healthMap = map[string]int8{
 	"HEALTH_ERR":  2,
 }
 
-// statusHandler TODO.
+// statusHandler returns data provided by "status" command.
 func statusHandler(data map[command][]byte) (interface{}, error) {
 	var status cephStatus
 

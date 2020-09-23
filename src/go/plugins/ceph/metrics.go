@@ -39,7 +39,7 @@ var (
 	extraParamDetails = map[string]string{"detail": "detail"}
 )
 
-// handle TODO.
+// handle runs metric's handler.
 func (m *metric) handle(data map[command][]byte) (res interface{}, err error) {
 	return m.handler(data)
 }
@@ -92,7 +92,7 @@ var metrics = pluginMetrics{
 		handler:     osdDumpHandler,
 	},
 	keyPing: metric{
-		description: "Test if a connection is alive or not.",
+		description: "Tests if a connection is alive or not.",
 		commands:    []command{cmdHealth},
 		params:      nil,
 		handler:     pingHandler,
@@ -111,7 +111,7 @@ var metrics = pluginMetrics{
 	},
 }
 
-// metrics TODO.
+// metrics returns an array of metrics and their descriptions suitable to pass to plugin.RegisterMetrics.
 func (pm pluginMetrics) metrics() (res []string) {
 	for key, params := range pm {
 		res = append(res, key, params.description)

@@ -50,7 +50,7 @@ type PluginOptions struct {
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]*Session `conf:"optional"`
 
-	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
+	// Timeout is the maximum time in seconds for waiting when a request has to be done.
 	// Default value equals to the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 

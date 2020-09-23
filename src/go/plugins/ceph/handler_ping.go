@@ -32,7 +32,7 @@ const (
 	pingOk     = 1
 )
 
-// pingHandler TODO.
+// pingHandler returns pingOk if a connection is alive or pingFailed otherwise.
 func pingHandler(data map[command][]byte) (interface{}, error) {
 	var health cephHealth
 

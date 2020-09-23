@@ -33,7 +33,7 @@ type aggDataInt struct {
 	Avg float64 `json:"avg"`
 }
 
-// newAggDataInt TODO.
+// newAggDataInt calculates min, max and average values for a given slice of integers.
 func newAggDataInt(v []uint64) aggDataInt {
 	if len(v) == 0 {
 		return aggDataInt{0, 0, 0}
@@ -54,14 +54,13 @@ func newAggDataInt(v []uint64) aggDataInt {
 	}
 }
 
-// aggDataFloat TODO.
 type aggDataFloat struct {
 	Min float64 `json:"min"`
 	Max float64 `json:"max"`
 	Avg float64 `json:"avg"`
 }
 
-// newAggDataFloat TODO.
+// newAggDataFloat calculates min, max and average values for a given slice of floats.
 func newAggDataFloat(v []float64) aggDataFloat {
 	if len(v) == 0 {
 		return aggDataFloat{0, 0, 0}
@@ -112,7 +111,7 @@ type outOsdStats struct {
 	Osds          map[string]osdStat `json:"osds"`
 }
 
-// osdHandler TODO.
+// osdHandler returns OSDs statistics provided by "pg dump" command.
 func osdHandler(data map[command][]byte) (interface{}, error) {
 	var pgDump cephPgDump
 

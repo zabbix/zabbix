@@ -50,7 +50,7 @@ type outOsdDump struct {
 	Osds              map[string]osdStatus `json:"osds"`
 }
 
-// osdDumpHandler TODO.
+// osdDumpHandler returns OSDs dump provided by "osd dump" command.
 func osdDumpHandler(data map[command][]byte) (interface{}, error) {
 	var osdDump cephOsdDump
 

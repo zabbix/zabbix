@@ -41,8 +41,7 @@ type crushRule struct {
 }
 
 type node struct {
-	ID int64 `json:"id"`
-	//Name     string  `json:"name"`
+	ID       int64   `json:"id"`
 	Type     string  `json:"type"`
 	Children []int64 `json:"children"`
 }
@@ -56,7 +55,7 @@ type osdEntity struct {
 	CrushRule string `json:"{#CRUSHRULE}"`
 }
 
-// getNode TODO.
+// getNode finds a node in a tree by a given nodeID.
 func getNode(tree []node, nodeID int64) (*node, error) {
 	for _, n := range tree {
 		if n.ID == nodeID {
@@ -67,7 +66,7 @@ func getNode(tree []node, nodeID int64) (*node, error) {
 	return nil, fmt.Errorf(`cannot find node "%d"`, nodeID)
 }
 
-// getStepOpTake TODO.
+// getStepOpTake finds a step with a "take" op for a given rule.
 func getStepOpTake(rule crushRule) (*step, error) {
 	for _, s := range rule.Steps {
 		if s.Op == "take" {
@@ -78,8 +77,8 @@ func getStepOpTake(rule crushRule) (*step, error) {
 	return nil, fmt.Errorf(`cannot find step with "take" op for rule %q`, rule.Name)
 }
 
-// walkCrushTree TODO.
-func walkCrushTree(tree []node, rootNodeID int64) (res []*node, err error) {
+// walkCrushTree recursively walks a tree starting from the rootNodeID and returns a list of children nodes (type "osd").
+func walkCrushTree(tree []node, rootNodeID int64) (children []*node, err error) {
 	rootNode, err := getNode(tree, rootNodeID)
 	if err != nil {
 		return nil, err
@@ -96,14 +95,14 @@ func walkCrushTree(tree []node, rootNodeID int64) (res []*node, err error) {
 		}
 
 		if len(childNodes) > 0 {
-			res = append(res, childNodes...)
+			children = append(children, childNodes...)
 		}
 	}
 
 	return
 }
 
-// osdDiscoveryHandler TODO.
+// osdDiscoveryHandler returns list of OSDs in LLD format.
 func osdDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
 		crushRules []crushRule
@@ -173,7 +172,7 @@ type poolEntity struct {
 	CrushRule string `json:"{#CRUSHRULE}"`
 }
 
-// osdDiscoveryHandler TODO.
+// osdDiscoveryHandler returns list of pools in LLD format.
 func poolDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 	var (
 		poolsDump  osdDumpPool
