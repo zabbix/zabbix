@@ -156,7 +156,6 @@ class CTabFilterItem extends CBaseComponent {
 	 * Set selected state of item.
 	 */
 	setSelected() {
-		this._target.focus();
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_SELECTED);
 		this.renderContentTemplate();
 
