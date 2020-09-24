@@ -465,7 +465,7 @@ class CTemplateScreenConverter extends CConverter {
 				if ($screen_item['style'] == TIME_TYPE_HOST) {
 					$fields[] = [
 						'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
-						'name' => 'value',
+						'name' => 'itemid',
 						'value' => $screen_item['resource']
 					];
 				}
@@ -480,7 +480,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH,
-					'name' => 'value',
+					'name' => 'graphid',
 					'value' => $screen_item['resource']
 				];
 				break;
@@ -494,7 +494,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
-					'name' => 'value',
+					'name' => 'itemid',
 					'value' => $screen_item['resource']
 				];
 				break;
@@ -508,7 +508,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-					'name' => 'value',
+					'name' => 'graphid',
 					'value' => $screen_item['resource']
 				];
 				$fields[] = [
@@ -532,7 +532,7 @@ class CTemplateScreenConverter extends CConverter {
 				];
 				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
-					'name' => 'value',
+					'name' => 'itemid',
 					'value' => $screen_item['resource']
 				];
 				$fields[] = [
@@ -551,7 +551,7 @@ class CTemplateScreenConverter extends CConverter {
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT;
 				$fields[] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
-					'name' => 'value',
+					'name' => 'itemids',
 					'value' => $screen_item['resource']
 				];
 				$fields[] = [
