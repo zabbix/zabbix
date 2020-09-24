@@ -79,7 +79,7 @@ function getMenuPopupHistory(options) {
  * @param {string} options[]['scriptid']         Script ID.
  * @param {string} options[]['confirmation']     Confirmation text.
  * @param {bool}   options['showGraphs']         Link to Monitoring->Hosts->Graphs page.
- * @param {bool}   options['showScreens']        Link to Monitoring->Screen page.
+ * @param {bool}   options['showDashboards']     Link to Monitoring->Hosts->Dashboards page.
  * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
  * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
  * @param {bool}   options['hasGoTo']            "Go to" block in popup.
@@ -110,8 +110,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs = {
 				label: t('Graphs')
 			},
-			screens = {
-				label: t('Screens')
+			dashboards = {
+				label: t('Dashboards')
 			},
 			web = {
 				label: t('Web')
@@ -166,14 +166,15 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs.url = graphs_url.getUrl();
 		}
 
-		if (!options.showScreens) {
-			screens.disabled = true;
+		if (!options.showDashboards) {
+			dashboards.disabled = true;
 		}
 		else {
-			var screens_url = new Curl('host_screen.php', false);
+			var dashboards_url = new Curl('zabbix.php', false);
 
-			screens_url.setArgument('hostid', options.hostid);
-			screens.url = screens_url.getUrl();
+			dashboards_url.setArgument('action', 'host.dashboard.view')
+			dashboards_url.setArgument('hostid', options.hostid)
+			dashboards.url = dashboards_url.getUrl();
 		}
 
 		if (!options.showWeb) {
@@ -192,7 +193,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			latest_data,
 			problems,
 			graphs,
-			screens,
+			dashboards,
 			web
 		];
 

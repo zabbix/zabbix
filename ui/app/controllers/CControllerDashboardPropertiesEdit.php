@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerDashboardPropertiesEdit extends CControllerDashboardAbstract {
+class CControllerDashboardPropertiesEdit extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -71,7 +71,7 @@ class CControllerDashboardPropertiesEdit extends CControllerDashboardAbstract {
 
 			$data['dashboard']['owner'] = [
 				'id' => $userid,
-				'name' => self::getOwnerName($userid)
+				'name' => CDashboardHelper::getOwnerName($userid)
 			];
 		}
 

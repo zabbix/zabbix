@@ -23,7 +23,7 @@
  * controller dashboard list
  *
  */
-class CControllerDashboardList extends CControllerDashboardAbstract {
+class CControllerDashboardList extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -113,7 +113,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		self::updateEditableFlag($data['dashboards']);
+		CDashboardHelper::updateEditableFlag($data['dashboards']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));

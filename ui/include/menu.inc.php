@@ -37,7 +37,7 @@ function getMainMenu(): CMenu {
 				(new CMenuItem(_('Hosts')))
 					->setAction('host.view')
 					->setAliases(['web.view', 'charts.view', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
-						'httpdetails.php', 'host_screen.php'
+						'httpdetails.php', 'host.dashboard.view'
 					]),
 				(new CMenuItem(_('Overview')))
 					->setUrl(new CUrl('overview.php'), 'overview.php'),

@@ -1455,3 +1455,34 @@ function renderInterfaceHeaders() {
 				])
 		);
 }
+
+function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
+	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
+
+	$dashboards = [];
+
+	$templateids = array_keys(API::Template()->get([
+		'output' => [],
+		'hostids' => [$hostid],
+		'preservekeys' => true
+	]));
+
+	while ($templateids) {
+		$templates = API::Template()->get([
+			'output' => [],
+			'templateids' => $templateids,
+			'selectParentTemplates' => ['templateid'],
+			'selectDashboards' => $dashboard_fields,
+			'preservekeys' => true
+		]);
+
+		$templateids = [];
+
+		foreach ($templates as $template) {
+			$dashboards += $template['dashboards'];
+			$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
+		}
+	}
+
+	return $dashboards;
+}

@@ -85,64 +85,65 @@ if ($data['dynamic']['has_dynamic_widgets']) {
 $widget = (new CWidget())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CList())
-		->setId('dashbrd-control')
-		->addItem($main_filter_form)
-		->addItem((new CTag('nav', true, [
-			(new CList())
-				->addItem((new CButton('dashbrd-edit', _('Edit dashboard')))
-					->setEnabled($data['dashboard']['editable'])
-					->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
-				)
-				->addItem((new CButton('', '&nbsp;'))
-					->addClass(ZBX_STYLE_BTN_ACTION)
-					->setId('dashbrd-actions')
-					->setTitle(_('Actions'))
-					->setAttribute('aria-haspopup', true)
-					->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
-						$data['dashboard']['editable']
-					))
-				)
-				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-		]))
-			->setAttribute('aria-label', _('Content controls'))
-		)
-		->addItem((new CListItem([
-			(new CTag('nav', true, [
-				new CList([
-					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
-					(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
-						->addClass(ZBX_STYLE_BTN_ALT),
-					(new CButton('dashbrd-paste-widget', _('Paste widget')))
-						->addClass(ZBX_STYLE_BTN_ALT)
-						->setEnabled(false),
-					(new CButton('dashbrd-save', _('Save changes'))),
-					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
-					''
-				])
-			]))
-				->setAttribute('aria-label', _('Content controls'))
-				->addClass(ZBX_STYLE_DASHBRD_EDIT)
-		]))
-			->addStyle('display: none')
-		)
-	)
-		->setBreadcrumbs((new CList())
+	->setControls(
+		(new CList())
+			->setId('dashbrd-control')
+			->addItem($main_filter_form)
+			->addItem((new CTag('nav', true, [
+				(new CList())
+					->addItem(
+						(new CButton('dashbrd-edit', _('Edit dashboard')))
+							->setEnabled($data['dashboard']['editable'])
+							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
+					)
+					->addItem(
+						(new CButton('', '&nbsp;'))
+							->addClass(ZBX_STYLE_BTN_ACTION)
+							->setId('dashbrd-actions')
+							->setTitle(_('Actions'))
+							->setAttribute('aria-haspopup', true)
+							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
+								$data['dashboard']['editable']
+							))
+					)
+					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+			]))->setAttribute('aria-label', _('Content controls')))
+			->addItem((new CListItem([
+				(new CTag('nav', true, [
+					new CList([
+						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
+						(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
+							->addClass(ZBX_STYLE_BTN_ALT),
+						(new CButton('dashbrd-paste-widget', _('Paste widget')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setEnabled(false),
+						(new CButton('dashbrd-save', _('Save changes'))),
+						(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
+						''
+					])
+				]))
+					->setAttribute('aria-label', _('Content controls'))
+					->addClass(ZBX_STYLE_DASHBRD_EDIT)
+			]))->addStyle('display: none'))
+	)->setBreadcrumbs(
+		(new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
 			->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
 				'dashboard' => $data['dashboard']
 			]))
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
-			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-		);
+				->addClass(ZBX_STYLE_OBJECT_GROUP)
+				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+	);
 
 if ($data['time_selector'] !== null) {
-	$widget->addItem((new CFilter(new CUrl()))
-		->setProfile($data['time_selector']['profileIdx'], $data['time_selector']['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['time_selector']['from'], $data['time_selector']['to'],
-			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+	$widget->addItem(
+		(new CFilter(new CUrl()))
+			->setProfile($data['time_selector']['profileIdx'], $data['time_selector']['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($data['time_selector']['from'], $data['time_selector']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
+			)
 	);
 }
 

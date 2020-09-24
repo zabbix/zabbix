@@ -19,9 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
-
-class CControllerDashboardView extends CControllerDashboardAbstract {
+class CControllerDashboardView extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -96,10 +94,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
-			'time_selector' => self::hasTimeSelector($dashboard['widgets'])
+			'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
 				? getTimeSelectorPeriod($time_selector_options)
 				: null,
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
 		];
 
 		if (self::hasDynamicWidgets($dashboard['widgets'])) {
@@ -146,7 +144,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'widgets' => [],
 				'owner' => [
 					'id' => CWebUser::$data['userid'],
-					'name' => self::getOwnerName(CWebUser::$data['userid'])
+					'name' => self::CDashboardHelper(CWebUser::$data['userid'])
 				]
 			];
 		}
@@ -157,7 +155,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
-				'dashboardids' => $this->getInput('source_dashboardid')
+				'dashboardids' => [$this->getInput('source_dashboardid')]
 			]);
 
 			if ($dashboards) {
@@ -165,10 +163,12 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'dashboardid' => null,
 					'name' => $dashboards[0]['name'],
 					'editable' => true,
-					'widgets' => self::prepareWidgetsForGrid(self::unsetInaccessibleFields($dashboards[0]['widgets'])),
+					'widgets' => CDashboardHelper::prepareWidgetsForGrid(
+						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['widgets']), null, true
+					),
 					'owner' => [
 						'id' => CWebUser::$data['userid'],
-						'name' => self::getOwnerName(CWebUser::$data['userid'])
+						'name' => self::CDashboardHelper(CWebUser::$data['userid'])
 					],
 					'sharing' => [
 						'private' => $dashboards[0]['private'],
@@ -204,18 +204,18 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid'],
 					'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
-					'dashboardids' => $dashboardid,
+					'dashboardids' => [$dashboardid],
 					'preservekeys' => true
 				]);
 
 				if ($dashboards) {
-					self::updateEditableFlag($dashboards);
+					CDashboardHelper::updateEditableFlag($dashboards);
 
 					$dashboard = array_shift($dashboards);
-					$dashboard['widgets'] = self::prepareWidgetsForGrid($dashboard['widgets']);
+					$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'], null, true);
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],
-						'name' => self::getOwnerName($dashboard['userid'])
+						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
 					];
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
@@ -230,83 +230,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		}
 
 		return [$dashboard, $error];
-	}
-
-	/**
-	 * Prepare widgets for dashboard grid.
-	 *
-	 * @static
-	 *
-	 * @return array
-	 */
-	private static function prepareWidgetsForGrid($widgets) {
-		$grid_widgets = [];
-
-		if ($widgets) {
-			CArrayHelper::sort($widgets, ['y', 'x']);
-
-			$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes(CWidgetConfig::CONTEXT_DASHBOARD));
-
-			foreach ($widgets as $widget) {
-				if (!in_array($widget['type'], $known_widget_types)) {
-					continue;
-				}
-
-				$widgetid = $widget['widgetid'];
-				$fields_orig = self::convertWidgetFields($widget['fields']);
-
-				// Transforms corrupted data to default values.
-				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig), null);
-				$widget_form->validate();
-				$fields = $widget_form->getFieldsData();
-
-				$rf_rate = ($fields['rf_rate'] == -1)
-					? CWidgetConfig::getDefaultRfRate($widget['type'])
-					: $fields['rf_rate'];
-
-				$grid_widgets[] = [
-					'widgetid' => $widgetid,
-					'type' => $widget['type'],
-					'header' => $widget['name'],
-					'view_mode' => $widget['view_mode'],
-					'pos' => [
-						'x' => (int) $widget['x'],
-						'y' => (int) $widget['y'],
-						'width' => (int) $widget['width'],
-						'height' => (int) $widget['height']
-					],
-					'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
-					'fields' => $fields_orig,
-					'configuration' => CWidgetConfig::getConfiguration($widget['type'], $fields, $widget['view_mode'])
-				];
-			}
-		}
-
-		return $grid_widgets;
-	}
-
-	/**
-	 * Converts fields, received from API to key/value format.
-	 *
-	 * @param array $fields  fields as received from API
-	 *
-	 * @static
-	 *
-	 * @return array
-	 */
-	private static function convertWidgetFields($fields) {
-		$ret = [];
-		foreach ($fields as $field) {
-			if (array_key_exists($field['name'], $ret)) {
-				$ret[$field['name']] = (array) $ret[$field['name']];
-				$ret[$field['name']][] = $field['value'];
-			}
-			else {
-				$ret[$field['name']] = $field['value'];
-			}
-		}
-
-		return $ret;
 	}
 
 	/**
@@ -325,24 +248,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			}
 		}
 
-		return false;
-	}
-
-	/**
-	 * Checks, if any of widgets needs time selector.
-	 *
-	 * @param array $widgets
-	 *
-	 * @static
-	 *
-	 * @return bool
-	 */
-	private static function hasTimeSelector(array $widgets) {
-		foreach ($widgets as $widget) {
-			if (CWidgetConfig::usesTimeSelector($widget)) {
-				return true;
-			}
-		}
 		return false;
 	}
 }

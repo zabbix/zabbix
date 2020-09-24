@@ -19,9 +19,9 @@
 **/
 
 
-class CControllerTemplateDashboardEdit extends CController {
+class CControllerHostDashboardView extends CController {
 
-	private $dashboard;
+	private $host;
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -29,13 +29,13 @@ class CControllerTemplateDashboardEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'db dashboard.templateid',
-			'dashboardid' => 'db dashboard.dashboardid'
+			'hostid' => 'required|db hosts.hostid',
+			'dashboardid' => 'db dashboard.dashboardid',
+			'from' => 'range_time',
+			'to' => 'range_time'
 		];
 
-		$ret = $this->validateInput($fields);
-
-		$ret = $ret && ($this->hasInput('templateid') || $this->hasInput('dashboardid'));
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -45,122 +45,90 @@ class CControllerTemplateDashboardEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_ADMIN) {
+		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
 			return false;
 		}
 
-		if ($this->hasInput('dashboardid')) {
-			$dashboards = API::TemplateDashboard()->get([
-				'output' => ['dashboardid', 'name', 'templateid'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
-				'dashboardids' => $this->getInput('dashboardid'),
-				'editable' => true
-			]);
+		$hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'selectParentTemplates' => ['templateid'],
+			'hostids' => [$this->getInput('hostid')]
+		]);
 
-			$this->dashboard = $dashboards[0];
+		$this->host = array_shift($hosts);
 
-			return (bool) $this->dashboard;
-		}
-		else {
-			return isWritableHostTemplates((array) $this->getInput('templateid'));
-		}
+		return (bool) $this->host;
 	}
 
 	protected function doAction() {
-		if ($this->hasInput('dashboardid')) {
-			$dashboard = $this->dashboard;
-			$dashboard['widgets'] = self::prepareWidgetsForGrid($dashboard['widgets'], $dashboard['templateid']);
+		$host_dashboards = $this->getSortedHostDashboards();
+
+		if (!$host_dashboards) {
+			$data = ['error' => _('No data found.')];
 		}
 		else {
-			$dashboard = [
-				'templateid' => $this->getInput('templateid'),
-				'name' => _('New dashboard'),
-				'widgets' => []
-			];
-		}
+			$dashboardid = $this->hasInput('dashboardid')
+				? $this->getInput('dashboardid')
+				: CProfile::get('web.host.dashboard.dashboardid', null, $this->getInput('hostid'));
 
-		$data = [
-			'dashboard' => $dashboard,
-			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
-			'page' => CPagerHelper::loadPage('template.dashboard.list', null)
-		];
+			if (!array_key_exists($dashboardid, $host_dashboards)) {
+				$dashboardid = array_keys($host_dashboards)[0];
+			}
+
+			$dashboards = API::TemplateDashboard()->get([
+				'output' => ['dashboardid', 'name', 'templateid'],
+				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+				'dashboardids' => [$dashboardid]
+			]);
+
+			$dashboard = array_shift($dashboards);
+
+			if ($dashboard !== null) {
+				CProfile::update('web.host.dashboard.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID,
+					$this->getInput('hostid')
+				);
+
+				$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'],
+					$dashboard['templateid'], true
+				);
+
+				$time_selector_options = [
+					'profileIdx' => 'web.host.dashboard.filter',
+					'profileIdx2' => $dashboard['dashboardid'],
+					'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+					'to' => $this->hasInput('to') ? $this->getInput('to') : null
+				];
+
+				updateTimeSelectorPeriod($time_selector_options);
+
+				$data = [
+					'host' => $this->host,
+					'host_dashboards' => $host_dashboards,
+					'dashboard' => $dashboard,
+					'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
+					'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
+						? getTimeSelectorPeriod($time_selector_options)
+						: null,
+					'active_tab' => CProfile::get('web.host.dashboard.filter.active', 1)
+				];
+			}
+			else {
+				$data = ['error' => _('No permissions to referred object or it does not exist!')];
+
+				CProfile::delete('web.host.dashboard.dashboardid', $this->getInput('hostid'));
+			}
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of dashboards'));
 		$this->setResponse($response);
 	}
 
-	/**
-	 * Prepare widgets for dashboard grid.
-	 *
-	 * @static
-	 *
-	 * @return array
-	 */
-	private static function prepareWidgetsForGrid(array $widgets, string $templateid): array {
-		$grid_widgets = [];
+	private function getSortedHostDashboards(): array {
+		$dashboards = getHostDashboards($this->host['hostid'], ['dashboardid', 'name']);
 
-		if ($widgets) {
-			CArrayHelper::sort($widgets, ['y', 'x']);
+		CArrayHelper::sort($dashboards, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
-			$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes(
-				CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-			));
-
-			foreach ($widgets as $widget) {
-				if (!in_array($widget['type'], $known_widget_types)) {
-					continue;
-				}
-
-				$widgetid = $widget['widgetid'];
-				$fields_orig = self::convertWidgetFields($widget['fields']);
-
-				// Transforms corrupted data to default values.
-				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig), $templateid);
-				$widget_form->validate();
-				$fields = $widget_form->getFieldsData();
-
-				$grid_widgets[] = [
-					'widgetid' => $widgetid,
-					'type' => $widget['type'],
-					'header' => $widget['name'],
-					'view_mode' => $widget['view_mode'],
-					'pos' => [
-						'x' => (int) $widget['x'],
-						'y' => (int) $widget['y'],
-						'width' => (int) $widget['width'],
-						'height' => (int) $widget['height']
-					],
-					'fields' => $fields_orig,
-					'configuration' => CWidgetConfig::getConfiguration($widget['type'], $fields, $widget['view_mode'])
-				];
-			}
-		}
-
-		return $grid_widgets;
-	}
-
-	/**
-	 * Converts fields, received from API to key/value format.
-	 *
-	 * @param array $fields  fields as received from API
-	 *
-	 * @static
-	 *
-	 * @return array
-	 */
-	private static function convertWidgetFields(array $fields) {
-		$ret = [];
-		foreach ($fields as $field) {
-			if (array_key_exists($field['name'], $ret)) {
-				$ret[$field['name']] = (array) $ret[$field['name']];
-				$ret[$field['name']][] = $field['value'];
-			}
-			else {
-				$ret[$field['name']] = $field['value'];
-			}
-		}
-
-		return $ret;
+		return array_combine(array_column($dashboards, 'dashboardid'), array_column($dashboards, 'name'));
 	}
 }

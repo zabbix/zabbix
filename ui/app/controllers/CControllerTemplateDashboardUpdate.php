@@ -63,7 +63,7 @@ class CControllerTemplateDashboardUpdate extends CControllerDashboardUpdateAbstr
 		if ($this->hasInput('dashboardid')) {
 			return (bool) API::TemplateDashboard()->get([
 				'output' => [],
-				'dashboardids' => $this->getInput('dashboardid'),
+				'dashboardids' => [$this->getInput('dashboardid')],
 				'templateids' => [$this->getInput('templateid')],
 				'editable' => true
 			]);

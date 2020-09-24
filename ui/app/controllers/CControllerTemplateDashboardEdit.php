@@ -53,7 +53,7 @@ class CControllerTemplateDashboardEdit extends CController {
 			$dashboards = API::TemplateDashboard()->get([
 				'output' => ['dashboardid', 'name', 'templateid'],
 				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
-				'dashboardids' => $this->getInput('dashboardid'),
+				'dashboardids' => [$this->getInput('dashboardid')],
 				'editable' => true
 			]);
 
@@ -69,7 +69,9 @@ class CControllerTemplateDashboardEdit extends CController {
 	protected function doAction() {
 		if ($this->hasInput('dashboardid')) {
 			$dashboard = $this->dashboard;
-			$dashboard['widgets'] = self::prepareWidgetsForGrid($dashboard['widgets'], $dashboard['templateid']);
+			$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'],
+				$dashboard['templateid'], false
+			);
 		}
 		else {
 			$dashboard = [
@@ -88,79 +90,5 @@ class CControllerTemplateDashboardEdit extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of dashboards'));
 		$this->setResponse($response);
-	}
-
-	/**
-	 * Prepare widgets for dashboard grid.
-	 *
-	 * @static
-	 *
-	 * @return array
-	 */
-	private static function prepareWidgetsForGrid(array $widgets, string $templateid): array {
-		$grid_widgets = [];
-
-		if ($widgets) {
-			CArrayHelper::sort($widgets, ['y', 'x']);
-
-			$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes(
-				CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-			));
-
-			foreach ($widgets as $widget) {
-				if (!in_array($widget['type'], $known_widget_types)) {
-					continue;
-				}
-
-				$widgetid = $widget['widgetid'];
-				$fields_orig = self::convertWidgetFields($widget['fields']);
-
-				// Transforms corrupted data to default values.
-				$widget_form = CWidgetConfig::getForm($widget['type'], json_encode($fields_orig), $templateid);
-				$widget_form->validate();
-				$fields = $widget_form->getFieldsData();
-
-				$grid_widgets[] = [
-					'widgetid' => $widgetid,
-					'type' => $widget['type'],
-					'header' => $widget['name'],
-					'view_mode' => $widget['view_mode'],
-					'pos' => [
-						'x' => (int) $widget['x'],
-						'y' => (int) $widget['y'],
-						'width' => (int) $widget['width'],
-						'height' => (int) $widget['height']
-					],
-					'fields' => $fields_orig,
-					'configuration' => CWidgetConfig::getConfiguration($widget['type'], $fields, $widget['view_mode'])
-				];
-			}
-		}
-
-		return $grid_widgets;
-	}
-
-	/**
-	 * Converts fields, received from API to key/value format.
-	 *
-	 * @param array $fields  fields as received from API
-	 *
-	 * @static
-	 *
-	 * @return array
-	 */
-	private static function convertWidgetFields(array $fields) {
-		$ret = [];
-		foreach ($fields as $field) {
-			if (array_key_exists($field['name'], $ret)) {
-				$ret[$field['name']] = (array) $ret[$field['name']];
-				$ret[$field['name']][] = $field['value'];
-			}
-			else {
-				$ret[$field['name']] = $field['value'];
-			}
-		}
-
-		return $ret;
 	}
 }

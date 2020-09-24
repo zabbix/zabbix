@@ -50,7 +50,7 @@ class CControllerDashboardShareEdit extends CController {
 			'output' => ['dashboardid', 'private'],
 			'selectUsers' => ['userid', 'permission'],
 			'selectUserGroups' => ['usrgrpid', 'permission'],
-			'dashboardids' => $this->getInput('dashboardid'),
+			'dashboardids' => [$this->getInput('dashboardid')],
 			'editable' => true
 		]);
 

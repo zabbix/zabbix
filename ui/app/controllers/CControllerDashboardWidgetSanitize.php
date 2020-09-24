@@ -24,7 +24,7 @@
  *
  * This involves unset of unaccessible values specified in copied widget fields.
  */
-class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
+class CControllerDashboardWidgetSanitize extends CController {
 
 	private $context;
 
@@ -70,7 +70,7 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 		$fields = $form->fieldsToApi();
 
 		if ($this->context === CWidgetConfig::CONTEXT_DASHBOARD) {
-			$fields = self::unsetInaccessibleFields([['fields' => $fields]])[0]['fields'];
+			$fields = CDashboardHelper::unsetInaccessibleFields([['fields' => $fields]])[0]['fields'];
 		}
 
 		$output = [

@@ -52,7 +52,7 @@ class CControllerDashboardShareUpdate extends CController {
 	protected function doAction() {
 		$editable_dashboard = (bool) API::Dashboard()->get([
 			'output' => [],
-			'dashboardids' => $this->getInput('dashboardid'),
+			'dashboardids' => [$this->getInput('dashboardid')],
 			'editable' => true
 		]);
 
