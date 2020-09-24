@@ -459,7 +459,7 @@ class CTabFilter extends CBaseComponent {
 					dropdown = [{
 						items: [{
 							label: this._items[0]._target.getAttribute('aria-label'),
-							clickCallback: () => this._items[0].fire(TABFILTERITEM_EVENT_EXPAND)
+							clickCallback: () => this._items[0].fire(TABFILTERITEM_EVENT_SELECT)
 						}]
 					}],
 					items = this._timeselector ? this._items.slice(1, -1) : this._items.slice(1);
@@ -470,7 +470,7 @@ class CTabFilter extends CBaseComponent {
 							label: item._data.filter_name,
 							dataAttributes: (item._data.filter_show_counter && !item._unsaved)
 								? {'data-counter': item.getCounter()} : [],
-							clickCallback: () => item.fire(TABFILTERITEM_EVENT_EXPAND)
+							clickCallback: () => item.fire(TABFILTERITEM_EVENT_SELECT)
 						});
 					}
 
