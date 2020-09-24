@@ -48,7 +48,9 @@ class CTemplateDashboardImporter extends CImporter {
 			foreach ($dashboards as $name => $dashboard) {
 				$dashboard['widgets'] = $this->resolveDashboardWidgetReferences($dashboard['widgets'], $name);
 
-				if ($this->referencer->resolveTemplateDashboards($templateid, $name)) {
+				$dashboardid = $this->referencer->resolveTemplateDashboards($templateid, $name);
+				if ($dashboardid) {
+					$dashboard['dashboardid'] = $dashboardid;
 					$dashboards_update[] = $dashboard;
 				}
 				else {
