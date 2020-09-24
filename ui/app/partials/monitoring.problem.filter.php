@@ -374,8 +374,9 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
-		let fields = ['show', 'application', 'name', 'tag_priority', 'show_opdata', 'show_suppressed',
-				'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age'
+		let fields = ['show', 'application', 'name', 'tag_priority', 'show_opdata', 'show_suppressed', 'show_tags',
+				'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age',
+				'tag_name_format', 'evaltype'
 			],
 			eventHandler = {
 				show: () => {
