@@ -118,10 +118,9 @@ if ($data['action'] === 'problem.view') {
 		// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
 		$data['filter_options'] = $filter->options;
 		$widget->addItem($filter);
-
-		$this->includeJsFile('monitoring.problem.view.js.php', $data);
 	}
 
+	$this->includeJsFile('monitoring.problem.view.js.php', $data);
 	$widget
 		->addItem($screen->get())
 		->show();

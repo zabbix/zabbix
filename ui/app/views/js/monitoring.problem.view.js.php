@@ -23,17 +23,17 @@
  * @var CView $this
  */
 
-?>
-<script type="text/javascript">
-	jQuery(function($) {
+if (array_key_exists('filter_options', $data)) { ?>
+	<script type="text/javascript">
+	$(function() {
 		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>),
-			refresh_interval = <?= $data['refresh_interval'] ?>,
-			refresh_url = '<?= $data['refresh_url'] ?>',
-			refresh_timer,
-			global_timerange = {
-				from: filter._timeselector._data.from,
-				to: filter._timeselector._data.to
-			};
+				refresh_interval = <?= $data['refresh_interval'] ?>,
+				refresh_url = '<?= $data['refresh_url'] ?>',
+				refresh_timer,
+				global_timerange = {
+					from: filter._timeselector._data.from,
+					to: filter._timeselector._data.to
+				};
 
 		filter.on(TABFILTER_EVENT_URLSET, () => {
 			let url = new Curl();
@@ -99,7 +99,13 @@
 				global_timerange.to = data.to;
 			}
 		});
-
+	});
+	</script>
+<?php
+}
+?>
+<script type="text/javascript">
+	jQuery(function($) {
 		$(document).on({
 			mouseenter: function() {
 				if ($(this)[0].scrollWidth > $(this)[0].offsetWidth) {
