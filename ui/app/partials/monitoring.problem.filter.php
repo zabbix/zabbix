@@ -481,6 +481,7 @@ if (array_key_exists('render_html', $data)) {
 					hostgroups: 'groupids_' + data.uniqid
 				},
 				parameters: {
+					multiselect: 1,
 					srctbl: 'hosts',
 					srcfld1: 'hostid',
 					dstfrm: 'zbx_filter',
