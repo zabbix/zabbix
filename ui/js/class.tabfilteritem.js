@@ -346,6 +346,10 @@ class CTabFilterItem extends CBaseComponent {
 	 * Request filter results for fields defined before last 'Apply' being used.
 	 */
 	setBrowserLocationToApplyUrl() {
+		if (this._apply_url === null) {
+			this.updateApplyUrl();
+		}
+
 		this.setBrowserLocation(new URLSearchParams(this._apply_url));
 	}
 
