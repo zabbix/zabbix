@@ -2,7 +2,7 @@
 Provides native Zabbix solution for monitoring Ceph clusters (distributed storage system). It can monitor several 
 Ceph instances simultaneously, remote or local to the Zabbix Agent.
 Best for use in conjunction with the official 
-[Template App Сeph Agent 2](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/Ceph_agent2). 
+[Template App Сeph Agent 2](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/ceph_agent2). 
 You can extend it or create your template for your specific needs. 
 
 ## Requirements
@@ -11,7 +11,7 @@ You can extend it or create your template for your specific needs.
 - Ceph version 14+
 
 ## Installation
-* Configure the Ceph RESTful Module according to [documentation.](https://docs.Ceph.com/en/latest/mgr/restful/)  
+* Configure the Ceph RESTful Module according to [documentation.](https://docs.ceph.com/en/latest/mgr/restful/)  
 * Make sure a RESTful API endpoint is available for connection.  
 
 ## Configuration
