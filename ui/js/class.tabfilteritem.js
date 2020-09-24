@@ -120,6 +120,7 @@ class CTabFilterItem extends CBaseComponent {
 			defaults.filter_name = this._data.filter_name;
 		}
 
+		this.updateUnsavedState();
 		return PopUp('popup.tabfilter.edit', {...defaults, ...params}, 'tabfilter_dialogue', edit_elm);
 	}
 
@@ -256,15 +257,12 @@ class CTabFilterItem extends CBaseComponent {
 				filter_name: form.querySelector('[name="filter_name"]'),
 				filter_show_counter: form.querySelector('[name="filter_show_counter"]'),
 				filter_custom_time: form.querySelector('[name="filter_custom_time"]')
-			},
-			search_params;
+			};
 
 		if (data.filter_custom_time) {
 			this._data.from = data.from;
 			this._data.to = data.to;
 		}
-
-		search_params = this.getFilterParams();
 
 		Object.keys(fields).forEach((key) => {
 			this._data[key] = data[key];
@@ -272,8 +270,6 @@ class CTabFilterItem extends CBaseComponent {
 			if (fields[key] instanceof HTMLElement) {
 				fields[key].value = data[key];
 			}
-
-			search_params.set(key, this._data[key]);
 		});
 
 		if (data.filter_show_counter) {
@@ -283,8 +279,12 @@ class CTabFilterItem extends CBaseComponent {
 			this.removeCounter();
 		}
 
+		if (!this._unsaved) {
+			this.updateApplyUrl();
+		}
+
 		this._target.text = data.filter_name;
-		this.setBrowserLocation(search_params);
+		this.setBrowserLocationToApplyUrl();
 	}
 
 	/**

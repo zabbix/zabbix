@@ -411,7 +411,6 @@ class CTabFilter extends CBaseComponent {
 					});
 				}
 				else {
-					item.updateApplyUrl();
 					this.setSelectedItem(item);
 				}
 			},
