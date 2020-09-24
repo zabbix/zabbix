@@ -70,6 +70,17 @@ if (array_key_exists('filter_options', $data)) { ?>
 			window.flickerfreeScreen.screens['problem'].data.sortorder = data.sortorder;
 			window.flickerfreeScreen.screens['problem'].timeline.from = data.from;
 			window.flickerfreeScreen.screens['problem'].timeline.to = data.to;
+
+			// Close all opened hint boxes otherwise flicker free screen will not refresh it content.
+			for (var i = overlays_stack.length - 1; i >= 0; i--) {
+				let hintbox = overlays_stack.getById(overlays_stack.stack[i]);
+
+				if (hintbox.type === 'hintbox') {
+					hintBox.hideHint(hintbox.element, true);
+					removeFromOverlaysStack(overlays_stack.stack[i]);
+				}
+			}
+
 			window.flickerfreeScreen.refresh('problem');
 		}
 
