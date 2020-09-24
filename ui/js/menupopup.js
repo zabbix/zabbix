@@ -138,17 +138,17 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		else {
 			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
-			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('hostids[]', options.hostid);
 			if (typeof options.severities !== 'undefined') {
-				url.setArgument('filter_severities[]', options.severities);
+				url.setArgument('severities[]', options.severities);
 			}
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-				url.setArgument('filter_show_suppressed', '1');
+				url.setArgument('show_suppressed', '1');
 			}
 			if (typeof options.filter_application !== 'undefined') {
-				url.setArgument('filter_application', options.filter_application);
+				url.setArgument('application', options.filter_application);
 			}
-			url.setArgument('filter_set', '1');
+
 			problems.url = url.getUrl();
 		}
 
@@ -305,17 +305,16 @@ function getMenuPopupMapElementGroup(options) {
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_groupids[]', options.groupid);
+	problems_url.setArgument('groupids[]', options.groupid);
 	if (typeof options.severities !== 'undefined') {
-		problems_url.setArgument('filter_severities[]', options.severities);
+		problems_url.setArgument('severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-		problems_url.setArgument('filter_show_suppressed', '1');
+		problems_url.setArgument('show_suppressed', '1');
 	}
 	if (typeof options.filter_application !== 'undefined') {
-		problems_url.setArgument('filter_application', options.filter_application);
+		problems_url.setArgument('application', options.filter_application);
 	}
-	problems_url.setArgument('filter_set', '1');
 
 	sections.push({
 		label: t('Go to'),
@@ -353,14 +352,13 @@ function getMenuPopupMapElementTrigger(options) {
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_triggerids[]', options.triggerids);
+	problems_url.setArgument('triggerids[]', options.triggerids);
 	if (typeof options.severities !== 'undefined') {
-		problems_url.setArgument('filter_severities[]', options.severities);
+		problems_url.setArgument('severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-		problems_url.setArgument('filter_show_suppressed', '1');
+		problems_url.setArgument('show_suppressed', '1');
 	}
-	problems_url.setArgument('filter_set', '1');
 
 	sections.push({
 		label: t('Go to'),
@@ -715,8 +713,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_triggerids[]', options.triggerid);
-		url.setArgument('filter_set', '1');
+		url.setArgument('triggerids[]', options.triggerid);
 
 		events.url = url.getUrl();
 	}
