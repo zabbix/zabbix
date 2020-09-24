@@ -327,7 +327,7 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		$interfaceid = 1;
 		foreach ($_REQUEST['interfaces'] as &$interface) {
 			$interface['interfaceid'] = (string) $interfaceid++;
-			unset($interface['locked'], $interface['items']);
+			unset($interface['items']);
 		}
 		unset($interface);
 	}
@@ -1163,7 +1163,7 @@ elseif (hasRequest('form')) {
 			$data['visiblename'] = $dbHost['name'];
 			$data['interfaces'] = API::HostInterface()->get([
 				'output' => API_OUTPUT_EXTEND,
-				'selectItems' => ['type'],
+				'selectItems' => ['itemid'],
 				'hostids' => [$data['hostid']],
 				'sortfield' => 'interfaceid'
 			]);
@@ -1189,21 +1189,6 @@ elseif (hasRequest('form')) {
 
 			// Interfaces
 			foreach ($data['interfaces'] as &$interface) {
-				if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$interface['locked'] = true;
-				}
-				else {
-					// check if interface has items that require specific interface type, if so type cannot be changed
-					$interface['locked'] = false;
-					foreach ($interface['items'] as $item) {
-						$type = itemTypeInterface($item['type']);
-						if ($type !== false && $type != INTERFACE_TYPE_ANY) {
-							$interface['locked'] = true;
-							break;
-						}
-					}
-				}
-
 				$interface['items'] = (bool) $interface['items'];
 			}
 			unset($interface);

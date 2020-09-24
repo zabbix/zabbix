@@ -234,9 +234,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					: SNMP_BULK_DISABLED;
 			}
 
-			unset($interfaces[$key]['isNew'], $interfaces[$key]['items'], $interfaces[$key]['locked'],
-				$interfaces[$key]['interfaceid']
-			);
+			unset($interfaces[$key]['isNew'], $interfaces[$key]['items'], $interfaces[$key]['interfaceid']);
 			$interfaces[$key]['main'] = 0;
 		}
 

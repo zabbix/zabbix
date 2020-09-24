@@ -26,7 +26,6 @@
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
 <div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="interface_row_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
-	<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
@@ -340,7 +339,6 @@
 		renderRow(iface) {
 			const container = document.querySelector(this.CONTAINER_IDS[iface.type]);
 			const disabled = (iface.items > 0);
-			const locked = (iface.locked > 0);
 
 			iface.type_name = this.INTERFACE_NAMES[iface.type];
 
