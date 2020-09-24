@@ -271,19 +271,20 @@ func main() {
 		version.Display()
 		os.Exit(0)
 	}
+	var err error
 
-	if err := openEventLog(); err != nil {
+	if err = openEventLog(); err != nil {
 		fatalExit("", err)
 	}
 
-	if err := validateExclusiveFlags(); err != nil {
+	if err = validateExclusiveFlags(); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("", err)
 	}
 
-	if err := conf.Load(confFlag, &agent.Options); err != nil {
+	if err = conf.Load(confFlag, &agent.Options); err != nil {
 		if argConfig || !(argTest || argPrint) {
 			if eerr := eventLogErr(err); eerr != nil {
 				err = fmt.Errorf("%s and %s", err, eerr)
@@ -296,12 +297,36 @@ func main() {
 		}
 	}
 
-	if err := agent.ValidateOptions(&agent.Options); err != nil {
+	if err = agent.ValidateOptions(&agent.Options); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("cannot validate configuration", err)
 	}
+
+	if err = log.Open(log.Console, log.None, "", 0); err != nil {
+		fatalExit("cannot initialize logger", err)
+	}
+
+	{
+		var m *scheduler.Manager
+
+		if m, err = scheduler.NewManager(&agent.Options); err != nil {
+			fatalExit("cannot create scheduling manager", err)
+		}
+
+		m.Start()
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
+		m.Stop()
+	}
+
+	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+	if err != nil {
+		fatalExit("cannot parse the \"Hostname\" parameter", err)
+	}
+	agent.FirstHostname = hostnames[0]
 
 	if err := handleWindowsService(confFlag); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
@@ -329,7 +354,6 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		var err error
 		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
@@ -399,7 +423,7 @@ func main() {
 
 	zbxlib.SetLogLevel(logLevel)
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
+	greeting := fmt.Sprintf("Starting Zabbix Agent 2 [%s]. (%s)", agent.Options.Hostname, version.Long())
 	log.Infof(greeting)
 
 	addresses, err := serverconnector.ParseServerActive()
@@ -459,24 +483,6 @@ func main() {
 	}
 
 	manager.Start()
-
-	if err = configUpdateItemParameters(manager, &agent.Options); err != nil {
-		fatalExit("cannot process configuration", err)
-	}
-
-	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
-	if err != nil {
-		fatalExit("cannot parse the \"Hostname\" parameter", err)
-	}
-	agent.FirstHostname = hostnames[0]
-	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
-	log.Infof(hostmessage)
-	if foregroundFlag {
-		if agent.Options.LogType != "console" {
-			fmt.Println(hostmessage)
-		}
-		fmt.Println("Press Ctrl+C to exit.")
-	}
 
 	if err = resultcache.Prepare(&agent.Options, addresses, hostnames); err != nil {
 		fatalExit("cannot prepare result cache", err)
