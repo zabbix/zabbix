@@ -62,13 +62,6 @@ return [
 				'length' => 32,
 				'default' => '30s',
 			],
-			'roleid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'role',
-				'ref_field' => 'roleid',
-			],
 			'theme' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -102,6 +95,13 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 50,
 				'default' => 'default',
+			],
+			'roleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'role',
+				'ref_field' => 'roleid',
 			],
 		],
 	],
