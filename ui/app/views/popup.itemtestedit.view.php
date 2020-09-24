@@ -86,7 +86,6 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 }
 
 $form_list = new CFormList();
-$r_label_style_dev = 'width:60px;display:block;text-align:right;';
 
 if ($data['is_item_testable']) {
 	$form_list
@@ -100,7 +99,7 @@ if ($data['is_item_testable']) {
 				: (new CTextBox('interface[address]'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setEnabled(false),
-			(new CLabel(_('Port'), 'interface_port'))->addStyle($r_label_style_dev),
+			(new CLabel(_('Port'), 'interface_port'))->addStyle('width:60px;display:block;text-align:right;'),
 			$data['interface_port_enabled']
 				? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -208,7 +207,7 @@ $form_list
 				'disabled' => false,
 				'readonly' => false
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CLabel(_('Time'), 'time'))->addStyle($r_label_style_dev),
+			(new CLabel(_('Time'), 'time'))->addStyle('width:60px;display:block;text-align:right;'),
 			(new CTextBox(null, 'now', true))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setId('time')
@@ -219,7 +218,7 @@ $form_list
 			(new CMultilineInput('prev_value', '', [
 				'disabled' => !$data['show_prev']
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CLabel(_('Prev. time'), 'prev_time'))->addStyle($r_label_style_dev),
+			(new CLabel(_('Prev. time'), 'prev_time'))->addStyle('width:60px;display:block;text-align:right;'),
 			(new CTextBox('prev_time', $data['prev_time']))
 				->setEnabled($data['show_prev'])
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
