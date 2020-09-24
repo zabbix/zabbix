@@ -5921,7 +5921,7 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token,
 			switch ((*data)[i])
 			{
 				case '\\':
-					if (0 != quoted)
+					if (1 == quoted)
 						i++;
 					break;
 				case '"':

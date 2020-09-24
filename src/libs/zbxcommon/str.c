@@ -3655,7 +3655,7 @@ static int	zbx_token_parse_expression_macro(const char *expression, const char *
 
 	for (ptr = macro + 2; '\0' != *ptr ; ptr++)
 	{
-		if (0 != quoted)
+		if (1 == quoted)
 		{
 			if ('\\' == *ptr)
 			{
