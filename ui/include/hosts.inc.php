@@ -1479,7 +1479,9 @@ function getHostDashboards(string $hostid, array $dashboard_fields = []): array 
 		$templateids = [];
 
 		foreach ($templates as $template) {
-			$dashboards += $template['dashboards'];
+			foreach ($template['dashboards'] as $dashboard) {
+				$dashboards[$dashboard['dashboardid']] = $dashboard;
+			}
 			$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
 		}
 	}

@@ -93,7 +93,7 @@ class CControllerHostDashboardView extends CController {
 				);
 
 				$time_selector_options = [
-					'profileIdx' => 'web.host.dashboard.filter',
+					'profileIdx' => 'web.dashbrd.filter',
 					'profileIdx2' => $dashboard['dashboardid'],
 					'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 					'to' => $this->hasInput('to') ? $this->getInput('to') : null
@@ -109,7 +109,7 @@ class CControllerHostDashboardView extends CController {
 					'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
 						? getTimeSelectorPeriod($time_selector_options)
 						: null,
-					'active_tab' => CProfile::get('web.host.dashboard.filter.active', 1)
+					'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
 				];
 			}
 			else {

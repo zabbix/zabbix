@@ -45,10 +45,13 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$histories = [];
 
 		// Editing template dashboard?
-		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_host')) {
+		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_hostid')) {
 			$error = _('No data.');
 		}
 		else {
+			$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+				|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+
 			if ($fields['itemids']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
@@ -65,7 +68,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 					$keys[$item['key_']] = true;
 				}
 
-				if ($items && $fields['dynamic'] && $dynamic_hostid) {
+				if ($items && $is_dynamic_item && $dynamic_hostid) {
 					$items = API::Item()->get([
 						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 						'selectHosts' => ['name'],

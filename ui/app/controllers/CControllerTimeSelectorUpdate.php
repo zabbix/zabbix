@@ -39,8 +39,8 @@ class CControllerTimeSelectorUpdate extends CController {
 
 	protected function checkInput() {
 		$profiles = ['web.auditacts.filter', 'web.auditlog.filter', 'web.avail_report.filter', 'web.charts.filter',
-			'web.dashbrd.filter', 'web.item.graph.filter', 'web.host.dashboard.filter', 'web.httpdetails.filter',
-			'web.problem.filter', 'web.screens.filter', 'web.slides.filter', 'web.toptriggers.filter'
+			'web.dashbrd.filter', 'web.item.graph.filter', 'web.httpdetails.filter', 'web.problem.filter',
+			'web.screens.filter', 'web.slides.filter', 'web.toptriggers.filter'
 		];
 
 		$fields = [

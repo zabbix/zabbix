@@ -46,6 +46,7 @@
 		this.$target
 			.dashboardGrid({
 				dashboard: {
+					templateid: this.data.templateid,
 					dashboardid: this.data.dashboardid,
 					dynamic_hostid: this.host.hostid
 				},

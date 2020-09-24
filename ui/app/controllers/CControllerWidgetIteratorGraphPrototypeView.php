@@ -35,8 +35,8 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 	protected function doAction() {
 		// Editing template dashboard?
-		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_host')) {
-			$return = [
+		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_hostid')) {
+			$data = [
 				'header' => $this->getInput('name', _('Graph prototype')),
 				'children' => [],
 				'page' => 1,
@@ -47,21 +47,21 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			$fields = $this->getForm()->getFieldsData();
 
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
-				$return = $this->doGraphPrototype($fields);
+				$data = $this->doGraphPrototype($fields);
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-				$return = $this->doSimpleGraphPrototype($fields);
+				$data = $this->doSimpleGraphPrototype($fields);
 			}
 			else {
 				error(_('Page received incorrect data'));
 			}
 
 			if (($messages = getMessages()) !== null) {
-				$return = ['messages' => $messages->toString()];
+				$data = ['messages' => $messages->toString()];
 			}
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($return)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 
 	/**
@@ -78,9 +78,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'selectDiscoveryRule' => ['hostid']
 		];
 
+		$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+			|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid) {
+		if ($is_dynamic_item && $dynamic_hostid) {
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
@@ -126,7 +129,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			// Collect graphs based on the graph prototype.
 			foreach ($graphs_created_all as $graph) {
 				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
-					if (count($graph['hosts']) == 1 || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid) {
+					if (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid) {
 						$graphs_collected[$graph['graphid']] = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
 					}
 					else {
@@ -188,9 +191,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'selectDiscoveryRule' => ['hostid']
 		];
 
+		$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+			|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid) {
+		if ($is_dynamic_item && $dynamic_hostid) {
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],

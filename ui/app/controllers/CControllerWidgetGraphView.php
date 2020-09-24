@@ -90,7 +90,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'reloadOnAdd' => 1
 		];
 
-		// data for flickerscreen
+		// Data for flickerscreen.
 		$fs_data = [
 			'id' => $dataid,
 			'interval' => CWebUser::getRefresh(),
@@ -100,15 +100,11 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'profileIdx2' => $profileIdx2
 		];
 
-		// Editing template dashboard?
-		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_host')) {
-			// TODO: Work in progress here, template-capable widgets will be reworked.
-
-			$fields['dynamic'] = WIDGET_SIMPLE_ITEM;
-		}
+		$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+			|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		// Replace graph item by particular host item if dynamic items are used.
-		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+		if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
@@ -275,14 +271,14 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
 
-				if (count($graph['hosts']) == 1 || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid != 0) {
+				if (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0) {
 					$header_label = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
 				}
 				else {
 					$header_label = $graph['name'];
 				}
 
-				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+				if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
 					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
 						$graph_src = (new CUrl('chart7.php'))
 							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
@@ -316,14 +312,14 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+					if (!$is_dynamic_item || $graph_src === '') {
 						$graph_src = (new CUrl('chart6.php'))
 							->setArgument('graphid', $resourceid)
 							->setArgument('graph3d', $graph['show_3d']);
 					}
 				}
 				else {
-					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+					if (!$is_dynamic_item || $graph_src === '') {
 						$graph_src = (new CUrl('chart2.php'))->setArgument('graphid', $resourceid);
 					}
 

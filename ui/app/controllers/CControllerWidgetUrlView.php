@@ -37,22 +37,23 @@ class CControllerWidgetUrlView extends CControllerWidget {
 		$error = null;
 
 		// Editing template dashboard?
-		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_host')) {
+		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_hostid')) {
 			$error = _('No data.');
 		}
 		else {
+			$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+				|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+
 			$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
 
-			if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid == 0) {
+			if ($is_dynamic_item && $dynamic_hostid == 0) {
 				$error = _('No host selected.');
 			}
 			else {
-				$resolveHostMacros = ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
-
 				$resolved_url = CMacrosResolverHelper::resolveWidgetURL([
-					'config' => $resolveHostMacros ? 'widgetURL' : 'widgetURLUser',
+					'config' => $is_dynamic_item ? 'widgetURL' : 'widgetURLUser',
 					'url' => $fields['url'],
-					'hostid' => $resolveHostMacros ? $dynamic_hostid : '0'
+					'hostid' => $is_dynamic_item ? $dynamic_hostid : '0'
 				]);
 
 				$fields['url'] = $resolved_url ? $resolved_url : $fields['url'];
