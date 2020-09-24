@@ -86,6 +86,7 @@ class CTabFilter extends CBaseComponent {
 		filter_src.filter_configurable = filter_data.filter_configurable;
 		target.setAttribute('data-target', target.getAttribute('data-target') + '__clone');
 		src_item = this.create(target, filter_src);
+		this._items.pop();
 
 		src_item.renderContentTemplate();
 		item._src_url = src_item._src_url;
