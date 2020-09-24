@@ -568,6 +568,10 @@ class ZSelect extends HTMLElement {
 			},
 
 			list_mousedown: (e) => {
+				e.preventDefault();
+			},
+
+			list_mouseup: (e) => {
 				const option = this.getOptionByIndex(this._closestIndex(e.target));
 
 				if (option && !option.disabled) {
@@ -606,6 +610,7 @@ class ZSelect extends HTMLElement {
 		this._list.addEventListener('mouseenter', this._events.list_mouseenter);
 		this._list.addEventListener('mouseleave', this._events.list_mouseleave);
 		this._list.addEventListener('mousedown', this._events.list_mousedown);
+		this._list.addEventListener('mouseup', this._events.list_mouseup);
 		this._list.addEventListener('mousemove', this._events.list_mousemove);
 
 		window.addEventListener('resize', this._events.window_resize);
@@ -619,6 +624,7 @@ class ZSelect extends HTMLElement {
 		this._list.removeEventListener('mouseenter', this._events.list_mouseenter);
 		this._list.removeEventListener('mouseleave', this._events.list_mouseleave);
 		this._list.removeEventListener('mousedown', this._events.list_mousedown);
+		this._list.removeEventListener('mouseup', this._events.list_mouseup);
 		this._list.removeEventListener('mousemove', this._events.list_mousemove);
 
 		window.removeEventListener('resize', this._events.window_resize);
