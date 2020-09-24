@@ -159,6 +159,13 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Set browser focus to filter label element.
+	 */
+	setFocused() {
+		this._target.focus();
+	}
+
+	/**
 	 * Set selected state of item.
 	 */
 	setSelected() {

@@ -38,6 +38,10 @@ class CTabFilter extends CBaseComponent {
 		this.init(options);
 		this.registerEvents();
 		this.initItemUnsavedState(this._active_item, this._active_item._data);
+
+		if (this._active_item instanceof CTabFilterItem) {
+			this._active_item.setFocused();
+		}
 	}
 
 	init(options) {
@@ -57,7 +61,6 @@ class CTabFilter extends CBaseComponent {
 			item = this.create(title, options.data[index] || {});
 
 			if (options.selected == index) {
-				item._target.focus();
 				item.renderContentTemplate();
 				this.setSelectedItem(item);
 
@@ -68,6 +71,17 @@ class CTabFilter extends CBaseComponent {
 
 			index++;
 		}
+	}
+
+	/**
+	 * Ensures item label is visible in tab filter navgation.
+	 *
+	 * @param {CTabfilterItem} item    Filter item object.
+	 */
+	scrollIntoView(item) {
+		let scrollable_parent = item._target.closest('.ui-sortable-container').parentNode;
+
+		scrollable_parent.scrollLeft = item._target.parentNode.offsetLeft - item._target.parentNode.clientWidth;
 	}
 
 	/**
@@ -246,6 +260,10 @@ class CTabFilter extends CBaseComponent {
 				item.removeCounter();
 			}
 		});
+
+		if (this._active_item !== this._timeselector) {
+			this.scrollIntoView(this._active_item);
+		}
 	}
 
 	/**
@@ -256,6 +274,7 @@ class CTabFilter extends CBaseComponent {
 	setSelectedItem(item) {
 		this._active_item = item;
 		item.setSelected();
+		this.scrollIntoView(item);
 
 		if (item !== this._timeselector) {
 			item.setBrowserLocationToApplyUrl();
@@ -304,10 +323,12 @@ class CTabFilter extends CBaseComponent {
 						});
 					}
 					else {
+						item.setFocused();
 						item.initUnsavedState();
 						this.profileUpdate('selected', {
 							value_int: item._index
 						});
+						this.scrollIntoView(item);
 					}
 				}
 
