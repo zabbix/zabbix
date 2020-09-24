@@ -26,6 +26,9 @@
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
+
+static int	time_unit_seconds[ZBX_TIME_UNIT_COUNT] = {0, SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, 0, 0};
+
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
 {
 	switch (*text)
@@ -87,35 +90,37 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_adjust_dst                                                    *
+ * Function: tm_add_seconds                                                   *
  *                                                                            *
- * Purpose: adjust time by DST hour if it was moved to other from summer time *
- *          to winter time or the other way around                            *
+ * Purpose: add seconds to the time and adjust result by dst                  *
  *                                                                            *
- * Parameter: tm         - [IN/OUT] the time structure                        *
+ * Parameter: tm      - [IN/OUT] the time structure                           *
+ *            seconds - [IN] the seconds to add (can be negative)             *
  *                                                                            *
  ******************************************************************************/
-static void	tm_adjust_dst(struct tm *tm)
+static void	tm_add_seconds(struct tm *tm, int seconds)
 {
 	time_t		time_new;
-	struct	tm	tm_new;
+	struct tm	tm_new = *tm;
 
-	tm_new = *tm;
-
-	if (-1 != (time_new = mktime(&tm_new)))
+	if (-1 == (time_new = mktime(&tm_new)))
 	{
-		localtime_r(&time_new, &tm_new);
-		tm->tm_wday = tm_new.tm_wday;
-
-		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
-		{
-			*tm = tm_new;
-			if (0 == tm->tm_isdst)
-				tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
-			else
-				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
-		}
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
 	}
+
+	time_new += seconds;
+	localtime_r(&time_new, &tm_new);
+
+	if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
+	{
+		if (0 == tm_new.tm_isdst)
+			tm_add(&tm_new, 1, ZBX_TIME_UNIT_HOUR);
+		else
+			tm_sub(&tm_new, 1, ZBX_TIME_UNIT_HOUR);
+	}
+
+	*tm = tm_new;
 }
 
 /******************************************************************************
@@ -187,8 +192,10 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	tm_add(tm, multiplier, base);
-	tm_adjust_dst(tm);
+	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
+		tm_add(tm, multiplier, base);
+
+	tm_add_seconds(tm, multiplier * time_unit_seconds[base]);
 
 	return;
 }
@@ -290,8 +297,10 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	tm_sub(tm, multiplier, base);
-	tm_adjust_dst(tm);
+	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
+		tm_sub(tm, multiplier, base);
+
+	tm_add_seconds(tm, -multiplier * time_unit_seconds[base]);
 
 	return;
 }
@@ -402,7 +411,7 @@ void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base)
 			break;
 	}
 
-	tm_adjust_dst(tm);
+	tm_add_seconds(tm, 0);
 
 	return;
 }
