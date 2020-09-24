@@ -526,7 +526,7 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Reset' button press.
 			 */
 			buttonResetAction: () => {
-				this._active_item.setBrowserLocation(new URLSearchParams());
+				this._active_item.setBrowserLocation(new URLSearchParams({filter_reset: 1}));
 				window.location.reload(true);
 			},
 

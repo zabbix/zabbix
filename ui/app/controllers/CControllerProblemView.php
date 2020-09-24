@@ -58,7 +58,8 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_name' =>			'string',
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
-			'filter_counters' =>		'in 1'
+			'filter_counters' =>		'in 1',
+			'filter_reset' =>			'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -114,6 +115,7 @@ class CControllerProblemView extends CControllerProblem {
 
 		$data = [
 			'action' => $this->getAction(),
+			'uncheck' => $this->hasInput('filter_reset'),
 			'tabfilter_idx' => static::FILTER_IDX,
 			'filter' => $filter,
 			'filter_view' => 'monitoring.problem.filter',
