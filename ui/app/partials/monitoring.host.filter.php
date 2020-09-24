@@ -29,8 +29,8 @@ $filter_tags_table = (new CTable())
 		(new CCol(
 			(new CRadioButtonList('evaltype', (int) $data['evaltype']))
 				->setId('evaltype_#{uniqid}')
-				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
+				->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
 				->setModern(true)
 		))->setColSpan(4)
 );
@@ -42,8 +42,8 @@ foreach (array_values($data['tags']) as $i => $tag) {
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->removeId(),
 		(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+			->addValue(_('Contains'), TAG_OPERATOR_LIKE, 'tags_0'.$i.'_#{uniqid}')
+			->addValue(_('Equals'), TAG_OPERATOR_EQUAL, 'tags_1'.$i.'_#{uniqid}')
 			->setId('tags_'.$i.'_#{uniqid}')
 			->setModern(true),
 		(new CTextBox('tags['.$i.'][value]', $tag['value']))
@@ -179,13 +179,16 @@ if (array_key_exists('render_html', $data)) {
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
 				->setAttribute('placeholder', _('tag'))
+				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE, 'tags_0#{rowNum}#{uniqid}')
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL, 'tags_1#{rowNum}#{uniqid}')
+				->setModern(true)
+				->setId('tags_#{rowNum}#{uniqid}'),
 			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
 				->setAttribute('placeholder', _('value'))
+				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
@@ -231,13 +234,17 @@ if (array_key_exists('render_html', $data)) {
 
 		// Tags table
 		if (data.tags.length == 0) {
-			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>});
+			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
 		}
 
 		$('#tags_' + data.uniqid, container).dynamicRows({
 			template: '#filter-tag-row-tmpl',
 			rows: data.tags,
-			counter: 0
+			counter: 0,
+			dataCallback: (tag) => {
+				tag.uniqid = data.uniqid
+				return tag;
+			}
 		});
 
 		// Input, radio and single checkboxes.

@@ -789,9 +789,8 @@ function getConditionFormula(conditions, evalType) {
 			$row;
 
 		options.rows.forEach((data) => {
-			$row = $(template.evaluate($.extend({
-				rowNum: counter
-			}, data)));
+			data.rowNum = counter;
+			$row = $(template.evaluate($.extend(data, options.dataCallback(data))));
 
 			for (const name in data) {
 				// Set 'select' value.

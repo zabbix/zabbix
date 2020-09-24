@@ -347,8 +347,8 @@ if (array_key_exists('render_html', $data)) {
 				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE, 'tags_#{rowNum}0#{uniqid}')
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL, 'tags_#{rowNum}1#{uniqid}')
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE, 'tags_0#{rowNum}#{uniqid}')
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL, 'tags_1#{rowNum}#{uniqid}')
 				->setModern(true)
 				->setId('tags_#{rowNum}#{uniqid}'),
 			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
@@ -447,7 +447,10 @@ if (array_key_exists('render_html', $data)) {
 			template: '#filter-tag-row-tmpl',
 			rows: data.tags,
 			counter: 0,
-			dataCallback: (tag) => tag.uniqid = data.uniqid
+			dataCallback: (tag) => {
+				tag.uniqid = data.uniqid
+				return tag;
+			}
 		});
 
 		// Host groups multiselect.
