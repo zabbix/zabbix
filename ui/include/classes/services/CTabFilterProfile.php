@@ -153,16 +153,10 @@ class CTabFilterProfile {
 	 * @return array
 	 */
 	public function getTabsWithDefaults(): array {
-		$tabfilters = [];
-
-		foreach ($this->tabfilters as $tabfilter) {
-			$tabfilters[] = $tabfilter + $this->filter_defaults;
-		}
+		$tabfilters = array_map([$this, 'getTabFilter'], range(0, count($this->tabfilters) - 1));
 
 		if (array_key_exists($this->selected, $this->db_tabfilters)) {
-			$tabfilters[$this->selected] += [
-				'filter_src' => $this->db_tabfilters[$this->selected] + $this->filter_defaults
-			];
+			$tabfilters[$this->selected]['filter_src'] = $this->db_tabfilters[$this->selected] + $this->filter_defaults;
 		}
 
 		return $tabfilters;
@@ -175,34 +169,41 @@ class CTabFilterProfile {
 	 * @param array $input  Tab filter properties array.
 	 */
 	public function setInput(array $input) {
-		if (array_key_exists('filter_name', $input)) {
-			$name_indexes = [];
+		$input += ['filter_name' => $this->tabfilters[$this->selected]['filter_name']];
+		$name_indexes = [];
 
-			foreach (array_slice($this->tabfilters, 1, null, true) as $index => $tabfilter) {
-				if ($tabfilter['filter_name'] === $input['filter_name']) {
-					$name_indexes[] = $index;
-				}
+		foreach (array_slice($this->tabfilters, 1, null, true) as $index => $tabfilter) {
+			if ($tabfilter['filter_name'] === $input['filter_name']) {
+				$name_indexes[] = $index;
 			}
-
-			if (!$name_indexes) {
-				$name_indexes = [0];
-			}
-
-			if (!in_array($this->selected, $name_indexes)) {
-				$this->selected = reset($name_indexes);
-				$this->update();
-			}
-
-			if ($input['filter_name'] === '') {
-				unset($input['filter_name']);
-			}
-
-			$input += $this->filter_defaults;
-			$input['filter_show_counter'] = (int) $input['filter_show_counter'];
-			$input['filter_custom_time'] = (int) $input['filter_custom_time'];
-			$this->tabfilters[$this->selected] = $input;
 		}
 
+		if (!$name_indexes) {
+			$name_indexes = [0];
+		}
+
+		if (!in_array($this->selected, $name_indexes)) {
+			$this->selected = reset($name_indexes);
+			$this->update();
+		}
+
+		if ($input['filter_name'] === '') {
+			unset($input['filter_name']);
+		}
+
+		$filter = $this->tabfilters[$this->selected];
+		$sorting = array_intersect_key($filter, ['sort' => '', 'sortorder' => '']);
+		$input_sorting = array_intersect_key($input, ['sort' => '', 'sortorder' => '']);
+
+		if ($sorting && array_diff_assoc($sorting, $input_sorting)) {
+			$this->tabfilters[$this->selected] = array_merge($filter, $input_sorting);
+			$this->update();
+		}
+
+		$input += array_merge($this->filter_defaults, $this->tabfilters[$this->selected]);
+		$input['filter_show_counter'] = (int) $input['filter_show_counter'];
+		$input['filter_custom_time'] = (int) $input['filter_custom_time'];
+		$this->tabfilters[$this->selected] = $input;
 		return $this;
 	}
 
@@ -269,9 +270,7 @@ class CTabFilterProfile {
 		unset($tabfilter);
 
 		if (!$this->tabfilters) {
-			$this->tabfilters[] = $this->createFilterTab([
-				'filter_name' => _('Untitled')
-			]);
+			$this->tabfilters[] = ['filter_name' => ''];
 		}
 
 		$this->db_tabfilters = $this->tabfilters;

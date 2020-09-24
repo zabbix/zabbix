@@ -82,30 +82,16 @@ class CControllerHostView extends CControllerHost {
 	}
 
 	protected function doAction(): void {
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$filter_tabs = [];
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
+			->read()
+			->setInput($this->cleanInput($this->getInputAll()));
+
+		foreach ($profile->getTabsWithDefaults() as $filter_tab) {
+			$filter_tabs[] = $filter_tab + ['filter_view_data' => $this->getAdditionalData($filter_tab)];
+		}
+
 		$filter = $profile->getTabFilter($profile->selected);
-		$input = $this->getInputAll();
-
-		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
-				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
-			$this->getInputs($filter, ['sort', 'sortorder']);
-			$profile->setTabFilter($profile->selected, $filter);
-			$profile->update();
-		}
-
-		$profile->setInput($this->cleanInput($input));
-		$this->getInputs($filter, ['page', 'sort', 'sortorder']);
-		$filter_tabs = $profile->getTabsWithDefaults();
-
-		foreach ($filter_tabs as &$filter_tab) {
-			$filter_tab += $this->getAdditionalData($filter_tab);
-
-			if (array_key_exists('filter_src', $filter_tab)) {
-				$filter_tab['filter_src'] += $this->getAdditionalData($filter_tab);
-			}
-		}
-		unset($filter_tab);
-
 		$refresh_curl = new CUrl('zabbix.php');
 		$filter['action'] = 'host.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);

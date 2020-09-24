@@ -109,7 +109,6 @@ $left_column = (new CFormList())
 	->addRow(_('Severity'),
 		(new CSeverityCheckBoxList('severities'))
 			->setChecked($data['severities'])
-			->removeValueIndex()
 			->setUniqid('#{uniqid}')
 	);
 
@@ -210,7 +209,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.groups_multiselect || [],
+			data: data.filter_view_data.groups_multiselect||[],
 			popup: {
 				parameters: {
 					multiselect: '1',
@@ -254,9 +253,12 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Severities checkboxes.
-		data.severities.forEach((value) => {
-			$('[name^="severities["][value="' + value + '"]', container).attr('checked', true);
-		});
+		for (const value in data.severities) {
+			$('[name="severities[' + value + ']"]', container).attr('checked', true);
+		}
+
+		// Initialize src_url
+		this.resetUnsavedState();
 	}
 
 	function expand(data, container) {

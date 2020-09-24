@@ -37,10 +37,7 @@ class CTabFilter extends CBaseComponent {
 
 		this.init(options);
 		this.registerEvents(options);
-
-		if ('filter_src' in this._active_item._data) {
-			this.initItemUnsavedState(this._active_item, this._active_item._data);
-		}
+		this.initItemUnsavedState(this._active_item, this._active_item._data);
 	}
 
 	init(options) {
@@ -67,13 +64,6 @@ class CTabFilter extends CBaseComponent {
 				if (options.expanded) {
 					item.setExpanded();
 				}
-
-				if (options.page !== null) {
-					let params = item.getFilterParams();
-
-					params.set('page', options.page);
-					item.setBrowserLocation(params);
-				}
 			}
 
 			index++;
@@ -89,14 +79,17 @@ class CTabFilter extends CBaseComponent {
 	initItemUnsavedState(item, filter_data) {
 		let filter_src = {...{tab_view: filter_data.tab_view}, ...filter_data.filter_src},
 			target = item._target.parentNode.cloneNode(true),
-			clone_item;
+			src_item;
 
 		filter_src.uniqid = filter_data.uniqid + '__clone';
+		filter_src.filter_view_data = filter_data.filter_view_data;
+		filter_src.filter_configurable = filter_data.filter_configurable;
 		target.setAttribute('data-target', target.getAttribute('data-target') + '__clone');
-		clone_item = this.create(target, filter_src);
+		src_item = this.create(target, filter_src);
 
-		clone_item.renderContentTemplate();
-		item._src_url = clone_item.getFilterParams().toString();
+		src_item.renderContentTemplate();
+		item._src_url = src_item._src_url;
+		src_item.delete();
 		item.updateUnsavedState();
 	}
 
@@ -248,11 +241,6 @@ class CTabFilter extends CBaseComponent {
 				item.removeCounter();
 			}
 		});
-
-		if (this._active_item) {
-			// Position of selected item is changed, update it to ensure label is visible.
-			this._active_item.setSelected();
-		}
 	}
 
 	/**
@@ -265,7 +253,7 @@ class CTabFilter extends CBaseComponent {
 		item.setSelected();
 
 		if (item !== this._timeselector) {
-			item.setBrowserLocation(item.getFilterParams());
+			item.setBrowserLocationToApplyUrl();
 		}
 
 		for (const _item of this._items) {
@@ -422,7 +410,7 @@ class CTabFilter extends CBaseComponent {
 					});
 				}
 				else {
-					item.setSelected();
+					this.setSelectedItem(item);
 				}
 			},
 
@@ -507,6 +495,7 @@ class CTabFilter extends CBaseComponent {
 					idx2: this._active_item._index,
 					value_str: params.toString()
 				}).then(() => {
+					this._active_item.updateApplyUrl();
 					this._active_item.setBrowserLocation(params);
 					this._active_item.resetUnsavedState();
 				});
@@ -527,7 +516,8 @@ class CTabFilter extends CBaseComponent {
 			 */
 			buttonApplyAction: () => {
 				this._active_item.updateUnsavedState();
-				this._active_item.setBrowserLocation(this._active_item.getFilterParams());
+				this._active_item.updateApplyUrl();
+				this._active_item.setBrowserLocationToApplyUrl();
 			},
 
 			/**

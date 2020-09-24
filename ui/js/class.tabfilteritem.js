@@ -48,6 +48,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._support_custom_time = options.support_custom_time;
 		this._template_rendered = false;
 		this._src_url = null;
+		this._apply_url = null;
 
 		this.init();
 		this.registerEvents();
@@ -56,6 +57,7 @@ class CTabFilterItem extends CBaseComponent {
 	init() {
 		if (this._expanded) {
 			this.renderContentTemplate();
+			this.updateApplyUrl();
 		}
 
 		if (this._data.filter_show_counter) {
@@ -107,13 +109,16 @@ class CTabFilterItem extends CBaseComponent {
 		let defaults = {
 			idx: this._idx_namespace,
 			idx2: this._index,
-			filter_name: this._data.filter_name,
 			filter_show_counter: this._data.filter_show_counter,
 			filter_custom_time: this._data.filter_custom_time,
 			tabfilter_from: this._data.from || '',
 			tabfilter_to: this._data.to || '',
 			support_custom_time: +this._support_custom_time
 		};
+
+		if ('filter_name' in this._data) {
+			defaults.filter_name = this._data.filter_name;
+		}
 
 		return PopUp('popup.tabfilter.edit', {...defaults, ...params}, 'tabfilter_dialogue', edit_elm);
 	}
@@ -307,6 +312,10 @@ class CTabFilterItem extends CBaseComponent {
 			params.set('to', this._data.to);
 		}
 
+		if ('page' in this._data && this._data.page > 1) {
+			params.set('page', this._data.page);
+		}
+
 		return params;
 	}
 
@@ -324,6 +333,20 @@ class CTabFilterItem extends CBaseComponent {
 		url.formatArguments();
 		history.replaceState(history.state, '', url.getUrl());
 		this.fire(TABFILTERITEM_EVENT_URLSET);
+	}
+
+	/**
+	 * Keep filter tab results request parameters.
+	 */
+	updateApplyUrl() {
+		this._apply_url = (this.getFilterParams()).toString();
+	}
+
+	/**
+	 * Request filter results for fields defined before last 'Apply' being used.
+	 */
+	setBrowserLocationToApplyUrl() {
+		this.setBrowserLocation(new URLSearchParams(this._apply_url));
 	}
 
 	/**
@@ -397,14 +420,8 @@ class CTabFilterItem extends CBaseComponent {
 			expand: () => {
 				this.setExpanded();
 
-				let search_params = this.getFilterParams();
-
 				if (this._src_url === null) {
 					this.resetUnsavedState();
-				}
-
-				if (search_params) {
-					this.setBrowserLocation(search_params);
 				}
 			},
 

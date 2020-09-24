@@ -35,7 +35,9 @@
 				to: filter._timeselector._data.to
 			};
 
-		filter.on(TABFILTER_EVENT_URLSET, (ev) => {
+		filter.on(TABFILTER_EVENT_URLSET, refreshResults);
+
+		function refreshResults() {
 			let url = new Curl(),
 				data = $.extend(<?= json_encode($data['filter_defaults']) ?>,
 					global_timerange, url.getArgumentsObject()
@@ -52,14 +54,15 @@
 				: data.severities;
 
 			// Modify filter data of flickerfreeScreen object with id 'problem'.
+			if (data.page > 1) {
+				window.flickerfreeScreen.screens['problem'].page = data.page;
+			}
+
 			window.flickerfreeScreen.screens['problem'].data.filter = data;
 			window.flickerfreeScreen.screens['problem'].data.sort = data.sort;
 			window.flickerfreeScreen.screens['problem'].data.sortorder = data.sortorder;
-			$.publish('timeselector.rangeupdate', {
-				from: data.from,
-				to: data.to
-			});
-		});
+			window.flickerfreeScreen.refresh('problem');
+		}
 
 		function refreshCounters() {
 			clearTimeout(refresh_timer);

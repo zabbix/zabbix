@@ -98,30 +98,16 @@ class CControllerProblemView extends CControllerProblem {
 	}
 
 	protected function doAction() {
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$filter_tabs = [];
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
+			->read()
+			->setInput($this->cleanInput($this->getInputAll()));
+
+		foreach ($profile->getTabsWithDefaults() as $filter_tab) {
+			$filter_tabs[] = $filter_tab + ['filter_view_data' => $this->getAdditionalData($filter_tab)];
+		}
+
 		$filter = $profile->getTabFilter($profile->selected);
-		$input = $this->getInputAll();
-
-		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
-				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
-			$this->getInputs($filter, ['sort', 'sortorder']);
-			$profile->setTabFilter($profile->selected, $filter);
-			$profile->update();
-		}
-
-		$profile->setInput($this->cleanInput($input));
-		$this->getInputs($filter, ['page', 'from', 'to']);
-		$filter_tabs = $profile->getTabsWithDefaults();
-
-		foreach ($filter_tabs as &$filter_tab) {
-			$filter_tab += $this->getAdditionalData($filter_tab);
-
-			if (array_key_exists('filter_src', $filter_tab)) {
-				$filter_tab['filter_src'] += $this->getAdditionalData($filter_tab);
-			}
-		}
-		unset($filter_tab);
-
 		$refresh_curl = (new CUrl('zabbix.php'));
 		$filter['action'] = 'problem.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
@@ -129,15 +115,15 @@ class CControllerProblemView extends CControllerProblem {
 		$data = [
 			'action' => $this->getAction(),
 			'tabfilter_idx' => static::FILTER_IDX,
-			'filter' => $filter_tabs[$profile->selected],
+			'filter' => $filter,
 			'filter_view' => 'monitoring.problem.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'timerange' => [
 				'idx' => static::FILTER_IDX,
 				'idx2' => 0,
 				'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time']),
-				'from' => $filter['filter_custom_time'] ? $filter['from'] : $profile->from,
-				'to' => $filter['filter_custom_time'] ? $filter['to'] : $profile->to
+				'from' => $profile->from,
+				'to' => $profile->to
 			],
 			'tabfilter_options' => [
 				'idx' => static::FILTER_IDX,

@@ -72,9 +72,13 @@ $left_column = (new CFormList())
 			->setId('hostids_#{uniqid}')
 	)
 	->addRow(_('Application'), [
-		(new CTextBox('application', $data['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+		(new CTextBox('application', $data['application']))
+			->setId('application_#{uniqid}')
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
+		(new CButton('application_select', _('Select')))
+			->setId('application_select_#{uniqid}')
+			->addClass(ZBX_STYLE_BTN_GREY)
 	])
 	->addRow((new CLabel(_('Triggers'), 'triggerids_#{uniqid}_ms')),
 		(new CMultiSelect([
@@ -107,12 +111,12 @@ $left_column = (new CFormList())
 	->addRow(_('Severity'),
 		(new CSeverityCheckBoxList('severities'))
 			->setChecked($data['severities'])
-			->removeValueIndex()
 			->setUniqid('#{uniqid}')
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->removeId();
 if ($data['age_state'] == 0) {
 	$filter_age->setAttribute('disabled', 'disabled');
 }
@@ -121,7 +125,8 @@ $left_column
 	->addRow(_('Age less than'), [
 		(new CCheckBox('age_state'))
 			->setChecked($data['age_state'] == 1)
-			->setUncheckedValue(0),
+			->setUncheckedValue(0)
+			->setId('age_state_#{uniqid}'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$filter_age,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -198,7 +203,7 @@ $filter_tags_table->addRow(
 
 $tag_format_line = (new CHorList())
 	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
-		->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
+		->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE, 'show_tags_0#{uniqid}')
 		->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1, 'show_tags_1#{uniqid}')
 		->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2, 'show_tags_2#{uniqid}')
 		->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3, 'show_tags_3#{uniqid}')
@@ -225,25 +230,28 @@ $right_column = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->setAttribute('placeholder', _('comma-separated list'))
 			->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
+			->setId('tag_priority_#{uniqid}')
 	)
 	->addRow(_('Show operational data'), [
 		(new CRadioButtonList('show_opdata', (int) $data['show_opdata']))
-			->addValue(_('None'), OPERATIONAL_DATA_SHOW_NONE)
-			->addValue(_('Separately'), OPERATIONAL_DATA_SHOW_SEPARATELY)
-			->addValue(_('With problem name'), OPERATIONAL_DATA_SHOW_WITH_PROBLEM)
+			->addValue(_('None'), OPERATIONAL_DATA_SHOW_NONE, 'show_opdata_0_#{uniqid}')
+			->addValue(_('Separately'), OPERATIONAL_DATA_SHOW_SEPARATELY, 'show_opdata_1_#{uniqid}')
+			->addValue(_('With problem name'), OPERATIONAL_DATA_SHOW_WITH_PROBLEM, 'show_opdata_2_#{uniqid}')
 			->setModern(true)
 			->setEnabled($data['compact_view'] == 0)
 	])
 	->addRow(_('Show suppressed problems'), [
 		(new CCheckBox('show_suppressed'))
 			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-			->setUncheckedValue(0),
+			->setUncheckedValue(0)
+			->setId('show_suppressed_#{uniqid}'),
 		(new CDiv([
-			(new CLabel(_('Show unacknowledged only'), 'unacknowledged'))
+			(new CLabel(_('Show unacknowledged only'), 'unacknowledged_#{uniqid}'))
 				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('unacknowledged'))
 				->setChecked($data['unacknowledged'] == 1)
 				->setUncheckedValue(0)
+				->setId('unacknowledged_#{uniqid}')
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	])
 	->addRow(_('Compact view'), [
@@ -264,13 +272,15 @@ $right_column = (new CFormList())
 		(new CCheckBox('details'))
 			->setChecked($data['details'] == 1)
 			->setEnabled($data['compact_view'] == 0)
-			->setUncheckedValue(0),
+			->setUncheckedValue(0)
+			->setId('details_#{uniqid}'),
 		(new CDiv([
 			(new CLabel(_('Highlight whole row'), 'highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('highlight_row'))
 				->setChecked($data['highlight_row'] == 1)
 				->setEnabled($data['compact_view'] == 1)
 				->setUncheckedValue(0)
+				->setId('highlight_row_#{uniqid}')
 		]))
 			->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 			->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
@@ -315,12 +325,15 @@ if (array_key_exists('render_html', $data)) {
 (new CScriptTemplate('filter-inventory-row'))
 	->addItem(
 		(new CRow([
-			new CComboBox('inventory[#{rowNum}][field]', null, null, $inventories),
-			(new CTextBox('inventory[#{rowNum}][value]', '#{value}'))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CComboBox('inventory[#{rowNum}][field]', null, null, $inventories))->removeId(),
+			(new CTextBox('inventory[#{rowNum}][value]', '#{value}'))
+				->removeId()
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton('inventory[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->addClass('form_row')
 	)
@@ -331,6 +344,7 @@ if (array_key_exists('render_html', $data)) {
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
 				->setAttribute('placeholder', _('tag'))
+				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
 				->addValue(_('Contains'), TAG_OPERATOR_LIKE, 'tags_#{rowNum}0#{uniqid}')
@@ -339,9 +353,11 @@ if (array_key_exists('render_html', $data)) {
 				->setId('tags_#{rowNum}#{uniqid}'),
 			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
 				->setAttribute('placeholder', _('value'))
+				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+					->removeId()
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -407,9 +423,9 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Severities checkboxes.
-		data.severities.forEach((value) => {
-			$('[name^="severities["][value="' + value + '"]', container).attr('checked', true);
-		});
+		for (const value in data.severities) {
+			$('[name="severities[' + value + ']"]', container).attr('checked', true);
+		}
 
 		// Inventory table.
 		if (data.inventory.length == 0) {
@@ -438,7 +454,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.groups||[],
+			data: data.filter_view_data.groups||[],
 			popup: {
 				parameters: {
 					srctbl: 'host_groups',
@@ -458,7 +474,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'hostids_' + data.uniqid,
 			object_name: 'hosts',
 			name: 'hostids[]',
-			data: data.hosts||[],
+			data: data.filter_view_data.hosts||[],
 			popup: {
 				filter_preselect_fields: {
 					hostgroups: 'groupids_' + data.uniqid
@@ -473,12 +489,12 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Application
-		$('[name="application_select"]').on('click', function() {
+		$('#application_select_' + data.uniqid).on('click', function() {
 			let options = {
 					srctbl: 'applications',
 					srcfld1: 'name',
 					dstfrm: 'zbx_filter',
-					dstfld1: 'application',
+					dstfld1: 'application_' + data.uniqid,
 					with_applications: '1',
 					real_hosts: '1'
 				};
@@ -491,7 +507,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'triggerids_' + data.uniqid,
 			object_name: 'triggers',
 			name: 'triggerids[]',
-			data: data.triggers || [],
+			data: data.filter_view_data.triggers||[],
 			popup: {
 				filter_preselect_fields: {
 					hosts: 'hostids_' + data.uniqid
@@ -513,6 +529,9 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="age_state"]').change(eventHandler.age_state).trigger('change');
 		$('[name="compact_view"]', container).change(eventHandler.compact_view).trigger('change');
 		$('[name="show_tags"]', container).change(eventHandler.show_tags).trigger('change');
+
+		// Initialize src_url
+		this.resetUnsavedState();
 	}
 
 	function expand(data, container) {

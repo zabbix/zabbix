@@ -104,14 +104,10 @@ if ($data['action'] === 'problem.view') {
 		);
 
 	if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-		$defaults = [
-			'tags' => [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]],
-			'inventory' => [['field' => 'type', 'value' => '']]
-		];
 		$filter = (new CTabFilter())
 			->setId('monitoring_problem_filter')
 			->setOptions($data['tabfilter_options'])
-			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults'] + $defaults));
+			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 		foreach ($data['filter_tabs'] as $tab) {
 			$tab['tab_view'] = $data['filter_view'];
