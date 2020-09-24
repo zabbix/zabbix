@@ -392,6 +392,8 @@ function saveItemTestInputs() {
 			value: jQuery('#value').multilineInput('value'),
 			eol: jQuery('#eol').find(':checked').val()
 		},
+		form_data = $form.serializeJSON(),
+		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		macros = {};
 
 	<?php if ($data['is_item_testable']): ?>
@@ -400,7 +402,8 @@ function saveItemTestInputs() {
 			proxy_hostid: jQuery('#proxy_hostid', $form).val(),
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
-			port: jQuery('#interface_port', $form).val()
+			port: jQuery('#interface_port', $form).val(),
+			interface_details: interface ? interface['details'] : null
 		});
 	<?php endif ?>
 

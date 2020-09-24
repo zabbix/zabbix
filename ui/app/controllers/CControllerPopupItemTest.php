@@ -402,37 +402,11 @@ abstract class CControllerPopupItemTest extends CController {
 			$interface_input['address'] = $input['address'];
 		}
 
-		if (array_key_exists('interface', $input) && array_key_exists('details', $input['interface'])) {
-			if (array_key_exists('version', $input['interface']['details'])) {
-				$interface_input['details']['version'] = $input['interface']['details']['version'];
-			}
-			if (array_key_exists('bulk', $input['interface']['details'])) {
-				$interface_input['details']['bulk'] = $input['interface']['details']['bulk'];
-			}
-			if (array_key_exists('community', $input['interface']['details'])) {
-				$interface_input['details']['community'] = $input['interface']['details']['community'];
-			}
-			if (array_key_exists('contextname', $input['interface']['details'])) {
-				$interface_input['details']['contextname'] = $input['interface']['details']['contextname'];
-			}
-			if (array_key_exists('securityname', $input['interface']['details'])) {
-				$interface_input['details']['securityname'] = $input['interface']['details']['securityname'];
-			}
-			if (array_key_exists('securitylevel', $input['interface']['details'])) {
-				$interface_input['details']['securitylevel'] = $input['interface']['details']['securitylevel'];
-			}
-			if (array_key_exists('authprotocol', $input['interface']['details'])) {
-				$interface_input['details']['authprotocol'] = $input['interface']['details']['authprotocol'];
-			}
-			if (array_key_exists('authpassphrase', $input['interface']['details'])) {
-				$interface_input['details']['authpassphrase'] = $input['interface']['details']['authpassphrase'];
-			}
-			if (array_key_exists('privprotocol', $input['interface']['details'])) {
-				$interface_input['details']['privprotocol'] = $input['interface']['details']['privprotocol'];
-			}
-			if (array_key_exists('privpassphrase', $input['interface']['details'])) {
-				$interface_input['details']['privpassphrase'] = $input['interface']['details']['privpassphrase'];
-			}
+		if (array_key_exists('data', $input) && array_key_exists('interface_details', $input['data'])) {
+			$interface_input['details'] = $input['data']['interface_details'];
+		}
+		elseif (array_key_exists('interface', $input) && array_key_exists('details', $input['interface'])) {
+			$interface_input['details'] = $input['inteface']['details'];
 		}
 
 		// Set proxy.
