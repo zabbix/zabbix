@@ -77,7 +77,6 @@ $widget
 		json_encode($data['host']).','.
 		json_encode($data['dashboard']).','.
 		json_encode($data['widget_defaults']).','.
-		json_encode($data['time_selector']).','.
 		json_encode($web_layout_mode).
 	');'
 ))
