@@ -271,6 +271,7 @@ func main() {
 		version.Display()
 		os.Exit(0)
 	}
+
 	var err error
 
 	if err = openEventLog(); err != nil {
