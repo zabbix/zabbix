@@ -556,7 +556,7 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 			// Log in with the created or updated user.
 			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
-			$this->userLogin($data['fields']['Alias'], $password);
+			$this->page->userLogin($data['fields']['Alias'], $password);
 			// Verification of URL after login.
 			$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
 			// Verification of the number of rows per page parameter.
@@ -974,12 +974,12 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 
 			// Atempt to sign in with old password.
-			$this->userLogin($data['alias'],$data['old_password']);
+			$this->page->userLogin($data['alias'],$data['old_password']);
 			$message = $this->query('class:red')->one()->getText();
 			$this->assertEquals($message, $data['error_message']);
 
 			// Sign in with new password.
-			$this->userLogin($data['alias'],$data['new_password']);
+			$this->page->userLogin($data['alias'],$data['new_password']);
 			$attempt_message = CMessageElement::find()->one();
 			$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
 			$this->page->logout();
@@ -1167,12 +1167,5 @@ class testFormUser extends CWebTest {
 		}
 		// Verify that Auto-login is unchecked after setting Auto-logout.
 		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
-	}
-
-	private function userLogin($alias, $password) {
-		$this->page->open('index.php');
-		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
-		$this->query('id:password')->one()->fill($password);
-		$this->query('button:Sign in')->one()->click();
 	}
 }

@@ -26,7 +26,7 @@ $page['title'] = _('Configuration of hosts');
 $page['file'] = 'hosts.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
-	'inputsecret.js', 'macrovalue.js'
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -347,7 +347,7 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		$msg = [
 			'type' => 'error',
 			'message' => _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
-			'src' => ''
+			'source' => ''
 		];
 
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);

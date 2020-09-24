@@ -54,13 +54,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [
-			'authtype'				=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'authtype'				=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'get_value'				=> 'in 0,1',
 			'eol'					=> 'in '.implode(',', [ZBX_EOL_LF, ZBX_EOL_CRLF]),
 			'headers'				=> 'array',
 			'proxy_hostid'			=> 'id',
 			'hostid'				=> 'db hosts.hostid',
-			'http_authtype'			=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'http_authtype'			=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
 			'http_username'			=> 'string',
@@ -293,9 +293,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			// Send test to be executed on Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 			);
-			$result = $server->testItem($item_test_data, get_cookie('zbx_sessionid'));
+			$result = $server->testItem($item_test_data, CSessionHelper::getId());
 
 			// Handle the response.
 			if ($result === false) {
@@ -338,9 +339,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			// Send test details to Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 			);
-			$result = $server->testPreprocessingSteps($preproc_test_data, get_cookie('zbx_sessionid'));
+			$result = $server->testPreprocessingSteps($preproc_test_data, CSessionHelper::getId());
 
 			if ($result === false) {
 				error($server->getError());

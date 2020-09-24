@@ -501,15 +501,15 @@ class C44ImportConverter extends CConverter {
 
 			// Add all new interfaces to host interfaces.
 			foreach ($new_interfaces as $values) {
-				foreach($values as $value) {
+				foreach ($values as $value) {
 					$host['interfaces'][] = $value;
 				}
 			}
 
-			$host['interfaces'] = $this->remapInterfaceKeys($host['interfaces']);
-
 			// Set proper default field for interfaces.
 			if (array_key_exists('interfaces', $host)) {
+				$host['interfaces'] = $this->remapInterfaceKeys($host['interfaces']);
+
 				$main = false;
 				foreach ($host['interfaces'] as &$interface) {
 					if (array_key_exists('type', $interface) && $interface['type'] === CXmlConstantName::SNMP) {

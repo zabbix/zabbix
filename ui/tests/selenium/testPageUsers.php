@@ -154,7 +154,7 @@ class testPageUsers extends CLegacyWebTest {
 
 			$this->zbxTestAcceptAlert();
 			$this->zbxTestCheckTitle('Configuration of users');
-			if ($alias === 'guest' || $alias === 'Admin') {
+			if ($alias === 'guest' || $alias === 'Admin' || $alias === 'test-timezone') {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Cannot delete user');
 				$this->assertNotEquals(0, CDBHelper::getCount("select * from users where userid=$id"));
 				$this->assertNotEquals(0, CDBHelper::getCount("select * from users_groups where userid=$id"));

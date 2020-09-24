@@ -71,6 +71,8 @@
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "export.h"
+#include "zbxvault.h"
+#include "zbxdiag.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -105,6 +107,11 @@ const char	*help_message[] = {
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
 	"                                 target is not specified",
 	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
+	"      " ZBX_SECRETS_RELOAD "             Reload secrets from Vault",
+	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
+	"                                 section (historycache, preprocessing, alerting,",
+	"                                 lld, valuecache) or everything if section is",
+	"                                 not specified",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
@@ -230,6 +237,9 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULTURL		= NULL;
+char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -306,6 +316,8 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
+
+volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -517,6 +529,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
+
+	if (NULL == CONFIG_VAULTURL)
+		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
 }
 
 /******************************************************************************
@@ -576,6 +591,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
 	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
 			"cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
+
 #endif
 
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
@@ -726,6 +744,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"DBUser",			&CONFIG_DBUSER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -951,6 +975,24 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
+static void	zbx_main_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_DIAGINFO == ZBX_RTC_GET_MSG(flags))
+	{
+		int	scope = ZBX_RTC_GET_SCOPE(flags);
+
+		if (ZBX_DIAGINFO_ALL == scope)
+		{
+			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
+					(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
+					(1 << ZBX_DIAGINFO_ALERTING);
+		}
+		else
+			zbx_diaginfo_scope = 1 << scope;
+	}
+
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
@@ -1107,6 +1149,20 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (FAIL == zbx_export_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_init_token_from_env(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_init_db_credentials(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1295,12 +1351,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_problems_export_init("main-process", 0);
 	}
 
+	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
+
 	while (-1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			break;
+		}
+
+		/* check if the wait was interrupted because of diaginfo remote command */
+		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
+		{
+			zbx_diag_log_info(zbx_diaginfo_scope);
+			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
 	}
 

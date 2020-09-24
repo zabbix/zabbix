@@ -430,7 +430,7 @@ Temperature readings of testpoint: {#SENSOR_INFO}</description>
                   <trigger_prototype>
                      <expression>{Template Net Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
 or&#13;
-{Template Net Brocade FC SNMP:sensor.temp.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Net Brocade FC SNMP:sensor.temp.status[swSensorStatus.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Net Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>

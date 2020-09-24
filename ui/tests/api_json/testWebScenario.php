@@ -671,16 +671,16 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with nonexistent authentication',
-					'authentication' => '4'
+					'authentication' => '5'
 				],
-				'expected_error' => 'Invalid parameter "/1/authentication": value must be one of 0, 1, 2, 3.'
+				'expected_error' => 'Invalid parameter "/1/authentication": value must be one of 0, 1, 2, 3, 4.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with nonexistent authentication',
 					'authentication' => '-2'
 				],
-				'expected_error' => 'Invalid parameter "/1/authentication": value must be one of 0, 1, 2, 3.'
+				'expected_error' => 'Invalid parameter "/1/authentication": value must be one of 0, 1, 2, 3, 4.'
 			],
 			[
 				'httptest' => [

@@ -694,7 +694,6 @@ class CHost extends CHostGeneral {
 		$this->validateCreate($hosts);
 
 		$hostids = [];
-		$ins_tags = [];
 		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
 			if (!array_key_exists('name', $host) || !trim($host['name'])) {
@@ -717,10 +716,8 @@ class CHost extends CHostGeneral {
 			}
 			DB::insert('hosts_groups', $groupsToAdd);
 
-			if (array_key_exists('tags', $host)) {
-				foreach (zbx_toArray($host['tags']) as $tag) {
-					$ins_tags[] = ['hostid' => $hostid] + $tag;
-				}
+			if (array_key_exists('tags', $host) && $host['tags']) {
+				$this->createTags([$hostid => zbx_toArray($host['tags'])]);
 			}
 
 			$options = [
@@ -766,10 +763,6 @@ class CHost extends CHostGeneral {
 		unset($host);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hosts);
-
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
-		}
 
 		return ['hostids' => $hostids];
 	}
@@ -857,10 +850,6 @@ class CHost extends CHostGeneral {
 
 				unset($host['macros']);
 			}
-
-			if (array_key_exists('tags', $host)) {
-				$host['tags'] = zbx_toArray($host['tags']);
-			}
 		}
 		unset($host);
 
@@ -892,7 +881,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$this->updateTags($hosts, 'hostid');
+		$this->updateTags(array_column($hosts, 'tags', 'hostid'));
 
 		return ['hostids' => $hostids];
 	}

@@ -90,6 +90,17 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to CheckboxForm element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CFormElement
+	 */
+	public function asCheckboxForm($options = []) {
+		return $this->cast(CCheckboxFormElement::class, $options);
+	}
+
+	/**
 	 * Cast object to Message element.
 	 *
 	 * @param array $options    additional casting options
@@ -241,5 +252,16 @@ trait CastableTrait {
 	 */
 	public function asPopupButton($options = []) {
 		return $this->cast(CPopupButtonElement::class, $options);
+	}
+
+	/**
+	 * Cast object to InputGroup element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CInputGroupElement
+	 */
+	public function asInputGroup($options = []) {
+		return $this->cast(CInputGroupElement::class, $options);
 	}
 }

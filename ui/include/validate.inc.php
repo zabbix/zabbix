@@ -304,9 +304,7 @@ function check_field(&$fields, &$field, $checks) {
 			return ZBX_VALID_OK;
 		}
 		elseif ($flags & P_ACT) {
-			if (!isset($_REQUEST['sid'])
-					|| (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)
-							&& $_REQUEST['sid'] != substr($_COOKIE[ZBX_SESSION_NAME], 16, 16))) {
+			if (!hasRequest('sid') || getRequest('sid') != substr(CSessionHelper::getId(), 16, 16)) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
@@ -364,16 +362,18 @@ function invalid_url($msg = null) {
 	}
 
 	// required global parameters for correct including page_header.php
-	global $DB, $ZBX_MESSAGES;
+	global $DB;
 
 	// backup messages before including page_header.php
-	$temp = $ZBX_MESSAGES;
-	$ZBX_MESSAGES = [];
+	$messages_backup = CMessageHelper::getMessages();
+	CMessageHelper::clear();
 
 	require_once dirname(__FILE__).'/page_header.php';
 
 	// Rollback reset messages.
-	$ZBX_MESSAGES = $temp;
+	foreach ($messages_backup as $message) {
+		CMessageHelper::addMessage($message);
+	}
 
 	unset_all();
 	show_error_message($msg);

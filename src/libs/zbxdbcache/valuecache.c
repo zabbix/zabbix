@@ -176,6 +176,17 @@ typedef struct
 	/* interval should be cached.                                 */
 	int		db_cached_from;
 
+	/* The maximum number of values returned by one request       */
+	/* during last hourly interval.                               */
+	int		last_hourly_num;
+
+	/* The maximum number of values returned by one request       */
+	/* during current hourly interval.                            */
+	int		hourly_num;
+
+	/* The hour of hourly_num                                     */
+	int		hour;
+
 	/* The number of cache hits for this item.                    */
 	/* Used to evaluate if the item must be dropped from cache    */
 	/* in low memory situation.                                   */
@@ -648,8 +659,21 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 {
 	if (NULL != item)
 	{
+		int	hour;
+
 		item->hits += hits;
 		item->last_accessed = time(NULL);
+
+		hour = item->last_accessed / SEC_PER_HOUR;
+		if (hour != item->hour)
+		{
+			item->last_hourly_num = item->hourly_num;
+			item->hourly_num = 0;
+			item->hour = hour;
+		}
+
+		if (hits + misses > item->hourly_num)
+			item->hourly_num = hits + misses;
 	}
 
 	if (ZBX_VC_ENABLED == vc_state)
@@ -771,6 +795,9 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
 	zbx_hashset_iter_t	iter;
 	zbx_vc_item_t		*item;
 	size_t			freed = 0;
+
+	if (NULL == vc_cache)
+		return freed;
 
 	timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
 
@@ -2813,6 +2840,92 @@ void	zbx_vc_enable(void)
 void	zbx_vc_disable(void)
 {
 	vc_state = ZBX_VC_DISABLED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_diag_stats                                            *
+ *                                                                            *
+ * Purpose: get value cache diagnostic statistics                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, int *mode)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_vc_item_t		*item;
+
+	*values_num = 0;
+
+	if (ZBX_VC_DISABLED == vc_state)
+	{
+		*items_num = 0;
+		*mode = -1;
+		return;
+	}
+
+	vc_try_lock();
+
+	*items_num = vc_cache->items.num_data;
+	*mode = vc_cache->mode;
+
+	zbx_hashset_iter_reset(&vc_cache->items, &iter);
+	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
+		*values_num += item->values_total;
+
+	vc_try_unlock();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_mem_stats                                             *
+ *                                                                            *
+ * Purpose: get value cache shared memory statistics                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
+{
+	if (ZBX_VC_DISABLED == vc_state)
+	{
+		memset(mem, 0, sizeof(zbx_mem_stats_t));
+		return;
+	}
+
+	vc_try_lock();
+	zbx_mem_get_stats(vc_mem, mem);
+	vc_try_unlock();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vc_get_item_stats                                            *
+ *                                                                            *
+ * Purpose: get statistics of cached items                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_vc_item_t		*item;
+	zbx_vc_item_stats_t	*item_stats;
+
+	if (ZBX_VC_DISABLED == vc_state)
+		return;
+
+	vc_try_lock();
+
+	zbx_vector_ptr_reserve(stats, vc_cache->items.num_data);
+
+	zbx_hashset_iter_reset(&vc_cache->items, &iter);
+	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		item_stats = (zbx_vc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_vc_item_stats_t));
+		item_stats->itemid = item->itemid;
+		item_stats->values_num = item->values_total;
+		item_stats->hourly_num = item->last_hourly_num;
+		zbx_vector_ptr_append(stats, item_stats);
+	}
+
+	vc_try_unlock();
 }
 
 #ifdef HAVE_TESTS

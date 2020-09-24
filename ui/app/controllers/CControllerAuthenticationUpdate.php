@@ -100,7 +100,7 @@ class CControllerAuthenticationUpdate extends CController {
 				|| $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 
 		if (!$is_valid) {
-			$this->response->setMessageError(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
+			CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
 				_('LDAP is not configured')
 			));
 		}
@@ -140,9 +140,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		foreach ($ldap_fields as $field) {
 			if (trim($ldap_auth[$field]) === '') {
-				$this->response->setMessageError(
-					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
-				);
+				CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
 				$is_valid = false;
 				break;
 			}
@@ -151,7 +149,7 @@ class CControllerAuthenticationUpdate extends CController {
 		if ($is_valid
 				&& ($ldap_auth['ldap_port'] < ZBX_MIN_PORT_NUMBER
 					|| $ldap_auth['ldap_port'] > ZBX_MAX_PORT_NUMBER)) {
-			$this->response->setMessageError(_s(
+			CMessageHelper::setErrorTitle(_s(
 				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $this->getInput('ldap_port'),
 				'ldap_port', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER
 			));
@@ -159,7 +157,7 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-			$this->response->setMessageError($ldap_status['error']);
+			CMessageHelper::setErrorTitle($ldap_status['error']);
 			$is_valid = false;
 		}
 		elseif ($is_valid) {
@@ -180,7 +178,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			if (!$login) {
-				$this->response->setMessageError($ldap_validator->getError());
+				CMessageHelper::setErrorTitle($ldap_validator->getError());
 				$is_valid = false;
 			}
 		}
@@ -197,7 +195,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
 		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-			$this->response->setMessageError($openssl_status['error']);
+			CMessageHelper::setErrorTitle($openssl_status['error']);
 
 			return false;
 		}
@@ -213,9 +211,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		foreach ($saml_fields as $field) {
 			if (trim($saml_auth[$field]) === '') {
-				$this->response->setMessageError(
-					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
-				);
+				CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
 
 				return false;
 			}
@@ -251,7 +247,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		// Only ZBX_AUTH_LDAP have 'Test' option.
 		if ($this->hasInput('ldap_test')) {
-			$this->response->setMessageOk(_('LDAP login successful'));
+			CMessageHelper::setSuccessTitle(_('LDAP login successful'));
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 
@@ -361,11 +357,11 @@ class CControllerAuthenticationUpdate extends CController {
 					$this->invalidateSessions();
 				}
 
-				$this->response->setMessageOk(_('Authentication settings updated'));
+				CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
 			}
 			else {
 				$this->response->setFormData($this->getInputAll());
-				$this->response->setMessageError(_('Cannot update authentication'));
+				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
 		}
 

@@ -831,6 +831,7 @@ class CConfigurationExport {
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
+			'selectTags' => ['tag', 'value'],
 			'inherited' => false,
 			'preservekeys' => true
 		]);

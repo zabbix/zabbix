@@ -42,7 +42,7 @@ if (!hasRequest('form_refresh')) {
 }
 
 $frmHost = (new CForm())
-	->setId('hostPrototypeForm')
+	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
@@ -178,13 +178,14 @@ $buttonRow = (new CRow())
 $customGroupTable->addRow($buttonRow);
 $groupList->addRow(_('Group prototypes'), (new CDiv($customGroupTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
-$divTabs->addTab('groupTab', _('Groups'), $groupList);
+$divTabs->addTab('groupTab', _('Groups'), $groupList, TAB_INDICATOR_GROUPS);
 
 // templates
 $tmplList = new CFormList();
 
 if ($hostPrototype['templateid']) {
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
@@ -213,6 +214,7 @@ else {
 	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
@@ -273,7 +275,7 @@ else {
 		);
 }
 
-$divTabs->addTab('templateTab', _('Templates'), $tmplList);
+$divTabs->addTab('templateTab', _('Templates'), $tmplList, TAB_INDICATOR_LINKED_TEMPLATE);
 
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -298,6 +300,14 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 }
 
+// tags
+$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+		'source' => 'host_prototype',
+		'tags' => $data['tags'],
+		'readonly' => $data['readonly']
+	]), TAB_INDICATOR_TAGS
+);
+
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 $divTabs->addTab('macroTab', _('Macros'),
@@ -311,7 +321,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 			'macros' => $data['macros'],
 			'parent_hostid' => $data['parent_host']['hostid'],
 			'readonly' => $data['readonly']
-		]), 'macros_container')
+		]), 'macros_container'),
+	TAB_INDICATOR_MACROS
 );
 
 $inventoryFormList = (new CFormList('inventorylist'))
@@ -324,7 +335,7 @@ $inventoryFormList = (new CFormList('inventorylist'))
 			->setModern(true)
 	);
 
-$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList, TAB_INDICATOR_INVENTORY);
 
 // Encryption form list.
 $encryption_form_list = (new CFormList('encryption'))
@@ -373,7 +384,7 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setAttribute('disabled', 'disabled')
 	);
 
-$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_INDICATOR_ENCRYPTION);
 
 /*
  * footer

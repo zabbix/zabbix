@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->addJsFile('class.tab-indicators.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 // Authentication general fields and HTTP authentication fields.
@@ -251,19 +252,20 @@ $saml_tab = (new CFormList('list_saml'))
 	->addItem((new CForm())
 		->addVar('action', $data['action_submit'])
 		->addVar('db_authentication_type', $data['db_authentication_type'])
+		->setId('authentication-form')
 		->setName('form_auth')
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->disablePasswordAutofill()
 		->addItem((new CTabView())
 			->setSelected($data['form_refresh'] ? null : 0)
 			->addTab('auth', _('Authentication'), $auth_tab)
-			->addTab('http', _('HTTP settings'), $http_tab)
-			->addTab('ldap', _('LDAP settings'), $ldap_tab)
-			->addTab('saml', _('SAML settings'), $saml_tab)
+			->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
+			->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
+			->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),
 				[(new CSubmitButton(_('Test'), 'ldap_test', 1))
-					->addStyle(($data['form_refresh'] && get_cookie('tab', 0) == 2) ? '' : 'display: none')
+					->addStyle(($data['form_refresh'] && CCookieHelper::get('tab') == 2) ? '' : 'display: none')
 					->setEnabled($data['ldap_enabled'])
 				]
 			))

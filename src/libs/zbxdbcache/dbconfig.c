@@ -38,6 +38,7 @@
 #include "dbsync.h"
 #include "proxy.h"
 #include "actions.h"
+#include "zbxvault.h"
 
 int	sync_in_progress = 0;
 
@@ -99,7 +100,8 @@ static void	dc_maintenance_precache_nested_groups(void);
 
 /* by default the macro environment is non-secure and all secret macros are masked with ****** */
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
-
+extern char		*CONFIG_VAULTDBPATH;
+extern char		*CONFIG_VAULTTOKEN;
 /******************************************************************************
  *                                                                            *
  * Function: dc_strdup                                                        *
@@ -254,7 +256,8 @@ int	zbx_is_counted_in_item_queue(unsigned char type, const char *key)
 		case ITEM_TYPE_ZABBIX_ACTIVE:
 			if (0 == strncmp(key, "log[", 4) ||
 					0 == strncmp(key, "logrt[", 6) ||
-					0 == strncmp(key, "eventlog[", 9))
+					0 == strncmp(key, "eventlog[", 9) ||
+					0 == strncmp(key, "mqtt.get[", ZBX_CONST_STRLEN("mqtt.get[")))
 			{
 				return FAIL;
 			}
@@ -858,6 +861,100 @@ static int	config_hmacro_context_compare(const void *d1, const void *d2)
 	return strcmp(m1->context, m2->context);
 }
 
+static int	dc_compare_kvs_path(const void *d1, const void *d2)
+{
+	const zbx_dc_kvs_path_t	*ptr1 = *((const zbx_dc_kvs_path_t **)d1);
+	const zbx_dc_kvs_path_t	*ptr2 = *((const zbx_dc_kvs_path_t **)d2);
+
+	return strcmp(ptr1->path, ptr2->path);
+}
+
+static zbx_hash_t	dc_kv_hash(const void *data)
+{
+	return ZBX_DEFAULT_STRING_HASH_FUNC(((zbx_dc_kv_t *)data)->key);
+}
+
+static int	dc_kv_compare(const void *d1, const void *d2)
+{
+	return strcmp(((zbx_dc_kv_t *)d1)->key, ((zbx_dc_kv_t *)d2)->key);
+}
+
+static zbx_dc_kv_t	*config_kvs_path_add(const char *path, const char *key)
+{
+	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
+	zbx_dc_kv_t		*kv, kv_local;
+	int			i;
+
+	kvs_path_local.path = path;
+
+	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+	{
+		kvs_path = (zbx_dc_kvs_path_t *)__config_mem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
+		DCstrpool_replace(0, &kvs_path->path, path);
+		zbx_vector_ptr_append(&config->kvs_paths, kvs_path);
+
+		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
+				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func);
+		kv = NULL;
+	}
+	else
+	{
+		kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+		kv_local.key = key;
+		kv = (zbx_dc_kv_t *)zbx_hashset_search(&kvs_path->kvs, &kv_local);
+	}
+
+	if (NULL == kv)
+	{
+		DCstrpool_replace(0, &kv_local.key, key);
+		kv_local.value = NULL;
+		kv_local.refcount = 0;
+
+		kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
+	}
+
+	kv->refcount++;
+
+	return kv;
+}
+
+static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
+{
+	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
+	int			i;
+	char			*path, *key;
+
+	if (0 != --kv->refcount)
+		return;
+
+	zbx_strsplit(value, ':', &path, &key);
+	zbx_free(key);
+
+	zbx_strpool_release(kv->key);
+	if (NULL != kv->value)
+		zbx_strpool_release(kv->value);
+
+	kvs_path_local.path = path;
+
+	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto clean;
+	}
+	kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+
+	zbx_hashset_remove_direct(&kvs_path->kvs, kv);
+
+	if (0 == kvs_path->kvs.num_data)
+	{
+		zbx_strpool_release(kvs_path->path);
+		__config_mem_free_func(kvs_path);
+		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
+	}
+clean:
+	zbx_free(path);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: set_hk_opt                                                       *
@@ -1405,6 +1502,16 @@ done:
 		ZBX_STR2UCHAR(host->tls_connect, row[29]);
 		ZBX_STR2UCHAR(host->tls_accept, row[30]);
 
+		if ((HOST_STATUS_PROXY_PASSIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_connect)) ||
+				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_accept)))
+		{
+			if (NULL != CONFIG_VAULTTOKEN)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "connection with Zabbix proxy \"%s\" should not be"
+						" unencrypted when using Vault", host->host);
+			}
+		}
+
 		if (0 == found)
 		{
 			ZBX_DBROW2UINT64(host->maintenanceid, row[33 + ZBX_HOST_TLS_OFFSET]);
@@ -1801,11 +1908,11 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
-	unsigned char		tag, context_op;
+	unsigned char		tag, context_op, type;
 	ZBX_DC_GMACRO		*gmacro;
 	int			found, context_existed, update_index, ret, i;
 	zbx_uint64_t		globalmacroid;
-	char			*macro = NULL, *context = NULL;
+	char			*macro = NULL, *context = NULL, *path = NULL, *key = NULL;
 	zbx_vector_ptr_t	indexes;
 	ZBX_DC_GMACRO_M		*gmacro_m;
 
@@ -1820,11 +1927,36 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(globalmacroid, row[0]);
+		ZBX_STR2UCHAR(type, row[3]);
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\"", row[1]);
 			continue;
+		}
+
+		if (ZBX_MACRO_VALUE_VAULT == type)
+		{
+			zbx_free(path);
+			zbx_free(key);
+			zbx_strsplit(row[2], ':', &path, &key);
+			if (NULL == key)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" Vault location \"%s\":"
+						" missing separator \":\"", row[1], row[2]);
+				continue;
+			}
+
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
+					0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
+							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse macro \"%s\" Vault location \"%s\":"
+						" database credentials should not be used with Vault macros",
+						row[1], row[2]);
+				continue;
+			}
 		}
 
 		gmacro = (ZBX_DC_GMACRO *)DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &found);
@@ -1844,8 +1976,16 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			update_index = 1;
 		}
 
+		if (0 != found && NULL != gmacro->kv)
+			config_kvs_path_remove(gmacro->value, gmacro->kv);
+
+		if (ZBX_MACRO_VALUE_VAULT == type)
+			gmacro->kv = config_kvs_path_add(path, key);
+		else
+			gmacro->kv = NULL;
+
 		/* store new information in macro structure */
-		ZBX_STR2UCHAR(gmacro->type, row[3]);
+		gmacro->type = type;
 		gmacro->context_op = context_op;
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
@@ -1880,6 +2020,9 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		if (NULL == (gmacro = (ZBX_DC_GMACRO *)zbx_hashset_search(&config->gmacros, &rowid)))
 			continue;
 
+		if (NULL != gmacro->kv)
+			config_kvs_path_remove(gmacro->value, gmacro->kv);
+
 		gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
 		zbx_vector_ptr_append(&indexes, gmacro_m);
 
@@ -1908,6 +2051,8 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			zbx_vector_ptr_sort(&gmacro_m->gmacros, config_gmacro_context_compare);
 	}
 
+	zbx_free(key);
+	zbx_free(path);
 	zbx_free(context);
 	zbx_free(macro);
 	zbx_vector_ptr_destroy(&indexes);
@@ -1919,11 +2064,11 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
-	unsigned char		tag, context_op;
+	unsigned char		tag, context_op, type;
 	ZBX_DC_HMACRO		*hmacro;
 	int			found, context_existed, update_index, ret, i;
 	zbx_uint64_t		hostmacroid, hostid;
-	char			*macro = NULL, *context = NULL;
+	char			*macro = NULL, *context = NULL, *path = NULL, *key = NULL;
 	zbx_vector_ptr_t	indexes;
 	ZBX_DC_HMACRO_HM	*hmacro_hm;
 
@@ -1939,11 +2084,36 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(hostmacroid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
+		ZBX_STR2UCHAR(type, row[4]);
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
 			continue;
+		}
+
+		if (ZBX_MACRO_VALUE_VAULT == type)
+		{
+			zbx_free(path);
+			zbx_free(key);
+			zbx_strsplit(row[3], ':', &path, &key);
+			if (NULL == key)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
+						" \"%s\": missing separator \":\"", row[1], row[2], row[3]);
+				continue;
+			}
+
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
+					0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
+							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" Vault location"
+						" \"%s\": database credentials should not be used with Vault macros",
+						row[1], row[2], row[3]);
+				continue;
+			}
 		}
 
 		hmacro = (ZBX_DC_HMACRO *)DCfind_id(&config->hmacros, hostmacroid, sizeof(ZBX_DC_HMACRO), &found);
@@ -1963,9 +2133,17 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 			update_index = 1;
 		}
 
+		if (0 != found && NULL != hmacro->kv)
+			config_kvs_path_remove(hmacro->value, hmacro->kv);
+
+		if (ZBX_MACRO_VALUE_VAULT == type)
+			hmacro->kv = config_kvs_path_add(path, key);
+		else
+			hmacro->kv = NULL;
+
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
-		ZBX_STR2UCHAR(hmacro->type, row[4]);
+		hmacro->type = type;
 		hmacro->context_op = context_op;
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
@@ -2000,6 +2178,9 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		if (NULL == (hmacro = (ZBX_DC_HMACRO *)zbx_hashset_search(&config->hmacros, &rowid)))
 			continue;
 
+		if (NULL != hmacro->kv)
+			config_kvs_path_remove(hmacro->value, hmacro->kv);
+
 		hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
 		zbx_vector_ptr_append(&indexes, hmacro_hm);
 
@@ -2028,11 +2209,114 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 			zbx_vector_ptr_sort(&hmacro_hm->hmacros, config_hmacro_context_compare);
 	}
 
+	zbx_free(key);
+	zbx_free(path);
 	zbx_free(context);
 	zbx_free(macro);
 	zbx_vector_ptr_destroy(&indexes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
+{
+	zbx_dc_kvs_path_t	*dc_kvs_path;
+	zbx_dc_kv_t		*dc_kv;
+	zbx_hashset_t		kvs;
+	zbx_hashset_iter_t	iter;
+	int			i, j, ret;
+	zbx_vector_ptr_pair_t	diff;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_pair_create(&diff);
+	zbx_hashset_create_ext(&kvs, 100, zbx_vault_kv_hash, zbx_vault_kv_compare, zbx_vault_kv_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	for (i = 0; i < config->kvs_paths.values_num; i++)
+	{
+		char	*error = NULL;
+
+		dc_kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			if (NULL == jp_kvs_paths)
+			{
+				ret = FAIL;
+				goto fail;
+			}
+
+			if (FAIL == zbx_vault_json_kvs_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
+						dc_kvs_path->path, error);
+				zbx_free(error);
+				continue;
+			}
+
+		}
+		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path, error);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_hashset_iter_reset(&dc_kvs_path->kvs, &iter);
+		while (NULL != (dc_kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
+		{
+			zbx_kv_t	*kv, kv_local;
+			zbx_ptr_pair_t	pair;
+
+			kv_local.key = (char *)dc_kv->key;
+			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			{
+				if (0 == zbx_strcmp_null(dc_kv->value, kv->value))
+					continue;
+			}
+			else if (NULL == dc_kv->value)
+				continue;
+
+			pair.first = dc_kv;
+			pair.second = kv;
+			zbx_vector_ptr_pair_append(&diff, pair);
+		}
+
+		if (0 != diff.values_num)
+		{
+			START_SYNC;
+
+			for (j = 0; j < diff.values_num; j++)
+			{
+				zbx_kv_t	*kv;
+
+				dc_kv = (zbx_dc_kv_t *)diff.values[j].first;
+				kv = (zbx_kv_t *)diff.values[j].second;
+
+				if (NULL != kv)
+				{
+					DCstrpool_replace(dc_kv->value != NULL ? 1 : 0, &dc_kv->value, kv->value);
+					continue;
+				}
+
+				zbx_strpool_release(dc_kv->value);
+				dc_kv->value = NULL;
+			}
+
+			FINISH_SYNC;
+		}
+
+		zbx_vector_ptr_pair_clear(&diff);
+		zbx_hashset_clear(&kvs);
+	}
+	ret = SUCCEED;
+fail:
+	zbx_vector_ptr_pair_destroy(&diff);
+	zbx_hashset_destroy(&kvs);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -5074,7 +5358,7 @@ static void	dc_hostgroups_update_cache(void)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode)
+void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
@@ -5097,6 +5381,12 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_uint64_t	update_flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (ZBX_SYNC_SECRETS == mode)
+	{
+		DCsync_kvs_paths(NULL);
+		goto skip;
+	}
 
 	zbx_dbsync_init_env(config);
 
@@ -5199,6 +5489,12 @@ void	DCsync_configuration(unsigned char mode)
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
+
+	if (FAIL == DCsync_kvs_paths(jp_kvs_paths))
+	{
+		START_SYNC;
+		goto out;
+	}
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
@@ -5608,6 +5904,7 @@ void	DCsync_configuration(unsigned char mode)
 				config->hmacros.num_data, config->hmacros.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __func__,
 				config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() kvs_paths : %d", __func__, config->kvs_paths.values_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __func__,
 				config->interfaces.num_data, config->interfaces.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces_snmp : %d (%d slots)", __func__,
@@ -5752,7 +6049,7 @@ out:
 	zbx_dbsync_clear(&hgroup_host_sync);
 
 	zbx_dbsync_free_env();
-
+skip:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
@@ -6142,6 +6439,8 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->corr_operations, 0);
 	CREATE_HASHSET(config->hostgroups, 0);
 	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
+			__config_mem_free_func);
+	zbx_vector_ptr_create_ext(&config->kvs_paths, __config_mem_malloc_func, __config_mem_realloc_func,
 			__config_mem_free_func);
 
 	CREATE_HASHSET(config->preprocops, 0);
@@ -9578,8 +9877,18 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 
 static void	dc_get_host_macro_value(const ZBX_DC_HMACRO *macro, char **value)
 {
-	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && (ZBX_MACRO_VALUE_SECRET == macro->type ||
+			ZBX_MACRO_VALUE_VAULT == macro->type))
+	{
 		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	}
+	else if (ZBX_MACRO_VALUE_VAULT == macro->type)
+	{
+		if (NULL == macro->kv->value)
+			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+		else
+			*value = zbx_strdup(*value, macro->kv->value);
+	}
 	else
 		*value = zbx_strdup(*value, macro->value);
 }
@@ -9662,8 +9971,18 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 
 static void	dc_get_global_macro_value(const ZBX_DC_GMACRO *macro, char **value)
 {
-	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && (ZBX_MACRO_VALUE_SECRET == macro->type ||
+			ZBX_MACRO_VALUE_VAULT == macro->type))
+	{
 		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	}
+	else if (ZBX_MACRO_VALUE_VAULT == macro->type)
+	{
+		if (NULL == macro->kv->value)
+			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+		else
+			*value = zbx_strdup(*value, macro->kv->value);
+	}
 	else
 		*value = zbx_strdup(*value, macro->value);
 }
@@ -9815,6 +10134,32 @@ char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
 
 	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_expand_user_macros                                        *
+ *                                                                            *
+ * Purpose: expand user macros in the specified text value                    *
+ *                                                                            *
+ * Parameters: text           - [IN] the text value to expand                 *
+ *             hostid         - [IN] related hostid                           *
+ *                                                                            *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
+ *               macros will be left unresolved.                              *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid)
+{
+	char	*resolved_text;
+
+	RDLOCK_CACHE;
+	resolved_text = dc_expand_user_macros(text, &hostid, 1);
+	UNLOCK_CACHE;
+
+	return resolved_text;
 }
 
 /******************************************************************************

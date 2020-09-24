@@ -76,7 +76,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	private function checkLastSelectedWidgetType($type = 'Action log', $db_type = null) {
 		$dashboard = CDashboardElement::find()->one();
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$this->assertEquals($type, $form->getField('Type')->getValue());

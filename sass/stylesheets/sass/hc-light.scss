@@ -625,6 +625,14 @@ a.link-action {
 	}
 }
 
+.tag {
+	&.green-bg,
+	&.yellow-bg {
+		background-color: $ui-bg-selected-color;
+		color: $white;
+	}
+}
+
 .disabled {
 	opacity: .5;
 }

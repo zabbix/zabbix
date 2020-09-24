@@ -81,6 +81,10 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
+					'key' => 'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
+					'description' => _('Reads modbus data. Returns various types')
+				],
+				[
 					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
@@ -399,6 +403,14 @@ class CHelpItems {
 					'description' => _('Count of matched lines in log file monitoring with log rotation support. Returns integer')
 				],
 				[
+					'key' => 'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
+					'description' => _('Reads modbus data. Returns various types')
+				],
+				[
+					'key' => 'mqtt.get[<broker_url>,topic]',
+					'description' => _('Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON')
+				],
+				[
 					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
@@ -673,8 +685,20 @@ class CHelpItems {
 			],
 			ITEM_TYPE_AGGREGATE => [
 				[
-					'key' => 'grpfunc[group,key,func,<param>]',
-					'description' => _('Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.')
+					'key' => 'grpavg[group,key,func,<param>]',
+					'description' => _('Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
+				],
+				[
+					'key' => 'grpmin[group,key,func,<param>]',
+					'description' => _('Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
+				],
+				[
+					'key' => 'grpmax[group,key,func,<param>]',
+					'description' => _('Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
+				],
+				[
+					'key' => 'grpsum[group,key,func,<param>]',
+					'description' => _('Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries.')
 				]
 			],
 			ITEM_TYPE_SIMPLE => [

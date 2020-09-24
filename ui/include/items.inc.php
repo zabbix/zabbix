@@ -266,6 +266,7 @@ function orderItemsByTrends(array &$items, $sortorder){
  * @param array  $items
  * @param int    $items['type']
  * @param string $items['delay']
+ * @param string $items['key_']
  * @param string $sortorder
  * @param array  $options
  * @param bool   $options['usermacros']
@@ -275,7 +276,8 @@ function orderItemsByDelay(array &$items, $sortorder, array $options){
 	$update_interval_parser = new CUpdateIntervalParser($options);
 
 	foreach ($items as &$item) {
-		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])) {
+		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 			$item['delay_sort'] = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -1032,7 +1034,7 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	foreach ($items_by_name as $name => $hostid_to_itemids) {
+	foreach ($items_by_name as $hostid_to_itemids) {
 		foreach ($db_hosts as $host) {
 			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
 				continue;
@@ -1194,10 +1196,10 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	list($db_items, $hostids) = getDataOverviewItems($groupids, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name'], $items_by_name)) {
-			$items_by_name[$db_item['name']] = [];
+		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
+			$items_by_name[$db_item['name_expanded']] = [];
 		}
-		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
 	}
 
 	$hidden_items_cnt = count(array_splice($items_by_name, (int) CSettingsHelper::get(
@@ -1239,10 +1241,10 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	list($db_items, $hostids) = getDataOverviewItems(null, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name'], $items_by_name)) {
-			$items_by_name[$db_item['name']] = [];
+		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
+			$items_by_name[$db_item['name_expanded']] = [];
 		}
-		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
 	}
 
 	$items_by_name_ctn = count($items_by_name);

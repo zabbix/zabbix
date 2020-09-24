@@ -95,7 +95,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		$original_form = $fields->asValues();
 		$original_widget_size = $replace
 			? self::$replaced_widget_size
-			: CDBHelper::getRow('SELECT width, height FROM widget WHERE name ='.zbx_dbstr($name));
+			: CDBHelper::getRow('SELECT width, height FROM widget WHERE dashboardid='.zbx_dbstr(self::DASHBOARD_ID).
+					' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC');
 
 		// Close widget configuration overlay.
 		COverlayDialogElement::find()->one()->close();
@@ -136,9 +137,12 @@ class testDashboardCopyWidgets extends CWebTest {
 		$copied_overlay = COverlayDialogElement::find()->one();
 		$copied_overlay->close();
 		$dashboard->save();
+		$this->page->waitUntilReady();
 
 		$copied_widget_size = CDBHelper::getRow('SELECT width, height FROM widget'.
-				' WHERE name ='.zbx_dbstr($name).' ORDER BY widgetid DESC');
+				' WHERE dashboardid='.zbx_dbstr($new_dashboard ? self::PASTE_DASHBOARD_ID : self::DASHBOARD_ID).
+				' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC'
+		);
 		$this->assertEquals($original_widget_size, $copied_widget_size);
 	}
 }

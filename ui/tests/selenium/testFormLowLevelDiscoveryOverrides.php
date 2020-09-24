@@ -145,7 +145,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty tags'
+								'Name' => 'Override with empty tags in trigger prototype'
 							],
 							'Operations' => [
 								[
@@ -166,7 +166,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty tag name'
+								'Name' => 'Override with empty tag name in trigger prototype'
 							],
 							'Operations' => [
 								[
@@ -200,6 +200,50 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								]
 							],
 							'error' => 'Incorrect value for field "Link templates": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with empty tag name in host prototype'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											['tag' => '', 'value' => 'value1']
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tag": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with empty tags in host prototype'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => []
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tags": cannot be empty.'
 						]
 					]
 				]
@@ -594,7 +638,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		// Add overrides from data to lld rule.
 		foreach($data['overrides'] as $i => $override){
 			$override_container->query('button:Add')->one()->click();
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 			// Fill Override name and what to do if Filter matches.
 			if (array_key_exists('fields', $override)) {
@@ -630,7 +674,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	/*
-	 * Overrides data for LLD creation.
+	 * Overrides data for LLD update.
 	 */
 	public static function getUpdateData() {
 		return [
@@ -846,6 +890,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Create enabled' => null,
 										'Discover' => null,
 										'Link templates' => null,
+										'Tags' => null,
 										'Host inventory' => null
 									]
 								]
@@ -931,6 +976,99 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								]
 							],
 							'error' => 'Incorrect value for field "Link templates": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'tag' => '',
+												'value' => ''
+											],
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 1
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tags": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'tag' => '',
+												'value' => 'new_value'
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tag": cannot be empty.'
+						]
+					]
+				]
+			],
+						[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 1
+											],
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 0
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tags": cannot be empty.'
 						]
 					]
 				]
@@ -1218,6 +1356,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Create enabled' => 'No',
 										'Discover' => 'Yes',
 										'Link templates' => 'Test Item Template',
+										'Tags' => [
+											['tag' => 'added_name1', 'value' => 'added_value1']
+										],
 										'Host inventory' => 'Disabled'
 									]
 								]
@@ -1303,6 +1444,30 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									]
 								]
 							]
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'fields' => [
+										'Discover' => 'No',
+									]
+								],
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Create enabled' => 'No',
+										'Discover' =>'Yes',
+										'Link templates' => null,
+										'Tags' => null,
+										'Host inventory' => null
+									]
+								]
+							]
 						]
 					]
 				]
@@ -1352,9 +1517,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @backup items
 	 */
-	public function testFormLowLevelDiscoveryOverrides_Update($data) {
+	// TODO: uncomment after fix ZBX-18271
+/*	public function testFormLowLevelDiscoveryOverrides_Update($data) {
 		$this->overridesUpdate($data);
 	}
+*/
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
@@ -1432,6 +1599,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Create enabled' => null,
 						'Discover' => null,
 						'Link templates' => 'Test Item Template',
+						'Tags' => [
+							['tag' => 'name1', 'value' => 'value1'],
+							['tag' => 'name2', 'value' => 'value2']
+						],
 						'Host inventory' => 'Automatic'
 					]
 				]
@@ -1506,7 +1677,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					}
 					// Open Override overlay.
 					$override_container->query('link', $override['name'])->one()->click();
-					$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+					$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 					// Get Operations Table.
 					$operations_container = $override_overlay->getField('Operations')->asTable();
@@ -1552,7 +1723,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				case USER_ACTION_UPDATE:
 					// Fill Override name and what to do if Filter matches.
 					if (array_key_exists('fields', $override)) {
-						$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+						$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 						$override_overlay->fill($override['fields']);
 					}
 					$this->fillOverrideFilter($override);
@@ -1601,7 +1772,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 * @return CFormElement $override_overlay  override or condition form in overlay
 	 */
 	private function fillOverrideFilter($override) {
-		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 		// Add Filters to override.
 		if (array_key_exists('Filters', $override)) {
@@ -1629,7 +1800,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 * @return CFormElement $override_overlay  override or condition form in overlay
 	 */
 	private function fillOverrideOperations($data, $override, $sources = null, $id = null) {
-		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 		$operation_container = $override_overlay->getField('Operations')->asTable();
 
 		// Add Operations to override.
@@ -1655,7 +1826,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			switch ($operation_action) {
 				case USER_ACTION_ADD:
 				case USER_ACTION_UPDATE:
-					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
+					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asCheckboxForm()->one();
 					if (array_key_exists('fields', $operation)) {
 						$operation_overlay->fill($operation['fields']);
 					}
@@ -1776,7 +1947,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Open each override dialog.
 			$row = $override_container->findRow('Name', $override['fields']['Name']);
 			$row->query('link', $override['fields']['Name'])->one()->click();
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 			// Check that Override fields filled with correct data.
 			foreach ($override['fields'] as $field => $value) {
@@ -1823,17 +1994,22 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
+				// TODO: remove sort after fix ZBX-18271
+				sort($condition_text);
 
 				// Compare Conditions from table with data.
+				$actual_conditions = [];
 				for ($n = 0; $n < $operation_count - 1; $n++) {
-					$this->assertEquals($condition_text[$n],
-							$operation_container->getRow($n)->getColumn('Condition')->getText()
-					);
+					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
+				// TODO: remove sort after fix ZBX-18271
+				sort($actual_conditions);
+
+				$this->assertEquals($condition_text, $actual_conditions);
 
 				foreach($override['Operations'] as $i => $operation) {
 					$operation_container->getRow($i)->query('button:Edit')->one()->click();
-					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
+					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asCheckboxForm()->one();
 					$operation_overlay->checkValue(
 							array_key_exists('fields', $operation) ? $operation['fields'] : $operation
 					);

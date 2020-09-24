@@ -54,8 +54,6 @@
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
-
 int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
 
@@ -104,7 +102,7 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
+void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);

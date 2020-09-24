@@ -55,7 +55,7 @@ class CControllerMiscConfigUpdate extends CController {
 						'discovery_groupid' => '0',
 						'alert_usrgrpid' => '0'
 					]);
-					$response->setMessageError(_('Cannot update configuration'));
+					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 
 					$this->setResponse($response);
 					break;
@@ -114,10 +114,10 @@ class CControllerMiscConfigUpdate extends CController {
 		);
 
 		if ($result) {
-			$response->setMessageOk(_('Configuration updated'));
+			CMessageHelper::setSuccessTitle(_('Configuration updated'));
 		}
 		else {
-			$response->setMessageError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 			$response->setFormData($this->getInputAll());
 		}
 

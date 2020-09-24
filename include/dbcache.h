@@ -25,6 +25,7 @@
 #include "sysinfo.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "memalloc.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -653,8 +654,9 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_INIT		0
 /* update sync, get changed data */
 #define ZBX_DBSYNC_UPDATE	1
+#define ZBX_SYNC_SECRETS	2
 
-void	DCsync_configuration(unsigned char mode);
+void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 
@@ -746,6 +748,7 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 
 #define ZBX_MACRO_VALUE_TEXT	0
 #define ZBX_MACRO_VALUE_SECRET	1
+#define ZBX_MACRO_VALUE_VAULT	2
 
 #define ZBX_MACRO_SECRET_MASK	"******"
 
@@ -849,6 +852,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	unsigned char	status;
+	int		values_num;
 
 	zbx_hc_data_t	*tail;
 	zbx_hc_data_t	*head;
@@ -982,6 +986,12 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env);
 
 const char	*zbx_dc_get_instanceid(void);
 
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+
+/* diagnostic data */
+void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
+void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
+void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 
 #endif

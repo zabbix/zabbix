@@ -28,7 +28,9 @@ require_once dirname(__FILE__).'/include/ident.inc.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'inputsecret.js', 'macrovalue.js',
+	'class.tab-indicators.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -201,7 +203,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$msg = [
 			'type' => 'error',
 			'message' => _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
-			'src' => ''
+			'source' => ''
 		];
 
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
