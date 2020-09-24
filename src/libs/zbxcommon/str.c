@@ -3696,7 +3696,6 @@ static int	zbx_token_parse_expression_macro(const char *expression, const char *
 		}
 		else if ('}' == *ptr)
 		{
-
 			/* empty macro */
 			if (ptr == macro + 2)
 				return FAIL;
@@ -3717,7 +3716,6 @@ static int	zbx_token_parse_expression_macro(const char *expression, const char *
 		}
 		else if ('"' == *ptr)
 			quoted = 1;
-
 	}
 
 	return FAIL;
