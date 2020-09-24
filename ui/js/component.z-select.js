@@ -427,7 +427,7 @@ class ZSelect extends HTMLElement {
 
 		document.body.appendChild(container);
 
-		const width = Math.ceil(list.scrollWidth) + 24;  // 24 = padding + border width
+		const width = Math.ceil(list.scrollWidth) + 34;  // 34 = scrollbar + padding + border width
 
 		container.remove();
 
