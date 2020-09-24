@@ -2540,7 +2540,7 @@ static int	get_expression_macro_result(const DB_EVENT *event, const DB_EVENT *r_
 	double			expression_result;
 	int			unknown_idx;
 	zbx_vector_ptr_t	unknown_msgs;	/* pointers to messages about origins of 'unknown' values */
-	char			eval_errors[1024] = { 0 };
+	char			err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, *expression);
 
@@ -2549,9 +2549,9 @@ static int	get_expression_macro_result(const DB_EVENT *event, const DB_EVENT *r_
 
 	zbx_vector_ptr_create(&unknown_msgs);
 
-	if (SUCCEED != evaluate(&expression_result, *expression, eval_errors, sizeof(eval_errors), &unknown_msgs))
+	if (SUCCEED != evaluate(&expression_result, *expression, err, sizeof(err), &unknown_msgs))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, eval_errors);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, err);
 
 		for (unknown_idx = 0; unknown_idx < unknown_msgs.values_num; unknown_idx++)
 		{
