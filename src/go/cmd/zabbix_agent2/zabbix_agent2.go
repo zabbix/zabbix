@@ -273,7 +273,6 @@ func main() {
 	}
 
 	var err error
-
 	if err = openEventLog(); err != nil {
 		fatalExit("", err)
 	}
