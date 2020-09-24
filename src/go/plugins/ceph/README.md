@@ -89,23 +89,225 @@ There are 4 levels of parameters overwriting:
 ## Supported keys
 The common parameters for all keys are: [connString][,user][,apikey]
 
-**ceph.df.details[\<commonParams\>]** — Returns statistics provided by "df detail" command.  
+**ceph.df.details[\<commonParams\>]** — Returns information about cluster’s data usage and distribution among pools.    
+Uses data provided by "df detail" command.  
+*Output sample:*
+```json
+{
+    "pools": {
+        "device_health_metrics": {
+            "percent_used": 0,
+            "objects": 0,
+            "bytes_used": 0,
+            "rd_ops": 0,
+            "rd_bytes": 0,
+            "wr_ops": 0,
+            "wr_bytes": 0,
+            "stored_raw": 0,
+            "max_avail": 1390035968
+        },
+        "new_pool": {
+            "percent_used": 0,
+            "objects": 0,
+            "bytes_used": 0,
+            "rd_ops": 0,
+            "rd_bytes": 0,
+            "wr_ops": 0,
+            "wr_bytes": 0,
+            "stored_raw": 0,
+            "max_avail": 695039808
+        },
+        "test_zabbix": {
+            "percent_used": 0,
+            "objects": 4,
+            "bytes_used": 786432,
+            "rd_ops": 0,
+            "rd_bytes": 0,
+            "wr_ops": 4,
+            "wr_bytes": 24576,
+            "stored_raw": 66618,
+            "max_avail": 1390035968
+        },
+        "zabbix": {
+            "percent_used": 0,
+            "objects": 0,
+            "bytes_used": 0,
+            "rd_ops": 0,
+            "rd_bytes": 0,
+            "wr_ops": 0,
+            "wr_bytes": 0,
+            "stored_raw": 0,
+            "max_avail": 1390035968
+        }
+    },
+    "rd_ops": 0,
+    "rd_bytes": 0,
+    "wr_ops": 4,
+    "wr_bytes": 24576,
+    "num_pools": 4,
+    "total_bytes": 12872318976,
+    "total_avail_bytes": 6898843648,
+    "total_used_bytes": 2752249856,
+    "total_objects": 4
+}
+```
 
-**ceph.osd.stats[\<commonParams\>]** — Returns OSDs statistics provided by "pg dump" command.  
+**ceph.osd.stats[\<commonParams\>]** — Returns aggregated and per OSD statistics.  
+Uses data provided by "pg dump" command.  
+*Output sample:*
+```json
+{
+    "osd_latency_apply": {
+        "min": 0,
+        "max": 0,
+        "avg": 0
+    },
+    "osd_latency_commit": {
+        "min": 0,
+        "max": 0,
+        "avg": 0
+    },
+    "osd_fill": {
+        "min": 47,
+        "max": 47,
+        "avg": 47
+    },
+    "osd_pgs": {
+        "min": 65,
+        "max": 65,
+        "avg": 65
+    },
+    "osds": {
+        "0": {
+            "osd_latency_apply": 0,
+            "osd_latency_commit": 0,
+            "num_pgs": 65,
+            "osd_fill": 47
+        },
+        "1": {
+            "osd_latency_apply": 0,
+            "osd_latency_commit": 0,
+            "num_pgs": 65,
+            "osd_fill": 47
+        },
+        "2": {
+            "osd_latency_apply": 0,
+            "osd_latency_commit": 0,
+            "num_pgs": 65,
+            "osd_fill": 47
+        }
+    }
+}
+```
 
-**ceph.osd.discovery[\<commonParams\>]** — Returns list of OSDs in LLD format.  
+**ceph.osd.discovery[\<commonParams\>]** — Returns a list of discovered OSDs in LLD format.
+Can be used in conjunction with "ceph.osd.stats" and "ceph.osd.dump" in order to create "per osd" items.  
+Uses data provided by "osd crush tree" and "osd crush rule dump" commands.  
+*Output sample:*
+```json
+[
+    {
+        "{#OSDNAME}": "2",
+        "{#CRUSHRULE}": "default"
+    },
+    {
+        "{#OSDNAME}": "1",
+        "{#CRUSHRULE}": "default"
+    },
+    {
+        "{#OSDNAME}": "0",
+        "{#CRUSHRULE}": "newbucket"
+    }
+]
+```
 
-**ceph.osd.dump[\<commonParams\>]** — Returns OSDs dump provided by "osd dump" command.  
+**ceph.osd.dump[\<commonParams\>]** — Returns usage thresholds and statuses of OSDs.  
+Uses data provided by "osd dump" command.  
+*Output sample:*
+```json
+{
+    "osd_backfillfull_ratio": 0.9,
+    "osd_full_ratio": 0.95,
+    "osd_nearfull_ratio": 0.85,
+    "num_pg_temp": 65,
+    "osds": {
+        "0": {
+            "in": 1,
+            "up": 1
+        },
+        "1": {
+            "in": 1,
+            "up": 1
+        },
+        "2": {
+            "in": 1,
+            "up": 1
+        }
+    }
+}
+```
 
-**ceph.ping[\<commonParams\>]** — Tests if a connection is alive or not.  
+**ceph.ping[\<commonParams\>]** — Tests if a connection is alive or not.
+Uses data provided by "health" command.    
 *Returns:*
 - "1" if a connection is alive.
 - "0" if a connection is broken (if there is any error presented including AUTH and configuration issues).
 
-**ceph.pool.discovery[\<commonParams\>]** — Returns list of pools in LLD format.  
+**ceph.pool.discovery[\<commonParams\>]** — Returns a list of discovered pools with assigned in LLD format.
+Can be used in conjunction with "ceph.df.details" in order to create "per pool" items.  
+Uses data provided by "osd dump" and "osd crush rule dump" commands.  
+*Output sample:*
+```json
+[
+    {
+        "{#POOLNAME}": "device_health_metrics",
+        "{#CRUSHRULE}": "default"
+    },
+    {
+        "{#POOLNAME}": "test_zabbix",
+        "{#CRUSHRULE}": "default"
+    },
+    {
+        "{#POOLNAME}": "zabbix",
+        "{#CRUSHRULE}": "default"
+    },
+    {
+        "{#POOLNAME}": "new_pool",
+        "{#CRUSHRULE}": "newbucket"
+    }
+]
+```
 
-**ceph.status[\<commonParams\>]** — Returns data provided by "status" command.  
-
+**ceph.status[\<commonParams\>]** — Returns an overall cluster's status.  
+Uses data provided by "status" command.  
+*Output sample:*
+```json
+{
+    "overall_status": 1,
+    "num_mon": 3,
+    "num_osd": 3,
+    "num_osd_in": 3,
+    "num_osd_up": 3,
+    "num_pg": 66,
+    "pg_states": {
+        "active": 65,
+        "backfill_toofull": 0,
+        "backfill_wait": 0,
+        "backfilling": 0,
+        "clean": 65,
+        "degraded": 0,
+        "inconsistent": 0,
+        "peering": 0,
+        "recovering": 0,
+        "recovery_wait": 0,
+        "remapped": 65,
+        "scrubbing": 0,
+        "undersized": 0,
+        "unknown": 1
+    },
+    "min_mon_release_name": "octopus"
+}
+```
 
 ## Troubleshooting
 The plugin uses Zabbix agent's logs. You can increase debugging level of Zabbix Agent if you need more details about 

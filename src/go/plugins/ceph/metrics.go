@@ -68,25 +68,25 @@ const (
 
 var metrics = pluginMetrics{
 	keyDf: metric{
-		description: "Returns statistics provided by \"df detail\" command.",
+		description: "Returns information about cluster’s data usage and distribution among pools.",
 		commands:    []command{cmdDf},
 		params:      extraParamDetails,
 		handler:     dfHandler,
 	},
 	keyOSD: metric{
-		description: "Returns OSDs statistics provided by \"pg dump\" command.",
+		description: "Returns aggregated and per OSD statistics.",
 		commands:    []command{cmdPgDump},
 		params:      nil,
 		handler:     osdHandler,
 	},
 	keyOSDDiscovery: metric{
-		description: "Returns list of OSDs in LLD format.",
+		description: "Returns a list of discovered OSDs.",
 		commands:    []command{cmdOSDCrushRuleDump, cmdOSDCrushTree},
 		params:      nil,
 		handler:     osdDiscoveryHandler,
 	},
 	keyOSDDump: metric{
-		description: "Returns OSDs dump provided by \"osd dump\" command.",
+		description: "Returns usage thresholds and statuses of OSDs.",
 		commands:    []command{cmdOSDDump},
 		params:      nil,
 		handler:     osdDumpHandler,
@@ -98,13 +98,13 @@ var metrics = pluginMetrics{
 		handler:     pingHandler,
 	},
 	keyPoolDiscovery: metric{
-		description: "Returns list of pools in LLD format.",
+		description: "Returns a list of discovered pools.",
 		commands:    []command{cmdOSDDump, cmdOSDCrushRuleDump},
 		params:      nil,
 		handler:     poolDiscoveryHandler,
 	},
 	keyStatus: metric{
-		description: "Returns data provided by \"status\" command.",
+		description: "Returns an overall cluster's status.",
 		commands:    []command{cmdStatus},
 		params:      nil,
 		handler:     statusHandler,
