@@ -5337,6 +5337,50 @@ void	remove_param(char *param, int num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: str_n_in_list                                                    *
+ *                                                                            *
+ * Purpose: check if string is contained in a list of delimited strings       *
+ *                                                                            *
+ * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
+ *             value     - [IN] value                                         *
+ *             len       - [IN] value length                                  *
+ *             delimiter - [IN] delimiter                                     *
+ *                                                                            *
+ * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
+ *                                                                            *
+ ******************************************************************************/
+int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
+{
+	const char	*end;
+	size_t		token_len, next = 1;
+
+	while ('\0' != *list)
+	{
+		if (NULL != (end = strchr(list, delimiter)))
+		{
+			token_len = end - list;
+			next = 1;
+		}
+		else
+		{
+			token_len = strlen(list);
+			next = 0;
+		}
+
+		if (len == token_len && 0 == memcmp(list, value, len))
+			return SUCCEED;
+
+		list += token_len + next;
+	}
+
+	if (1 == next && 0 == len)
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
@@ -5352,27 +5396,7 @@ void	remove_param(char *param, int num)
  ******************************************************************************/
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
-	const char	*end;
-	int		ret = FAIL;
-	size_t		len;
-
-	len = strlen(value);
-
-	while (SUCCEED != ret)
-	{
-		if (NULL != (end = strchr(list, delimiter)))
-		{
-			ret = (len == (size_t)(end - list) && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
-			list = end + 1;
-		}
-		else
-		{
-			ret = (0 == strcmp(list, value) ? SUCCEED : FAIL);
-			break;
-		}
-	}
-
-	return ret;
+	return str_n_in_list(list, value, strlen(value), delimiter);
 }
 
 /******************************************************************************
