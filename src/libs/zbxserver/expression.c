@@ -3016,7 +3016,9 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
+				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_LLD_MACRO:
+				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				/* neither lld nor {123123} macros are processed by this function, skip them */
 				pos = token.loc.r + 1;
@@ -3066,6 +3068,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				m = NULL;
 				break;
 			case ZBX_TOKEN_REFERENCE:
+				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_EXPRESSION_MACRO:
 				/* These macros (and probably all other in the future) must be resolved using only */
 				/* information stored in token.data union. For now, force crash if they rely on m. */
@@ -4144,15 +4147,16 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					if (0 != (macro_type & MACRO_TYPE_EVENT_NAME))
 					{
-						size_t	exp_alloc = 0, exp_offset = 0;
+						char		*exp = NULL;
+						size_t		exp_alloc = 0, exp_offset = 0;
 						zbx_strloc_t	*loc = &token.data.expression_macro.expression;
 
-						zbx_free(expression);
-						zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, *data + loc->l,
+						zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, *data + loc->l,
 								loc->r - loc->l + 1);
 
 						ret = get_expression_macro_result(event, r_event, alert, ack,
-								&expression, &replace_to, error, maxerrlen);
+								&exp, &replace_to, error, maxerrlen);
+						zbx_free(exp);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
