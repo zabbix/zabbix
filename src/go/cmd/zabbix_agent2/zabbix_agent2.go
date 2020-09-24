@@ -304,30 +304,6 @@ func main() {
 		fatalExit("cannot validate configuration", err)
 	}
 
-	if err = log.Open(log.Console, log.None, "", 0); err != nil {
-		fatalExit("cannot initialize logger", err)
-	}
-
-	{
-		var m *scheduler.Manager
-
-		if m, err = scheduler.NewManager(&agent.Options); err != nil {
-			fatalExit("cannot create scheduling manager", err)
-		}
-
-		m.Start()
-		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
-			fatalExit("cannot process configuration", err)
-		}
-		m.Stop()
-	}
-
-	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
-	if err != nil {
-		fatalExit("cannot parse the \"Hostname\" parameter", err)
-	}
-	agent.FirstHostname = hostnames[0]
-
 	if err := handleWindowsService(confFlag); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
@@ -363,6 +339,14 @@ func main() {
 			fatalExit("cannot create scheduling manager", err)
 		}
 		m.Start()
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
+		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+		if err != nil {
+			fatalExit("cannot parse the \"Hostname\" parameter", err)
+		}
+		agent.FirstHostname = hostnames[0]
 
 		if argTest {
 			checkMetric(m, testFlag)
@@ -373,6 +357,7 @@ func main() {
 		m.Stop()
 		monitor.Wait(monitor.Scheduler)
 		os.Exit(0)
+
 	}
 
 	if argVerbose {
@@ -423,7 +408,7 @@ func main() {
 
 	zbxlib.SetLogLevel(logLevel)
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent 2 [%s]. (%s)", agent.Options.Hostname, version.Long())
+	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
 	log.Infof(greeting)
 
 	addresses, err := serverconnector.ParseServerActive()
@@ -484,6 +469,23 @@ func main() {
 
 	manager.Start()
 
+	if err = configUpdateItemParameters(manager, &agent.Options); err != nil {
+		fatalExit("cannot process configuration", err)
+	}
+
+	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+	if err != nil {
+		fatalExit("cannot parse the \"Hostname\" parameter", err)
+	}
+	agent.FirstHostname = hostnames[0]
+	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
+	log.Infof(hostmessage)
+	if foregroundFlag {
+		if agent.Options.LogType != "console" {
+			fmt.Println(hostmessage)
+		}
+		fmt.Println("Press Ctrl+C to exit.")
+	}
 	if err = resultcache.Prepare(&agent.Options, addresses, hostnames); err != nil {
 		fatalExit("cannot prepare result cache", err)
 	}
