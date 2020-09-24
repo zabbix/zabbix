@@ -1,5 +1,5 @@
 # MQTT plugin
-This plugin provides a native solution for monitoring MQTT brokers published messages. 
+This plugin provides a native solution for monitoring messages published by MQTT brokers. 
 The plugin can monitor several broker instances simultaneously via Zabbix agent 2. Proxy and websocket connections are 
 supported. The plugin keeps all subscriptions to a single broker in one connection to reduce network strain. The plugin 
 supports active checks only.
