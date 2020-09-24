@@ -215,7 +215,9 @@ class ZSelect extends HTMLElement {
 	}
 
 	get value() {
-		return this._input.value;
+		return !this._is_connected
+			? this.getAttribute('value')
+			: this._input.value;
 	}
 
 	set value(value) {
