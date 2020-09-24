@@ -439,6 +439,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
 #define ZBX_SNMP_CACHE_RELOAD	"snmp_cache_reload"
+#define ZBX_DIAGINFO		"diaginfo"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -930,6 +931,7 @@ zbx_task_t;
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 #define ZBX_RTC_SNMP_CACHE_RELOAD	9
+#define ZBX_RTC_DIAGINFO		10
 
 typedef enum
 {
@@ -1244,7 +1246,7 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
-void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, char **utf8_value);
+void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);

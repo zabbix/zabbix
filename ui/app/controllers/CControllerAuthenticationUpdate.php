@@ -183,6 +183,14 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateSamlAuth() {
+		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+
+		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
+			$this->response->setMessageError($openssl_status['error']);
+
+			return false;
+		}
+
 		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_sp_entityid', 'saml_username_attribute'];
 		$config = select_config();
 		$this->getInputs($config, $saml_fields);
@@ -221,6 +229,7 @@ class CControllerAuthenticationUpdate extends CController {
 		if (!$auth_valid) {
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
+
 			return;
 		}
 
@@ -229,6 +238,7 @@ class CControllerAuthenticationUpdate extends CController {
 			$this->response->setMessageOk(_('LDAP login successful'));
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
+
 			return;
 		}
 

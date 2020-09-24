@@ -87,6 +87,7 @@ class CControllerAuthenticationEdit extends CController {
 
 	protected function doAction() {
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
+		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
 		$data = [
 			'action_submit' => 'authentication.update',
@@ -94,6 +95,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'ldap_test_password' => '',
 			'ldap_test_user' => CWebUser::$data['alias'],
+			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'change_bind_password' => 0,
 			'form_refresh' => 0
 		];
@@ -146,6 +148,8 @@ class CControllerAuthenticationEdit extends CController {
 
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
+		$data['saml_enabled'] = ($openssl_status['result'] == CFrontendSetup::CHECK_OK
+				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));

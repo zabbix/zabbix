@@ -46,8 +46,8 @@ function getMainMenu(): CMenu {
 					->setAliases(['history.php', 'chart.php']),
 				(new CMenuItem(_('Screens')))
 					->setUrl(new CUrl('screens.php'), 'screens.php')
-					->setAliases(['screenconf.php', 'screenedit.php', 'screen.import.php', 'slides.php',
-						'slideconf.php'
+					->setAliases(['screenconf.php?!templateid=*', 'screenedit.php?!templateid=*', 'screen.import.php',
+						'slides.php', 'slideconf.php'
 					]),
 				(new CMenuItem(_('Maps')))
 					->setAction('map.view')
@@ -102,7 +102,9 @@ function getMainMenu(): CMenu {
 						->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php'),
 					(new CMenuItem(_('Templates')))
 						->setUrl(new CUrl('templates.php'), 'templates.php')
-						->setAliases(['conf.import.php?rules_preset=template']),
+						->setAliases(['conf.import.php?rules_preset=template', 'screenconf.php?templateid=*',
+							'screenedit.php?templateid=*'
+						]),
 					(new CMenuItem(_('Hosts')))
 						->setUrl(new CUrl('hosts.php'), 'hosts.php')
 						->setAliases(['items.php', 'triggers.php', 'graphs.php', 'applications.php',

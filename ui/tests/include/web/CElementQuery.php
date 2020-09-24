@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/CElement.php';
 require_once dirname(__FILE__).'/CElementCollection.php';
 require_once dirname(__FILE__).'/elements/CNullElement.php';
 require_once dirname(__FILE__).'/elements/CFormElement.php';
+require_once dirname(__FILE__).'/elements/CCheckboxFormElement.php';
 require_once dirname(__FILE__).'/elements/CTableElement.php';
 require_once dirname(__FILE__).'/elements/CTableRowElement.php';
 require_once dirname(__FILE__).'/elements/CWidgetElement.php';
@@ -41,6 +42,7 @@ require_once dirname(__FILE__).'/elements/CColorPickerElement.php';
 require_once dirname(__FILE__).'/elements/CCompositeInputElement.php';
 require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
 require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
+require_once dirname(__FILE__).'/elements/CInputGroupElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -491,6 +493,15 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * Check that the corresponding element exists.
+	 *
+	 * @return boolean
+	 */
+	public function exists() {
+		return $this->one(false)->isValid();
+	}
+
+	/**
 	 * Get input element from container.
 	 *
 	 * @param CElement     $target    container element
@@ -530,7 +541,8 @@ class CElementQuery implements IWaitable {
 				'/div[contains(@class, "calendar-control")]'
 			],
 			'CColorPickerElement'		=> '/div[contains(@class, "input-color-picker")]',
-			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]'
+			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
+			'CInputGroupElement'		=> '/div[contains(@class, "input-group")]'
 		];
 
 		if ($class !== null) {
