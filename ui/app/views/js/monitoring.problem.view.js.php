@@ -35,7 +35,14 @@
 				to: filter._timeselector._data.to
 			};
 
-		filter.on(TABFILTER_EVENT_URLSET, refreshResults);
+		filter.on(TABFILTER_EVENT_URLSET, () => {
+			let url = new Curl();
+
+			url.setArgument('action', 'problem.view.csv');
+			$('#export_csv').attr('data-url', url.getUrl());
+
+			refreshResults();
+		});
 
 		function refreshResults() {
 			let url = new Curl(),

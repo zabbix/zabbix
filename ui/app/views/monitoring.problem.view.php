@@ -96,9 +96,9 @@ if ($data['action'] === 'problem.view') {
 		->setControls(
 			(new CTag('nav', true,
 				(new CList())
-					->addItem(new CRedirectButton(_('Export to CSV'),
+					->addItem((new CRedirectButton(_('Export to CSV'),
 						(new CUrl())->setArgument('action', 'problem.view.csv')
-					))
+					))->setId('export_csv'))
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			))->setAttribute('aria-label', _('Content controls'))
 		);
