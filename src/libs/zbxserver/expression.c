@@ -4140,18 +4140,20 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 
 					get_trigger_expression_constant(expression, &token.data.reference, &replace_to);
 				}
-				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type &&
-							0 != (macro_type & MACRO_TYPE_EVENT_NAME))
+				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
 				{
-					size_t	exp_alloc = 0, exp_offset = 0;
-					zbx_strloc_t	*loc = &token.data.expression_macro.expression;
+					if (0 != (macro_type & MACRO_TYPE_EVENT_NAME))
+					{
+						size_t	exp_alloc = 0, exp_offset = 0;
+						zbx_strloc_t	*loc = &token.data.expression_macro.expression;
 
-					zbx_free(expression);
-					zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, *data + loc->l,
-							loc->r - loc->l + 1);
+						zbx_free(expression);
+						zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, *data + loc->l,
+								loc->r - loc->l + 1);
 
-					ret = get_expression_macro_result(event, r_event, alert, ack, &expression,
-							&replace_to, error, maxerrlen);
+						ret = get_expression_macro_result(event, r_event, alert, ack,
+								&expression, &replace_to, error, maxerrlen);
+					}
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
