@@ -305,15 +305,15 @@ class CTabFilterItem extends CBaseComponent {
 					params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'))
 				}
 			}
-		}
 
-		if (this._data.filter_custom_time) {
-			params.set('from', this._data.from);
-			params.set('to', this._data.to);
-		}
+			if (this._data.filter_custom_time) {
+				params.set('from', this._data.from);
+				params.set('to', this._data.to);
+			}
 
-		if ('page' in this._data && this._data.page > 1) {
-			params.set('page', this._data.page);
+			if ('page' in this._data && this._data.page > 1) {
+				params.set('page', this._data.page);
+			}
 		}
 
 		return params;

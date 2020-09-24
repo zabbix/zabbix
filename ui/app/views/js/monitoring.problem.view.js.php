@@ -61,6 +61,8 @@
 			window.flickerfreeScreen.screens['problem'].data.filter = data;
 			window.flickerfreeScreen.screens['problem'].data.sort = data.sort;
 			window.flickerfreeScreen.screens['problem'].data.sortorder = data.sortorder;
+			window.flickerfreeScreen.screens['problem'].timeline.from = data.from;
+			window.flickerfreeScreen.screens['problem'].timeline.to = data.to;
 			window.flickerfreeScreen.refresh('problem');
 		}
 
