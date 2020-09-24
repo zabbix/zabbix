@@ -115,7 +115,6 @@ class CControllerProblemView extends CControllerProblem {
 
 		$data = [
 			'action' => $this->getAction(),
-			'uncheck' => $this->hasInput('filter_reset'),
 			'tabfilter_idx' => static::FILTER_IDX,
 			'filter' => $filter,
 			'filter_view' => 'monitoring.problem.filter',
@@ -141,7 +140,7 @@ class CControllerProblemView extends CControllerProblem {
 			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
-			'uncheck' => $this->hasInput('uncheck'),
+			'uncheck' => $this->hasInput('filter_reset'),
 			'page' => $this->getInput('page', 1),
 		];
 
