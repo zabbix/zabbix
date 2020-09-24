@@ -37,12 +37,12 @@ class CTabFilterItem extends CBaseComponent {
 	constructor(target, options) {
 		super(target);
 
-		this._parent = options.parent||null;
+		this._parent = options.parent || null;
 		this._idx_namespace = options.idx_namespace;
 		this._index = options.index;
 		this._content_container = options.container;
 		this._can_toggle = options.can_toggle;
-		this._data = options.data||{};
+		this._data = options.data || {};
 		this._template = options.template;
 		this._expanded = options.expanded;
 		this._support_custom_time = options.support_custom_time;
@@ -190,7 +190,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * Fire TABFILTERITEM_EVENT_EXPAND event on template.
 	 */
 	setExpanded() {
-		let item_template = this._template||this._content_container.querySelector('[data-template]');
+		let item_template = this._template || this._content_container.querySelector('[data-template]');
 
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_EXPANDED);
 
@@ -206,7 +206,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * Remove expanded state of item and it content. Fire TABFILTERITEM_EVENT_COLLAPSE on item template.
 	 */
 	removeExpanded() {
-		let item_template = (this._template||this._content_container.querySelector('[data-template]'));
+		let item_template = this._template || this._content_container.querySelector('[data-template]');
 
 		this._expanded = false;
 		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_EXPANDED);

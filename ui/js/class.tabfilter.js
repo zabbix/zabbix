@@ -36,7 +36,7 @@ class CTabFilter extends CBaseComponent {
 		this._timeselector = null;
 
 		this.init(options);
-		this.registerEvents(options);
+		this.registerEvents();
 		this.initItemUnsavedState(this._active_item, this._active_item._data);
 	}
 
@@ -100,7 +100,7 @@ class CTabFilter extends CBaseComponent {
 	delete(item) {
 		let index = this._items.indexOf(item);
 
-		if (index > -1) {
+		if (index != -1) {
 			this.setSelectedItem(this._items[index - 1]);
 
 			if (item._expanded) {
@@ -141,11 +141,11 @@ class CTabFilter extends CBaseComponent {
 			parent: this,
 			idx_namespace: this._idx_namespace,
 			index: this._items.length,
-			expanded: data.expanded||false,
+			expanded: data.expanded || false,
 			can_toggle: this._options.can_toggle,
 			container: container,
 			data: data,
-			template: this._templates[data.tab_view]||null,
+			template: this._templates[data.tab_view] || null,
 			support_custom_time: this._options.support_custom_time
 		});
 
@@ -166,7 +166,7 @@ class CTabFilter extends CBaseComponent {
 	collapseAllItemsExcept(except) {
 		for (const item of this._items) {
 			if (item !== except && item._expanded) {
-				item.fire(TABFILTERITEM_EVENT_COLLAPSE)
+				item.fire(TABFILTERITEM_EVENT_COLLAPSE);
 			}
 		}
 	}
@@ -178,19 +178,21 @@ class CTabFilter extends CBaseComponent {
 	 * @param {bool}           disable  Additional status to determine should the timeselector to be disabled or not.
 	 */
 	updateTimeselector(item, disable) {
+		if (!this._timeselector) {
+			return;
+		}
+
 		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
-			buttons = this._target.querySelectorAll('button.btn-time-left,button.btn-time-out,button.btn-time-right');
+			buttons = this._target.querySelectorAll('button.btn-time-left, button.btn-time-out, button.btn-time-right');
 
-		if (this._timeselector) {
-			this._timeselector.setDisabled(disabled);
+		this._timeselector.setDisabled(disabled);
 
-			for (const button of buttons) {
-				if (disabled) {
-					button.setAttribute('disabled', 'disabled');
-				}
-				else {
-					button.removeAttribute('disabled');
-				}
+		for (const button of buttons) {
+			if (disabled) {
+				button.setAttribute('disabled', 'disabled');
+			}
+			else {
+				button.removeAttribute('disabled');
 			}
 		}
 	}
@@ -215,9 +217,11 @@ class CTabFilter extends CBaseComponent {
 			method: 'POST',
 			signal: this._fetch.signal,
 			body: new URLSearchParams(body)
-		}).then(() => {
+		})
+		.then(() => {
 			this._fetch = null;
-		}).catch(() => {
+		})
+		.catch(() => {
 			// User aborted a request.
 		});
 	}
@@ -265,7 +269,7 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Get first selected item. If there are no selected item will return null.
+	 * Get first selected item. Return null if no item is selected.
 	 *
 	 * @return {CTabFilterItem}
 	 */
@@ -281,10 +285,8 @@ class CTabFilter extends CBaseComponent {
 
 	/**
 	 * Register tab filter events, called once during initialization.
-	 *
-	 * @param {object} options  Tab filter initialization options.
 	 */
-	registerEvents(options) {
+	registerEvents() {
 		this._events = {
 			/**
 			 * Event handler on tab content expand.
@@ -373,7 +375,8 @@ class CTabFilter extends CBaseComponent {
 
 				this.profileUpdate('taborder', {
 					value_str: value_str
-				}).then(() => {
+				})
+				.then(() => {
 					this._items.forEach((item, index) => {
 						item._index = index;
 					});
@@ -381,7 +384,7 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
-			 * Event handler for 'Delete' button
+			 * Event handler for 'Delete' button.
 			 */
 			deleteActiveFilterTab: (ev) => {
 				this.delete(this._active_item);
@@ -405,7 +408,8 @@ class CTabFilter extends CBaseComponent {
 					this.profileUpdate('properties', {
 						'idx2': ev.detail.idx2,
 						'value_str': params.toString()
-					}).then(() => {
+					})
+					.then(() => {
 						item.setBrowserLocation(params);
 						window.location.reload(true);
 					});
@@ -495,7 +499,8 @@ class CTabFilter extends CBaseComponent {
 				this.profileUpdate('properties', {
 					idx2: this._active_item._index,
 					value_str: params.toString()
-				}).then(() => {
+				})
+				.then(() => {
 					this._active_item.updateApplyUrl();
 					this._active_item.setBrowserLocation(params);
 					this._active_item.resetUnsavedState();
@@ -538,7 +543,7 @@ class CTabFilter extends CBaseComponent {
 				}
 
 				if (ev.path.indexOf(this._target.querySelector('nav')) > -1) {
-					this._events[(ev.key == 'ArrowRight') ? 'selectNextTab' : 'selectPrevTab']();
+					this._events[(ev.key === 'ArrowRight') ? 'selectNextTab' : 'selectPrevTab']();
 					cancelEvent(ev);
 				}
 			},
@@ -573,8 +578,9 @@ class CTabFilter extends CBaseComponent {
 
 		try {
 			addEventListener('test', null, {get passive() {}});
-			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev), {passive:true});
-		} catch(e) {
+			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev), {passive: true});
+		}
+		catch(e) {
 			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev));
 		}
 
@@ -582,10 +588,14 @@ class CTabFilter extends CBaseComponent {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
 		}
 
-		this._filters_footer.querySelector('[name="filter_update"]').addEventListener('click', this._events.buttonUpdateAction);
-		this._filters_footer.querySelector('[name="filter_new"]').addEventListener('click', this._events.buttonSaveAsAction);
-		this._filters_footer.querySelector('[name="filter_apply"]').addEventListener('click', this._events.buttonApplyAction);
-		this._filters_footer.querySelector('[name="filter_reset"]').addEventListener('click', this._events.buttonResetAction);
+		this._filters_footer.querySelector('[name="filter_update"]')
+			.addEventListener('click', this._events.buttonUpdateAction);
+		this._filters_footer.querySelector('[name="filter_new"]')
+			.addEventListener('click', this._events.buttonSaveAsAction);
+		this._filters_footer.querySelector('[name="filter_apply"]')
+			.addEventListener('click', this._events.buttonApplyAction);
+		this._filters_footer.querySelector('[name="filter_reset"]')
+			.addEventListener('click', this._events.buttonResetAction);
 
 		this.on('keydown', this._events.keydown);
 		this.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateActiveFilterTab);

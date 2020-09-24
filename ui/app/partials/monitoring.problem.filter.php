@@ -458,7 +458,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.filter_view_data.groups||[],
+			data: data.filter_view_data.groups || [],
 			popup: {
 				parameters: {
 					srctbl: 'host_groups',
@@ -478,7 +478,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'hostids_' + data.uniqid,
 			object_name: 'hosts',
 			name: 'hostids[]',
-			data: data.filter_view_data.hosts||[],
+			data: data.filter_view_data.hosts || [],
 			popup: {
 				filter_preselect_fields: {
 					hostgroups: 'groupids_' + data.uniqid
@@ -512,7 +512,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'triggerids_' + data.uniqid,
 			object_name: 'triggers',
 			name: 'triggerids[]',
-			data: data.filter_view_data.triggers||[],
+			data: data.filter_view_data.triggers || [],
 			popup: {
 				filter_preselect_fields: {
 					hosts: 'hostids_' + data.uniqid
@@ -535,7 +535,7 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="compact_view"]', container).change(eventHandler.compact_view).trigger('change');
 		$('[name="show_tags"]', container).change(eventHandler.show_tags).trigger('change');
 
-		// Initialize src_url
+		// Initialize src_url.
 		this.resetUnsavedState();
 	}
 

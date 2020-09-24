@@ -212,7 +212,7 @@ if (array_key_exists('render_html', $data)) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.filter_view_data.groups_multiselect||[],
+			data: data.filter_view_data.groups_multiselect || [],
 			popup: {
 				parameters: {
 					multiselect: '1',
@@ -264,7 +264,7 @@ if (array_key_exists('render_html', $data)) {
 			$('[name="severities[' + value + ']"]', container).attr('checked', true);
 		}
 
-		// Initialize src_url
+		// Initialize src_url.
 		this.resetUnsavedState();
 	}
 
