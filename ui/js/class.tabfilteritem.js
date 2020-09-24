@@ -116,7 +116,7 @@ class CTabFilterItem extends CBaseComponent {
 			support_custom_time: +this._support_custom_time
 		};
 
-		if ('filter_name' in this._data) {
+		if (this._data.filter_name !== '') {
 			defaults.filter_name = this._data.filter_name;
 		}
 

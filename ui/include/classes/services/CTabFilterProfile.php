@@ -187,10 +187,6 @@ class CTabFilterProfile {
 			$this->update();
 		}
 
-		if ($input['filter_name'] === '') {
-			unset($input['filter_name']);
-		}
-
 		$filter = $this->tabfilters[$this->selected];
 		$sorting = array_intersect_key($filter, ['sort' => '', 'sortorder' => '']);
 		$input_sorting = array_intersect_key($input, ['sort' => '', 'sortorder' => '']);
