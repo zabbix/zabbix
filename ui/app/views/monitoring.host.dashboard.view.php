@@ -25,6 +25,13 @@
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
+}
+
+if (array_key_exists('no_data', $data)) {
+	(new CWidget())
+		->setTitle(_('Dashboards'))
+		->addItem(new CTableInfo())
+		->show();
 
 	return;
 }
@@ -32,6 +39,7 @@ if (array_key_exists('error', $data)) {
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('dashboard.grid.js');
+$this->addJsFile('layout.mode.js');
 $this->addJsFile('class.cclock.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');
