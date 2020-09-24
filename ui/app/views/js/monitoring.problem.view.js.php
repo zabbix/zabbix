@@ -30,6 +30,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 				refresh_interval = <?= $data['refresh_interval'] ?>,
 				refresh_url = '<?= $data['refresh_url'] ?>',
 				refresh_timer,
+				active_filter = filter._active_item,
 				global_timerange = {
 					from: filter._timeselector._data.from,
 					to: filter._timeselector._data.to
@@ -40,8 +41,12 @@ if (array_key_exists('filter_options', $data)) { ?>
 
 			url.setArgument('action', 'problem.view.csv');
 			$('#export_csv').attr('data-url', url.getUrl());
-
 			refreshResults();
+
+			if (active_filter !== filter._active_item) {
+				active_filter = filter._active_item;
+				chkbxRange.clearSelectedOnFilterChange();
+			}
 		});
 
 		function refreshResults() {
