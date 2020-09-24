@@ -779,6 +779,7 @@ insert_javascript_for_visibilitybox();
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
+				overlays_stack.end().centerDialog();
 			});
 
 		jQuery('#overrides-evaltype').change(function() {
