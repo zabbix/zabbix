@@ -163,13 +163,14 @@ class CTabFilterProfile {
 	}
 
 	/**
-	 * Update selected tab filter properties from $input array. If $input contains filter name will set tab filter
-	 * having this name or create new if tab with such name does not exists.
+	 * Update selected tab filter properties from $input array. Set home tab as selected if no filter parameters were
+	 * passed in input, active tab or tab having filter_name.
 	 *
 	 * @param array $input  Tab filter properties array.
 	 */
 	public function setInput(array $input) {
-		$input += ['filter_name' => $this->tabfilters[$this->selected]['filter_name']];
+		$index = array_intersect_key($input, $this->filter_defaults) ? 0 : $this->selected;
+		$input += ['filter_name' => $this->tabfilters[$index]['filter_name']];
 		$name_indexes = [];
 
 		foreach (array_slice($this->tabfilters, 1, null, true) as $index => $tabfilter) {
