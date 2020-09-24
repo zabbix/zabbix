@@ -48,7 +48,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	total, avail, err := getSwap()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get Swap data:%s", err.Error())
+		return nil, fmt.Errorf("Failed to get Swap data: %s", err.Error())
 	}
 
 	if avail > total {
