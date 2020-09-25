@@ -62,7 +62,8 @@ class CControllerWidgetClockView extends CControllerWidget {
 								],
 								'webitems' => true
 							]);
-						} else {
+						}
+						else {
 							$items = [];
 						}
 					}
