@@ -65,12 +65,12 @@ class CRoleHelper {
 	public const API = 'api';
 	public const API_ACCESS_MODE = 'api.access.mode';
 	public const API_METHOD = 'api.method.';
-	public const PRIVILEGES_EDIT_DASHBOARDS = 'privileges.edit.dashboards';
-	public const PRIVILEGES_EDIT_MAPS = 'privileges.edit.maps';
-	public const PRIVILEGES_EDIT_MAINTENANCE = 'privileges.edit.maintenance';
-	public const PRIVILEGES_UPDATE_PROBLEMS = 'privileges.update.problems';
-	public const PRIVILEGES_EXECUTE_SCRIPTS = 'privileges.execute.scripts';
-	public const PRIVILEGES_DEFAULT_ACCESS = 'privileges.default_access';
+	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit.dashboards';
+	public const ACTIONS_EDIT_MAPS = 'actions.edit.maps';
+	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit.maintenance';
+	public const ACTIONS_UPDATE_PROBLEMS = 'actions.update.problems';
+	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute.scripts';
+	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 
 	/**
 	 * Array for storing the list of all available role rules for each user type.
@@ -82,7 +82,7 @@ class CRoleHelper {
 	private static $all_rules = [];
 
 	/**
-	 * Array for storing roles data(including rules) loaded from Role API object and converted to one format.
+	 * Array for storing roles data (including rules) loaded from Role API object and converted to one format.
 	 *
 	 * @static
 	 *
@@ -109,7 +109,7 @@ class CRoleHelper {
 		return in_array($rule_name, self::getAllRules(self::$roles[$roleid]['type']))
 				&& ((!array_key_exists($rule_name, $role_rules)
 					&& (in_array($default_access_name, [self::UI_DEFAULT_ACCESS, self::MODULES_DEFAULT_ACCESS,
-						self::PRIVILEGES_DEFAULT_ACCESS
+						self::ACTIONS_DEFAULT_ACCESS
 					])
 						&& (!array_key_exists($default_access_name, $role_rules) || $role_rules[$default_access_name])))
 					|| $role_rules[$rule_name]);
@@ -125,42 +125,45 @@ class CRoleHelper {
 	 * @param string $roleid  Role ID.
 	 */
 	public static function loadRoleRules(int $roleid): void {
-		if (!array_key_exists($roleid, self::$roles)) {
-			$roles = API::Role()->get([
-				'output' => ['roleid', 'name', 'type'],
-				'selectRules' => ['name', 'value'],
-				'roleids' => $roleid
-			]);
-
-			$role = reset($roles);
-
-			if (!$role) {
-				throw new Exception(_('Specified role was not found.'));
-			}
-
-			$rules = [];
-			$modules = [];
-
-			foreach ($role['rules'] as $rule) {
-				if (strncmp($rule['name'], self::MODULES_MODULE_STATUS, strlen(self::MODULES_MODULE_STATUS)) === 0) {
-					$modules[substr($rule['name'], strrpos($rule['name'], '.') + 1)]['status'] = $rule['value'];
-				}
-				else if (strncmp($rule['name'], self::MODULES_MODULE, strlen(self::MODULES_MODULE)) === 0) {
-					$modules[substr($rule['name'], strrpos($rule['name'], '.') + 1)]['id'] = $rule['value'];
-				}
-				else {
-					$rules[$rule['name']] = $rule['value'];
-				}
-			}
-
-			foreach ($modules as $module) {
-				$rules[self::MODULES_MODULE.$module['id']] = $module['status'];
-			}
-
-			$role['type'] = (int) $role['type'];
-			$role['rules'] = $rules;
-			self::$roles[$roleid] = $role;
+		if (array_key_exists($roleid, self::$roles)) {
+			return;
 		}
+
+		$roles = API::Role()->get([
+			'output' => ['roleid', 'name', 'type'],
+			'selectRules' => ['name', 'value'],
+			'roleids' => $roleid
+		]);
+
+		$role = reset($roles);
+
+		if (!$role) {
+			throw new Exception(_('Specified role was not found.'));
+		}
+
+		$rules = [];
+		$modules = [];
+
+		foreach ($role['rules'] as $rule) {
+			if (strncmp($rule['name'], self::MODULES_MODULE_STATUS, strlen(self::MODULES_MODULE_STATUS)) === 0) {
+				$modules[substr($rule['name'], strrpos($rule['name'], '.') + 1)]['status'] = $rule['value'];
+			}
+			elseif (strncmp($rule['name'], self::MODULES_MODULE, strlen(self::MODULES_MODULE)) === 0) {
+				$modules[substr($rule['name'], strrpos($rule['name'], '.') + 1)]['id'] = $rule['value'];
+			}
+			else {
+				$rules[$rule['name']] = $rule['value'];
+			}
+		}
+
+		foreach ($modules as $module) {
+			$rules[self::MODULES_MODULE.$module['id']] = $module['status'];
+		}
+
+		$role['type'] = (int) $role['type'];
+		$role['rules'] = $rules;
+
+		self::$roles[$roleid] = $role;
 	}
 
 	/**
@@ -177,7 +180,7 @@ class CRoleHelper {
 	public static function getAllRules(?int $user_type = null): array {
 		self::loadAllRules();
 
-		return (array_key_exists($user_type, self::$all_rules)) ? self::$all_rules[$user_type] : self::$all_rules;
+		return array_key_exists($user_type, self::$all_rules) ? self::$all_rules[$user_type] : self::$all_rules;
 	}
 
 	/**
@@ -186,41 +189,45 @@ class CRoleHelper {
 	 * @static
 	 */
 	public static function loadAllRules(): void {
-		if (!self::$all_rules) {
-			$all_rules = [USER_TYPE_ZABBIX_USER => [
+		if (self::$all_rules) {
+			return;
+		}
+
+		$all_rules = [
+			USER_TYPE_ZABBIX_USER => [
 				self::UI_MONITORING_DASHBOARD, self::UI_MONITORING_PROBLEMS, self::UI_MONITORING_HOSTS,
 				self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_SCREENS,
 				self::UI_MONITORING_MAPS, self::UI_MONITORING_SERVICES, self::UI_INVENTORY_OVERVIEW,
 				self::UI_INVENTORY_HOSTS, self::UI_REPORTS_AVAILABILITY_REPORT, self::UI_REPORTS_TOP_TRIGGERS,
-				self::API, self::API_ACCESS_MODE, self::PRIVILEGES_EDIT_DASHBOARDS, self::PRIVILEGES_EDIT_MAPS,
-				self::PRIVILEGES_UPDATE_PROBLEMS, self::PRIVILEGES_EXECUTE_SCRIPTS
-			]];
+				self::API, self::API_ACCESS_MODE, self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS,
+				self::ACTIONS_UPDATE_PROBLEMS, self::ACTIONS_EXECUTE_SCRIPTS
+			]
+		];
 
-			$modules = API::Module()->get([
-				'output' => ['moduleid'],
-				'filter' => ['status' => MODULE_STATUS_ENABLED]
-			]);
+		$modules = API::Module()->get([
+			'output' => ['moduleid'],
+			'filter' => ['status' => MODULE_STATUS_ENABLED]
+		]);
 
-			foreach ($modules as $module) {
-				$all_rules[USER_TYPE_ZABBIX_USER][] = self::MODULES_MODULE.$module['moduleid'];
-			}
-
-			$all_rules[USER_TYPE_ZABBIX_ADMIN] = array_merge($all_rules[USER_TYPE_ZABBIX_USER], [
-				self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_CONFIGURATION_HOST_GROUPS,
-				self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS, self::UI_CONFIGURATION_MAINTENANCE,
-				self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY, self::UI_CONFIGURATION_SERVICES,
-				self::PRIVILEGES_EDIT_MAINTENANCE
-			]);
-
-			$all_rules[USER_TYPE_SUPER_ADMIN] = array_merge($all_rules[USER_TYPE_ZABBIX_ADMIN], [
-				self::UI_REPORTS_SYSTEM_INFO, self::UI_REPORTS_AUDIT, self::UI_REPORTS_ACTION_LOG,
-				self::UI_CONFIGURATION_EVENT_CORRELATION, self::UI_ADMINISTRATION_GENERAL, self::UI_ADMINISTRATION_PROXIES,
-				self::UI_ADMINISTRATION_AUTHENTICATION, self::UI_ADMINISTRATION_USER_GROUPS,
-				self::UI_ADMINISTRATION_USER_ROLES, self::UI_ADMINISTRATION_USERS, self::UI_ADMINISTRATION_MEDIA_TYPES,
-				self::UI_ADMINISTRATION_SCRIPTS, self::UI_ADMINISTRATION_QUEUE
-			]);
-
-			self::$all_rules = $all_rules;
+		foreach ($modules as $module) {
+			$all_rules[USER_TYPE_ZABBIX_USER][] = self::MODULES_MODULE.$module['moduleid'];
 		}
+
+		$all_rules[USER_TYPE_ZABBIX_ADMIN] = array_merge($all_rules[USER_TYPE_ZABBIX_USER], [
+			self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_CONFIGURATION_HOST_GROUPS,
+			self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS, self::UI_CONFIGURATION_MAINTENANCE,
+			self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY, self::UI_CONFIGURATION_SERVICES,
+			self::ACTIONS_EDIT_MAINTENANCE
+		]);
+
+		$all_rules[USER_TYPE_SUPER_ADMIN] = array_merge($all_rules[USER_TYPE_ZABBIX_ADMIN], [
+			self::UI_REPORTS_SYSTEM_INFO, self::UI_REPORTS_AUDIT, self::UI_REPORTS_ACTION_LOG,
+			self::UI_CONFIGURATION_EVENT_CORRELATION, self::UI_ADMINISTRATION_GENERAL, self::UI_ADMINISTRATION_PROXIES,
+			self::UI_ADMINISTRATION_AUTHENTICATION, self::UI_ADMINISTRATION_USER_GROUPS,
+			self::UI_ADMINISTRATION_USER_ROLES, self::UI_ADMINISTRATION_USERS, self::UI_ADMINISTRATION_MEDIA_TYPES,
+			self::UI_ADMINISTRATION_SCRIPTS, self::UI_ADMINISTRATION_QUEUE
+		]);
+
+		self::$all_rules = $all_rules;
 	}
 }
