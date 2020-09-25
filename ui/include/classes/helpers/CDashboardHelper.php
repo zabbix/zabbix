@@ -319,6 +319,7 @@ class CDashboardHelper {
 	}
 
 	/**
+	 * Validate widget input parameters.
 	 *
 	 * @static
 	 *
