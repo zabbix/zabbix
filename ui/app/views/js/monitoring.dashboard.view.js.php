@@ -24,6 +24,54 @@
  */
 ?>
 
+<script type="text/x-jquery-tmpl" id="user_group_row_tpl">
+<?= (new CRow([
+	new CCol([
+		(new CTextBox('userGroups[#{usrgrpid}][usrgrpid]', '#{usrgrpid}'))->setAttribute('type', 'hidden'),
+		'#{name}'
+	]),
+	new CCol(
+		(new CRadioButtonList('userGroups[#{usrgrpid}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user_group_#{usrgrpid}_permission_'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('window.dashboard_share.removeUserGroupShares("#{usrgrpid}");')
+			->removeId()
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user_group_shares_#{usrgrpid}')
+	->toString()
+?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="user_row_tpl">
+<?= (new CRow([
+	new CCol([
+		(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
+		'#{name}',
+	]),
+	new CCol(
+		(new CRadioButtonList('users[#{id}][permission]', PERM_READ))
+			->addValue(_('Read-only'), PERM_READ, 'user_#{id}_permission_'.PERM_READ)
+			->addValue(_('Read-write'), PERM_READ_WRITE, 'user_#{id}_permission_'.PERM_READ_WRITE)
+			->setModern(true)
+	),
+	(new CCol(
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('window.dashboard_share.removeUserShares("#{id}");')
+			->removeId()
+	))->addClass(ZBX_STYLE_NOWRAP)
+]))
+	->setId('user_shares_#{id}')
+	->toString()
+?>
+</script>
+
 <script>
 	class dashboardSingleton {
 		constructor(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
@@ -316,9 +364,132 @@
 		}
 	}
 
+	class dashboardShareSingleton {
+		constructor(data) {
+			this.data = data;
+		}
+
+		live() {
+			this.addPopupValues({'object': 'private', 'values': [this.data.private] });
+			this.addPopupValues({'object': 'userid', 'values': this.data.users });
+			this.addPopupValues({'object': 'usrgrpid', 'values': this.data.userGroups });
+		}
+
+		/**
+		 * @param {Overlay} overlay
+		 */
+		submit(overlay) {
+			var $form = overlay.$dialogue.find('form'),
+				url = new Curl('zabbix.php', false);
+
+			clearMessages();
+
+			url.setArgument('action', 'dashboard.share.update');
+
+			overlay.setLoading();
+			overlay.xhr = $.ajax({
+				url: url.getUrl(),
+				data: $form.serializeJSON(),
+				dataType: 'json',
+				method: 'POST'
+			});
+
+			overlay.xhr
+				.always(() => overlay.unsetLoading())
+				.done((response) => {
+					$form.prevAll('.msg-good, .msg-bad').remove();
+
+					if ('errors' in response) {
+						$(response.errors).insertBefore($form);
+					}
+					else if ('messages' in response) {
+						addMessage(response.messages);
+
+						overlayDialogueDestroy(overlay.dialogueid);
+					}
+				});
+		}
+
+		removeUserGroupShares(usrgrpid) {
+			$('#user_group_shares_' + usrgrpid).remove();
+		}
+
+		removeUserShares(userid) {
+			$('#user_shares_' + userid).remove();
+		}
+
+		addPopupValues(list) {
+			var	i,
+				tpl,
+				container;
+
+			for (i = 0; i < list.values.length; i++) {
+				var	value = list.values[i];
+
+				if (list.object === 'usrgrpid' || list.object === 'userid') {
+					if (typeof value.permission === 'undefined') {
+						if ($('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
+							value.permission = <?= PERM_READ ?>;
+						}
+						else {
+							value.permission = <?= PERM_READ_WRITE ?>;
+						}
+					}
+				}
+
+				switch (list.object) {
+					case 'private':
+						$('input[name=private][value=' + value + ']').prop('checked', true);
+
+						break;
+
+					case 'usrgrpid':
+						if ($('#user_group_shares_' + value.usrgrpid).length) {
+							continue;
+						}
+
+						tpl = new Template($('#user_group_row_tpl').html());
+
+						container = $('#user_group_list_footer');
+						container.before(tpl.evaluate(value));
+
+						$('#user_group_' + value.usrgrpid + '_permission_' + value.permission + '').prop('checked', true);
+
+						break;
+
+					case 'userid':
+						if ($('#user_shares_' + value.id).length) {
+							continue;
+						}
+
+						tpl = new Template($('#user_row_tpl').html());
+
+						container = $('#user_list_footer');
+						container.before(tpl.evaluate(value));
+
+						$('#user_' + value.id + '_permission_' + value.permission + '').prop('checked', true);
+
+						break;
+				}
+			}
+		}
+	}
+
 	function initializeDashboard(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
 		window.dashboard = new dashboardSingleton(data, widget_defaults, time_selector, dynamic, web_layout_mode);
 		window.dashboard.live();
+	}
+
+	function initializeDashboardShare(data) {
+		window.dashboard_share = new dashboardShareSingleton(data);
+		window.dashboard_share.live();
+	}
+
+	/**
+	 * @see init.js add.popup event
+	 */
+	function addPopupValues(list) {
+		window.dashboard_share.addPopupValues(list);
 	}
 
 	/**

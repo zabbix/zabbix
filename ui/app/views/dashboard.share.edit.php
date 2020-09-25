@@ -91,8 +91,7 @@ $form
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		)
-	)
-	->addItem(new CObject($this->readJsFile('dashboard.share.edit.js.php')));
+	);
 
 $output = [
 	'header' => _('Dashboard sharing'),
