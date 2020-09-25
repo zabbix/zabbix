@@ -48,6 +48,7 @@ type AgentOptions struct {
 	Server                 string   `conf:"optional"`
 	UserParameter          []string `conf:"optional"`
 	UnsafeUserParameters   int      `conf:"optional,range=0:1,default=0"`
+	UserParameterDir       string   `conf:"optional"`
 	ControlSocket          string   `conf:"optional"`
 	Alias                  []string `conf:"optional"`
 	TLSConnect             string   `conf:"optional"`

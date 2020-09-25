@@ -277,7 +277,7 @@ The current value read from the sensor.</description>
                   <trigger_prototype>
                      <expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
@@ -288,7 +288,7 @@ or&#13;
                   <trigger_prototype>
                      <expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
 or&#13;
-{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
@@ -300,7 +300,7 @@ or&#13;
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                            <expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}</expression>
                            <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>

@@ -90,7 +90,7 @@ $override_evaltype = (new CDiv([
 $filter_table = (new CTable())
 	->setId('overrides_filters')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), (new CColHeader('Action'))->setWidth('100%')]);
 
 $overrides_filters = $options['overrides_filters'];
 if (!$overrides_filters) {
@@ -157,7 +157,8 @@ $filter_table->setFooter(new CCol(
 $overrides_popup_form_list->addRow(_('Filters'),
 	(new CDiv([$override_evaltype, $filter_table]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('width: 100%;')
 );
 
 // operations
@@ -185,6 +186,7 @@ $overrides_popup_form_list->addRow(_('Operations'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		->addStyle('width: 100%;')
+		->addStyle('max-width: 775px;')
 );
 
 $output['buttons'] = [

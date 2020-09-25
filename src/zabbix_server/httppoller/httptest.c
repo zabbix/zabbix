@@ -515,7 +515,7 @@ static void	add_http_headers(char *headers, struct curl_slist **headers_slist, c
 
 	char	*line;
 
-	while (NULL != (line = zbx_http_get_header(&headers)))
+	while (NULL != (line = zbx_http_parse_header(&headers)))
 	{
 		if (0 == strncmp(COOKIE_HEADER_STR, line, COOKIE_HEADER_STR_LEN))
 			*header_cookie = zbx_strdup(*header_cookie, line + COOKIE_HEADER_STR_LEN);

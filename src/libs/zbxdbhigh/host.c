@@ -3936,6 +3936,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					host_prototype->hostid);
 		}
 
+		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+
 		for (j = 0; j < host_prototype->lnk_templateids.values_num; j++)
 		{
 			zbx_db_insert_add_values(&db_insert_htemplates, hosttemplateid++, host_prototype->hostid,
@@ -4095,7 +4097,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		/* in ORACLE always present begin..end; */
 		if (16 < sql1_offset)
 			DBexecute("%s", sql1);
-
 		zbx_free(sql1);
 	}
 

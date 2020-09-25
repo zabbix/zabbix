@@ -32,8 +32,9 @@ import (
 	"zabbix.com/pkg/log"
 )
 
-func Execute(s string, timeout time.Duration) (string, error) {
+func Execute(s string, timeout time.Duration, path string) (string, error) {
 	cmd := exec.Command("sh", "-c", s)
+	cmd.Dir = path
 
 	var b bytes.Buffer
 	cmd.Stdout = &b

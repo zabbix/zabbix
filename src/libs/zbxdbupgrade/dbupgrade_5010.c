@@ -261,12 +261,44 @@ static int	DBpatch_5010028(void)
 
 static int	DBpatch_5010029(void)
 {
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_5010030(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_5010031(void)
+{
+	const ZBX_FIELD	old_field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_5010032(void)
+{
+	const ZBX_FIELD	old_field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_5010033(void)
+{
 	const ZBX_FIELD	field = {"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("triggers", &field);
 }
 
-static int	DBpatch_5010030(void)
+static int	DBpatch_5010034(void)
 {
 	const ZBX_TABLE	table =
 			{"trigger_queue", "", 0,
@@ -282,7 +314,6 @@ static int	DBpatch_5010030(void)
 
 	return DBcreate_table(&table);
 }
-
 
 #endif
 
@@ -321,5 +352,9 @@ DBPATCH_ADD(5010027, 0, 1)
 DBPATCH_ADD(5010028, 0, 1)
 DBPATCH_ADD(5010029, 0, 1)
 DBPATCH_ADD(5010030, 0, 1)
+DBPATCH_ADD(5010031, 0, 1)
+DBPATCH_ADD(5010032, 0, 1)
+DBPATCH_ADD(5010033, 0, 1)
+DBPATCH_ADD(5010034, 0, 1)
 
 DBPATCH_END()
