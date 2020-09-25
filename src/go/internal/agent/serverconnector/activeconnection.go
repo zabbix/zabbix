@@ -32,6 +32,7 @@ import (
 
 type activeConnection struct {
 	address   string
+	hostname  string
 	localAddr net.Addr
 	tlsConfig *tls.Config
 }
@@ -61,6 +62,10 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (err error)
 
 func (c *activeConnection) Addr() (s string) {
 	return c.address
+}
+
+func (c *activeConnection) Hostname() (s string) {
+	return c.hostname
 }
 
 func (c *activeConnection) CanRetry() (enabled bool) {
