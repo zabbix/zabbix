@@ -59,12 +59,10 @@ class CTask extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$config = select_config();
-
 		$options += [
 			'sortfield' => 'taskid',
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit'		=> $config['search_limit']
+			'limit'		=> CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 		];
 
 		$sql_parts = [
