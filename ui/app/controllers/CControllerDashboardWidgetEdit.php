@@ -55,7 +55,7 @@ class CControllerDashboardWidgetEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->hasInput('templateid')
+		return ($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)
 			? ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN)
 			: ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
