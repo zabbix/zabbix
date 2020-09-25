@@ -407,7 +407,6 @@ INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES 
 INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (18,'{$Y_SECRET_MACRO_2_TEXT_REVERT}','Change value and type and revert','' , 1);
 INSERT INTO globalmacro (globalmacroid, macro, value, description, type) VALUES (19,'{$Z_GLOBAL_MACRO_2_RESOLVE}','Value 2 B resolved','' , 0);
 
-
 -- Adding records into Auditlog
 
 -- add user

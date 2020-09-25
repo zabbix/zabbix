@@ -547,6 +547,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 		return [
 			[
 				[
+					'expected' => TEST_GOOD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO}',
 						'value' => [
@@ -555,12 +556,12 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description'
 					],
-					'result' => TEST_GOOD,
 					'title' => 'Host prototype updated'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO2}',
 						'value' => [
@@ -569,13 +570,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description2'
 					],
-					'result' => TEST_BAD,
 					'title' => 'Cannot update host prototype',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": incorrect syntax near "path:".'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO3}',
 						'value' => [
@@ -584,13 +585,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description3'
 					],
-					'result' => TEST_BAD,
 					'title' => 'Cannot update host prototype',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "/path:key".'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO4}',
 						'value' => [
@@ -599,13 +600,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description4'
 					],
-					'result' => TEST_BAD,
 					'title' => 'Cannot update host prototype',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "path:key".'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO5}',
 						'value' => [
@@ -614,13 +615,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description5'
 					],
-					'result' => TEST_BAD,
 					'title' => 'Cannot update host prototype',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near ":key".'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO6}',
 						'value' => [
@@ -629,13 +630,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description6'
 					],
-					'result' => TEST_BAD,
 					'title' => 'Cannot update host prototype',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near "path".'
 				]
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO7}',
 						'value' => [
@@ -644,12 +645,12 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description7'
 					],
-					'result' => TEST_GOOD,
 					'title' => 'Host prototype updated'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO8}',
 						'value' => [
@@ -658,13 +659,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description8'
 					],
-					'result' => TEST_BAD,
 					'title' => 'Cannot update host prototype',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
 				]
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO9}',
 						'value' => [
@@ -673,7 +674,6 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description9'
 					],
-					'result' => TEST_BAD,
 					'title' => 'Cannot update host prototype',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
 				]

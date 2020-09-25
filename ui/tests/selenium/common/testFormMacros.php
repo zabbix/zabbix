@@ -33,7 +33,7 @@ abstract class testFormMacros extends CWebTest {
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
-		/**
+	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -595,13 +595,17 @@ abstract class testFormMacros extends CWebTest {
 		$this->openMacrosTab($url, $source, true);
 		$this->fillMacros([$data['macro_fields']]);
 		$this->query('button:Update')->one()->click();
-		if ($data['result'] == TEST_BAD) {
-			$this->assertMessage($data['result'], $data['title'], $data['message']);
-		} else {
-			$this->assertMessage($data['result'], $data['title']);
+		if ($data['expected'] == TEST_BAD) {
+			$this->assertMessage($data['expected'], $data['title'], $data['message']);
+		}
+		else {
+			$this->assertMessage($data['expected'], $data['title']);
 			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
 			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], 2],
-				array_values(CDBHelper::getRow($sql)));
+					array_values(CDBHelper::getRow($sql)));
+			$this->openMacrosTab($url, $source);
+			$value_field = $this->getValueField($data['macro_fields']['macro']);
+			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		}
 	}
 
@@ -614,7 +618,7 @@ abstract class testFormMacros extends CWebTest {
 		foreach (['macro', 'value', 'description'] as $field) {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
 		}
-		array_push($result,"2");
+		array_push($result, ZBX_MACRO_TYPE_VAULT);
 		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 	}
