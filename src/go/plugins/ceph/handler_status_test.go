@@ -32,10 +32,12 @@ func Test_statusHandler(t *testing.T) {
 		NumOsdIn: 3,
 		NumOsdUp: 3,
 		NumPg:    33,
-		PgStates: map[string]uint64{
-			"active": 33, "backfill_toofull": 0, "backfill_wait": 0, "backfilling": 0, "clean": 33, "degraded": 0,
-			"inconsistent": 0, "peering": 0, "recovering": 0, "recovery_wait": 0, "remapped": 0, "scrubbing": 0,
-			"undersized": 0, "unknown": 0},
+		PgStates: map[string]uint64{"activating": 0, "active": 33, "backfill_toofull": 0, "backfill_unfound": 0,
+			"backfill_wait": 0, "backfilling": 0, "clean": 33, "creating": 0, "deep": 0, "degraded": 0, "down": 0,
+			"forced_backfill": 0, "forced_recovery": 0, "incomplete": 0, "inconsistent": 0, "laggy": 0, "peered": 0,
+			"peering": 0, "recovering": 0, "recovery_toofull": 0, "recovery_unfound": 0, "recovery_wait": 0,
+			"remapped": 0, "repair": 0, "scrubbing": 0, "snaptrim": 0, "snaptrim_error": 0, "snaptrim_wait": 0,
+			"stale": 0, "undersized": 0, "unknown": 0, "wait": 0},
 		MinMonReleaseName: "octopus"}
 
 	success, err := json.Marshal(out)

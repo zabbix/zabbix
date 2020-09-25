@@ -60,8 +60,13 @@ type outStatus struct {
 	MinMonReleaseName string            `json:"min_mon_release_name"`
 }
 
-var pgStates = []string{"active", "backfill_toofull", "backfill_wait", "backfilling", "clean", "degraded",
-	"inconsistent", "peering", "recovering", "recovery_wait", "remapped", "scrubbing", "undersized", "unknown"}
+// pgStates is a list of all possible placement group states according to the Ceph's documentation.
+// https://docs.ceph.com/en/octopus/rados/operations/pg-states/
+var pgStates = []string{"creating", "activating", "active", "clean", "down", "laggy", "wait", "scrubbing", "deep",
+	"degraded", "inconsistent", "peering", "repair", "recovering", "forced_recovery", "recovery_wait",
+	"recovery_toofull", "recovery_unfound", "backfilling", "forced_backfill", "backfill_wait", "backfill_toofull",
+	"backfill_unfound", "incomplete", "stale", "remapped", "undersized", "peered", "snaptrim", "snaptrim_wait",
+	"snaptrim_error", "unknown"}
 
 var healthMap = map[string]int8{
 	"HEALTH_OK":   0,
