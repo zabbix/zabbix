@@ -35,6 +35,7 @@ require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testHostImport.php';
 require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testItem.php';
+require_once dirname(__FILE__).'/testItemPrototype.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testScripts.php';
@@ -72,6 +73,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testHostImport');
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testItem');
+		$suite->addTestSuite('testItemPrototype');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testScripts');

@@ -129,6 +129,8 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  * Parameters: pid     - [OUT] child process PID                              *
  *             command - [IN] a pointer to a null-terminated string           *
  *                       containing a shell command line                      *
+ *             dir     - [IN] directory to execute command under,             *
+ *                       stay in current directory if NULL                    *
  *                                                                            *
  * Return value: on success, reading file descriptor is returned. On error,   *
  *               -1 is returned, and errno is set appropriately               *
@@ -136,7 +138,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_popen(pid_t *pid, const char *command)
+static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 {
 	int	fd[2], stdout_orig, stderr_orig;
 
@@ -182,12 +184,14 @@ static int	zbx_popen(pid_t *pid, const char *command)
 				__func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
 	if (-1 == (stderr_orig = dup(STDERR_FILENO)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to duplicate stderr: %s",
 				__func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
 	fcntl(stdout_orig, F_SETFD, FD_CLOEXEC);
 	fcntl(stderr_orig, F_SETFD, FD_CLOEXEC);
 
@@ -196,6 +200,12 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	dup2(fd[1], STDOUT_FILENO);
 	dup2(fd[1], STDERR_FILENO);
 	close(fd[1]);
+
+	if (NULL != dir && 0 != chdir(dir))
+	{
+		fprintf(stderr, "cannot change directory to UserParameterDir: %s\n", zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
@@ -220,7 +230,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
  * Purpose: this function waits for process to change state                   *
  *                                                                            *
  * Parameters: pid     - [IN] child process PID                               *
- *             status  - [OUT] process status
+ *             status  - [OUT] process status                                 *
  *                                                                            *
  * Return value: on success, PID is returned. On error,                       *
  *               -1 is returned, and errno is set appropriately               *
@@ -289,6 +299,8 @@ exit:
  *             max_error_len - [IN] length of error buffer                    *
  *             timeout       - [IN] execution timeout                         *
  *             flag          - [IN] indicates if exit code must be checked    *
+ *             dir           - [IN] directory to execute command under,       *
+ *                                  pass NULL to stay in current directory    *
  *                                                                            *
  * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
  *               timeout occurred or FAIL otherwise                           *
@@ -297,7 +309,7 @@ exit:
  *                                                                            *
  ******************************************************************************/
 int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
-		unsigned char flag)
+		unsigned char flag, const char *dir)
 {
 	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
 	int			ret = FAIL;
@@ -308,7 +320,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	SECURITY_ATTRIBUTES	sa;
 	HANDLE			job = NULL, hWrite = NULL, hRead = NULL;
 	char			*cmd = NULL;
-	wchar_t			*wcmd = NULL;
+	wchar_t			*wcmd = NULL, *wdir = NULL;
 	struct _timeb		start_time, current_time;
 	DWORD			code;
 #else
@@ -357,8 +369,11 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	cmd = zbx_dsprintf(cmd, "cmd /C \"%s\"", command);
 	wcmd = zbx_utf8_to_unicode(cmd);
 
+	if(NULL != dir)
+		wdir = zbx_utf8_to_unicode(dir);
+
 	/* create the new process */
-	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
+	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, wdir, &si, &pi))
 	{
 		zbx_snprintf(error, max_error_len, "unable to create process [%s]: %s",
 				cmd, strerror_from_system(GetLastError()));
@@ -443,12 +458,13 @@ close:
 
 	zbx_free(cmd);
 	zbx_free(wcmd);
+	zbx_free(wdir);
 
 #else	/* not _WINDOWS */
 
 	zbx_alarm_on(timeout);
 
-	if (-1 != (fd = zbx_popen(&pid, command)))
+	if (-1 != (fd = zbx_popen(&pid, command, dir)))
 	{
 		int	rc, status;
 		char	tmp_buf[PIPE_BUFFER_SIZE];

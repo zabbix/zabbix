@@ -54,7 +54,7 @@ static int	execute_script_alert(const char *command, char *error, size_t max_err
 	int	ret = FAIL;
 
 	if (SUCCEED == (ret = zbx_execute(command, &output, error, max_error_len, ALARM_ACTION_TIMEOUT,
-			ZBX_EXIT_CODE_CHECKS_ENABLED)))
+			ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", command, output);
 		zbx_free(output);
