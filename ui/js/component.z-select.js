@@ -450,6 +450,11 @@ class ZSelect extends HTMLElement {
 	registerEvents() {
 		this._events = {
 			button_mousedown: (e) => {
+				// Safari fix - event needs to be prevented, else blur event is fired on this button.
+				e.preventDefault();
+				// Safari fix - a click button on label would not focus button element.
+				document.activeElement !== this._button && this._button.focus();
+
 				if (e.which === 1) {
 					if (this._expanded) {
 						this._change(this._preselected_index);
@@ -556,6 +561,11 @@ class ZSelect extends HTMLElement {
 				}
 			},
 
+			button_click: () => {
+				// Safari fix - a click button on label would not focus button element.
+				document.activeElement !== this._button && this._button.focus();
+			},
+
 			button_blur: () => {
 				this._change(this._preselected_index);
 				this._collapse();
@@ -605,6 +615,7 @@ class ZSelect extends HTMLElement {
 			}
 		}
 
+		this._button.addEventListener('click', this._events.button_click);
 		this._button.addEventListener('mousedown', this._events.button_mousedown);
 		this._button.addEventListener('keydown', this._events.button_keydown);
 		this._button.addEventListener('blur', this._events.button_blur);
@@ -619,6 +630,7 @@ class ZSelect extends HTMLElement {
 	}
 
 	unregisterEvents() {
+		this._button.removeEventListener('click', this._events.button_click);
 		this._button.removeEventListener('mousedown', this._events.button_mousedown);
 		this._button.removeEventListener('keydown', this._events.button_keydown);
 		this._button.removeEventListener('blur', this._events.button_blur);
