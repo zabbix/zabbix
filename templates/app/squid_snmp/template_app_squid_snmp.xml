@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-25T05:54:05Z</date>
+   <date>2020-09-25T07:51:14Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -750,12 +750,6 @@ Template tooling version used: 0.38</description>
                      <name>Squid</name>
                   </application>
                </applications>
-               <preprocessing>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
-                  </step>
-               </preprocessing>
             </item>
             <item>
                <name>Squid: ICP traffic received</name>
@@ -1232,12 +1226,6 @@ Template tooling version used: 0.38</description>
                      <name>Squid</name>
                   </application>
                </applications>
-               <preprocessing>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
-                  </step>
-               </preprocessing>
             </item>
          </items>
          <macros>

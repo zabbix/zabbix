@@ -76,9 +76,9 @@ There are no template links in this template.
 |Squid |Squid: Request hit ratio per 1 minute |<p>Byte Hit Ratios</p> |SNMP |squid.snmp[cacheRequestHitRatio.1] |
 |Squid |Squid: Request hit ratio per 5 minute |<p>Byte Hit Ratios</p> |SNMP |squid.snmp[cacheRequestHitRatio.5] |
 |Squid |Squid: Request hit ratio per 1 hour |<p>Byte Hit Ratios</p> |SNMP |squid.snmp[cacheRequestHitRatio.60] |
-|Squid |Squid: Sys page faults count |<p>Page faults with physical I/O</p> |SNMP |squid.syspage.faults.count[cacheSysPageFaults]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Squid |Squid: Sys page faults count |<p>Page faults with physical I/O</p> |SNMP |squid.syspage.faults.count[cacheSysPageFaults] |
 |Squid |Squid: Sys page faults per second |<p>Page faults with physical I/O per second</p> |DEPENDENT |squid.snmp[cacheSysPageFaultsRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: HTTP requests received count |<p>Number of HTTP requests received</p> |SNMP |squid.http.received.count[cacheProtoClientHttpRequests]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Squid |Squid: HTTP requests received count |<p>Number of HTTP requests received</p> |SNMP |squid.http.received.count[cacheProtoClientHttpRequests] |
 |Squid |Squid: HTTP requests received per second |<p>Number of HTTP requests received per second</p> |DEPENDENT |squid.snmp[cacheProtoClientHttpRequestsRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: HTTP traffic received |<p>Number of HTTP KB's received from clients</p> |SNMP |squid.http.in[cacheHttpInKb]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
 |Squid |Squid: HTTP traffic received per second |<p>Number of HTTP KB's received per second</p> |DEPENDENT |squid.snmp[cacheHttpInKbRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
