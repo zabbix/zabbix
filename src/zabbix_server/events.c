@@ -223,6 +223,8 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
+		char	err[256];
+
 		if (TRIGGER_VALUE_PROBLEM == value)
 			event->severity = trigger_priority;
 
@@ -239,10 +241,10 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		event->name = zbx_strdup(NULL, (NULL != event_name ? event_name : trigger_description));
 
 		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&event->trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+				&event->trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, err, sizeof(err));
 
 		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&event->name, MACRO_TYPE_EVENT_NAME, NULL, 0);
+				&event->name, MACRO_TYPE_EVENT_NAME, err, sizeof(err));
 
 		zbx_vector_ptr_create(&event->tags);
 

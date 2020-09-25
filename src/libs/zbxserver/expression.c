@@ -2533,45 +2533,24 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_expression_macro_result(const DB_EVENT *event, const DB_EVENT *r_event, DB_ALERT *alert,
-		const DB_ACKNOWLEDGE *ack, char **expression, char **replace_to, char *error, int maxerrlen)
+static int	get_expression_macro_result(const DB_EVENT *event, const DB_EVENT *r_event, char **expression,
+		char **replace_to, char *error, int maxerrlen)
 {
-	int			ret;
-	double			expression_result;
-	int			unknown_idx;
-	zbx_vector_ptr_t	unknown_msgs;	/* pointers to messages about origins of 'unknown' values */
-	char			err[MAX_STRING_LEN];
+	int	ret;
+	double	expression_result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, *expression);
 
-	substitute_simple_macros_impl(NULL, event, r_event, NULL, NULL, NULL, NULL, alert, ack, NULL, expression,
+	substitute_simple_macros_impl(NULL, event, r_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, expression,
 			MACRO_TYPE_EXPRESSION, error, maxerrlen);
 
-	zbx_vector_ptr_create(&unknown_msgs);
-
-	if (SUCCEED != evaluate(&expression_result, *expression, err, sizeof(err), &unknown_msgs))
+	if (SUCCEED == (ret = evaluate(&expression_result, *expression, error, maxerrlen, NULL)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, err);
+		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
-		for (unknown_idx = 0; unknown_idx < unknown_msgs.values_num; unknown_idx++)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, (char *)(unknown_msgs.values[unknown_idx]));
-		}
-
-		ret = FAIL;
+		zbx_print_double(buffer, sizeof(buffer), expression_result);
+		*replace_to = zbx_strdup(*replace_to, buffer);
 	}
-	else
-	{
-		size_t	alloc_len;
-		size_t	offset;
-
-		zbx_snprintf_alloc(replace_to, &alloc_len, &offset, "%f", expression_result);
-
-		ret = SUCCEED;
-	}
-
-	zbx_vector_ptr_clear_ext(&unknown_msgs, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&unknown_msgs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -4155,8 +4134,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 						zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, *data + loc->l,
 								loc->r - loc->l + 1);
 
-						ret = get_expression_macro_result(event, r_event, alert, ack,
-								&exp, &replace_to, error, maxerrlen);
+						ret = get_expression_macro_result(event, r_event, &exp, &replace_to,
+								error, maxerrlen);
 						zbx_free(exp);
 					}
 				}
