@@ -569,7 +569,7 @@ class testFormTemplateMacros extends testFormMacros {
 				[
 					'expected' => TEST_GOOD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO7}',
+						'macro' => '{$VAULT_MACRO2}',
 						'value' => [
 							'text' => 'one/two/three/four/five/six:key',
 							'type' => 'Vault secret'
@@ -583,7 +583,7 @@ class testFormTemplateMacros extends testFormMacros {
 				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO2}',
+						'macro' => '{$VAULT_MACRO3}',
 						'value' => [
 							'text' => 'secret/path:',
 							'type' => 'Vault secret'
@@ -598,7 +598,7 @@ class testFormTemplateMacros extends testFormMacros {
 				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO3}',
+						'macro' => '{$VAULT_MACRO4}',
 						'value' => [
 							'text' => '/path:key',
 							'type' => 'Vault secret'
@@ -613,7 +613,7 @@ class testFormTemplateMacros extends testFormMacros {
 				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO4}',
+						'macro' => '{$VAULT_MACRO5}',
 						'value' => [
 							'text' => 'path:key',
 							'type' => 'Vault secret'
@@ -628,7 +628,7 @@ class testFormTemplateMacros extends testFormMacros {
 				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO5}',
+						'macro' => '{$VAULT_MACRO6}',
 						'value' => [
 							'text' => ':key',
 							'type' => 'Vault secret'
@@ -643,7 +643,7 @@ class testFormTemplateMacros extends testFormMacros {
 				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO6}',
+						'macro' => '{$VAULT_MACRO7}',
 						'value' => [
 							'text' => 'secret/path',
 							'type' => 'Vault secret'
