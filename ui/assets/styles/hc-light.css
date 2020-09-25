@@ -5415,6 +5415,22 @@ table.preprocessing-test-results .rel-container {
 .icon-secret:not(.highlighted):enabled:hover::before, .icon-secret:not(.highlighted):enabled:focus::before, .icon-secret:not(.highlighted):enabled:active::before, .icon-secret:not(.highlighted):enabled[aria-expanded="true"]::before {
   background-position: -399px -510px; }
 
+.icon-invisible.menu-popup-item,
+.icon-invisible.btn-dropdown-toggle {
+  width: 100%; }
+  .icon-invisible.menu-popup-item::before,
+  .icon-invisible.btn-dropdown-toggle::before {
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -87px -800px; }
+  .icon-invisible.menu-popup-item:not(.highlighted):enabled:hover::before, .icon-invisible.menu-popup-item:not(.highlighted):enabled:focus::before, .icon-invisible.menu-popup-item:not(.highlighted):enabled:active::before, .icon-invisible.menu-popup-item:not(.highlighted):enabled[aria-expanded="true"]::before,
+  .icon-invisible.btn-dropdown-toggle:not(.highlighted):enabled:hover::before,
+  .icon-invisible.btn-dropdown-toggle:not(.highlighted):enabled:focus::before,
+  .icon-invisible.btn-dropdown-toggle:not(.highlighted):enabled:active::before,
+  .icon-invisible.btn-dropdown-toggle:not(.highlighted):enabled[aria-expanded="true"]::before {
+    background-position: -399px -800px; }
+
+.icon-invisible.btn-dropdown-toggle {
+  margin: 0; }
+
 .btn-split {
   display: inline-block;
   position: relative;

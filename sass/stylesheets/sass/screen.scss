@@ -7060,6 +7060,29 @@ table.preprocessing-test-results {
 	}
 }
 
+.icon-invisible.menu-popup-item,
+.icon-invisible.btn-dropdown-toggle {
+	width: 100%;
+
+	&::before {
+		background: url($sprite-path) no-repeat -87px -800px;
+	}
+
+	&:not(.highlighted):enabled {
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::before {
+				background-position: -399px -800px;
+			}
+		}
+	}
+}
+.icon-invisible.btn-dropdown-toggle {
+	margin: 0;
+}
+
 .btn-split {
 	display: inline-block;
 	position: relative;

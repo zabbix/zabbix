@@ -227,7 +227,19 @@ class ZBase {
 					$this->initLocales(CWebUser::$data['lang']);
 				}
 				catch (ConfigFileException $e) {
-					new CCookieSession();
+					if ($e->getCode() == CConfigFile::CONFIG_VAULT_ERROR) {
+						echo (new CView('general.warning', [
+							'header' => _('Vault connection failed.'),
+							'messages' => [$e->getMessage()],
+							'theme' => ZBX_DEFAULT_THEME
+						]))->getOutput();
+
+						session_write_close();
+						exit;
+					}
+					else {
+						new CCookieSession();
+					}
 				}
 				break;
 		}
@@ -379,6 +391,8 @@ class ZBase {
 	protected function initDB() {
 		$error = null;
 		if (!DBconnect($error)) {
+			CDataCacheHelper::clearValues(['db_username', 'db_password']);
+
 			throw new DBException($error);
 		}
 	}

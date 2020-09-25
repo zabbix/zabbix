@@ -24,6 +24,8 @@
  */
 class CSetupWizard extends CForm {
 
+	const VAULT_URL_DEFAULT = 'https://localhost:8200';
+
 	protected $DISABLE_CANCEL_BUTTON = false;
 
 	protected $DISABLE_BACK_BUTTON = false;
@@ -34,7 +36,8 @@ class CSetupWizard extends CForm {
 
 	protected $frontend_setup;
 
-	public function __construct() {
+	function __construct() {
+
 		$this->frontend_setup = new CFrontendSetup();
 
 		$this->stage = [
@@ -266,6 +269,7 @@ class CSetupWizard extends CForm {
 
 	private function stage2(): array {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
+		$db_creds_storage = (int) $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG);
 
 		$table = (new CFormList())
 			->addItem([
@@ -303,12 +307,44 @@ class CSetupWizard extends CForm {
 			ZBX_STYLE_DISPLAY_NONE
 		);
 
-		$table->addRow(_('User'),
-			(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		);
-		$table->addRow(_('Password'),
-			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		);
+		$table->addRow(_('Store credentials in'), [
+			(new CRadioButtonList('creds_storage', $db_creds_storage))
+				->addValue(_('Plain text'), DB_STORE_CREDS_CONFIG, null, 'submit()')
+				->addValue(_('HashiCorp Vault'), DB_STORE_CREDS_VAULT, null, 'submit()')
+				->setModern(true)
+		]);
+
+		if ($db_creds_storage == DB_STORE_CREDS_VAULT) {
+			$table
+				->addRow(_('Vault API endpoint'),
+					(new CTextBox('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT)))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+				->addRow(_('Vault secret path'),
+					(new CTextBox('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH')))
+						->setAttribute('placeholder', _('path/to/secret'))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				->addRow(_('Vault authentication token'),
+					(new CTextBox('vault_token', $this->getConfig('DB_VAULT_TOKEN')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAttribute('maxlength', 2048)
+				)
+				->addVar('user', '')
+				->addVar('password', '');
+		}
+		else {
+			$table
+				->addRow(_('User'),
+					(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				->addRow(_('Password'),
+					(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				->addVar('vault_url', '')
+				->addVar('vault_db_path', '')
+				->addVar('vault_token', '');
+		}
 
 		$table->addRow(_('Database TLS encryption'), [
 				(new CCheckBox('tls_encryption'))->setChecked($this->getConfig('DB_ENCRYPTION', true)),
@@ -431,16 +467,38 @@ class CSetupWizard extends CForm {
 		$table->addRow((new CSpan(_('Database type')))->addClass(ZBX_STYLE_GREY), $databases[$db_type]);
 
 		$db_port = ($this->getConfig('DB_PORT') == 0) ? _('default') : $this->getConfig('DB_PORT');
-		$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
+
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
+			$db_password = _('Stored in HashiCorp Vault secret');
+			$db_username = _('Stored in HashiCorp Vault secret');
+		}
+		else {
+			$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
+			$db_username = $this->getConfig('DB_USER');
+		}
 
 		$table->addRow((new CSpan(_('Database server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SERVER'));
 		$table->addRow((new CSpan(_('Database port')))->addClass(ZBX_STYLE_GREY), $db_port);
 		$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
-		$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
+		$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $db_username);
 		$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
 		if ($db_type === ZBX_DB_POSTGRESQL) {
 			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
+
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
+			$table
+				->addRow((new CSpan(_('Vault API endpoint')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_URL')
+				)
+				->addRow((new CSpan(_('Vault secret path')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_DB_PATH')
+				)
+				->addRow((new CSpan(_('Vault authentication token')))->addClass(ZBX_STYLE_GREY),
+					$this->getConfig('DB_VAULT_TOKEN')
+				);
+		}
+
 		$table->addRow((new CSpan(_('Database TLS encryption')))->addClass(ZBX_STYLE_GREY),
 			$this->getConfig('DB_ENCRYPTION') ? 'true' : 'false'
 		);
@@ -456,6 +514,7 @@ class CSetupWizard extends CForm {
 			);
 			$table->addRow((new CSpan(_('Database host verification')))->addClass(ZBX_STYLE_GREY),
 				$this->getConfig('DB_VERIFY_HOST') ? 'true' : 'false'
+
 			);
 			if ($db_type === ZBX_DB_MYSQL) {
 				$table->addRow((new CSpan(_('Database TLS cipher list')))->addClass(ZBX_STYLE_GREY),
@@ -484,7 +543,45 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stage6(): array {
-		$this->dbConnect();
+		$vault_config = [
+			'VAULT_URL' => '',
+			'VAULT_DB_PATH' => '',
+			'VAULT_TOKEN' => ''
+		];
+
+		$db_creds_config = [
+			'USER' => '',
+			'PASSWORD' => ''
+		];
+
+		$db_user = null;
+		$db_pass = null;
+		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
+			$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
+			$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
+			$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
+
+			$vault = new CVaultHelper($vault_config['VAULT_URL'], $vault_config['VAULT_TOKEN']);
+			$secret = $vault->loadSecret($vault_config['VAULT_DB_PATH']);
+
+			if (array_key_exists('username', $secret) && array_key_exists('password', $secret)) {
+				$db_user = $secret['username'];
+				$db_pass = $secret['password'];
+			}
+			else {
+				error(_('Username and password must be stored in Vault secret keys "username" and "password".'));
+				$this->STEP_FAILED = true;
+				$this->setConfig('step', 2);
+				return $this->stage2();
+			}
+		}
+		else {
+			$db_creds_config['USER'] = $this->getConfig('DB_USER');
+			$db_creds_config['PASSWORD'] = $this->getConfig('DB_PASSWORD');
+		}
+
+		$this->dbConnect($db_user, $db_pass);
+
 		$update = [];
 		foreach (['default_lang', 'default_timezone', 'default_theme'] as $key) {
 			$update[] = $key.'='.zbx_dbstr($this->getConfig($key));
@@ -502,8 +599,6 @@ class CSetupWizard extends CForm {
 				'SERVER' => $this->getConfig('DB_SERVER'),
 				'PORT' => $this->getConfig('DB_PORT'),
 				'DATABASE' => $this->getConfig('DB_DATABASE'),
-				'USER' => $this->getConfig('DB_USER'),
-				'PASSWORD' => $this->getConfig('DB_PASSWORD'),
 				'SCHEMA' => $this->getConfig('DB_SCHEMA'),
 				'ENCRYPTION' => $this->getConfig('DB_ENCRYPTION'),
 				'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
@@ -512,7 +607,7 @@ class CSetupWizard extends CForm {
 				'VERIFY_HOST' => $this->getConfig('DB_VERIFY_HOST'),
 				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
 				'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
-			],
+			] + $db_creds_config + $vault_config,
 			'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
@@ -521,7 +616,7 @@ class CSetupWizard extends CForm {
 		$error = false;
 
 		// Create session secret key.
-		if (!$this->dbConnect() || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
+		if (!$this->dbConnect($db_user, $db_pass) || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
 			$this->STEP_FAILED = true;
 			$this->setConfig('step', 2);
 			return $this->stage2();
@@ -568,7 +663,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	private function dbConnect() {
+	private function dbConnect(?string $username = null, ?string $password = null) {
 		global $DB;
 
 		if (!$this->getConfig('check_fields_result')) {
@@ -583,8 +678,8 @@ class CSetupWizard extends CForm {
 		$DB['SERVER'] = $this->getConfig('DB_SERVER', 'localhost');
 		$DB['PORT'] = $this->getConfig('DB_PORT', '0');
 		$DB['DATABASE'] = $this->getConfig('DB_DATABASE', 'zabbix');
-		$DB['USER'] = $this->getConfig('DB_USER', 'root');
-		$DB['PASSWORD'] = $this->getConfig('DB_PASSWORD', '');
+		$DB['USER'] = $username ? $username : $this->getConfig('DB_USER', 'root');
+		$DB['PASSWORD'] = $password ? $password : $this->getConfig('DB_PASSWORD', '');
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
 		$DB['ENCRYPTION'] = (bool) $this->getConfig('DB_ENCRYPTION', true);
 		$DB['VERIFY_HOST'] = (bool) $this->getConfig('DB_VERIFY_HOST', true);
@@ -713,8 +808,70 @@ class CSetupWizard extends CForm {
 
 			array_map([$this, 'setConfig'], array_keys($input), $input);
 
+			$creds_storage = getRequest('creds_storage', $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG));
+			$this->setConfig('DB_CREDS_STORAGE', $creds_storage);
+
+			switch ($creds_storage) {
+				case DB_STORE_CREDS_CONFIG:
+					$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
+					$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
+					$this->setConfig('DB_VAULT_URL', '');
+					$this->setConfig('DB_VAULT_DB_PATH', '');
+					$this->setConfig('DB_VAULT_TOKEN', '');
+					break;
+
+				case DB_STORE_CREDS_VAULT:
+					$vault_url = getRequest('vault_url', $this->getConfig('DB_VAULT_URL'));
+					if (!$vault_url) {
+						$vault_url = self::VAULT_URL_DEFAULT;
+					}
+
+					$vault_db_path = getRequest('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH'));
+					$vault_token = getRequest('vault_token', $this->getConfig('DB_VAULT_TOKEN'));
+
+					$this->setConfig('DB_VAULT_URL', $vault_url);
+					$this->setConfig('DB_VAULT_DB_PATH', $vault_db_path);
+					$this->setConfig('DB_VAULT_TOKEN', $vault_token);
+					$this->setConfig('DB_USER', '');
+					$this->setConfig('DB_PASSWORD', '');
+					break;
+			}
+
 			if (hasRequest('next') && array_key_exists(2, getRequest('next'))) {
-				$db_connected = $this->dbConnect();
+				if ($creds_storage == DB_STORE_CREDS_VAULT) {
+					$vault_connection_checked = false;
+					$secret_parser = new CVaultSecretParser(['with_key' => false]);
+					$secret = [];
+
+					if (ini_get('allow_url_fopen') != 1) {
+						error(_('Please enable "allow_url_fopen" directive.'));
+					}
+					elseif (CVaultHelper::validateVaultApiEndpoint($vault_url)
+							&& CVaultHelper::validateVaultToken($vault_token)
+							&& $secret_parser->parse($vault_db_path) == CParser::PARSE_SUCCESS) {
+						$vault = new CVaultHelper($vault_url, $vault_token);
+						$secret = $vault->loadSecret($vault_db_path);
+
+						if ($secret) {
+							$vault_connection_checked = true;
+						}
+					}
+
+					if (!$vault_connection_checked) {
+						$db_connected = _('Vault connection failed.');
+					}
+					elseif (!array_key_exists('username', $secret)
+							|| !array_key_exists('password', $secret)) {
+						$db_connected = _('Username and password must be stored in Vault secret keys "username" and "password".');
+					}
+					else {
+						$db_connected = $this->dbConnect($secret['username'], $secret['password']);
+					}
+				}
+				else {
+					$db_connected = $this->dbConnect();
+				}
+
 				if ($db_connected === true) {
 					$db_connection_checked = $this->checkConnection();
 				}
@@ -751,6 +908,27 @@ class CSetupWizard extends CForm {
 		}
 		elseif ($this->getStep() == 6) {
 			if (hasRequest('save_config')) {
+				$vault_config = [
+					'VAULT_URL' => '',
+					'VAULT_DB_PATH' => '',
+					'VAULT_TOKEN' => ''
+				];
+
+				$db_creds_config = [
+					'USER' => '',
+					'PASSWORD' => ''
+				];
+
+				if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT) {
+					$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
+					$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
+					$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
+				}
+				else {
+					$db_creds_config['USER'] = $this->getConfig('DB_USER');
+					$db_creds_config['PASSWORD'] = $this->getConfig('DB_PASSWORD');
+				}
+
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');
 				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
@@ -761,8 +939,6 @@ class CSetupWizard extends CForm {
 						'SERVER' => $this->getConfig('DB_SERVER'),
 						'PORT' => $this->getConfig('DB_PORT'),
 						'DATABASE' => $this->getConfig('DB_DATABASE'),
-						'USER' => $this->getConfig('DB_USER'),
-						'PASSWORD' => $this->getConfig('DB_PASSWORD'),
 						'SCHEMA' => $this->getConfig('DB_SCHEMA'),
 						'ENCRYPTION' => (bool) $this->getConfig('DB_ENCRYPTION'),
 						'VERIFY_HOST' => (bool) $this->getConfig('DB_VERIFY_HOST'),
@@ -771,7 +947,7 @@ class CSetupWizard extends CForm {
 						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
 						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
 						'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
-					],
+					] + $db_creds_config + $vault_config,
 					'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 					'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')

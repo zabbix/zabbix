@@ -57,6 +57,9 @@ define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
 
+// TTL timeout in seconds used to invalidate data cache of Vault response. Set 0 to disable Vault response caching.
+define('ZBX_DATA_CACHE_TTL', 60);
+
 define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
 
@@ -140,6 +143,9 @@ define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
 define('ORACLE_MAX_STRING_SIZE', 4000);
 define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
 define('ORACLE_CESU8_CHARSET', 'UTF8');
+
+define('DB_STORE_CREDS_CONFIG', 0);
+define('DB_STORE_CREDS_VAULT', 1);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -1354,6 +1360,7 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
+define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in HashiCorp Vault).
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
