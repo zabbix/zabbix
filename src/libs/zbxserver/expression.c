@@ -5936,8 +5936,7 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token,
 				pos = cur_token.loc.r;
 				break;
 			case ZBX_TOKEN_SIMPLE_MACRO:
-				process_simple_macro_token(data, &cur_token, jp_row, lld_macro_paths, error,
-						error_len);
+				process_simple_macro_token(data, &cur_token, jp_row, lld_macro_paths, error, error_len);
 				token->loc.r += cur_token.loc.r - tmp_token.loc.r;
 				pos = cur_token.loc.r;
 				break;
@@ -6027,7 +6026,7 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
 
-	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
+	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 	{
 		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
 		{
