@@ -217,6 +217,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				new CLink($trigger['description'],
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
 						->setArgument('triggerids', [$trigger['triggerid']])
 				)
 			];
@@ -231,6 +232,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			$reason[] = new CLink($problemTrigger['description'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
+					->setArgument('filter_name', '')
 					->setArgument('triggerids', [$problemTrigger['triggerid']])
 			);
 		}

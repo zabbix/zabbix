@@ -355,6 +355,7 @@ function makeSystemStatus(array $filter, array $data) {
 
 	$url_group = (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
+		->setArgument('filter_name', '')
 		->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
 		->setArgument('hostids', array_key_exists('hostids', $filter) ? $filter['hostids'] : [])
 		->setArgument('name', array_key_exists('problem', $filter) ? $filter['problem'] : null)

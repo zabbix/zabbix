@@ -247,6 +247,7 @@ class CScreenHostTriggers extends CScreenBase {
 			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
+					->setArgument('filter_name', '')
 					->setArgument('triggerids', [$trigger['triggerid']])
 			);
 

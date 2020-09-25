@@ -51,6 +51,7 @@ else {
 
 	$groupurl = (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
+		->setArgument('filter_name', '')
 		->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
 		->setArgument('hostids',
 			array_key_exists('hostids', $data['filter']) ? $data['filter']['hostids'] : null

@@ -122,6 +122,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			new CLink(_('Problems'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
+					->setArgument('filter_name', '')
 					->setArgument('severities', $data['filter']['severities'])
 					->setArgument('hostids', [$host['hostid']])
 			),

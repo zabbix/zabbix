@@ -138,6 +138,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		else {
 			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
+			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
 			if (typeof options.severities !== 'undefined') {
 				url.setArgument('severities[]', options.severities);
@@ -305,6 +306,7 @@ function getMenuPopupMapElementGroup(options) {
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
+	problems_url.setArgument('filter_name', '');
 	problems_url.setArgument('groupids[]', options.groupid);
 	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('severities[]', options.severities);
@@ -352,6 +354,7 @@ function getMenuPopupMapElementTrigger(options) {
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
+	problems_url.setArgument('filter_name', '');
 	problems_url.setArgument('triggerids[]', options.triggerids);
 	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('severities[]', options.severities);
@@ -713,6 +716,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
+		url.setArgument('filter_name', '');
 		url.setArgument('triggerids[]', options.triggerid);
 
 		events.url = url.getUrl();
