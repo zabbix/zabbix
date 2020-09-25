@@ -52,7 +52,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 
 			if ($templateid === null) {
 				// For groups and hosts selection.
-				$field_item->setFilterParameter('with_simple_graph_item_prototypes', true);
+				$field_item_prototype->setFilterParameter('with_simple_graph_item_prototypes', true);
 			}
 
 			if (array_key_exists('itemid', $this->data)) {
