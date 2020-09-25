@@ -4268,7 +4268,6 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  *           }                                                                *
  *                                                                            *
  ******************************************************************************/
-#include "log.h"
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
 {
 	int		ret = FAIL;
