@@ -623,7 +623,7 @@ class testFormHostMacros extends testFormMacros {
 					],
 					'title' => 'Host updated'
 				]
-			],			
+			],
 			[
 				[
 					'expected' => TEST_BAD,

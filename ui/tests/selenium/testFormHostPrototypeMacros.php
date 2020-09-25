@@ -572,7 +572,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					],
 					'title' => 'Host prototype updated'
 				]
-			],			
+			],
 			[
 				[
 					'expected' => TEST_BAD,

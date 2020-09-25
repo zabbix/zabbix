@@ -879,7 +879,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 					],
 					'title' => 'Macros updated'
 				]
-			],			
+			],
 			[
 				[
 					'expected' => TEST_BAD,

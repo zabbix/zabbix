@@ -578,7 +578,7 @@ class testFormTemplateMacros extends testFormMacros {
 					],
 					'title' => 'Template updated'
 				]
-			],			
+			],
 			[
 				[
 					'expected' => TEST_BAD,
