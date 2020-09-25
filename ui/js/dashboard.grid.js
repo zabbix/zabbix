@@ -1805,8 +1805,6 @@
 		child['uniqueid'] = generateUniqueId($obj, data);
 		child['div'] = makeWidgetDiv($obj, data, child);
 
-		updateWidgetDynamic($obj, data, child);
-
 		iterator['content_body'].append(child['div']);
 		iterator['children'].push(child);
 
@@ -2151,8 +2149,8 @@
 		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
 			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
-		if (typeof widget['dynamic'] !== 'undefined') {
-			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
+		if (data.dashboard.dynamic_hostid !== null) {
+			ajax_data['dynamic_hostid'] = data.dashboard.dynamic_hostid;
 		}
 
 		setDashboardBusy(data, 'updateWidgetContent', widget.uniqueid);
@@ -2438,7 +2436,6 @@
 
 					applyWidgetConfiguration($obj, data, widget, configuration);
 					doAction('afterUpdateWidgetConfig', $obj, data, null);
-					updateWidgetDynamic($obj, data, widget);
 
 					if (widget['iterator']) {
 						updateWidgetContent($obj, data, widget, {
@@ -3191,22 +3188,6 @@
 		}
 	}
 
-	function updateWidgetDynamic($obj, data, widget) {
-		// This function may be called for widget that is not in data['widgets'] array yet.
-		if (typeof widget['fields']['dynamic'] !== 'undefined') {
-			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
-				var dynamic_hosts = data['dashboard']['dynamic']['host'];
-
-				widget['dynamic'] = {
-					'hostid': dynamic_hosts.length ? dynamic_hosts[0]['id'] : undefined
-				};
-			}
-			else {
-				delete widget['dynamic'];
-			}
-		}
-	}
-
 	function generateUniqueId($obj, data) {
 		var ref = false;
 
@@ -3579,16 +3560,10 @@
 			var	$this = $(this),
 				data = $this.data('dashboardGrid');
 
-			$.each(data['widgets'], function(index, widget) {
-				if (widget.fields.dynamic && +widget.fields.dynamic == 1) {
-					if (host) {
-						widget.dynamic = {};
-						widget.dynamic.hostid = host.id;
-					}
-					else {
-						delete widget.dynamic;
-					}
+			data.dashboard.dynamic_hostid = (host === null) ? null : host.id;
 
+			$.each(data['widgets'], function(index, widget) {
+				if (widget.fields.dynamic && widget.fields.dynamic == 1) {
 					updateWidgetContent($this, data, widget);
 				}
 			});
@@ -3673,8 +3648,6 @@
 				widget_local['uniqueid'] = generateUniqueId($this, data);
 				widget_local['div'] = makeWidgetDiv($this, data, widget_local);
 				widget_local['div'].data('widget-index', data['widgets'].length);
-
-				updateWidgetDynamic($this, data, widget_local);
 
 				data['widgets'].push(widget_local);
 				$this.append(widget_local['div']);

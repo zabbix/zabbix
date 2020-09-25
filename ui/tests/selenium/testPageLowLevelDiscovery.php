@@ -274,9 +274,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Virtualization'
+						'Host groups' => 'Templates/Server hardware'
 					],
-					'rows' => 8
+					'rows' => 39
 				]
 			],
 			[

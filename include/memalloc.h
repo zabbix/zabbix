@@ -56,6 +56,7 @@ typedef struct
 	zbx_uint64_t	used_size;
 	zbx_uint64_t	min_chunk_size;
 	zbx_uint64_t	max_chunk_size;
+	zbx_uint64_t	overhead;
 	unsigned int	chunks_num[MEM_BUCKET_COUNT];
 	unsigned int	free_chunks;
 	unsigned int	used_chunks;
@@ -86,6 +87,7 @@ void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats);
 void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info);
 
 size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param);
+zbx_uint64_t	zbx_mem_required_chunk_size(zbx_uint64_t size);
 
 #define ZBX_MEM_FUNC1_DECL_MALLOC(__prefix)				\
 static void	*__prefix ## _mem_malloc_func(void *old, size_t size)

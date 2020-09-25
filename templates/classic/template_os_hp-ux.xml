@@ -1495,7 +1495,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template OS HP-UX:vfs.fs.size[{#FSNAME},pfree].last(0)}&lt;20</expression>
+                            <expression>{Template OS HP-UX:vfs.fs.size[{#FSNAME},pfree].last()}&lt;20</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Free disk space is less than 20% on volume {#FSNAME}</name>
@@ -1511,7 +1511,7 @@
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template OS HP-UX:vfs.fs.inode[{#FSNAME},pfree].last(0)}&lt;20</expression>
+                            <expression>{Template OS HP-UX:vfs.fs.inode[{#FSNAME},pfree].last()}&lt;20</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Free inodes is less than 20% on volume {#FSNAME}</name>
@@ -1728,7 +1728,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS HP-UX:vm.memory.size[available].last(0)}&lt;20M</expression>
+            <expression>{Template OS HP-UX:vm.memory.size[available].last()}&lt;20M</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Lack of available memory on server {HOST.NAME}</name>

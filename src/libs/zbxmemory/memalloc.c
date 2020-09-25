@@ -755,8 +755,8 @@ void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
 		stats->chunks_num[i] = counter;
 	}
 
-	stats->used_chunks = (info->total_size - info->used_size - info->free_size) / (2 * MEM_SIZE_FIELD) + 1 -
-			stats->free_chunks;
+	stats->overhead = info->total_size - info->used_size - info->free_size;
+	stats->used_chunks = stats->overhead / (2 * MEM_SIZE_FIELD) + 1 - stats->free_chunks;
 	stats->free_size = info->free_size;
 	stats->used_size = info->used_size;
 }
@@ -789,6 +789,8 @@ void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
 			(unsigned long long)stats.free_size, (unsigned long long)stats.free_chunks);
 	zabbix_log(level, "of those, %10llu bytes are in %8llu used chunks",
 			(unsigned long long)stats.used_size, (unsigned long long)stats.used_chunks);
+	zabbix_log(level, "of those, %10llu bytes are used by allocation overhead",
+			(unsigned long long)stats.overhead);
 
 	zabbix_log(level, "================================");
 }
@@ -819,4 +821,12 @@ size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *para
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() size:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)size);
 
 	return size;
+}
+
+zbx_uint64_t	zbx_mem_required_chunk_size(zbx_uint64_t size)
+{
+	if (0 == size)
+		return 0;
+
+	return mem_proper_alloc_size(size) + MEM_SIZE_FIELD * 2;
 }
