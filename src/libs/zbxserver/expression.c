@@ -4138,7 +4138,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 							get_expanded_expression(event->trigger.expression)))
 					{
 						/* expansion failed, reference substitution is impossible */
-						token_search &= ~ZBX_TOKEN_SEARCH_BASIC;
+						token_search &= ~ZBX_TOKEN_SEARCH_REFERENCES;
 						continue;
 					}
 
