@@ -3693,7 +3693,7 @@
 				doAction('onEditStart', $this, data, null);
 				editDashboard($this, data);
 
-				// This event must not fire id dashboard was loaded in edit mode initially.
+				// Event must not fire if the dashboard was initially loaded in edit mode.
 				$.publish('dashboard.grid.editDashboard');
 			});
 		},
