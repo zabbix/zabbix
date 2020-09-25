@@ -1003,7 +1003,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 		else {
 			$this->assertMessage($data['expected'], $data['title']);
 			$sql = 'SELECT value, description, type FROM globalmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
-			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], 2],
+			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
 				array_values(CDBHelper::getRow($sql)));
 			$value_field = $this->getValueField($data['macro_fields']['macro']);
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
@@ -1073,7 +1073,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
 		}
 		$this->assertEquals([$data['macro'], $data['value']['text'], $data['description']], $result);
-		array_push($result,"2");
+		array_push($result, ZBX_MACRO_TYPE_VAULT);
 		$sql = 'SELECT macro, value, description, type FROM globalmacro WHERE macro='.zbx_dbstr($data['macro']);
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 	}

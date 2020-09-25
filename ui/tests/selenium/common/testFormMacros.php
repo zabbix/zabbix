@@ -601,7 +601,7 @@ abstract class testFormMacros extends CWebTest {
 		else {
 			$this->assertMessage($data['expected'], $data['title']);
 			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
-			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], 2],
+			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
 					array_values(CDBHelper::getRow($sql)));
 			$this->openMacrosTab($url, $source);
 			$value_field = $this->getValueField($data['macro_fields']['macro']);
