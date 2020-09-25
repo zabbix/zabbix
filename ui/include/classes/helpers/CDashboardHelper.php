@@ -412,6 +412,7 @@ class CDashboardHelper {
 
 	/**
 	 * Prepare data for cloning template dashboards.
+	 * Replace item and graph ids to new ids.
 	 *
 	 * @static
 	 *
