@@ -8158,7 +8158,7 @@ static void	dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers)
 			ZBX_DC_FUNCTION	*function;
 
 			if (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
-					&timer->objectid)))
+					&timer->objectid)) && function->timer_revision == timer->revision)
 			{
 				function->timer_revision = 0;
 			}
