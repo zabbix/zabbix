@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerDashboardUpdate extends CControllerDashboardUpdateAbstract {
+class CControllerDashboardUpdate extends CController {
 
 	private $widgets;
 
@@ -39,7 +39,7 @@ class CControllerDashboardUpdate extends CControllerDashboardUpdateAbstract {
 			[
 				'widgets' => $this->widgets,
 				'errors' => $widgets_errors
-			] = self::validateWidgets($this->getInput('widgets', []), null);
+			] = CDashboardHelper::validateWidgets($this->getInput('widgets', []), null);
 
 			$errors = array_merge($sharing_errors, $widgets_errors);
 

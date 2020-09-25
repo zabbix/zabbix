@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerTemplateDashboardUpdate extends CControllerDashboardUpdateAbstract {
+class CControllerTemplateDashboardUpdate extends CController {
 
 	private $widgets;
 
@@ -37,7 +37,7 @@ class CControllerTemplateDashboardUpdate extends CControllerDashboardUpdateAbstr
 			[
 				'widgets' => $this->widgets,
 				'errors' => $errors
-			] = self::validateWidgets($this->getInput('widgets', []), $this->getInput('templateid'));
+			] = CDashboardHelper::validateWidgets($this->getInput('widgets', []), $this->getInput('templateid'));
 
 			foreach ($errors as $error) {
 				error($error);

@@ -24,11 +24,13 @@ class CDashboardHelper {
 	/**
 	 * Get dashboard owner name.
 	 *
+	 * @static
+	 *
 	 * @param string $userid
 	 *
 	 * @return string
 	 */
-	public static function getOwnerName($userid) {
+	public static function getOwnerName($userid): string {
 		$users = API::User()->get([
 			'output' => ['name', 'surname', 'alias'],
 			'userids' => $userid
@@ -42,9 +44,11 @@ class CDashboardHelper {
 	/**
 	 * Update editable flag.
 	 *
+	 * @static
+	 *
 	 * @param array $dashboards  An associative array of the dashboards.
 	 */
-	public static function updateEditableFlag(array &$dashboards) {
+	public static function updateEditableFlag(array &$dashboards): void {
 		$dashboards_rw = API::Dashboard()->get([
 			'output' => [],
 			'dashboardids' => array_keys($dashboards),
@@ -135,6 +139,8 @@ class CDashboardHelper {
 
 	/**
 	 * Returns array of widgets without inaccessible fields.
+	 *
+	 * @static
 	 *
 	 * @param array $widgets
 	 * @param array $widgets[]['fields']
@@ -271,14 +277,15 @@ class CDashboardHelper {
 	/**
 	 * Converts fields, received from API to key/value format.
 	 *
-	 * @param array $fields  fields as received from API
-	 *
 	 * @static
+	 *
+	 * @param array $fields  fields as received from API
 	 *
 	 * @return array
 	 */
-	public static function convertWidgetFields($fields) {
+	public static function convertWidgetFields(array $fields): array {
 		$ret = [];
+
 		foreach ($fields as $field) {
 			if (array_key_exists($field['name'], $ret)) {
 				$ret[$field['name']] = (array) $ret[$field['name']];
@@ -295,18 +302,111 @@ class CDashboardHelper {
 	/**
 	 * Checks, if any of widgets needs time selector.
 	 *
-	 * @param array $widgets
-	 *
 	 * @static
+	 *
+	 * @param array $widgets
 	 *
 	 * @return bool
 	 */
-	public static function hasTimeSelector(array $widgets) {
+	public static function hasTimeSelector(array $widgets): bool {
 		foreach ($widgets as $widget) {
 			if (CWidgetConfig::usesTimeSelector($widget)) {
 				return true;
 			}
 		}
+
 		return false;
+	}
+
+	/**
+	 * Validate widget input parameters.
+	 *
+	 * @static
+	 *
+	 * @var array  $widgets
+	 * @var string $widget[]['widgetid']       (optional)
+	 * @var array  $widget[]['pos']
+	 * @var int    $widget[]['pos']['x']
+	 * @var int    $widget[]['pos']['y']
+	 * @var int    $widget[]['pos']['width']
+	 * @var int    $widget[]['pos']['height']
+	 * @var string $widget[]['type']
+	 * @var string $widget[]['name']
+	 * @var string $widget[]['fields']         (optional) JSON object
+	 *
+	 * @return array  Widgets and/or errors.
+	 */
+	public static function validateWidgets(array $widgets, string $templateid = null): array {
+		$errors = [];
+
+		foreach ($widgets as $index => &$widget) {
+			$widget_errors = [];
+
+			if (!array_key_exists('pos', $widget)) {
+				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+					_s('the parameter "%1$s" is missing', 'pos')
+				);
+			}
+			else {
+				foreach (['x', 'y', 'width', 'height'] as $field) {
+					if (!is_array($widget['pos']) || !array_key_exists($field, $widget['pos'])) {
+						$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
+							_s('the parameter "%1$s" is missing', $field)
+						);
+					}
+				}
+			}
+
+			if (!array_key_exists('type', $widget)) {
+				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+					_s('the parameter "%1$s" is missing', 'type')
+				);
+			}
+
+			if (!array_key_exists('name', $widget)) {
+				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+					_s('the parameter "%1$s" is missing', 'name')
+				);
+			}
+
+			if (!array_key_exists('view_mode', $widget)) {
+				$widget_errors[] = _s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
+					_s('the parameter "%1$s" is missing', 'view_mode')
+				);
+			}
+
+			if ($widget_errors) {
+				$errors = array_merge($errors, $widget_errors);
+
+				break;
+			}
+
+			$widget_fields = array_key_exists('fields', $widget) ? $widget['fields'] : '{}';
+			$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget_fields, $templateid);
+			unset($widget['fields']);
+
+			if ($widget_errors = $widget['form']->validate()) {
+				if ($widget['name'] === '') {
+					$context = $this->hasInput('templateid')
+						? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+						: CWidgetConfig::CONTEXT_DASHBOARD;
+
+					$widget_name = CWidgetConfig::getKnownWidgetTypes($context)[$widget['type']];
+				}
+				else {
+					$widget_name = $widget['name'];
+				}
+
+				foreach ($widget_errors as $error) {
+					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '.$error;
+				}
+			}
+		}
+		unset($widget);
+
+		return [
+			'widgets' => $widgets,
+			'errors' => $errors
+		];
 	}
 }
