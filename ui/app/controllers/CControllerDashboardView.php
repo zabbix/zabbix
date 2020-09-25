@@ -144,7 +144,7 @@ class CControllerDashboardView extends CController {
 				'widgets' => [],
 				'owner' => [
 					'id' => CWebUser::$data['userid'],
-					'name' => self::CDashboardHelper(CWebUser::$data['userid'])
+					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
 				]
 			];
 		}
@@ -168,7 +168,7 @@ class CControllerDashboardView extends CController {
 					),
 					'owner' => [
 						'id' => CWebUser::$data['userid'],
-						'name' => self::CDashboardHelper(CWebUser::$data['userid'])
+						'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
 					],
 					'sharing' => [
 						'private' => $dashboards[0]['private'],
