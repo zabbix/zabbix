@@ -29,7 +29,7 @@ class CControllerDashboardPropertiesEdit extends CController {
 		$fields = [
 			'template' => 'in 1',
 			'userid' => 'db users.userid',
-			'name' => 'db dashboard.name'
+			'name' => 'required|db dashboard.name'
 		];
 
 		$ret = $this->validateInput($fields);
