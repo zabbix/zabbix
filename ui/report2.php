@@ -374,6 +374,7 @@ else {
 		}
 
 		$select_filter_groupid = (new CSelect('filter_groups'))
+			->setAttribute('autofocus', 'autofocus')
 			->setValue($data['filter']['groups'])
 			->setFocusableElementId('filter-groups')
 			->onChange('$(this).closest("form").submit()')
