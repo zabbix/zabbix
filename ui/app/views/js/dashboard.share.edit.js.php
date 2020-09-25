@@ -135,16 +135,14 @@
 			for (i = 0; i < list.values.length; i++) {
 				var	value = list.values[i];
 
-				if (empty(value)) {
-					continue;
-				}
-
-				if (typeof value.permission === 'undefined') {
-					if ($('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
-						value.permission = <?= PERM_READ ?>;
-					}
-					else {
-						value.permission = <?= PERM_READ_WRITE ?>;
+				if (list.object === 'usrgrpid' || list.object === 'userid') {
+					if (typeof value.permission === 'undefined') {
+						if ($('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
+							value.permission = <?= PERM_READ ?>;
+						}
+						else {
+							value.permission = <?= PERM_READ_WRITE ?>;
+						}
 					}
 				}
 
