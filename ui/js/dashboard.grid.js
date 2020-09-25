@@ -2751,8 +2751,6 @@
 	function editDashboard($obj, data) {
 		$obj.addClass('dashbrd-mode-edit');
 
-		data['options']['edit_mode'] = true;
-
 		// Recalculate minimal height and expand dashboard to the whole screen.
 		data.minimalHeight = calculateGridMinHeight($obj);
 
@@ -3448,6 +3446,7 @@
 					resize_timeout;
 
 				if (data.options.edit_mode) {
+					doAction('onEditStart', $this, data, null);
 					editDashboard($this, data);
 				}
 
@@ -3688,9 +3687,13 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				// Set before firing "onEditStart" for isEditMode to work correctly.
+				data['options']['edit_mode'] = true;
+
 				doAction('onEditStart', $this, data, null);
 				editDashboard($this, data);
 
+				// This event must not fire id dashboard was loaded in edit mode initially.
 				$.publish('dashboard.grid.editDashboard');
 			});
 		},
