@@ -2067,7 +2067,7 @@ static zbx_macro_functions_t	mod_macros[] =
 	{MVAR_ITEM_VALUE, "regsub,iregsub,fmtnum"},
 	{MVAR_ITEM_LASTVALUE, "regsub,iregsub,fmtnum"},
 	{MVAR_TIME, "fmttime"},
-	{"?", "fmtnum"},
+	{"{?}", "fmtnum"},
 	{NULL, NULL}
 };
 
@@ -2731,7 +2731,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 		if (len > fm_len || 0 != strncmp(mod_macros[i].macro, str + fm->macro.l, len - 1))
 			continue;
 
-		if (len != fm_len)
+		if ('?' != mod_macros[i].macro[1] && len != fm_len)
 		{
 			if (SUCCEED != is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
 					sizeof(*N_functionid), 1, 9))
@@ -2739,7 +2739,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 				continue;
 			}
 		}
-		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + len - 1])
+		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + fm_len - 1])
 			continue;
 
 		if (SUCCEED == str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
@@ -3021,7 +3021,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
-	zbx_token_t		token;
+	zbx_token_t		token, inner_token;
 	zbx_token_search_t	token_search = ZBX_TOKEN_SEARCH_BASIC;
 	char			*expression = NULL, *user_alias = NULL, *user_name = NULL, *user_surname = NULL;
 
@@ -3054,6 +3054,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		N_functionid = 1;
 		raw_value = 0;
 		pos = token.loc.l;
+		inner_token = token;
 
 		switch (token.type)
 		{
@@ -3081,7 +3082,9 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
 				indexed_macro = is_indexed_macro(*data, &token);
-				if (NULL == (m = func_macro_in_list(*data, &token.data.func_macro, &N_functionid)))
+				if (NULL == (m = func_macro_in_list(*data, &token.data.func_macro, &N_functionid)) ||
+						SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
+								&inner_token, token_search))
 				{
 					/* Ignore functions with macros not supporting them, but do not skip the */
 					/* whole token, nested macro should be resolved in this case. */
@@ -4184,13 +4187,13 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 
 					get_trigger_expression_constant(expression, &token.data.reference, &replace_to);
 				}
-				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
+				else if (ZBX_TOKEN_EXPRESSION_MACRO == inner_token.type)
 				{
 					if (0 != (macro_type & MACRO_TYPE_EVENT_NAME))
 					{
 						char		*exp = NULL;
 						size_t		exp_alloc = 0, exp_offset = 0;
-						zbx_strloc_t	*loc = &token.data.expression_macro.expression;
+						zbx_strloc_t	*loc = &inner_token.data.expression_macro.expression;
 
 						zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, *data + loc->l,
 								loc->r - loc->l + 1);
