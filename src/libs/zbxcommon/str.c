@@ -4213,6 +4213,19 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
 		if (3 == ptr - macro)
 			return FAIL;
 	}
+	else if ('?' == macro[2])
+	{
+		zbx_token_t	expr_token;
+
+		if (SUCCEED != zbx_token_find(macro, 1, &expr_token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) ||
+				ZBX_TOKEN_EXPRESSION_MACRO != expr_token.type ||
+				1 != expr_token.loc.l)
+		{
+			return FAIL;
+		}
+
+		ptr = macro + expr_token.loc.r;
+	}
 	else
 	{
 		zbx_strloc_t	loc;

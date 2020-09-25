@@ -554,4 +554,37 @@ out:
   token_type: ZBX_TOKEN_EXPRESSION_MACRO
   expression: '{$MACRO}'
   return: SUCCEED
+---
+test case: 'Success: {{?1}.fmtnum(1)}'
+in:
+  expression: '{{?1}.fmtnum(1)}'
+out:
+  token: '{{?1}.fmtnum(1)}'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  macro: '{?1}'
+  func: 'fmtnum(1)'
+  param: '(1)'
+  return: SUCCEED
+---
+test case: 'Success: {{? {{HOST.HOST}:key.last()} }.fmtnum(2)}'
+in:
+  expression: '{{? {{HOST.HOST}:key.last()} }.fmtnum(2)}'
+out:
+  token: '{{? {{HOST.HOST}:key.last()} }.fmtnum(2)}'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  macro: '{? {{HOST.HOST}:key.last()} }'
+  func: 'fmtnum(2)'
+  param: '(2)'
+  return: SUCCEED
+---
+test case: 'Success: {{? {? {?1 }.fmtnum(1)}'
+in:
+  expression: '{{? {? {?1 }.fmtnum(1)}'
+out:
+  token: '{{? {? {?1 }.fmtnum(1)}'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  macro: '{? {? {?1 }'
+  func: 'fmtnum(1)'
+  param: '(1)'
+  return: SUCCEED
 ...
