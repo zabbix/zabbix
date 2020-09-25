@@ -4268,6 +4268,7 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  *           }                                                                *
  *                                                                            *
  ******************************************************************************/
+#include "log.h"
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search)
 {
 	int		ret = FAIL;
@@ -4277,32 +4278,25 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 	{
 		ptr = strchr(ptr, '{');
 
-		switch (token_search)
+		if (0 != (token_search & ZBX_TOKEN_SEARCH_REFERENCES))
 		{
-			case ZBX_TOKEN_SEARCH_BASIC:
-				break;
-			case ZBX_TOKEN_SEARCH_REFERENCES:
-				while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+			while (NULL != (dollar = strchr(dollar, '$')) && (NULL == ptr || ptr > dollar))
+			{
+				if (0 == isdigit(dollar[1]))
 				{
-					if (0 == isdigit(dollar[1]))
-					{
-						dollar++;
-						continue;
-					}
-
-					token->data.reference.index = dollar[1] - '0';
-					token->type = ZBX_TOKEN_REFERENCE;
-					token->loc.l = dollar - expression;
-					token->loc.r = token->loc.l + 1;
-					return SUCCEED;
+					dollar++;
+					continue;
 				}
 
-				if (NULL == dollar)
-					token_search = ZBX_TOKEN_SEARCH_BASIC;
+				token->data.reference.index = dollar[1] - '0';
+				token->type = ZBX_TOKEN_REFERENCE;
+				token->loc.l = dollar - expression;
+				token->loc.r = token->loc.l + 1;
+				return SUCCEED;
+			}
 
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+			if (NULL == dollar)
+				token_search &= ~ZBX_TOKEN_SEARCH_REFERENCES;
 		}
 
 		if (NULL == ptr)
@@ -4320,7 +4314,8 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				ret = zbx_token_parse_lld_macro(expression, ptr, token);
 				break;
 			case '?':
-				ret = zbx_token_parse_expression_macro(expression, ptr, token);
+				if (0 != (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
+					ret = zbx_token_parse_expression_macro(expression, ptr, token);
 				break;
 			case '{':
 				ret = zbx_token_parse_nested_macro(expression, ptr, token);

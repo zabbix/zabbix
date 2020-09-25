@@ -2981,7 +2981,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
 	zbx_token_t		token;
-	zbx_token_search_t	token_search;
+	zbx_token_search_t	token_search = ZBX_TOKEN_SEARCH_BASIC;
 	char			*expression = NULL, *user_alias = NULL, *user_name = NULL, *user_surname = NULL;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
@@ -2993,9 +2993,10 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
 
 	if (0 != (macro_type & (MACRO_TYPE_TRIGGER_DESCRIPTION | MACRO_TYPE_EVENT_NAME)))
-		token_search = ZBX_TOKEN_SEARCH_REFERENCES;
-	else
-		token_search = ZBX_TOKEN_SEARCH_BASIC;
+		token_search |= ZBX_TOKEN_SEARCH_REFERENCES;
+
+	if (0 != (macro_type & (MACRO_TYPE_EVENT_NAME)))
+		token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
 		return res;
@@ -4137,7 +4138,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 							get_expanded_expression(event->trigger.expression)))
 					{
 						/* expansion failed, reference substitution is impossible */
-						token_search = ZBX_TOKEN_SEARCH_BASIC;
+						token_search &= ~ZBX_TOKEN_SEARCH_BASIC;
 						continue;
 					}
 
