@@ -45,6 +45,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 
 			if (active_filter !== filter._active_item) {
 				active_filter = filter._active_item;
+				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 				chkbxRange.clearSelectedOnFilterChange();
 			}
 		});
