@@ -73,121 +73,123 @@
 </script>
 
 <script>
+	class dashboardShareSingleton {
+		constructor(data) {
+			this.data = data;
+		}
+
+		live() {
+			this.addPopupValues({'object': 'private', 'values': [this.data.private] });
+			this.addPopupValues({'object': 'userid', 'values': this.data.users });
+			this.addPopupValues({'object': 'usrgrpid', 'values': this.data.userGroups });
+		}
+
+		/**
+		 * @param {Overlay} overlay
+		 */
+		submit(overlay) {
+			var $form = overlay.$dialogue.find('form'),
+				url = new Curl('zabbix.php', false);
+
+			clearMessages();
+
+			url.setArgument('action', 'dashboard.share.update');
+
+			overlay.setLoading();
+			overlay.xhr = $.ajax({
+				url: url.getUrl(),
+				data: $form.serializeJSON(),
+				dataType: 'json',
+				method: 'POST'
+			});
+
+			overlay.xhr
+				.always(() => overlay.unsetLoading())
+				.done((response) => {
+					$form.prevAll('.msg-good, .msg-bad').remove();
+
+					if ('errors' in response) {
+						$(response.errors).insertBefore($form);
+					}
+					else if ('messages' in response) {
+						addMessage(response.messages);
+
+						overlayDialogueDestroy(overlay.dialogueid);
+					}
+				});
+		}
+
+		removeUserGroupShares(usrgrpid) {
+			$('#user_group_shares_' + usrgrpid).remove();
+		}
+
+		removeUserShares(userid) {
+			$('#user_shares_' + userid).remove();
+		}
+
+		addPopupValues(list) {
+			var	i,
+				tpl,
+				container;
+
+			for (i = 0; i < list.values.length; i++) {
+				var	value = list.values[i];
+
+				if (empty(value)) {
+					continue;
+				}
+
+				if (typeof value.permission === 'undefined') {
+					if ($('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
+						value.permission = <?= PERM_READ ?>;
+					}
+					else {
+						value.permission = <?= PERM_READ_WRITE ?>;
+					}
+				}
+
+				switch (list.object) {
+					case 'private':
+						$('input[name=private][value=' + value + ']').prop('checked', true);
+
+						break;
+
+					case 'usrgrpid':
+						if ($('#user_group_shares_' + value.usrgrpid).length) {
+							continue;
+						}
+
+						tpl = new Template($('#user_group_row_tpl').html());
+
+						container = $('#user_group_list_footer');
+						container.before(tpl.evaluate(value));
+
+						$('#user_group_' + value.usrgrpid + '_permission_' + value.permission + '').prop('checked', true);
+
+						break;
+
+					case 'userid':
+						if ($('#user_shares_' + value.id).length) {
+							continue;
+						}
+
+						tpl = new Template($('#user_row_tpl').html());
+
+						container = $('#user_list_footer');
+						container.before(tpl.evaluate(value));
+
+						$('#user_' + value.id + '_permission_' + value.permission + '').prop('checked', true);
+
+						break;
+				}
+			}
+		}
+	}
+
 	function initializeDashboardShare(data) {
 		window.dashboard_share = new dashboardShareSingleton(data);
 		window.dashboard_share.live();
 	}
-
-	function dashboardShareSingleton(data) {
-		this.data = data;
-	}
-
-	dashboardShareSingleton.prototype.live = function() {
-		this.addPopupValues({'object': 'private', 'values': [this.data.private] });
-		this.addPopupValues({'object': 'userid', 'values': this.data.users });
-		this.addPopupValues({'object': 'usrgrpid', 'values': this.data.userGroups });
-	};
-
-	/**
-	 * @param {Overlay} overlay
-	 */
-	dashboardShareSingleton.prototype.submit = function(overlay) {
-		var $form = overlay.$dialogue.find('form'),
-			url = new Curl('zabbix.php', false);
-
-		clearMessages();
-
-		url.setArgument('action', 'dashboard.share.update');
-
-		overlay.setLoading();
-		overlay.xhr = $.ajax({
-			url: url.getUrl(),
-			data: $form.serializeJSON(),
-			dataType: 'json',
-			method: 'POST'
-		});
-
-		overlay.xhr
-			.always(() => overlay.unsetLoading())
-			.done((response) => {
-				$form.prevAll('.msg-good, .msg-bad').remove();
-
-				if ('errors' in response) {
-					$(response.errors).insertBefore($form);
-				}
-				else if ('messages' in response) {
-					addMessage(response.messages);
-
-					overlayDialogueDestroy(overlay.dialogueid);
-				}
-			});
-	};
-
-	dashboardShareSingleton.prototype.removeUserGroupShares = function(usrgrpid) {
-		$('#user_group_shares_' + usrgrpid).remove();
-	}
-
-	dashboardShareSingleton.prototype.removeUserShares = function(userid) {
-		$('#user_shares_' + userid).remove();
-	}
-
-	dashboardShareSingleton.prototype.addPopupValues = function(list) {
-		var	i,
-			tpl,
-			container;
-
-		for (i = 0; i < list.values.length; i++) {
-			var	value = list.values[i];
-
-			if (empty(value)) {
-				continue;
-			}
-
-			if (typeof value.permission === 'undefined') {
-				if ($('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
-					value.permission = <?= PERM_READ ?>;
-				}
-				else {
-					value.permission = <?= PERM_READ_WRITE ?>;
-				}
-			}
-
-			switch (list.object) {
-				case 'private':
-					$('input[name=private][value=' + value + ']').prop('checked', true);
-
-					break;
-
-				case 'usrgrpid':
-					if ($('#user_group_shares_' + value.usrgrpid).length) {
-						continue;
-					}
-
-					tpl = new Template($('#user_group_row_tpl').html());
-
-					container = $('#user_group_list_footer');
-					container.before(tpl.evaluate(value));
-
-					$('#user_group_' + value.usrgrpid + '_permission_' + value.permission + '').prop('checked', true);
-
-					break;
-
-				case 'userid':
-					if ($('#user_shares_' + value.id).length) {
-						continue;
-					}
-
-					tpl = new Template($('#user_row_tpl').html());
-
-					container = $('#user_list_footer');
-					container.before(tpl.evaluate(value));
-
-					$('#user_' + value.id + '_permission_' + value.permission + '').prop('checked', true);
-
-					break;
-			}
-		}
-	};
 
 	/**
 	 * @see init.js add.popup event
