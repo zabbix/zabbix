@@ -119,20 +119,18 @@ class CControllerProblemView extends CControllerProblem {
 			'filter' => $filter,
 			'filter_view' => 'monitoring.problem.filter',
 			'filter_defaults' => $profile->filter_defaults,
-			'timerange' => [
-				'idx' => static::FILTER_IDX,
-				'idx2' => 0,
-				'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time']),
-				'from' => $profile->from,
-				'to' => $profile->to
-			],
 			'tabfilter_options' => [
 				'idx' => static::FILTER_IDX,
 				'can_toggle' => true,
 				'selected' => $profile->selected,
 				'support_custom_time' => true,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'timeselector' => [
+					'from' => $profile->from,
+					'to' => $profile->to,
+					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
+				]
 			],
 			'filter_tabs' => $filter_tabs,
 			'refresh_url' => $refresh_curl->getUrl(),

@@ -114,7 +114,6 @@ if ($data['action'] === 'problem.view') {
 			$filter->addTemplatedTab($tab['filter_name'], $tab);
 		}
 
-		$filter->addTimeselector($data['timerange']);
 		// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
 		$data['filter_options'] = $filter->options;
 		$widget->addItem($filter);

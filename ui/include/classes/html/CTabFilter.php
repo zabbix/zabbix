@@ -41,6 +41,14 @@ class CTabFilter extends CDiv {
 
 	/**
 	 * Tab options array.
+	 * idx                  - namespace used to get/update filter related data in profiles table.
+	 * can_toggle           - is it allowed to collapse all filters.
+	 * selected             - zero based index of selected filter.
+	 * expanded             - is selected filter expanded or not.
+	 * support_custom_time  - can filters define custom time range or not.
+	 * data                 - array of filters data arrays.
+	 * page                 - current page number used by selected tab for pagination.
+	 * timeselector         - array of timeselector data, can be set with addTimeselector or passed as array.
 	 */
 	public $options = [
 		'idx' => '',
@@ -49,8 +57,7 @@ class CTabFilter extends CDiv {
 		'expanded' => false,
 		'support_custom_time' => true,
 		'data' => [],
-		'page' => null,
-		'src_url' => ''
+		'page' => null
 	];
 
 	/**
@@ -102,6 +109,10 @@ class CTabFilter extends CDiv {
 	public function setOptions(array $options) {
 		$this->options = $options;
 
+		if (array_key_exists('timeselector', $options)) {
+			$this->addTimeselector($this->options['timeselector']);
+		}
+
 		return $this;
 	}
 
@@ -139,23 +150,23 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Add template for browser side rendered tabs.
-	 *
-	 * @param CPartial $template  Template object.
-	 */
-	public function addTemplate(CPartial $template) {
-		$this->templates[$template->getName()] = $template;
-
-		return $this;
-	}
-
-	/**
 	 * Set idx namespace used by tab filter.
 	 *
 	 * @param string $idx  Idx string without ending dot.
 	 */
 	public function setIdx(string $idx) {
 		$this->options['idx'] = $idx;
+
+		return $this;
+	}
+
+	/**
+	 * Add template for browser side rendered tabs.
+	 *
+	 * @param CPartial $template  Template object.
+	 */
+	public function addTemplate(CPartial $template) {
+		$this->templates[$template->getName()] = $template;
 
 		return $this;
 	}
@@ -193,6 +204,11 @@ class CTabFilter extends CDiv {
 			}
 		}
 
+		if (is_a($label, CLink::class)) {
+			// Disable navigation by TAB, javascript code will modify this attribute.
+			$label->setAttribute('tabindex', -1);
+		}
+
 		if ($content) {
 			$content->setId($targetid);
 		}
@@ -219,31 +235,14 @@ class CTabFilter extends CDiv {
 	 * @param int     $timerange['idx2']
 	 */
 	public function addTimeselector(array $timerange) {
-		$timerange += [
+		$this->options['timeselector'] = $timerange + [
 			'format' => ZBX_FULL_DATE_TIME,
 			'from' => 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT),
 			'to' => 'now',
-			'disabled' => false
-		];
-		$data = $timerange + [
-			'label' => relativeDateToText($timerange['from'], $timerange['to'])
+			'disabled' => true
 		];
 
-		$content = (new CDiv(new CPartial('timeselector.filter', $data)))->setId(static::CSS_ID_PREFIX.'timeselector');
-		$this
-			->addClass('filter-space')
-			->setAttribute('data-disable-initial-check', 1)
-			->setAttribute('data-accessible', 1)
-			->setAttribute('data-profile-idx', $timerange['idx'])
-			->setAttribute('data-profile-idx2', $timerange['idx2']);
-		$link = (new CLink($data['label']))
-			->addClass(ZBX_STYLE_BTN_TIME)
-			->addClass($timerange['disabled'] ? ZBX_STYLE_DISABLED : null);
-
-		return $this->addTab($link, $content, $data + [
-			'filter_sortable' => false,
-			'filter_configurable' => false
-		]);
+		return $this;
 	}
 
 	/**
@@ -260,77 +259,12 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Generate tabs navigation layout.
+	 * Return HTML of tab filter body element.
+	 *
+	 * @return string
 	 */
-	protected function getNavigation() {
-		$sortable = [];
-		$static = [];
-
-		foreach ($this->labels as $index => $label) {
-			if ($this->options['data'][$index]['filter_sortable']) {
-				$sortable[$index] = $label;
-			}
-			else {
-				$static[$index] = $label;
-			}
-		}
-
-		// Last static tab is timeselector.
-		$timeselector = end($static);
-		$index = key($static);
-
-		// First dynamic tab is 'Home' tab and cannot be sorted.
-		array_unshift($sortable, array_shift($static));
-
-		if (is_a($this->contents[$index], CTag::class)
-				&& $this->contents[$index]->getId() === static::CSS_ID_PREFIX.'timeselector') {
-			$timeselector = array_pop($static);
-		}
-		else {
-			$timeselector = null;
-		}
-
-		$nav_list = new CList([
-			(new CSimpleButton())
-				->setAttribute('data-action', 'toggleTabsList')
-				->addClass('btn-widget-expand'),
-			(new CSimpleButton())
-				->setAttribute('data-action', 'selectNextTab')
-				->addClass('btn-iterator-page-next')
-		]);
-
-		if ($timeselector) {
-			$timeselector_data = end($this->options['data']);
-			$tab = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
-			$enabled = !$tab['filter_custom_time'] && !$timeselector_data['disabled'];
-			$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
-
-			$nav_list
-				->addItem($timeselector)
-				->addItem((new CSimpleButton())
-					->setEnabled($enabled)
-					->addClass(ZBX_STYLE_BTN_TIME_LEFT))
-				->addItem((new CSimpleButton(_('Zoom out')))
-					->setEnabled($enabled)
-					->addClass(ZBX_STYLE_BTN_TIME_OUT))
-				->addItem((new CSimpleButton())
-					->setEnabled($enabled)
-					->addClass(ZBX_STYLE_BTN_TIME_RIGHT));
-		}
-
-		$nav = [
-			(new CSimpleButton())
-				->setAttribute('data-action', 'selectPrevTab')
-				->addClass('btn-iterator-page-previous'),
-			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
-			$static ? $static : null,
-			$nav_list
-		];
-
-		return new CTag('nav', true , new CList($nav));
-	}
-
-	public function bodyToString() {
+	public function bodyToString(): string {
+		$timeselector = array_key_exists('timeselector', $this->options) ? $this->options['timeselector'] : [];
 		$selected = $this->options['selected'];
 		$this->labels[$selected]->addClass(static::CSS_TAB_SELECTED);
 
@@ -342,9 +276,21 @@ class CTabFilter extends CDiv {
 				->setId($this->labels[$selected]->getAttribute('data-target'));
 		}
 
+		if ($timeselector) {
+			$data = $timeselector + [
+				'label' => relativeDateToText($timeselector['from'], $timeselector['to']),
+				'filter_timeselector' => true,
+				'filter_sortable' => false,
+				'filter_configurable' => false
+			];
+			$this->contents[] = (new CDiv(new CPartial('timeselector.filter', $data)))
+				->setId(static::CSS_ID_PREFIX.'timeselector');
+			$this->options['data'][] = $data;
+		}
+
 		foreach ($this->contents as $index => $content) {
 			if (is_a($content, CTag::class)) {
-				$content->addClass($index == $selected ? null : 'display-none');
+				$content->addClass($index == $selected ? null : ZBX_STYLE_DISPLAY_NONE);
 			}
 		}
 
@@ -361,8 +307,99 @@ class CTabFilter extends CDiv {
 				$this->buttons,
 			]))
 				->addClass('tabfilter-content-container')
-				->addClass($this->options['expanded'] ? null : 'display-none'),
+				->addClass($this->options['expanded'] ? null : ZBX_STYLE_DISPLAY_NONE),
 			$templates,
 		]);
+	}
+
+	public function toString($destroy = true) {
+		if (array_key_exists('timeselector', $this->options)) {
+			$this
+				->addClass('filter-space')
+				->setAttribute('data-disable-initial-check', 1)
+				->setAttribute('data-accessible', 1)
+				->setAttribute('data-profile-idx', $this->options['idx'])
+				->setAttribute('data-profile-idx2', 0);
+		}
+
+		return parent::toString($destroy);
+	}
+
+	/**
+	 * Get time selector navigation buttons as array.
+	 *
+	 * @return array
+	 */
+	protected function getTimeselectorNavigation(): array {
+		$data = $this->options['timeselector'];
+		$selected = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
+		$enabled = !$selected['filter_custom_time'] && !$selected['disabled'];
+		// Disable navigation by TAB, if timeselector is disabled.
+		$link = (new CLink(relativeDateToText($data['from'], $data['to'])))
+			->addClass('tabfilter-item-link')
+			->setAttribute('tabindex', $enabled ? 0 : -1)
+			->addClass(ZBX_STYLE_BTN_TIME)
+			->addClass($data['disabled'] ? ZBX_STYLE_DISABLED : null);
+		$timeselector = (new CListItem($link))
+			->setAttribute('data-target', static::CSS_ID_PREFIX.'timeselector')
+			->addClass('tabfilter-item-label');
+		$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
+
+		return [
+			$timeselector,
+			(new CSimpleButton())
+				->setEnabled($enabled)
+				->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+			(new CSimpleButton(_('Zoom out')))
+				->setEnabled($enabled)
+				->addClass(ZBX_STYLE_BTN_TIME_OUT),
+			(new CSimpleButton())
+				->setEnabled($enabled)
+				->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+		];
+	}
+
+	/**
+	 * Generate tabs navigation layout.
+	 *
+	 * @return CTag
+	 */
+	protected function getNavigation() {
+		$sortable = [];
+		$static = [];
+
+		foreach ($this->labels as $index => $label) {
+			if ($this->options['data'][$index]['filter_sortable']) {
+				$sortable[$index] = $label;
+			}
+			else {
+				$static[$index] = $label;
+			}
+		}
+
+		// First dynamic tab is 'Home' tab and cannot be sorted.
+		array_unshift($sortable, array_shift($static));
+
+		$nav_list = new CList([
+			(new CSimpleButton())
+				->setAttribute('data-action', 'toggleTabsList')
+				->addClass('btn-widget-expand'),
+			(new CSimpleButton())
+				->setAttribute('data-action', 'selectNextTab')
+				->addClass('btn-iterator-page-next')
+		]);
+
+		if (array_key_exists('timeselector', $this->options)) {
+			array_map([$nav_list, 'addItem'], $this->getTimeselectorNavigation());
+		}
+
+		return new CTag('nav', true , new CList([
+			(new CSimpleButton())
+				->setAttribute('data-action', 'selectPrevTab')
+				->addClass('btn-iterator-page-previous'),
+			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
+			$static ? $static : null,
+			$nav_list
+		]));
 	}
 }
