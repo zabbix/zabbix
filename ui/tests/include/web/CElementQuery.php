@@ -275,7 +275,7 @@ class CElementQuery implements IWaitable {
 	public function query($type, $locator = null) {
 		$prefix = CXPathHelper::fromWebDriverBy($this->by);
 		$suffix = CXPathHelper::fromSelector($type, $locator);
-		$this->by = static::getSelector('xpath', './'.$prefix.'/'.$suffix);
+		$this->by = static::getSelector('xpath', './/'.$prefix.'//'.$suffix);
 
 		return $this;
 	}

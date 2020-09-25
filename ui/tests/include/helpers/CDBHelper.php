@@ -192,6 +192,11 @@ class CDBHelper {
 			return;
 		}
 
+		if (substr($top_table, 0, 1) === '!') {
+			$tables[] = substr($top_table, 1);
+			return;
+		}
+
 		$schema = DB::getSchema();
 
 		foreach ($schema[$top_table]['fields'] as $field => $field_data) {
