@@ -163,13 +163,17 @@ class CTabFilterProfile {
 	}
 
 	/**
-	 * Update selected tab filter properties from $input array. Set home tab as selected if no filter parameters were
-	 * passed in input, active tab or tab having filter_name.
+	 * Update selected tab filter properties from $input array. Active filter selection:
+	 * - If no filter_name passed in input select last opened filter.
+	 * - If filter_name is empty select home filter (is used for hotlinking from other pages to home filter)
+	 * - If filter_name does not exists in stored filters, select home filer
+	 * - If filter_name exists and is not unique among stored filters, select last opened filter if it name match else
+	 *   select first filter from matched flters list.
 	 *
 	 * @param array $input  Tab filter properties array.
 	 */
 	public function setInput(array $input) {
-		$index = array_intersect_key($input, $this->filter_defaults) ? 0 : $this->selected;
+		$index = array_key_exists('filter_name', $input) ? 0 : $this->selected;
 		$input += ['filter_name' => $this->tabfilters[$index]['filter_name']];
 		$name_indexes = [];
 
