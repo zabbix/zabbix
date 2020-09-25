@@ -451,6 +451,7 @@ class CTabFilter extends CBaseComponent {
 
 					this._active_item.removeExpanded();
 					this.setSelectedItem(this._items[index - 1]);
+					this._active_item.setFocused();
 
 					if (expanded) {
 						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
@@ -469,6 +470,7 @@ class CTabFilter extends CBaseComponent {
 
 					this._active_item.removeExpanded();
 					this.setSelectedItem(this._items[index + 1]);
+					this._active_item.setFocused();
 
 					if (expanded) {
 						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
