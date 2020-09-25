@@ -59,7 +59,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')
 				: data.inventory;
 			data.tags = data.tags
-				? data.tags.filter(tag => 'tag' in tag && tag.tag !== '' && tag.value !== '')
+				? data.tags.filter(tag => !(tag.tag === '' && tag.value === ''))
 				: data.tags;
 			data.severities = data.severities
 				? data.severities.filter((value, key) => value == key)

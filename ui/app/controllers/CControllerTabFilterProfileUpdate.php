@@ -142,7 +142,7 @@ class CControllerTabFilterProfileUpdate extends CController {
 	protected function cleanProperties(array $properties): array {
 		if (array_key_exists('tags', $properties)) {
 			$tags = array_filter($properties['tags'], function ($tag) {
-				return ($tag['tag'] !== '' && $tag['value'] !== '');
+				return !($tag['tag'] === '' && $tag['value'] === '');
 			});
 
 			if ($tags) {
