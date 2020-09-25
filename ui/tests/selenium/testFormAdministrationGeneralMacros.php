@@ -892,7 +892,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description2'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO2}": incorrect syntax near "path:".'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "path:".'
 				]
 			],
 			[
@@ -907,7 +907,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description3'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "/path:key".'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "/path:key".'
 				]
 			],
 			[
@@ -922,7 +922,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description4'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "path:key".'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near "path:key".'
 				]
 			],
 			[
@@ -937,7 +937,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near ":key".'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near ":key".'
 				]
 			],
 			[
@@ -952,7 +952,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 						'description' => 'vault description6'
 					],
 					'title' => 'Cannot update macros',
-					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near "path".'
+					'message' => 'Invalid value for macro "{$VAULT_MACRO7}": incorrect syntax near "path".'
 				]
 			],
 			[
@@ -989,8 +989,6 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	}
 
 	/**
-	 * @backup globalmacro
-	 *
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormAdministrationGeneralMacros_CreateVaultMacros($data) {
@@ -1015,8 +1013,8 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 18,
-					'macro' => '{$_VAULT_MACRO_CHANGED}',
+					'index' => 1,
+					'macro' => '{$1_VAULT_MACRO_CHANGED}',
 					'value' => [
 						'text' => 'secret/path:key'
 					],
@@ -1026,8 +1024,8 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 18,
-					'macro' => '{$_VAULT_MACRO_CHANGED}',
+					'index' => 1,
+					'macro' => '{$1_VAULT_MACRO_CHANGED}',
 					'value' => [
 						'text' => 'new/path/to/secret:key'
 					],
@@ -1037,8 +1035,8 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 18,
-					'macro' => '{$_VAULT_MACRO_CHANGED}',
+					'index' => 1,
+					'macro' => '{$1_VAULT_MACRO_CHANGED}',
 					'value' => [
 						'text' => 'new/path/to/secret:key'
 					],
@@ -1050,7 +1048,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 
 	public function prepareUpdateData() {
 		$response = CDataHelper::call('usermacro.createglobal', [
-			'macro' => '{$_VAULT_MACRO}',
+			'macro' => '{$1_VAULT_MACRO}',
 			'value' => 'secret/path:key',
 			'type' => ZBX_MACRO_TYPE_VAULT
 		]);
