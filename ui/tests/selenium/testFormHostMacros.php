@@ -612,6 +612,20 @@ class testFormHostMacros extends testFormMacros {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO7}',
+						'value' => [
+							'text' => 'one/two/three/four/five/six:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description7'
+					],
+					'title' => 'Host updated'
+				]
+			],			
+			[
+				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO2}',
@@ -687,20 +701,6 @@ class testFormHostMacros extends testFormMacros {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO7}',
-						'value' => [
-							'text' => 'one/two/three/four/five/six:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description7'
-					],
-					'title' => 'Host updated'
-				]
-			],
-			[
-				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO8}',
@@ -745,15 +745,11 @@ class testFormHostMacros extends testFormMacros {
 				[
 					'action' => USER_ACTION_UPDATE,
 					'index' => 2,
-					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}'
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 2,
 					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
-					'description' => 'Changing description'
+					'value' => [
+						'text' => 'secret/path:key'
+					],
+					'description' => ''
 				]
 			],
 			[
@@ -763,7 +759,19 @@ class testFormHostMacros extends testFormMacros {
 					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
 					'value' => [
 						'text' => 'new/path/to/secret:key'
-					]
+					],
+					'description' => ''
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 2,
+					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					],
+					'description' => 'Changing description'
 				]
 			]
 		];

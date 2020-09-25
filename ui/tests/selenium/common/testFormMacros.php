@@ -618,6 +618,7 @@ abstract class testFormMacros extends CWebTest {
 		foreach (['macro', 'value', 'description'] as $field) {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
 		}
+		$this->assertEquals([$data['macro'], $data['value']['text'], $data['description']], $result);
 		array_push($result, ZBX_MACRO_TYPE_VAULT);
 		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));

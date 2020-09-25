@@ -868,6 +868,20 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO7}',
+						'value' => [
+							'text' => 'one/two/three/four/five/six:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description7'
+					],
+					'title' => 'Macros updated'
+				]
+			],			
+			[
+				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO2}',
@@ -939,20 +953,6 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update macros',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near "path".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO7}',
-						'value' => [
-							'text' => 'one/two/three/four/five/six:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description7'
-					],
-					'title' => 'Macros updated'
 				]
 			],
 			[
@@ -1052,7 +1052,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 		$response = CDataHelper::call('usermacro.createglobal', [
 			'macro' => '{$_VAULT_MACRO}',
 			'value' => 'secret/path:key',
-			'type' => 2
+			'type' => ZBX_MACRO_TYPE_VAULT
 		]);
 
 		$this->assertArrayHasKey('globalmacroids', $response);
