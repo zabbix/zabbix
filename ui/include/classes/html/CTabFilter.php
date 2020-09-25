@@ -333,20 +333,19 @@ class CTabFilter extends CDiv {
 	protected function getTimeselectorNavigation(): array {
 		$data = $this->options['timeselector'];
 		$selected = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
-		$enabled = !$selected['filter_custom_time'] && !$selected['disabled'];
+		$enabled = (!$selected['filter_custom_time'] && !$data['disabled']);
 		// Disable navigation by TAB, if timeselector is disabled.
 		$link = (new CLink(relativeDateToText($data['from'], $data['to'])))
 			->addClass('tabfilter-item-link')
 			->setAttribute('tabindex', $enabled ? 0 : -1)
 			->addClass(ZBX_STYLE_BTN_TIME)
 			->addClass($data['disabled'] ? ZBX_STYLE_DISABLED : null);
-		$timeselector = (new CListItem($link))
-			->setAttribute('data-target', static::CSS_ID_PREFIX.'timeselector')
-			->addClass('tabfilter-item-label');
-		$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
 
 		return [
-			$timeselector,
+			(new CListItem($link))
+				->setAttribute('data-target', static::CSS_ID_PREFIX.'timeselector')
+				->addClass('tabfilter-item-label')
+				->addClass($enabled ? null : ZBX_STYLE_DISABLED),
 			(new CSimpleButton())
 				->setEnabled($enabled)
 				->addClass(ZBX_STYLE_BTN_TIME_LEFT),
