@@ -282,6 +282,10 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($result) {
+			if (self::dbDistinct($sqlParts)) {
+				$result = $this->addNclobFieldValues($options, $result);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 
