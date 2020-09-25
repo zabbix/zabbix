@@ -40,7 +40,6 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$error = null;
 
 		$dynamic_widget_name = $this->getDefaultHeader();
-		$same_host = true;
 		$items = [];
 		$histories = [];
 
@@ -49,8 +48,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			$error = _('No data.');
 		}
 		else {
-			$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-				|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+			$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);
+			$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 			if ($fields['itemids']) {
 				$items = API::Item()->get([
@@ -109,6 +108,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				]);
 
 				$host_name = '';
+				$same_host = true;
+
 				foreach ($items as $item) {
 					if ($host_name === '') {
 						$host_name = $item['hosts'][0]['name'];
@@ -119,12 +120,17 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				}
 
 				$items_count = count($items);
+
 				if ($items_count == 1) {
 					$item = reset($items);
-					$dynamic_widget_name = $host_name.NAME_DELIMITER.$item['name_expanded'];
+					$dynamic_widget_name = $is_template_dashboard
+						? $item['name_expanded']
+						: $host_name.NAME_DELIMITER.$item['name_expanded'];
 				}
 				elseif ($same_host && $items_count > 1) {
-					$dynamic_widget_name = $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
+					$dynamic_widget_name = $is_template_dashboard
+						? _n('%1$s item', '%1$s items', $items_count)
+						: $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
 				}
 			}
 		}

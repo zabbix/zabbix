@@ -36,13 +36,14 @@ class CControllerWidgetUrlView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$error = null;
 
+		$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);
+
 		// Editing template dashboard?
-		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_hostid')) {
+		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
 			$error = _('No data.');
 		}
 		else {
-			$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-				|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+			$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 			$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
 

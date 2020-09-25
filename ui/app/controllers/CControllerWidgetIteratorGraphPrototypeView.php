@@ -78,12 +78,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'selectDiscoveryRule' => ['hostid']
 		];
 
-		$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-			|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);
+		$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-		if ($is_dynamic_item && $dynamic_hostid) {
+		if ($is_dynamic_item && $dynamic_hostid != 0) {
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
@@ -116,29 +116,28 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		$graphs_collected = [];
 
-		if ($graph_prototype) {
-			$graphs_created_all = API::Graph()->get([
-				'output' => ['graphid', 'name'],
-				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
-				'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
-				'selectHosts' => ['name'],
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-				'expandName' => true
-			]);
+		$graphs_created_all = API::Graph()->get([
+			'output' => ['graphid', 'name'],
+			'hostids' => [$graph_prototype['discoveryRule']['hostid']],
+			'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
+			'selectHosts' => ['name'],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+			'expandName' => true
+		]);
 
-			// Collect graphs based on the graph prototype.
-			foreach ($graphs_created_all as $graph) {
-				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
-					if (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid) {
-						$graphs_collected[$graph['graphid']] = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
-					}
-					else {
-						$graphs_collected[$graph['graphid']] = $graph['name'];
-					}
-				}
+		// Collect graphs based on the graph prototype.
+		foreach ($graphs_created_all as $graph) {
+			if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
+				$prepend_host_name = $is_template_dashboard
+					? false
+					: (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0);
+
+				$graphs_collected[$graph['graphid']] = $prepend_host_name
+					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
+					: $graph['name'];
 			}
-			natsort($graphs_collected);
 		}
+		natsort($graphs_collected);
 
 		$page = $this->getIteratorPage(count($graphs_collected));
 		$page_count = $this->getIteratorPageCount(count($graphs_collected));
@@ -165,9 +164,14 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			];
 		}
 
-		$widget_header = $this->hasInput('name')
-			? $this->getInput('name')
-			: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
+		if ($this->hasInput('name')) {
+			$widget_header = $this->getInput('name');
+		}
+		else {
+			$widget_header = $is_template_dashboard
+				? $graph_prototype['name']
+				: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
+		}
 
 		return [
 			'header' => $widget_header,
@@ -191,12 +195,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'selectDiscoveryRule' => ['hostid']
 		];
 
-		$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-			|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);
+		$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-		if ($is_dynamic_item && $dynamic_hostid) {
+		if ($is_dynamic_item && $dynamic_hostid != 0) {
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
@@ -229,27 +233,26 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		$items_collected = [];
 
-		if ($item_prototype) {
-			$items_created_all = API::Item()->get([
-				'output' => ['itemid', 'name', 'key_', 'hostid'],
-				'hostids' => [$item_prototype['discoveryRule']['hostid']],
-				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-			]);
+		$items_created_all = API::Item()->get([
+			'output' => ['itemid', 'name', 'key_', 'hostid'],
+			'hostids' => [$item_prototype['discoveryRule']['hostid']],
+			'selectItemDiscovery' => ['itemid', 'parent_itemid'],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
+		]);
 
-			// Collect items based on the item prototype.
-			$items_created = [];
-			foreach ($items_created_all as $item) {
-				if ($item['itemDiscovery']['parent_itemid'] === $item_prototype['itemid']) {
-					$items_created[] = $item;
-				}
+		// Collect items based on the item prototype.
+		$items_created = [];
+		foreach ($items_created_all as $item) {
+			if ($item['itemDiscovery']['parent_itemid'] === $item_prototype['itemid']) {
+				$items_created[] = $item;
 			}
-			foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
-				$items_collected[$item['itemid']] =
-					$item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
-			}
-			natsort($items_collected);
 		}
+		foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
+			$items_collected[$item['itemid']] = $is_template_dashboard
+				? $item['name_expanded']
+				: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+		}
+		natsort($items_collected);
 
 		$page = $this->getIteratorPage(count($items_collected));
 		$page_count = $this->getIteratorPageCount(count($items_collected));
@@ -276,9 +279,14 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			];
 		}
 
-		$widget_header = $this->hasInput('name')
-			? $this->getInput('name')
-			: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name'];
+		if ($this->hasInput('name')) {
+			$widget_header = $this->getInput('name');
+		}
+		else {
+			$widget_header = $is_template_dashboard
+				? $item_prototype['name']
+				: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name'];
+		}
 
 		return [
 			'header' => $widget_header,

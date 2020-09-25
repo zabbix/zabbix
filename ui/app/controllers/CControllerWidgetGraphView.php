@@ -100,8 +100,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'profileIdx2' => $profileIdx2
 		];
 
-		$is_dynamic_item = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-			|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);
+		$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		// Replace graph item by particular host item if dynamic items are used.
 		if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
@@ -266,17 +266,21 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					->setArgument('to', $timeline['to']);
 
 				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
-				$header_label = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+
+				$header_label = $is_template_dashboard
+					? $item['name_expanded']
+					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
 
-				if (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0) {
-					$header_label = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
-				}
-				else {
-					$header_label = $graph['name'];
-				}
+				$prepend_host_name = $is_template_dashboard
+					? false
+					: (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0);
+
+				$header_label = $prepend_host_name
+					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
+					: $graph['name'];
 
 				if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
 					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
