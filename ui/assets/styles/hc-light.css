@@ -4389,7 +4389,9 @@ span.is-loading {
   overflow: hidden; }
   .overlay-dialogue.modal .overlay-dialogue-body.is-loading:before {
     top: 42px;
-    bottom: 42px; }
+    right: 1px;
+    bottom: 42px;
+    left: 1px; }
 
 .menu-popup-preloader {
   background: #ffffff;
