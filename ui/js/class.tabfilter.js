@@ -274,9 +274,9 @@ class CTabFilter extends CBaseComponent {
 	setSelectedItem(item) {
 		this._active_item = item;
 		item.setSelected();
-		this.scrollIntoView(item);
 
 		if (item !== this._timeselector) {
+			this.scrollIntoView(item);
 			item.setBrowserLocationToApplyUrl();
 		}
 
