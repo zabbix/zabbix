@@ -2026,7 +2026,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads].last(0)} * 0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads].last()} * 0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% http-8080 worker threads busy on {HOST.NAME}</name>
@@ -2042,7 +2042,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads].last(0)} * 0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads].last()} * 0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% http-8443 worker threads busy on {HOST.NAME}</name>
@@ -2058,7 +2058,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy].last(0)} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads].last(0)}  *0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads].last()}  *0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% jk-8009 worker threads busy on {HOST.NAME}</name>

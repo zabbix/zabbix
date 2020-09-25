@@ -50,6 +50,8 @@ import (
 var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
+var closeChan = make(chan bool)
+var stopChan = make(chan bool)
 
 func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
 	if log.IncreaseLogLevel() {
@@ -134,6 +136,7 @@ func run() (err error) {
 	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
 		return
 	}
+	confirmService()
 	control.Start()
 
 loop:
@@ -142,6 +145,7 @@ loop:
 		case sig := <-sigs:
 			switch sig {
 			case syscall.SIGINT, syscall.SIGTERM:
+				sendServiceStop()
 				break loop
 			}
 		case client := <-control.Client():
@@ -150,14 +154,27 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
+			sendServiceStop()
 			client.Close()
+		case serviceStop := <-closeChan:
+			if serviceStop {
+				break loop
+			}
 		}
 	}
 	control.Stop()
 	return nil
 }
 
-var confDefault string
+var (
+	confDefault string
+
+	argConfig  bool
+	argTest    bool
+	argPrint   bool
+	argVersion bool
+	argVerbose bool
+)
 
 func main() {
 	var confFlag string
@@ -214,7 +231,22 @@ func main() {
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
+	var helpFlag bool
+	const (
+		helpDefault     = false
+		helpDescription = "Display this help message"
+	)
+	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
+	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
+
+	loadOSDependentFlags()
 	flag.Parse()
+	setServiceRun(foregroundFlag)
+
+	if helpFlag {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
@@ -240,8 +272,23 @@ func main() {
 		os.Exit(0)
 	}
 
-	if err := conf.Load(confFlag, &agent.Options); err != nil {
+	var err error
+	if err = openEventLog(); err != nil {
+		fatalExit("", err)
+	}
+
+	if err = validateExclusiveFlags(); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("", err)
+	}
+
+	if err = conf.Load(confFlag, &agent.Options); err != nil {
 		if argConfig || !(argTest || argPrint) {
+			if eerr := eventLogErr(err); eerr != nil {
+				err = fmt.Errorf("%s and %s", err, eerr)
+			}
 			fatalExit("", err)
 		}
 		// create default configuration for testing options
@@ -250,11 +297,21 @@ func main() {
 		}
 	}
 
-	if err := agent.ValidateOptions(agent.Options); err != nil {
+	if err = agent.ValidateOptions(&agent.Options); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
 		fatalExit("cannot validate configuration", err)
 	}
 
-	if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
+	if err = handleWindowsService(confFlag); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("", err)
+	}
+
+	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
@@ -265,16 +322,16 @@ func main() {
 		} else {
 			level = log.None
 		}
-		if err := log.Open(log.Console, level, "", 0); err != nil {
+		if err = log.Open(log.Console, level, "", 0); err != nil {
 			fatalExit("cannot initialize logger", err)
 		}
 
-		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		var err error
-		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
+		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+			agent.Options.UserParameterDir); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
 
@@ -283,6 +340,14 @@ func main() {
 			fatalExit("cannot create scheduling manager", err)
 		}
 		m.Start()
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
+		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+		if err != nil {
+			fatalExit("cannot parse the \"Hostname\" parameter", err)
+		}
+		agent.FirstHostname = hostnames[0]
 
 		if argTest {
 			checkMetric(m, testFlag)
@@ -293,6 +358,7 @@ func main() {
 		m.Stop()
 		monitor.Wait(monitor.Scheduler)
 		os.Exit(0)
+
 	}
 
 	if argVerbose {
@@ -337,13 +403,13 @@ func main() {
 		logLevel = log.Trace
 	}
 
-	if err := log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
+	if err = log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
 	zbxlib.SetLogLevel(logLevel)
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent 2 [%s]. (%s)", agent.Options.Hostname, version.Long())
+	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
 	log.Infof(greeting)
 
 	addresses, err := serverconnector.ParseServerActive()
@@ -351,15 +417,11 @@ func main() {
 		fatalExit("cannot parse the \"ServerActive\" parameter", err)
 	}
 
-	if err = resultcache.Prepare(&agent.Options, addresses); err != nil {
-		fatalExit("cannot prepare result cache", err)
-	}
-
 	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
 		fatalExit("cannot use encryption configuration", err)
 	} else {
 		if tlsConfig != nil {
-			if err := tls.Init(tlsConfig); err != nil {
+			if err = tls.Init(tlsConfig); err != nil {
 				fatalExit("cannot configure encryption", err)
 			}
 		}
@@ -372,12 +434,13 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 		log.Errf("Failed to load key access rules: %s", err.Error())
 		os.Exit(1)
 	}
 
-	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
+	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+		agent.Options.UserParameterDir); err != nil {
 		fatalExit("cannot initialize user parameters", err)
 	}
 
@@ -396,12 +459,14 @@ func main() {
 			listeners = append(listeners, listener)
 		}
 	}
+	if err = loadOSDependentItems(); err != nil {
+		fatalExit("cannot load os dependent items", err)
+	}
 
 	if foregroundFlag {
 		if agent.Options.LogType != "console" {
 			fmt.Println(greeting)
 		}
-		fmt.Println("Press Ctrl+C to exit.")
 	}
 
 	manager.Start()
@@ -410,13 +475,35 @@ func main() {
 		fatalExit("cannot process configuration", err)
 	}
 
-	serverConnectors = make([]*serverconnector.Connector, len(addresses))
-
-	for i := 0; i < len(serverConnectors); i++ {
-		if serverConnectors[i], err = serverconnector.New(manager, addresses[i], &agent.Options); err != nil {
-			fatalExit("cannot create server connector", err)
+	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+	if err != nil {
+		fatalExit("cannot parse the \"Hostname\" parameter", err)
+	}
+	agent.FirstHostname = hostnames[0]
+	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
+	log.Infof(hostmessage)
+	if foregroundFlag {
+		if agent.Options.LogType != "console" {
+			fmt.Println(hostmessage)
 		}
-		serverConnectors[i].Start()
+		fmt.Println("Press Ctrl+C to exit.")
+	}
+	if err = resultcache.Prepare(&agent.Options, addresses, hostnames); err != nil {
+		fatalExit("cannot prepare result cache", err)
+	}
+
+	serverConnectors = make([]*serverconnector.Connector, len(addresses)*len(hostnames))
+
+	var idx int
+	for i := 0; i < len(addresses); i++ {
+		for j := 0; j < len(hostnames); j++ {
+			if serverConnectors[idx], err = serverconnector.New(manager, addresses[i], hostnames[j], &agent.Options); err != nil {
+				fatalExit("cannot create server connector", err)
+			}
+			serverConnectors[idx].Start()
+			agent.SetHostname(serverConnectors[idx].ClientID(), hostnames[j])
+			idx++
+		}
 	}
 
 	for _, listener := range listeners {
@@ -459,16 +546,17 @@ func main() {
 		serverConnectors[i].StopCache()
 	}
 	monitor.Wait(monitor.Output)
-
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
 
 	if foregroundFlag && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
+	waitServiceClose()
 }
 
 func fatalExit(message string, err error) {
+	fatalCloseOSItems()
 	if len(message) == 0 {
 		message = err.Error()
 	} else {

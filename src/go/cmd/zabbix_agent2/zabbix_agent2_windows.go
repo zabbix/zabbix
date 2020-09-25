@@ -23,7 +23,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"zabbix.com/pkg/pdh"
 )
+
+func loadOSDependentItems() error {
+	return pdh.LocateObjectsAndDefaultCounters(true)
+}
 
 func init() {
 

@@ -44,6 +44,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
+	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -71,8 +72,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
-	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a
+	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 
