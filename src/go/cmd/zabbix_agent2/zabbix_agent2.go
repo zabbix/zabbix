@@ -304,14 +304,14 @@ func main() {
 		fatalExit("cannot validate configuration", err)
 	}
 
-	if err := handleWindowsService(confFlag); err != nil {
+	if err = handleWindowsService(confFlag); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("", err)
 	}
 
-	if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
+	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
@@ -322,11 +322,11 @@ func main() {
 		} else {
 			level = log.None
 		}
-		if err := log.Open(log.Console, level, "", 0); err != nil {
+		if err = log.Open(log.Console, level, "", 0); err != nil {
 			fatalExit("cannot initialize logger", err)
 		}
 
-		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 			fatalExit("failed to load key access rules", err)
 		}
 
@@ -402,7 +402,7 @@ func main() {
 		logLevel = log.Trace
 	}
 
-	if err := log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
+	if err = log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
 
@@ -420,7 +420,7 @@ func main() {
 		fatalExit("cannot use encryption configuration", err)
 	} else {
 		if tlsConfig != nil {
-			if err := tls.Init(tlsConfig); err != nil {
+			if err = tls.Init(tlsConfig); err != nil {
 				fatalExit("cannot configure encryption", err)
 			}
 		}
@@ -433,7 +433,7 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 		log.Errf("Failed to load key access rules: %s", err.Error())
 		os.Exit(1)
 	}
