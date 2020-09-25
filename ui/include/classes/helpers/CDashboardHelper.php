@@ -319,7 +319,6 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Validate widget input parameters.
 	 *
 	 * @static
 	 *
@@ -408,5 +407,95 @@ class CDashboardHelper {
 			'widgets' => $widgets,
 			'errors' => $errors
 		];
+	}
+
+	/**
+	 * Prepare data for cloning template dashboards.
+	 *
+	 * @static
+	 *
+	 * @param array  $dashboards  Dashboards array.
+	 * @param string $templateid  New template id.
+	 *
+	 * @return array
+	 */
+	public static function prepareForClone(array $dashboards, $templateid): array {
+		foreach ($dashboards as &$dashboard) {
+			// Remove dashboard id.
+			unset($dashboard['dashboardid']);
+			// Replace template id.
+			$dashboard['templateid'] = $templateid;
+
+			if ($dashboard['widgets']) {
+				foreach ($dashboard['widgets'] as &$widget) {
+					$items = [];
+					$graphs = [];
+
+					// Remove widget id from array.
+					unset($widget['widgetid']);
+
+					foreach ($widget['fields'] as $field) {
+						switch ($field['type']) {
+							case ZBX_WIDGET_FIELD_TYPE_ITEM:
+							case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+								$items[$field['value']] = true;
+								break;
+
+							case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+							case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+								$graphs[$field['value']] = true;
+								break;
+						}
+					}
+
+					if ($items) {
+						$db_items = DBselect(
+							'SELECT src.itemid AS srcid,dest.itemid as destid'.
+							' FROM items dest,items src'.
+							' WHERE dest.key_=src.key_'.
+								' AND dest.hostid='.zbx_dbstr($templateid).
+								' AND '.dbConditionInt('src.itemid', array_keys($items))
+						);
+						while ($db_item = DBfetch($db_items)) {
+							$items[$db_item['srcid']] = $db_item['destid'];
+						}
+					}
+
+					if ($graphs) {
+						$db_graphs = DBselect(
+							'SELECT src.graphid AS srcid,dest.graphid as destid'.
+							' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
+							' WHERE dest.name=src.name'.
+								' AND destgi.graphid=dest.graphid'.
+								' AND destgi.itemid=desti.itemid'.
+								' AND desti.hostid='.zbx_dbstr($templateid).
+								' AND '.dbConditionInt('src.graphid', array_keys($graphs))
+						);
+						while ($db_graph = DBfetch($db_graphs)) {
+							$graphs[$db_graph['srcid']] = $db_graph['destid'];
+						}
+					}
+
+					foreach ($widget['fields'] as &$field) {
+						switch ($field['type']) {
+							case ZBX_WIDGET_FIELD_TYPE_ITEM:
+							case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+								$field['value'] = $items[$field['value']];
+								break;
+
+							case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+							case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+								$field['value'] = $graphs[$field['value']];
+								break;
+						}
+					}
+					unset($field);
+				}
+				unset ($widget);
+			}
+		}
+		unset($dashboard);
+
+		return $dashboards;
 	}
 }

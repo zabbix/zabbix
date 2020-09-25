@@ -654,28 +654,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			// Copy template dashboards.
-			$dbTemplateDashboards = API::TemplateDashboard()->get([
+			$db_template_dashboards = API::TemplateDashboard()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'templateids' => $cloneTemplateId,
 				'selectWidgets' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			]);
 
-			if ($dbTemplateDashboards) {
-				$dbTemplateDashboards = array_map(function (array $dashboard) use ($templateId): array {
-					unset($dashboard['dashboardid']);
-					$dashboard['templateid'] = $templateId;
+			if ($db_template_dashboards) {
+				$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards, $templateId);
 
-					$dashboard['widgets'] = array_map(function (array $widget): array {
-						unset($widget['widgetid']);
-
-						return $widget;
-					}, $dashboard['widgets']);
-
-					return $dashboard;
-				}, $dbTemplateDashboards);
-
-				if (!API::TemplateDashboard()->create($dbTemplateDashboards)) {
+				if (!API::TemplateDashboard()->create($db_template_dashboards)) {
 					throw new Exception();
 				}
 			}
