@@ -364,7 +364,7 @@ abstract class CControllerHost extends CController {
 	protected function cleanInput(array $input): array {
 		if (array_key_exists('tags', $input) && $input['tags']) {
 			$input['tags'] = array_filter($input['tags'], function($tag) {
-				return $tag['tag'] !== '' && $tag['value'] !== '';
+				return !($tag['tag'] === '' && $tag['value'] === '');
 			});
 		}
 
