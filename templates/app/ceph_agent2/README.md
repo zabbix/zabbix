@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.0
+For Zabbix version: 5.0  
 The template to monitor Ceph cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -106,14 +106,15 @@ There are no template links in this template.
 |Ceph |Ceph: [osd.{#OSDNAME}] OSD fill | |DEPENDENT |ceph.osd[{#OSDNAME},fill]<p>**Preprocessing**:</p><p>- JSONPATH: `$.osds.{#OSDNAME}.osd_fill`</p> |
 |Ceph |Ceph: [osd.{#OSDNAME}] OSD latency apply |<p>Time taken to flush an update to disks.</p> |DEPENDENT |ceph.osd[{#OSDNAME},latency_apply]<p>**Preprocessing**:</p><p>- JSONPATH: `$.osds.{#OSDNAME}.osd_latency_apply`</p> |
 |Ceph |Ceph: [osd.{#OSDNAME}] OSD latency commit |<p>Time taken to commit an operation to the journal.</p> |DEPENDENT |ceph.osd[{#OSDNAME},latency_commit]<p>**Preprocessing**:</p><p>- JSONPATH: `$.osds.{#OSDNAME}.osd_latency_commit`</p> |
-|Ceph |Ceph: [{#POOLNAME}] Pool Used | |DEPENDENT |ceph.pool[{#POOLNAME},bytes_used]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.bytes_used`</p> |
-|Ceph |Ceph: [{#POOLNAME}] Pool RAW Used | |DEPENDENT |ceph.pool[{#POOLNAME},stored_raw]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.stored_raw`</p> |
-|Ceph |Ceph: [{#POOLNAME}] Pool Percent Used | |DEPENDENT |ceph.pool[{#POOLNAME},percent_used]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.percent_used`</p> |
-|Ceph |Ceph: [{#POOLNAME}] Pool objects |<p>Object count for a given pool.</p> |DEPENDENT |ceph.pool[{#POOLNAME},objects]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.objects`</p> |
-|Ceph |Ceph: [{#POOLNAME}] Pool Read bandwidth | |DEPENDENT |ceph.pool[{#POOLNAME},rd_bytes]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.rd_bytes`</p><p>- CHANGE_PER_SECOND |
-|Ceph |Ceph: [{#POOLNAME}] Pool Write bandwidth |<p>Per-pool write operations/second</p> |DEPENDENT |ceph.pool[{#POOLNAME},wr_bytes]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.wr_bytes`</p><p>- CHANGE_PER_SECOND |
-|Ceph |Ceph: [{#POOLNAME}] Pool Read operations |<p>Per-pool read operations/second</p> |DEPENDENT |ceph.pool[{#POOLNAME},rd_ops]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.rd_ops`</p><p>- CHANGE_PER_SECOND |
-|Ceph |Ceph: [{#POOLNAME}] Pool Write operations | |DEPENDENT |ceph.pool[{#POOLNAME},wr_ops]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.wr_ops`</p><p>- CHANGE_PER_SECOND |
+|Ceph |Ceph: [{#POOLNAME}] Pool Used |<p>Total bytes used in pool.</p> |DEPENDENT |ceph.pool[{#POOLNAME},bytes_used]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.bytes_used`</p> |
+|Ceph |Ceph: [{#POOLNAME}] Max available |<p>The maximum available space in the given pool.</p> |DEPENDENT |ceph.pool[{#POOLNAME},max_avail]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.max_avail`</p> |
+|Ceph |Ceph: [{#POOLNAME}] Pool RAW Used |<p>Bytes used in pool including copies made.</p> |DEPENDENT |ceph.pool[{#POOLNAME},stored_raw]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.stored_raw`</p> |
+|Ceph |Ceph: [{#POOLNAME}] Pool Percent Used |<p>Percentage of storage used per pool</p> |DEPENDENT |ceph.pool[{#POOLNAME},percent_used]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.percent_used`</p> |
+|Ceph |Ceph: [{#POOLNAME}] Pool objects |<p>Number of objects in the pool.</p> |DEPENDENT |ceph.pool[{#POOLNAME},objects]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.objects`</p> |
+|Ceph |Ceph: [{#POOLNAME}] Pool Read bandwidth |<p>Per-pool read Bytes/second</p> |DEPENDENT |ceph.pool[{#POOLNAME},rd_bytes.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.rd_bytes`</p><p>- CHANGE_PER_SECOND |
+|Ceph |Ceph: [{#POOLNAME}] Pool Write bandwidth |<p>Per-pool write Bytes/second</p> |DEPENDENT |ceph.pool[{#POOLNAME},wr_bytes.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.wr_bytes`</p><p>- CHANGE_PER_SECOND |
+|Ceph |Ceph: [{#POOLNAME}] Pool Read operations |<p>Per-pool read operations/second</p> |DEPENDENT |ceph.pool[{#POOLNAME},rd_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.rd_ops`</p><p>- CHANGE_PER_SECOND |
+|Ceph |Ceph: [{#POOLNAME}] Pool Write operations |<p>Per-pool write operations/second</p> |DEPENDENT |ceph.pool[{#POOLNAME},wr_ops.rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pools.{#POOLNAME}.wr_ops`</p><p>- CHANGE_PER_SECOND |
 |Zabbix_raw_items |Ceph: Get overall cluster status | |ZABBIX_PASSIVE |ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
 |Zabbix_raw_items |Ceph: Get OSD stats | |ZABBIX_PASSIVE |ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
 |Zabbix_raw_items |Ceph: Get OSD dump | |ZABBIX_PASSIVE |ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"] |
@@ -127,9 +128,9 @@ There are no template links in this template.
 |Ceph: Cluster in ERROR state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=2` |AVERAGE |<p>Manual close: YES</p> |
 |Ceph: Cluster in WARNING state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=1` |WARNING |<p>Manual close: YES</p> |
 |Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE}) |<p>Ceph version has changed. Ack to close.</p> |`{TEMPLATE_NAME:ceph.min_mon_release_name.diff()}=1 and {TEMPLATE_NAME:ceph.min_mon_release_name.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Ceph: OSD osd.{#OSDNAME} is down |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},up].last()} = 0` |WARNING | |
-|Ceph: OSD {#OSDNAME} is full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100` |AVERAGE | |
-|Ceph: Ceph OSD {#OSDNAME} is near full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD {#OSDNAME} is full</p> |
+|Ceph: OSD osd.{#OSDNAME} is down |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},up].last()} = 0` |AVERAGE | |
+|Ceph: OSD osd.{#OSDNAME} is full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100` |AVERAGE | |
+|Ceph: Ceph OSD osd.{#OSDNAME} is near full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD osd.{#OSDNAME} is full</p> |
 
 ## Feedback
 

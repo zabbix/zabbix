@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-21T07:44:06Z</date>
+   <date>2020-09-25T10:03:40Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1246,7 +1246,7 @@
                      <units>%</units>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. OSD</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] OSD</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1261,16 +1261,16 @@
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100</expression>
-                           <name>Ceph: OSD {#OSDNAME} is full</name>
+                           <name>Ceph: OSD osd.{#OSDNAME} is full</name>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100</expression>
-                           <name>Ceph: Ceph OSD {#OSDNAME} is near full</name>
+                           <name>Ceph: Ceph OSD osd.{#OSDNAME} is near full</name>
                            <priority>WARNING</priority>
                            <dependencies>
                               <dependency>
-                                 <name>Ceph: OSD {#OSDNAME} is full</name>
+                                 <name>Ceph: OSD osd.{#OSDNAME} is full</name>
                                  <expression>{Template App Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100</expression>
                               </dependency>
                            </dependencies>
@@ -1285,7 +1285,7 @@
                      <history>7d</history>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. OSD</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] OSD</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1313,7 +1313,7 @@
                      <description>Time taken to flush an update to disks.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. OSD</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] OSD</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1337,7 +1337,7 @@
                      <description>Time taken to commit an operation to the journal.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. OSD</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] OSD</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1358,7 +1358,7 @@
                      <history>7d</history>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. OSD</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] OSD</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1379,7 +1379,7 @@
                      <history>7d</history>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. OSD</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] OSD</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1399,7 +1399,7 @@
                         <trigger_prototype>
                            <expression>{last()} = 0</expression>
                            <name>Ceph: OSD osd.{#OSDNAME} is down</name>
-                           <priority>WARNING</priority>
+                           <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1441,9 +1441,10 @@
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Total bytes used in pool.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1457,15 +1458,38 @@
                      </master_item>
                   </item_prototype>
                   <item_prototype>
+                     <name>Ceph: [{#POOLNAME}] Max available</name>
+                     <type>DEPENDENT</type>
+                     <key>ceph.pool[{#POOLNAME},max_avail]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The maximum available space in the given pool.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.pools.{#POOLNAME}.max_avail</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool objects</name>
                      <type>DEPENDENT</type>
                      <key>ceph.pool[{#POOLNAME},objects]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <description>Object count for a given pool.</description>
+                     <description>Number of objects in the pool.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1485,9 +1509,10 @@
                      <delay>0</delay>
                      <history>7d</history>
                      <units>%</units>
+                     <description>Percentage of storage used per pool</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1503,14 +1528,15 @@
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Read bandwidth</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},rd_bytes]</key>
+                     <key>ceph.pool[{#POOLNAME},rd_bytes.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <units>B</units>
+                     <units>Bps</units>
+                     <description>Per-pool read Bytes/second</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1530,7 +1556,7 @@
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Read operations</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},rd_ops]</key>
+                     <key>ceph.pool[{#POOLNAME},rd_ops.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1538,7 +1564,7 @@
                      <description>Per-pool read operations/second</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1562,9 +1588,10 @@
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Bytes used in pool including copies made.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1580,15 +1607,15 @@
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Write bandwidth</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},wr_bytes]</key>
+                     <key>ceph.pool[{#POOLNAME},wr_bytes.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <units>B</units>
-                     <description>Per-pool write operations/second</description>
+                     <units>Bps</units>
+                     <description>Per-pool write Bytes/second</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1608,14 +1635,15 @@
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Write operations</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},wr_ops]</key>
+                     <key>ceph.pool[{#POOLNAME},wr_ops.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>ops</units>
+                     <description>Per-pool write operations/second</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Ceph CRUSH [{#CRUSHRULE}}]. Pool</name>
+                           <name>Ceph CRUSH [{#CRUSHRULE}] Pool</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1642,7 +1670,7 @@
                            <color>1A7C11</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},rd_bytes]</key>
+                              <key>ceph.pool[{#POOLNAME},rd_bytes.rate]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1650,7 +1678,7 @@
                            <color>2774A4</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},wr_bytes]</key>
+                              <key>ceph.pool[{#POOLNAME},wr_bytes.rate]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1662,7 +1690,7 @@
                            <color>1A7C11</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},rd_ops]</key>
+                              <key>ceph.pool[{#POOLNAME},rd_ops.rate]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1670,7 +1698,35 @@
                            <color>2774A4</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},wr_ops]</key>
+                              <key>ceph.pool[{#POOLNAME},wr_ops.rate]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Ceph: [{#POOLNAME}] Pool Usage</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Ceph by Zabbix Agent2</host>
+                              <key>ceph.pool[{#POOLNAME},bytes_used]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Ceph by Zabbix Agent2</host>
+                              <key>ceph.pool[{#POOLNAME},max_avail]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Ceph by Zabbix Agent2</host>
+                              <key>ceph.pool[{#POOLNAME},stored_raw]</key>
                            </item>
                         </graph_item>
                      </graph_items>
