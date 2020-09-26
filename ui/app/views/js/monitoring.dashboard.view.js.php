@@ -321,7 +321,6 @@
 		window.dashboard.live();
 	}
 
-
 	/**
 	 * Reload widget configuration dialogue. Used as callback in widget forms.
 	 */
