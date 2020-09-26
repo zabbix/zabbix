@@ -1785,7 +1785,7 @@ class CHostPrototype extends CHostBase {
 			$db_host_prototypes = $this->get([
 				'output' => ['hostid', 'name'],
 				'selectInterfaces' => ['interfaceid', 'type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
-				'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
+				'hostids' => array_column($host_prototypes, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
 			]);
