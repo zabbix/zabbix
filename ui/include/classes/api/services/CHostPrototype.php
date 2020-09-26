@@ -1460,7 +1460,7 @@ class CHostPrototype extends CHostBase {
 		if ($options['selectInterfaces'] !== null) {
 			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
 				$interfaces = API::HostInterface()->get([
-					'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid', 'type']),
+					'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
 					'hostids' => $hostPrototypeIds,
 					'nopermissions' => true,
 					'preservekeys' => true
@@ -1469,13 +1469,17 @@ class CHostPrototype extends CHostBase {
 				// We need to order interfaces for proper linkage and viewing.
 				order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
 
-				$relation_map = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
+				foreach (array_keys($result) as $hostid) {
+					$result[$hostid]['interfaces'] = [];
+				}
 
-				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid', 'type'],
-					$options['selectInterfaces']
-				);
-
-				$result = $relation_map->mapMany($result, $interfaces, 'interfaces');
+				foreach ($interfaces as $interface) {
+					$hostid = $interface['hostid'];
+					$interface = $this->unsetExtraFields([$interface], ['hostid', 'interfaceid'],
+						$options['selectInterfaces']
+					);
+					$result[$hostid]['interfaces'][] = reset($interface);
+				}
 			}
 			else {
 				$interfaces = API::HostInterface()->get([
