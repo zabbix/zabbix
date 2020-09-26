@@ -671,7 +671,7 @@ return valueArr.reduce(function(acc,obj){
                <key>etcd.leader.changes</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>The the number of leader changes the member has seen since its start.</description>
+               <description>The number of leader changes the member has seen since its start.</description>
                <applications>
                   <application>
                      <name>Etcd</name>
