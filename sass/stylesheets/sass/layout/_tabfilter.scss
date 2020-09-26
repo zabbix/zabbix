@@ -4,8 +4,9 @@
 
 $tab-label-color: $btn-font-color;
 $tab-label-bg-color: $btn-bg-color;
-$tab-label-selected-color: $form-font-color;
-$tab-label-selected-bg-color: $ui-bg-color;
+$tab-label-focus-bg-color: $btn-form-hover-color;
+$tab-label-selected-color: $btn-font-color;
+$tab-label-selected-bg-color: $btn-bg-color;
 $tab-label-selected-border-color: $btn-bg-color;
 $tab-label-expanded-color: $font-color;
 $tab-label-expanded-bg-color: $ui-bg-color;
@@ -44,6 +45,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 	nav > ul > li {
 		margin: 0 2px 5px 0;
+		padding-top: 3px;
 
 		// Container with sortable tab items. Occupy space left with overflow and scrolling of content (javascript)
 		&:nth-child(2) {
@@ -67,8 +69,12 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	nav li {
 		display: inline-block;
 		vertical-align: top;
-		height: 26px;
-		line-height: 26px;
+		height: 24px;
+		line-height: 24px;
+
+		button {
+			vertical-align: middle;
+		}
 	}
 
 	/* tab filter label li element */
@@ -110,12 +116,26 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			&::after {
 				display: block;
 				width: 100%;
-				height: 5px;
+				height: 6px;
 				background-color: $tab-label-expanded-bg-color;
 				border-left: 1px solid $tab-label-expanded-border-color;
 				border-right: 1px solid $tab-label-expanded-border-color;
 				margin-left: -1px;
+				margin-top: -1px;
 				content: '';
+			}
+
+			&.focused {
+				background: $tab-label-focus-bg-color;
+				box-shadow: none;
+
+				&::after {
+					background: $tab-label-focus-bg-color;
+				}
+			}
+
+			.icon-edit {
+				background: url($sprite-path) no-repeat -44px -619px;
 			}
 		}
 
@@ -130,6 +150,15 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			.tabfilter-item-link[data-counter]::after {
 				display: none;
 			}
+		}
+
+		&.focused {
+			box-shadow: 0 0 0 2px rgba($tab-label-bg-color, .35);
+		}
+
+		&.disabled {
+			box-shadow: none;
+			pointer-events: none;
 		}
 
 		.icon-home.tabfilter-item-link[data-counter]::after {
@@ -152,7 +181,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		@extend %btn-widget-defaults;
 		width: 24px;
 		height: 24px;
-		background: url($sprite-path) no-repeat -42px -619px;
+		background: url($sprite-path) no-repeat -354px -619px;
 
 		cursor: pointer;
 		margin: 0;
@@ -200,18 +229,18 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 .icon-home::before {
 	display: block;
 	width: 22px;
-	height: 22px;
+	height: 24px;
 	content: '';
 	// white icon
 	background: url($sprite-path) no-repeat -433px -510px;
 }
-.selected .icon-home::before {
+.selected.expanded .icon-home::before {
 	// grey icon
 	background: url($sprite-path) no-repeat -121px -510px;
 }
 
 @if $theme-name == 'hc-dark' {
-	.selected .icon-home::before {
+	.selected.expanded .icon-home::before {
 		// white icon
 		background: url($sprite-path) no-repeat -433px -510px;
 	}
