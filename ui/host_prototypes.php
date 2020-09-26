@@ -217,15 +217,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$interfaces = getRequest('interfaces', []);
 
 		foreach ($interfaces as $key => $interface) {
-			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
-				unset($interface[$key]);
+			if ($interface['ip'] === '' && $interface['dns'] === '') {
+				unset($interfaces[$key]);
 				continue;
 			}
 
 			// Proccess SNMP interface fields.
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 				if (!array_key_exists('details', $interface)) {
-					unset($interface[$key]);
+					unset($interfaces[$key]);
 					continue;
 				}
 
@@ -241,7 +241,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$main_interfaces = getRequest('mainInterfaces', []);
 
 		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
-			if (array_key_exists($type, $main_interfaces)) {
+			if (array_key_exists($type, $main_interfaces) && array_key_exists($main_interfaces[$type], $interfaces)) {
 				$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
 			}
 		}
