@@ -1350,7 +1350,9 @@ class CMacrosResolverGeneral {
 	 * @return string
 	 */
 	public static function getMacroValue(array $macro): string {
-		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_SECRET_MASK : $macro['value'];
+		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET || $macro['type'] == ZBX_MACRO_TYPE_VAULT)
+			? ZBX_SECRET_MASK
+			: $macro['value'];
 	}
 
 	/**

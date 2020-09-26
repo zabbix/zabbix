@@ -438,6 +438,7 @@ zbx_graph_yaxis_types_t;
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+#define ZBX_SECRETS_RELOAD	"secrets_reload"
 #define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
@@ -935,6 +936,7 @@ zbx_task_t;
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 #define ZBX_RTC_SNMP_CACHE_RELOAD	9
 #define ZBX_RTC_DIAGINFO		10
+#define ZBX_RTC_SECRETS_RELOAD		11
 
 typedef enum
 {
@@ -1094,6 +1096,7 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	str_in_list(const char *list, const char *value, char delimiter);
+int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
@@ -1652,5 +1655,22 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 
 #define AUDIT_ACTION_EXECUTE	7
 #define AUDIT_RESOURCE_SCRIPT	25
+
+typedef enum
+{
+	ZBX_TIME_UNIT_UNKNOWN,
+	ZBX_TIME_UNIT_HOUR,
+	ZBX_TIME_UNIT_DAY,
+	ZBX_TIME_UNIT_WEEK,
+	ZBX_TIME_UNIT_MONTH,
+	ZBX_TIME_UNIT_YEAR
+}
+zbx_time_unit_t;
+
+void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
+void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
+
+zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
+int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
 
 #endif

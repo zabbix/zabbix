@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/CTest.php';
 require_once dirname(__FILE__).'/web/CPage.php';
 require_once dirname(__FILE__).'/helpers/CXPathHelper.php';
 require_once dirname(__FILE__).'/helpers/CImageHelper.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CMessageHelper.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
@@ -36,7 +37,7 @@ class CWebTest extends CTest {
 
 	// Network throttling emulation modes.
 	const NETWORK_THROTTLING_NONE		= 'none';
-	const NETWORK_THROTTLING_OFFLINE		= 'offline';
+	const NETWORK_THROTTLING_OFFLINE	= 'offline';
 	const NETWORK_THROTTLING_SLOW		= 'slow';
 	const NETWORK_THROTTLING_FAST		= 'fast';
 

@@ -474,7 +474,7 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	if (0 == request->headers_in_offset)
 		return 1;
 
-	for (ptr = request->headers_in; NULL != (header = zbx_http_get_header(&ptr)); )
+	for (ptr = request->headers_in; NULL != (header = zbx_http_parse_header(&ptr)); )
 	{
 		es_put_header(ctx, idx, header);
 		zbx_free(header);

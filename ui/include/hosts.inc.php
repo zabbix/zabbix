@@ -994,7 +994,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 	foreach ($db_global_macros as $db_global_macro) {
 		$all_macros[$db_global_macro['macro']] = true;
 		$global_macros[$db_global_macro['macro']] = [
-			'value' => CMacrosResolverGeneral::getMacroValue($db_global_macro),
+			'value' => getMacroConfigValue($db_global_macro),
 			'description' => $db_global_macro['description'],
 			'type' => $db_global_macro['type']
 		];
@@ -1032,7 +1032,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 			foreach ($db_template['macros'] as $dbMacro) {
 				if (array_key_exists($dbMacro['macro'], $all_macros)) {
 					$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-						'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+						'value' => getMacroConfigValue($dbMacro),
 						'description' => $dbMacro['description'],
 						'type' => $dbMacro['type']
 					];
@@ -1045,7 +1045,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 					if ($tpl_context === null) {
 						$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-							'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+							'value' => getMacroConfigValue($dbMacro),
 							'description' => $dbMacro['description'],
 							'type' => $dbMacro['type']
 						];
@@ -1067,7 +1067,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 								);
 
 								$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-									'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+									'value' => getMacroConfigValue($dbMacro),
 									'description' => $dbMacro['description'],
 									'type' => $dbMacro['type']
 								];
@@ -1080,7 +1080,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 						if (!$match_found) {
 							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-								'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+								'value' => getMacroConfigValue($dbMacro),
 								'description' => $dbMacro['description'],
 								'type' => $dbMacro['type']
 							];
@@ -1123,7 +1123,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 		if (array_key_exists($macro, $parent_host_macros)) {
 			$inherited_macro['parent_host'] = [
-				'value' => CMacrosResolverGeneral::getMacroValue($parent_host_macros[$macro]),
+				'value' => getMacroConfigValue($parent_host_macros[$macro]),
 				'description' => $parent_host_macros[$macro]['description'],
 				'type' => $parent_host_macros[$macro]['type']
 			];
@@ -1454,4 +1454,15 @@ function renderInterfaceHeaders() {
 					)
 				])
 		);
+}
+
+/**
+ * Return macro value to display in the list of inherited macros.
+ *
+ * @param array $macro
+ *
+ * @return string
+ */
+function getMacroConfigValue(array $macro): string {
+	return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_SECRET_MASK : $macro['value'];
 }
