@@ -1487,7 +1487,7 @@ class CHostPrototype extends CHostBase {
 
 				$interfaces = zbx_toHash($interfaces, 'hostid');
 
-				foreach ($result as $hostid => $host) {
+				foreach (array_keys($result) as $hostid) {
 					$result[$hostid]['interfaces'] = array_key_exists($hostid, $interfaces)
 						? $interfaces[$hostid]['rowscount']
 						: '0';
