@@ -31,6 +31,7 @@ const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit';
 const TABFILTERITEM_STYLE_SELECTED = 'selected';
 const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';
+const TABFILTERITEM_STYLE_FOCUSED = 'focused';
 
 class CTabFilterItem extends CBaseComponent {
 
@@ -134,7 +135,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		let edit = document.createElement('a');
 		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN);
-		edit.addEventListener('click', (ev) => this.openPropertiesDialog({}, ev.target));
+		edit.addEventListener('click', (ev) => this.openPropertiesDialog({}, this._target));
 		this._target.parentNode.appendChild(edit);
 	}
 
@@ -425,6 +426,7 @@ class CTabFilterItem extends CBaseComponent {
 					return;
 				}
 
+				this.setFocused();
 				this.fire(TABFILTERITEM_EVENT_SELECT);
 			},
 
@@ -438,12 +440,22 @@ class CTabFilterItem extends CBaseComponent {
 
 			collapse: () => {
 				this.removeExpanded();
+			},
+
+			focusin: () => {
+				this._target.parentNode.classList.add(TABFILTERITEM_STYLE_FOCUSED);
+			},
+
+			focusout: () => {
+				this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_FOCUSED);
 			}
 		}
 
 		this
 			.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand)
 			.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse)
+			.on('focusin', this._events.focusin)
+			.on('focusout', this._events.focusout)
 			.on('click', this._events.click);
 	}
 }

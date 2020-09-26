@@ -200,6 +200,7 @@ class CTabFilter extends CBaseComponent {
 			buttons = this._target.querySelectorAll('button.btn-time-left, button.btn-time-out, button.btn-time-right');
 
 		this._timeselector.setDisabled(disabled);
+		this._timeselector._target.setAttribute('tabindex', disabled ? -1 : 0);
 
 		for (const button of buttons) {
 			if (disabled) {
@@ -276,6 +277,7 @@ class CTabFilter extends CBaseComponent {
 		item.setSelected();
 
 		if (item !== this._timeselector) {
+			item._target.setAttribute('tabindex', 0);
 			this.scrollIntoView(item);
 			item.setBrowserLocationToApplyUrl();
 		}
@@ -283,6 +285,10 @@ class CTabFilter extends CBaseComponent {
 		for (const _item of this._items) {
 			if (_item !== this._active_item && this._timeselector !== this._active_item) {
 				_item.removeSelected();
+
+				if (_item !== this._timeselector) {
+					_item._target.setAttribute('tabindex', -1);
+				}
 			}
 		}
 	}
@@ -314,6 +320,7 @@ class CTabFilter extends CBaseComponent {
 				let item = ev.detail.target,
 					expand = (this._active_item._expanded
 						|| (item === this._timeselector && this._active_item !== this._timeselector)
+						|| (item !== this._timeselector && this._active_item === this._timeselector)
 					);
 
 				if (item !== this._timeselector) {
@@ -337,6 +344,7 @@ class CTabFilter extends CBaseComponent {
 					this.collapseAllItemsExcept(item);
 
 					if (expand) {
+						item.setFocused();
 						item.fire(TABFILTERITEM_EVENT_EXPAND);
 					}
 				}
@@ -451,7 +459,6 @@ class CTabFilter extends CBaseComponent {
 
 					this._active_item.removeExpanded();
 					this.setSelectedItem(this._items[index - 1]);
-					this._active_item.setFocused();
 
 					if (expanded) {
 						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
@@ -470,7 +477,6 @@ class CTabFilter extends CBaseComponent {
 
 					this._active_item.removeExpanded();
 					this.setSelectedItem(this._items[index + 1]);
-					this._active_item.setFocused();
 
 					if (expanded) {
 						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
@@ -486,7 +492,13 @@ class CTabFilter extends CBaseComponent {
 					dropdown = [{
 						items: [{
 							label: this._items[0]._target.getAttribute('aria-label'),
-							clickCallback: () => this._items[0].fire(TABFILTERITEM_EVENT_SELECT)
+							clickCallback: () => {
+								if (this._active_item !== this._items[0]) {
+									this._items[0].fire(TABFILTERITEM_EVENT_SELECT);
+									// Set selected item focus after popup menu will focus it opener element (used for ESC).
+									setTimeout(() => this._items[0].setFocused(), 0);
+								}
+							}
 						}]
 					}],
 					items = this._timeselector ? this._items.slice(1, -1) : this._items.slice(1);
@@ -497,14 +509,20 @@ class CTabFilter extends CBaseComponent {
 							label: item._data.filter_name,
 							dataAttributes: (item._data.filter_show_counter && !item._unsaved)
 								? {'data-counter': item.getCounter()} : [],
-							clickCallback: () => item.fire(TABFILTERITEM_EVENT_SELECT)
+							clickCallback: () => {
+								if (this._active_item !== item) {
+									item.fire(TABFILTERITEM_EVENT_SELECT);
+									// Set selected item focus after popup menu will focus it opener element (used for ESC).
+									setTimeout(() => item.setFocused(), 0);
+								}
+							}
 						});
 					}
 
 					dropdown.push({items: dropdown_items});
 				}
 
-				$(this._target).menuPopup(dropdown, $(ev), {
+				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {
 					position: {
 						of: ev.target,
 						my: 'left bottom',
@@ -565,8 +583,11 @@ class CTabFilter extends CBaseComponent {
 					return;
 				}
 
-				if (ev.path.indexOf(this._target.querySelector('nav')) > -1) {
+				let path = ev.path || (ev.composedPath && ev.composedPath());
+
+				if (path && path.indexOf(this._target.querySelector('nav')) > -1) {
 					this._events[(ev.key === 'ArrowRight') ? 'selectNextTab' : 'selectPrevTab']();
+					this._active_item.setFocused();
 					cancelEvent(ev);
 				}
 			},
