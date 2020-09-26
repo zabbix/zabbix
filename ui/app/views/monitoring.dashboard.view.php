@@ -49,6 +49,7 @@ $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
+$this->includeJsFile('monitoring.dashboard.view.sharing.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
