@@ -60,14 +60,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		mode = params[1]
 	}
 
-	if total == 0 && mode != "total" && mode != "" {
+	if total == 0 && mode != "total" {
 		return nil, errors.New("Cannot be calculated because swap file size is 0")
 	}
 
 	switch mode {
-	case "", "total":
+	case "total":
 		return total, nil
-	case "free":
+	case "", "free":
 		return avail, nil
 	case "used":
 		return total - avail, nil
