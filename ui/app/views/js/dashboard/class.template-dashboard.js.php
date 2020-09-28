@@ -78,9 +78,7 @@
 				$('#dashbrd-paste-widget').attr('disabled', false);
 			}
 			else {
-				$.subscribe('dashboard.grid.copyWidget',
-					() => $('#dashbrd-paste-widget').attr('disabled', false)
-				);
+				$.subscribe('dashboard.grid.copyWidget', () => $('#dashbrd-paste-widget').attr('disabled', false));
 			}
 
 			$.subscribe('dashboard.grid.busy', (event, data) => {
@@ -138,7 +136,7 @@
 					this.is_busy_saving = false;
 					this.updateBusy();
 				})
-				.then(response => {
+				.then((response) => {
 					if ('errors' in response) {
 						addMessage(response.errors);
 					}
@@ -203,9 +201,7 @@
 				form_data;
 
 			$form.trimValues(['#name']);
-			form_data = $.extend({
-				template: '1'
-			}, $form.serializeJSON());
+			form_data = $.extend({template: '1'}, $form.serializeJSON());
 
 			url.setArgument('action', 'dashboard.properties.check');
 
@@ -219,8 +215,10 @@
 
 			overlay.xhr
 				.always(() => overlay.unsetLoading())
-				.done(response => {
-					$form.prevAll('.msg-good, .msg-bad').remove();
+				.done((response) => {
+					$form
+						.prevAll('.msg-good, .msg-bad')
+						.remove();
 
 					if ('errors' in response) {
 						$(response.errors).insertBefore($form);

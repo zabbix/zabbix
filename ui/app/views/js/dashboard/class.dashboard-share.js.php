@@ -106,7 +106,9 @@
 			overlay.xhr
 				.always(() => overlay.unsetLoading())
 				.done((response) => {
-					$form.prevAll('.msg-good, .msg-bad').remove();
+					$form
+						.prevAll('.msg-good, .msg-bad')
+						.remove();
 
 					if ('errors' in response) {
 						$(response.errors).insertBefore($form);
@@ -149,7 +151,6 @@
 				switch (list.object) {
 					case 'private':
 						$('input[name=private][value=' + value + ']').prop('checked', true);
-
 						break;
 
 					case 'usrgrpid':
@@ -162,8 +163,8 @@
 						container = $('#user_group_list_footer');
 						container.before(tpl.evaluate(value));
 
-						$('#user_group_' + value.usrgrpid + '_permission_' + value.permission + '').prop('checked', true);
-
+						$('#user_group_' + value.usrgrpid + '_permission_' + value.permission + '')
+							.prop('checked', true);
 						break;
 
 					case 'userid':
@@ -177,7 +178,6 @@
 						container.before(tpl.evaluate(value));
 
 						$('#user_' + value.id + '_permission_' + value.permission + '').prop('checked', true);
-
 						break;
 				}
 			}

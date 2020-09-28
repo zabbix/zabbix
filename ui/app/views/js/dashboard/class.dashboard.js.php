@@ -87,8 +87,8 @@
 
 		liveDynamicHost() {
 			// Perform dynamic host switch when browser back/previous buttons are pressed.
-			window.addEventListener('popstate', e => {
-				var host = (e.state && e.state.host) ? e.state.host : null,
+			window.addEventListener('popstate', (event) => {
+				var host = (event.state && event.state.host) ? event.state.host : null,
 					hostid = host ? host.id : null;
 
 				$('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
@@ -96,7 +96,7 @@
 				this.$target.dashboardGrid('updateDynamicHost', hostid);
 			});
 
-			$('#dynamic_hostid').on('change', e => {
+			$('#dynamic_hostid').on('change', () => {
 				var hosts = $('#dynamic_hostid').multiSelect('getData'),
 					host = hosts.length ? hosts[0] : null,
 					url = new Curl('zabbix.php', false);
@@ -131,7 +131,10 @@
 
 			clearMessages();
 
-			$('#dashbrd-control > li').hide().last().show();
+			$('#dashbrd-control > li')
+				.hide()
+				.last()
+				.show();
 
 			$('#dashbrd-config').on('click', () => this.openProperties());
 			$('#dashbrd-add-widget').on('click', () => this.$target.dashboardGrid('addNewWidget', this));
@@ -147,9 +150,7 @@
 				$('#dashbrd-paste-widget').attr('disabled', false);
 			}
 			else {
-				$.subscribe('dashboard.grid.copyWidget',
-					() => $('#dashbrd-paste-widget').attr('disabled', false)
-				);
+				$.subscribe('dashboard.grid.copyWidget', () => $('#dashbrd-paste-widget').attr('disabled', false));
 			}
 
 			$.subscribe('dashboard.grid.busy', (event, data) => {
@@ -204,7 +205,7 @@
 					this.is_busy_saving = false;
 					this.updateBusy();
 				})
-				.then(response => {
+				.then((response) => {
 					if ('redirect' in response) {
 						if ('system-message-ok' in response) {
 							postMessageOk(response['system-message-ok']);
@@ -294,8 +295,10 @@
 
 			overlay.xhr
 				.always(() => overlay.unsetLoading())
-				.done(response => {
-					$form.prevAll('.msg-good, .msg-bad').remove();
+				.done((response) => {
+					$form
+						.prevAll('.msg-good, .msg-bad')
+						.remove();
 
 					if ('errors' in response) {
 						$(response.errors).insertBefore($form);
