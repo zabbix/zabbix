@@ -22,7 +22,7 @@
 /**
  * Controller to update dashboard
  */
-class CControllerDashboardSharingUpdate extends CController {
+class CControllerDashboardShareUpdate extends CController {
 	const EMPTY_USER = 'empty_user';
 	const EMPTY_GROUP = 'empty_group';
 

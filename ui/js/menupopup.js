@@ -655,7 +655,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
 					var popup_options = {'dashboardid': options.dashboardid};
-					PopUp('dashboard.sharing.edit', popup_options, 'dashboard_sharing', trigger_elmnt);
+					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
 				},
 				disabled: !options.editable
 			},

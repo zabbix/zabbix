@@ -71,9 +71,9 @@ $form
 	->addItem(getMessages())
 	->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']))
 	// indicator to help delete all users
-	->addItem(new CInput('hidden', 'users['.CControllerDashboardSharingUpdate::EMPTY_USER.']', '1'))
+	->addItem(new CInput('hidden', 'users['.CControllerDashboardShareUpdate::EMPTY_USER.']', '1'))
 	// indicator to help delete all user groups
-	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardSharingUpdate::EMPTY_GROUP.']', '1'))
+	->addItem(new CInput('hidden', 'userGroups['.CControllerDashboardShareUpdate::EMPTY_GROUP.']', '1'))
 	->addItem((new CFormList('sharing_form'))
 		->addRow(_('Type'),
 			(new CRadioButtonList('private', PRIVATE_SHARING))
@@ -96,13 +96,13 @@ $form
 $output = [
 	'header' => _('Dashboard sharing'),
 	'body' => $form->toString(),
-	'script_inline' => 'initializeDashboardSharing('.json_encode($data['dashboard']).');',
+	'script_inline' => 'initializeDashboardShare('.json_encode($data['dashboard']).');',
 	'buttons' => [
 		[
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'window.dashboard_sharing.submit(overlay);'
+			'action' => 'window.dashboard_share.submit(overlay);'
 		]
 	]
 ];

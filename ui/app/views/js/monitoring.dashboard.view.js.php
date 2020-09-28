@@ -25,7 +25,7 @@
 ?>
 
 <script>
-	class dashboard {
+	class dashboardSingleton {
 		constructor(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
 			this.$target = $('.<?= ZBX_STYLE_DASHBRD_GRID_CONTAINER ?>');
 
@@ -251,7 +251,7 @@
 		enableNavigationWarning() {
 			this.disableNavigationWarning();
 
-			$(window).on('beforeunload.dashboard', () => {
+			$(window).on('beforeunload.dashboardSingleton', () => {
 				if (this.has_properties_modified || this.$target.dashboardGrid('isDashboardUpdated')) {
 					return true;
 				}
@@ -259,7 +259,7 @@
 		}
 
 		disableNavigationWarning() {
-			$(window).off('beforeunload.dashboard');
+			$(window).off('beforeunload.dashboardSingleton');
 		}
 
 		openProperties() {
@@ -317,7 +317,7 @@
 	}
 
 	function initializeDashboard(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
-		window.dashboard = new dashboard(data, widget_defaults, time_selector, dynamic, web_layout_mode);
+		window.dashboard = new dashboardSingleton(data, widget_defaults, time_selector, dynamic, web_layout_mode);
 		window.dashboard.live();
 	}
 
