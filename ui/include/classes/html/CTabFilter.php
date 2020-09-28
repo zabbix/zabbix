@@ -361,7 +361,7 @@ class CTabFilter extends CDiv {
 	 *
 	 * @return CTag
 	 */
-	protected function getNavigation() {
+	protected function getNavigation(): CTag {
 		$sortable = [];
 		$static = [];
 
