@@ -155,6 +155,7 @@ $filter_inventory_table->addRow(
 		(new CButton('inventory_add', _('Add')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-add')
+			->removeId()
 	))->setColSpan(3)
 );
 
@@ -188,6 +189,7 @@ foreach ($data['tags'] as $tag) {
 			(new CButton('tags['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
+				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 
@@ -198,6 +200,7 @@ $filter_tags_table->addRow(
 		(new CButton('tags_add', _('Add')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-add')
+			->removeId()
 	))->setColSpan(3)
 );
 
@@ -239,6 +242,7 @@ $right_column = (new CFormList())
 			->addValue(_('With problem name'), OPERATIONAL_DATA_SHOW_WITH_PROBLEM, 'show_opdata_2_#{uniqid}')
 			->setModern(true)
 			->setEnabled($data['compact_view'] == 0)
+			->removeId()
 	])
 	->addRow(_('Show suppressed problems'), [
 		(new CCheckBox('show_suppressed'))
@@ -360,6 +364,7 @@ if (array_key_exists('render_html', $data)) {
 					->removeId()
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->addClass('form_row')
 	)

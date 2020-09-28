@@ -54,6 +54,7 @@ foreach (array_values($data['tags']) as $i => $tag) {
 			(new CButton('tags['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
+				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 }
@@ -62,6 +63,7 @@ $filter_tags_table->addRow(
 		(new CButton('tags_add', _('Add')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-add')
+			->removeId()
 	))->setColSpan(3)
 );
 
@@ -194,6 +196,7 @@ if (array_key_exists('render_html', $data)) {
 				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('form_row'))
