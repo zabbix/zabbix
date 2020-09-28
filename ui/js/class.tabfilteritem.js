@@ -135,7 +135,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		let edit = document.createElement('a');
 		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN);
-		edit.addEventListener('click', (ev) => this.openPropertiesDialog({}, this._target));
+		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
 		this._target.parentNode.appendChild(edit);
 	}
 
