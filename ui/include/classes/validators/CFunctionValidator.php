@@ -277,8 +277,6 @@ class CFunctionValidator extends CValidator {
 			'trendcount' => [
 				'args' => [
 					['type' => 'period', 'mandat' => true],
-					['type' => 'str'],
-					['type' => 'operation'],
 					['type' => 'period_shift', 'mandat' => true]
 				],
 				'value_types' => $valueTypesAll

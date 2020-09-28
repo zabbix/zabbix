@@ -28,7 +28,6 @@ class CControllerPopupTriggerExpr extends CController {
 	private $param2SecCount = [];
 	private $param2SecMode = [];
 	private $param3SecVal = [];
-	private $param3SecPeriod = [];
 	private $param3SecPercent = [];
 	private $paramSecIntCount = [];
 	private $paramForecast = [];
@@ -146,29 +145,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT,
 				'A' => false
-			]
-		];
-
-		$this->param3SecPeriod = [
-			'last' => [
-				'C' => _('Last of').' (T)',
-				'T' => T_ZBX_INT,
-				'A' => true
-			],
-			'v' => [
-				'C' => 'V',
-				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'o' => [
-				'C' => 'O',
-				'T' => T_ZBX_STR,
-				'A' => false
-			],
-			'period_shift' => [
-				'C' => _('Period shift'),
-				'T' => T_ZBX_INT,
-				'A' => true
 			]
 		];
 
@@ -463,7 +439,7 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'trendcount' => [
 				'description' => _('trendcount() - Number of successfully retrieved values V (which fulfill operator O) for period T with exact period shift'),
-				'params' => $this->param3SecPeriod,
+				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
