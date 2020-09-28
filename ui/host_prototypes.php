@@ -217,16 +217,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$interfaces = getRequest('interfaces', []);
 
 		foreach ($interfaces as $key => $interface) {
-			if ($interface['ip'] === '' && $interface['dns'] === '') {
-				unset($interfaces[$key]);
-				continue;
-			}
-
 			// Proccess SNMP interface fields.
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 				if (!array_key_exists('details', $interface)) {
-					unset($interfaces[$key]);
-					continue;
+					$interface['details'] = [];
 				}
 
 				$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
