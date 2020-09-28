@@ -30,6 +30,7 @@ class CTabFilter extends CDiv {
 	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
 	const CSS_TABFILTER_ICON_HOME = 'icon-home';
+	const CSS_TABFILTER_ITEM = 'tabfilter-item-label';
 
 	/**
 	 * Array of arrays for tabs data. Single element contains: tab label object, tab content object or null and tab data
@@ -213,7 +214,7 @@ class CTabFilter extends CDiv {
 
 		$this->labels[] = (new CListItem($label->addClass('tabfilter-item-link')))
 			->setAttribute('data-target', $targetid)
-			->addClass('tabfilter-item-label');
+			->addClass(self::CSS_TABFILTER_ITEM);
 		$this->contents[] = $content;
 		$this->options['data'][] = $data + [
 			'filter_sortable' => true,
@@ -342,7 +343,7 @@ class CTabFilter extends CDiv {
 		return [
 			(new CListItem($link))
 				->setAttribute('data-target', static::CSS_ID_PREFIX.'timeselector')
-				->addClass('tabfilter-item-label')
+				->addClass(self::CSS_TABFILTER_ITEM)
 				->addClass($enabled ? null : ZBX_STYLE_DISABLED),
 			(new CSimpleButton())
 				->setEnabled($enabled)
