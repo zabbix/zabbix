@@ -42,7 +42,6 @@ class CTabFilter extends CDiv {
 	/**
 	 * Tab options array.
 	 * idx                  - namespace used to get/update filter related data in profiles table.
-	 * can_toggle           - is it allowed to collapse all filters.
 	 * selected             - zero based index of selected filter.
 	 * expanded             - is selected filter expanded or not.
 	 * support_custom_time  - can filters define custom time range or not.
@@ -52,7 +51,6 @@ class CTabFilter extends CDiv {
 	 */
 	public $options = [
 		'idx' => '',
-		'can_toggle' => true,
 		'selected' => 0,
 		'expanded' => false,
 		'support_custom_time' => true,

@@ -42,7 +42,6 @@ class CTabFilterItem extends CBaseComponent {
 		this._idx_namespace = options.idx_namespace;
 		this._index = options.index;
 		this._content_container = options.container;
-		this._can_toggle = options.can_toggle;
 		this._data = options.data || {};
 		this._template = options.template;
 		this._expanded = options.expanded;

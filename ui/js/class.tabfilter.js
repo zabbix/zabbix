@@ -156,7 +156,6 @@ class CTabFilter extends CBaseComponent {
 			idx_namespace: this._idx_namespace,
 			index: this._items.length,
 			expanded: data.expanded || false,
-			can_toggle: this._options.can_toggle,
 			container: container,
 			data: data,
 			template: this._templates[data.tab_view] || null,
@@ -351,7 +350,7 @@ class CTabFilter extends CBaseComponent {
 				else if (!item._expanded) {
 					item.fire(TABFILTERITEM_EVENT_EXPAND);
 				}
-				else if (item._can_toggle) {
+				else {
 					item.fire(TABFILTERITEM_EVENT_COLLAPSE);
 				}
 			},

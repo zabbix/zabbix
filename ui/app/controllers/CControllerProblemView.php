@@ -121,7 +121,6 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_defaults' => $profile->filter_defaults,
 			'tabfilter_options' => [
 				'idx' => static::FILTER_IDX,
-				'can_toggle' => true,
 				'selected' => $profile->selected,
 				'support_custom_time' => true,
 				'expanded' => $profile->expanded,
