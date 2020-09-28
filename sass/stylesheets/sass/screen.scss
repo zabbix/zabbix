@@ -2792,6 +2792,11 @@ $form-icon-btn: (
 		margin-bottom: 40px;
 		justify-content: flex-start;
 	}
+
+	#tls_encryption_hint {
+		font-style: italic;
+		color: $font-alt-color;
+	}
 }
 
 .setup-left {
@@ -2826,15 +2831,6 @@ $form-icon-btn: (
 
 	.list-table {
 		border: 0;
-	}
-
-	.table-forms-td-left {
-		text-align: left;
-		width: auto;
-	}
-
-	.table-forms-td-right {
-		width: 100%;
 	}
 
 	h1 {
@@ -7063,6 +7059,29 @@ table.preprocessing-test-results {
 			}
 		}
 	}
+}
+
+.icon-invisible.menu-popup-item,
+.icon-invisible.btn-dropdown-toggle {
+	width: 100%;
+
+	&::before {
+		background: url($sprite-path) no-repeat -87px -800px;
+	}
+
+	&:not(.highlighted):enabled {
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::before {
+				background-position: -399px -800px;
+			}
+		}
+	}
+}
+.icon-invisible.btn-dropdown-toggle {
+	margin: 0;
 }
 
 .btn-split {

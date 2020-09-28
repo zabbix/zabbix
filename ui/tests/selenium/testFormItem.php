@@ -1543,6 +1543,17 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// Update and custom intervals are hidden if item key is mqtt.get
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix agent (active)',
+					'name' => 'Zabbix agent (active) mqtt',
+					'key' => 'mqtt.get[0]',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1935,6 +1946,15 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
+		// Check hidden update and custom interval for mqtt.get key.
+		if (CTestArrayHelper::get($data, 'type') === 'Zabbix agent (active)'
+				&& substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
+			$this->zbxTestTextNotVisible('Update interval');
+			$this->zbxTestAssertNotVisibleId('row_delay');
+			$this->zbxTestTextNotVisible('Custom intervals');
+			$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+		}
+
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
 
@@ -2054,6 +2074,22 @@ class testFormItem extends CLegacyWebTest {
 				case 'TELNET agent':
 				case 'JMX agent':
 					$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.$interfaceid.'"]');
+					break;
+				case 'Zabbix agent (active)':
+					$this->zbxTestAssertNotVisibleId('interfaceid');
+					// Check hidden update and custom interval for mqtt.get key.
+					if (substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
+						$this->zbxTestTextNotVisible('Update interval');
+						$this->zbxTestAssertNotVisibleId('row_delay');
+						$this->zbxTestTextNotVisible('Custom intervals');
+						$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+					}
+					else {
+						$this->zbxTestTextVisible('Update interval');
+						$this->zbxTestAssertVisibleId('row_delay');
+						$this->zbxTestTextVisible('Custom intervals');
+						$this->zbxTestAssertVisibleId('row_flex_intervals');
+					}
 					break;
 				default:
 					$this->zbxTestAssertNotVisibleId('interface-select');

@@ -113,6 +113,7 @@ $availableJScripts = [
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
+	'setup.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/'
 ];
@@ -348,11 +349,13 @@ $tranStrings = [
 	'common.js' => [
 		'Cancel' => _('Cancel')
 	],
-	'macrovalue.js' => [
-		'Set new value' => _('Set new value')
-	],
 	'component.z-select.js' => [
 		'All' => _('All')
+	],
+	'macrovalue.js' => [
+		'Set new value' => _('Set new value'),
+		'path/to/secret:key' => _('path/to/secret:key'),
+		'value' => _('value')
 	]
 ];
 
