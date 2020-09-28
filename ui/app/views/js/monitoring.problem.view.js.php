@@ -27,14 +27,14 @@ if (array_key_exists('filter_options', $data)) { ?>
 	<script type="text/javascript">
 	$(function() {
 		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>),
-				refresh_interval = <?= $data['refresh_interval'] ?>,
-				refresh_url = '<?= $data['refresh_url'] ?>',
-				refresh_timer,
-				active_filter = filter._active_item,
-				global_timerange = {
-					from: filter._timeselector._data.from,
-					to: filter._timeselector._data.to
-				};
+			refresh_interval = <?= $data['refresh_interval'] ?>,
+			refresh_url = '<?= $data['refresh_url'] ?>',
+			refresh_timer,
+			active_filter = filter._active_item,
+			global_timerange = {
+				from: filter._timeselector._data.from,
+				to: filter._timeselector._data.to
+			};
 
 		filter.on(TABFILTER_EVENT_URLSET, () => {
 			let url = new Curl();
