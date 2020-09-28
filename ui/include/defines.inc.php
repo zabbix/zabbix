@@ -1932,6 +1932,8 @@ define('ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE', 'interface-btn-remove');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE', 'interface-btn-main-interface');
 define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
 
+define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
+
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
 
