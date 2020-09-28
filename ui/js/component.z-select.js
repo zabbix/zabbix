@@ -291,6 +291,7 @@ class ZSelect extends HTMLElement {
 		this._highlight(this._preselected_index);
 
 		document.addEventListener('wheel', this._events.document_wheel);
+		document.querySelector('.wrapper').addEventListener('scroll', this._events.document_wheel);
 	}
 
 	_collapse() {
@@ -298,6 +299,7 @@ class ZSelect extends HTMLElement {
 		this.classList.remove('is-expanded');
 
 		document.removeEventListener('wheel', this._events.document_wheel);
+		document.querySelector('.wrapper').removeEventListener('scroll', this._events.document_wheel);
 	}
 
 	_highlight(index) {
