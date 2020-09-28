@@ -25,7 +25,7 @@
 ?>
 
 <script>
-	class dashboardSingleton {
+	class dashboard {
 		constructor(host, data, widget_defaults, web_layout_mode) {
 			this.$target = $('.<?= ZBX_STYLE_DASHBRD_GRID_CONTAINER ?>');
 
@@ -65,7 +65,7 @@
 	}
 
 	function initializeDashboard(host, data, widget_defaults, web_layout_mode) {
-		window.dashboard = new dashboardSingleton(host, data, widget_defaults, web_layout_mode);
+		window.dashboard = new dashboard(host, data, widget_defaults, web_layout_mode);
 		window.dashboard.live();
 	}
 </script>

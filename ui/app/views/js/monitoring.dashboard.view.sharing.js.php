@@ -39,7 +39,7 @@
 	(new CCol(
 		(new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('window.dashboard_share.removeUserGroupShares("#{usrgrpid}");')
+			->onClick('window.dashboard_sharing.removeUserGroupShares("#{usrgrpid}");')
 			->removeId()
 	))->addClass(ZBX_STYLE_NOWRAP)
 ]))
@@ -63,7 +63,7 @@
 	(new CCol(
 		(new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('window.dashboard_share.removeUserShares("#{id}");')
+			->onClick('window.dashboard_sharing.removeUserShares("#{id}");')
 			->removeId()
 	))->addClass(ZBX_STYLE_NOWRAP)
 ]))
@@ -73,7 +73,7 @@
 </script>
 
 <script>
-	class dashboardShareSingleton {
+	class dashboardSharing {
 		constructor(data) {
 			this.data = data;
 		}
@@ -93,7 +93,7 @@
 
 			clearMessages();
 
-			url.setArgument('action', 'dashboard.share.update');
+			url.setArgument('action', 'dashboard.sharing.update');
 
 			overlay.setLoading();
 			overlay.xhr = $.ajax({
@@ -184,15 +184,15 @@
 		}
 	}
 
-	function initializeDashboardShare(data) {
-		window.dashboard_share = new dashboardShareSingleton(data);
-		window.dashboard_share.live();
+	function initializeDashboardSharing(data) {
+		window.dashboard_sharing = new dashboardSharing(data);
+		window.dashboard_sharing.live();
 	}
 
 	/**
 	 * @see init.js add.popup event
 	 */
 	function addPopupValues(list) {
-		window.dashboard_share.addPopupValues(list);
+		window.dashboard_sharing.addPopupValues(list);
 	}
 </script>
