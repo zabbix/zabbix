@@ -565,8 +565,12 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Reset' button press.
 			 */
 			buttonResetAction: () => {
-				this._active_item.setBrowserLocation(new URLSearchParams({filter_reset: 1}));
-				window.location.reload(true);
+				let current_url = new Curl(),
+					url = new Curl('zabbix.php', false);
+
+				url.setArgument('action', current_url.getArgument('action'));
+				url.setArgument('filter_reset', 1);
+				window.location.href = url.getUrl();
 			},
 
 			/**
