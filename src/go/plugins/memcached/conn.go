@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alimy/mc/v2"
+	"github.com/memcachier/mc/v3"
 	"zabbix.com/pkg/log"
 )
 
@@ -165,7 +165,7 @@ func (c *ConnManager) create(uri URI) *MCConn {
 	}
 
 	client := mc.NewMCwithConfig(
-		uri.Addr(),
+		uri.URI(),
 		uri.User(),
 		uri.Password(),
 		&mc.Config{

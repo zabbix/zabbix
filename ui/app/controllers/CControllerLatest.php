@@ -157,7 +157,6 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if ($select_items) {
-			// Select items, requesting extended data.
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
@@ -303,10 +302,7 @@ abstract class CControllerLatest extends CController {
 		$items = CMacrosResolverHelper::resolveItemNames($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
-		// Choosing max history period for already filtered items having data.
-		$history_period = $show_without_data ? ZBX_HISTORY_PERIOD : null;
-
-		$history = Manager::History()->getLastValues($items, 2, $history_period);
+		$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
 
 		$prepared_data['items'] = $items;
 		$prepared_data['history'] = $history;

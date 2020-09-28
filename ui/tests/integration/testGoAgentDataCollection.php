@@ -480,7 +480,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					'itemids' => $ids,
 					'history' => $type
 				]);
-				CTestArrayHelper::sort($result['result'], ['itemid', 'clock', 'ns']);
+				$this->sort($result['result'], ['itemid', 'clock', 'ns']);
 
 				foreach ($result['result'] as $item) {
 					$values[$item['itemid']][] = $item['value'];
@@ -571,5 +571,33 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				);
 				break;
 		}
+	}
+
+	/**
+	 * Sort array by multiple fields.
+	 *
+	 * @static
+	 *
+	 * @param array $array  array to sort passed by reference
+	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
+	 */
+	public static function sort(array &$array, array $fields) {
+		foreach ($fields as $fid => $field) {
+			if (!is_array($field)) {
+				$fields[$fid] = ['field' => $field, 'order' => ZBX_SORT_UP];
+			}
+		}
+
+		uasort($array, function($a, $b) use ($fields) {
+			foreach ($fields as $field) {
+				$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
+
+				if ($cmp != 0) {
+					return $cmp * ($field['order'] == ZBX_SORT_UP ? 1 : -1);
+				}
+			}
+
+			return 0;
+		});
 	}
 }

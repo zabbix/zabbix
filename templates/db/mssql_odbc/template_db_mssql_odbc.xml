@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-27T11:13:59Z</date>
+   <date>2020-09-14T08:53:21Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -24,7 +24,7 @@ The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -47,49 +47,40 @@ Template tooling version used: 0.37</description>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT object_name, counter_name, instance_name, cntr_value
-FROM sys.dm_os_performance_counters 
-UNION 
-SELECT '{$MSSQL.INSTANCE}' as object_name, 'Version' as counter_name, @@version as instance_name, 0 as cntr_value
-UNION 
-SELECT '{$MSSQL.INSTANCE}' as object_name, 'Uptime' as counter_name, '' as instance_name, 
-DATEDIFF(second, sqlserver_start_time, GETDATE()) as cntr_value
+               <params>SELECT object_name,counter_name,instance_name,cntr_value
+FROM sys.dm_os_performance_counters
+UNION
+SELECT '{$MSSQL.INSTANCE}' as object_name,'Version' as counter_name,@@version as instance_name,0 as cntr_value
+UNION
+SELECT '{$MSSQL.INSTANCE}' as object_name,'Uptime' as counter_name,'' as instance_name,DATEDIFF(second,sqlserver_start_time,GETDATE()) as cntr_value
 FROM sys.dm_os_sys_info
 UNION
-SELECT '{$MSSQL.INSTANCE}:Databases' as object_name, 'State' as counter_name, name as instance_name, state as cntr_value
+SELECT '{$MSSQL.INSTANCE}:Databases' as object_name,'State' as counter_name,name as instance_name,state as cntr_value
 FROM sys.databases
 UNION
-SELECT a.object_name, 'BufferCacheHitRatio' as counter_name, '' as instance_name, 
-cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters  a
-JOIN  (SELECT cntr_value,OBJECT_NAME 
-  FROM sys.dm_os_performance_counters  
-    WHERE counter_name = 'Buffer cache hit ratio base'
-        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager') b ON  a.OBJECT_NAME = b.OBJECT_NAME
-WHERE a.counter_name = 'Buffer cache hit ratio'
-AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager'
+SELECT a.object_name,'BufferCacheHitRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters a
+JOIN (SELECT cntr_value,OBJECT_NAME
+FROM sys.dm_os_performance_counters
+WHERE counter_name='Buffer cache hit ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager') b
+ON a.OBJECT_NAME=b.OBJECT_NAME
+WHERE a.counter_name='Buffer cache hit ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager'
 UNION
-SELECT a.object_name, 'WorktablesFromCacheRatio' as counter_name, '' as instance_name, 
-cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters  a
-JOIN  (SELECT cntr_value,OBJECT_NAME 
-  FROM sys.dm_os_performance_counters  
-    WHERE counter_name = 'Worktables From Cache Base'
-        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods') b ON  a.OBJECT_NAME = b.OBJECT_NAME
-WHERE a.counter_name = 'Worktables From Cache Ratio'
-AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods'
+SELECT a.object_name,'WorktablesFromCacheRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters a
+JOIN (SELECT cntr_value,OBJECT_NAME
+FROM sys.dm_os_performance_counters
+WHERE counter_name='Worktables From Cache Base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods') b
+ON a.OBJECT_NAME=b.OBJECT_NAME
+WHERE a.counter_name='Worktables From Cache Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods'
 UNION
-SELECT a.object_name, 'CacheHitRatio' as counter_name, '_Total' as instance_name, 
-cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters  a
-JOIN  (SELECT cntr_value,OBJECT_NAME 
-  FROM sys.dm_os_performance_counters  
-    WHERE counter_name = 'Cache Hit Ratio base'
-        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
-        AND instance_name = '_Total') b ON  a.OBJECT_NAME = b.OBJECT_NAME
-WHERE a.counter_name = 'Cache Hit Ratio'
-  AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
-  AND instance_name = '_Total'</params>
+SELECT a.object_name,'CacheHitRatio' as counter_name,'_Total' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters a
+JOIN (SELECT cntr_value,OBJECT_NAME
+FROM sys.dm_os_performance_counters
+WHERE counter_name='Cache Hit Ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total') b
+ON a.OBJECT_NAME=b.OBJECT_NAME
+WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total'</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
                <description>The item gets server global status information.</description>
@@ -1349,6 +1340,56 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                </triggers>
             </item>
             <item>
+               <name>MSSQL: Percent of Adhoc queries running</name>
+               <type>CALCULATED</type>
+               <key>mssql.percent_of_adhoc_queries</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <params>last(mssql.sql_compilations_sec.rate) * 100 /
+(last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))</params>
+               <description>The ratio of SQL compilations per second to Batch requests per second in percent.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
+                     <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Percent of Recompiled Transact-SQL Objects</name>
+               <type>CALCULATED</type>
+               <key>mssql.percent_recompilations_to_compilations</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <params>last(mssql.sql_recompilations_sec.rate) * 100 /
+(last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))</params>
+               <description>The ratio of SQL re-compilations per second to SQL compilations per second in percent.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
+                     <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
                <name>MSSQL: Number of blocked processes</name>
                <type>DEPENDENT</type>
                <key>mssql.processes_blocked</key>
@@ -1423,6 +1464,29 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <master_item>
                   <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Full scans to Index searches ratio</name>
+               <type>CALCULATED</type>
+               <key>mssql.scan_to_search</key>
+               <delay>0;m0-59s3</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <params>last(mssql.full_scans_sec.rate) / (last(mssql.index_searches_sec.rate) + (last(mssql.index_searches_sec.rate)=0))</params>
+               <description>The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)} &gt; 0.001</expression>
+                     <name>MSSQL: Index and table scans are often than index searches for 15m</name>
+                     <priority>WARNING</priority>
+                     <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>MSSQL: SQL compilations per second</name>
@@ -1724,7 +1788,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                      <dependencies>
                         <dependency>
                            <name>MSSQL: Service is unavailable</name>
-                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].max(#3)}=0</expression>
+                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1941,7 +2005,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{max(#3)}=0</expression>
+                     <expression>{last()}=0</expression>
                      <name>MSSQL: Service is unavailable</name>
                      <priority>DISASTER</priority>
                      <description>The TCP port of the MS SQL Server service is currently unavailable.</description>
@@ -2043,8 +2107,8 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                            <params>$[?(@.group_name=='{#GROUP_NAME}')].primary_replica.first()</params>
                         </step>
                         <step>
-                           <type>DISCARD_UNCHANGED</type>
-                           <params/>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2423,14 +2487,6 @@ FROM sys.databases</params>
                      <master_item>
                         <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                      </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB '{#DBNAME}': Rate of log growths is high (over {$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
-                           <priority>WARNING</priority>
-                           <description>The transaction log for the database has grown too frequently.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log shrinks</name>
@@ -2453,14 +2509,6 @@ FROM sys.databases</params>
                      <master_item>
                         <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                      </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB '{#DBNAME}': Rate of log shrinks is (over {$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
-                           <priority>WARNING</priority>
-                           <description>The transaction log for the database has shrunken too frequently.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log truncations</name>
@@ -2607,6 +2655,34 @@ FROM sys.databases</params>
                            <item>
                               <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_files_used_size["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>MSSQL DB '{#DBNAME}': Number of Log changes</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_growths["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_shrinks["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_truncations["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -3587,16 +3663,6 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <description>The maximum log flush waits per second for trigger expression.</description>
             </macro>
             <macro>
-               <macro>{$MSSQL.LOG_GROWTHS.MAX}</macro>
-               <value>1</value>
-               <description>The maximum log growths for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$MSSQL.LOG_SHRINKS.MAX}</macro>
-               <value>1</value>
-               <description>The maximum log shrinks for trigger expression.</description>
-            </macro>
-            <macro>
                <macro>{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</macro>
                <value>300</value>
                <description>The minimum page life expectancy for trigger expression.</description>
@@ -3666,32 +3732,13 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
    </templates>
    <triggers>
       <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()} + ({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()}=0)) *&#13;
-1000 &lt; {Template DB MSSQL by ODBC:mssql.index_searches_sec.rate.last()}</expression>
-         <name>MSSQL: Index and table scans are often than index searches</name>
-         <priority>WARNING</priority>
-         <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
-      </trigger>
-      <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
-         <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}%</name>
-         <priority>WARNING</priority>
-         <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
-      </trigger>
-      <trigger>
-         <expression>({Template DB MSSQL by ODBC:mssql.sql_recompilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
-         <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}%</name>
-         <priority>WARNING</priority>
-         <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
-      </trigger>
-      <trigger>
          <expression>{Template DB MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 &gt; 10 * {Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}</expression>
          <name>MSSQL: Too frequently pointers using</name>
          <priority>WARNING</priority>
          <description>Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} / {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX}</expression>
+         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()}</expression>
          <name>MSSQL: Too many physical reads occurring</name>
          <priority>WARNING</priority>
          <description>If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.</description>

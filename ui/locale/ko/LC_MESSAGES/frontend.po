@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-11 09:35+0300\n"
+"POT-Creation-Date: 2020-09-18 19:53+0300\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -430,8 +430,7 @@ msgstr "대응 완료된 해결 이벤트"
 #: app/views/dashboard.sharing.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/popup.lldoperation.php:111 app/views/popup.lldoperation.php:240
-#: app/views/popup.lldoverride.php:93 app/views/popup.triggerwizard.php:47
-#: app/views/popup.triggerwizard.php:117
+#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
 #: app/views/reports.auditlog.list.php:56
 #: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
@@ -443,7 +442,7 @@ msgstr "대응 완료된 해결 이벤트"
 #: include/views/configuration.action.edit.php:399
 #: include/views/configuration.action.edit.php:469
 #: include/views/configuration.correlation.edit.php:53
-#: include/views/configuration.graph.edit.php:357
+#: include/views/configuration.graph.edit.php:362
 #: include/views/configuration.host.discovery.edit.php:492
 #: include/views/configuration.host.discovery.edit.php:591
 #: include/views/configuration.host.discovery.edit.php:741
@@ -524,7 +523,7 @@ msgid_plural "Actions enabled"
 msgstr[0] "액션이 활성화 되었습니다"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:137
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:139
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:26
 msgid "Action log"
@@ -542,8 +541,8 @@ msgstr "액션을 갱신하였습니다"
 #: include/classes/screens/CScreenProblem.php:923
 #: include/classes/screens/CScreenProblem.php:1171
 #: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:251
-#: include/forms.inc.php:1199 include/menu.inc.php:114
-#: include/menu.inc.php:144 include/views/configuration.action.edit.php:28
+#: include/forms.inc.php:1199 include/menu.inc.php:116
+#: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
@@ -617,8 +616,8 @@ msgstr "종료시간"
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
-#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
-#: app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:175
+#: app/views/popup.lldoverride.php:194
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
@@ -633,8 +632,8 @@ msgstr "종료시간"
 #: include/views/configuration.correlation.edit.php:176
 #: include/views/configuration.discovery.edit.php:78
 #: include/views/configuration.discovery.edit.php:149
-#: include/views/configuration.graph.edit.php:400
-#: include/views/configuration.graph.edit.php:495
+#: include/views/configuration.graph.edit.php:405
+#: include/views/configuration.graph.edit.php:500
 #: include/views/configuration.host.discovery.edit.php:117
 #: include/views/configuration.host.discovery.edit.php:209
 #: include/views/configuration.host.discovery.edit.php:528
@@ -764,7 +763,7 @@ msgstr ""
 msgid "Add new override"
 msgstr "새로운 오버라이드를 추가"
 
-#: include/views/configuration.graph.edit.php:406
+#: include/views/configuration.graph.edit.php:411
 #: include/views/configuration.trigger.prototype.edit.php:603
 #: include/views/configuration.trigger.prototype.massupdate.php:153
 msgid "Add prototype"
@@ -800,7 +799,7 @@ msgstr "%1$s을 추가했습니다."
 msgid "Admin"
 msgstr "Admin"
 
-#: include/menu.inc.php:150
+#: include/menu.inc.php:152
 msgid "Administration"
 msgstr "관리"
 
@@ -852,10 +851,6 @@ msgstr "에이전트 인터페이스"
 msgid "Aggregate"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:677
-msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr "어그리게이트 체크는 감시대상의 호스트상에서 에이전트가 기동될 필요는 없습니다. Zabbix서버는 데이터베이스에서 직접 정보를 수집합니다. 자세한 것은 메뉴얼을 참고하십시오."
-
 #: include/classes/widgets/CWidgetHelper.php:1088
 msgid "Aggregation function"
 msgstr ""
@@ -903,7 +898,7 @@ msgstr "전체 대시보드"
 msgid "All groups"
 msgstr "모든 그룹"
 
-#: include/html.inc.php:333
+#: include/html.inc.php:322
 msgid "All hosts"
 msgstr "모든 호스트"
 
@@ -911,7 +906,7 @@ msgstr "모든 호스트"
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "모든 링크는 반드시 \"이름\"과 \"URL\"을 설정할 필요가 있습니다"
 
-#: include/html.inc.php:538
+#: include/html.inc.php:527
 msgid "All maps"
 msgstr "모든 맵"
 
@@ -1073,7 +1068,7 @@ msgstr "applicationid \"%1$s\"의 어플리케이션이 없습니다."
 #: app/controllers/CControllerPopupGeneric.php:176 app/views/search.php:38
 #: app/views/search.php:60 app/views/search.php:64 app/views/search.php:228
 #: app/views/search.php:246 app/views/search.php:250 include/forms.inc.php:649
-#: include/html.inc.php:357
+#: include/html.inc.php:346
 #: include/views/configuration.application.edit.php:27
 #: include/views/configuration.application.list.php:157
 #: include/views/configuration.host.edit.php:235
@@ -1245,8 +1240,8 @@ msgstr "시도 간격"
 msgid "Attempts"
 msgstr "시도횟수"
 
-#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:133
-#: include/menu.inc.php:136
+#: app/views/administration.housekeeping.edit.php:93 include/menu.inc.php:135
+#: include/menu.inc.php:138
 msgid "Audit"
 msgstr "감사"
 
@@ -1274,7 +1269,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
-#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:165
+#: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
@@ -1365,7 +1360,7 @@ msgstr "아이콘의 자동선택"
 #: app/views/administration.autoreg.edit.php:29
 #: app/views/administration.autoreg.edit.php:89
 #: app/views/popup.mediatype.message.php:58
-#: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:908
+#: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:897
 msgid "Autoregistration"
 msgstr ""
 
@@ -1387,7 +1382,7 @@ msgstr ""
 msgid "Availability"
 msgstr "상태"
 
-#: include/menu.inc.php:72 include/menu.inc.php:128 report2.php:25
+#: include/menu.inc.php:72 include/menu.inc.php:130 report2.php:25
 #: report2.php:161
 msgid "Availability report"
 msgstr "가동 보고서"
@@ -1583,6 +1578,22 @@ msgstr "SLA의 계산, SLA의 허용치(%)"
 #: include/views/configuration.graph.edit.php:246
 msgid "Calculated"
 msgstr "자동 계산"
+
+#: include/classes/items/CHelpItems.php:677
+msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:685
+msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:681
+msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:689
+msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
+msgstr ""
 
 #: jsLoader.php:166
 msgid "Calendar"
@@ -2058,7 +2069,7 @@ msgstr "아이템 프로토타입을 삭제할 수 없습니다"
 msgid "Cannot delete item prototypes"
 msgstr "아이템 프로토타입을 삭제할 수 없습니다"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Cannot delete items"
 msgstr "아이템을 삭제할 수 없습니다"
 
@@ -2347,7 +2358,7 @@ msgstr "맵 \"%2$s\"에서 이용되는 호스트 \"%1$s\"를 찾을 수 없습�
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"에서 이용되고 있는 호스트 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1197
+#: include/classes/import/CConfigurationImport.php:1231
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타입 \"%2$s\"를 위한 호스트 그룹 \"%1$s\"를 찾을 수 없습니다."
@@ -2370,32 +2381,47 @@ msgstr "맵 \"%2$s\"에서 이용되는 아이콘 \"%1$s\"를 찾을 수 없습�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "맵 \"%2$s\"에서 이용되는 아이콘 매핑 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1581
+#: include/classes/import/CConfigurationImport.php:972
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:762
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1139
+#, c-format
+msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:1636
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"의 Y축의 최대치로서 이용되는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1350
+#: include/classes/import/CConfigurationImport.php:1405
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\"에서 Y축의 최대치로서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1565
+#: include/classes/import/CConfigurationImport.php:1620
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"의 Y축의 최소값으로 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1330
+#: include/classes/import/CConfigurationImport.php:1385
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\"에서 Y축의 최소값으로 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1599
+#: include/classes/import/CConfigurationImport.php:1654
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"내에서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1370
+#: include/classes/import/CConfigurationImport.php:1425
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\" 에서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
@@ -2415,12 +2441,12 @@ msgstr "맵 \"%2$s\"에서 이용되고 있는 맵 \"%1$s\"를 찾을 수 없습
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"에서 이용되고 있는 맵 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1220
+#: include/classes/import/CConfigurationImport.php:1254
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타입 \"%2$s\"를 위한 템플릿 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1005
+#: include/classes/import/CConfigurationImport.php:1025
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2431,12 +2457,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "맵 \"%2$s\"에서 이용되고 있는 트리거 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:762
+#: include/classes/import/CConfigurationImport.php:773
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\"상의 아이템 \"%2$s\"에서 이용되고 있는 값의 매핑 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1119
+#: include/classes/import/CConfigurationImport.php:1153
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 아이템 프로토타입 \"%2$s\"에서 이용되고 있는 값 매핑 \"%1$s\"를 찾을 수 없습니다."
@@ -2558,7 +2584,7 @@ msgstr "위젯을 보존할 수 없습니다 \"%1$s\"."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "커맨드를 송신할 수 없습니다. Zabbix서버 \"%1$s\"와의 접속을 확인해 주십시오."
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Cannot send request"
 msgstr "리퀘스트를 송신할 수 없습니다"
 
@@ -2771,7 +2797,7 @@ msgstr "인증 설정을 갱신할 수 없습니다"
 #: app/controllers/CControllerGuiUpdate.php:43
 #: app/controllers/CControllerGuiUpdate.php:80
 #: app/controllers/CControllerHousekeepingUpdate.php:57
-#: app/controllers/CControllerHousekeepingUpdate.php:126
+#: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:43
 #: app/controllers/CControllerMiscConfigUpdate.php:80
 #: app/controllers/CControllerTrigDisplayUpdate.php:47
@@ -3009,11 +3035,11 @@ msgstr "로그인의 대소문자 구별"
 msgid "Catalan (ca_ES)"
 msgstr "카탈루냐어 (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:945
+#: include/classes/items/CHelpItems.php:957
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "정규표현식에 일치하는 모든 SNMP트랩을 캐치한다. 정규표현식이 지정되어 있지 않은 경우, 모든 트랩을 캐치한다."
 
-#: include/classes/items/CHelpItems.php:941
+#: include/classes/items/CHelpItems.php:953
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "snmptrap[]아이템으로 캐치되어 있지 않은 모든 SNMP 트랩을 캐치한다."
 
@@ -3155,19 +3181,19 @@ msgstr "파일 확인 체크. 파일이 존재하지 않는 경우 0을 리턴, 
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "지정된 포트에 TCP접속성을 체크. 접속할 수 없는 경우엔 0을 리턴, 접속 가능한 경우엔 1을 리턴."
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:695
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr "서버가 ICMP ping으로 접속이 가능한가 체크함. ICMP ping에 실패한 경우엔 0을 리턴, ICMP ping에 성공한 경우 1을 리턴."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:439
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:707
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "서비스 기동과 TCP 접속성 체크. 서비스가 정지되어 있는 경우엔 0을 리턴, 서비스가 기동되어 있는 경우엔 1을 리턴."
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:451
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:715
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "서비스 기동과 UDP응답성 체크. 서비스가 정지되어 있는 경우엔 0을 리턴. 서비스가 기동되어 있는 경우엔 1을 리턴."
 
@@ -3183,13 +3209,13 @@ msgstr "지정된 UDP 포트 번호가 대기상태(LISTEN)인지 체크. 대기
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:443
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:711
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "TCP서비스의 퍼포먼스를 체크. 서비스가 다운된 경우엔 0을 리턴, 초(seconds)를 리턴한 경우엔 서비스에 접속에 걸린 시간을 리턴."
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:455
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:719
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "UDP서비스의 퍼포먼스를 체크. 서비스가 다운된 경우엔 0을 리턴. 초(seconds)를 리턴한 경우엔 서비스 응답이 돌아오기까지의 시간을 리턴."
 
@@ -3258,7 +3284,7 @@ msgstr "시각"
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.correlation.edit.php:165
 #: include/views/configuration.discovery.edit.php:141
-#: include/views/configuration.graph.edit.php:487
+#: include/views/configuration.graph.edit.php:492
 #: include/views/configuration.host.discovery.edit.php:779
 #: include/views/configuration.host.edit.php:757
 #: include/views/configuration.hostgroups.edit.php:62
@@ -3317,7 +3343,7 @@ msgstr "축소"
 msgid "Collapse sidebar"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:356
+#: include/views/configuration.graph.edit.php:361
 #: include/views/js/monitoring.sysmaps.js.php:344
 #: include/views/js/monitoring.sysmaps.js.php:365
 #: include/views/js/monitoring.sysmaps.js.php:384
@@ -3403,7 +3429,7 @@ msgid "Concurrent sessions"
 msgstr "동시 세션의 숫자"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:740
-#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:168
+#: app/views/popup.lldoperation.php:56 app/views/popup.lldoverride.php:169
 msgid "Condition"
 msgstr "조건"
 
@@ -3460,12 +3486,12 @@ msgstr "조건"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "상관관계 \"%1$s\"의 실행조건이 중복되어 있습니다."
 
-#: include/menu.inc.php:97 include/menu.inc.php:142
+#: include/menu.inc.php:97 include/menu.inc.php:144
 #: include/views/inventory.host.view.php:211 jsLoader.php:275
 msgid "Configuration"
 msgstr "설정"
 
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1039
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "설정한 캐쉬의 통계. cache - buffer (mode: pfree, total, used, free)."
 
@@ -3808,7 +3834,7 @@ msgstr "컨텐츠 컨트롤"
 msgid "Content controls: header"
 msgstr ""
 
-#: include/html.inc.php:349
+#: include/html.inc.php:338
 msgid "Content menu"
 msgstr "컨텐츠 메뉴"
 
@@ -4169,7 +4195,7 @@ msgstr ""
 msgid "Custom multiplier"
 msgstr "승수"
 
-#: app/views/js/popup.itemtestedit.view.js.php:373 include/forms.inc.php:1198
+#: app/views/js/popup.itemtestedit.view.js.php:375 include/forms.inc.php:1198
 #: include/forms.inc.php:1400 include/views/js/item.preprocessing.js.php:61
 msgid "Custom on fail"
 msgstr ""
@@ -4285,7 +4311,7 @@ msgstr "대시보드"
 msgid "Dashed line"
 msgstr "파선"
 
-#: include/classes/items/CHelpItems.php:1075
+#: include/classes/items/CHelpItems.php:1087
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "데이터캐쉬 통계. cache - values (mode: all, float, uint, str, log, text), history (mode: pfree, total, used, free), trend (mode: pfree, total, used, free), text (mode: pfree, total, used, free)."
 
@@ -4570,11 +4596,11 @@ msgstr "디스커버리 규칙를 삭제하시겠습니까?"
 msgid "Delete expression?"
 msgstr "조건식를 삭제하시겠습니까?"
 
-#: include/views/configuration.graph.edit.php:473
+#: include/views/configuration.graph.edit.php:478
 msgid "Delete graph prototype?"
 msgstr "그래프 프로토타입을 삭제하시겠습니까?"
 
-#: include/views/configuration.graph.edit.php:473
+#: include/views/configuration.graph.edit.php:478
 msgid "Delete graph?"
 msgstr "그래프를 삭제하시겠습니까?"
 
@@ -5035,7 +5061,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: app/views/administration.user.list.php:199
 #: app/views/monitoring.host.view.php:143 app/views/popup.lldoperation.php:276
 #: include/discovery.inc.php:108 include/hosts.inc.php:1342
-#: include/html.inc.php:319 include/httptest.inc.php:47
+#: include/html.inc.php:306 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:185 include/maps.inc.php:320
 #: include/triggers.inc.php:2060 include/users.inc.php:86
@@ -5065,13 +5091,13 @@ msgstr ""
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:351 include/forms.inc.php:1379
+#: app/views/js/popup.itemtestedit.view.js.php:353 include/forms.inc.php:1379
 #: include/views/js/item.preprocessing.js.php:63
 msgid "Discard value"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:86
-#: include/views/configuration.graph.edit.php:445
+#: include/views/configuration.graph.edit.php:450
 #: include/views/configuration.graph.list.php:124
 #: include/views/configuration.host.prototype.edit.php:124
 #: include/views/configuration.host.prototype.list.php:60
@@ -5107,7 +5133,7 @@ msgstr "디스커버리된 아이템"
 #: app/views/search.php:88 app/views/search.php:92 app/views/search.php:228
 #: app/views/search.php:278 app/views/search.php:282
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:293
-#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
+#: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:118
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
 #: include/views/configuration.template.list.php:156
@@ -5134,7 +5160,7 @@ msgstr "디스커버리 체크"
 msgid "Discovery checks"
 msgstr "디스커버리 체크"
 
-#: include/html.inc.php:463
+#: include/html.inc.php:452
 msgid "Discovery list"
 msgstr "디스커버리 리스트"
 
@@ -5203,7 +5229,7 @@ msgid "Discovery rule updated"
 msgstr "디스커버리 규칙을 갱신하였습니다"
 
 #: app/controllers/CControllerPopupGeneric.php:344
-#: app/views/popup.condition.common.php:455 include/html.inc.php:424
+#: app/views/popup.condition.common.php:455 include/html.inc.php:413
 #: include/views/configuration.discovery.edit.php:28
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.edit.php:27
@@ -5339,7 +5365,7 @@ msgstr "정지 시간"
 msgid "Draw"
 msgstr "그래프 형식"
 
-#: include/views/configuration.graph.edit.php:347
+#: include/views/configuration.graph.edit.php:351
 msgid "Draw style"
 msgstr "종류"
 
@@ -5530,8 +5556,8 @@ msgstr "실효값"
 msgid "Elasticsearch error: %1$s."
 msgstr "Elasticsearch에러 : %1$s"
 
-#: include/classes/api/managers/CHistoryManager.php:1231
-#: include/classes/api/managers/CHistoryManager.php:1240
+#: include/classes/api/managers/CHistoryManager.php:1229
+#: include/classes/api/managers/CHistoryManager.php:1238
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
 msgstr "다음 타입을 위한 Elasticsearch의 URL이 설정되어 있지 않습니다: %1$s"
@@ -5808,7 +5834,7 @@ msgstr "트래핑의 활성화"
 #: app/views/administration.user.list.php:200
 #: app/views/monitoring.host.view.php:142 app/views/popup.media.php:85
 #: app/views/popup.triggerwizard.php:132 include/discovery.inc.php:107
-#: include/html.inc.php:315 include/httptest.inc.php:46
+#: include/html.inc.php:302 include/httptest.inc.php:46
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:1254
 #: include/triggers.inc.php:2057
@@ -5910,7 +5936,7 @@ msgstr "이벤트ID"
 msgid "Event acknowledged"
 msgstr "장애대응 완료"
 
-#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:147
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr "이벤트 상관관계"
@@ -6517,7 +6543,7 @@ msgid "Full clone"
 msgstr "모두 복제"
 
 #: app/views/popup.triggerexpr.php:102
-#: include/views/configuration.graph.edit.php:345
+#: include/views/configuration.graph.edit.php:348
 msgid "Function"
 msgstr "기능"
 
@@ -6535,7 +6561,7 @@ msgid "GSM modem"
 msgstr "GSM 모뎀"
 
 #: app/views/administration.gui.edit.php:27
-#: app/views/administration.gui.edit.php:52 include/html.inc.php:907
+#: app/views/administration.gui.edit.php:52 include/html.inc.php:896
 msgid "GUI"
 msgstr "표시 설정"
 
@@ -6543,7 +6569,7 @@ msgstr "표시 설정"
 msgid "GUI access disabled."
 msgstr "GUI 액세스를 비활성 하였습니다"
 
-#: include/menu.inc.php:154
+#: include/menu.inc.php:156
 msgid "General"
 msgstr "일반"
 
@@ -6569,8 +6595,8 @@ msgstr "Web페이지 콘텐츠 습득. text로 Web페이지 소스를 리턴."
 msgid "Get value"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:483
-#: app/views/popup.itemtestedit.view.php:304
+#: app/views/js/popup.itemtestedit.view.js.php:485
+#: app/views/popup.itemtestedit.view.php:313
 msgid "Get value and test"
 msgstr ""
 
@@ -6658,7 +6684,7 @@ msgstr "그라데이션 라인"
 #: include/classes/widgets/CWidgetConfig.php:49
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
-#: include/screens.inc.php:30 include/views/configuration.graph.edit.php:455
+#: include/screens.inc.php:30 include/views/configuration.graph.edit.php:460
 #: include/views/monitoring.history.php:75
 #: include/views/monitoring.screen.constructor.edit.php:126 report2.php:482
 msgid "Graph"
@@ -6739,7 +6765,7 @@ msgstr "그래프 구성요소"
 #: include/classes/widgets/CWidgetConfig.php:41
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:32
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:62
-#: include/screens.inc.php:44 include/views/configuration.graph.edit.php:455
+#: include/screens.inc.php:44 include/views/configuration.graph.edit.php:460
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:159
 #: include/views/monitoring.screen.constructor.edit.php:184
 msgid "Graph prototype"
@@ -6781,7 +6807,7 @@ msgstr "그래프 프로토타입을 갱신하였습니다"
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 그래프의 프로토타입은 사용할 수 없습니다."
 
-#: app/controllers/CControllerPopupGeneric.php:304 include/html.inc.php:496
+#: app/controllers/CControllerPopupGeneric.php:304 include/html.inc.php:485
 #: include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:261
@@ -6837,7 +6863,7 @@ msgstr "같은 이름에 다른 타입의 그래프가 존재합니다."
 #: app/views/monitoring.charts.view.php:135 app/views/search.php:35
 #: app/views/search.php:41 app/views/search.php:81 app/views/search.php:85
 #: app/views/search.php:128 app/views/search.php:228 app/views/search.php:267
-#: app/views/search.php:271 graphs.php:480 include/html.inc.php:399
+#: app/views/search.php:271 graphs.php:480 include/html.inc.php:388
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:43
 #: include/views/configuration.host.discovery.list.php:175
@@ -6949,7 +6975,7 @@ msgstr "다음에 의한 그루핑"
 msgid "Groups"
 msgstr "그룹"
 
-#: include/menu.inc.php:225
+#: include/menu.inc.php:227
 msgid "Guest user"
 msgstr ""
 
@@ -7047,7 +7073,7 @@ msgstr "히브리어 (he_IL)"
 msgid "Height"
 msgstr "높이"
 
-#: include/menu.inc.php:211 include/menu.inc.php:214
+#: include/menu.inc.php:213 include/menu.inc.php:216
 #: include/views/general.login.php:89
 msgid "Help"
 msgstr "도움말"
@@ -7079,7 +7105,7 @@ msgid "Hide sidebar"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:125 include/html.inc.php:275
-#: include/html.inc.php:534 include/views/monitoring.screen.php:45
+#: include/html.inc.php:523 include/views/monitoring.screen.php:45
 #: include/views/monitoring.slides.php:43
 msgctxt "screen reader"
 msgid "Hierarchy"
@@ -7126,7 +7152,7 @@ msgid "History cleanup is not supported if compression is enabled"
 msgstr ""
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:491 httpconf.php:503
-#: items.php:893 items.php:901 items.php:1315 items.php:1329
+#: items.php:893 items.php:901 items.php:1319 items.php:1333
 msgid "History cleared"
 msgstr "이력이 삭제되었습니다"
 
@@ -7212,7 +7238,7 @@ msgstr "가로 위치"
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:64
 #: include/views/monitoring.slides.php:76
-#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1314
+#: include/views/reports.toptriggers.php:83 items.php:893 items.php:1318
 #: jsLoader.php:199 jsLoader.php:292 queue.php:221 report2.php:482
 msgid "Host"
 msgid_plural "Hosts"
@@ -7484,7 +7510,7 @@ msgstr "호스트명 \"%1$s\"를 가진 호스트 프로토타입은 디스커�
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트의 표시명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
 
-#: include/html.inc.php:507
+#: include/html.inc.php:496
 #: include/views/configuration.host.discovery.list.php:268
 #: include/views/configuration.host.edit.php:440
 #: include/views/configuration.host.prototype.edit.php:35
@@ -7562,7 +7588,7 @@ msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:207 include/forms.inc.php:644 include/menu.inc.php:37
-#: include/menu.inc.php:65 include/menu.inc.php:106
+#: include/menu.inc.php:65 include/menu.inc.php:108
 #: include/views/configuration.application.list.php:50
 #: include/views/configuration.copy.elements.php:62
 #: include/views/configuration.graph.list.php:87
@@ -7606,7 +7632,7 @@ msgid "Hours"
 msgstr "시간"
 
 #: app/views/administration.housekeeping.edit.php:29
-#: app/views/administration.housekeeping.edit.php:184 include/html.inc.php:909
+#: app/views/administration.housekeeping.edit.php:184 include/html.inc.php:898
 msgid "Housekeeping"
 msgstr "데이터 보존기간"
 
@@ -7691,7 +7717,7 @@ msgstr "IPMI스크립트는 서버에서만 실행가능합니다."
 msgid "IPMI sensor"
 msgstr "IPMI센서"
 
-#: include/classes/items/CHelpItems.php:1109
+#: include/classes/items/CHelpItems.php:1121
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -7750,7 +7776,7 @@ msgstr "아이콘 매핑를 갱신하였습니다"
 
 #: app/controllers/CControllerAuditLogList.php:215
 #: app/views/administration.iconmap.edit.php:29
-#: app/views/administration.iconmap.list.php:27 include/html.inc.php:911
+#: app/views/administration.iconmap.list.php:27 include/html.inc.php:900
 msgid "Icon mapping"
 msgstr "아이콘 매핑"
 
@@ -7840,7 +7866,7 @@ msgid "Image updated"
 msgstr "이미지를 갱신하였습니다"
 
 #: app/views/administration.image.edit.php:29
-#: app/views/administration.image.list.php:28 include/html.inc.php:910
+#: app/views/administration.image.list.php:28 include/html.inc.php:899
 #: include/views/conf.import.php:50
 msgid "Images"
 msgstr "이미지"
@@ -7881,7 +7907,7 @@ msgstr "가져오기에 성공하였습니다."
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr ""
 
-#: include/html.inc.php:312 include/maps.inc.php:404
+#: include/html.inc.php:299 include/maps.inc.php:404
 msgid "In maintenance"
 msgstr "메인터넌스 중"
 
@@ -9050,18 +9076,18 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:178
 #: include/classes/helpers/CSvgGraphHelper.php:373
 #: include/classes/helpers/CSvgGraphHelper.php:385
-#: include/classes/import/CConfigurationImport.php:774
-#: include/classes/import/CConfigurationImport.php:859
-#: include/classes/import/CConfigurationImport.php:897
-#: include/classes/import/CConfigurationImport.php:985
-#: include/classes/import/CConfigurationImport.php:1132
-#: include/classes/import/CConfigurationImport.php:2636
-#: include/classes/import/CConfigurationImport.php:2740
-#: include/classes/import/CConfigurationImport.php:2750
-#: include/classes/import/CConfigurationImport.php:2778
-#: include/classes/import/CConfigurationImport.php:2792
-#: include/classes/import/CConfigurationImport.php:2801
-#: include/classes/import/CConfigurationImport.php:2807
+#: include/classes/import/CConfigurationImport.php:785
+#: include/classes/import/CConfigurationImport.php:870
+#: include/classes/import/CConfigurationImport.php:908
+#: include/classes/import/CConfigurationImport.php:1005
+#: include/classes/import/CConfigurationImport.php:1166
+#: include/classes/import/CConfigurationImport.php:2691
+#: include/classes/import/CConfigurationImport.php:2795
+#: include/classes/import/CConfigurationImport.php:2805
+#: include/classes/import/CConfigurationImport.php:2833
+#: include/classes/import/CConfigurationImport.php:2847
+#: include/classes/import/CConfigurationImport.php:2856
+#: include/classes/import/CConfigurationImport.php:2862
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -9720,7 +9746,7 @@ msgstr "이탈리아어 (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:245
 #: include/views/monitoring.screen.constructor.edit.php:414
 #: include/views/monitoring.screen.constructor.edit.php:725 items.php:892
-#: items.php:1314
+#: items.php:1318
 msgid "Item"
 msgstr "아이템"
 
@@ -9756,7 +9782,7 @@ msgstr "아이템\"%1$s\"는 템플릿\"%2$s\"에 존재하지 않습니다."
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "아이템 \"%1$s\"가 존재하지 않거나 접속권한이 없습니다"
 
-#: include/classes/import/CConfigurationImport.php:745
+#: include/classes/import/CConfigurationImport.php:747
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" 상의 아이템 \"%1$s\": 어플리케이션 \"%3$s\"는 존재하지 않습니다."
@@ -9764,6 +9790,10 @@ msgstr "\"%2$s\" 상의 아이템 \"%1$s\": 어플리케이션 \"%3$s\"는 존�
 #: items.php:845
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
+
+#: app/views/popup.itemtestedit.view.php:298
+msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
+msgstr ""
 
 #: items.php:1269
 msgid "Item copied"
@@ -9844,7 +9874,7 @@ msgstr[0] "아이템 프로토타입을 갱신하였습니다"
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 아이템의 프로토타입은 사용할 수 없습니다."
 
-#: app/controllers/CControllerPopupGeneric.php:317 include/html.inc.php:474
+#: app/controllers/CControllerPopupGeneric.php:317 include/html.inc.php:463
 #: include/views/configuration.host.discovery.list.php:247
 #: include/views/configuration.host.edit.php:367
 #: include/views/configuration.item.prototype.edit.php:26
@@ -9930,10 +9960,10 @@ msgstr "키\"%1$s\"가 설정된 아이템은 지정한 호스트 \"%2$s\"에 �
 #: app/views/search.php:67 app/views/search.php:71 app/views/search.php:228
 #: app/views/search.php:253 app/views/search.php:257
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
-#: include/html.inc.php:371
+#: include/html.inc.php:360
 #: include/views/configuration.application.list.php:85
 #: include/views/configuration.application.list.php:129
-#: include/views/configuration.graph.edit.php:440
+#: include/views/configuration.graph.edit.php:445
 #: include/views/configuration.host.discovery.list.php:173
 #: include/views/configuration.host.edit.php:258
 #: include/views/configuration.host.list.php:185
@@ -9945,11 +9975,11 @@ msgstr "키\"%1$s\"가 설정된 아이템은 지정한 호스트 \"%2$s\"에 �
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
-#: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
+#: include/views/inventory.host.view.php:204 items.php:1694 queue.php:110
 msgid "Items"
 msgstr "아이템"
 
-#: items.php:1339
+#: items.php:1343
 msgid "Items deleted"
 msgstr "아이템을 삭제하였습니다"
 
@@ -10276,7 +10306,7 @@ msgstr "최근 값"
 msgid "Last week graph"
 msgstr "최근 1주일의 그래프"
 
-#: app/controllers/CControllerLatestView.php:139
+#: app/controllers/CControllerLatestView.php:144
 #: app/partials/monitoring.host.view.html.php:39
 #: app/partials/monitoring.host.view.html.php:107
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:33
@@ -10628,7 +10658,7 @@ msgstr "hostmacroid \"%1$s\"를 가진 매크로는 업습니다."
 #: app/partials/massupdate.macros.tab.php:118
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
-#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:913
+#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:902
 #: include/views/configuration.host.edit.php:621
 #: include/views/configuration.host.massupdate.php:308
 #: include/views/configuration.host.prototype.edit.php:303
@@ -10657,7 +10687,7 @@ msgstr "메인 필터"
 msgid "Main navigation"
 msgstr "메인 네비게이션"
 
-#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:114
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -10709,15 +10739,15 @@ msgstr "메인터넌스 타입"
 msgid "Maintenance updated"
 msgstr "메인터넌스를 갱신하였습니다"
 
-#: include/html.inc.php:962
+#: include/html.inc.php:951
 msgid "Maintenance with data collection"
 msgstr "데이터수집을 하는 메인터넌스"
 
-#: include/html.inc.php:961
+#: include/html.inc.php:950
 msgid "Maintenance without data collection"
 msgstr "데이터수집을 하지 않는 메인터넌스"
 
-#: include/html.inc.php:998
+#: include/html.inc.php:987
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "메인테넌스 : %1$s"
@@ -11013,7 +11043,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 미디어 타입은 사용할 수 없습니다."
 
 #: app/views/administration.mediatype.edit.php:30
-#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:174
+#: app/views/administration.mediatype.list.php:31 include/menu.inc.php:176
 #: include/views/conf.import.php:51
 msgid "Media types"
 msgstr "미디어 타입"
@@ -11269,7 +11299,7 @@ msgstr ""
 #: app/controllers/CControllerModuleEdit.php:98
 #: app/controllers/CControllerModuleList.php:123
 #: app/views/administration.module.edit.php:23
-#: app/views/administration.module.list.php:27 include/html.inc.php:918
+#: app/views/administration.module.list.php:27 include/html.inc.php:907
 msgid "Modules"
 msgstr ""
 
@@ -12143,7 +12173,7 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
 #: include/classes/screens/CScreenLldGraph.php:51 include/func.inc.php:1507
-#: items.php:1443 items.php:1647 services.php:84
+#: items.php:1447 items.php:1651 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "대상이 존재하지 않거나, 액세스 권한이 없습니다!"
 
@@ -12349,7 +12379,7 @@ msgstr "11월"
 msgid "Number of CPUs. Returns integer"
 msgstr "CPU 수. integer를 리턴."
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:987
 msgid "Number of enabled items on the host."
 msgstr "호스트상의 유효 아이템 수."
 
@@ -12361,25 +12391,25 @@ msgstr ""
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "아이템수 (활성/비활성/습득불가)"
 
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1011
 msgid "Number of items in Zabbix database."
 msgstr "Zabbix데이터베이스 안의 아이템수."
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1031
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "서버에 송신되지 않은 프록시의 히스토리 아이템 수"
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1035
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "from에서 to까지의 시간이 늦는 큐의 아이템수."
 
 #: include/classes/items/CHelpItems.php:357
 #: include/classes/items/CHelpItems.php:671
-#: include/classes/items/CHelpItems.php:1039
+#: include/classes/items/CHelpItems.php:1051
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:995
+#: include/classes/items/CHelpItems.php:1007
 msgid "Number of monitored hosts"
 msgstr "감시호스트수"
 
@@ -12396,15 +12426,15 @@ msgstr "장애의 수"
 msgid "Number of problems and expand most critical one"
 msgstr "장애의 수와 가장 치명적인 1건을 전개"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:791
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상의 프로세서 코어 수, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:795
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상의 프로세서 스레드 수, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저의 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:859
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 상의 프로세서 수, <url> - VMware서비스URL, <uuid> - VMware가상 머신의 호스트 이름"
 
@@ -12433,15 +12463,15 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "트리거 수 (활성/비활성 [장애/정상])"
 
-#: include/classes/items/CHelpItems.php:1051
+#: include/classes/items/CHelpItems.php:1063
 msgid "Number of triggers in Zabbix database."
 msgstr "Zabbix데이터베이스 안의 트리거 수."
 
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1015
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Zabbix데이터베이스 내의 습득불가 아이템 수."
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:991
 msgid "Number of unsupported items on the host."
 msgstr "호스트 상의 습득불가 아이템 수."
 
@@ -12454,35 +12484,35 @@ msgstr "유저 수 (온라인)"
 msgid "Number of users logged in. Returns integer"
 msgstr "로그인 하고있는 유저 수. integer를 리턴."
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:967
 msgid "Number of values stored in table HISTORY."
 msgstr "테이블 HISTORY내의 값 보존 수."
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:971
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "테이블 HISTORY_LOG내의 값 보존 수."
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:975
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "테이블 HISTORY_STR내의 값 보존 수."
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:979
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "테이블 HISTORY_TEXT내의 값 보존 수."
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:983
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "테이블 HISTORY_UINT내의 값 보존 수."
 
-#: include/classes/items/CHelpItems.php:1043
+#: include/classes/items/CHelpItems.php:1055
 msgid "Number of values stored in table TRENDS."
 msgstr "테이블 TRENDS내의 값 보존 수."
 
-#: include/classes/items/CHelpItems.php:1047
+#: include/classes/items/CHelpItems.php:1059
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "테이블 TRENDS_UINT내의 값 보존 수."
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:847
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저상의 가상 머신 수, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저의 호스트 이름"
 
@@ -12796,7 +12826,7 @@ msgstr "오퍼레이션 종류"
 msgid "Operational data"
 msgstr ""
 
-#: app/views/popup.lldoverride.php:183
+#: app/views/popup.lldoverride.php:184
 #: include/views/configuration.action.edit.php:306
 #: include/views/configuration.action.edit.php:470
 #: include/views/configuration.action.list.php:90
@@ -12949,7 +12979,7 @@ msgstr "Or"
 msgid "Original"
 msgstr "변경 안함"
 
-#: include/html.inc.php:919
+#: include/html.inc.php:908
 msgid "Other"
 msgstr "기타"
 
@@ -13586,7 +13616,7 @@ msgstr ""
 #: app/views/administration.iconmap.edit.php:79
 #: app/views/administration.iconmap.edit.php:111
 #: app/views/js/administration.iconmap.edit.js.php:47
-#: include/views/configuration.graph.edit.php:467
+#: include/views/configuration.graph.edit.php:472
 msgid "Preview"
 msgstr "미리보기"
 
@@ -13812,7 +13842,7 @@ msgstr "설정된URL \"%1$s\"는 올바르지 않습니다."
 
 #: app/controllers/CControllerPopupGeneric.php:164
 #: app/views/administration.proxy.edit.php:28
-#: app/views/administration.proxy.list.php:31 include/menu.inc.php:162
+#: app/views/administration.proxy.list.php:31 include/menu.inc.php:164
 msgid "Proxies"
 msgstr "프록시"
 
@@ -13914,7 +13944,7 @@ msgstr "공개키 파일"
 msgid "Query fields"
 msgstr "Query필드"
 
-#: include/menu.inc.php:180 queue.php:25
+#: include/menu.inc.php:182 queue.php:25
 msgid "Queue"
 msgstr "큐"
 
@@ -14125,7 +14155,7 @@ msgid "Regular expression updated"
 msgstr "정규표현식을 갱신하였습니다"
 
 #: app/views/administration.regex.edit.php:29
-#: app/views/administration.regex.list.php:31 include/html.inc.php:912
+#: app/views/administration.regex.list.php:31 include/html.inc.php:901
 msgid "Regular expressions"
 msgstr "정규표현식"
 
@@ -14348,7 +14378,7 @@ msgstr "치환"
 msgid "Replace dependencies"
 msgstr "의존관계를 치환"
 
-#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:126
+#: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:128
 #: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "보고서"
@@ -14369,7 +14399,7 @@ msgstr "리퀘스트 body"
 msgid "Request body type"
 msgstr "리퀘스트 body 타입"
 
-#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1351
+#: host_discovery.php:382 host_discovery.php:707 items.php:862 items.php:1355
 msgid "Request sent successfully"
 msgstr "리퀘스트를 송신을 성공하였습니다"
 
@@ -14392,7 +14422,7 @@ msgstr "필요한 호스트의 액세스 권한"
 msgid "Required performance (vps)"
 msgstr "요구 퍼포먼스 (vps)"
 
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1043
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Zabbix서버의 요구 퍼포먼스를 1초간격으로 기대되는 값을 취득"
 
@@ -14531,7 +14561,7 @@ msgstr "결과가 TRUE"
 msgid "Result type"
 msgstr "결과 타입"
 
-#: app/views/js/popup.itemtestedit.view.js.php:314
+#: app/views/js/popup.itemtestedit.view.js.php:316
 msgid "Result with value map applied"
 msgstr ""
 
@@ -14551,49 +14581,49 @@ msgstr "파일 콘텐츠 습득. text값을 리턴"
 msgid "Retry"
 msgstr "재실행"
 
-#: include/classes/items/CHelpItems.php:1099
+#: include/classes/items/CHelpItems.php:1111
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1103
+#: include/classes/items/CHelpItems.php:1115
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1093
 msgid "Return first column of the first row of the SQL query result."
 msgstr "SQL쿼리 실행결과의 첫 행의 첫 열을 리턴."
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1107
 msgid "Return value of an attribute of MBean object."
 msgstr "MBean오브젝트의 속성값을 리턴."
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:703
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "ICMP ping의 응답시간을 초로 리턴. 예： 0.02"
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:999
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:353
 #: include/classes/items/CHelpItems.php:667
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1047
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:1003
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "호스트상의 특정 체크 종류별의 가동상황을 리턴. 이 아이템의 값이 호스트리스트의 가동 상황 아이콘에 대응함. 유효한 타입： agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:995
 msgid "Returns current maintenance status of the host."
 msgstr "호스트의 현재 메인터넌스 상태를 리턴."
 
-#: include/classes/items/CHelpItems.php:1007
+#: include/classes/items/CHelpItems.php:1019
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "관련되지 않은 Zabbix Java Gateway의 정보를 리턴. 유효한 옵션：ping, version."
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:699
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "ICMP ping 패킷의 실패율을 리턴."
 
@@ -15046,7 +15076,7 @@ msgstr "스크린을 갱신하였습니다"
 #: app/partials/monitoring.host.view.html.php:136
 #: app/partials/monitoring.host.view.html.php:139 app/views/search.php:36
 #: app/views/search.php:134 app/views/search.php:228 app/views/search.php:274
-#: app/views/search.php:275 include/html.inc.php:413 include/menu.inc.php:47
+#: app/views/search.php:275 include/html.inc.php:402 include/menu.inc.php:47
 #: include/views/configuration.template.edit.php:310
 #: include/views/configuration.template.list.php:155
 #: include/views/configuration.template.list.php:270
@@ -15122,7 +15152,7 @@ msgstr "스크립트를 갱신하였습니다"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
-#: app/views/administration.script.list.php:31 include/menu.inc.php:177
+#: app/views/administration.script.list.php:31 include/menu.inc.php:179
 #: jsLoader.php:303
 msgid "Scripts"
 msgstr "스크립트"
@@ -15430,7 +15460,7 @@ msgid "Service updated"
 msgstr "서비스를 갱신하였습니다"
 
 #: app/views/administration.housekeeping.edit.php:79 include/menu.inc.php:55
-#: include/menu.inc.php:118 include/views/configuration.services.edit.php:30
+#: include/menu.inc.php:120 include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.list.php:27 srv_status.php:26
 #: srv_status.php:161
@@ -15452,7 +15482,7 @@ msgid "Set custom time period"
 msgstr "시간범위의 커스터마이즈"
 
 #: app/controllers/CControllerPopupItemTestSend.php:395
-#: app/views/js/popup.itemtestedit.view.js.php:363 include/forms.inc.php:1381
+#: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1381
 #: include/views/js/item.preprocessing.js.php:65
 msgid "Set error to"
 msgstr ""
@@ -15465,7 +15495,7 @@ msgstr "인벤토리 모드의 설정"
 msgid "Set new value"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:357 include/forms.inc.php:1380
+#: app/views/js/popup.itemtestedit.view.js.php:359 include/forms.inc.php:1380
 #: include/views/js/item.preprocessing.js.php:64
 msgid "Set value to"
 msgstr ""
@@ -15544,7 +15574,7 @@ msgstr "심각도를 올렸습니다"
 msgid "Shape"
 msgstr "도형"
 
-#: include/menu.inc.php:202
+#: include/menu.inc.php:204
 msgid "Share"
 msgstr ""
 
@@ -15585,7 +15615,7 @@ msgstr "단축"
 msgid "Show"
 msgstr "보이기"
 
-#: app/views/monitoring.latest.view.php:108
+#: app/views/monitoring.latest.view.php:110
 #: app/views/monitoring.problem.view.php:331
 msgid "Show details"
 msgstr "자세히 표시"
@@ -15725,7 +15755,7 @@ msgstr "HTTP로 로그인"
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/menu.inc.php:240 include/menu.inc.php:243
+#: include/menu.inc.php:242 include/menu.inc.php:245
 msgid "Sign out"
 msgstr "로그 아웃"
 
@@ -15905,7 +15935,7 @@ msgstr "소프트웨어 어플리케이션E"
 msgid "Software architecture information. Returns string"
 msgstr "소프트웨어의 아키텍쳐 정보. string을 리턴."
 
-#: include/classes/api/managers/CHistoryManager.php:1127
+#: include/classes/api/managers/CHistoryManager.php:1125
 msgid "Some of the history for this item may be compressed, deletion is not available."
 msgstr ""
 
@@ -15923,7 +15953,7 @@ msgstr "정렬 순서(0->999)"
 msgid "Sort triggers by"
 msgstr "다음에 의한 트리거의 정렬"
 
-#: include/classes/api/CApiService.php:581
+#: include/classes/api/CApiService.php:579
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "항목 \"%1$s\"에 의한 정렬은 허가되어 있지 않습니다."
@@ -15981,7 +16011,7 @@ msgstr "시작시간"
 msgid "Starting TLS failed."
 msgstr "TLS 접속에 실패하였습니다."
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:963
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Zabbix서버의 기동시각, UNIX 타임스탬프."
 
@@ -16208,11 +16238,11 @@ msgstr "일"
 msgid "Sunday"
 msgstr "일"
 
-#: include/menu.inc.php:195 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:96
 msgid "Support"
 msgstr "지원"
 
-#: include/html.inc.php:993
+#: include/html.inc.php:982
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "억제기한: %1$s"
@@ -16272,7 +16302,7 @@ msgstr "시스템 호스트 명. string을 리턴"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:29
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:129
+#: include/classes/widgets/CWidgetConfig.php:50 include/menu.inc.php:131
 #: include/screens.inc.php:36
 msgid "System information"
 msgstr "시스템 정보"
@@ -16587,8 +16617,8 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
-#: app/views/js/popup.itemtestedit.view.js.php:506
-#: app/views/popup.itemtestedit.view.php:304
+#: app/views/js/popup.itemtestedit.view.js.php:508
+#: app/views/popup.itemtestedit.view.php:313
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1421
 #: include/views/configuration.host.discovery.edit.php:789
@@ -16625,7 +16655,7 @@ msgstr "테스트데이터"
 msgid "Test expressions"
 msgstr "테스트조건식"
 
-#: app/controllers/CControllerPopupItemTestEdit.php:274
+#: app/controllers/CControllerPopupItemTestEdit.php:294
 msgid "Test item"
 msgstr ""
 
@@ -16682,12 +16712,12 @@ msgstr "스크린\"%3$s\"의 X - %1$s Y - %2$s에 있는 스크린 요소의 Y�
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/html.inc.php:712
+#: include/html.inc.php:701
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "어플리케이션이 디스커버리할 수 없게 되었기 때문에 %1$s에 삭제됩니다. (날짜 %2$s at %3$s)"
 
-#: include/html.inc.php:707
+#: include/html.inc.php:696
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 어플리케이션을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
@@ -16703,30 +16733,30 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: include/html.inc.php:739
+#: include/html.inc.php:728
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: include/html.inc.php:734
+#: include/html.inc.php:723
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
-#: include/html.inc.php:658
+#: include/html.inc.php:647
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "호스트 그룹이 발견되지 않게 되었기 때문에 %1$s에 삭제됩니다. (일시 %2$s at %3$s)"
 
-#: include/html.inc.php:653
+#: include/html.inc.php:642
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 호스트 그룹을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
-#: include/html.inc.php:685
+#: include/html.inc.php:674
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "호스트가 발견되지 않게 되었기 때문에 %1$s에 삭제됩니다. (일시 %2$s at %3$s)"
 
-#: include/html.inc.php:680
+#: include/html.inc.php:669
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 호스트를 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
@@ -16742,12 +16772,12 @@ msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
 msgstr[0] "이미지는 맵 %1$s에 사용되고 있습니다."
 
-#: include/html.inc.php:793
+#: include/html.inc.php:782
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "아이템이 발견되지 않게 되었기 때문에 %1$s에 삭제됩니다.(일시 %2$s %3$s)"
 
-#: include/html.inc.php:788
+#: include/html.inc.php:777
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 아이템을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
@@ -16769,12 +16799,12 @@ msgstr "수신된 JSON은 올바르지 않은 JSON-RPC리퀘스트 입니다."
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "수신된 리모트 프로시져는 존재하지 않거나 이용할 수 없습니다."
 
-#: include/html.inc.php:766
+#: include/html.inc.php:755
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: include/html.inc.php:761
+#: include/html.inc.php:750
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
@@ -16888,7 +16918,7 @@ msgstr "시간 (오름차순)"
 msgid "Time (descending)"
 msgstr "시간 (내림차순)"
 
-#: include/classes/items/CHelpItems.php:1011
+#: include/classes/items/CHelpItems.php:1023
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "특정 Zabbix프록시 혹은 프록시 그룹 (<type>이나 <mode>로 특정할 수 있는 것)이<state>로 소비되고 있는 시간의 퍼센테이지."
 
@@ -16896,7 +16926,7 @@ msgstr "특정 Zabbix프록시 혹은 프록시 그룹 (<type>이나 <mode>로 �
 msgid "Time elapsed:"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1027
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -17013,11 +17043,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "트랜잭션이 닫혀있지 않습니다. 종료합니다..."
 
-#: include/classes/items/CHelpItems.php:1085
+#: include/classes/items/CHelpItems.php:1097
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1089
+#: include/classes/items/CHelpItems.php:1101
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17099,7 +17129,7 @@ msgstr "트리거 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "트리거 \"%1$s\"는 링크되어 있는 다른 템플릿에 포함됩니다."
 
-#: include/classes/import/CConfigurationImport.php:1719
+#: include/classes/import/CConfigurationImport.php:1774
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "트리거 \"%1$s\"는 존재하지않는 트리거\"%2$s\"에 의존하고 있습니다."
@@ -17143,7 +17173,7 @@ msgid_plural "Triggers disabled"
 msgstr[0] "트리거를 비활성화 하였습니다"
 
 #: app/views/administration.trigdisplay.edit.php:31
-#: app/views/administration.trigdisplay.edit.php:106 include/html.inc.php:917
+#: app/views/administration.trigdisplay.edit.php:106 include/html.inc.php:906
 msgid "Trigger displaying options"
 msgstr "트리거 표시 옵션"
 
@@ -17219,7 +17249,7 @@ msgstr "트리거 프로토타입 \"%1$s\"는 링크되어있는 다른 템플�
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "트리거 프로토타입 \"%1$s\"에 복수의 디스커버리 규칙에서의 아이템 프로토타입이 포함되어 있습니다."
 
-#: include/classes/import/CConfigurationImport.php:1443
+#: include/classes/import/CConfigurationImport.php:1498
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "트리거 프로토타입 \"%1$s\"는 트리거 \"%2$s\"에 의존하지만 존재하지 않습니다."
@@ -17246,7 +17276,7 @@ msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "트리거 프로토타입을 갱신하였습니다"
 
-#: app/controllers/CControllerPopupGeneric.php:214 include/html.inc.php:484
+#: app/controllers/CControllerPopupGeneric.php:214 include/html.inc.php:473
 #: include/views/configuration.host.discovery.list.php:254
 #: include/views/configuration.host.edit.php:395
 #: include/views/configuration.template.edit.php:268
@@ -17269,7 +17299,7 @@ msgid "Trigger recovery expression must contain at least one host:key reference.
 msgstr "트리거 복구조건식에는 적어도 하나의 host:key에 참조가 필요합니다."
 
 #: app/views/administration.trigseverity.edit.php:31
-#: app/views/administration.trigseverity.edit.php:95 include/html.inc.php:916
+#: app/views/administration.trigseverity.edit.php:95 include/html.inc.php:905
 msgid "Trigger severities"
 msgstr "트리거 심각도"
 
@@ -17299,7 +17329,7 @@ msgstr "트리거를 갱신하였습니다"
 #: app/views/popup.condition.common.php:193 app/views/search.php:40
 #: app/views/search.php:74 app/views/search.php:78 app/views/search.php:228
 #: app/views/search.php:260 app/views/search.php:264 include/forms.inc.php:262
-#: include/html.inc.php:385
+#: include/html.inc.php:374
 #: include/views/configuration.host.discovery.list.php:174
 #: include/views/configuration.host.edit.php:286
 #: include/views/configuration.host.list.php:186
@@ -17322,7 +17352,7 @@ msgstr "트리거"
 msgid "Triggers deleted"
 msgstr "트리거를 삭제하였습니다"
 
-#: include/menu.inc.php:75 include/menu.inc.php:132
+#: include/menu.inc.php:75 include/menu.inc.php:134
 msgid "Triggers top 100"
 msgstr "상위 100 트리거"
 
@@ -17376,7 +17406,7 @@ msgstr "2개의 타입요소를 선택할 필요가 있습니다"
 #: include/hosts.inc.php:1424
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.discovery.edit.php:74
-#: include/views/configuration.graph.edit.php:343
+#: include/views/configuration.graph.edit.php:346
 #: include/views/configuration.host.discovery.edit.php:58
 #: include/views/configuration.host.discovery.edit.php:63
 #: include/views/configuration.host.discovery.edit.php:492
@@ -17602,7 +17632,7 @@ msgstr "단위"
 #: include/discovery.inc.php:151 include/events.inc.php:44
 #: include/events.inc.php:74 include/graphs.inc.php:37
 #: include/graphs.inc.php:67 include/hosts.inc.php:47 include/hosts.inc.php:74
-#: include/html.inc.php:322 include/httptest.inc.php:40
+#: include/html.inc.php:309 include/httptest.inc.php:40
 #: include/httptest.inc.php:57 include/items.inc.php:45
 #: include/items.inc.php:110 include/items.inc.php:133
 #: include/items.inc.php:167 include/maintenances.inc.php:33
@@ -17795,14 +17825,14 @@ msgstr "Up"
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
-#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
+#: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:194
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.correlation.edit.php:164
 #: include/views/configuration.discovery.edit.php:139
-#: include/views/configuration.graph.edit.php:471
+#: include/views/configuration.graph.edit.php:476
 #: include/views/configuration.host.discovery.edit.php:795
 #: include/views/configuration.host.edit.php:755
 #: include/views/configuration.hostgroups.edit.php:61
@@ -17882,7 +17912,7 @@ msgstr ""
 msgid "Upload"
 msgstr "업로드"
 
-#: include/html.inc.php:556 include/html.inc.php:559
+#: include/html.inc.php:545 include/html.inc.php:548
 msgid "Upper level maps"
 msgstr "상위레벨 맵"
 
@@ -17892,7 +17922,7 @@ msgstr "상위레벨 맵"
 msgid "Uptime"
 msgstr "가동 시간"
 
-#: include/classes/items/CHelpItems.php:1055
+#: include/classes/items/CHelpItems.php:1067
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Zabbix서버 프로세스의 가동시간(초)."
 
@@ -18065,7 +18095,7 @@ msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
 #: app/controllers/CControllerPopupGeneric.php:228
 #: app/views/administration.usergroup.edit.php:28
 #: app/views/administration.usergroup.list.php:31
-#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:168
+#: app/views/dashboard.sharing.edit.php:29 include/menu.inc.php:170
 #: include/views/monitoring.screen.edit.php:128
 #: include/views/monitoring.slideconf.edit.php:177
 #: include/views/monitoring.sysmap.edit.php:298
@@ -18117,7 +18147,7 @@ msgstr "유저 세션데이터의 보존기간 \"%1$s\"."
 msgid "User sessions"
 msgstr "유저 세션"
 
-#: include/menu.inc.php:232
+#: include/menu.inc.php:234
 msgid "User settings"
 msgstr ""
 
@@ -18188,223 +18218,223 @@ msgstr ""
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
 #: app/views/dashboard.sharing.edit.php:50
-#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:173
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
 msgid "Users"
 msgstr "유저"
 
-#: include/classes/items/CHelpItems.php:1071
+#: include/classes/items/CHelpItems.php:1083
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware 캐쉬통계. 이용가능한 모드：total, free, pfree, used, pused."
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware 클래스터의 상태, <url> - VMware서비스URL, <name> - VMware클래스터 이름"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:731
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "VMware datastore의 바이트 단위 혹은 전체에서 퍼센트 용량에서의 통계치. 바이트 단위라면 integer, 퍼센트라면 float 로 리턴"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 BIOS uuid, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 벌루닝된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 클래스터 이름, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware하이퍼바이저 데이터스토어 읽기통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <datastore> - 데이터스토어 이름, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware하이퍼바이저 데이터스토어 쓰기통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <datastore> - 데이터스토어 이름, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 모델, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 이름, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware하이퍼바이저 네트워크입력통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware하이퍼바이저 네트워크출력통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware하이퍼바이저 퍼포먼스 카운터, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저의 호스트 이름, <path> - 퍼포먼스 카운터의 패스, <instance> - 퍼포먼스 카운터의 인스턴스"
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 주파수, <url> - VMware 서비스 URL, <uuid> -  VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 모델, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 사용량(Hz), <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상태, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 전체 메모리 사이즈, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 가동시간(초), <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:819
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 사용된 메모리 사이즈, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 벤더 이름, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 버전, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware서비스 풀네임, <url> - VMware서비스URL"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware서비스버전, <url> - VMware서비스URL"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:875
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신에서 발루닝된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:923
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 커밋된 저장용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 압축된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:939
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware가상 머신 디스크 디바이스 읽기 통계, <url> - VMware서비스 URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 디스크 디바이스 인스턴스, <mode> - bps/ops - 매 초 바이트 / 오퍼레이션"
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:943
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware 가상 머신 디스크 디바이스 쓰기 통계, <url> - VMware 서비스 URL, <uuid> - VMware 가상 머신호스트 이름, <instance> - 디스크 디바이스 인스턴스, <mode> - bps/ops - 매 초 바이트/오퍼레이션"
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:947
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware가상 머신 파일 시스템통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <fsname> - 파일 시스템 이름, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 게스트 메모리사용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 호스트 메모리사용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 하이퍼바이저 이름, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 이름, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware가상 머신네트워크인터페이스 입력통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 네트워크인터페이스인스턴스, <mode> - bps/pps - 매 초 바이트/패킷"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware가상 머신네트워크인터페이스 출력통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 네트워크인터페이스인스턴스, <mode> - bps/pps - 매 초 바이트/패킷"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware가상 머신의 퍼포먼스 카운터, <url> - VMware서비스URL, <uuid> - VMware가상 머신의 호스트 이름, <path> - 퍼포먼스 카운터의 패스, <instance> - 퍼포먼스 카운터의 인스턴스"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 전원상태, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 private 메모리 사이즈, <url> - VMware 서비스URL, <uuid> - VMware 가상 머신호스트 이름"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신의 프로세서 유효시간(ms)、<url> - VMware 서비스 URL、<uuid> - VMware 가상 머신 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신의 프로세서사용량(Hz), <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 공유메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 스왑된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 전체 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 커밋되지 않은 저장용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신의 공유하지 않은 저장용량, <url> - VMware서비스 URL, <uuid> - VMware가상 머신 호스트명"
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:935
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신 가동시간, <url> - VMware서비스 URL, <uuid> - VMware 가상머신 호스트명"
 
@@ -18483,11 +18513,11 @@ msgstr "파라미터 \"grid_show\"의 값 \"%1$s\"가 올바르지 않습니다.
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "필드 \"%2$s\"의 값 \"%1$s\"가 너무 깁니다 - %3$d문자. %4$d문자 이내로 설정해주십시오."
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1075
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "값의 캐쉬 효과. 유효한 파라미터：requests, hits, misses."
 
-#: include/classes/items/CHelpItems.php:1059
+#: include/classes/items/CHelpItems.php:1071
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "값의 캐쉬 통계. 유효한 파라미터：total, free, pfree, used, pused."
 
@@ -18516,7 +18546,7 @@ msgstr "값 매핑을 갱신하였습니다"
 
 #: app/views/administration.valuemap.edit.php:29
 #: app/views/administration.valuemap.edit.php:89
-#: app/views/administration.valuemap.list.php:31 include/html.inc.php:914
+#: app/views/administration.valuemap.list.php:31 include/html.inc.php:903
 msgid "Value mapping"
 msgstr "값 매핑"
 
@@ -18586,7 +18616,7 @@ msgstr ""
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Zabbix 에이전트의 버전. string을 리턴"
 
-#: include/classes/items/CHelpItems.php:1067
+#: include/classes/items/CHelpItems.php:1079
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
@@ -18697,7 +18727,7 @@ msgstr "Web시나리오 \"%1$s\"는 호스트 \"%2$s\"에 이미 존재합니다
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Web시나리오\"%1$s\"는 이미 존재합니다."
 
-#: include/classes/import/CConfigurationImport.php:1493
+#: include/classes/import/CConfigurationImport.php:1548
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"상의 Web시나리오 \"%1$s\": 어플리케이션 \"%3$s\"이 존재하지 않습니다."
@@ -18724,7 +18754,7 @@ msgstr[0] "Web시나리오를 활성화 하였습니다"
 msgid "Web scenario updated"
 msgstr "Web시나리오를 갱신했습니다."
 
-#: include/html.inc.php:437 include/views/configuration.host.edit.php:462
+#: include/html.inc.php:426 include/views/configuration.host.edit.php:462
 #: include/views/configuration.template.edit.php:332
 #: include/views/conf.import.php:42
 msgid "Web scenarios"
@@ -18840,7 +18870,7 @@ msgstr "마법사"
 
 #: app/views/administration.workingtime.edit.php:27
 #: app/views/administration.workingtime.edit.php:31
-#: app/views/administration.workingtime.edit.php:33 include/html.inc.php:915
+#: app/views/administration.workingtime.edit.php:33 include/html.inc.php:904
 msgid "Working time"
 msgstr "워킹 타임"
 
@@ -18974,7 +19004,7 @@ msgstr "Y축의 최댓값은 Y축의 최솟값보다도 큰 숫자로 설정해�
 msgid "Y axis MIN value"
 msgstr "Y축 최솟값"
 
-#: include/views/configuration.graph.edit.php:352
+#: include/views/configuration.graph.edit.php:357
 msgid "Y axis side"
 msgstr "Y축"
 
@@ -19159,7 +19189,7 @@ msgstr "Zabbix"
 msgid "Zabbix Admin"
 msgstr "ZABBIX 관리자"
 
-#: include/menu.inc.php:205
+#: include/menu.inc.php:207
 msgid "Zabbix Share"
 msgstr "Zabbix Share"
 
@@ -19167,7 +19197,7 @@ msgstr "Zabbix Share"
 msgid "Zabbix Super Admin"
 msgstr "ZABBIX 최고 관리자"
 
-#: include/menu.inc.php:198
+#: include/menu.inc.php:200
 msgid "Zabbix Technical Support"
 msgstr "Zabbix 기술 지원"
 
@@ -19596,10 +19626,10 @@ msgstr "변경할 수 없습니다"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
-#: include/classes/import/CConfigurationImport.php:775
-#: include/classes/import/CConfigurationImport.php:986
-#: include/classes/import/CConfigurationImport.php:1133
-#: include/classes/import/CConfigurationImport.php:2779
+#: include/classes/import/CConfigurationImport.php:786
+#: include/classes/import/CConfigurationImport.php:1006
+#: include/classes/import/CConfigurationImport.php:1167
+#: include/classes/import/CConfigurationImport.php:2834
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -19659,7 +19689,7 @@ msgid "circular dependency is not allowed"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1925
-#: include/classes/import/CConfigurationImport.php:2793
+#: include/classes/import/CConfigurationImport.php:2848
 msgid "circular item dependency is not allowed"
 msgstr "모순된 아이템의 의존관계는 허가되지 않습니다."
 
@@ -20122,8 +20152,8 @@ msgid "maximum dependent items count reached"
 msgstr "의존 아이템수가 최대 수에 도달하였습니다"
 
 #: include/classes/api/services/CItemGeneral.php:2005
-#: include/classes/import/CConfigurationImport.php:2741
-#: include/classes/import/CConfigurationImport.php:2808
+#: include/classes/import/CConfigurationImport.php:2796
+#: include/classes/import/CConfigurationImport.php:2863
 msgid "maximum number of dependency levels reached"
 msgstr "의존 레벨 수가 최대수에 도달하였습니다"
 
@@ -20651,8 +20681,8 @@ msgstr "지원되지 않는 버전의 번호입니다."
 #: app/views/administration.usergroup.edit.php:183
 #: app/views/js/monitoring.host.view.js.php:36
 #: app/views/js/monitoring.problem.view.js.php:52
-#: app/views/js/popup.itemtestedit.view.js.php:435
-#: app/views/js/popup.itemtestedit.view.js.php:446
+#: app/views/js/popup.itemtestedit.view.js.php:437
+#: app/views/js/popup.itemtestedit.view.js.php:448
 #: app/views/monitoring.host.view.php:69
 #: app/views/monitoring.problem.view.php:257
 #: app/views/popup.itemtestedit.view.php:82
@@ -20688,11 +20718,11 @@ msgstr "값"
 msgid "value \"%1$s\" already exists"
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:860
-#: include/classes/import/CConfigurationImport.php:898
-#: include/classes/import/CConfigurationImport.php:2637
-#: include/classes/import/CConfigurationImport.php:2751
-#: include/classes/import/CConfigurationImport.php:2802
+#: include/classes/import/CConfigurationImport.php:871
+#: include/classes/import/CConfigurationImport.php:909
+#: include/classes/import/CConfigurationImport.php:2692
+#: include/classes/import/CConfigurationImport.php:2806
+#: include/classes/import/CConfigurationImport.php:2857
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "값 \"%1$s\"가 존재하지 않습니다"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-30T14:23:21Z</date>
+   <date>2020-09-14T14:08:40Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -149,72 +149,86 @@ FROM v$pdbs;</params>
                </applications>
             </item>
             <item>
-               <name>Oracle: Get system metrics</name>
+               <name>Oracle: Get system metrics (1)</name>
                <type>ODBC</type>
-               <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                <delay>0;m0-59</delay>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT 'SYS::' || METRIC_NAME AS METRIC, ROUND(VALUE,3) as VALUE
+               <params>SELECT 'SYS::' || METRIC_NAME AS METRIC, ROUND(VALUE,3) AS VALUE
  FROM V$SYSMETRIC WHERE GROUP_ID = 2
 UNION
- SELECT 'SYSPARAM::' || INITCAP(NAME) AS METRIC, to_number(VALUE)
- FROM V$SYSTEM_PARAMETER WHERE NAME IN ('sessions', 'processes', 'db_files')
+  SELECT 'SYSPARAM::' || INITCAP(NAME), to_number(VALUE)
+  FROM V$SYSTEM_PARAMETER WHERE NAME IN ('sessions', 'processes', 'db_files')
 UNION
- SELECT 'SESSION::' || INITCAP(STATUS)|| ' ' || INITCAP(TYPE) AS METRIC, COUNT(*) AS VALUE
- FROM V$SESSION GROUP BY STATUS, TYPE
+ SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
 UNION
- SELECT 'SESSION::Total', COUNT(*) AS VALUE
-  FROM V$SESSION
- UNION
-  SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
+SELECT 'SESSION::Lock rate' ,(cnt_block / cnt_all)* 100 pct
+FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM v$session)
 UNION
- SELECT 'SESSION::Lock rate' ,(cnt_block / cnt_all)* 100 pct
- FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM gv$session)
+ SELECT 'SESSION::Total', COUNT(*) FROM V$SESSION
 UNION
- SELECT 'SESSION::Concurrency rate', NVL(ROUND(SUM(duty_act.cnt*100 / num_cores.val)), 0)
- FROM
- ( SELECT DECODE(session_state, 'ON CPU', 'CPU', wait_class) wait_class, ROUND(COUNT(*)/(60 * 15), 1) cnt
- FROM v$active_session_history sh
- WHERE sh.sample_time &gt;= SYSDATE - 15 / 1440 AND DECODE(session_state, 'ON CPU', 'CPU', wait_class) IN('Concurrency')
- GROUP BY DECODE(session_state, 'ON CPU', 'CPU', wait_class)) duty_act,
- ( SELECT SUM(value) val FROM v$osstat WHERE stat_name = 'NUM_CPU_CORES') num_cores
+SELECT 'SESSION::' || INITCAP(STATUS)|| ' ' || INITCAP(TYPE), COUNT(*) FROM V$SESSION GROUP BY STATUS, TYPE
+UNION
+SELECT 'SESSION::Concurrency rate', NVL(ROUND(SUM(duty_act.cnt*100 / num_cores.val)), 0)
+FROM
+( SELECT DECODE(session_state, 'ON CPU', 'CPU', wait_class) wait_class, ROUND(COUNT(*)/(60 * 15), 1) cnt
+FROM v$active_session_history sh
+WHERE sh.sample_time &gt;= SYSDATE - 15 / 1440 AND DECODE(session_state, 'ON CPU', 'CPU', wait_class) IN('Concurrency')
+GROUP BY DECODE(session_state, 'ON CPU', 'CPU', wait_class)) duty_act,
+( SELECT SUM(value) val FROM v$osstat WHERE stat_name = 'NUM_CPU_CORES') num_cores
 UNION
  SELECT 'PGA::' || INITCAP(NAME), VALUE FROM V$PGASTAT
+ UNION
+SELECT 'PROC::Procnum', COUNT(*) FROM v$process
 UNION
- SELECT 'FRA::Space Limit' AS METRIC, space_limit AS VALUE FROM V$RECOVERY_FILE_DEST
+SELECT 'DATAFILE::Count', COUNT(*) FROM v$datafile;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>The item gets system metric values.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Oracle: Get system metrics (2)</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
+               <delay>0;m0-59</delay>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT 'SGA::' || INITCAP(pool) AS METRIC , SUM(bytes) AS VALUE FROM V$SGASTAT
+WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
 UNION
- SELECT 'FRA::Space Used', space_used AS VALUE FROM V$RECOVERY_FILE_DEST
+SELECT 'SGA::Shared Pool', SUM(bytes) FROM V$SGASTAT
+WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory', 'sql area')
 UNION
- SELECT 'FRA::Space Reclaimable', space_reclaimable AS VALUE FROM V$RECOVERY_FILE_DEST
+SELECT 'SGA::' || INITCAP(name), bytes FROM V$SGASTAT
+WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
 UNION
- SELECT 'FRA::Number Of Files', number_of_files AS VALUE FROM V$RECOVERY_FILE_DEST
+SELECT 'SGA::Buffer_Cache', SUM(bytes) FROM V$SGASTAT
+WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers')
+UNION
+SELECT 'REDO::Available', count(*) from v$log t where t.status in ('INACTIVE', 'UNUSED')
+UNION
+SELECT 'USER::Expire password', ROUND(DECODE(SIGN(NVL(u.expiry_date, SYSDATE + 999) - SYSDATE),-1, 0, NVL(u.expiry_date, SYSDATE + 999) - SYSDATE)) exp_passwd_days_before
+FROM dba_users u WHERE username = UPPER('{$ORACLE.USER}')
+UNION
+ SELECT 'FRA::Space Limit', space_limit FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Space Used', space_used FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Space Reclaimable', space_reclaimable FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Number Of Files', number_of_files FROM V$RECOVERY_FILE_DEST
 UNION
  SELECT 'FRA::Usable Pct', DECODE(space_limit, 0, 0,(100-(100 *(space_used-space_reclaimable)/ space_limit))) AS VALUE FROM V$RECOVERY_FILE_DEST
 UNION
- SELECT 'FRA::Restore Point', COUNT(*) AS VALUE FROM V$RESTORE_POINT
-UNION
- SELECT 'PROC::Procnum', COUNT(*) FROM v$process
-UNION
- SELECT 'DATAFILE::Count', COUNT(*) FROM v$datafile
-UNION
- SELECT 'SGA::' || INITCAP(pool), SUM(bytes) FROM V$SGASTAT
-  WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
-UNION
- SELECT 'SGA::Shared Pool', SUM(bytes) FROM V$SGASTAT
-  WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory', 'sql area')
-UNION
- SELECT 'SGA::' || INITCAP(name), bytes FROM V$SGASTAT
-  WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
-UNION
- SELECT 'SGA::Buffer_Cache', SUM(bytes) FROM V$SGASTAT
-  WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers')
-UNION
- SELECT 'REDO::Available', count(*) from v$log t where t.status in ('INACTIVE', 'UNUSED')
-UNION
-SELECT 'USER::Expire password', ROUND(DECODE(SIGN(NVL(u.expiry_date, SYSDATE + 999) - SYSDATE),-1, 0, NVL(u.expiry_date, SYSDATE + 999) - SYSDATE)) exp_passwd_days_before
- FROM dba_users u WHERE username = UPPER('{$ORACLE.USER}');</params>
+ SELECT 'FRA::Restore Point', COUNT(*) FROM V$RESTORE_POINT;</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
                <description>The item gets system metric values.</description>
@@ -231,65 +245,7 @@ SELECT 'USER::Expire password', ROUND(DECODE(SIGN(NVL(u.expiry_date, SYSDATE + 9
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT
-df.tablespace_name AS tablespace,
-df.type AS TYPE,
-SUM(df.bytes) AS used_bytes,
-SUM(df.max_bytes) AS max_bytes,
-SUM(f.free) AS free_bytes,
-ROUND(SUM(df.bytes)/ SUM(df.max_bytes)* 100, 2) AS used_pct,
-DECODE(df.status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status
-FROM ( SELECT
-   ddf.file_id,
-   dt.contents AS TYPE,
-   dt.STATUS ,
-   ddf.file_name,
-   ddf.tablespace_name,
-   TRUNC(ddf.bytes) AS bytes,
-   TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes
-   FROM
-    dba_data_files ddf,
-    dba_tablespaces dt
-  WHERE
-   ddf.tablespace_name = dt.tablespace_name ) df,
-   ( SELECT TRUNC(SUM(bytes)) AS FREE, file_id FROM dba_free_space GROUP BY file_id ) f
-   WHERE df.file_id = f.file_id (+)
-   GROUP BY df.tablespace_name, df.TYPE, df.status
-UNION ALL
-SELECT
-   Y.name AS tablespace_name,
-   Y.type AS TYPE,
-   SUM(Y.bytes) AS bytes,
-   SUM(Y.max_bytes) AS max_bytes,
-   MAX(NVL(Y.free_bytes, 0)) AS FREE,
-   ROUND(SUM(Y.bytes)/ SUM(Y.max_bytes)* 100, 2) AS used_pct,
-   DECODE(Y.tbs_status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status
-   FROM ( SELECT
-     dtf.tablespace_name AS name,
-     dt.contents AS TYPE,
-     dt.STATUS AS tbs_status,
-     dtf.status AS status,
-     dtf.bytes AS bytes,
-     (SELECT
-       ((f.total_blocks - s.tot_used_blocks)* vp.value)
-       FROM ( SELECT tablespace_name, SUM(used_blocks) tot_used_blocks FROM gv$sort_segment
-          WHERE tablespace_name != 'DUMMY'
-          GROUP BY tablespace_name) s,
-     ( SELECT tablespace_name, SUM(blocks) total_blocks FROM dba_temp_files
-       WHERE tablespace_name != 'DUMMY'
-       GROUP BY tablespace_name) f,
-     ( SELECT value FROM v$parameter WHERE name = 'db_block_size') vp
-   WHERE
-     f.tablespace_name = s.tablespace_name
-     AND f.tablespace_name = dtf.tablespace_name ) AS free_bytes,
-     CASE WHEN dtf.maxbytes = 0 THEN dtf.bytes
-     ELSE dtf.maxbytes END AS max_bytes
-   FROM
-    sys.dba_temp_files dtf,
-    sys.dba_tablespaces dt
-   WHERE
-   dtf.tablespace_name = dt.tablespace_name ) Y
-   GROUP BY Y.name, Y.TYPE, Y.tbs_status ORDER BY tablespace;</params>
+               <params>SELECT df.tablespace_name AS tablespace, df.type AS TYPE, SUM(df.bytes) AS used_bytes, SUM(df.max_bytes) AS max_bytes, SUM(f.free) AS free_bytes, ROUND(SUM(df.bytes)/ SUM(df.max_bytes)* 100, 2) AS used_pct, DECODE(df.status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status FROM ( SELECT ddf.file_id, dt.contents AS TYPE, dt.STATUS , ddf.file_name, ddf.tablespace_name, TRUNC(ddf.bytes) AS bytes, TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes FROM dba_data_files ddf, dba_tablespaces dt WHERE ddf.tablespace_name = dt.tablespace_name ) df, ( SELECT TRUNC(SUM(bytes)) AS FREE, file_id FROM dba_free_space GROUP BY file_id ) f WHERE df.file_id = f.file_id (+) GROUP BY df.tablespace_name, df.TYPE, df.status UNION ALL SELECT Y.name AS tablespace_name, Y.type AS TYPE, SUM(Y.bytes) AS bytes, SUM(Y.max_bytes) AS max_bytes, MAX(NVL(Y.free_bytes, 0)) AS FREE, ROUND(SUM(Y.bytes)/ SUM(Y.max_bytes)* 100, 2) AS used_pct, DECODE(Y.tbs_status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status FROM ( SELECT dtf.tablespace_name AS name, dt.contents AS TYPE, dt.STATUS AS tbs_status, dtf.status AS status, dtf.bytes AS bytes, (SELECT ((f.total_blocks - s.tot_used_blocks)* vp.value) FROM ( SELECT tablespace_name, SUM(used_blocks) tot_used_blocks FROM gv$sort_segment WHERE tablespace_name != 'DUMMY' GROUP BY tablespace_name) s, ( SELECT tablespace_name, SUM(blocks) total_blocks FROM dba_temp_files WHERE tablespace_name != 'DUMMY' GROUP BY tablespace_name) f, ( SELECT value FROM v$parameter WHERE name = 'db_block_size') vp WHERE f.tablespace_name = s.tablespace_name AND f.tablespace_name = dtf.tablespace_name ) AS free_bytes, CASE WHEN dtf.maxbytes = 0 THEN dtf.bytes ELSE dtf.maxbytes END AS max_bytes FROM sys.dba_temp_files dtf, sys.dba_tablespaces dt WHERE dtf.tablespace_name = dt.tablespace_name ) Y GROUP BY Y.name, Y.TYPE, Y.tbs_status ORDER BY tablespace;</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
                <description>Get tablespaces stats.</description>
@@ -340,7 +296,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -363,7 +319,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -386,7 +342,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -435,7 +391,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -457,7 +413,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -479,7 +435,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -503,7 +459,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -527,7 +483,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -551,7 +507,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -573,7 +529,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -595,7 +551,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -619,7 +575,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -643,7 +599,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -667,7 +623,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -689,7 +645,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -714,7 +670,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -739,7 +695,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -748,7 +704,7 @@ SELECT
                <key>oracle.fra_space_used</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Amount of disk space (in bytes) used by fast recovery area files created in current and all previous fast recovery areas.</description>
                <applications>
                   <application>
@@ -764,7 +720,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -789,7 +745,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -813,7 +769,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -953,7 +909,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -977,7 +933,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1001,7 +957,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1025,7 +981,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1048,7 +1004,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1071,7 +1027,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1095,7 +1051,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1119,7 +1075,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1143,7 +1099,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1167,7 +1123,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1188,7 +1144,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1210,7 +1166,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1232,7 +1188,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1263,7 +1219,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1291,7 +1247,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1316,7 +1272,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1341,7 +1297,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1365,7 +1321,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1396,7 +1352,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1421,7 +1377,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1443,7 +1399,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1467,7 +1423,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1498,7 +1454,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1515,7 +1471,7 @@ SELECT
                <key>oracle.sga_buffer_cache</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The size of the cache of standard blocks.</description>
                <applications>
                   <application>
@@ -1531,7 +1487,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1540,7 +1496,7 @@ SELECT
                <key>oracle.sga_fixed</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The fixed SGA is an internal housekeeping area.</description>
                <applications>
                   <application>
@@ -1556,7 +1512,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1565,7 +1521,7 @@ SELECT
                <key>oracle.sga_java_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the java pool.</description>
                <applications>
                   <application>
@@ -1581,7 +1537,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1590,7 +1546,7 @@ SELECT
                <key>oracle.sga_large_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the large pool.</description>
                <applications>
                   <application>
@@ -1606,7 +1562,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1615,7 +1571,7 @@ SELECT
                <key>oracle.sga_log_buffer</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The number of bytes allocated for the redo log buffer.</description>
                <applications>
                   <application>
@@ -1631,7 +1587,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1640,7 +1596,7 @@ SELECT
                <key>oracle.sga_shared_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the shared pool.</description>
                <applications>
                   <application>
@@ -1656,7 +1612,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1680,7 +1636,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1711,7 +1667,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1735,7 +1691,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1758,7 +1714,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1781,7 +1737,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1804,7 +1760,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -1873,7 +1829,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_2,"{$ORACLE.DSN}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1905,7 +1861,7 @@ SELECT
                   </step>
                </preprocessing>
                <master_item>
-                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+                  <key>db.odbc.get[get_system_metrics_1,"{$ORACLE.DSN}"]</key>
                </master_item>
             </item>
             <item>
@@ -2378,7 +2334,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                <type>ODBC</type>
                <key>db.odbc.discovery[pdb_list,"{$ORACLE.DSN}"]</key>
                <delay>1h</delay>
-               <params>SELECT name as DBNAME, 'PDB' AS TYPE  FROM V$PDBS;</params>
+               <params>SELECT name as DBNAME FROM V$PDBS;</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
                <filter>
@@ -2408,7 +2364,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <description>1 - 'MOUNTED', 2 - 'READ WRITE', 3 - 'READ ONLY', 4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode)</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Oracle {#TYPE}</name>
+                           <name>Oracle PDB</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2475,12 +2431,36 @@ contents  FROM DBA_TABLESPACES;</params>
                <description>Scanning tablespaces in DBMS.</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Currently allocated bytes for tablespace (sum of the current size of datafiles).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Oracle TBS '{#TABLESPACE}': Tablespace free, bytes</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_free_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Free bytes of allocated space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2497,12 +2477,13 @@ contents  FROM DBA_TABLESPACES;</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace max size, bytes</name>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Maximum size of tablespace.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2565,28 +2546,6 @@ contents  FROM DBA_TABLESPACES;</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage, bytes</name>
-                     <type>DEPENDENT</type>
-                     <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <units>B</units>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
                      <name>Oracle TBS '{#TABLESPACE}': Tablespace usage percent</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
@@ -2594,6 +2553,7 @@ contents  FROM DBA_TABLESPACES;</params>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
+                     <description>Allocated bytes/Max bytes*100</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2637,7 +2597,7 @@ contents  FROM DBA_TABLESPACES;</params>
                            <color>1A7C11</color>
                            <item>
                               <host>Template DB Oracle by ODBC</host>
-                              <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                              <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>

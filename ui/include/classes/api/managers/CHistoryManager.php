@@ -1107,7 +1107,6 @@ class CHistoryManager {
 	 */
 	private function deleteHistoryFromSql(array $items) {
 		global $DB;
-		$config = select_config();
 
 		$item_tables = array_map('self::getTableName', array_unique($items));
 		$table_names = array_flip(self::getTableName());
@@ -1122,8 +1121,7 @@ class CHistoryManager {
 			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
 		}
 
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
-				&& PostgresqlDbBackend::isCompressed($item_tables)) {
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && PostgresqlDbBackend::isCompressed($item_tables)) {
 			error(_('Some of the history for this item may be compressed, deletion is not available.'));
 
 			return false;

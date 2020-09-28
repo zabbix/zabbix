@@ -136,6 +136,8 @@ typedef struct
 }
 zbx_hashset_t;
 
+#define ZBX_HASHSET_ENTRY_OFFSET	offsetof(ZBX_HASHSET_ENTRY_T, data)
+
 void	zbx_hashset_create(zbx_hashset_t *hs, size_t init_size,
 				zbx_hash_func_t hash_func,
 				zbx_compare_func_t compare_func);

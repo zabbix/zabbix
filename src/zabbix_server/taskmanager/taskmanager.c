@@ -28,6 +28,7 @@
 #include "../actions.h"
 #include "export.h"
 #include "taskmanager.h"
+#include "zbxdiag.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -163,26 +164,6 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 	}
 
 	DBfree_result(result);
-
-	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_EXPIRED, taskid);
-
-	DBcommit();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: tm_expire_data                                                   *
- *                                                                            *
- * Purpose: process expired data task                                         *
- *                                                                            *
- ******************************************************************************/
-static void	tm_expire_data(zbx_uint64_t taskid)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid:" ZBX_FS_UI64, __func__, taskid);
-
-	DBbegin();
 
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_EXPIRED, taskid);
 
@@ -533,6 +514,114 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_process_diaginfo                                              *
+ *                                                                            *
+ * Purpose: process diaginfo task                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
+{
+	zbx_tm_task_t		*task;
+	int			ret;
+	char			*info = NULL;
+	struct zbx_json_parse	jp_data;
+
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+
+	if (SUCCEED == zbx_json_open(data, &jp_data))
+	{
+		ret = zbx_diag_get_info(&jp_data, &info);
+		task->data = zbx_tm_data_result_create(taskid, ret, info);
+		zbx_free(info);
+	}
+	else
+		task->data = zbx_tm_data_result_create(taskid, FAIL, zbx_json_strerror());
+
+	zbx_tm_save_task(task);
+	zbx_tm_task_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_process_data                                                  *
+ *                                                                            *
+ * Purpose: process data tasks                                                *
+ *                                                                            *
+ * Return value: The number of successfully processed tasks                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_process_data(zbx_vector_uint64_t *taskids)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			processed_num = 0, data_type;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	done_taskids;
+	zbx_uint64_t		taskid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, taskids->values_num);
+
+	DBbegin();
+
+	zbx_vector_uint64_create(&done_taskids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select t.taskid,td.type,td.data"
+			" from task t"
+			" left join task_data td"
+				" on t.taskid=td.taskid"
+			" where t.proxy_hostid is null"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", taskids->values, taskids->values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(taskid, row[0]);
+
+		if (SUCCEED == DBis_null(row[1]))
+		{
+			zbx_vector_uint64_append(&done_taskids, taskid);
+			continue;
+		}
+
+		data_type = atoi(row[1]);
+
+		switch (data_type)
+		{
+			case ZBX_TM_DATA_TYPE_DIAGINFO:
+				tm_process_diaginfo(taskid, row[2]);
+				zbx_vector_uint64_append(&done_taskids, taskid);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+	DBfree_result(result);
+
+	if (0 != (processed_num = done_taskids.values_num))
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
+				ZBX_TM_STATUS_DONE);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", done_taskids.values,
+				done_taskids.values_num);
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&done_taskids);
+
+	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
+
+	return processed_num;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_expire_generic_tasks                                          *
  *                                                                            *
  * Purpose: expires tasks that don't require specific expiration handling     *
@@ -548,6 +637,7 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where", ZBX_TM_STATUS_EXPIRED);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
 	DBexecute("%s", sql);
+	zbx_free(sql);
 
 	return taskids->values_num;
 }
@@ -567,11 +657,12 @@ static int	tm_process_tasks(int now)
 	DB_RESULT		result;
 	int			type, processed_num = 0, expired_num = 0, clock, ttl;
 	zbx_uint64_t		taskid;
-	zbx_vector_uint64_t	ack_taskids, check_now_taskids, expire_taskids;
+	zbx_vector_uint64_t	ack_taskids, check_now_taskids, expire_taskids, data_taskids;
 
 	zbx_vector_uint64_create(&ack_taskids);
 	zbx_vector_uint64_create(&check_now_taskids);
 	zbx_vector_uint64_create(&expire_taskids);
+	zbx_vector_uint64_create(&data_taskids);
 
 	result = DBselect("select taskid,type,clock,ttl"
 				" from task"
@@ -618,10 +709,9 @@ static int	tm_process_tasks(int now)
 			case ZBX_TM_TASK_DATA:
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
-				{
-					tm_expire_data(taskid);
-					expired_num++;
-				}
+					zbx_vector_uint64_append(&expire_taskids, taskid);
+				else
+					zbx_vector_uint64_append(&data_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA_RESULT:
 				tm_process_data_result(taskid);
@@ -641,9 +731,13 @@ static int	tm_process_tasks(int now)
 	if (0 < check_now_taskids.values_num)
 		processed_num += tm_process_check_now(&check_now_taskids);
 
+	if (0 < data_taskids.values_num)
+		processed_num += tm_process_data(&data_taskids);
+
 	if (0 < expire_taskids.values_num)
 		expired_num += tm_expire_generic_tasks(&expire_taskids);
 
+	zbx_vector_uint64_destroy(&data_taskids);
 	zbx_vector_uint64_destroy(&expire_taskids);
 	zbx_vector_uint64_destroy(&check_now_taskids);
 	zbx_vector_uint64_destroy(&ack_taskids);
