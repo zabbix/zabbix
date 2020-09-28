@@ -74,7 +74,7 @@ $output = [
 			'title' => _('Apply'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'window.dashboard.applyProperties(overlay);'
+			'action' => 'dashboard.applyProperties(overlay);'
 		]
 	]
 ];

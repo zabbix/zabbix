@@ -29,6 +29,7 @@ $this->addJsFile('dashboard.grid.js');
 $this->addJsFile('multiselect.js');
 $this->addJsFile('class.cclock.js');
 
+$this->includeJsFile('dashboard/class.template-dashboard.js.php');
 $this->includeJsFile('configuration.dashboard.edit.js.php');
 
 (new CWidget())
@@ -58,7 +59,7 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 	->show();
 
 (new CScriptTag(
-	'initializeDashboard('.
+	'initializeTemplateDashboard('.
 		json_encode($data['dashboard']).','.
 		json_encode($data['widget_defaults']).','.
 		json_encode($data['page']).

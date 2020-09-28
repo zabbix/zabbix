@@ -102,7 +102,7 @@ $output = [
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'window.dashboard_share.submit(overlay);'
+			'action' => 'dashboard_share.submit(overlay);'
 		]
 	]
 ];

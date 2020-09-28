@@ -81,7 +81,7 @@ $widget
 	->show();
 
 (new CScriptTag(
-	'initializeDashboard('.
+	'initializeHostDashboard('.
 		json_encode($data['host']).','.
 		json_encode($data['dashboard']).','.
 		json_encode($data['widget_defaults']).','.

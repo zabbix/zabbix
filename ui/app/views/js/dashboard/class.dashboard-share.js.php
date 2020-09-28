@@ -39,7 +39,7 @@
 	(new CCol(
 		(new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('window.dashboard_share.removeUserGroupShares("#{usrgrpid}");')
+			->onClick('dashboard_share.removeUserGroupShares("#{usrgrpid}");')
 			->removeId()
 	))->addClass(ZBX_STYLE_NOWRAP)
 ]))
@@ -63,7 +63,7 @@
 	(new CCol(
 		(new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('window.dashboard_share.removeUserShares("#{id}");')
+			->onClick('dashboard_share.removeUserShares("#{id}");')
 			->removeId()
 	))->addClass(ZBX_STYLE_NOWRAP)
 ]))
@@ -73,7 +73,7 @@
 </script>
 
 <script>
-	class dashboardShareSingleton {
+	class DashboardShare {
 		constructor(data) {
 			this.data = data;
 		}
@@ -182,17 +182,5 @@
 				}
 			}
 		}
-	}
-
-	function initializeDashboardShare(data) {
-		window.dashboard_share = new dashboardShareSingleton(data);
-		window.dashboard_share.live();
-	}
-
-	/**
-	 * @see init.js add.popup event
-	 */
-	function addPopupValues(list) {
-		window.dashboard_share.addPopupValues(list);
 	}
 </script>
