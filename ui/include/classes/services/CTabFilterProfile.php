@@ -168,7 +168,7 @@ class CTabFilterProfile {
 	 * - If filter_name is empty select home filter (is used for hotlinking from other pages to home filter)
 	 * - If filter_name does not exists in stored filters, select home filer
 	 * - If filter_name exists and is not unique among stored filters, select last opened filter if it name match else
-	 *   select first filter from matched flters list.
+	 *   select first filter from matched filters list.
 	 *
 	 * @param array $input  Tab filter properties array.
 	 */

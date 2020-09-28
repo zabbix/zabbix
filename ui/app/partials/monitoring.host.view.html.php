@@ -21,10 +21,6 @@
 
 $form = (new CForm())->setName('host_view');
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'host.view')
-	->getUrl();
-
 $table = (new CTableInfo());
 
 $view_url = $data['view_curl']->getUrl();

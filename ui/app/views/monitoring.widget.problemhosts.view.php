@@ -39,7 +39,7 @@ $url_group = (new CUrl('zabbix.php'))
 	->setArgument('action', 'problem.view')
 	->setArgument('filter_name', '')
 	->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
-	->setArgument('hostids', [$data['filter']['hostids']])
+	->setArgument('hostids', $data['filter']['hostids'])
 	->setArgument('name', $data['filter']['problem'])
 	->setArgument('show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 		? ZBX_PROBLEM_SUPPRESSED_TRUE
