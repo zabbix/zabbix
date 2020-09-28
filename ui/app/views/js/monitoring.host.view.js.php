@@ -33,6 +33,7 @@
 			this.refresh_interval = <?= $data['refresh_interval'] ?>;
 			this.running = false;
 			this.timeout = null;
+			this.deferred = null;
 
 			if (filter_options) {
 				this.refresh_counters = this.createCountersRefresh(1);
@@ -81,9 +82,9 @@
 			refresh: function() {
 				this.setLoading();
 
-				var deferred = $.getJSON(this.refresh_url);
+				this.deferred = $.getJSON(this.refresh_url);
 
-				return this.bindDataEvents(deferred);
+				return this.bindDataEvents(this.deferred);
 			},
 			setLoading: function() {
 				this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
@@ -136,6 +137,7 @@
 			},
 			onDataAlways: function() {
 				if (this.running) {
+					this.deferred = null;
 					this.scheduleRefresh();
 				}
 			},
@@ -150,6 +152,10 @@
 				if (this.timeout !== null) {
 					clearTimeout(this.timeout);
 					this.timeout = null;
+				}
+
+				if (this.deferred) {
+					this.deferred.abort();
 				}
 			},
 			start: function() {

@@ -31,7 +31,7 @@ class CTabFilter extends CBaseComponent {
 		this._filters_footer = null;
 		// NodeList of available templates (<script> DOM elements).
 		this._templates = {};
-		this._fetchpromise = null;
+		this._fetch = {};
 		this._idx_namespace = options.idx;
 		this._timeselector = null;
 
@@ -220,20 +220,29 @@ class CTabFilter extends CBaseComponent {
 	 * @return {Promise}
 	 */
 	profileUpdate(property, body) {
-		if (this._fetch && 'abort' in this._fetch && !this._fetch.aborted) {
-			this._fetch.abort();
+		let url = new Curl('zabbix.php', false),
+			signal = null;
+
+		url.setArgument('action', 'tabfilter.profile.update');
+
+		if (this._fetch[property] && 'abort' in this._fetch[property] && !this._fetch[property].aborted) {
+			this._fetch[property].abort();
 		}
 
 		body.idx = this._idx_namespace + '.' + property;
-		this._fetch = new AbortController();
 
-		return fetch('zabbix.php?action=tabfilter.profile.update', {
+		if (property !== 'properties') {
+			this._fetch[property] = new AbortController();
+			signal = this._fetch[property].signal;
+		}
+
+		return fetch(url.getUrl(), {
 			method: 'POST',
-			signal: this._fetch.signal,
+			signal: signal,
 			body: new URLSearchParams(body)
 		})
 		.then(() => {
-			this._fetch = null;
+			this._fetch[property] = null;
 		})
 		.catch(() => {
 			// User aborted a request.
@@ -450,36 +459,22 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Action on 'chevron left' button press. Select previous active tab filter.
 			 */
-			selectPrevTab: (ev) => {
+			selectPrevTab: () => {
 				let index = this._items.indexOf(this._active_item);
 
 				if (index > 0) {
-					let expanded = this._active_item._expanded;
-
-					this._active_item.removeExpanded();
-					this.setSelectedItem(this._items[index - 1]);
-
-					if (expanded) {
-						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
-					}
+					this._items[index - 1].fire(TABFILTERITEM_EVENT_SELECT);
 				}
 			},
 
 			/**
 			 * Action on 'chevron right' button press. Select next active tab filter.
 			 */
-			selectNextTab: (ev) => {
+			selectNextTab: () => {
 				let index = this._items.indexOf(this._active_item);
 
 				if (index > -1 && index < this._items.length - 1 && this._items[index + 1] !== this._timeselector) {
-					let expanded = this._active_item._expanded;
-
-					this._active_item.removeExpanded();
-					this.setSelectedItem(this._items[index + 1]);
-
-					if (expanded) {
-						this._active_item.fire(TABFILTERITEM_EVENT_EXPAND);
-					}
+					this._items[index + 1].fire(TABFILTERITEM_EVENT_SELECT);
 				}
 			},
 
