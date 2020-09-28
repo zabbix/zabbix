@@ -65,14 +65,19 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		natsort($known_widget_types);
 
-		if ($this->hasInput('type') && $this->hasInput('prev_type')
-				&& $this->getInput('type') !== $this->getInput('prev_type')) {
-			CProfile::update('web.dashbrd.last_widget_type', $this->getInput('type'), PROFILE_TYPE_STR);
-		}
+		if ($this->hasInput('type')) {
+			$type = $this->getInput('type');
 
-		$type = $this->getInput('type',
-			CProfile::get('web.dashbrd.last_widget_type', array_keys($known_widget_types)[0])
-		);
+			if (!array_key_exists($type, $known_widget_types) || $this->getInput('prev_type', $type) !== $type) {
+				CProfile::update('web.dashbrd.last_widget_type', $type, PROFILE_TYPE_STR);
+			}
+		}
+		else {
+			$type = CProfile::get('web.dashbrd.last_widget_type');
+			if (!array_key_exists($type, $known_widget_types)) {
+				$type = array_keys($known_widget_types)[0];
+			}
+		}
 
 		$templateid = ($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)
 			? $this->getInput('templateid')
