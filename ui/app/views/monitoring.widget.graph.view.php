@@ -33,13 +33,19 @@ if ($data['graph']['unavailable_object']) {
 }
 else {
 	$flickerfree_item = (new CDiv())
-		->addItem((new CLink(null, $data['item_graph_url']))
-			->setId($data['graph']['containerid'])
-			->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
-		)
 		->addClass('flickerfreescreen')
-		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
+
+	if ($data['item_graph_url'] !== null) {
+		$flickerfree_item->addItem(
+			(new CLink(null, $data['item_graph_url']))
+				->setId($data['graph']['containerid'])
+				->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
+		);
+	}
+	else {
+		$flickerfree_item->addItem((new CDiv())->setId($data['graph']['containerid']));
+	}
 
 	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.json_encode($data['timeline']).', '.
 			json_encode($data['time_control_data']).

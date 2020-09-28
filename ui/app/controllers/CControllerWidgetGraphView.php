@@ -351,20 +351,54 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-				$item_graph_url = (new CUrl('zabbix.php'))
-					->setArgument('action', 'charts.view')
-					->setArgument('view_as', HISTORY_GRAPH)
-					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-					->setArgument('filter_graphids', [$resourceid])
-					->setArgument('filter_set', '1');
+			if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+				$item_graph_url = null;
 			}
 			else {
-				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+				if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+					if ($is_dynamic_item && $dynamic_hostid) {
+						$template_graphs = API::Graph()->get([
+							'output' => ['name'],
+							'graphids' => [$resourceid]
+						]);
+
+						$resourceid = null;
+
+						if ($template_graphs) {
+							$host_graphs = API::Graph()->get([
+								'output' => ['graphid'],
+								'hostids' => [$dynamic_hostid],
+								'filter' => [
+									'name' => $template_graphs[0]['name']
+								]
+							]);
+
+							if ($host_graphs) {
+								$resourceid = $host_graphs[0]['graphid'];
+							}
+						}
+					}
+
+					if ($resourceid !== null) {
+						$item_graph_url = (new CUrl('zabbix.php'))
+							->setArgument('action', 'charts.view')
+							->setArgument('view_as', HISTORY_GRAPH)
+							->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+							->setArgument('filter_graphids', [$resourceid])
+							->setArgument('filter_set', '1');
+					}
+					else {
+						$item_graph_url = null;
+					}
+				}
+				else {
+					$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+				}
+
+				$item_graph_url
+					->setArgument('from', $timeline['from'])
+					->setArgument('to', $timeline['to']);
 			}
-			$item_graph_url
-				->setArgument('from', $timeline['from'])
-				->setArgument('to', $timeline['to']);
 		}
 
 		$response = [
@@ -372,10 +406,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'graph' => [
 				'dataid' => $dataid,
 				'containerid' => $containerid,
-				'timestamp' => time(),
 				'unavailable_object' => $unavailable_object
 			],
-			'item_graph_url' => $unavailable_object ? '' : $item_graph_url,
+			'item_graph_url' => $unavailable_object ? null : $item_graph_url,
 			'widget' => [
 				'uniqueid' => $uniqueid,
 				'initial_load' => (int) $this->getInput('initial_load', 0),
