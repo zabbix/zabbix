@@ -70,6 +70,7 @@ $output = [
 			'keepOpen' => true,
 			'enabled' => !$data['create'],
 			'class' => 'float-left',
+			'confirmation' => _('Delete selected filter?'),
 			'action' => 'return tabFilterDelete(overlay)'
 		],
 		[
