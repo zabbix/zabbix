@@ -67,8 +67,8 @@ if (array_key_exists('filter_options', $data)) { ?>
 				: data.severities;
 
 			// Modify filter data of flickerfreeScreen object with id 'problem'.
-			if (data.page > 1) {
-				window.flickerfreeScreen.screens['problem'].page = data.page;
+			if (data.page === null) {
+				delete data.page;
 			}
 
 			window.flickerfreeScreen.screens['problem'].data.filter = data;

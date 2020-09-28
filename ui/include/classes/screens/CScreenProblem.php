@@ -758,6 +758,9 @@ class CScreenProblem extends CScreenBase {
 		$this->dataId = 'problem';
 
 		$url = (new CUrl('zabbix.php'))->setArgument('action', 'problem.view');
+		array_map([$url, 'setArgument'], array_keys($this->data['filter']), $this->data['filter']);
+		$url->setArgument('sort', $this->data['sort']);
+		$url->setArgument('sortorder', $this->data['sortorder']);
 
 		$data = self::getData($this->data['filter'], true);
 		$data = self::sortData($data, $this->data['sort'], $this->data['sortorder']);
