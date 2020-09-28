@@ -258,8 +258,6 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {object} data  Updated tab properties object.
 	 */
 	update(data) {
-		this.renderContentTemplate();
-
 		var form = this._content_container.querySelector('form'),
 			fields = {
 				filter_name: form.querySelector('[name="filter_name"]'),

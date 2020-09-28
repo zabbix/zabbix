@@ -242,7 +242,7 @@ if (array_key_exists('render_html', $data)) {
 			rows: data.tags,
 			counter: 0,
 			dataCallback: (tag) => {
-				tag.uniqid = data.uniqid
+				tag.uniqid = data.uniqid;
 				return tag;
 			}
 		});
