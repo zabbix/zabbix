@@ -254,7 +254,9 @@ class CTabFilter extends CDiv {
 	 * @return CTabFilter
 	 */
 	public function addTemplatedTab($label, array $data) {
-		return $this->addTab($label, null, $data + ['uniqid' => uniqid()]);
+		$uniqid = count($this->labels);
+
+		return $this->addTab($label, null, $data + ['uniqid' => $uniqid]);
 	}
 
 	/**
