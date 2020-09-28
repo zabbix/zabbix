@@ -1359,7 +1359,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 	$data['hosts'] = API::Host()->get([
 		'output' => ['hostid'],
 		'itemids' => $data['item_prototypeids'],
-		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port']
+		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
 	]);
 
 	$data['display_interfaces'] = true;

@@ -27,6 +27,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
+@import "components/z-select";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -7245,4 +7246,22 @@ table.preprocessing-test-results {
 	.table-col-y-axis-side { width: 85px; }
 	.table-col-colour { width: 105px; }
 	.table-col-action { width: 55px; }
+}
+
+z-select,
+.z-select {
+	&.z-select-host-interface {
+		.description:not(:empty) {
+			display: block;
+			margin-top: 5px;
+			color: $input-placeholder-color;
+		}
+
+		&[disabled],
+		li[disabled] {
+			.description:not(:empty) {
+				color: $form-disabled-font-color;
+			}
+		}
+	}
 }
