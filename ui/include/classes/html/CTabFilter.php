@@ -313,7 +313,7 @@ class CTabFilter extends CDiv {
 	public function toString($destroy = true) {
 		if (array_key_exists('timeselector', $this->options)) {
 			$this
-				->addClass('filter-space')
+				->addClass(ZBX_STYLE_FILTER_SPACE)
 				->setAttribute('data-disable-initial-check', 1)
 				->setAttribute('data-accessible', 1)
 				->setAttribute('data-profile-idx', $this->options['idx'])

@@ -1643,6 +1643,7 @@ define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
+define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
