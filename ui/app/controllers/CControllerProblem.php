@@ -52,8 +52,8 @@ abstract class CControllerProblem extends CController {
 		'tag_name_format' => PROBLEMS_TAG_NAME_FULL,
 		'tag_priority' => '',
 		'page' => null,
-		'sort' => 'name',
-		'sortorder' => ZBX_SORT_UP,
+		'sort' => 'clock',
+		'sortorder' => ZBX_SORT_DOWN,
 		'from' => '',
 		'to' => ''
 	];
