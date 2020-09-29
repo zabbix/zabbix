@@ -231,8 +231,8 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	]));
 
 if ($data['admin']) {
-	$table = (new CTableInfo())->setHeader([
-		_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'), _('Screens'), _('Discovery'), _('Web')
+	$table = (new CTableInfo())->setHeader([_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'),
+		_('Dashboards'), _('Discovery'), _('Web')
 	]);
 
 	foreach ($data['templates'] as $templateid => $template) {
