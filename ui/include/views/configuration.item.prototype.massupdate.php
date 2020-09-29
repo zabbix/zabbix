@@ -95,6 +95,12 @@ $item_form_list
 				->setModern(true)
 		))->setId('post_type_container')
 	)
+	->addRow(
+		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))
+			->setLabel(_('Timeout'))
+			->setChecked(array_key_exists('timeout', $data['visible'])),
+		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
 	// Append "Request body" field (optional) for item prototype type "ITEM_TYPE_HTTPAGENT".
 	->addRow(
 		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))
