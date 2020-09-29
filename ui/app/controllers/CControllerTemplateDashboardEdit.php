@@ -75,6 +75,7 @@ class CControllerTemplateDashboardEdit extends CController {
 		}
 		else {
 			$dashboard = [
+				'dashboardid' => null,
 				'templateid' => $this->getInput('templateid'),
 				'name' => _('New dashboard'),
 				'widgets' => []
