@@ -8480,6 +8480,35 @@ return [
 			],
 		],
 	],
+	'item_parameter' => [
+		'key' => 'item_parameterid',
+		'fields' => [
+			'item_parameterid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
+		],
+	],
 	'dbversion' => [
 		'key' => '',
 		'fields' => [
