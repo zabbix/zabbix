@@ -76,17 +76,24 @@ if ($data['time_selector'] !== null) {
 	);
 }
 
-$widget
-	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
-	->show();
+if ($data['dashboard']['widgets']) {
+	$widget
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
+		->show();
 
-(new CScriptTag(
-	'initializeHostDashboard('.
-		json_encode($data['host']).','.
-		json_encode($data['dashboard']).','.
-		json_encode($data['widget_defaults']).','.
-		json_encode($web_layout_mode).
-	');'
-))
-	->setOnDocumentReady()
-	->show();
+	(new CScriptTag(
+		'initializeHostDashboard('.
+			json_encode($data['host']).','.
+			json_encode($data['dashboard']).','.
+			json_encode($data['widget_defaults']).','.
+			json_encode($web_layout_mode).
+		');'
+	))
+		->setOnDocumentReady()
+		->show();
+}
+else {
+	$widget
+		->addItem(new CTableInfo())
+		->show();
+}
