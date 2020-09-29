@@ -1386,6 +1386,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
 	ZBX_DC_HTTPITEM		*httpitem;
+	ZBX_DC_SCRIPTITEM	*scriptitem;
 	unsigned char		value_type, type;
 	int			history_sec, trends_sec;
 
@@ -1577,6 +1578,21 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 	else if (NULL != telnetitem)
+		return FAIL;
+
+	scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&dbsync_env.cache->scriptitems, &item->itemid);
+	if (ITEM_TYPE_SCRIPT == item->type)
+	{
+		if (NULL == scriptitem)
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[14], scriptitem->timeout))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[11], scriptitem->script))
+			return FAIL;
+	}
+	else if (NULL != scriptitem)
 		return FAIL;
 
 	simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&dbsync_env.cache->simpleitems, &item->itemid);
@@ -3679,6 +3695,143 @@ static int	dbsync_compare_maintenance(const zbx_dc_maintenance_t *maintenance, c
 
 	if (FAIL == dbsync_compare_uchar(dbrow[4], maintenance->tags_evaltype))
 		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbsync_item_script_param_preproc_row                             *
+ *                                                                            *
+ * Purpose: applies necessary preprocessing before row is compared/used       *
+ *                                                                            *
+ * Parameter: row - [IN] the row to preprocess                                *
+ *                                                                            *
+ * Return value: the preprocessed row of item_script_param table              *
+ *                                                                            *
+ * Comments: The row preprocessing can be used to expand user macros in       *
+ *           some columns.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static char	**dbsync_item_script_param_preproc_row(char **row)
+{
+	zbx_uint64_t	hostid;
+
+	ZBX_STR2UINT64(hostid, row[4]);
+
+	if (SUCCEED == dbsync_check_row_macros(row, 3))
+		row[3] = dc_expand_user_macros(row[3], &hostid, 1);
+
+	return row;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbsync_compare_itemscript_param                                  *
+ *                                                                            *
+ * Purpose: compares item script params table row with cached configuration   *
+ *          data                                                              *
+ *                                                                            *
+ * Parameter: script - [IN] the cached item script                            *
+ *            dbrow  - [IN] the database row                                  *
+ *                                                                            *
+ * Return value: SUCCEED - the row matches configuration data                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbsync_compare_itemscript_param(const zbx_dc_scriptitem_param_t *scriptitem_param, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_uint64(dbrow[1], scriptitem_param->itemid))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[2], scriptitem_param->name))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[3], scriptitem_param->value))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_compare_item_script_param                             *
+ *                                                                            *
+ * Purpose: compares item_script_param table with cached configuration data   *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
+{
+	DB_ROW				dbrow;
+	DB_RESULT			result;
+	zbx_hashset_t			ids;
+	zbx_hashset_iter_t		iter;
+	zbx_uint64_t			rowid;
+	zbx_dc_scriptitem_param_t	*itemscript_params;
+	char				**row;
+
+	if (NULL == (result = DBselect(
+			"select s.item_script_paramid,s.itemid,s.name,s.value,i.hostid"
+			" from item_script_param s,items i,hosts h"
+			" where s.itemid=i.itemid"
+				" and i.hostid=h.hostid"
+				" and h.status in (%d,%d)"
+				" and i.flags<>%d"
+			" order by s.itemid",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 5, dbsync_item_script_param_preproc_row);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	zbx_hashset_create(&ids, dbsync_env.cache->itemscript_params.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(rowid, dbrow[0]);
+		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+
+		row = dbsync_preproc_row(sync, dbrow);
+
+		if (NULL == (itemscript_params = (zbx_dc_scriptitem_param_t *)
+				zbx_hashset_search(&dbsync_env.cache->itemscript_params, &rowid)))
+		{
+			tag = ZBX_DBSYNC_ROW_ADD;
+		}
+		else if (FAIL == dbsync_compare_itemscript_param(itemscript_params, row))
+		{
+			tag = ZBX_DBSYNC_ROW_UPDATE;
+		}
+
+		if (ZBX_DBSYNC_ROW_NONE != tag)
+			dbsync_add_row(sync, rowid, tag, row);
+	}
+
+	zbx_hashset_iter_reset(&dbsync_env.cache->itemscript_params, &iter);
+	while (NULL != (itemscript_params = (zbx_dc_scriptitem_param_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == zbx_hashset_search(&ids, &itemscript_params->item_script_paramid))
+			dbsync_add_row(sync, itemscript_params->item_script_paramid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+	}
+
+	zbx_hashset_destroy(&ids);
+	DBfree_result(result);
 
 	return SUCCEED;
 }

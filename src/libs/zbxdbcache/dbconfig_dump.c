@@ -514,6 +514,21 @@ static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 			httpitem->verify_peer, httpitem->verify_host);
 }
 
+static void	DCdump_scriptitem(const ZBX_DC_SCRIPTITEM *scriptitem)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "  script:[timeout:'%s' script:'%s']", scriptitem->timeout, scriptitem->script);
+
+	for (i = 0; i < scriptitem->params.values_num; i++)
+	{
+		zbx_dc_scriptitem_param_t	*params = (zbx_dc_scriptitem_param_t *)scriptitem->params.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "      item_script_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
+				params->item_script_paramid, params->name, params->value);
+	}
+}
+
 static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:[username:'%s' password:'%s' params:'%s']", telnetitem->username,
@@ -599,6 +614,7 @@ static void	DCdump_items(void)
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
 		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
+		{&config->scriptitems, (zbx_dc_dump_func_t)DCdump_scriptitem},
 	};
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);

@@ -313,7 +313,7 @@ FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
 FIELD		|valuemapid	|t_id		|	|NULL		|0			|3|valuemaps	|		|RESTRICT
-FIELD		|params		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|params		|t_text	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
@@ -1846,7 +1846,14 @@ TABLE|lld_override_opinventory|lld_override_operationid|ZBX_TEMPLATE
 FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation
 FIELD	|inventory_mode			|t_integer	|'0'	|NOT NULL	|0
 
+TABLE|item_script_param|item_script_paramid|ZBX_TEMPLATE
+FIELD		|item_script_paramid|t_id	|	|NOT NULL	|ZBX_PROXY
+FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|items
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
+INDEX		|1		|itemid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5010028	|5010028
+ROW		|5010032	|5010032

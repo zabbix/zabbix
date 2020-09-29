@@ -274,6 +274,15 @@ typedef struct
 }
 ZBX_DC_HTTPITEM;
 
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	const char		*script;
+	const char		*timeout;
+	zbx_vector_ptr_t	params;
+}
+ZBX_DC_SCRIPTITEM;
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
@@ -711,6 +720,15 @@ zbx_dc_preproc_op_t;
 
 typedef struct
 {
+	zbx_uint64_t	item_script_paramid;
+	zbx_uint64_t	itemid;
+	const char	*name;
+	const char	*value;
+}
+zbx_dc_scriptitem_param_t;
+
+typedef struct
+{
 	zbx_uint64_t		maintenanceid;
 	unsigned char		type;
 	unsigned char		tags_evaltype;
@@ -795,6 +813,7 @@ typedef struct
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
 	zbx_hashset_t		httpitems;
+	zbx_hashset_t		scriptitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -832,6 +851,7 @@ typedef struct
 	zbx_vector_ptr_t	hostgroups_name;	/* host groups sorted by name */
 	zbx_vector_ptr_t	kvs_paths;
 	zbx_hashset_t		preprocops;
+	zbx_hashset_t		itemscript_params;
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;

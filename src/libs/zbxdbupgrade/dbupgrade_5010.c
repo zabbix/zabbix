@@ -259,6 +259,43 @@ static int	DBpatch_5010028(void)
 	return DBmodify_field_type("task_result", &field, &old_field);
 }
 
+static int	DBpatch_5010029(void)
+{
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 2048, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_5010030(void)
+{
+	const ZBX_TABLE	table =
+			{"item_script_param", "item_script_paramid", 0,
+				{
+					{"item_script_paramid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5010031(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_script_param", 1, &field);
+}
+
+static int	DBpatch_5010032(void)
+{
+	return DBcreate_index("item_script_param", "item_script_param_1", "itemid", 1);
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -294,5 +331,9 @@ DBPATCH_ADD(5010025, 0, 1)
 DBPATCH_ADD(5010026, 0, 1)
 DBPATCH_ADD(5010027, 0, 1)
 DBPATCH_ADD(5010028, 0, 1)
+DBPATCH_ADD(5010029, 0, 1)
+DBPATCH_ADD(5010030, 0, 1)
+DBPATCH_ADD(5010031, 0, 1)
+DBPATCH_ADD(5010032, 0, 1)
 
 DBPATCH_END()

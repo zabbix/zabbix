@@ -33,6 +33,7 @@
 #include "checks_aggregate.h"
 #include "checks_external.h"
 #include "checks_internal.h"
+#include "checks_script.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
 #include "checks_db.h"
@@ -402,6 +403,9 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = CONFIG_ERROR;
 #endif
 			break;
+		case ITEM_TYPE_SCRIPT:
+			res = get_value_script(item, result);
+			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
 			res = CONFIG_ERROR;
@@ -577,6 +581,22 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
+				break;
+			case ITEM_TYPE_SCRIPT:
+				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
+
+				if (MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
+						NULL, NULL, NULL, NULL, &items[i].script_params, MACRO_TYPE_COMMON,
+						NULL, 0);
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+						NULL, NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD,
+						NULL, 0);
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+						NULL, NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD,
+						NULL, 0);
 				break;
 			case ITEM_TYPE_SSH:
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
@@ -785,6 +805,11 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].ssl_key_password);
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
+				break;
+			case ITEM_TYPE_SCRIPT:
+				zbx_free(items[i].timeout);
+				zbx_free(items[i].params);
+				zbx_free(items[i].script_params);
 				break;
 			case ITEM_TYPE_SSH:
 				zbx_free(items[i].publickey);
