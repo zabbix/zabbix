@@ -214,7 +214,7 @@ class CTabFilter extends CBaseComponent {
 	/**
 	 * Updates filter values in user profile. Aborts any previous unfinished updates.
 	 *
-	 * @param {string} property  Filter property to be updated: 'selected', 'expanded', 'properties'.
+	 * @param {string} property  Filter property to be updated: 'selected', 'expanded', 'properties', 'taborder'.
 	 * @param {object} body      Key value pair of data to be passed to profile.update action.
 	 *
 	 * @return {Promise}
@@ -225,7 +225,7 @@ class CTabFilter extends CBaseComponent {
 
 		url.setArgument('action', 'tabfilter.profile.update');
 
-		if (this._fetch[property] && 'abort' in this._fetch[property] && !this._fetch[property].aborted) {
+		if (this._fetch[property] && ('abort' in this._fetch[property]) && !this._fetch[property].aborted) {
 			this._fetch[property].abort();
 		}
 
