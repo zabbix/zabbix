@@ -1837,7 +1837,7 @@ class CHostPrototype extends CHostBase {
 				// Do nothing, because in case of inherited interfaces, all $db_interfaces sould be deleted.
 			}
 
-			$interfaceids_to_delete += array_flip(array_column($db_interfaces,'interfaceid'));
+			$interfaceids_to_delete += array_flip(array_column($db_interfaces, 'interfaceid'));
 		}
 
 		if ($interfaceids_to_delete) {
