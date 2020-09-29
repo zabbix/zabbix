@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testTriggerExpressions extends CWebTest {
 
-	const TRIGGER_ID = 13357;		//'Lack of available memory on server {HOST.NAME}'
+	const TRIGGER_ID = 17094;		//'Lack of available memory on server {HOST.NAME}'
 
 	public function testTriggerExpressions_SimpleTest() {
 		// Open advanced editor for testing trigger expression results.

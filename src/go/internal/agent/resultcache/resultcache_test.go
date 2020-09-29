@@ -64,6 +64,10 @@ func (w *mockWriter) CanRetry() bool {
 	return false
 }
 
+func (w *mockWriter) Hostname() string {
+	return ""
+}
+
 func TestResultCache(t *testing.T) {
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0

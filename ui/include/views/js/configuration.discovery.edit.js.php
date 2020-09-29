@@ -313,7 +313,7 @@
 	 * @return {object}
 	 */
 	function setDCheckDefaultPort() {
-		return jQuery('#ports').val(getDCheckDefaultPort(jQuery('#type').val()));
+		return jQuery('#ports').val(getDCheckDefaultPort(jQuery('#type-select').val()));
 	}
 
 	/**
@@ -393,13 +393,14 @@
 		var $form = jQuery(document.forms['dcheck_form']),
 			dcheckid = jQuery('#dcheckid').val(),
 			dcheck = $form
-				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
+				.find('#ports, >input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
 				.serializeJSON(),
 			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase'
 			];
 
+		dcheck['type'] = $form.find('z-select').val();
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
 		if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
