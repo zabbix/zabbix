@@ -105,14 +105,24 @@ class CRoleHelper {
 
 		$role_rules = self::$roles[$roleid]['rules'];
 		$default_access_name = explode('.', $rule_name, 2)[0].'.default_access';
+		$default_access_is_enabled = in_array($default_access_name, [self::UI_DEFAULT_ACCESS,
+			self::MODULES_DEFAULT_ACCESS, self::ACTIONS_DEFAULT_ACCESS
+		]) && (!array_key_exists($default_access_name, $role_rules) || $role_rules[$default_access_name]);
 
-		return in_array($rule_name, self::getAllRules(self::$roles[$roleid]['type']))
-				&& ((!array_key_exists($rule_name, $role_rules)
-					&& (in_array($default_access_name, [self::UI_DEFAULT_ACCESS, self::MODULES_DEFAULT_ACCESS,
-						self::ACTIONS_DEFAULT_ACCESS
-					])
-						&& (!array_key_exists($default_access_name, $role_rules) || $role_rules[$default_access_name])))
-					|| $role_rules[$rule_name]);
+		$rule_is_in_scope_of_role_type = in_array($rule_name, self::getAllRules(self::$roles[$roleid]['type']));
+		$role_rule_exists = array_key_exists($rule_name, $role_rules);
+		$role_rule_is_enabled = $role_rule_exists ? $role_rules[$rule_name] : 1;
+
+		if ($rule_is_in_scope_of_role_type) {
+			if ($role_rule_exists && $role_rule_is_enabled) {
+				return true;
+			}
+			elseif (!$role_rule_exists && $default_access_is_enabled) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
