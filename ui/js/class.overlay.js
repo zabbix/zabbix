@@ -287,7 +287,7 @@ Overlay.prototype.makeButton = function(obj) {
 		});
 
 	$button.on('click', function(e) {
-		if ('confirmation' in obj && !confirm(obj.confirmation)) {
+		if (('confirmation' in obj) && !confirm(obj.confirmation)) {
 			e.preventDefault();
 			return;
 		}
