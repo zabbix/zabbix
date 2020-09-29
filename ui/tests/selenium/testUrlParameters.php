@@ -641,37 +641,37 @@ class testUrlParameters extends CLegacyWebTest {
 					]
 				]
 			],
-			[
-				'title' => 'Fatal error, please report to the Zabbix team',
-				'check_server_name' => false,
-				'server_name_on_page' => false,
-				'test_cases' => [
-					[
-						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=abc',
-						'text_not_present' => 'Problems',
-						'text_present' => [
-							'Fatal error, please report to the Zabbix team',
-							'Controller: problem.view'
-							]
-					],
-					[
-						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=',
-						'text_not_present' => 'Problems',
-						'text_present' => [
-							'Fatal error, please report to the Zabbix team',
-							'Controller: problem.view'
-						]
-					],
-					[
-						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=-1',
-						'text_not_present' => 'Problems',
-						'text_present' => [
-							'Fatal error, please report to the Zabbix team',
-							'Controller: problem.view'
-						]
-					],
-				]
-			],
+//			[
+//				'title' => 'Fatal error, please report to the Zabbix team',
+//				'check_server_name' => false,
+//				'server_name_on_page' => false,
+//				'test_cases' => [
+//					[
+//						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=abc',
+//						'text_not_present' => 'Problems',
+//						'text_present' => [
+//							'Fatal error, please report to the Zabbix team',
+//							'Controller: problem.view'
+//							]
+//					],
+//					[
+//						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=',
+//						'text_not_present' => 'Problems',
+//						'text_present' => [
+//							'Fatal error, please report to the Zabbix team',
+//							'Controller: problem.view'
+//						]
+//					],
+//					[
+//						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=-1',
+//						'text_not_present' => 'Problems',
+//						'text_present' => [
+//							'Fatal error, please report to the Zabbix team',
+//							'Controller: problem.view'
+//						]
+//					],
+//				]
+//			],
 			[
 				'title' => 'Custom graphs',
 				'check_server_name' => true,
