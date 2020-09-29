@@ -74,7 +74,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	public function getDefaultMessageTemplateData() {
 		return [
-			// Defult messages for plain text Email media type
+			// Default messages for plain text Email media type
 			[
 				[
 					'media_type' => [
@@ -145,7 +145,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					]
 				]
 			],
-			// Defult messages for HTML text Email media type
+			// Default messages for HTML text Email media type
 			[
 				[
 					'media_type' => [
@@ -210,7 +210,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					]
 				]
 			],
-			// Defult messages for SMS media type
+			// Default messages for SMS media type
 			[
 				[
 					'media_type' => [
@@ -652,7 +652,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				case 'Edit':
 				case 'Add':
 				case 'Skip':
-					// Open the correspondig message template and check its content according to the values in data provider.
+					// Open the corresponding message template and check its content according to the values in data provider.
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					$form = $this->query('id:mediatype_message_form')->asForm()->one();

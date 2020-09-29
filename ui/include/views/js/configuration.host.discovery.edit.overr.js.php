@@ -683,7 +683,7 @@ insert_javascript_for_visibilitybox();
 		delete this.data.filter;
 
 		/*
-		 * Used to add propper letter, when creating new dynamic row for filter. If no filters are configured,
+		 * Used to add proper letter, when creating new dynamic row for filter. If no filters are configured,
 		 * one empty row is created by View.
 		 */
 		this.filter_counter = (this.data.overrides_filters.length > 0) ? this.data.overrides_filters.length : 1;
