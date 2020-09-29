@@ -217,7 +217,9 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	zbx_preproc_history_t	*vault;
 	zbx_vector_ptr_t	*phistory;
 
-	if (ISSET_LOG(request->value.result_ptr->result))
+	if (ITEM_STATE_NOTSUPPORTED == request->value.state)
+		zbx_variant_set_str(&value,"");
+	else if (ISSET_LOG(request->value.result_ptr->result))
 		zbx_variant_set_str(&value, request->value.result_ptr->result->log->value);
 	else if (ISSET_UI64(request->value.result_ptr->result))
 		zbx_variant_set_ui64(&value, request->value.result_ptr->result->ui64);
@@ -304,12 +306,18 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 	zbx_list_iterator_init(&manager->queue, &iterator);
 	while (SUCCEED == zbx_list_iterator_next(&iterator))
 	{
+		int process_notsupported = 0;
+
 		zbx_list_iterator_peek(&iterator, (void **)&request);
 
 		if (REQUEST_STATE_QUEUED != request->state)
 			continue;
 
-		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
+		if(NULL != request->steps && ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == request->steps[0].type)
+			process_notsupported = 1;
+
+
+		if (ITEM_STATE_NOTSUPPORTED == request->value.state && 0 == process_notsupported)
 		{
 			zbx_preproc_history_t	*vault;
 
@@ -652,6 +660,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	int				i;
 	zbx_preprocessing_states_t	state;
 	unsigned char			priority = ZBX_PREPROC_PRIORITY_NONE;
+	int				notsupport = -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __func__, value->itemid);
 
@@ -686,19 +695,39 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	memcpy(&request->value, value, sizeof(zbx_preproc_item_value_t));
 	request->state = state;
 
-	if (REQUEST_STATE_QUEUED == state && ITEM_STATE_NOTSUPPORTED != value->state)
+	for (i = 0; i < item->preproc_ops_num; i++)
 	{
-		request->value_type = item->value_type;
-		request->steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * item->preproc_ops_num);
-		request->steps_num = item->preproc_ops_num;
-
-		for (i = 0; i < item->preproc_ops_num; i++)
+		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == item->preproc_ops[i].type)
 		{
-			request->steps[i].type = item->preproc_ops[i].type;
-			request->steps[i].params = zbx_strdup(NULL, item->preproc_ops[i].params);
-			request->steps[i].error_handler = item->preproc_ops[i].error_handler;
+			notsupport = i;
+			if (0 != notsupport)
+				THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		}
+	}
+
+	if (REQUEST_STATE_QUEUED == state && (ITEM_STATE_NOTSUPPORTED != value->state ||
+			((ITEM_STATE_NOTSUPPORTED == value->state && 0 <= notsupport))))
+	{
+		int skip = 0;
+
+		if (ITEM_STATE_NOTSUPPORTED != value->state && 0 <= notsupport)
+		{
+			skip = 1;
+		}
+
+		request->value_type = item->value_type;
+		request->steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) *
+				(item->preproc_ops_num - skip));
+		request->steps_num = item->preproc_ops_num - skip;
+
+		for (i = 0; i < item->preproc_ops_num - skip; i++)
+		{
+			request->steps[i].type = item->preproc_ops[i + skip].type;
+			request->steps[i].params = zbx_strdup(NULL, item->preproc_ops[i + skip].params);
+			request->steps[i].error_handler = item->preproc_ops[i + skip].error_handler;
 			request->steps[i].error_handler_params = zbx_strdup(NULL,
-					item->preproc_ops[i].error_handler_params);
+					item->preproc_ops[i + skip].error_handler_params);
 		}
 
 		manager->preproc_num++;
@@ -871,6 +900,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 	{
 		/* on error item state is set to ITEM_STATE_NOTSUPPORTED */
 		request->value.state = ITEM_STATE_NOTSUPPORTED;
+		zbx_free(request->value.error);
 		request->value.error = error;
 		ret = FAIL;
 
@@ -908,6 +938,9 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		AGENT_RESULT	*result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
 
 		init_result(result);
+
+		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
+			request->value.state = ITEM_STATE_NORMAL;
 
 		switch (request->value_type)
 		{
