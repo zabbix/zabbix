@@ -3776,13 +3776,13 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	char				**row;
 
 	if (NULL == (result = DBselect(
-			"select s.item_script_paramid,s.itemid,s.name,s.value,i.hostid"
-			" from item_script_param s,items i,hosts h"
-			" where s.itemid=i.itemid"
+			"select p.item_parameterid,p.itemid,p.name,p.value,i.hostid"
+			" from item_parameter p,items i,hosts h"
+			" where p.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and h.status in (%d,%d)"
 				" and i.flags<>%d"
-			" order by s.itemid",
+			" order by p.itemid",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{

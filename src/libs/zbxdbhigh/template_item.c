@@ -1352,18 +1352,18 @@ static void	copy_template_item_script_params(const zbx_vector_uint64_t *template
 	{
 		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_script_param where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_parameter where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 		DBexecute("%s", sql);
 		sql_offset = 0;
 	}
 
-	zbx_db_insert_prepare(&db_insert, "item_script_param", "item_script_paramid", "itemid", "name", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "item_parameter", "item_parameterid", "itemid", "name", "value", NULL);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select is.itemid,is.name,is.value"
-				" from item_script_param is,items ti"
-				" where is.itemid=ti.itemid"
+			"select ip.itemid,ip.name,ip.value"
+				" from item_parameter ip,items ti"
+				" where ip.itemid=ti.itemid"
 				" and");
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
@@ -1385,7 +1385,7 @@ static void	copy_template_item_script_params(const zbx_vector_uint64_t *template
 	}
 	DBfree_result(result);
 
-	zbx_db_insert_autoincrement(&db_insert, "item_script_paramid");
+	zbx_db_insert_autoincrement(&db_insert, "item_parameterid");
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 

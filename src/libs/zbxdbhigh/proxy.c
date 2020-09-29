@@ -1117,7 +1117,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"items",
 		"item_rtdata",
 		"item_preproc",
-		"item_script_param",
+		"item_parameter",
 		"drules",
 		"dchecks",
 		"regexps",
@@ -1160,7 +1160,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 			ret = get_proxyconfig_table_items(proxy_hostid, j, table, &itemids);
 		}
 		else if (0 == strcmp(proxytable[i], "item_preproc") || 0 == strcmp(proxytable[i], "item_rtdata") ||
-				0 == strcmp(proxytable[i], "item_script_param"))
+				0 == strcmp(proxytable[i], "item_parameter"))
 		{
 			if (0 != itemids.num_data)
 				ret = get_proxyconfig_table_items_ext(proxy_hostid, &itemids, j, table);
