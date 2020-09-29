@@ -837,9 +837,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	}
 
 	/**
-	 * Function used to popullate fields located in the Operations tab.
+	 * Function used to populate fields located in the Operations tab.
 	 * Field concurrent sessions has two input elelents - one of them is displayed only if concurrent sessions = Custom.
-	 * Therefore, fill() method cannot be used for this field, and it needs to be popullated separately.
+	 * Therefore, fill() method cannot be used for this field, and it needs to be populated separately.
 	 */
 	private function fillOperationsTab($data, $form) {
 		if (CTestArrayHelper::get($data, 'options', false)) {
@@ -885,7 +885,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	 * the values obtained from the media type configuration form.
 	 */
 	private function checkParameters($data) {
-		// Check creation, update and deletion of webhook parameters, or check that all default prameters are present.
+		// Check creation, update and deletion of webhook parameters, or check that all default parameters are present.
 		$expected_params = [
 			['name' => 'HTTPProxy', 'value' => ''],
 			['name' => 'Message', 'value' => '{ALERT.MESSAGE}'],
