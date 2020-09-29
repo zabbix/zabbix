@@ -275,7 +275,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	return nil
 }
 
-// cleanup releases unused uplugins. For external clients it's done after update,
+// cleanup releases unused plugins. For external clients it's done after update,
 // while for internal clients once per hour.
 func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
 	released = make([]*pluginAgent, 0, len(c.pluginsInfo))
