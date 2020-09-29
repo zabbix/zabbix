@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-25T10:03:40Z</date>
+   <date>2020-09-29T08:26:18Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1253,6 +1253,7 @@
                         <step>
                            <type>JSONPATH</type>
                            <params>$.osds.{#OSDNAME}.osd_fill</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1320,6 +1321,7 @@
                         <step>
                            <type>JSONPATH</type>
                            <params>$.osds.{#OSDNAME}.osd_latency_apply</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1344,6 +1346,7 @@
                         <step>
                            <type>JSONPATH</type>
                            <params>$.osds.{#OSDNAME}.osd_latency_commit</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1365,6 +1368,7 @@
                         <step>
                            <type>JSONPATH</type>
                            <params>$.osds.{#OSDNAME}.num_pgs</params>
+                           <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
                      <master_item>
