@@ -40,6 +40,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$error = null;
 
 		$dynamic_widget_name = $this->getDefaultHeader();
+		$same_host = true;
 		$items = [];
 		$histories = [];
 
@@ -108,7 +109,6 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				]);
 
 				$host_name = '';
-				$same_host = true;
 
 				foreach ($items as $item) {
 					if ($host_name === '') {
