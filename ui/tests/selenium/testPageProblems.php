@@ -154,7 +154,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
-		
+
 		// Select host group
 		$this->zbxTestClickButtonMultiselect('groupids_0');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -216,7 +216,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//label[@for="show_tags_10"]');
 		$this->query('name:filter_apply')->one()->click();
 		$this->page->waitUntilReady();
-		
+
 		// Check Tags column in result
 		$this->zbxTestAssertVisibleXpath('//thead/tr/th[text()="Tags"]');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
