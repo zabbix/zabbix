@@ -22,19 +22,7 @@
 /**
  * Validate import data from Zabbix 2.x.
  */
-class C20XmlValidator {
-
-	/**
-	 * @var string
-	 */
-	private $format;
-
-	/**
-	 * @param string $format format of import source
-	 */
-	public function __construct($format) {
-		$this->format = $format;
-	}
+class C20XmlValidator extends CXmlValidatorGeneral {
 
 	/**
 	 * Base validation function.
@@ -816,7 +804,7 @@ class C20XmlValidator {
 			]]
 		]];
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -860,7 +848,7 @@ class C20XmlValidator {
 				]]
 			]];
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -928,7 +916,7 @@ class C20XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -988,7 +976,7 @@ class C20XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -1014,7 +1002,7 @@ class C20XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1037,7 +1025,7 @@ class C20XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**

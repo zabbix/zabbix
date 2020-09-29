@@ -22,50 +22,82 @@
 /**
  * General XML validator
  */
-class CXmlValidatorGeneral {
-
-	/**
-	 * Validation rules.
-	 *
-	 * @var array
-	 */
-	private $rules;
+abstract class CXmlValidatorGeneral {
 
 	/**
 	 * Format of import source.
 	 *
 	 * @var string
 	 */
-	private $format;
+	protected $format;
 
 	/**
-	 * @param array  $rules   Validation rules.
+	 * Key validation for XML_INDEXED_ARRAY containers.
+	 *
+	 * @var bool
+	 */
+	protected $strict = false;
+
+	/**
 	 * @param string $format  Format of import source.
 	 */
-	public function __construct(array $rules, $format) {
-		$this->rules = $rules;
+	public function __construct(string $format) {
 		$this->format = $format;
 	}
 
 	/**
-	 * Base validation method.
+	 * Get key validation for XML_INDEXED_ARRAY containers.
+	 *
+	 * @return bool
+	 */
+	public function getStrict() {
+		return $this->strict;
+	}
+
+	/**
+	 * Set key validation for XML_INDEXED_ARRAY containers.
+	 *
+	 * @param bool $strict
+	 *
+	 * @return CXmlValidatorGeneral
+	 */
+	public function setStrict(bool $strict) {
+		$this->strict = $strict;
+
+		return $this;
+	}
+
+	/**
+	 * Validate import data.
 	 *
 	 * @param array|string $data  Import data.
 	 * @param string       $path  XML path (for error reporting).
+	 *
+	 * @return array  Validator does some manipulation for the incoming data. For example, converts empty tags to
+	 *                an array, if desired. Converted array is returned.
+	 */
+	abstract public function validate(array $data, $path);
+
+	/**
+	 * Validate import data against the rules.
+	 *
+	 * @param array        $rules  Validation rules.
+	 * @param array|string $data   Import data.
+	 * @param string       $path   XML path (for error reporting).
 	 *
 	 * @throws Exception if $data does not correspond to validation rules.
 	 *
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
-	public function validate($data, $path) {
-		$this->validateData($this->rules, $data, null, $path);
+	protected function doValidate($rules, $data, $path) {
+		$this->doValidateRecursive($rules, $data, null, $path);
 
 		return $data;
 	}
 
 	/**
-	 * Validate import data.
+	 * Validate import data recursively.
 	 *
 	 * @param array        $rules        Validation rules.
 	 * @param array|string $data         Import data.
@@ -74,7 +106,7 @@ class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if $data does not correspond to validation $rules.
 	 */
-	public function validateData(array $rules, &$data, array $parent_data = null, $path) {
+	private function doValidateRecursive(array $rules, &$data, array $parent_data = null, $path) {
 		if (array_key_exists('preprocessor', $rules)) {
 			$data = call_user_func($rules['preprocessor'], $data);
 		}
@@ -110,7 +142,7 @@ class CXmlValidatorGeneral {
 
 				if (array_key_exists($tag, $data)) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->validateData($rule, $data[$tag], $data, $subpath);
+					$this->doValidateRecursive($rule, $data[$tag], $data, $subpath);
 				}
 				elseif (($rule['type'] & XML_REQUIRED) || (array_key_exists('ex_required', $rule)
 						&& call_user_func($rule['ex_required'], $data))) {
@@ -142,30 +174,32 @@ class CXmlValidatorGeneral {
 			foreach ($data as $tag => &$value) {
 				if (array_key_exists('extra', $rules) && $rules['extra'] == $tag) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->validateData($rules['rules'][$tag], $value, $data, $subpath);
+					$this->doValidateRecursive($rules['rules'][$tag], $value, $data, $subpath);
 					continue;
 				}
 
-				switch ($this->format) {
-					case 'xml':
-						$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
-						break;
+				if ($this->strict) {
+					switch ($this->format) {
+						case 'xml':
+							$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
+							break;
 
-					case 'json':
-						$is_valid_tag = ctype_digit(strval($tag));
-						break;
+						case 'json':
+							$is_valid_tag = ctype_digit(strval($tag));
+							break;
 
-					default:
-						throw new Exception(_('Internal error.'));
-				}
+						default:
+							throw new Exception(_('Internal error.'));
+					}
 
-				if (!$is_valid_tag) {
-					throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected tag "%1$s"', $tag)));
+					if (!$is_valid_tag) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected tag "%1$s"', $tag)));
+					}
 				}
 
 				$index++;
 				$subpath = ($path === '/' ? $path : $path.'/').$prefix.'('.$index.')';
-				$this->validateData($rules['rules'][$prefix], $value, $data, $subpath);
+				$this->doValidateRecursive($rules['rules'][$prefix], $value, $data, $subpath);
 			}
 			unset($value);
 

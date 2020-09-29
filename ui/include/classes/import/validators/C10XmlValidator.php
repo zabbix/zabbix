@@ -22,19 +22,7 @@
 /**
  * Validate import data from Zabbix 1.8.
  */
-class C10XmlValidator {
-
-	/**
-	 * @var string
-	 */
-	private $format;
-
-	/**
-	 * @param string $format format of import source
-	 */
-	public function __construct($format) {
-		$this->format = $format;
-	}
+class C10XmlValidator extends CXmlValidatorGeneral {
 
 	/**
 	 * Base validation function.
@@ -341,7 +329,7 @@ class C10XmlValidator {
 			]]
 		]];
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -502,10 +490,9 @@ class C10XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
 	}
-
 }
