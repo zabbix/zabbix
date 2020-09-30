@@ -332,6 +332,40 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
+				if ($update) {
+					if ($dbItems[$item['itemid']]['type'] == $item['type']) {
+						$flags = 0x00;
+					}
+					else {
+						$flags = API_REQUIRED | API_NOT_EMPTY;
+					}
+				}
+				else {
+					$flags = API_REQUIRED | API_NOT_EMPTY;
+				}
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'params' => ['type' => API_STRING_UTF8, 'flags' => $flags, 'length' => DB::getFieldLength('items', 'params')],
+					'timeout' => [
+						'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
+							? $flags | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+							: $flags | API_ALLOW_USER_MACRO,
+						'in' => '1:'.SEC_PER_MIN
+					],
+					'parameters' => ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+						'name' =>		['type' => API_STRING_UTF8, 'flags' => $flags, 'length' => DB::getFieldLength('item_parameter', 'name')],
+						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
+					]]
+				]];
+
+				$data = array_intersect_key($item, $api_input_rules['fields']);
+
+				if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($inum + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+
 			$host = $dbHosts[$fullItem['hostid']];
 
 			// Validate update interval.
@@ -1707,6 +1741,127 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Create item parameters.
+	 *
+	 * @param array $items                             Array of items.
+	 * @param array $items[]['parameters']             Item parameters.
+	 * @param array $items[]['parameters'][]['name']   Parameter name.
+	 * @param array $items[]['parameters'][]['value']  Parameter value.
+	 * @param array $itemids                           Array of item IDs that were created before.
+	 */
+	protected function createItemParameters(array $items, array $itemids): void {
+		$item_parameters = [];
+
+		foreach ($items as $key => $item) {
+			$items[$key]['itemid'] = $itemids[$key];
+
+			if (!array_key_exists('parameters', $item) || !$item['parameters']) {
+				continue;
+			}
+
+			foreach ($item['parameters'] as $parameter) {
+				$item_parameters[] = [
+					'itemid' => $items[$key]['itemid'],
+					'name' => $parameter['name'],
+					'value' => $parameter['value']
+				];
+			}
+		}
+
+		if ($item_parameters) {
+			DB::insertBatch('item_parameter', $item_parameters);
+		}
+	}
+
+	/**
+	 * Create item parameters.
+	 *
+	 * @param array $items                             Array of items.
+	 * @param array $items[]['itemid']                 Item ID.
+	 * @param array $items[]['parameters']             Item parameters.
+	 * @param array $items[]['parameters'][]['name']   Parameter name.
+	 * @param array $items[]['parameters'][]['value']  Parameter value.
+	 */
+	protected function updateItemParameters(array $items): void {
+		$items_parameters = [];
+		$del_item_parameters = [];
+
+		foreach ($items as $item) {
+			if ($item['type'] == ITEM_TYPE_SCRIPT) {
+				if (array_key_exists('parameters', $item)) {
+					if ($item['parameters']) {
+						$params = [];
+
+						foreach ($item['parameters'] as $param) {
+							$params[$param['name']] = $param['value'];
+						}
+
+						$items_parameters[$item['itemid']] = $params;
+					}
+					else {
+						$del_item_parameters[$item['itemid']] = true;
+					}
+				}
+			}
+			else {
+				$del_item_parameters[$item['itemid']] = true;
+			}
+		}
+
+		if ($items_parameters) {
+			$ins_item_parameters = [];
+			$upd_item_parameters = [];
+			$db_item_parameters = DB::select('item_parameter', [
+				'output' => ['item_parameterid', 'itemid', 'name', 'value'],
+				'filter' => ['itemid' => array_keys($items_parameters)]
+			]);
+
+			foreach ($db_item_parameters as $param) {
+				$itemid = $param['itemid'];
+				if (!array_key_exists($itemid, $items_parameters)) {
+					$del_item_parameters[] = $param['item_parameterid'];
+				}
+				elseif (!array_key_exists($param['name'], $items_parameters[$itemid])) {
+					$del_item_parameters[] = $param['item_parameterid'];
+				}
+				elseif ($items_parameters[$itemid][$param['name']] !== $param['value']) {
+					$upd_item_parameters[] = [
+						'values' => ['value' => $items_parameters[$itemid][$param['name']]],
+						'where' => ['item_parameterid' => $param['item_parameterid']]
+					];
+					unset($items_parameters[$itemid][$param['name']]);
+				}
+				else {
+					unset($items_parameters[$itemid][$param['name']]);
+				}
+			}
+
+			$items_parameters = array_filter($items_parameters);
+
+			foreach ($items_parameters as $itemid => $params) {
+				foreach ($params as $name => $value) {
+					$ins_item_parameters[] = compact('itemid', 'name', 'value');
+				}
+			}
+
+			if ($del_item_parameters) {
+				DB::delete('item_parameter', ['item_parameterid' => array_keys(array_flip($del_item_parameters))]);
+			}
+
+			if ($upd_item_parameters) {
+				DB::update('item_parameter', $upd_item_parameters);
+			}
+
+			if ($ins_item_parameters) {
+				DB::insert('item_parameter', $ins_item_parameters);
+			}
+		}
+		elseif ($del_item_parameters) {
+			DB::delete('item_parameter', ['itemid' => array_keys($del_item_parameters)]);
+		}
+	}
+
+	/**
 	 * Check if any item from list already exists.
 	 * If items have item ids it will check for existing item with different itemid.
 	 *
@@ -1787,6 +1942,26 @@ abstract class CItemGeneral extends CApiService {
 				if (array_key_exists($itemid, $result)) {
 					$result[$itemid]['preprocessing'][] = $step;
 				}
+			}
+		}
+
+		if (!$options['countOutput'] && $this->outputIsRequested('parameters', $options['output'])) {
+			$item_parameters = DBselect(
+				'SELECT ip.itemid,ip.name,ip.value'.
+				' FROM item_parameter ip'.
+				' WHERE '.dbConditionInt('ip.itemid', array_keys($result))
+			);
+
+			foreach ($result as &$item) {
+				$item['parameters'] = [];
+			}
+			unset($item);
+
+			while ($row = DBfetch($item_parameters)) {
+				$result[$row['itemid']]['parameters'][] = [
+					'name' =>  $row['name'],
+					'value' =>  $row['value']
+				];
 			}
 		}
 

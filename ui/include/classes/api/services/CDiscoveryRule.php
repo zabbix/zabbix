@@ -499,6 +499,17 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['headers'] = '';
 			}
 
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
+						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
+					$item['params'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$item['timeout'] = $defaults['timeout'];
+				}
+			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -909,8 +920,11 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::insert('item_rtdata', $items_rtdata, false);
 
 		$conditions = [];
+		$itemids = [];
+
 		foreach ($items as $key => &$item) {
 			$item['itemid'] = $create_items[$key]['itemid'];
+			$itemids[$key] = $item['itemid'];
 
 			// conditions
 			if (isset($item['filter'])) {
@@ -949,8 +963,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
-
 		$this->createOverrides($items);
 	}
 
@@ -1413,6 +1427,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
 
 		// Delete old overrides and replace with new ones if any.

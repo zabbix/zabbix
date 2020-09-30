@@ -759,6 +759,61 @@ function prepareItemHttpAgentFormData(array $item) {
 }
 
 /**
+ * Prepare ITEM_TYPE_SCRIPT type item data for create or update API calls.
+ * - Converts 'parameters' from array of keys and array of values to arrays of names and values.
+ *   IN:
+ *   Array (
+ *       [name] => Array (
+ *           [0] => a
+ *           [1] => c
+ *       )
+ *       [value] => Array (
+ *           [0] => b
+ *           [1] => d
+ *       )
+ *   )
+ *
+ *   OUT:
+ *   Array (
+ *       [0] => Array (
+ *           [name] => a
+ *           [value] => b
+ *       )
+ *       [1] => Array (
+ *           [name] => c
+ *           [value] => d
+ *       )
+ *   )
+ *
+ * @param array $item                          Array of form fields data for ITEM_TYPE_SCRIPT item.
+ * @param array $item['parameters']            Item parameters array.
+ * @param array $item['parameters']['name']    Item parameter names array.
+ * @param array $item['parameters']['values']  Item parameter values array.
+ *
+ * @return array
+ */
+function prepareScriptItemFormData(array $item): array {
+	$values = [];
+
+	if (is_array($item['parameters']) && array_key_exists('name', $item['parameters'])
+			&& array_key_exists('value', $item['parameters'])) {
+		foreach ($item['parameters']['name'] as $index => $key) {
+			if (array_key_exists($index, $item['parameters']['value'])
+					&& ($key !== '' || $item['parameters']['value'][$index] !== '')) {
+				$values[] = [
+					'name' => $key,
+					'value' => $item['parameters']['value'][$index]
+				];
+			}
+		}
+	}
+
+	$item['parameters'] = $values;
+
+	return $item;
+}
+
+/**
  * Get data for item edit page.
  *
  * @param array $item                          Item, item prototype, LLD rule or LLD item to take the data from.
@@ -811,6 +866,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 		'url' => getRequest('url'),
 		'query_fields' => getRequest('query_fields', []),
+		'parameters' => getRequest('parameters', []),
 		'posts' => getRequest('posts'),
 		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
 		'follow_redirects' => hasRequest('form_refresh')
@@ -858,10 +914,32 @@ function getItemFormData(array $item = [], array $options = []) {
 			}
 			$data[$property] = $values;
 		}
+
+		$data['parameters'] = [];
+	}
+	elseif ($data['type'] == ITEM_TYPE_SCRIPT) {
+		$values = [];
+
+		if (is_array($data['parameters']) && array_key_exists('name', $data['parameters'])
+				&& array_key_exists('value', $data['parameters'])) {
+			foreach ($data['parameters']['name'] as $index => $key) {
+				if (array_key_exists($index, $data['parameters']['value'])) {
+					$values[] = [
+						'name' => $key,
+						'value' => $data['parameters']['value'][$index]
+					];
+				}
+			}
+		}
+		$data['parameters'] = $values;
+
+		$data['headers'] = [];
+		$data['query_fields'] = [];
 	}
 	else {
 		$data['headers'] = [];
 		$data['query_fields'] = [];
+		$data['parameters'] = [];
 	}
 
 	// Dependent item initialization by master_itemid.
@@ -983,6 +1061,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['timeout'] = $data['item']['timeout'];
 		$data['url'] = $data['item']['url'];
 		$data['query_fields'] = $data['item']['query_fields'];
+		$data['parameters'] = $data['item']['parameters'];
 		$data['posts'] = $data['item']['posts'];
 		$data['status_codes'] = $data['item']['status_codes'];
 		$data['follow_redirects'] = $data['item']['follow_redirects'];
@@ -1010,6 +1089,9 @@ function getItemFormData(array $item = [], array $options = []) {
 			}
 
 			$data['headers'] = $headers;
+		}
+		elseif ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
+			CArrayHelper::sort($data['parameters'], ['name']);
 		}
 
 		$data['preprocessing'] = $data['item']['preprocessing'];

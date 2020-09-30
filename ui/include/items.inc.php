@@ -100,7 +100,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_JMX => _('JMX agent'),
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
-		ITEM_TYPE_DEPENDENT => _('Dependent item')
+		ITEM_TYPE_DEPENDENT => _('Dependent item'),
+		ITEM_TYPE_SCRIPT => _('Script')
 	];
 
 	if ($type === null) {
@@ -1726,6 +1727,8 @@ function httpItemExists($items) {
 
 function getParamFieldNameByType($itemType) {
 	switch ($itemType) {
+		case ITEM_TYPE_SCRIPT:
+			return 'script';
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:

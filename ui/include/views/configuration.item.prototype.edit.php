@@ -111,7 +111,7 @@ $form_list
 		'url_row'
 	);
 
-// Append ITEM_TYPE_HTTPAGENT Query fields to form list.
+// Prepare ITEM_TYPE_HTTPAGENT query fields.
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
@@ -125,7 +125,47 @@ elseif (!$readonly) {
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
 $query_fields->items = [json_encode($query_fields_data)];
 
+// Prepare ITEM_TYPE_SCRIPT parameters.
+if ($data['parameters']) {
+	$parameters_data = $data['parameters'];
+}
+elseif (!$readonly) {
+	$parameters_data[] = ['name' => '', 'value' => ''];
+}
+
+$parameters_table = (new CTable())
+	->setId('parameters_table')
+	->setHeader([
+		(new CColHeader(_('Name')))->setWidth('50%'),
+		(new CColHeader(_('Value')))->setWidth('50%'),
+		_('Action')
+	])
+	->setAttribute('style', 'width: 100%;');
+
+foreach ($parameters_data as $parameter) {
+	$parameters_table->addRow([
+		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('item_parameter', 'name')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('parameters[value][]', $parameter['value'], false, DB::getFieldLength('item_parameter', 'value')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('jQuery(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]);
+}
+
+$parameters_table->addRow([
+	(new CButton('parameter_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+]);
+
 $form_list
+	// Append ITEM_TYPE_HTTPAGENT Query fields to form list.
 	->addRow(
 		new CLabel(_('Query fields'), 'query_fields_pairs'),
 		(new CDiv([
@@ -165,6 +205,47 @@ $form_list
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
 		'query_fields_row'
 	)
+	// Append ITEM_TYPE_SCRIPT parameters to form list.
+	->addItem(
+		(new CTag('script', true))
+			->setId('parameters_table_row')
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->addItem(
+				(new CRow([
+					(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('item_parameter', 'name')))
+						->setAttribute('style', 'width: 100%;')
+						->removeId(),
+					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
+						->setAttribute('style', 'width: 100%;')
+						->removeId(),
+					(new CButton('', _('Remove')))
+						->removeId()
+						->onClick('jQuery(this).closest("tr").remove()')
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				]))
+			)
+	)
+	->addRow(
+		new CLabel(_('Parameters'), $parameters_table->getId()),
+		(new CDiv($parameters_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		'parameters_row'
+	)
+	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
+		(new CMultilineInput('script', $data['params'], [
+			'title' => _('JavaScript'),
+			'placeholder' => _('script'),
+			'placeholder_textarea' => 'return value',
+			'grow' => 'auto',
+			'rows' => 0,
+			'maxlength' => DB::getFieldLength('items', 'params')
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		'script_row'
+	)
 	// Append ITEM_TYPE_HTTPAGENT Request type to form list.
 	->addRow(
 		new CLabel(_('Request type'), 'request_method'),
@@ -179,9 +260,9 @@ $form_list
 		],
 		'request_method_row'
 	)
-	// Append ITEM_TYPE_HTTPAGENT Timeout field to form list.
+	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
 	->addRow(
-		new CLabel(_('Timeout'), 'timeout'),
+		(new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark($data['type'] == ITEM_TYPE_SCRIPT),
 		(new CTextBox('timeout', $data['timeout'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'timeout_row'
 	)

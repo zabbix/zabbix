@@ -74,7 +74,7 @@ $fields = [
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
 											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
-											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 										]),
 										'isset({add}) || isset({update})'
 									],
@@ -113,7 +113,7 @@ $fields = [
 	$paramsFieldName =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
 											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.
-												ITEM_TYPE_CALCULATED, 'type'
+												ITEM_TYPE_CALCULATED.','.ITEM_TYPE_SCRIPT, 'type'
 											),
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
@@ -163,6 +163,7 @@ $fields = [
 										_('URL')
 									],
 	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'parameters' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
@@ -693,6 +694,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
+			if ($item['type'] == ITEM_TYPE_SCRIPT) {
+				$script_item = [
+					'parameters' => getRequest('parameters', []),
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+				];
+
+				$item = prepareScriptItemFormData($script_item) + $item;
+			}
+
 			$result = (bool) API::Item()->create($item);
 		}
 		else {
@@ -703,7 +713,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'templateid', 'flags', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
 					'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-					'verify_peer', 'verify_host', 'allow_traps'
+					'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -836,6 +846,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if (getRequest('type') == ITEM_TYPE_DEPENDENT && hasRequest('master_itemid')
 					&& bccomp($db_item['master_itemid'], getRequest('master_itemid')) != 0) {
 				$item['master_itemid'] = getRequest('master_itemid');
+			}
+
+			if (getRequest('type') == ITEM_TYPE_SCRIPT) {
+				$script_item = [
+					'parameters' => getRequest('parameters', []),
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+				];
+
+				$item = prepareScriptItemFormData($script_item) + $item;
+				if ($db_item['type'] == $item['type']) {
+					if ($db_item['parameters'] == $item['parameters']) {
+						unset($item['parameters']);
+					}
+					if ($db_item['timeout'] === $item['timeout']) {
+						unset($item['timeout']);
+					}
+				}
 			}
 
 			if ($item) {
@@ -1391,13 +1418,13 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	if (hasRequest('itemid')) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid',
-				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint',
-				'master_itemid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects',
-				'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
+				'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
+				'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+				'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file',
+				'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
