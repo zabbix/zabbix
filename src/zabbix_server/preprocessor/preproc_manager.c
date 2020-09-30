@@ -660,7 +660,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	int				i;
 	zbx_preprocessing_states_t	state;
 	unsigned char			priority = ZBX_PREPROC_PRIORITY_NONE;
-	int				notsupport = -1;
+	int				notsupport_step = -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __func__, value->itemid);
 
@@ -695,23 +695,26 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	memcpy(&request->value, value, sizeof(zbx_preproc_item_value_t));
 	request->state = state;
 
-	for (i = 0; i < item->preproc_ops_num; i++)
+	if (REQUEST_STATE_QUEUED == state)
 	{
-		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == item->preproc_ops[i].type)
+		for (i = 0; i < item->preproc_ops_num; i++)
 		{
-			notsupport = i;
-			if (0 != notsupport)
-				THIS_SHOULD_NEVER_HAPPEN;
-			break;
+			if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == item->preproc_ops[i].type)
+			{
+				notsupport_step = i;
+				if (0 != notsupport_step)
+					THIS_SHOULD_NEVER_HAPPEN;
+				break;
+			}
 		}
 	}
 
 	if (REQUEST_STATE_QUEUED == state && (ITEM_STATE_NOTSUPPORTED != value->state ||
-			((ITEM_STATE_NOTSUPPORTED == value->state && 0 <= notsupport))))
+			((ITEM_STATE_NOTSUPPORTED == value->state && 0 < notsupport_step))))
 	{
 		int skip = 0;
 
-		if (ITEM_STATE_NOTSUPPORTED != value->state && 0 <= notsupport)
+		if (ITEM_STATE_NOTSUPPORTED != value->state && 0 < notsupport_step)
 		{
 			skip = 1;
 		}
