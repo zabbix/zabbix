@@ -7402,10 +7402,9 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			}
 			else
 			{
-				*dst_item->timeout = '\0';
+				*dst_item->timeout_orig = '\0';
 				dst_item->params = zbx_strdup(NULL, "");
 				dst_item->script_params = zbx_strdup(NULL, "");
-
 			}
 
 			dst_item->timeout = NULL;
