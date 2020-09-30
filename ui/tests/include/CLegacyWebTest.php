@@ -367,10 +367,7 @@ class CLegacyWebTest extends CWebTest {
 
 	public function zbxTestDropdownSelectWait($id, $string) {
 		$dropdown = $this->zbxTestDropdownSelect($id, $string);
-
-		if ($dropdown->isStalled()) {
-			$this->zbxTestWaitForPageToLoad();
-		}
+		$this->zbxTestWaitForPageToLoad();
 	}
 
 	public function zbxTestDropdownAssertSelected($name, $text) {
