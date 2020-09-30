@@ -26,9 +26,6 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 	int		script_bin_sz, ret;
 	zbx_es_t	es;
 
-	SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set follow redirects: %s", error));
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize scripting environment"));
-
 	zbx_es_init(&es);
 
 	if (SUCCEED != zbx_es_init_env(&es, &error))

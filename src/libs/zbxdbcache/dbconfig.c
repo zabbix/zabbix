@@ -7489,11 +7489,13 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 				zbx_free(items[i].headers);
 				zbx_free(items[i].posts);
 				break;
+			case ITEM_TYPE_SCRIPT:
+				zbx_free(items[i].script_params);
+				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_CALCULATED:
-			case ITEM_TYPE_SCRIPT:
 				zbx_free(items[i].params);
 				break;
 		}
