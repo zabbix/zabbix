@@ -173,6 +173,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		if (array_key_exists('period', $data)) {
 			$this->zbxTestDropdownSelectWait('period', $data['period']);
 			if ($data['period'] === 'Yearly') {
+				sleep(3);
 				$this->zbxTestAssertElementNotPresentId('year');
 			}
 		}
