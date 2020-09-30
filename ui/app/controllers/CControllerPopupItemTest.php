@@ -33,6 +33,8 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Define a set of item types allowed to test and item properties needed to collect for each item type.
 	 *
+	 * @static
+	 *
 	 * @var array
 	 */
 	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
@@ -228,6 +230,10 @@ abstract class CControllerPopupItemTest extends CController {
 	protected $preproc_item;
 
 	/**
+	 * Preprocessing steps using previous value to calculate new value.
+	 *
+	 * @static
+	 *
 	 * @var array
 	 */
 	protected static $preproc_steps_using_prev_value = [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED,
@@ -244,10 +250,12 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @param string $hostid
 	 *
+	 * @static
+	 *
 	 * @return array
 	 */
 	public static function getTestableItemTypes(string $hostid = '0'): array {
-		if ($hostid != 0 && self::isItemTypeTestable($hostid)) {
+		if ($hostid !== '0' && self::isItemTypeTestable($hostid)) {
 			self::$testable_item_types[] = ITEM_TYPE_IPMI;
 		}
 
@@ -258,6 +266,8 @@ abstract class CControllerPopupItemTest extends CController {
 	 * Function checks if item type can be tested depending on what type of host it belongs to.
 	 *
 	 * @param string $hostid
+	 *
+	 * @static
 	 *
 	 * @return bool
 	 */
@@ -312,6 +322,8 @@ abstract class CControllerPopupItemTest extends CController {
 	 * Function returns instance of item, item prototype or discovery rule class.
 	 *
 	 * @param int $test_type
+	 *
+	 * @static
 	 *
 	 * @return CItem|CItemPrototype|CDiscoveryRule
 	 */
@@ -666,7 +678,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @return array $interface_data
 	 */
-	protected function getHostInterface(array $inputs) {
+	protected function getHostInterface(array $inputs): array {
 		$interface_data = [
 			'address' => '',
 			'port' => '',
@@ -691,15 +703,13 @@ abstract class CControllerPopupItemTest extends CController {
 		// Get values from database; resolve macros.
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
 				&& array_key_exists('interfaceid', $inputs)) {
-			$interfaces = array_key_exists('interfaceid', $inputs)
-				? API::HostInterface()->get([
-					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip', 'details'],
-					'interfaceids' => $inputs['interfaceid'],
-					'hostids' => $this->host['hostid']
-				])
-				: [];
+			$interfaces = API::HostInterface()->get([
+				'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip', 'details'],
+				'interfaceids' => $inputs['interfaceid'],
+				'hostids' => $this->host['hostid']
+			]);
 
-			if (count($interfaces) > 0) {
+			if (count($interfaces) != 0) {
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
 				$details = $interfaces[0]['details'] + $interface_data['details'];
 				$interface_data = [
@@ -756,13 +766,13 @@ abstract class CControllerPopupItemTest extends CController {
 	}
 
 	/**
-	 * Function to unset unspecified values before sending 'get value' request to server.
+	 * Function to unset unspecified values before sending 'item.test' request to server.
 	 *
 	 * @param array $data  Data array containing all parameters prepared to be sent to server.
 	 *
 	 * @return array
 	 */
-	protected function unsetEmptyValues(array $data) {
+	protected function unsetEmptyValues(array $data): array {
 		foreach ($data as $key => $value) {
 			if ($key === 'host' && is_array($value)) {
 				$data[$key] = $this->unsetEmptyValues($value);
@@ -780,13 +790,15 @@ abstract class CControllerPopupItemTest extends CController {
 							unset($data['interface']['details']['authprotocol'],
 								$data['interface']['details']['authpassphrase'],
 								$data['interface']['details']['privprotocol'],
-								$data['interface']['details']['privpassphrase']);
+								$data['interface']['details']['privpassphrase']
+							);
 						}
 						elseif (
 							$data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
 						) {
 							unset($data['interface']['details']['privprotocol'],
-								$data['interface']['details']['privpassphrase']);
+								$data['interface']['details']['privpassphrase']
+							);
 						}
 					}
 					else {
@@ -796,7 +808,8 @@ abstract class CControllerPopupItemTest extends CController {
 							$data['interface']['details']['authprotocol'],
 							$data['interface']['details']['authpassphrase'],
 							$data['interface']['details']['privprotocol'],
-							$data['interface']['details']['privpassphrase']);
+							$data['interface']['details']['privpassphrase']
+						);
 					}
 				}
 			}
