@@ -641,7 +641,9 @@ static int	lw_array_idx_for_min_val(zbx_vector_char_t *v)
 static zbx_vector_char_t	*lw_array_diff(zbx_vector_char_t *a, zbx_vector_char_t *b)
 {
 	int			i;
-	zbx_vector_char_t	*v = lw_array_create();
+	zbx_vector_char_t	*v;
+
+	v = lw_array_create();
 
 	for (i = 0; i < a->values_num; i++)
 		if (a->values[i] != b->values[i])
@@ -653,7 +655,9 @@ static zbx_vector_char_t	*lw_array_diff(zbx_vector_char_t *a, zbx_vector_char_t 
 static zbx_vector_char_t	*lw_array_intersect(zbx_vector_char_t *a, zbx_vector_char_t *b)
 {
 	int			i;
-	zbx_vector_char_t	*v = lw_array_create();
+	zbx_vector_char_t	*v;
+
+	v = lw_array_create();
 
 	for (i = 0; i < a->values_num; i++)
 		if (a->values[i] == b->values[i])
@@ -706,8 +710,8 @@ static int	DBpatch_block_compare_func(const void *d1, const void *d2)
 	unsized_a = lw_array_count(diff1);
 	unsized_b = lw_array_count(diff2);
 
-	zbx_vector_char_destroy(diff1);
-	zbx_vector_char_destroy(diff2);
+	lw_array_free(diff1);
+	lw_array_free(diff2);
 
 	ZBX_RETURN_IF_NOT_EQUAL(unsized_a, unsized_b);
 
@@ -747,6 +751,8 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 
 		block_dimensions = lw_array_intersect(dimensions, r_block);
 		block_dimensions_sum = lw_array_sum(block_dimensions);
+		lw_array_free(block_dimensions);
+
 		block_unsized = lw_array_diff(r_block, dimensions);
 		block_unsized_count = lw_array_count(block_unsized);
 		size_overflow = scitems->values[block->index].size - block_dimensions_sum;
@@ -777,7 +783,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 			}
 		}
 
-		zbx_vector_char_destroy(block->r_block);
+		lw_array_free(block->r_block);
 		zbx_free(block);
 		zbx_vector_ptr_remove(&blocks, 0);
 	}
