@@ -566,7 +566,6 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		clickCallback: function() {
 			jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
 			jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			jQuery('#dashbrd-paste-widget').attr('disabled', false);
 		}
 	});
 
