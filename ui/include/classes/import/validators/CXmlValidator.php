@@ -43,13 +43,14 @@ class CXmlValidator extends CXmlValidatorGeneral {
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $path) {
+	public function validate(array $data, string $path): array {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
 			'zabbix_export' => ['type' => XML_ARRAY | XML_REQUIRED, 'check_unexpected' => false, 'rules' => [
 				'version' => ['type' => XML_STRING | XML_REQUIRED]
 			]]
 		]];
 
+		// Save strict flag value.
 		$strict = $this->getStrict();
 
 		$data = $this

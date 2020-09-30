@@ -50,7 +50,7 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @return bool
 	 */
-	public function getStrict() {
+	public function getStrict(): bool {
 		return $this->strict;
 	}
 
@@ -59,9 +59,9 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @param bool $strict
 	 *
-	 * @return CXmlValidatorGeneral
+	 * @return self
 	 */
-	public function setStrict(bool $strict) {
+	public function setStrict(bool $strict): self {
 		$this->strict = $strict;
 
 		return $this;
@@ -76,7 +76,7 @@ abstract class CXmlValidatorGeneral {
 	 * @return array  Validator does some manipulation for the incoming data. For example, converts empty tags to
 	 *                an array, if desired. Converted array is returned.
 	 */
-	abstract public function validate(array $data, $path);
+	abstract public function validate(array $data, string $path);
 
 	/**
 	 * Validate import data against the rules.
@@ -90,7 +90,7 @@ abstract class CXmlValidatorGeneral {
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
-	protected function doValidate($rules, $data, $path) {
+	protected function doValidate(array $rules, $data, string $path) {
 		$this->doValidateRecursive($rules, $data, null, $path);
 
 		return $data;
@@ -106,7 +106,7 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if $data does not correspond to validation $rules.
 	 */
-	private function doValidateRecursive(array $rules, &$data, array $parent_data = null, $path) {
+	private function doValidateRecursive(array $rules, &$data, ?array $parent_data = null, string $path): void {
 		if (array_key_exists('preprocessor', $rules)) {
 			$data = call_user_func($rules['preprocessor'], $data);
 		}
@@ -178,7 +178,7 @@ abstract class CXmlValidatorGeneral {
 					continue;
 				}
 
-				if ($this->strict) {
+				if ($this->getStrict()) {
 					switch ($this->format) {
 						case 'xml':
 							$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
@@ -230,7 +230,7 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if this $value is not a character string.
 	 */
-	private function validateString($value, $path) {
+	private function validateString($value, string $path): void {
 		if (!is_string($value)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('a character string is expected')));
 		}
@@ -244,7 +244,7 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if this $value is not an array.
 	 */
-	private function validateArray($value, $path) {
+	private function validateArray($value, string $path): void {
 		if (!is_array($value)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('an array is expected')));
 		}
@@ -259,7 +259,7 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if this $value is an invalid constant.
 	 */
-	private function validateConstant($value, $rules, $path) {
+	private function validateConstant($value, array $rules, string $path): void {
 		if (array_key_exists('in', $rules) && !in_array($value, array_values($rules['in']))) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant "%1$s"', $value)));
 		}

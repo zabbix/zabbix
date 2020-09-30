@@ -147,8 +147,8 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$importReader = CImportReaderFactory::getReader($params['format']);
-		$data = $importReader->read($params['source']);
+		$import_reader = CImportReaderFactory::getReader($params['format']);
+		$data = $import_reader->read($params['source']);
 
 		$import_validator_factory = new CImportValidatorFactory($params['format']);
 		$import_converter_factory = new CImportConverterFactory();
@@ -168,6 +168,7 @@ class CConfiguration extends CApiService {
 				->getObject($version)
 				->convert($data);
 
+			// Strict flag set to false, because converters cannot correct change keys for indexed array.
 			$data = $validator
 				->setStrict(false)
 				->validate($data, '/');
@@ -193,12 +194,12 @@ class CConfiguration extends CApiService {
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
 
-		$configurationImport = new CConfigurationImport(
+		$configuration_import = new CConfigurationImport(
 			$params['rules'],
 			new CImportReferencer(),
 			new CImportedObjectContainer()
 		);
 
-		return $configurationImport->import($adapter);
+		return $configuration_import->import($adapter);
 	}
 }
