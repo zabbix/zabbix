@@ -50,7 +50,6 @@ class CXmlValidator extends CXmlValidatorGeneral {
 			]]
 		]];
 
-		// Save strict flag value.
 		$strict = $this->getStrict();
 
 		$data = $this

@@ -168,8 +168,8 @@ class CConfiguration extends CApiService {
 				->getObject($version)
 				->convert($data);
 
-			// Strict flag set to false, because converters cannot correct change keys for indexed array.
 			$data = $validator
+				// Must not use XML_INDEXED_ARRAY key validaiton for the converted data.
 				->setStrict(false)
 				->validate($data, '/');
 		}

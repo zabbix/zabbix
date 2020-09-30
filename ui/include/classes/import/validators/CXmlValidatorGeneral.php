@@ -24,6 +24,9 @@
  */
 abstract class CXmlValidatorGeneral {
 
+	public const XML = 'xml';
+	public const JSON = 'json';
+
 	/**
 	 * Format of import source.
 	 *
@@ -106,7 +109,7 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if $data does not correspond to validation $rules.
 	 */
-	private function doValidateRecursive(array $rules, &$data, ?array $parent_data = null, string $path): void {
+	private function doValidateRecursive(array $rules, &$data, ?array $parent_data, string $path): void {
 		if (array_key_exists('preprocessor', $rules)) {
 			$data = call_user_func($rules['preprocessor'], $data);
 		}
@@ -178,13 +181,13 @@ abstract class CXmlValidatorGeneral {
 					continue;
 				}
 
-				if ($this->getStrict()) {
+				if ($this->strict) {
 					switch ($this->format) {
-						case 'xml':
+						case self::XML:
 							$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
 							break;
 
-						case 'json':
+						case self::JSON:
 							$is_valid_tag = ctype_digit(strval($tag));
 							break;
 
