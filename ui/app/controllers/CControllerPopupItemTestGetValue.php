@@ -105,32 +105,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 				}
 			}
 
-			// Test interface options.
+			// Test interface properties.
 			$interface = $this->getInput('interface', []);
-
-			if (array_key_exists($this->item_type, $this->items_require_interface)) {
-
-				if ($this->items_require_interface[$this->item_type]['details']) {
-					if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
-							&& (!array_key_exists('community', $interface['details'])
-								|| $interface['details']['community'] === '')) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('SNMP community'), _('cannot be empty')));
-						$ret = false;
-					}
-				}
-
-				if ($this->items_require_interface[$this->item_type]['address']
-						&& (!array_key_exists('address', $interface) || $interface['address'] === '')) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
-					$ret = false;
-				}
-
-				if ($this->items_require_interface[$this->item_type]['port']
-						&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
-					$ret = false;
-				}
-			}
+			$ret = ($ret && $this->validateInterface($interface));
 		}
 
 		if (($messages = getMessages()) !== null) {

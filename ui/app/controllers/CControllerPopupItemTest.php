@@ -1105,4 +1105,44 @@ abstract class CControllerPopupItemTest extends CController {
 
 		return $value;
 	}
+
+	/**
+	 * Validate interface properties against rules for each item type.
+	 *
+	 * @param array $interface  Interface to validate.
+	 *
+	 * @return bool
+	 */
+	protected function validateInterface(array $interface): bool {
+		if (!array_key_exists($this->item_type, $this->items_require_interface)) {
+			return true;
+		}
+
+		if ($this->items_require_interface[$this->item_type]['details']) {
+			$det = array_key_exists('details', $interface) ? $interface['details'] : [];
+			$det += [
+				'version' => SNMP_V2C,
+				'community' => ''
+			];
+
+			if (($det == SNMP_V1 || $det == SNMP_V2C) && $det['community'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('SNMP community'), _('cannot be empty')));
+				return false;
+			}
+		}
+
+		if ($this->items_require_interface[$this->item_type]['address']
+				&& (!array_key_exists('address', $interface) || $interface['address'] === '')) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
+			return false;
+		}
+
+		if ($this->items_require_interface[$this->item_type]['port']
+				&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+			return false;
+		}
+
+		return true;
+	}
 }
