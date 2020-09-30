@@ -772,10 +772,9 @@ out:
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *service_version;
+	char			*url;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
-	size_t			service_version_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -792,24 +791,10 @@ int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const ch
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == service->major_version)
+	if (NULL == service->version_str)
 		goto unlock;
 
-	if (NULL == service->minor_version)
-		goto unlock;
-
-	if (NULL == service->minor_version_revision)
-		goto unlock;
-
-	service_version_len = strlen(service->major_version) + strlen(service->minor_version) +
-			strlen(service->minor_version_revision) + 3;
-
-	service_version = (char *)zbx_malloc(NULL, service_version_len);
-
-	zbx_snprintf(service_version, service_version_len, "%s.%s.%s", service->major_version,
-			service->minor_version, service->minor_version_revision);
-
-	SET_STR_RESULT(result, service_version);
+	SET_STR_RESULT(result, zbx_strdup(NULL, service->version_str));
 
 	ret = SYSINFO_RET_OK;
 unlock:

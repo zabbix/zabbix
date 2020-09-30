@@ -244,10 +244,12 @@ typedef struct
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int				lastaccess;
 
-	/* the vmware service instance version numbers */
-	char				*major_version;
-	char				*minor_version;
-	char				*minor_version_revision;
+	/* the vmware service instance version */
+	char				*version_str;
+
+	/* the vmware service instance version numeric */
+	unsigned short			major_version_num;
+	unsigned short			minor_version_num;
 
 	/* the vmware service instance fullname */
 	char				*fullname;
