@@ -710,11 +710,11 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	}
 
 	if (REQUEST_STATE_QUEUED == state && (ITEM_STATE_NOTSUPPORTED != value->state ||
-			((ITEM_STATE_NOTSUPPORTED == value->state && 0 < notsupport_step))))
+			((ITEM_STATE_NOTSUPPORTED == value->state && 0 <= notsupport_step))))
 	{
 		int skip = 0;
 
-		if (ITEM_STATE_NOTSUPPORTED != value->state && 0 < notsupport_step)
+		if (ITEM_STATE_NOTSUPPORTED != value->state && 0 <= notsupport_step)
 		{
 			skip = 1;
 		}
