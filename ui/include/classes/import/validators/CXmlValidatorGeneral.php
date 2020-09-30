@@ -76,8 +76,8 @@ abstract class CXmlValidatorGeneral {
 	 * @param array|string $data  Import data.
 	 * @param string       $path  XML path (for error reporting).
 	 *
-	 * @return array  Validator does some manipulation for the incoming data. For example, converts empty tags to
-	 *                an array, if desired. Converted array is returned.
+	 * @return mixed  Validator does some manipulations for the incoming data. For example, converts empty tags to an
+	 *                array, if desired. Converted data is returned.
 	 */
 	abstract public function validate(array $data, string $path);
 
@@ -90,8 +90,8 @@ abstract class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if $data does not correspond to validation rules.
 	 *
-	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
-	 *                array, if desired. Converted array is returned.
+	 * @return mixed  Validator does some manipulations for the incoming data. For example, converts empty tags to an
+	 *                array, if desired. Converted data is returned.
 	 */
 	protected function doValidate(array $rules, $data, string $path) {
 		$this->doValidateRecursive($rules, $data, null, $path);
