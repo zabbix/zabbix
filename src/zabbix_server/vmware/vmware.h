@@ -245,11 +245,11 @@ typedef struct
 	int				lastaccess;
 
 	/* the vmware service instance version */
-	char				*version_str;
+	char				*version;
 
 	/* the vmware service instance version numeric */
-	unsigned short			major_version_num;
-	unsigned short			minor_version_num;
+	unsigned short			major_version;
+	unsigned short			minor_version;
 
 	/* the vmware service instance fullname */
 	char				*fullname;

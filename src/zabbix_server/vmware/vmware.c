@@ -1202,8 +1202,8 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 	vmware_shared_strfree(service->username);
 	vmware_shared_strfree(service->password);
 
-	if (NULL != service->version_str)
-		vmware_shared_strfree(service->version_str);
+	if (NULL != service->version)
+		vmware_shared_strfree(service->version);
 
 	if (NULL != service->fullname)
 		vmware_shared_strfree(service->fullname);
@@ -2714,8 +2714,8 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	id_esc = xml_escape_dyn(id);
 
-	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version_str &&
-			ZBX_VMWARE_DS_REFRESH_VERSION > service->major_version_num && SUCCEED !=
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version &&
+			ZBX_VMWARE_DS_REFRESH_VERSION > service->major_version && SUCCEED !=
 			vmware_service_refresh_datastore_info(easyhandle, id_esc, &error))
 	{
 		zbx_free(id_esc);
@@ -4419,8 +4419,8 @@ out:
  ******************************************************************************/
 static unsigned int	get_default_maxquerymetrics_for_vcenter(const zbx_vmware_service_t *service)
 {
-	if ((6 == service->major_version_num && 5 <= service->minor_version_num) ||
-			6 < service->major_version_num)
+	if ((6 == service->major_version && 5 <= service->minor_version) ||
+			6 < service->major_version)
 	{
 		return ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS;
 	}
@@ -4552,13 +4552,10 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
 #	define UNPARSED_SERVICE_MAJOR_VERSION_DELIM	"."
-#	define MAXIMUM_VMWARE_VERSION_MAX_NUM_COUNT	10
 
-	char			*remainder_after_service_major_version, *unparsed_service_version = NULL,
-				*fullname = NULL;
-	char			service_minor_version_str_buf[MAXIMUM_VMWARE_VERSION_MAX_NUM_COUNT];
+	char			*unparsed_service_version = NULL, *fullname = NULL;
 	zbx_vector_ptr_t	counters;
-	int			ret = FAIL, i = 0;
+	int			ret = FAIL;
 
 	zbx_vector_ptr_create(&counters);
 
@@ -4570,22 +4567,13 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	zbx_vmware_lock();
 
-	service->version_str = vmware_shared_strdup(unparsed_service_version);
+	service->version = vmware_shared_strdup(unparsed_service_version);
 
 	/* version should have the "x.y.z" format, but there is also a "x.y Un" format in nature */
 	/* according to https://www.vmware.com/support/policies/version.html */
-	service->major_version_num = atoi(strtok(zbx_strdup(NULL, service->version_str),
+	service->major_version = atoi(service->version);
+	service->minor_version = atoi(strlen(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + strstr(service->version,
 			UNPARSED_SERVICE_MAJOR_VERSION_DELIM));
-	remainder_after_service_major_version = strtok(NULL, "");
-
-	while (isdigit(remainder_after_service_major_version[i]))
-	{
-		service_minor_version_str_buf[i] = remainder_after_service_major_version[i];
-		i++;
-	}
-
-	service_minor_version_str_buf[i] = 0;
-	service->minor_version_num = strtol(service_minor_version_str_buf, NULL, 10);
 
 	service->fullname = vmware_shared_strdup(fullname);
 	vmware_counters_shared_copy(&service->counters, &counters);

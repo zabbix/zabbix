@@ -791,10 +791,10 @@ int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const ch
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == service->version_str)
+	if (NULL == service->version)
 		goto unlock;
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, service->version_str));
+	SET_STR_RESULT(result, zbx_strdup(NULL, service->version));
 
 	ret = SYSINFO_RET_OK;
 unlock:
