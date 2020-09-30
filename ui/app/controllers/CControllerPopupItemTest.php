@@ -782,20 +782,26 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 			}
 			elseif ($key === 'interface') {
-				if ($data['interface']['type'] == INTERFACE_TYPE_SNMP) {
-					if ($data['interface']['details']['version'] == SNMP_V3) {
+				if (is_array($value) && array_key_exists('type', $value) && $value['type'] == INTERFACE_TYPE_SNMP) {
+					$dets = (array_key_exists('details', $value) && is_array($value['details']))
+						? $value['details']
+						: [];
+					$dets += [
+						'version' => SNMP_V2C,
+						'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV
+					];
+
+					if ($dets['version'] == SNMP_V3) {
 						unset($data['interface']['details']['community']);
 
-						if ($data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+						if ($dets['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
 							unset($data['interface']['details']['authprotocol'],
 								$data['interface']['details']['authpassphrase'],
 								$data['interface']['details']['privprotocol'],
 								$data['interface']['details']['privpassphrase']
 							);
 						}
-						elseif (
-							$data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-						) {
+						elseif ($dets['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
 							unset($data['interface']['details']['privprotocol'],
 								$data['interface']['details']['privpassphrase']
 							);
