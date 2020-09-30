@@ -393,7 +393,7 @@ if (empty($_GET['files'])) {
 	require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
-		$session = unserialize(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)));
+		$session = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 		$js .= 'window.ZBX_SESSION_NAME = "'.crc32($session['sessionid']).'";';
 		$files[] = 'class.localstorage.js';
 	}

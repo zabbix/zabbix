@@ -649,6 +649,9 @@ class CSetupWizard extends CForm {
 			$this->DISABLE_CANCEL_BUTTON = true;
 			$this->DISABLE_BACK_BUTTON = true;
 
+			// Clear session after success install.
+			CSessionHelper::clear();
+
 			$message_box = null;
 			$message = [
 				(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))

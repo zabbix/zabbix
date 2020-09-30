@@ -37,11 +37,9 @@ class CCookieSession implements \SessionHandlerInterface {
 
 			// Set use standard cookie PHPSESSID to false.
 			ini_set('session.use_cookies', '0');
-			// Set serialize method to standard serialize / unserialize.
-			ini_set('session.serialize_handler', 'php_serialize');
 
-			session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'],
-				[$this, 'write'], [$this, 'destroy'], [$this, 'gc']
+			session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'], [$this, 'write'],
+				[$this, 'destroy'], [$this, 'gc']
 			);
 
 			if (!$this->session_start()) {
@@ -109,7 +107,17 @@ class CCookieSession implements \SessionHandlerInterface {
 	 * @return string
 	 */
 	public function read($session_id) {
-		return $this->parseData();
+		$session_data = json_decode($this->parseData(), true);
+
+		if (!is_array($session_data)) {
+			return '';
+		}
+
+		foreach ($session_data as $key => $value) {
+			CSessionHelper::set($key, $value);
+		}
+
+		return session_encode();
 	}
 
 	/**
@@ -121,7 +129,8 @@ class CCookieSession implements \SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function write($session_id, $session_data) {
-		$session_data = $this->prepareData($session_data);
+		session_decode($session_data);
+		$session_data = $this->prepareData(CSessionHelper::getAll());
 
 		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, 0)) {
 			throw new \Exception(_('Cannot set session cookie.'));
@@ -136,9 +145,9 @@ class CCookieSession implements \SessionHandlerInterface {
 	 * @return boolean
 	 */
 	protected function session_start(): bool {
-		$session_data = $this->parseData();
+		$session_data = json_decode($this->parseData(), true);
 
-		if (mb_strlen($session_data) === 0) {
+		if ($session_data === null) {
 			return session_start();
 		}
 
@@ -153,13 +162,11 @@ class CCookieSession implements \SessionHandlerInterface {
 	/**
 	 * Extract session id from session data.
 	 *
-	 * @param string $session_data
+	 * @param array $session_data
 	 *
 	 * @return string|null
 	 */
-	protected function extractSessionId(string $session_data): ?string {
-		$session_data = unserialize($session_data);
-
+	protected function extractSessionId(array $session_data): ?string {
 		if (array_key_exists('sessionid', $session_data)) {
 			return $session_data['sessionid'];
 		}
@@ -170,14 +177,12 @@ class CCookieSession implements \SessionHandlerInterface {
 	/**
 	 * Prepare session data.
 	 *
-	 * @param string $data
+	 * @param array $data
 	 *
 	 * @return string
 	 */
-	protected function prepareData(string $data): string {
-		$data = unserialize($data);
-
-		return base64_encode(serialize($data));
+	protected function prepareData(array $data): string {
+		return base64_encode(json_encode($data));
 	}
 
 	/**
