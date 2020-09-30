@@ -92,22 +92,23 @@ if ($data['is_item_testable']) {
 		->addRow(new CLabel(_('Get value from host'), 'get_value'),
 			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
 		)
-		->addRow((new CLabel(_('Host address'), 'interface_address'))->setAsteriskMark(), (new CHorList([
-			$data['interface_address_enabled']
-				? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				: (new CTextBox('interface[address]'))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setEnabled(false),
-			(new CLabel(_('Port'), 'interface_port'))->addStyle('width:60px;display:block;text-align:right;'),
-			$data['interface_port_enabled']
-				? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				: (new CTextBox('interface[port]'))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setEnabled(false)
-		])),
-		'host_address_row'
+		->addRow((new CLabel(_('Host address'), 'interface_address'))->setAsteriskMark(),
+			new CHorList([
+				$data['interface_address_enabled']
+					? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					: (new CTextBox('interface[address]'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setEnabled(false),
+				(new CLabel(_('Port'), 'interface_port'))->addStyle('width:60px;display:block;text-align:right;'),
+				$data['interface_port_enabled']
+					? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					: (new CTextBox('interface[port]'))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setEnabled(false)
+			]),
+			'host_address_row'
 	);
 
 	if ($data['show_snmp_form']) {
@@ -119,7 +120,7 @@ if ($data['is_item_testable']) {
 			)
 			->addRow((new CLabel(_('SNMP community'), 'interface[details][community]'))->setAsteriskMark(),
 				(new CTextBox('interface[details][community]', $data['inputs']['interface']['details']['community'],
-						false, DB::getFieldLength('interface_snmp', 'community')
+					false, DB::getFieldLength('interface_snmp', 'community')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired(),
@@ -127,30 +128,30 @@ if ($data['is_item_testable']) {
 			)
 			->addRow(new CLabel(_('Context name'), 'interface[details][contextname]'),
 				(new CTextBox('interface[details][contextname]', $data['inputs']['interface']['details']['contextname'],
-						false, DB::getFieldLength('interface_snmp', 'contextname')
+					false, DB::getFieldLength('interface_snmp', 'contextname')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				'popup_row_snmpv3_contextname'
 			)
 			->addRow(new CLabel(_('Security name'), 'interface[details][securityname]'),
 				(new CTextBox('interface[details][securityname]',
-						$data['inputs']['interface']['details']['securityname'], false,
-						DB::getFieldLength('interface_snmp', 'securityname')
+					$data['inputs']['interface']['details']['securityname'], false,
+					DB::getFieldLength('interface_snmp', 'securityname')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				'popup_row_snmpv3_securityname'
 			)
 			->addRow(new CLabel(_('Security level'), 'interface[details][securitylevel]'),
 				new CComboBox('interface[details][securitylevel]',
-						$data['inputs']['interface']['details']['securitylevel'], null, [
-							ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-						]
+					$data['inputs']['interface']['details']['securitylevel'], null, [
+						ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+						ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+					]
 				),
 				'popup_row_snmpv3_securitylevel'
 			)
 			->addRow(new CLabel(_('Authentication protocol'), 'interface[details][authprotocol]'),
 				(new CRadioButtonList('interface[details][authprotocol]',
-						(int) $data['inputs']['interface']['details']['authprotocol']
+					(int) $data['inputs']['interface']['details']['authprotocol']
 				))
 					->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
 					->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
@@ -159,14 +160,14 @@ if ($data['is_item_testable']) {
 			)
 			->addRow(new CLabel(_('Authentication passphrase'), 'interface[details][authpassphrase]'),
 				(new CTextBox('interface[details][authpassphrase]',
-						$data['inputs']['interface']['details']['authpassphrase'], false,
-						DB::getFieldLength('interface_snmp', 'authpassphrase')
+					$data['inputs']['interface']['details']['authpassphrase'], false,
+					DB::getFieldLength('interface_snmp', 'authpassphrase')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				'popup_row_snmpv3_authpassphrase'
 			)
 			->addRow(new CLabel(_('Privacy protocol'), 'interface[details][privprotocol]'),
 				(new CRadioButtonList('interface[details][privprotocol]',
-						(int) $data['inputs']['interface']['details']['privprotocol']
+					(int) $data['inputs']['interface']['details']['privprotocol']
 				))
 					->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
 					->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
@@ -175,8 +176,8 @@ if ($data['is_item_testable']) {
 			)
 			->addRow(new CLabel(_('Privacy passphrase'), 'interface[details][privpassphrase]'),
 				(new CTextBox('interface[details][privpassphrase]',
-						$data['inputs']['interface']['details']['privpassphrase'], false,
-						DB::getFieldLength('interface_snmp', 'privpassphrase')
+					$data['inputs']['interface']['details']['privpassphrase'], false,
+					DB::getFieldLength('interface_snmp', 'privpassphrase')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				'popup_row_snmpv3_privpassphrase'
 			);
