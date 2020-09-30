@@ -213,7 +213,7 @@ class CHostPrototype extends CHostBase {
 				'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
 				'main' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
 				'details' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_SNMP])], 'type' => API_OBJECT, 'fields' => [
+											['if' => ['field' => 'type', 'in' => (string) INTERFACE_TYPE_SNMP], 'type' => API_OBJECT, 'fields' => [
 					'version' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
 					'bulk' =>					['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
 					'community' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'community')],
@@ -425,7 +425,7 @@ class CHostPrototype extends CHostBase {
 				'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('interface', 'port')],
 				'main' => 				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_SECONDARY, INTERFACE_PRIMARY])],
 				'details' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_SNMP])], 'type' => API_OBJECT, 'fields' => [
+											['if' => ['field' => 'type', 'in' => (string) INTERFACE_TYPE_SNMP], 'type' => API_OBJECT, 'fields' => [
 					'version' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SNMP_V1, SNMP_V2C, SNMP_V3])],
 					'bulk' =>					['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
 					'community' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'community')],

@@ -338,7 +338,7 @@
 
 		renderRow(iface) {
 			const container = document.querySelector(this.CONTAINER_IDS[iface.type]);
-			const disabled = (iface.items > 0);
+			const disabled = (typeof iface.items !== 'undefined' && iface.items > 0);
 
 			iface.type_name = this.INTERFACE_NAMES[iface.type];
 

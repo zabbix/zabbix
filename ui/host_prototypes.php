@@ -476,11 +476,6 @@ if (hasRequest('form')) {
 			}
 
 			$data['tags'] = $data['host_prototype']['tags'];
-
-			foreach ($data['host_prototype']['interfaces'] as &$interface) {
-				$interface['items'] = false;
-			}
-			unset($interface);
 		}
 		else {
 			// Set default values for new host prototype.
