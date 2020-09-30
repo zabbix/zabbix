@@ -1616,8 +1616,6 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the interfaces input is invalid.
 	 */
 	private function validateInterfaces(array $host_prototypes): void {
-		$interfaces = [];
-
 		foreach ($host_prototypes as $hp_idx => $host_prototype) {
 			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
 				if (array_key_exists('interfaces', $host_prototype) && $host_prototype['interfaces']) {
@@ -1682,10 +1680,9 @@ class CHostPrototype extends CHostBase {
 								_s('unexpected parameter "%1$s"', 'details')
 							));
 						}
-
-						$interface['hostid'] = $host_prototype['hostid'];
-						$interfaces[] = $interface;
 					}
+
+					$this->checkMainInterfaces($host_prototype, $host_prototype['interfaces']);
 				}
 			}
 			elseif (array_key_exists('interfaces', $host_prototype) && $host_prototype['interfaces']) {
@@ -1694,58 +1691,47 @@ class CHostPrototype extends CHostBase {
 				));
 			}
 		}
-
-		$this->checkMainInterfaces($host_prototypes, $interfaces);
 	}
 
 	/**
 	 * Check if main interfaces are correctly set for every interface type. Each host must either have only one main
 	 * interface for each interface type, or have no interface of that type at all.
 	 *
-	 * @param array  $host_prototypes            Array of host prototypes.
-	 * @param string $host_prototypes[]['name']  Host prototype name.
-	 * @param array  $interfaces                 All host prototype interfaces including existing ones in DB.
-	 * @param string $interfaces[]['hostid']     Host prototype ID.
-	 * @param int    $interfaces[]['type']       Interface type.
-	 * @param int    $interfaces[]['main']       If interface type is main.
+	 * @param array  $host_prototype          Host prototype object.
+	 * @param string $host_prototype['name']  Host prototype name.
+	 * @param array  $interfaces              All single host prototype interfaces including existing ones in DB.
+	 * @param int    $interfaces[]['type']    Interface type.
+	 * @param int    $interfaces[]['main']    If interface type is main.
 	 *
 	 * @throws APIException if two main or no main interfaces are given.
 	 */
-	private function checkMainInterfaces(array $host_prototypes, array $interfaces): void {
+	private function checkMainInterfaces(array $host_prototype, array $interfaces): void {
 		$interface_types = [];
 
 		foreach ($interfaces as $interface) {
-			if (!array_key_exists($interface['hostid'], $interface_types)) {
-				$interface_types[$interface['hostid']] = [];
-			}
-
-			if (!array_key_exists($interface['type'], $interface_types[$interface['hostid']])) {
-				$interface_types[$interface['hostid']][$interface['type']] = ['main' => 0, 'all' => 0];
+			if (!array_key_exists($interface['type'], $interface_types)) {
+				$interface_types[$interface['type']] = ['main' => 0, 'all' => 0];
 			}
 
 			if ($interface['main'] == INTERFACE_PRIMARY) {
-				$interface_types[$interface['hostid']][$interface['type']]['main']++;
+				$interface_types[$interface['type']]['main']++;
 			}
 			else {
-				$interface_types[$interface['hostid']][$interface['type']]['all']++;
+				$interface_types[$interface['type']]['all']++;
 			}
 		}
 
-		$host_prototypes = zbx_toHash($host_prototypes, 'hostid');
+		foreach ($interface_types as $type => $counters) {
+			if ($counters['all'] && !$counters['main']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No default interface for "%1$s" type on "%2$s".',
+					hostInterfaceTypeNumToName($type), $host_prototype['name']
+				));
+			}
 
-		foreach ($interface_types as $hostid => $interface_type) {
-			foreach ($interface_type as $type => $counters) {
-				if ($counters['all'] && !$counters['main']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No default interface for "%1$s" type on "%2$s".',
-						hostInterfaceTypeNumToName($type), $host_prototypes[$hostid]['name']
-					));
-				}
-
-				if ($counters['main'] > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Host prototype cannot have more than one default interface of the same type.')
-					);
-				}
+			if ($counters['main'] > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('Host prototype cannot have more than one default interface of the same type.')
+				);
 			}
 		}
 	}
