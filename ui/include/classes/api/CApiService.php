@@ -23,6 +23,8 @@ class CApiService {
 
 	public static $userData;
 
+	public const ACCESS_RULES = [];
+
 	/**
 	 * The name of the table.
 	 *

@@ -24,6 +24,30 @@
  */
 class CUser extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => [
+			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
+		],
+		'create' => [
+			'user_types' => [USER_TYPE_SUPER_ADMIN]
+		],
+		'update' => [
+			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
+		],
+		'delete' => [
+			'user_types' => [USER_TYPE_SUPER_ADMIN]
+		],
+		'logout' => [
+			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
+		],
+		'login' => [
+			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
+		],
+		'checkauthentication' => [
+			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
+		]
+	];
+
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'alias'];
@@ -1416,6 +1440,7 @@ class CUser extends CApiService {
 		}
 
 		$db_user = $db_users[0];
+		$db_user['type'] = $this->getUserType($db_user['roleid']);
 
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
@@ -1458,9 +1483,6 @@ class CUser extends CApiService {
 			]);
 		}
 
-		$db_user['role'] = $this->getUserRoleData($db_user['roleid']);
-		$db_user['type'] = $db_user['role']['type'];
-
 		self::$userData = $db_user;
 
 		return $db_user;
@@ -1497,20 +1519,14 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Returns an array with user role and its rules.
+	 * Returns user type.
 	 *
 	 * @param string $roleid
 	 *
-	 * @return array
+	 * @return int
 	 */
-	private function getUserRoleData(string $roleid): array {
-		$db_roles = API::Role()->get([
-			'output' => ['roleid', 'name', 'type', 'readonly'],
-			'selectRules' => ['type', 'name', 'value'],
-			'roleids' => $roleid
-		]);
-
-		return $db_roles[0];
+	private function getUserType(string $roleid): int {
+		return DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type')[0];
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -1696,6 +1712,8 @@ class CUser extends CApiService {
 		}
 
 		$db_user = reset($db_users);
+		$db_user['type'] = $this->getUserType($db_user['roleid']);
+
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
 		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
@@ -1715,9 +1733,6 @@ class CUser extends CApiService {
 		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($db_user['timezone']);
 		}
-
-		$db_user['role'] = $this->getUserRoleData($db_user['roleid']);
-		$db_user['type'] = $db_user['role']['type'];
 
 		return $db_user;
 	}

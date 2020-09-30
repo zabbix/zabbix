@@ -72,6 +72,11 @@ class CRoleHelper {
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute.scripts';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 
+	public const API_WILDCARD = '*';
+	public const API_WILDCARD_ALIAS = '*.*';
+	public const API_ANY_SERVICE = '*.';
+	public const API_ANY_METHOD = '.*';
+
 	/**
 	 * Array for storing the list of all available role rules for each user type.
 	 *

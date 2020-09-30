@@ -108,6 +108,14 @@ class CLocalApiClient extends CApiClient {
 			// authenticate
 			if ($requiresAuthentication) {
 				$this->authenticate($auth);
+
+				// check permissions
+				if (APP::getMode() === APP::EXEC_MODE_API && !$this->isAllowedMethod($api, $method)) {
+					$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+					$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
+
+					return $response;
+				}
 			}
 
 			// the nopermission parameter must not be available for external API calls.
@@ -196,17 +204,16 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @return bool
 	 */
-	protected function isValidMethod($api, $method) {
-		$apiService = $this->serviceFactory->getObject($api);
+	protected function isValidMethod(string $api, string $method): bool {
+		$api_service = $this->serviceFactory->getObject($api);
 
-		// validate the method
-		$availableMethods = [];
-		foreach (get_class_methods($apiService) as $serviceMethod) {
-			// the comparison must be case insensitive
-			$availableMethods[strtolower($serviceMethod)] = true;
+		foreach (get_class_methods($api_service) as $service_method) {
+			if ($method === strtolower($service_method) && array_key_exists($method, $api_service::ACCESS_RULES)) {
+				return true;
+			}
 		}
 
-		return isset($availableMethods[$method]);
+		return false;
 	}
 
 	/**
@@ -222,5 +229,64 @@ class CLocalApiClient extends CApiClient {
 			|| ($api === 'user' && $method === 'checkauthentication')
 			|| ($api === 'apiinfo' && $method === 'version')
 			|| ($api === 'settings' && $method === 'getglobal'));
+	}
+
+	/**
+	 * Returns true if the current user is permitted to call the given API method.
+	 *
+	 * @param string $api
+	 * @param string $method
+	 *
+	 * @return bool
+	 */
+	protected function isAllowedMethod(string $api, string $method): bool {
+		$api_service = $this->serviceFactory->getObject($api);
+		$user_data = $api_service::$userData;
+		$method_rules = $api_service::ACCESS_RULES[$method];
+
+		if (!in_array($user_data['type'], $method_rules['user_types'])) {
+			return false;
+		}
+
+		$actions = array_key_exists('actions', $method_rules) ? $method_rules['actions'] : [];
+
+		$db_rules = DBselect(
+			'SELECT type,name,value_str,value_int'.
+			' FROM role_rule'.
+			' WHERE roleid='.zbx_dbstr($user_data['roleid']).
+				' AND (name LIKE "'.CRoleHelper::API.'%"'.
+				($actions ? ' OR name IN("'.implode('","', $actions).'")' : '').')'.
+			' ORDER by name'
+		);
+
+		$rules = [];
+		while ($db_rule = DBfetch($db_rules)) {
+			$rules[] = [
+				'name' => $db_rule['name'],
+				'value' => $db_rule[CRole::RULE_VALUE_TYPES[$db_rule['type']]]
+			];
+		}
+
+		$access_mode = false;
+		$api_methods = [];
+		$method_masks = [CRoleHelper::API_WILDCARD, CRoleHelper::API_WILDCARD_ALIAS,
+			CRoleHelper::API_ANY_SERVICE.$method, $api.CRoleHelper::API_ANY_METHOD
+		];
+
+		foreach ($rules as $rule) {
+			if ($rule['value'] == 0 && ($rule['name'] === CRoleHelper::API || in_array($rule['name'], $actions))) {
+				return false;
+			}
+
+			if ($rule['name'] === CRoleHelper::API_ACCESS_MODE) {
+				$access_mode = (bool) $rule['value'];
+			}
+			elseif (strpos($rule['name'], CRoleHelper::API_METHOD) !== false
+					&& ($rule['value'] === $api.'.'.$method || in_array($rule['value'], $method_masks))) {
+				$api_methods[] = $rule['value'];
+			}
+		}
+
+		return $api_methods ? $access_mode : true;
 	}
 }

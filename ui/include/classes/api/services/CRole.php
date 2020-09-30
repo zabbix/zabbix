@@ -24,6 +24,21 @@
  */
 class CRole extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => [
+			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
+		],
+		'create' => [
+			'user_types' => [USER_TYPE_SUPER_ADMIN],
+		],
+		'update' => [
+			'user_types' => [USER_TYPE_SUPER_ADMIN],
+		],
+		'delete' => [
+			'user_types' => [USER_TYPE_SUPER_ADMIN]
+		]
+	];
+
 	/**
 	 * @var string
 	 */
@@ -49,7 +64,7 @@ class CRole extends CApiService {
 	/**
 	 * Set of rule value types and database field names that store their values.
 	 */
-	private const RULE_VALUE_TYPES = [
+	public const RULE_VALUE_TYPES = [
 		self::RULE_VALUE_TYPE_INT32 => 'value_int',
 		self::RULE_VALUE_TYPE_STR => 'value_str',
 		self::RULE_VALUE_TYPE_MODULE => 'value_moduleid'

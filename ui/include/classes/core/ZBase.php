@@ -59,6 +59,13 @@ class ZBase {
 	private $component_registry;
 
 	/**
+	 * Application mode.
+	 *
+	 * @var string
+	 */
+	private $mode;
+
+	/**
 	 * @var CModuleManager
 	 */
 	private $module_manager;
@@ -159,6 +166,8 @@ class ZBase {
 	 * @throws DBException
 	 */
 	public function run($mode) {
+		$this->mode = $mode;
+
 		$this->init();
 
 		$this->setMaintenanceMode();
@@ -231,6 +240,15 @@ class ZBase {
 				}
 				break;
 		}
+	}
+
+	/**
+	 * Returns the application mode.
+	 *
+	 * @return string
+	 */
+	public static function getMode(): string {
+		return self::getInstance()->mode;
 	}
 
 	/**
