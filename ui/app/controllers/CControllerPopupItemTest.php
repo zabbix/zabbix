@@ -418,7 +418,7 @@ abstract class CControllerPopupItemTest extends CController {
 			$interface_input['details'] = $input['data']['interface_details'];
 		}
 		elseif (array_key_exists('interface', $input) && array_key_exists('details', $input['interface'])) {
-			$interface_input['details'] = $input['inteface']['details'];
+			$interface_input['details'] = $input['interface']['details'];
 		}
 
 		// Set proxy.
