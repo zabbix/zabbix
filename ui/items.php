@@ -855,7 +855,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				];
 
 				$item = prepareScriptItemFormData($script_item) + $item;
-				if ($db_item['type'] == $item['type']) {
+				if ($db_item['type'] == getRequest('type')) {
 					if ($db_item['parameters'] == $item['parameters']) {
 						unset($item['parameters']);
 					}
