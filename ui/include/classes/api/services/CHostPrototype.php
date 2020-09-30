@@ -1462,12 +1462,10 @@ class CHostPrototype extends CHostBase {
 				$interfaces = API::HostInterface()->get([
 					'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
 					'hostids' => $hostPrototypeIds,
+					'sortfield' => 'interfaceid',
 					'nopermissions' => true,
 					'preservekeys' => true
 				]);
-
-				// We need to order interfaces for proper linkage and viewing.
-				order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
 
 				foreach (array_keys($result) as $hostid) {
 					$result[$hostid]['interfaces'] = [];
