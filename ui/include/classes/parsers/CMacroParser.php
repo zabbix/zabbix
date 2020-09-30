@@ -149,6 +149,7 @@ class CMacroParser extends CParser {
 
 		return false;
 	}
+
 	/**
 	 * Parse reference of type defined in "ref_type". Reference of type REFERENCE_ALPHANUMERIC containing non
 	 * alphanumeric characters or underscore should be quoted. Inside quotes only " and \ escape sequences are allowed.
