@@ -1,3 +1,10 @@
+Changes for 5.2.0beta2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.2.0beta1
 
 New features:
@@ -13,9 +20,11 @@ A.FG...PS. [ZBXNEXT-3950,ZBXNEXT-6092] added MQTT support for Zabbix agent 2 (es
 .........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
 ...G...... [ZBXNEXT-6171] added UserParameterDir config option to agent and agent2 (dimir, yurii)
 ...G...... [ZBXNEXT-6090] added modbus support for Zabbix agent 2 (MVekslers)
+...G...... [ZBXNEXT-6093] added modbus support for Zabbix agent (akozlovs, asestakovs)
 ...G...... [ZBXNEXT-6023] added Windows service support for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-17877] fixed details not displayed on SNMP interfaces within select element (ashubin, talbergs)
 ....I..... [ZBX-18359] fixed long data row formatting for OracleDB (kalimulin, viktors)
 ...G...... [ZBX-18337] fixed potential crash due to printing NULL pointer (viktors)
 ........S. [ZBX-17993] fixed ZabbixWeb Test Item for Admin is not working (arimdjonoks)
@@ -88,7 +97,7 @@ A......... [ZBX-18181] fixed undefined index when importing host with non-existi
 ..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
 ..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
 ..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
-..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS() function (averza)
 .........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
 .........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
 A......... [ZBX-17952] fixed compression availability not being checked when deleting history (talbergs)
@@ -113,6 +122,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.5rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.4
+
+5.0.4rc1 was released as 5.0.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.4rc1
@@ -171,7 +192,7 @@ A......... [ZBX-18181] fixed undefined index when importing host with non-existi
 ..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
 ..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
 ..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
-..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS() function (averza)
 .........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
 .........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
 .........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
@@ -1854,6 +1875,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.26rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.25
+
+4.0.25rc1 was released as 4.0.25 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.25rc1
