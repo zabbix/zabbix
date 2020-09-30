@@ -368,7 +368,6 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
-
 		foreach ($dashboards as $dashboard) {
 			$dashboard['widgets'] = $this->prepareDashboardWidgets($dashboard['widgets']);
 
@@ -395,23 +394,23 @@ class CConfigurationExport {
 			foreach ($widget['fields'] as $field) {
 				switch ($field['type']) {
 					case ZBX_WIDGET_FIELD_TYPE_HOST:
-						$hostids[] = $field['value'];
+						$hostids[$field['value']] = true;
 						break;
 					case ZBX_WIDGET_FIELD_TYPE_ITEM:
 					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-						$itemids[] = $field['value'];
+						$itemids[$field['value']] = true;
 						break;
 					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-						$graphids[] = $field['value'];
+						$graphids[$field['value']] = true;
 						break;
 				}
 			}
 		}
 
-		$hosts = $this->getHostsReferences($hostids);
-		$items = $this->getItemsReferences($itemids);
-		$graphs = $this->getGraphsReferences($graphids);
+		$hosts = $this->getHostsReferences(array_keys($hostids));
+		$items = $this->getItemsReferences(array_keys($itemids));
+		$graphs = $this->getGraphsReferences(array_keys($graphids));
 
 		// Replace ids.
 		foreach ($widgets as &$widget) {
