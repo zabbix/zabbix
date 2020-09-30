@@ -377,6 +377,8 @@ function invalid_url($msg = null) {
 
 	unset_all();
 	show_error_message($msg);
+
+	(new CWidget())->show();
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
