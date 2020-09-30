@@ -362,19 +362,14 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestDropdownSelect($id, $string) {
-		$this->getDropdown($id)->select($string);
+		return $this->getDropdown($id)->select($string);
 	}
 
 	public function zbxTestDropdownSelectWait($id, $string) {
-		$option = $this->zbxTestDropdownSelect($id, $string);
+		$dropdown = $this->zbxTestDropdownSelect($id, $string);
 
-		if ($option !== null) {
-			try {
-				$option->waitUntilSelected();
-			} catch (StaleElementReferenceException $e) {
-				// Element not found in the cache, looks like page changed.
-				$this->zbxTestWaitForPageToLoad();
-			}
+		if ($dropdown->isStalled()) {
+			$this->zbxTestWaitForPageToLoad();
 		}
 	}
 
