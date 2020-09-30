@@ -279,7 +279,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 				var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
 					interface_ids_by_types = <?= json_encode($interface_ids_by_types) ?>;
 
-				updateItemTestBtn();
+				updateItemFormElements();
 				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt($(this).val()));
 
 				setAuthTypeLabel();

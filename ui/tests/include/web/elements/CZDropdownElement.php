@@ -77,6 +77,8 @@ class CZDropdownElement extends CElement {
 		else {
 			throw new Exception('Cannot select disabled dropdown element.');
 		}
+
+		return $this;
 	}
 
 	/**
