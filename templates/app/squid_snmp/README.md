@@ -55,17 +55,17 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Squid |Squid: {$SQUID.HTTP.PORT} port ping |<p>-</p> |SIMPLE |net.tcp.service[tcp,,{$SQUID.HTTP.PORT}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Squid |Squid: Service ping |<p>-</p> |SIMPLE |net.tcp.service[tcp,,{$SQUID.HTTP.PORT}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Squid |Squid: Uptime |<p>The Uptime of the cache in timeticks (in hundredths of a second) with preprocessing</p> |SNMP |squid[cacheUptime]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
 |Squid |Squid: Version |<p>Cache Software Version</p> |SNMP |squid[cacheVersionId]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Squid |Squid: CPU usage |<p>The percentage use of the CPU</p> |SNMP |squid[cacheCpuUsage] |
-|Squid |Squid: Memory maximum resident size |<p>Maximum Resident Size in KB</p> |SNMP |squid[cacheMaxResSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Squid |Squid: Memory maximum cache size |<p>The value of the cache_mem parameter in MB</p> |SNMP |squid[cacheMemMaxSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
-|Squid |Squid: Memory cache usage |<p>Total memory accounted in KB</p> |SNMP |squid[cacheMemUsage]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
+|Squid |Squid: Memory maximum resident size |<p>Maximum Resident Size</p> |SNMP |squid[cacheMaxResSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
+|Squid |Squid: Memory maximum cache size |<p>The value of the cache_mem parameter</p> |SNMP |squid[cacheMemMaxSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
+|Squid |Squid: Memory cache usage |<p>Total accounted memory</p> |SNMP |squid[cacheMemUsage]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
 |Squid |Squid: Cache swap low water mark |<p>Cache Swap Low Water Mark</p> |SNMP |squid[cacheSwapLowWM] |
 |Squid |Squid: Cache swap high water mark |<p>Cache Swap High Water Mark</p> |SNMP |squid[cacheSwapHighWM] |
-|Squid |Squid: Cache swap directory size |<p>The total of the cache_dir space allocated in MB</p> |SNMP |squid[cacheSwapMaxSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
-|Squid |Squid: Cache swap current size |<p>Storage Swap Size in MB</p> |SNMP |squid[cacheCurrentSwapSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
+|Squid |Squid: Cache swap directory size |<p>The total of the cache_dir space allocated</p> |SNMP |squid[cacheSwapMaxSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
+|Squid |Squid: Cache swap current size |<p>Storage Swap Size</p> |SNMP |squid[cacheCurrentSwapSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Squid |Squid: File descriptor count - current used |<p>Number of file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrCnt] |
 |Squid |Squid: File descriptor count - current maximum |<p>Highest file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrMax] |
 |Squid |Squid: File descriptor count - current reserved |<p>Reserved number of file descriptors</p> |SNMP |squid[cacheCurrentResFileDescrCnt] |
@@ -103,7 +103,7 @@ There are no template links in this template.
 |Squid |Squid: FQDN cache misses |<p>Number of FQDN Cache misses</p> |SNMP |squid[cacheFqdnMisses] |
 |Squid |Squid: IP cache requests |<p>Number of IP Cache requests</p> |SNMP |squid[cacheIpRequests] |
 |Squid |Squid: IP cache hits |<p>Number of IP Cache hits</p> |SNMP |squid[cacheIpHits] |
-|Squid |Squid: Ip cache misses |<p>Number of IP Cache misses</p> |SNMP |squid[cacheIpMisses] |
+|Squid |Squid: IP cache misses |<p>Number of IP Cache misses</p> |SNMP |squid[cacheIpMisses] |
 |Squid |Squid: Objects count |<p>Number of objects stored by the cache</p> |SNMP |squid[cacheNumObjCount] |
 |Squid |Squid: Objects LRU expiration age |<p>Storage LRU Expiration Age</p> |SNMP |squid[cacheCurrentLRUExpiration]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
 |Squid |Squid: Objects unlinkd requests |<p>Requests given to unlinkd</p> |SNMP |squid[cacheCurrentUnlinkRequests] |
