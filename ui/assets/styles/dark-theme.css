@@ -472,6 +472,42 @@ footer {
   .sidebar-nav-toggle + div {
     flex-shrink: 1; }
 
+.form-grid {
+  display: grid;
+  row-gap: 10px;
+  column-gap: 10px;
+  grid-template-columns: auto 1fr; }
+  .form-grid > label {
+    line-height: 24px;
+    text-align: right;
+    word-wrap: break-word; }
+  .form-grid .form-actions,
+  .form-grid .form-field,
+  .form-grid .field-fluid {
+    grid-column: 2 / -1;
+    text-align: left;
+    line-height: 24px; }
+  .form-grid .form-field.offset-1 {
+    grid-column-start: 2 !important; }
+  .form-grid .form-field.offset-2 {
+    grid-column-start: 3 !important; }
+  .form-grid .form-field.offset-3 {
+    grid-column-start: 4 !important; }
+  .form-grid.form-grid-3-1 {
+    grid-template-columns: auto 3fr auto auto; }
+  .form-grid.form-grid-1-1 {
+    grid-template-columns: repeat(2, auto 1fr); }
+  .form-grid.form-grid-3-1 .form-field:not(.field-fluid), .form-grid.form-grid-1-1 .form-field:not(.field-fluid) {
+    grid-column-start: initial;
+    grid-column-end: span 1; }
+
+.form-grid table {
+  line-height: initial; }
+  .form-grid table td {
+    padding: 5px 5px 5px 0; }
+.form-grid .form-actions button:not(:first-of-type) {
+  margin-left: 10px; }
+
 .form-search {
   position: relative;
   height: 24px; }
@@ -5330,15 +5366,6 @@ svg {
 
 .inline-sr-only {
   font-size: 0; }
-
-.item-test-popup-value-row,
-.preproc-test-popup-value-row {
-  display: flex; }
-  .item-test-popup-value-row label,
-  .preproc-test-popup-value-row label {
-    padding: 0 10px;
-    margin-left: auto;
-    line-height: 24px; }
 
 table.preprocessing-test-results td {
   vertical-align: top !important; }
