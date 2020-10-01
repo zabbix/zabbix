@@ -588,15 +588,10 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 				if (MACRO_EXPAND_NO == expand_macros)
 					break;
 
+				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL,
+						NULL, NULL, &items[i].script_params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, NULL, &items[i].script_params, MACRO_TYPE_COMMON,
-						NULL, 0);
-				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
-						NULL, NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD,
-						NULL, 0);
-				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
-						NULL, NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD,
-						NULL, 0);
+						NULL, NULL, NULL, NULL, &items[i].params, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 			case ITEM_TYPE_SSH:
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);

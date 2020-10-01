@@ -31,7 +31,7 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != zbx_es_init_env(&es, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize scripting environment: %s", error));
-		return FAIL;
+		return ret;
 	}
 
 	if (SUCCEED != zbx_es_compile(&es, item->params, &script_bin, &script_bin_sz, &error))
