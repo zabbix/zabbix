@@ -385,19 +385,20 @@ class CControllerWidgetGraphView extends CControllerWidget {
 							->setArgument('view_as', HISTORY_GRAPH)
 							->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 							->setArgument('filter_graphids', [$resourceid])
-							->setArgument('filter_set', '1');
+							->setArgument('filter_set', '1')
+							->setArgument('from', $timeline['from'])
+							->setArgument('to', $timeline['to']);
 					}
 					else {
 						$item_graph_url = null;
 					}
 				}
 				else {
-					$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+					$item_graph_url = (new CUrl('history.php'))
+						->setArgument('itemids', [$resourceid])
+						->setArgument('from', $timeline['from'])
+						->setArgument('to', $timeline['to']);
 				}
-
-				$item_graph_url
-					->setArgument('from', $timeline['from'])
-					->setArgument('to', $timeline['to']);
 			}
 		}
 
