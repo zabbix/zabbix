@@ -453,18 +453,16 @@ class CTemplateScreenConverter extends CConverter {
 			'hide_header' => CXmlConstantName::NO
 		];
 
-		$fields = [];
-
 		switch ($screen_item['resourcetype']) {
 			case SCREEN_RESOURCE_CLOCK:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_CLOCK;
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'time_type',
 					'value' => $screen_item['style']
 				];
 				if ($screen_item['style'] == TIME_TYPE_HOST) {
-					$fields[] = [
+					$widget['fields'][] = [
 						'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 						'name' => 'itemid',
 						'value' => $screen_item['resource']
@@ -474,12 +472,12 @@ class CTemplateScreenConverter extends CConverter {
 
 			case SCREEN_RESOURCE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_GRAPH
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH,
 					'name' => 'graphid',
 					'value' => $screen_item['resource']
@@ -488,12 +486,12 @@ class CTemplateScreenConverter extends CConverter {
 
 			case SCREEN_RESOURCE_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC;
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 					'name' => 'itemid',
 					'value' => $screen_item['resource']
@@ -502,22 +500,22 @@ class CTemplateScreenConverter extends CConverter {
 
 			case SCREEN_RESOURCE_LLD_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 					'name' => 'graphid',
 					'value' => $screen_item['resource']
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'columns',
 					'value' => '1'
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'rows',
 					'value' => '1'
@@ -526,22 +524,22 @@ class CTemplateScreenConverter extends CConverter {
 
 			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE;
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'source_type',
 					'value' => (string) ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
 					'name' => 'itemid',
 					'value' => $screen_item['resource']
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'columns',
 					'value' => '1'
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'rows',
 					'value' => '1'
@@ -550,17 +548,17 @@ class CTemplateScreenConverter extends CConverter {
 
 			case SCREEN_RESOURCE_PLAIN_TEXT:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT;
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 					'name' => 'itemids',
 					'value' => $screen_item['resource']
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'show_as_html',
 					'value' => $screen_item['style']
 				];
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 					'name' => 'show_lines',
 					'value' => $screen_item['elements']
@@ -569,25 +567,12 @@ class CTemplateScreenConverter extends CConverter {
 
 			case SCREEN_RESOURCE_URL:
 				$widget['type'] = CXmlConstantName::DASHBOARD_WIDGET_TYPE_URL;
-				$fields[] = [
+				$widget['fields'][] = [
 					'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 					'name' => 'url',
 					'value' => $screen_item['url']
 				];
 				break;
-		}
-
-		if ($fields) {
-			$widget['fields'] = [];
-
-			foreach ($fields as $field) {
-				$key = 'field';
-				if (count($widget['fields']) > 0) {
-					$key .= count($widget['fields']);
-				}
-
-				$widget['fields'][$key] = $field;
-			}
 		}
 
 		return $widget;
