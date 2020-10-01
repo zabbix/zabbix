@@ -70,6 +70,7 @@ $availableJScripts = [
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
 	// classes
+	'component.z-select.js' => '',
 	'class.base-component.js' => '',
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -323,7 +324,8 @@ $tranStrings = [
 	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
-		'No interface found' => _('No interface found')
+		'No interface found' => _('No interface found'),
+		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'class.cnavtree.js' => [
 		'Edit' => _('Edit'),
@@ -346,6 +348,9 @@ $tranStrings = [
 	'common.js' => [
 		'Cancel' => _('Cancel')
 	],
+	'component.z-select.js' => [
+		'All' => _('All')
+	],
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value')
 	]
@@ -358,6 +363,7 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
+		'component.z-select.js',
 		'class.base-component.js',
 		'class.cdebug.js',
 		'class.overlaycollection.js',

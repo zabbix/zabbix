@@ -24,7 +24,7 @@
  */
 ?>
 
-new CViewSwitcher('type', 'change', <?= json_encode([
+new CViewSwitcher('type-select', 'change', <?= json_encode([
 	SVC_SSH => ['row_dcheck_ports'],
 	SVC_LDAP => ['row_dcheck_ports'],
 	SVC_SMTP => ['row_dcheck_ports'],
@@ -46,14 +46,14 @@ new CViewSwitcher('type', 'change', <?= json_encode([
 	SVC_TELNET => ['row_dcheck_ports']
 ]) ?>);
 
-var $type = jQuery('#type'),
-	$snmpv3_securitylevel = jQuery('#snmpv3_securitylevel');
+var $type = jQuery('#type-select'),
+	$snmpv3_securitylevel = jQuery('#snmpv3-securitylevel');
 
 $type.on('change', function() {
 	$snmpv3_securitylevel.off('change');
 
 	if (jQuery(this).val() == <?= SVC_SNMPv3 ?>) {
-		new CViewSwitcher('snmpv3_securitylevel', 'change', <?= json_encode([
+		new CViewSwitcher('snmpv3-securitylevel', 'change', <?= json_encode([
 			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => [],
 			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => ['row_dcheck_snmpv3_authprotocol',
 				'row_dcheck_snmpv3_authpassphrase'
@@ -94,6 +94,6 @@ else {
 function clearDCheckForm() {
 	jQuery('#key_, #snmp_community, #snmp_oid, #snmpv3_contextname, #snmpv3_securityname, #snmpv3_authpassphrase, ' +
 		'#snmpv3_privpassphrase').val('');
-	jQuery('#snmpv3_securitylevel').val(<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>);
+	jQuery('#snmpv3-securitylevel').val(<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>);
 	jQuery('#snmpv3_authprotocol_0, #snmpv3_privprotocol_0').prop('checked', true);
 }
