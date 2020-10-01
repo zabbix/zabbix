@@ -179,7 +179,7 @@ class CPage {
 
 		$cookie_sessionid = '';
 		if (self::$cookie !== null) {
-			$cookie = unserialize(base64_decode(self::$cookie['value']));
+			$cookie = json_decode(base64_decode(self::$cookie['value']), true);
 			$cookie_sessionid = $cookie['sessionid'];
 		}
 
@@ -187,12 +187,12 @@ class CPage {
 			$data = ['sessionid' => $sessionid];
 
 			$config = CDBHelper::getRow('select session_key from config where configid=1');
-			$data['sign'] = openssl_encrypt(serialize($data), 'aes-256-ecb', $config['session_key']);
+			$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
 
 			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
 				'name' => 'zbx_session',
-				'value' => base64_encode(serialize($data)),
+				'value' => base64_encode(json_encode($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
