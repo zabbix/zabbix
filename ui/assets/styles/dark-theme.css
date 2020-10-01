@@ -5634,6 +5634,23 @@ table.preprocessing-test-results .rel-container {
 #itemsTable .table-col-action {
   width: 55px; }
 
+.multiselect-description-container {
+  display: flex;
+  align-items: center; }
+  .multiselect-description-container > .multiselect-control {
+    margin-right: 5px; }
+
+.rules-status-container > span {
+  text-transform: none;
+  margin: 3px 3px 3px 0; }
+.rules-status-container > .status-green:not(:last-of-type) {
+  border-right: 1px solid #2f9f5e; }
+.rules-status-container > .status-grey:not(:last-of-type) {
+  border-right: 1px solid #3d3d3d; }
+
+.input-section-header {
+  padding-top: 10px; }
+
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
 

@@ -72,22 +72,25 @@ class CRoleHelper {
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute.scripts';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 
+	public const SECTION_UI = 'ui';
+	public const SECTION_MODULES = 'modules';
+	public const SECTION_API = 'api';
+	public const SECTION_ACTIONS = 'actions';
+
+	public const UI_SECTION_MONITORING = 'ui.monitoring';
+	public const UI_SECTION_INVENTORY = 'ui.inventory';
+	public const UI_SECTION_REPORTS = 'ui.reports';
+	public const UI_SECTION_CONFIGURATION = 'ui.configuration';
+	public const UI_SECTION_ADMINISTRATION = 'ui.administration';
+
 	public const API_WILDCARD = '*';
 	public const API_WILDCARD_ALIAS = '*.*';
-	public const API_ANY_SERVICE = '*.';
 	public const API_ANY_METHOD = '.*';
+	public const API_ANY_SERVICE = '*.';
 
 	/**
-	 * Array for storing the list of all available role rules for each user type.
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
-	private static $all_rules = [];
-
-	/**
-	 * Array for storing roles data (including rules) loaded from Role API object and converted to one format.
+	 * Array for storing roles data (including rules) loaded from Role API object and converted to one format. The data
+	 * of specific role can be accessed in following way: self::roles[{role ID}].
 	 *
 	 * @static
 	 *
@@ -96,38 +99,74 @@ class CRoleHelper {
 	private static $roles = [];
 
 	/**
+	 * Array for storing all loaded role rules for specific section name and user type. The rules of specific section
+	 * name and user type can be accessed in following way: self::$section_rules[{section name}][{user type}].
+	 *
+	 * @static
+	 *
+	 * @var array
+	 */
+	private static $section_rules = [];
+
+	/**
 	 * Checks the access of specific role to specific rule.
 	 *
 	 * @static
 	 *
-	 * @param string $rule_name  Name of the rule to check access for.
-	 * @param string $roleid     ID of the role where check of access is necessary to perform.
+	 * @param string  $rule_name  Name of the rule to check access for.
+	 * @param integer $roleid     ID of the role where check of access is necessary to perform.
 	 *
 	 * @return bool  Returns true if role have access to specified rule, false - otherwise.
 	 */
 	public static function checkAccess(string $rule_name, int $roleid): bool {
 		self::loadRoleRules($roleid);
 
+		$section_name = self::getRuleSection($rule_name);
+		$user_type = self::$roles[$roleid]['type'];
+		self::loadSectionRules($section_name, $user_type);
+
+		$rule_exists_in_section_rules = in_array($rule_name, self::$section_rules[$section_name][$user_type]);
+
 		$role_rules = self::$roles[$roleid]['rules'];
-		$default_access_name = explode('.', $rule_name, 2)[0].'.default_access';
-		$default_access_is_enabled = in_array($default_access_name, [self::UI_DEFAULT_ACCESS,
-			self::MODULES_DEFAULT_ACCESS, self::ACTIONS_DEFAULT_ACCESS
-		]) && (!array_key_exists($default_access_name, $role_rules) || $role_rules[$default_access_name]);
-
-		$rule_is_in_scope_of_role_type = in_array($rule_name, self::getAllRules(self::$roles[$roleid]['type']));
 		$role_rule_exists = array_key_exists($rule_name, $role_rules);
-		$role_rule_is_enabled = $role_rule_exists ? $role_rules[$rule_name] : 1;
+		$role_rule_is_enabled = false;
 
-		if ($rule_is_in_scope_of_role_type) {
-			if ($role_rule_exists && $role_rule_is_enabled) {
-				return true;
+		if ($section_name === self::SECTION_API || $rule_name === $section_name.'.default_access') {
+			if ($rule_name === self::API_ACCESS_MODE) {
+				$role_rule_is_enabled = $role_rule_exists ? (bool) $role_rules[$rule_name] : false;
 			}
-			elseif (!$role_rule_exists && $default_access_is_enabled) {
-				return true;
+			else {
+				$role_rule_is_enabled = (bool) $role_rules[$rule_name];
 			}
+		}
+		else {
+			$default_access_is_enabled = $section_name !== self::SECTION_API
+					&& $role_rules[$section_name.'.default_access'];
+			$role_rule_is_enabled = ($default_access_is_enabled && !$role_rule_exists)
+					|| (!$default_access_is_enabled && $role_rule_exists);
+		}
+
+		if ($rule_exists_in_section_rules && $role_rule_is_enabled) {
+			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Gets list of API methods (with wildcards if that exists) that are considered allowed or denied (depending from
+	 * API access mode) for specific role.
+	 *
+	 * @static
+	 *
+	 * @param integer $roleid  Role ID.
+	 *
+	 * @return array  Returns the array of API methods.
+	 */
+	public static function getRoleApiMethods(int $roleid): array {
+		self::loadRoleRules($roleid);
+
+		return self::$roles[$roleid]['rules']['api_methods'];
 	}
 
 	/**
@@ -137,9 +176,9 @@ class CRoleHelper {
 	 *
 	 * @throws Exception
 	 *
-	 * @param string $roleid  Role ID.
+	 * @param integer $roleid  Role ID.
 	 */
-	public static function loadRoleRules(int $roleid): void {
+	private static function loadRoleRules(int $roleid): void {
 		if (array_key_exists($roleid, self::$roles)) {
 			return;
 		}
@@ -156,7 +195,7 @@ class CRoleHelper {
 			throw new Exception(_('Specified role was not found.'));
 		}
 
-		$rules = [];
+		$rules = ['api_methods' => []];
 		$modules = [];
 
 		foreach ($role['rules'] as $rule) {
@@ -165,6 +204,9 @@ class CRoleHelper {
 			}
 			elseif (strncmp($rule['name'], self::MODULES_MODULE, strlen(self::MODULES_MODULE)) === 0) {
 				$modules[substr($rule['name'], strrpos($rule['name'], '.') + 1)]['id'] = $rule['value'];
+			}
+			elseif (strncmp($rule['name'], self::API_METHOD, strlen(self::API_METHOD)) === 0) {
+				$rules['api_methods'][] = $rule['value'];
 			}
 			else {
 				$rules[$rule['name']] = $rule['value'];
@@ -182,42 +224,107 @@ class CRoleHelper {
 	}
 
 	/**
-	 * Gets once loaded all available rules for all user types or for specific user type.
+	 * Collects once all available rules for specific rule section and user type into $section_rules property.
 	 *
 	 * @static
 	 *
-	 * @param integer|null $user_type  User type value.
+	 * @throws Exception
 	 *
-	 * @return array       Returns the array of rule names for specified user type. If user type was not specified,
-	 *                     returns array of rules for all user types where key is user type value and values is rule
-	 *                     names.
+	 * @param string  $section_name  Section name.
+	 * @param integer $user_type     User type.
 	 */
-	public static function getAllRules(?int $user_type = null): array {
-		self::loadAllRules();
-
-		return array_key_exists($user_type, self::$all_rules) ? self::$all_rules[$user_type] : self::$all_rules;
-	}
-
-	/**
-	 * Collects once all available rules for project into $all_rules property.
-	 *
-	 * @static
-	 */
-	public static function loadAllRules(): void {
-		if (self::$all_rules) {
+	private static function loadSectionRules(string $section_name, int $user_type): void {
+		if (array_key_exists($section_name, self::$section_rules)
+				&& array_key_exists($user_type, self::$section_rules[$section_name])) {
 			return;
 		}
 
-		$all_rules = [
-			USER_TYPE_ZABBIX_USER => [
-				self::UI_MONITORING_DASHBOARD, self::UI_MONITORING_PROBLEMS, self::UI_MONITORING_HOSTS,
-				self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_SCREENS,
-				self::UI_MONITORING_MAPS, self::UI_MONITORING_SERVICES, self::UI_INVENTORY_OVERVIEW,
-				self::UI_INVENTORY_HOSTS, self::UI_REPORTS_AVAILABILITY_REPORT, self::UI_REPORTS_TOP_TRIGGERS,
-				self::API, self::API_ACCESS_MODE, self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS,
-				self::ACTIONS_UPDATE_PROBLEMS, self::ACTIONS_EXECUTE_SCRIPTS
-			]
+		switch ($section_name) {
+			case self::SECTION_UI:
+				self::$section_rules[$section_name][$user_type] = self::getAllUiElements($user_type);
+				break;
+			case self::SECTION_MODULES:
+				self::$section_rules[$section_name][$user_type] = self::getAllModules($user_type);
+				break;
+			case self::SECTION_API:
+				$rules = [self::API, self::API_ACCESS_MODE];
+				self::$section_rules[$section_name][$user_type] = $rules;
+				break;
+			case self::SECTION_ACTIONS:
+				self::$section_rules[$section_name][$user_type] = self::getAllActions($user_type);
+				break;
+			default:
+				throw new Exception(_('Rule section was not found.'));
+		}
+	}
+
+	/**
+	 * Gets the section name of specific rule name.
+	 *
+	 * @static
+	 *
+	 * @throws Exception
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return array Returns name of rules section.
+	 */
+	public static function getRuleSection(string $rule_name): string {
+		$section = explode('.', $rule_name, 2)[0];
+		if (in_array($section, [self::SECTION_UI, self::SECTION_MODULES, self::SECTION_API, self::SECTION_ACTIONS])) {
+			return $section;
+		}
+
+		throw new Exception(_('Rule section was not found.'));
+	}
+
+	/**
+	 * Gets all available UI elements rules for specific user type.
+	 *
+	 * @static
+	 *
+	 * @param integer $user_type  User type.
+	 *
+	 * @return array  Returns the array of rule names for specified user type.
+	 */
+	public static function getAllUiElements(int $user_type): array {
+		$rules = [
+			self::UI_MONITORING_DASHBOARD, self::UI_MONITORING_PROBLEMS, self::UI_MONITORING_HOSTS,
+			self::UI_MONITORING_OVERVIEW, self::UI_MONITORING_LATEST_DATA, self::UI_MONITORING_SCREENS,
+			self::UI_MONITORING_MAPS, self::UI_MONITORING_SERVICES, self::UI_INVENTORY_OVERVIEW,
+			self::UI_INVENTORY_HOSTS, self::UI_REPORTS_AVAILABILITY_REPORT, self::UI_REPORTS_TOP_TRIGGERS
 		];
+
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$rules = array_merge($rules, [
+				self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_CONFIGURATION_HOST_GROUPS,
+				self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS, self::UI_CONFIGURATION_MAINTENANCE,
+				self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY, self::UI_CONFIGURATION_SERVICES
+			]);
+		}
+
+		if ($user_type === USER_TYPE_SUPER_ADMIN) {
+			$rules = array_merge($rules, [
+				self::UI_REPORTS_SYSTEM_INFO, self::UI_REPORTS_AUDIT, self::UI_REPORTS_ACTION_LOG,
+				self::UI_CONFIGURATION_EVENT_CORRELATION, self::UI_ADMINISTRATION_GENERAL, self::UI_ADMINISTRATION_PROXIES,
+				self::UI_ADMINISTRATION_AUTHENTICATION, self::UI_ADMINISTRATION_USER_GROUPS,
+				self::UI_ADMINISTRATION_USER_ROLES, self::UI_ADMINISTRATION_USERS, self::UI_ADMINISTRATION_MEDIA_TYPES,
+				self::UI_ADMINISTRATION_SCRIPTS, self::UI_ADMINISTRATION_QUEUE
+			]);
+		}
+
+		return $rules;
+	}
+
+	/**
+	 * Gets all available modules rules.
+	 *
+	 * @static
+	 *
+	 * @return array  Returns the array of rule names.
+	 */
+	public static function getAllModules(): array {
+		$rules = [];
 
 		$modules = API::Module()->get([
 			'output' => ['moduleid'],
@@ -225,24 +332,193 @@ class CRoleHelper {
 		]);
 
 		foreach ($modules as $module) {
-			$all_rules[USER_TYPE_ZABBIX_USER][] = self::MODULES_MODULE.$module['moduleid'];
+			$rules[] = self::MODULES_MODULE.$module['moduleid'];
 		}
 
-		$all_rules[USER_TYPE_ZABBIX_ADMIN] = array_merge($all_rules[USER_TYPE_ZABBIX_USER], [
-			self::UI_MONITORING_DISCOVERY, self::UI_REPORTS_NOTIFICATIONS, self::UI_CONFIGURATION_HOST_GROUPS,
-			self::UI_CONFIGURATION_TEMPLATES, self::UI_CONFIGURATION_HOSTS, self::UI_CONFIGURATION_MAINTENANCE,
-			self::UI_CONFIGURATION_ACTIONS, self::UI_CONFIGURATION_DISCOVERY, self::UI_CONFIGURATION_SERVICES,
-			self::ACTIONS_EDIT_MAINTENANCE
-		]);
+		return $rules;
+	}
 
-		$all_rules[USER_TYPE_SUPER_ADMIN] = array_merge($all_rules[USER_TYPE_ZABBIX_ADMIN], [
-			self::UI_REPORTS_SYSTEM_INFO, self::UI_REPORTS_AUDIT, self::UI_REPORTS_ACTION_LOG,
-			self::UI_CONFIGURATION_EVENT_CORRELATION, self::UI_ADMINISTRATION_GENERAL, self::UI_ADMINISTRATION_PROXIES,
-			self::UI_ADMINISTRATION_AUTHENTICATION, self::UI_ADMINISTRATION_USER_GROUPS,
-			self::UI_ADMINISTRATION_USER_ROLES, self::UI_ADMINISTRATION_USERS, self::UI_ADMINISTRATION_MEDIA_TYPES,
-			self::UI_ADMINISTRATION_SCRIPTS, self::UI_ADMINISTRATION_QUEUE
-		]);
+	/**
+	 * Gets all available actions rules for specific user type.
+	 *
+	 * @static
+	 *
+	 * @param integer $user_type  User type.
+	 *
+	 * @return array  Returns the array of rule names for specified user type.
+	 */
+	public static function getAllActions(int $user_type): array {
+		$rules = [
+			self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS, self::ACTIONS_UPDATE_PROBLEMS,
+			self::ACTIONS_EXECUTE_SCRIPTS
+		];
 
-		self::$all_rules = $all_rules;
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
+		}
+
+		return $rules;
+	}
+
+	/**
+	 * Gets labels of all available UI sections for specific user type in order as it need to display in UI.
+	 *
+	 * @static
+	 *
+	 * @param integer $user_type  User type.
+	 *
+	 * @return array  Returns the array where key of each element is UI section name and value is UI section label.
+	 */
+	public static function getUiSectionsLabels(int $user_type): array {
+		$sections = [
+			self::UI_SECTION_MONITORING => _('Monitoring'),
+			self::UI_SECTION_INVENTORY => _('Inventory'),
+			self::UI_SECTION_REPORTS => _('Reports')
+		];
+
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$sections += [self::UI_SECTION_CONFIGURATION => _('Configuration')];
+		}
+
+		if ($user_type === USER_TYPE_SUPER_ADMIN) {
+			$sections += [self::UI_SECTION_ADMINISTRATION => _('Administration')];
+		}
+
+		return $sections;
+	}
+
+	/**
+	 * Gets labels of all available rules for specific UI section and user type in order as it need to display in UI.
+	 *
+	 * @static
+	 *
+	 * @param string  $ui_section_name  UI section name.
+	 * @param integer $user_type        User type.
+	 *
+	 * @return array  Returns the array where key of each element is rule name and value is rule label.
+	 */
+	public static function getUiSectionRulesLabels(string $ui_section_name, int $user_type): array {
+		switch ($ui_section_name) {
+			case self::UI_SECTION_MONITORING:
+				$labels = [
+					self::UI_MONITORING_DASHBOARD => _('Dashboard'),
+					self::UI_MONITORING_PROBLEMS => _('Problems'),
+					self::UI_MONITORING_HOSTS => _('Hosts'),
+					self::UI_MONITORING_OVERVIEW => _('Overview'),
+					self::UI_MONITORING_LATEST_DATA => _('Latest data'),
+					self::UI_MONITORING_SCREENS => _('Screens'),
+					self::UI_MONITORING_MAPS => _('Maps')
+				];
+
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [self::UI_MONITORING_DISCOVERY => _('Discovery')];
+				}
+
+				$labels += [self::UI_MONITORING_SERVICES => _('Services')];
+
+				return $labels;
+			case self::UI_SECTION_INVENTORY:
+				return [
+					self::UI_INVENTORY_OVERVIEW => _('Overview'),
+					self::UI_INVENTORY_HOSTS => _('Hosts')
+				];
+			case self::UI_SECTION_REPORTS:
+				$labels = [];
+
+				if ($user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [self::UI_REPORTS_SYSTEM_INFO => _('System information')];
+				}
+
+				$labels += [
+					self::UI_REPORTS_AVAILABILITY_REPORT => _('Availability report'),
+					self::UI_REPORTS_TOP_TRIGGERS => _('Triggers top 100')
+				];
+
+				if ($user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [
+						self::UI_REPORTS_AUDIT => _('Audit'),
+						self::UI_REPORTS_ACTION_LOG => _('Action log')
+					];
+				}
+
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [self::UI_REPORTS_NOTIFICATIONS => _('Notifications')];
+				}
+
+				return $labels;
+			case self::UI_SECTION_CONFIGURATION:
+				$labels = [];
+
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels = [
+						self::UI_CONFIGURATION_HOST_GROUPS => _('Host groups'),
+						self::UI_CONFIGURATION_TEMPLATES => _('Templates'),
+						self::UI_CONFIGURATION_HOSTS => _('Hosts'),
+						self::UI_CONFIGURATION_MAINTENANCE => _('Maintenance'),
+						self::UI_CONFIGURATION_ACTIONS => _('Actions')
+					];
+				}
+
+				if ($user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [self::UI_CONFIGURATION_EVENT_CORRELATION => _('Event correlation')];
+				}
+
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [
+						self::UI_CONFIGURATION_DISCOVERY => _('Discovery'),
+						self::UI_CONFIGURATION_SERVICES => _('Services')
+					];
+				}
+
+				return $labels;
+			case self::UI_SECTION_ADMINISTRATION:
+				$labels = [];
+
+				if ($user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels = [
+						self::UI_ADMINISTRATION_GENERAL => _('General'),
+						self::UI_ADMINISTRATION_PROXIES => _('Proxies'),
+						self::UI_ADMINISTRATION_AUTHENTICATION => _('Authentication'),
+						self::UI_ADMINISTRATION_USER_GROUPS => _('User groups'),
+						self::UI_ADMINISTRATION_USER_ROLES => _('User roles'),
+						self::UI_ADMINISTRATION_USERS => _('Users'),
+						self::UI_ADMINISTRATION_MEDIA_TYPES => _('Media types'),
+						self::UI_ADMINISTRATION_SCRIPTS => _('Scripts'),
+						self::UI_ADMINISTRATION_QUEUE => _('Queue')
+					];
+				}
+
+				return $labels;
+			default:
+				return [];
+		}
+	}
+
+	/**
+	 * Gets labels of all available actions rules for specific user type in order as it need to display on user roles
+	 * page.
+	 *
+	 * @static
+	 *
+	 * @param integer $user_type  User type.
+	 *
+	 * @return array  Returns the array where key of each element is rule name and value is rule label.
+	 */
+	public static function getActionsLabels(int $user_type): array {
+		$labels = [
+			self::ACTIONS_EDIT_DASHBOARDS => _('Create and edit dashboards and screens'),
+			self::ACTIONS_EDIT_MAPS => _('Create and edit maps')
+		];
+
+		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$labels += [self::ACTIONS_EDIT_MAINTENANCE => _('Create and edit maintenance')];
+		}
+
+		$labels += [
+			self::ACTIONS_UPDATE_PROBLEMS => _('Acknowledge problems'),
+			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts')
+		];
+
+		return $labels;
 	}
 }

@@ -636,7 +636,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
+	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

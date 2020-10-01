@@ -367,7 +367,7 @@ class CUser extends CApiService {
 			}
 
 			// integers
-			foreach (['autologin', 'rows_per_page'] as $field_name) {
+			foreach (['autologin', 'rows_per_page', 'roleid'] as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] != $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
 				}
