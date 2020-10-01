@@ -126,6 +126,7 @@ $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
 $query_fields->items = [json_encode($query_fields_data)];
 
 // Prepare ITEM_TYPE_SCRIPT parameters.
+$parameters_data = [];
 if ($data['parameters']) {
 	$parameters_data = $data['parameters'];
 }
@@ -142,26 +143,34 @@ $parameters_table = (new CTable())
 	])
 	->setAttribute('style', 'width: 100%;');
 
-foreach ($parameters_data as $parameter) {
-	$parameters_table->addRow([
-		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('item_parameter', 'name')))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CTextBox('parameters[value][]', $parameter['value'], false, DB::getFieldLength('item_parameter', 'value')))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CButton('', _('Remove')))
-			->removeId()
-			->onClick('jQuery(this).closest("tr").remove()')
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	]);
+if ($parameters_data) {
+	foreach ($parameters_data as $parameter) {
+		$parameters_table->addRow([
+			(new CTextBox('parameters[name][]', $parameter['name'], $readonly,
+				DB::getFieldLength('item_parameter', 'name'))
+			)
+				->setAttribute('style', 'width: 100%;')
+				->removeId(),
+			(new CTextBox('parameters[value][]', $parameter['value'], $readonly,
+				DB::getFieldLength('item_parameter', 'value'))
+			)
+				->setAttribute('style', 'width: 100%;')
+				->removeId(),
+			(new CButton('', _('Remove')))
+				->removeId()
+				->onClick('jQuery(this).closest("tr").remove()')
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled(!$readonly)
+		]);
+	}
 }
 
 $parameters_table->addRow([
 	(new CButton('parameter_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
+		->setEnabled(!$readonly)
 ]);
 
 $form_list
@@ -240,7 +249,8 @@ $form_list
 			'placeholder_textarea' => 'return value',
 			'grow' => 'auto',
 			'rows' => 0,
-			'maxlength' => DB::getFieldLength('items', 'params')
+			'maxlength' => DB::getFieldLength('items', 'params'),
+			'readonly' => $readonly
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),

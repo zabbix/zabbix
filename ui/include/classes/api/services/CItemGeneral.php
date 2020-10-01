@@ -87,6 +87,7 @@ abstract class CItemGeneral extends CApiService {
 			'url'					=> ['template' => 1],
 			'timeout'				=> ['template' => 1],
 			'query_fields'			=> ['template' => 1],
+			'parameters'			=> ['template' => 1],
 			'posts'					=> ['template' => 1],
 			'status_codes'			=> ['template' => 1],
 			'follow_redirects'		=> ['template' => 1],
@@ -268,6 +269,10 @@ abstract class CItemGeneral extends CApiService {
 
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
+					if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
+						$rules['template'] = 1;
+					}
+
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
 
@@ -334,7 +339,7 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
 				if ($update) {
-					if ($dbItems[$item['itemid']]['type'] == $item['type']) {
+					if ($dbItems[$item['itemid']]['type'] == $fullItem['type']) {
 						$flags = 0x00;
 					}
 					else {
