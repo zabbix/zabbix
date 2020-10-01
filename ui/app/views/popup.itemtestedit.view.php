@@ -95,7 +95,7 @@ if ($data['is_item_testable']) {
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 		(new CLabel(_('Host address'), 'interface_address'))
-			->setAsteriskMark()
+			->setAsteriskMark($data['interface_address_enabled'])
 			->addClass('js-host-address-row'),
 		(new CFormField(
 			$data['interface_address_enabled']
