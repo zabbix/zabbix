@@ -1710,7 +1710,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 	// item types
 	$data['itemTypes'] = item_type2str();
-	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
+	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST], $data['itemTypes'][ITEM_TYPE_SCRIPT]);
 
 	// valuemap
 	$data['valuemaps'] = API::ValueMap()->get([

@@ -2046,11 +2046,11 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
 			'itemids' => $discoveryid,
-			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt',
-				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'mtime', 'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url',
-				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt', 'valuemapid', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags',
+				'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url', 'query_fields',
+				'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
 			],
@@ -2187,7 +2187,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-				'allow_traps', 'discover'
+				'allow_traps', 'discover', 'parameters'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
