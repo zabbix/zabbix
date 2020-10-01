@@ -727,7 +727,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 
 	/*
 	 * Get the number of interfaces by their type or status, depending on the layout of the HA widget.
-	 * For horizontal layout interface type is passed to the function, but for vertical layout - iterface status.
+	 * For horizontal layout interface type is passed to the function, but for vertical layout - interface status.
 	 */
 	private function getExpectedInterfaceCountFromDB($data, $header) {
 		$db_interfaces = [
@@ -756,7 +756,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		// Construct sql for horizontal widget layout.
 		if (CTestArrayHelper::get($data, 'fields.Layout', 'Horizontal') === 'Horizontal') {
 			$total_sql = $interfaces_sql.$db_interfaces['type'][$header].' AND hostid IN ('.$hosts_sql;
-			// Filter out hosts in maintenence if the flag 'Show hosts in maintenance' is not set.
+			// Filter out hosts in maintenance if the flag 'Show hosts in maintenance' is not set.
 			if (CTestArrayHelper::get($data['fields'], 'Show hosts in maintenance', false) === false) {
 				$total_sql = $total_sql.' AND maintenance_status=0';
 			}
@@ -770,7 +770,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		}
 		// Construct sql for vertical widget layout.
 		else {
-			// Filter out hosts in maintenence if the flag 'Show hosts in maintenance' is not set.
+			// Filter out hosts in maintenance if the flag 'Show hosts in maintenance' is not set.
 			if (CTestArrayHelper::get($data['fields'], 'Show hosts in maintenance', false) === false) {
 				$hosts_sql = $hosts_sql.' AND maintenance_status=0';
 			}

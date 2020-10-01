@@ -1460,6 +1460,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (numitem->trends != (0 != trends_sec))
 			return FAIL;
 
+		if (numitem->trends_sec != trends_sec)
+			return FAIL;
+
 		if (FAIL == dbsync_compare_str(dbrow[26], numitem->units))
 			return FAIL;
 	}
