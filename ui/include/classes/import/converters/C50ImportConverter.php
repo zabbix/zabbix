@@ -56,17 +56,12 @@ class C50ImportConverter extends CConverter {
 				continue;
 			}
 
+			$converter = new CTemplateScreenConverter();
+
 			$dashboards = [];
 
 			foreach ($template['screens'] as $screen) {
-				$dashboard = (new CTemplateScreenConverter())->convert($screen);
-
-				$key = 'dashboard';
-				if (count($dashboards) > 0) {
-					$key .= count($dashboards);
-				}
-
-				$dashboards[$key] = $dashboard;
+				$dashboards[] = $converter->convert($screen);
 			}
 
 			unset($template['screens']);

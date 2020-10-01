@@ -1795,7 +1795,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'y1' =>					['type' => XML_STRING | XML_REQUIRED],
 							'x2' =>					['type' => XML_STRING | XML_REQUIRED],
 							'y2' =>					['type' => XML_STRING | XML_REQUIRED],
-							'line_type' =>			['type' => XML_STRING | XML_REQUIRED],
+							'line_type' =>          ['type' => XML_STRING | XML_REQUIRED],
 							'line_width' =>			['type' => XML_STRING | XML_REQUIRED],
 							'line_color' =>			['type' => XML_STRING | XML_REQUIRED],
 							'zindex' =>				['type' => XML_STRING | XML_REQUIRED]
@@ -2206,7 +2206,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	public function validateWidgetFieldValue($data, array $parent_data = null, string $path) {
 		$rules = $this->getWidgetFieldValueExtendedRules($parent_data);
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
