@@ -2536,8 +2536,8 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		{
 			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside history "
-					"storage period", item->host.host, item->key_orig, zbx_date2str(h->ts.sec),
-					zbx_time2str(h->ts.sec));
+					"storage period", item->host.host, item->key_orig,
+					zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
 		}
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
@@ -2551,7 +2551,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 				h->flags |= ZBX_DC_FLAG_NOTRENDS;
 				zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside "
 						"trends storage period", item->host.host, item->key_orig,
-						zbx_date2str(h->ts.sec), zbx_time2str(h->ts.sec));
+						zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
 			}
 		}
 		else
