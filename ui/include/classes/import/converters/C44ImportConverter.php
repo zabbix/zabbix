@@ -489,8 +489,6 @@ class C44ImportConverter extends CConverter {
 
 			// Set proper default field for interfaces.
 			if (array_key_exists('interfaces', $host)) {
-				$host['interfaces'] = $this->remapInterfaceKeys($host['interfaces']);
-
 				$main = false;
 				foreach ($host['interfaces'] as &$interface) {
 					if (array_key_exists('type', $interface) && $interface['type'] === CXmlConstantName::SNMP) {
