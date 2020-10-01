@@ -306,6 +306,7 @@ function itemCompleteTest(overlay) {
 				}
 
 				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
+					.css({lineHeight: '1.4', whiteSpace: 'normal'})
 					.append(jQuery('<div>').append(ret.final.action, $result))
 					.css({display: 'block', width: '675px'});
 
