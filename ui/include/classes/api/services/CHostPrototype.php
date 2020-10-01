@@ -1649,12 +1649,6 @@ class CHostPrototype extends CHostBase {
 
 						if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 							if (array_key_exists('details', $interface)) {
-								if (!$interface['details']) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										$path.'/details', _('cannot be empty')
-									));
-								}
-
 								if ($interface['details']['version'] == SNMP_V1
 										|| $interface['details']['version'] == SNMP_V2C) {
 									if (!array_key_exists('community', $interface['details'])) {
