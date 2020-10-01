@@ -552,6 +552,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	var $dashboard = jQuery('.dashbrd-grid-container'),
+		dashboard_data = $dashboard.dashboardGrid('getDashboardData'),
 		editMode = $dashboard.dashboardGrid('isEditMode'),
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
@@ -559,15 +560,18 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget_actions = [];
 
 	options.widgetid = widgetid;
-	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
+	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
 
-	widget_actions.push({
-		label: t('S_COPY'),
-		clickCallback: function() {
-			jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
-			jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-		}
-	});
+	// Do not show "Copy" action for host dashboards.
+	if (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null) {
+		widget_actions.push({
+			label: t('S_COPY'),
+			clickCallback: function() {
+				jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			}
+		});
+	}
 
 	if (editMode) {
 		widget_actions.push({

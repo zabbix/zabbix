@@ -3471,6 +3471,12 @@
 			});
 		},
 
+		getDashboardData: function() {
+			var	$this = this.first(),
+				data = $this.data('dashboardGrid');
+
+			return $.extend({}, data.dashboard);
+		},
 
 		/**
 		 * Get copied widget (if compatible with the current dashboard) or null otherwise.
