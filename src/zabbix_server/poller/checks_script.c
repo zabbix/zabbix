@@ -23,7 +23,7 @@
 int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
-	int		script_bin_sz, ret;
+	int		script_bin_sz, ret = NOTSUPPORTED;
 	zbx_es_t	es;
 
 	zbx_es_init(&es);
@@ -34,7 +34,7 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 		return FAIL;
 	}
 
-	if (SUCCEED != (ret = zbx_es_compile(&es, item->params, &script_bin, &script_bin_sz, &error)))
+	if (SUCCEED != zbx_es_compile(&es, item->params, &script_bin, &script_bin_sz, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile script: %s", error));
 		goto err;
@@ -42,13 +42,13 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 
 	zbx_es_set_timeout(&es, atoi(item->timeout));
 
-	if (SUCCEED != (ret = zbx_es_execute(&es, NULL, script_bin, script_bin_sz, item->script_params, &output,
-			&error)))
+	if (SUCCEED != zbx_es_execute(&es, NULL, script_bin, script_bin_sz, item->script_params, &output, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot execute script: %s", error));
 		goto err;
 	}
 
+	ret = SUCCEED;
 	SET_TEXT_RESULT(result, output);
 err:
 	zbx_free(script_bin);
