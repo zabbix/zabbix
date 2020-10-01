@@ -4553,7 +4553,7 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 {
 #	define UNPARSED_SERVICE_MAJOR_VERSION_DELIM	"."
 
-	char			*version = NULL, *fullname = NULL;
+	char			*version_without_major, *version = NULL, *fullname = NULL;
 	zbx_vector_ptr_t	counters;
 	int			ret = FAIL;
 
@@ -4574,14 +4574,13 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	/* version should have the "x.y.z" format, but there is also an "x.y Un" format in nature */
 	/* according to https://www.vmware.com/support/policies/version.html */
-	if (NULL == strstr(version, UNPARSED_SERVICE_MAJOR_VERSION_DELIM))
+	if (NULL == (version_without_major = strstr(version, UNPARSED_SERVICE_MAJOR_VERSION_DELIM)))
 	{
 		*error = zbx_dsprintf(*error, "Invalid version: %s.", version);
 		goto unlock;
 	}
 
-	service->minor_version = atoi(strlen(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + strstr(version,
-			UNPARSED_SERVICE_MAJOR_VERSION_DELIM));
+	service->minor_version = atoi(strlen(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + version_without_major);
 
 	ret = SUCCEED;
 unlock:
