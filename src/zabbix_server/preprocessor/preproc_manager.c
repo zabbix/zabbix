@@ -660,7 +660,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	int				i;
 	zbx_preprocessing_states_t	state;
 	unsigned char			priority = ZBX_PREPROC_PRIORITY_NONE;
-	int				notsupport_step = -1;
+	int				notsupp_shift;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __func__, value->itemid);
 
@@ -697,40 +697,34 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 
 	if (REQUEST_STATE_QUEUED == state)
 	{
+		notsupp_shift = ITEM_STATE_NOTSUPPORTED == value->state ? -1 : 0;
+
 		for (i = 0; i < item->preproc_ops_num; i++)
 		{
 			if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == item->preproc_ops[i].type)
 			{
-				notsupport_step = i;
-				if (0 != notsupport_step)
+				notsupp_shift = ITEM_STATE_NOTSUPPORTED != value->state;
+				if (0 != i)
 					THIS_SHOULD_NEVER_HAPPEN;
 				break;
 			}
 		}
 	}
 
-	if (REQUEST_STATE_QUEUED == state && (ITEM_STATE_NOTSUPPORTED != value->state ||
-			((ITEM_STATE_NOTSUPPORTED == value->state && 0 <= notsupport_step))))
+	if (REQUEST_STATE_QUEUED == state && 0 <= notsupp_shift)
 	{
-		int skip = 0;
-
-		if (ITEM_STATE_NOTSUPPORTED != value->state && 0 <= notsupport_step)
-		{
-			skip = 1;
-		}
-
 		request->value_type = item->value_type;
 		request->steps = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) *
-				(item->preproc_ops_num - skip));
-		request->steps_num = item->preproc_ops_num - skip;
+				(item->preproc_ops_num - notsupp_shift));
+		request->steps_num = item->preproc_ops_num - notsupp_shift;
 
-		for (i = 0; i < item->preproc_ops_num - skip; i++)
+		for (i = 0; i < item->preproc_ops_num - notsupp_shift; i++)
 		{
-			request->steps[i].type = item->preproc_ops[i + skip].type;
-			request->steps[i].params = zbx_strdup(NULL, item->preproc_ops[i + skip].params);
-			request->steps[i].error_handler = item->preproc_ops[i + skip].error_handler;
+			request->steps[i].type = item->preproc_ops[i + notsupp_shift].type;
+			request->steps[i].params = zbx_strdup(NULL, item->preproc_ops[i + notsupp_shift].params);
+			request->steps[i].error_handler = item->preproc_ops[i + notsupp_shift].error_handler;
 			request->steps[i].error_handler_params = zbx_strdup(NULL,
-					item->preproc_ops[i + skip].error_handler_params);
+					item->preproc_ops[i + notsupp_shift].error_handler_params);
 		}
 
 		manager->preproc_num++;
