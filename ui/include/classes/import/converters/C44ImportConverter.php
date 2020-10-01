@@ -174,25 +174,6 @@ class C44ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Remapping interface array keys.
-	 *
-	 * @param array $interfaces
-	 *
-	 * @return array
-	 */
-	protected function remapInterfaceKeys(array $interfaces): array {
-		$data = [];
-		$number = 0;
-
-		foreach ($interfaces as $interface) {
-			$data['interface'. (($number > 0) ? $number : '')] = $interface;
-			$number++;
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Extract SNMP fields from items, discovery rules and item prototypes.
 	 *
 	 * @param array $host
