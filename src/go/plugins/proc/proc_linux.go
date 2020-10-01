@@ -28,6 +28,8 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"math"
 	"os/user"
 	"regexp"
@@ -136,7 +138,6 @@ type cpuUtil struct {
 	started uint64
 	err     error
 }
-
 
 func (q *cpuUtilQuery) match(p *procInfo) bool {
 	if q.name != "" && q.name != p.name && q.name != p.arg0 {
@@ -308,6 +309,17 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("This item is available only in daemon mode.")
 	}
 
+	switch key {
+	case "proc.cpu.util":
+		return p.getCpuUtil(params)
+	case "proc.mem":
+		return p.getMem(params)
+	default:
+		return nil, errors.New("Unsupported item key.")
+	}
+}
+
+func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	var name, user, cmdline, mode, utiltype string
 	switch len(params) {
 	case 5:
@@ -405,6 +417,314 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return
 }
 
+func (p *Plugin) getMem(params []string) (result interface{}, err error) {
+	var name, mode, cmdline, memtype string
+	var usr *user.User
+
+	switch len(params) {
+	case 5:
+		memtype = params[4]
+		fallthrough
+	case 4:
+		cmdline = params[3]
+		fallthrough
+	case 3:
+		mode = params[2]
+		fallthrough
+	case 2:
+		if username := params[1]; username != "" {
+			usr, err = user.Lookup(username)
+			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain user '%s': %s", username, err.Error())
+			}
+		}
+		fallthrough
+	case 1:
+		name = params[0]
+	case 0:
+	default:
+		return nil, errors.New("Too many parameters.")
+	}
+
+	switch mode {
+	case "sum", "", "avg", "max", "min":
+	default:
+		return nil, errors.New("Invalid third parameter.")
+	}
+
+	meminfo, err := readAll("/proc/meminfo")
+	if err != nil {
+		return nil, err
+	}
+
+	var mem int
+	mem, err = byteFromProcFileData(meminfo, "MemTotal")
+	if err != nil {
+		return nil, fmt.Errorf("Cannot obtain amount of total memory: %s", err.Error())
+	}
+
+	if mem == 0 {
+		return nil, errors.New("Total memory reported is 0.")
+	}
+
+	files, err := ioutil.ReadDir("/proc")
+	if err != nil {
+		return nil, errors.New("Failed to read proc directory.")
+	}
+
+	var typeStr string
+	if memtype != "size" && memtype != "pmem" {
+		typeStr, err = getTypeString(memtype)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var count int
+
+	var memSize int
+	var value int
+
+	var percMemSize float64
+	var percValue float64
+
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+
+		pid := file.Name()
+		_, err := strconv.Atoi(pid)
+		if err != nil {
+			continue
+		}
+
+		if !p.validFile(usr, pid, name, cmdline) {
+			continue
+		}
+
+		data, err := readAll("/proc/" + pid + "/status")
+		if err != nil {
+			return nil, err
+		}
+
+		switch memtype {
+		case "pmem":
+			vmRSS, err := byteFromProcFileData(data, "VmRSS")
+			if err != nil {
+				continue
+			}
+			percValue = (float64(vmRSS) / float64(mem)) * 100.00
+		case "size":
+			vmData, err := byteFromProcFileData(data, "VmData")
+			if err != nil {
+				continue
+			}
+
+			vmStk, err := byteFromProcFileData(data, "VmStk")
+			if err != nil {
+				continue
+			}
+
+			vmExe, err := byteFromProcFileData(data, "VmExe")
+			if err != nil {
+				continue
+			}
+
+			value = vmData + vmStk + vmExe
+		default:
+			value, err = byteFromProcFileData(data, typeStr)
+			if err != nil {
+				continue
+			}
+		}
+
+		if memtype != "pmem" {
+			if count != 0 {
+				switch mode {
+				case "max":
+					memSize = getMax(memSize, value)
+				case "min":
+					memSize = getMin(memSize, value)
+				default:
+					memSize += value
+				}
+			} else {
+				memSize = value
+			}
+			count++
+		} else {
+			if count != 0 {
+				switch mode {
+				case "max":
+					percMemSize = getMaxFloat(percMemSize, percValue)
+				case "min":
+					percMemSize = getMinFloat(percMemSize, percValue)
+				default:
+					percMemSize += percValue
+				}
+			} else {
+				percMemSize = percValue
+			}
+			count++
+		}
+	}
+
+	if count == 0 {
+		return nil, fmt.Errorf("Cannot get amount of '%s' memory.", typeStr)
+	}
+
+	if memtype == "pmem" {
+		if mode == "avg" {
+			return percMemSize / float64(count), nil
+		}
+		return percMemSize, nil
+	}
+
+	if mode == "avg" {
+		return float64(memSize) / float64(count), nil
+	}
+
+	return memSize, nil
+}
+
+func getMax(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func getMin(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func getMaxFloat(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func getMinFloat(a, b float64) float64 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func checkProcname(cmd, stats, name string) bool {
+	if name == "" {
+		return true
+	}
+	if stats == name {
+		return true
+	}
+
+	if cmd == name {
+		return true
+	}
+
+	return false
+}
+
+func checkUserInfo(uid int64, usr *user.User) bool {
+	if usr == nil {
+		return true
+	}
+
+	if strconv.FormatInt(uid, 10) == usr.Uid {
+		return true
+	}
+
+	return false
+}
+
+func checkProccom(cmd, cmdline string) (bool, error) {
+	if cmdline == "" {
+		return true, nil
+	}
+
+	rx, err := regexp.Compile(cmdline)
+	if err != nil {
+		return false, err
+	}
+	return rx.MatchString(cmd), nil
+}
+
+func getTypeString(t string) (string, error) {
+	switch t {
+	case "vsize", "":
+		return "VmSize", nil
+	case "rss":
+		return "VmRSS", nil
+	case "peak":
+		return "VmPeak", nil
+	case "swap":
+		return "VmSwap", nil
+	case "lib":
+		return "VmLib", nil
+	case "lck":
+		return "VmLck", nil
+	case "pin":
+		return "VmPin", nil
+	case "hwm":
+		return "VmHWM", nil
+	case "data":
+		return "VmData", nil
+	case "stk":
+		return "VmStk", nil
+	case "exe":
+		return "VmExe", nil
+	case "pte":
+		return "VmPTE", nil
+	default:
+		return "", errors.New("Invalid fifth parameter.")
+	}
+}
+
+func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
+	_, cmd, err := p.getProcessCmdline(pid, procInfoCmdline)
+	if err != nil {
+		return false
+	}
+
+	stats, err := p.getProcessName(pid)
+	if err != nil {
+		return false
+	}
+
+	if !checkProcname(cmd, stats, name) {
+		return false
+	}
+
+	uid, err := p.getProcessUserID(pid)
+	if err != nil {
+		return false
+	}
+
+	if !checkUserInfo(uid, user) {
+		return false
+	}
+
+	match, err := checkProccom(cmd, cmdline)
+	if err != nil {
+		return false
+	}
+
+	if !match {
+		return false
+	}
+
+	return true
+}
+
 func init() {
-	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilisation percentage.")
+	plugin.RegisterMetrics(&impl, "Proc",
+		"proc.cpu.util", "Process CPU utilisation percentage.",
+		"proc.mem", "Process CPU utilisation percentage.",
+	)
 }

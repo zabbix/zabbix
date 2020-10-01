@@ -27,7 +27,9 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"syscall"
+	"unicode"
 )
 
 func read2k(filename string) (data []byte, err error) {
@@ -190,4 +192,52 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 	}
 
 	return processes, nil
+}
+
+func byteFromProcFileData(data []byte, valueName string) (value int, err error) {
+	str := string(data)
+	split := strings.Split(str, "\n")
+
+	var valueString, valueType string
+	for _, line := range split {
+		i := strings.Index(line, ":")
+		if i < 0 {
+			continue
+		}
+
+		//should never happen but escapes panics
+		if len(line) <= i || len(line) < 3 {
+			continue
+		}
+
+		if valueName != line[:i] {
+			continue
+		}
+
+		valueType = line[len(line)-2:]
+		valueString = strings.TrimFunc(line[i+1:], func(r rune) bool {
+			if unicode.IsLetter(r) || r == ' ' || r == '\t' {
+				return true
+			}
+			return false
+		})
+	}
+
+	value, err = strconv.Atoi(valueString)
+	if err != nil {
+		return
+	}
+
+	switch valueType {
+	case "kB":
+		value = value * 1024
+	case "mB":
+		value = value * 1024 * 1024
+	case "GB":
+		value = value * 1024 * 1024 * 1024
+	case "TB":
+		value = value * 1024 * 1024 * 1024 * 1024
+	}
+
+	return
 }
