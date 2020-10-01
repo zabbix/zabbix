@@ -1144,7 +1144,7 @@ abstract class CControllerPopupItemTest extends CController {
 				'community' => ''
 			];
 
-			if (($det == SNMP_V1 || $det == SNMP_V2C) && $det['community'] === '') {
+			if (($det['version'] == SNMP_V1 || $det['version'] == SNMP_V2C) && $det['community'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('SNMP community'), _('cannot be empty')));
 				return false;
 			}
