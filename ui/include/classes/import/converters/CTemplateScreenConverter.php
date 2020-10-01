@@ -85,12 +85,7 @@ class CTemplateScreenConverter extends CConverter {
 					'height' => (string) $widget_pos['height']
 				];
 
-				$key = 'widget';
-				if (count($widgets) > 0) {
-					$key .= count($widgets);
-				}
-
-				$widgets[$key] = $widget;
+				$widgets[] = $widget;
 			}
 		}
 
