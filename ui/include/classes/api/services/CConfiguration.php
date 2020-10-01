@@ -24,6 +24,11 @@
  */
 class CConfiguration extends CApiService {
 
+	public const ACCESS_RULES = [
+		'export' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'import' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	/**
 	 * @param array $params
 	 *

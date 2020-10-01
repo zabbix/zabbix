@@ -24,6 +24,13 @@
  */
 class CScreenItem extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'screens_items';
 	protected $tableAlias = 'si';
 

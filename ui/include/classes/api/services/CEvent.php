@@ -24,6 +24,11 @@
  */
 class CEvent extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'acknowledge' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'action' => CRoleHelper::ACTIONS_UPDATE_PROBLEMS]
+	];
+
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];

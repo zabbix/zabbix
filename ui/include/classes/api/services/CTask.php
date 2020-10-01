@@ -24,6 +24,10 @@
  */
 class CTask extends CApiService {
 
+	public const ACCESS_RULES = [
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	/**
 	 * @param array        $task             Task to create.
 	 * @param string|array $task['itemids']  Array of item and LLD rule IDs to create tasks for.

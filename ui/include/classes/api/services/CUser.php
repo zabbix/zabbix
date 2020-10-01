@@ -25,27 +25,13 @@
 class CUser extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
-		],
-		'create' => [
-			'user_types' => [USER_TYPE_SUPER_ADMIN]
-		],
-		'update' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
-		],
-		'delete' => [
-			'user_types' => [USER_TYPE_SUPER_ADMIN]
-		],
-		'logout' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
-		],
-		'login' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
-		],
-		'checkauthentication' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
-		]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'checkauthentication' => [],
+		'login' => [],
+		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'users';
@@ -298,11 +284,11 @@ class CUser extends CApiService {
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -428,11 +414,11 @@ class CUser extends CApiService {
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
-			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -465,7 +451,7 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'theme', 'roleid', 'refresh', 'rows_per_page', 'timezone'
+				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
@@ -1429,7 +1415,7 @@ class CUser extends CApiService {
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'roleid', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone'
+				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
 			],
 			'userids' => $db_session['userid']
 		]);
@@ -1669,8 +1655,8 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
 			GROUP_GUI_ACCESS_DISABLED => $default_auth
 		];
-		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh', 'roleid',
-			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd', 'timezone'
+		$fields = ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
 		];
 
 		if ($case_sensitive) {

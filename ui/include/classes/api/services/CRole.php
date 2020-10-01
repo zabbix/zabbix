@@ -25,18 +25,10 @@
 class CRole extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
-		],
-		'create' => [
-			'user_types' => [USER_TYPE_SUPER_ADMIN],
-		],
-		'update' => [
-			'user_types' => [USER_TYPE_SUPER_ADMIN],
-		],
-		'delete' => [
-			'user_types' => [USER_TYPE_SUPER_ADMIN]
-		]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	/**

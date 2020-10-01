@@ -25,21 +25,10 @@
 class CMap extends CMapElement {
 
 	public const ACCESS_RULES = [
-		'get' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]
-		],
-		'create' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN],
-			'actions' => [CRoleHelper::ACTIONS_EDIT_MAPS]
-		],
-		'update' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN],
-			'actions' => [CRoleHelper::ACTIONS_EDIT_MAPS]
-		],
-		'delete' => [
-			'user_types' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN],
-			'actions' => [CRoleHelper::ACTIONS_EDIT_MAPS]
-		]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS]
 	];
 
 	protected $tableName = 'sysmaps';
