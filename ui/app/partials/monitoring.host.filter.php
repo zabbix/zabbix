@@ -216,6 +216,10 @@ if (array_key_exists('render_html', $data)) {
 			object_name: 'hostGroup',
 			name: 'groupids[]',
 			data: data.filter_view_data.groups_multiselect || [],
+			objectOptions: {
+				real_hosts: 1,
+				enrich_parent_groups: 1
+			},
 			popup: {
 				parameters: {
 					multiselect: '1',
