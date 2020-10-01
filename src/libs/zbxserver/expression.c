@@ -2443,50 +2443,6 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vector_ptr_least_tag                                         *
- *                                                                            *
- * Purpose: find the index of the least valued tag in the vector of tags      *
- *                                                                            *
- * Parameters: vector - [IN] vector of tags                                   *
- *                      [IN] name of tag to search                            *
- *                                                                            *
- * Return value: index of the least valued tag that matches the tagname       *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_vector_ptr_least_tag(const zbx_vector_ptr_t *vector, const char *name)
-{
-	int	least_index = FAIL, index, least_index_equals_name, current_index_equals_name;
-
-	if (0 == vector->values_num)
-		return least_index;
-
-	least_index = 0;
-	least_index_equals_name = 0;
-
-	if (0 == strcmp(name, ((const zbx_tag_t *)(vector->values[least_index]))->tag))
-		least_index_equals_name = 1;
-
-	for (index = 1; index < vector->values_num; index++)
-	{
-		current_index_equals_name = 0 == strcmp(name, ((const zbx_tag_t *)(vector->values[index]))->tag);
-
-		if (1 == current_index_equals_name && 1 == least_index_equals_name)
-		{
-			if (0 > compare_tags(&(vector->values[index]), &(vector->values[least_index])))
-				least_index = index;
-		}
-		else if (1 == current_index_equals_name)
-		{
-			least_index = index;
-			least_index_equals_name = 1;
-		}
-	}
-
-	return least_index;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_event_value                                                  *
  *                                                                            *
  * Purpose: request event value by macro                                      *
@@ -2560,18 +2516,28 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			if (SUCCEED == zbx_str_extract(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX),
 					strlen(macro) - ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX) - 1, &name))
 			{
-				int	best_match_index;
-
-				best_match_index = zbx_vector_ptr_least_tag(&(event->tags), name);
-
-				if (FAIL != best_match_index)
+				if (0 < event->tags.values_num)
 				{
-					zbx_tag_t	*tag;
+					int			i;
+					zbx_tag_t       	*tag;
+					zbx_vector_ptr_t	ptr_tags;
 
-					tag = (zbx_tag_t *)event->tags.values[best_match_index];
+					zbx_vector_ptr_create(&ptr_tags);
+					zbx_vector_ptr_append_array(&ptr_tags, event->tags.values, event->tags.values_num);
+					zbx_vector_ptr_sort(&ptr_tags, compare_tags);
 
-					if (0 == strcmp(name, tag->tag))
-						*replace_to = zbx_strdup(*replace_to, tag->value);
+					for (i = 0; i < ptr_tags.values_num; i++)
+					{
+						tag = (zbx_tag_t *)ptr_tags.values[i];
+
+						if (0 == strcmp(name, tag->tag))
+						{
+							*replace_to = zbx_strdup(*replace_to, tag->value);
+							break;
+						}
+					}
+
+					zbx_vector_ptr_destroy(&ptr_tags);
 				}
 
 				zbx_free(name);
