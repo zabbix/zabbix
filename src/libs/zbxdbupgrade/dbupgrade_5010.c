@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "../zbxalgo/vectorimpl.h"
+
 /*
  * 5.2 development database patches
  */
@@ -302,21 +303,35 @@ static int	DBpatch_5010033(void)
 
 static int	DBpatch_5010034(void)
 {
-	const ZBX_FIELD	field = {"templateid", 0, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("dashboard", 2, &field);
-}
-
-static int	DBpatch_5010035(void)
-{
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBmodify_field_type("dashboard", &field, NULL);
 }
 
+static int	DBpatch_5010035(void)
+{
+	return DBcreate_index("dashboard", "dashboard_1", "userid", 0);
+}
+
 static int	DBpatch_5010036(void)
 {
-	return DBcreate_index("dashboard", "c_dashboard_2", "templateid", 0);
+#ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
+	if (SUCCEED == DBindex_exists("dashboard", "c_dashboard_1"))
+		return DBdrop_index("dashboard", "c_dashboard_1");
+#endif
+	return SUCCEED;
+}
+
+static int	DBpatch_5010037(void)
+{
+	return DBcreate_index("dashboard", "dashboard_2", "templateid", 0);
+}
+
+static int	DBpatch_5010038(void)
+{
+	const ZBX_FIELD	field = {"templateid", 0, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("dashboard", 2, &field);
 }
 
 typedef struct
@@ -1307,7 +1322,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 	return ret;
 }
 
-static int	DBpatch_5010037(void)
+static int	DBpatch_5010039(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1370,6 +1385,16 @@ static int	DBpatch_5010037(void)
 #undef POS_TAKEN
 #undef SKIP_EMPTY
 
+static int	DBpatch_5010040(void)
+{
+	return DBdrop_foreign_key("screens", 1);
+}
+
+static int	DBpatch_5010041(void)
+{
+	return DBdrop_field("screens", "templateid");
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -1414,5 +1439,9 @@ DBPATCH_ADD(5010034, 0, 1)
 DBPATCH_ADD(5010035, 0, 1)
 DBPATCH_ADD(5010036, 0, 1)
 DBPATCH_ADD(5010037, 0, 1)
+DBPATCH_ADD(5010038, 0, 1)
+DBPATCH_ADD(5010039, 0, 1)
+DBPATCH_ADD(5010040, 0, 1)
+DBPATCH_ADD(5010041, 0, 1)
 
 DBPATCH_END()
