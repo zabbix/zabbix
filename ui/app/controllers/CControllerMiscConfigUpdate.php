@@ -23,7 +23,6 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'refresh_unsupported' =>			'required|db config.refresh_unsupported|time_unit '.implode(':', [0, SEC_PER_DAY]),
 			'discovery_groupid' =>				'required|db config.discovery_groupid',
 			'default_inventory_mode' =>			'required|in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
 			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
@@ -75,7 +74,6 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function doAction() {
 		$settings = [
-			CSettingsHelper::REFRESH_UNSUPPORTED => $this->getInput('refresh_unsupported'),
 			CSettingsHelper::DISCOVERY_GROUPID => $this->getInput('discovery_groupid'),
 			CSettingsHelper::DEFAULT_INVENTORY_MODE => $this->getInput('default_inventory_mode'),
 			CSettingsHelper::SNMPTRAP_LOGGING => $this->getInput('snmptrap_logging'),
