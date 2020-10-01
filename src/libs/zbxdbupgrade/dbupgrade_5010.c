@@ -1395,6 +1395,22 @@ static int	DBpatch_5010041(void)
 	return DBdrop_field("screens", "templateid");
 }
 
+static int	DBpatch_5010042(void)
+{
+	return DBcreate_index("screens", "screens_1", "userid", 0);
+}
+
+static int	DBpatch_5010043(void)
+{
+#ifdef HAVE_MYSQL	/* fix automatic index name on MySQL */
+	if (SUCCEED == DBindex_exists("screens", "c_screens_3"))
+	{
+		return DBdrop_index("screens", "c_screens_3");
+	}
+#endif
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -1443,5 +1459,7 @@ DBPATCH_ADD(5010038, 0, 1)
 DBPATCH_ADD(5010039, 0, 1)
 DBPATCH_ADD(5010040, 0, 1)
 DBPATCH_ADD(5010041, 0, 1)
+DBPATCH_ADD(5010042, 0, 1)
+DBPATCH_ADD(5010043, 0, 1)
 
 DBPATCH_END()
