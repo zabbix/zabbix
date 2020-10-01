@@ -261,6 +261,8 @@ header {
     white-space: nowrap; }
     header .header-controls label {
       line-height: 24px; }
+  header .header-combobox {
+    max-width: 600px; }
   header a.link-action {
     box-sizing: border-box;
     display: block;

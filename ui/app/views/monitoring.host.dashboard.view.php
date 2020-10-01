@@ -58,9 +58,11 @@ $widget = (new CWidget())
 					->addVar('action', 'host.dashboard.view')
 					->addVar('hostid', $data['host']['hostid'])
 					->addItem((new CLabel(_('Dashboard'), 'dashboardid'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
-					->addItem(new CComboBox('dashboardid', $data['dashboard']['dashboardid'], 'submit()',
-						$data['host_dashboards']
-					))
+					->addItem(
+						(new CComboBox('dashboardid', $data['dashboard']['dashboardid'], 'submit()',
+							$data['host_dashboards']
+						))->addClass(ZBX_STYLE_HEADER_COMBOBOX)
+					)
 			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 	))->setAttribute('aria-label', _('Content controls')));
