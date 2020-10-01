@@ -768,7 +768,7 @@ class CControllerPopupGeneric extends CController {
 		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER);
 		$this->page_options = $this->getPageOptions();
 
-		// Make control filters. Must be called bedore extending groupids.
+		// Make control filters. Must be called before extending groupids.
 		$filters = $this->makeFilters();
 
 		// Select subgroups.

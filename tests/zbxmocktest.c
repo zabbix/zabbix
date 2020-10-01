@@ -177,10 +177,12 @@ const char	*progname = "mock_progname";
 const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-char	*CONFIG_HOSTNAME		= NULL;
+char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 char	*CONFIG_HOST_METADATA		= NULL;
 char	*CONFIG_HOST_METADATA_ITEM	= NULL;
+
+ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME	= NULL;
 
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 

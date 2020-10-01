@@ -749,9 +749,11 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const char *host, unsigned short port)
+static int	sender_add_serveractive_host_cb(const char *host, unsigned short port, zbx_vector_str_t *hostnames)
 {
 	int	i;
+
+	ZBX_UNUSED(hostnames);
 
 	for (i = 0; i < destinations_count; i++)
 	{
@@ -807,7 +809,7 @@ static void	zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"ServerActive",		&cfg_active_hosts,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"Hostname",			&cfg_hostname,				TYPE_STRING,
+		{"Hostname",			&cfg_hostname,				TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"TLSConnect",			&cfg_tls_connect,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -841,16 +843,29 @@ static void	zbx_load_config(const char *config_file)
 	/* do not complain about unknown parameters in agent configuration file */
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
+	/* get first hostname only */
+	if (NULL != cfg_hostname)
+	{
+		if (NULL == ZABBIX_HOSTNAME)
+		{
+			char	*p;
+
+			ZABBIX_HOSTNAME = NULL != (p = strchr(cfg_hostname, ',')) ?
+					zbx_dsprintf(NULL, "%.*s", (int)(p - cfg_hostname), cfg_hostname) :
+					zbx_strdup(NULL, cfg_hostname);
+		}
+
+		zbx_free(cfg_hostname);
+	}
+
 	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
 		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
-			zbx_set_data_destination_hosts(cfg_active_hosts, sender_add_serveractive_host_cb);
+			zbx_set_data_destination_hosts(cfg_active_hosts, sender_add_serveractive_host_cb, NULL);
 	}
 	zbx_free(cfg_active_hosts);
-
-	zbx_fill_from_config_file(&ZABBIX_HOSTNAME, cfg_hostname);
 
 	zbx_fill_from_config_file(&CONFIG_TLS_CONNECT, cfg_tls_connect);
 	zbx_fill_from_config_file(&CONFIG_TLS_CA_FILE, cfg_tls_ca_file);
@@ -1023,7 +1038,7 @@ static void	parse_commandline(int argc, char **argv)
 		else
 			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
 
-		sender_add_serveractive_host_cb(ZABBIX_SERVER, port);
+		sender_add_serveractive_host_cb(ZABBIX_SERVER, port, NULL);
 	}
 
 	/* every option may be specified only once */

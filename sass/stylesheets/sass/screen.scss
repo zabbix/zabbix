@@ -28,6 +28,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
+@import "components/z-select";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -7062,6 +7063,29 @@ table.preprocessing-test-results {
 	}
 }
 
+.icon-invisible.menu-popup-item,
+.icon-invisible.btn-dropdown-toggle {
+	width: 100%;
+
+	&::before {
+		background: url($sprite-path) no-repeat -87px -800px;
+	}
+
+	&:not(.highlighted):enabled {
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::before {
+				background-position: -399px -800px;
+			}
+		}
+	}
+}
+.icon-invisible.btn-dropdown-toggle {
+	margin: 0;
+}
+
 .btn-split {
 	display: inline-block;
 	position: relative;
@@ -7337,4 +7361,22 @@ table.preprocessing-test-results {
 	.table-col-y-axis-side { width: 85px; }
 	.table-col-colour { width: 105px; }
 	.table-col-action { width: 55px; }
+}
+
+z-select,
+.z-select {
+	&.z-select-host-interface {
+		.description:not(:empty) {
+			display: block;
+			margin-top: 5px;
+			color: $input-placeholder-color;
+		}
+
+		&[disabled],
+		li[disabled] {
+			.description:not(:empty) {
+				color: $form-disabled-font-color;
+			}
+		}
+	}
 }

@@ -408,8 +408,11 @@ class CItem extends CItemGeneral {
 			return $result;
 		}
 
-		// add other related objects
 		if ($result) {
+			if (self::dbDistinct($sqlParts)) {
+				$result = $this->addNclobFieldValues($options, $result);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type'], $options['output']);
 		}

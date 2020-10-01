@@ -22,7 +22,7 @@
 /**
  * Validate import data from Zabbix 4.4.x.
  */
-class C44XmlValidator {
+class C44XmlValidator extends CXmlValidatorGeneral {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
@@ -273,20 +273,6 @@ class C44XmlValidator {
 		CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION => CXmlConstantName::RECOVERY_EXPRESSION,
 		CXmlConstantValue::TRIGGER_NONE => CXmlConstantName::NONE
 	];
-
-	/**
-	 * Format of import source.
-	 *
-	 * @var string
-	 */
-	private $format;
-
-	/**
-	 * @param string $format  Format of import source.
-	 */
-	public function __construct($format) {
-		$this->format = $format;
-	}
 
 	/**
 	 * Get validation rules schema.
@@ -1735,10 +1721,8 @@ class C44XmlValidator {
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $path) {
-		$rules = $this->getSchema();
-
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+	public function validate(array $data, string $path) {
+		return $this->doValidate($this->getSchema(), $data, $path);
 	}
 
 	/**
@@ -1797,7 +1781,7 @@ class C44XmlValidator {
 	public function validateMapElements($data, array $parent_data = null, $path) {
 		$rules = $this->getMapElementsExtendedRules($parent_data);
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1861,7 +1845,7 @@ class C44XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -1894,7 +1878,7 @@ class C44XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1924,7 +1908,7 @@ class C44XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1941,7 +1925,7 @@ class C44XmlValidator {
 	public function validateMediaTypeParameters($data, array $parent_data, $path) {
 		$rules = $this->getMediaTypeParametersExtendedRules($parent_data);
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1981,7 +1965,7 @@ class C44XmlValidator {
 			$rules = ['type' => XML_STRING, 'default' => ''];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2003,7 +1987,7 @@ class C44XmlValidator {
 			$rules['rules']['key']['type'] |= XML_REQUIRED;
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2020,7 +2004,7 @@ class C44XmlValidator {
 	public function validateAuthType($data, array $parent_data = null, $path) {
 		$rules = $this->getAuthTypeExtendedRules($parent_data);
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
