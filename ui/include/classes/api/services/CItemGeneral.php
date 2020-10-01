@@ -1779,7 +1779,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Create item parameters.
+	 * Update item parameters.
 	 *
 	 * @param array $items                             Array of items.
 	 * @param array $items[]['itemid']                 Item ID.
@@ -1813,9 +1813,15 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		if ($del_item_parameters) {
+			DB::delete('item_parameter', ['itemid' => array_keys($del_item_parameters)]);
+		}
+
 		if ($items_parameters) {
 			$ins_item_parameters = [];
 			$upd_item_parameters = [];
+			$del_item_parameters = [];
+
 			$db_item_parameters = DB::select('item_parameter', [
 				'output' => ['item_parameterid', 'itemid', 'name', 'value'],
 				'filter' => ['itemid' => array_keys($items_parameters)]
@@ -1860,9 +1866,6 @@ abstract class CItemGeneral extends CApiService {
 			if ($ins_item_parameters) {
 				DB::insert('item_parameter', $ins_item_parameters);
 			}
-		}
-		elseif ($del_item_parameters) {
-			DB::delete('item_parameter', ['itemid' => array_keys($del_item_parameters)]);
 		}
 	}
 
