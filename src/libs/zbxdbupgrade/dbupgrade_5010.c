@@ -291,6 +291,11 @@ static int	DBpatch_5010032(void)
 	return DBmodify_field_type("items", &field, &old_field);
 }
 
+static int	DBpatch_5010033(void)
+{
+	return DBdrop_field("config", "refresh_unsupported");
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -330,5 +335,6 @@ DBPATCH_ADD(5010029, 0, 1)
 DBPATCH_ADD(5010030, 0, 1)
 DBPATCH_ADD(5010031, 0, 1)
 DBPATCH_ADD(5010032, 0, 1)
+DBPATCH_ADD(5010033, 0, 1)
 
 DBPATCH_END()

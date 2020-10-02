@@ -434,7 +434,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 
 #define SELECTED_CONFIG_FIELD_COUNT	34	/* number of columns in the following DBselect() */
 
-	if (NULL == (result = DBselect("select refresh_unsupported,discovery_groupid,snmptrap_logging,"
+	if (NULL == (result = DBselect("select discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5,"
 				"hk_events_mode,hk_events_trigger,hk_events_internal,"
