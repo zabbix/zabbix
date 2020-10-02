@@ -35,6 +35,11 @@ class CTemplateScreenConverter extends CConverter {
 	private const WIDGET_ROW_HEIGHT = 70;
 
 	/**
+	 * Average height of screen legend.
+	 */
+	private const SCREEN_LEGEND_HEIGHT = 215;
+
+	/**
 	 * Convert template screen definition to template dashboard definition.
 	 *
 	 * @param array $screen
@@ -376,7 +381,7 @@ class CTemplateScreenConverter extends CConverter {
 		// Convert graph inner height to outer height.
 		if (in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH,
 				SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH])) {
-			$height += 215;
+			$height += self::SCREEN_LEGEND_HEIGHT;
 		}
 
 		return self::limitWidgetSize([
