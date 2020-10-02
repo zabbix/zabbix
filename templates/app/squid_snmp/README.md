@@ -76,34 +76,24 @@ There are no template links in this template.
 |Squid |Squid: Request hit ratio per 1 minute |<p>Byte Hit Ratios</p> |SNMP |squid[cacheRequestHitRatio.1] |
 |Squid |Squid: Request hit ratio per 5 minute |<p>Byte Hit Ratios</p> |SNMP |squid[cacheRequestHitRatio.5] |
 |Squid |Squid: Request hit ratio per 1 hour |<p>Byte Hit Ratios</p> |SNMP |squid[cacheRequestHitRatio.60] |
-|Squid |Squid: Sys page faults count |<p>Page faults with physical I/O</p> |SNMP |squid[cacheSysPageFaults] |
-|Squid |Squid: Sys page faults per second |<p>Page faults with physical I/O per second</p> |DEPENDENT |squid[cacheSysPageFaultsRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: HTTP requests received count |<p>Number of HTTP requests received</p> |SNMP |squid[cacheProtoClientHttpRequests] |
-|Squid |Squid: HTTP requests received per second |<p>Number of HTTP requests received per second</p> |DEPENDENT |squid[cacheProtoClientHttpRequestsRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: HTTP traffic received |<p>Number of HTTP KB's received from clients</p> |SNMP |squid[cacheHttpInKb]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Squid |Squid: HTTP traffic received per second |<p>Number of HTTP KB's received per second</p> |DEPENDENT |squid[cacheHttpInKbRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: HTTP traffic sent |<p>Number of HTTP KB's sent to clients</p> |SNMP |squid[cacheHttpOutKb]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Squid |Squid: HTTP requests sent per second |<p>Number of HTTP requests sent per second</p> |DEPENDENT |squid[cacheHttpOutKbRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: HTTP Hits sent from cache |<p>Number of HTTP Hits sent to clients from cache</p> |SNMP |squid[cacheHttpHits] |
-|Squid |Squid: HTTP Hits sent from cache per second |<p>Number of HTTP Hits sent to clients from cache per second</p> |DEPENDENT |squid[cacheHttpHitsRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: HTTP Errors sent |<p>Number of HTTP Errors sent to clients</p> |SNMP |squid[cacheHttpErrors] |
-|Squid |Squid: HTTP Errors sent per second |<p>Number of HTTP Errors sent to clients per second</p> |DEPENDENT |squid[cacheHttpErrorsRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: ICP messages sent |<p>Number of ICP messages sent</p> |SNMP |squid[cacheIcpPktsSent] |
-|Squid |Squid: ICP messages sent per second |<p>Number of ICP messages sent per second</p> |DEPENDENT |squid[cacheIcpPktsSentRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: ICP messages received |<p>Number of ICP messages received</p> |SNMP |squid[cacheIcpPktsRecv] |
-|Squid |Squid: ICP messages received per second |<p>Number of ICP messages received per second</p> |DEPENDENT |squid[cacheIcpPktsRecvRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: ICP traffic transmitted |<p>Number of ICP KB's transmitted</p> |SNMP |squid[cacheIcpKbSent]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Squid |Squid: ICP traffic transmitted per second |<p>Number of ICP KB's transmitted per second</p> |DEPENDENT |squid[cacheIcpKbSentRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: ICP traffic received |<p>Number of ICP KB's received</p> |SNMP |squid[cacheIcpKbRecv]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Squid |Squid: ICP traffic received per second |<p>Number of ICP KB's received per second</p> |DEPENDENT |squid[cacheIcpKbRecvRate]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: DNS server requests |<p>Number of external dns server requests</p> |SNMP |squid[cacheDnsRequests] |
-|Squid |Squid: DNS server replies |<p>Number of external dns server replies</p> |SNMP |squid[cacheDnsReplies] |
-|Squid |Squid: FQDN cache requests |<p>Number of FQDN Cache requests</p> |SNMP |squid[cacheFqdnRequests] |
-|Squid |Squid: FQDN cache hits |<p>Number of FQDN Cache hits</p> |SNMP |squid[cacheFqdnHits] |
-|Squid |Squid: FQDN cache misses |<p>Number of FQDN Cache misses</p> |SNMP |squid[cacheFqdnMisses] |
-|Squid |Squid: IP cache requests |<p>Number of IP Cache requests</p> |SNMP |squid[cacheIpRequests] |
-|Squid |Squid: IP cache hits |<p>Number of IP Cache hits</p> |SNMP |squid[cacheIpHits] |
-|Squid |Squid: IP cache misses |<p>Number of IP Cache misses</p> |SNMP |squid[cacheIpMisses] |
+|Squid |Squid: Sys page faults per second |<p>Page faults with physical I/O</p> |SNMP |squid[cacheSysPageFaults]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: HTTP requests received per second |<p>Number of HTTP requests received</p> |SNMP |squid[cacheProtoClientHttpRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: HTTP traffic received per second |<p>Number of HTTP traffic received from clients</p> |SNMP |squid[cacheHttpInKb]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: HTTP traffic sent per second |<p>Number of HTTP traffic sent to clients</p> |SNMP |squid[cacheHttpOutKb]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: HTTP Hits sent from cache per second |<p>Number of HTTP Hits sent to clients from cache</p> |SNMP |squid[cacheHttpHits]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: HTTP Errors sent per second |<p>Number of HTTP Errors sent to clients</p> |SNMP |squid[cacheHttpErrors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: ICP messages sent per second |<p>Number of ICP messages sent</p> |SNMP |squid[cacheIcpPktsSent]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: ICP messages received per second |<p>Number of ICP messages received</p> |SNMP |squid[cacheIcpPktsRecv]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: ICP traffic transmitted per second |<p>Number of ICP traffic transmitted</p> |SNMP |squid[cacheIcpKbSent]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: ICP traffic received per second |<p>Number of ICP traffic received</p> |SNMP |squid[cacheIcpKbRecv]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: DNS server requests per second |<p>Number of external dns server requests</p> |SNMP |squid[cacheDnsRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: DNS server replies per second |<p>Number of external dns server replies</p> |SNMP |squid[cacheDnsReplies]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: FQDN cache requests per second |<p>Number of FQDN Cache requests</p> |SNMP |squid[cacheFqdnRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: FQDN cache hits per second |<p>Number of FQDN Cache hits</p> |SNMP |squid[cacheFqdnHits]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: FQDN cache misses per second |<p>Number of FQDN Cache misses</p> |SNMP |squid[cacheFqdnMisses]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: IP cache requests per second |<p>Number of IP Cache requests</p> |SNMP |squid[cacheIpRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: IP cache hits per second |<p>Number of IP Cache hits</p> |SNMP |squid[cacheIpHits]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: IP cache misses per second |<p>Number of IP Cache misses</p> |SNMP |squid[cacheIpMisses]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: Objects count |<p>Number of objects stored by the cache</p> |SNMP |squid[cacheNumObjCount] |
 |Squid |Squid: Objects LRU expiration age |<p>Storage LRU Expiration Age</p> |SNMP |squid[cacheCurrentLRUExpiration]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
 |Squid |Squid: Objects unlinkd requests |<p>Requests given to unlinkd</p> |SNMP |squid[cacheCurrentUnlinkRequests] |
@@ -130,7 +120,7 @@ There are no template links in this template.
 |Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Template App Squid SNMP:squid[cacheSwapLowWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
 |Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Template App Squid SNMP:squid[cacheSwapHighWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
 |Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN}) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentUnusedFDescrCnt].last()}<{$SQUID.FILE.DESC.WARN.MIN}` |WARNING | |
-|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaultsRate].avg(5m)}>{Template App Squid SNMP:squid[cacheProtoClientHttpRequestsRate].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
+|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Template App Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
 
 ## Feedback
 
