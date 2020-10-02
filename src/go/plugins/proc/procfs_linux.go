@@ -23,8 +23,10 @@ package proc
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -194,7 +196,7 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 	return processes, nil
 }
 
-func byteFromProcFileData(data []byte, valueName string) (value int, err error) {
+func byteFromProcFileData(data []byte, valueName string) (value float64, found bool, err error) {
 	str := string(data)
 	split := strings.Split(str, "\n")
 
@@ -214,6 +216,7 @@ func byteFromProcFileData(data []byte, valueName string) (value int, err error) 
 			continue
 		}
 
+		found = true
 		valueType = line[len(line)-2:]
 		valueString = strings.TrimFunc(line[i+1:], func(r rune) bool {
 			if unicode.IsLetter(r) || r == ' ' || r == '\t' {
@@ -223,20 +226,27 @@ func byteFromProcFileData(data []byte, valueName string) (value int, err error) 
 		})
 	}
 
-	value, err = strconv.Atoi(valueString)
+	if !found {
+		return
+	}
+
+	i, err := strconv.Atoi(valueString)
 	if err != nil {
 		return
 	}
 
+	value = float64(i)
 	switch valueType {
 	case "kB":
 		value = value * 1024
 	case "mB":
-		value = value * 1024 * 1024
+		value = value * math.Pow(1024, 2)
 	case "GB":
-		value = value * 1024 * 1024 * 1024
+		value = value * math.Pow(1024, 3)
 	case "TB":
-		value = value * 1024 * 1024 * 1024 * 1024
+		value = value * math.Pow(1024, 4)
+	default:
+		return 0, false, errors.New("cannot resolve value type")
 	}
 
 	return

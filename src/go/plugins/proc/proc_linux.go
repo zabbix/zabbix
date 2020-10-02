@@ -457,19 +457,19 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 		return nil, err
 	}
 
-	var mem int
-	mem, err = byteFromProcFileData(meminfo, "MemTotal")
+	var mem float64
+	var found bool
+	mem, found, err = byteFromProcFileData(meminfo, "MemTotal")
 	if err != nil {
 		return nil, fmt.Errorf("Cannot obtain amount of total memory: %s", err.Error())
 	}
 
-	if mem == 0 {
-		return nil, errors.New("Total memory reported is 0.")
+	if !found {
+		return nil, fmt.Errorf("Cannot obtain amount of total memory")
 	}
 
-	files, err := ioutil.ReadDir("/proc")
-	if err != nil {
-		return nil, errors.New("Failed to read proc directory.")
+	if mem == 0 {
+		return nil, errors.New("Total memory reported is 0.")
 	}
 
 	var typeStr string
@@ -480,13 +480,14 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 		}
 	}
 
+	files, err := ioutil.ReadDir("/proc")
+	if err != nil {
+		return nil, errors.New("Failed to read proc directory.")
+	}
+
 	var count int
-
-	var memSize int
-	var value int
-
-	var percMemSize float64
-	var percValue float64
+	var memSize float64
+	var value float64
 
 	for _, file := range files {
 		if !file.IsDir() {
@@ -510,106 +511,97 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 
 		switch memtype {
 		case "pmem":
-			vmRSS, err := byteFromProcFileData(data, "VmRSS")
+			vmRSS, found, err := byteFromProcFileData(data, "VmRSS")
 			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of VmRSS: %s", err.Error())
+			}
+
+			if !found {
 				continue
 			}
-			percValue = (float64(vmRSS) / float64(mem)) * 100.00
+
+			value = (float64(vmRSS) / float64(mem)) * 100.00
 		case "size":
-			vmData, err := byteFromProcFileData(data, "VmData")
+			vmData, found, err := byteFromProcFileData(data, "VmData")
 			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of VmData: %s", err.Error())
+			}
+
+			if !found {
 				continue
 			}
 
-			vmStk, err := byteFromProcFileData(data, "VmStk")
+			vmStk, found, err := byteFromProcFileData(data, "VmStk")
 			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of VmStk: %s", err.Error())
+			}
+
+			if !found {
 				continue
 			}
 
-			vmExe, err := byteFromProcFileData(data, "VmExe")
+			vmExe, found, err := byteFromProcFileData(data, "VmExe")
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("Cannot obtain amount of VmExe: %s", err.Error())
 			}
 
-			value = vmData + vmStk + vmExe
+			if !found {
+				continue
+			}
+			value = float64(vmData + vmStk + vmExe)
 		default:
-			value, err = byteFromProcFileData(data, typeStr)
+			value, found, err = byteFromProcFileData(data, typeStr)
 			if err != nil {
+				return nil, fmt.Errorf("Cannot obtain amount of %s: %s", typeStr, err.Error())
+			}
+
+			if !found {
 				continue
 			}
 		}
 
-		if memtype != "pmem" {
-			if count != 0 {
-				switch mode {
-				case "max":
-					memSize = getMax(memSize, value)
-				case "min":
-					memSize = getMin(memSize, value)
-				default:
-					memSize += value
-				}
-			} else {
-				memSize = value
+		if count != 0 {
+			switch mode {
+			case "max":
+				memSize = getMax(memSize, value)
+			case "min":
+				memSize = getMin(memSize, value)
+			default:
+				memSize += value
 			}
-			count++
 		} else {
-			if count != 0 {
-				switch mode {
-				case "max":
-					percMemSize = getMaxFloat(percMemSize, percValue)
-				case "min":
-					percMemSize = getMinFloat(percMemSize, percValue)
-				default:
-					percMemSize += percValue
-				}
-			} else {
-				percMemSize = percValue
-			}
-			count++
+			memSize = value
 		}
+		count++
 	}
 
 	if count == 0 {
 		return nil, fmt.Errorf("Cannot get amount of '%s' memory.", typeStr)
 	}
 
-	if memtype == "pmem" {
+	if memtype != "pmem" {
 		if mode == "avg" {
-			return percMemSize / float64(count), nil
+			return int(memSize / float64(count)), nil
 		}
-		return percMemSize, nil
+
+		return int(memSize), nil
 	}
 
 	if mode == "avg" {
-		return float64(memSize) / float64(count), nil
+		return memSize / float64(count), nil
 	}
 
 	return memSize, nil
 }
 
-func getMax(a, b int) int {
+func getMax(a, b float64) float64 {
 	if a > b {
 		return a
 	}
 	return b
 }
 
-func getMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func getMaxFloat(a, b float64) float64 {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func getMinFloat(a, b float64) float64 {
+func getMin(a, b float64) float64 {
 	if a < b {
 		return a
 	}
@@ -620,6 +612,7 @@ func checkProcname(cmd, stats, name string) bool {
 	if name == "" {
 		return true
 	}
+
 	if stats == name {
 		return true
 	}
@@ -689,11 +682,13 @@ func getTypeString(t string) (string, error) {
 func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
 	_, cmd, err := p.getProcessCmdline(pid, procInfoCmdline)
 	if err != nil {
+		p.Logger.Debugf("failed to get proccess cmdline for pid '%s': %s", pid, err.Error())
 		return false
 	}
 
 	stats, err := p.getProcessName(pid)
 	if err != nil {
+		p.Logger.Debugf("failed to get proccess name for pid '%s': %s", pid, err.Error())
 		return false
 	}
 
@@ -712,6 +707,8 @@ func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
 
 	match, err := checkProccom(cmd, cmdline)
 	if err != nil {
+		p.Logger.Debugf(
+			"failed to compare provided regular expression for cmd '%s' for process '%s': %s", cmd, pid, err.Error())
 		return false
 	}
 
