@@ -86,12 +86,14 @@ func (e ZabbixError) Raw() string {
 }
 
 var (
-	ErrorInvalidParams     = New("invalid parameters")
-	ErrorTooManyParameters = New("too many parameters")
-	ErrorCannotFetchData   = New("cannot fetch data")
-	ErrorCannotMarshalJSON = New("cannot marshal JSON")
-	ErrorConnectionFailed  = New("connection failed")
-	ErrorUnsupportedMetric = New("unsupported metric")
-	ErrorEmptyResult       = New("empty result")
-	ErrorUnknownSession    = New("unknown session")
+	ErrorInvalidParams       = New("invalid parameters")
+	ErrorTooManyParameters   = New("too many parameters")
+	ErrorCannotFetchData     = New("cannot fetch data")
+	ErrorCannotUnmarshalJSON = New("cannot unmarshal JSON")
+	ErrorCannotMarshalJSON   = New("cannot marshal JSON")
+	ErrorCannotParseResult   = New("cannot parse result")
+	ErrorConnectionFailed    = New("connection failed")
+	ErrorUnsupportedMetric   = New("unsupported metric")
+	ErrorEmptyResult         = New("empty result")
+	ErrorUnknownSession      = New("unknown session")
 )

@@ -17,19 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package ceph
 
 import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"io/ioutil"
+	"log"
+	"os"
+	"strings"
+	"testing"
 )
+
+var fixtures map[command][]byte
+
+const cmdBroken command = "broken"
+
+func TestMain(m *testing.M) {
+	var err error
+
+	fixtures = make(map[command][]byte)
+
+	for _, cmd := range []command{cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth, cmdStatus} {
+		fixtures[cmd], err = ioutil.ReadFile("testdata/" + strings.ReplaceAll(string(cmd), " ", "_") + ".json")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	fixtures[cmdBroken] = []byte{1, 2, 3, 4, 5}
+
+	os.Exit(m.Run())
+}

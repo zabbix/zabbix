@@ -17,19 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package ceph
 
 import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"encoding/json"
 )
+
+type cephHealth struct {
+	Status string `json:"status"`
+}
+
+const (
+	pingFailed = 0
+	pingOk     = 1
+)
+
+// pingHandler returns pingOk if a connection is alive or pingFailed otherwise.
+func pingHandler(data map[command][]byte) (interface{}, error) {
+	var health cephHealth
+
+	err := json.Unmarshal(data[cmdHealth], &health)
+	if err != nil {
+		return pingFailed, nil
+	}
+
+	if len(health.Status) > 0 {
+		return pingOk, nil
+	}
+
+	return pingFailed, nil
+}
