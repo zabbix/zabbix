@@ -1458,35 +1458,15 @@ function renderInterfaceHeaders() {
 
 function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
 	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
+	$dashboard_fields = array_keys(array_flip($dashboard_fields));
 
-	$dashboards = [];
+	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
 
-	$templateids = array_keys(API::Template()->get([
-		'output' => [],
-		'hostids' => [$hostid],
+	return API::TemplateDashboard()->get([
+		'output' => $dashboard_fields,
+		'templateids' => $templateids,
 		'preservekeys' => true
-	]));
-
-	while ($templateids) {
-		$templates = API::Template()->get([
-			'output' => [],
-			'templateids' => $templateids,
-			'selectParentTemplates' => ['templateid'],
-			'selectDashboards' => $dashboard_fields,
-			'preservekeys' => true
-		]);
-
-		$templateids = [];
-
-		foreach ($templates as $template) {
-			foreach ($template['dashboards'] as $dashboard) {
-				$dashboards[$dashboard['dashboardid']] = $dashboard;
-			}
-			$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
-		}
-	}
-
-	return $dashboards;
+	]);
 }
 
 /**

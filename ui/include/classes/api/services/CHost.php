@@ -1638,26 +1638,32 @@ class CHost extends CHostGeneral {
 
 		// Adding dashboards.
 		if ($options['selectDashboards'] !== null) {
+			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
+
 			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
 				$dashboards = API::TemplateDashboard()->get([
 					'output' => $this->outputExtend($options['selectDashboards'], ['templateid']),
-					'templateids' => $hostids
+					'templateids' => $templateids
 				]);
+
 				if (!is_null($options['limitSelects'])) {
 					order_result($dashboards, 'name');
 				}
 
-				$relationMap = new CRelationMap();
-				foreach ($dashboards as $key => $dashboard) {
-					$relationMap->addRelation($dashboard['templateid'], $key);
+				foreach ($result as &$host) {
+					foreach ($hosts_templates[$host['hostid']] as $templateid) {
+						foreach ($dashboards as $dashboard) {
+							if ($dashboard['templateid'] == $templateid) {
+								$host['dashboards'][] = $dashboard;
+							}
+						}
+					}
 				}
-
-				$dashboards = $this->unsetExtraFields($dashboards, ['templateid'], $options['selectDashboards']);
-				$result = $relationMap->mapMany($result, $dashboards, 'dashboards', $options['limitSelects']);
+				unset($host);
 			}
 			else {
 				$dashboards = API::TemplateDashboard()->get([
-					'templateid' => $hostids,
+					'templateids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
@@ -1666,10 +1672,12 @@ class CHost extends CHostGeneral {
 					$result[$hostid]['dashboards'] = 0;
 
 					foreach ($dashboards as $dashboard) {
-						if (bccomp($dashboard['templateid'], $hostid) == 0) {
+						if (in_array($dashboard['templateid'], $hosts_templates[$hostid])) {
 							$result[$hostid]['dashboards'] += $dashboard['rowscount'];
 						}
 					}
+
+					$result[$hostid]['dashboards'] = (string) $result[$hostid]['dashboards'];
 				}
 			}
 		}
