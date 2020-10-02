@@ -308,8 +308,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				&& $inputs['interface']['type'] == INTERFACE_TYPE_SNMP) {
 			$show_snmp_form = true;
 		}
-		elseif (array_key_exists($this->item_type, $this->items_require_interface)
-				&& $this->items_require_interface[$this->item_type]['details']) {
+		elseif ($inputs['type'] == ITEM_TYPE_SNMP) {
 			$show_snmp_form = true;
 		}
 
