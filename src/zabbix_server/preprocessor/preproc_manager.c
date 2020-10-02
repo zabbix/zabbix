@@ -218,7 +218,7 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	zbx_vector_ptr_t	*phistory;
 
 	if (ITEM_STATE_NOTSUPPORTED == request->value.state)
-		zbx_variant_set_str(&value,"");
+		zbx_variant_set_str(&value, "");
 	else if (ISSET_LOG(request->value.result_ptr->result))
 		zbx_variant_set_str(&value, request->value.result_ptr->result->log->value);
 	else if (ISSET_UI64(request->value.result_ptr->result))
@@ -313,9 +313,8 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 		if (REQUEST_STATE_QUEUED != request->state)
 			continue;
 
-		if(NULL != request->steps && ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == request->steps[0].type)
+		if (NULL != request->steps && ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == request->steps[0].type)
 			process_notsupported = 1;
-
 
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state && 0 == process_notsupported)
 		{
