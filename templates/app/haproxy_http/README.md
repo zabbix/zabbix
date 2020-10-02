@@ -53,7 +53,7 @@ No specific Zabbix configuration is required.
 |{$HAPROXY.BACK_RTIME.MAX.WARN} |<p>Maximum of average BACKEND response time for trigger expression.</p> |`10s` |
 |{$HAPROXY.FRONT_DREQ.MAX.WARN} |<p>The HAProxy maximum denied requests for trigger expression.</p> |`10` |
 |{$HAPROXY.FRONT_EREQ.MAX.WARN} |<p>The HAProxy maximum number of request errors for trigger expression.</p> |`10` |
-|{$HAPROXY.FRONT_SUTIL.MAX.WARN} |<p>Maximum of session usage percentage on frontend for trigger expression.</p> |`80%` |
+|{$HAPROXY.FRONT_SUTIL.MAX.WARN} |<p>Maximum of session usage percentage on frontend for trigger expression.</p> |`80` |
 |{$HAPROXY.PASSWORD} |<p>The password of the HAProxy stats page.</p> |`` |
 |{$HAPROXY.RESPONSE_TIME.MAX.WARN} |<p>The HAProxy stats page maximum response time in seconds for trigger expression.</p> |`10s` |
 |{$HAPROXY.SERVER_ERESP.MAX.WARN} |<p>Maximum of responses with error on server for trigger expression.</p> |`10` |
