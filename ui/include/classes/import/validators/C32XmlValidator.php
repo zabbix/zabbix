@@ -22,19 +22,7 @@
 /**
  * Validate import data from Zabbix 3.2.x.
  */
-class C32XmlValidator {
-
-	/**
-	 * @var string
-	 */
-	private $format;
-
-	/**
-	 * @param string $format format of import source
-	 */
-	public function __construct($format) {
-		$this->format = $format;
-	}
+class C32XmlValidator extends CXmlValidatorGeneral {
 
 	/**
 	 * Base validation function.
@@ -45,7 +33,7 @@ class C32XmlValidator {
 	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
 	 *						an array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $path) {
+	public function validate(array $data, string $path) {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
 			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
@@ -990,7 +978,7 @@ class C32XmlValidator {
 			]]
 		]];
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1073,7 +1061,7 @@ class C32XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -1139,7 +1127,7 @@ class C32XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -1165,7 +1153,7 @@ class C32XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1188,7 +1176,7 @@ class C32XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**

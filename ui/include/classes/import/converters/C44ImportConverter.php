@@ -174,25 +174,6 @@ class C44ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Remapping interface array keys.
-	 *
-	 * @param array $interfaces
-	 *
-	 * @return array
-	 */
-	protected function remapInterfaceKeys(array $interfaces): array {
-		$data = [];
-		$number = 0;
-
-		foreach ($interfaces as $interface) {
-			$data['interface'. (($number > 0) ? $number : '')] = $interface;
-			$number++;
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Extract SNMP fields from items, discovery rules and item prototypes.
 	 *
 	 * @param array $host
@@ -508,8 +489,6 @@ class C44ImportConverter extends CConverter {
 
 			// Set proper default field for interfaces.
 			if (array_key_exists('interfaces', $host)) {
-				$host['interfaces'] = $this->remapInterfaceKeys($host['interfaces']);
-
 				$main = false;
 				foreach ($host['interfaces'] as &$interface) {
 					if (array_key_exists('type', $interface) && $interface['type'] === CXmlConstantName::SNMP) {
