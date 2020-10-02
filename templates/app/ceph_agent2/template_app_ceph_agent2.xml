@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-29T08:26:18Z</date>
+   <date>2020-10-02T13:24:27Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -676,9 +676,17 @@
                   </trigger>
                   <trigger>
                      <expression>{last()}=1</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{last()}=0</recovery_expression>
                      <name>Ceph: Cluster in WARNING state</name>
                      <priority>WARNING</priority>
                      <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Ceph: Cluster in ERROR state</name>
+                           <expression>{Template App Ceph by Zabbix Agent2:ceph.overall_status.last()}=2</expression>
+                        </dependency>
+                     </dependencies>
                   </trigger>
                </triggers>
             </item>
@@ -1404,6 +1412,8 @@
                            <expression>{last()} = 0</expression>
                            <name>Ceph: OSD osd.{#OSDNAME} is down</name>
                            <priority>AVERAGE</priority>
+                           <description>OSD osd.{#OSDNAME} is marked "down" in the osdmap.&#13;
+The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>

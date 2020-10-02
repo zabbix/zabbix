@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.0 and higher
 The template to monitor Ceph cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Setup and configure zabbix-agent2 compiled with the Ceph monitoring plugin.
 2. Set the {$CEPH.CONNSTRING} such as <protocol(host:port)> or named session.
@@ -126,9 +126,9 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Ceph: Can not connect to cluster |<p>Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).</p> |`{TEMPLATE_NAME:ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"].last()}=0` |AVERAGE | |
 |Ceph: Cluster in ERROR state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=2` |AVERAGE |<p>Manual close: YES</p> |
-|Ceph: Cluster in WARNING state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=1` |WARNING |<p>Manual close: YES</p> |
+|Ceph: Cluster in WARNING state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=1`<p>Recovery expression:</p>`{TEMPLATE_NAME:ceph.overall_status.last()}=0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Ceph: Cluster in ERROR state</p> |
 |Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE}) |<p>Ceph version has changed. Ack to close.</p> |`{TEMPLATE_NAME:ceph.min_mon_release_name.diff()}=1 and {TEMPLATE_NAME:ceph.min_mon_release_name.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Ceph: OSD osd.{#OSDNAME} is down |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},up].last()} = 0` |AVERAGE | |
+|Ceph: OSD osd.{#OSDNAME} is down |<p>OSD osd.{#OSDNAME} is marked "down" in the osdmap.</p><p>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},up].last()} = 0` |AVERAGE | |
 |Ceph: OSD osd.{#OSDNAME} is full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100` |AVERAGE | |
 |Ceph: Ceph OSD osd.{#OSDNAME} is near full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD osd.{#OSDNAME} is full</p> |
 
