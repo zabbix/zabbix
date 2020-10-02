@@ -109,6 +109,13 @@ class CRoleHelper {
 	private static $section_rules = [];
 
 	/**
+	 * Array for storing all API methods by user type.
+	 *
+	 * @var array
+	 */
+	private static $api_methods = [];
+
+	/**
 	 * Checks the access of specific role to specific rule.
 	 *
 	 * @static
@@ -520,5 +527,54 @@ class CRoleHelper {
 		];
 
 		return $labels;
+	}
+
+	/**
+	 * Returns a list of all API methods by user type or API methods available only for the given user type.
+	 *
+	 * @static
+	 *
+	 * @param int $user_type
+	 *
+	 * @return array
+	 */
+	public static function getApiMethods(?int $user_type = null): array {
+		if (!self::$api_methods) {
+			self::loadApiMethods();
+		}
+
+		return ($user_type !== null) ? self::$api_methods[$user_type] : self::$api_methods;
+	}
+
+	/**
+	 * Collects all API methods for all user types.
+	 *
+	 * @static
+	 */
+	private static function loadApiMethods(): void {
+		$api_methods = [
+			USER_TYPE_ZABBIX_USER => [],
+			USER_TYPE_ZABBIX_ADMIN => [],
+			USER_TYPE_SUPER_ADMIN => []
+		];
+
+		foreach (CApiServiceFactory::API_SERVICES as $service => $class_name) {
+			foreach (constant($class_name.'::ACCESS_RULES') as $method => $rules) {
+				if (array_key_exists('min_user_type', $rules)) {
+					switch ($rules['min_user_type']) {
+						case USER_TYPE_ZABBIX_USER:
+							$api_methods[USER_TYPE_ZABBIX_USER][] = $service.'.'.$method;
+							// break; is not missing here
+						case USER_TYPE_ZABBIX_ADMIN:
+							$api_methods[USER_TYPE_ZABBIX_ADMIN][] = $service.'.'.$method;
+							// break; is not missing here
+						case USER_TYPE_SUPER_ADMIN:
+							$api_methods[USER_TYPE_SUPER_ADMIN][] = $service.'.'.$method;
+					}
+				}
+			}
+		}
+
+		self::$api_methods = $api_methods;
 	}
 }
