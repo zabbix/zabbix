@@ -691,13 +691,11 @@ abstract class CControllerPopupItemTest extends CController {
 		// Get values from database; resolve macros.
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
 				&& array_key_exists('interfaceid', $inputs)) {
-			$interfaces = array_key_exists('interfaceid', $inputs)
-				? API::HostInterface()->get([
-					'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip', 'details'],
-					'interfaceids' => $inputs['interfaceid'],
-					'hostids' => $this->host['hostid']
-				])
-				: [];
+			$interfaces = API::HostInterface()->get([
+				'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip', 'details'],
+				'interfaceids' => $inputs['interfaceid'],
+				'hostids' => $this->host['hostid']
+			]);
 
 			if (count($interfaces) > 0) {
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
