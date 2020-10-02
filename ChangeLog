@@ -127,8 +127,27 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.5rc1
 
 New features:
+.........T [ZBXNEXT-6180] added Squid template (tuskov)
+...G...... [ZBXNEXT-6142] added Ceph monitoring plugin (vadimipatov)
+A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history cache contents (miks, wiper)
+.........T [ZBXNEXT-6159] added "Template App PHP-FPM by HTTP" and "Template App PHP-FPM by Zabbix agent" (ychukina)
+..F....... [ZBXNEXT-6157] reworked UI for setup to simplify db encryption configuration (rlataria)
+.........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
 
 Bug fixes:
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+...G...... [ZBX-18385] fixed segmentation violation in oracle plugin (vadimipatov)
+.......PS. [ZBX-18193] added logging for snmp_cache_reload (arimdjonoks)
+.......PS. [ZBX-18400] fixed http(s) requests from JavaScript to use SourceIP parameter in connections (Andris)
+..F....... [ZBX-17877] fixed details not displayed on SNMP interfaces within select element (ashubin, talbergs)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+A......... [ZBX-18417] fixed unexpected tag errors while importing JSON-exported data (averza)
+.......PS. [ZBX-17916] removed inserting of "wait" into "system.run[]" when executing frontend scripts (Andris)
+........S. [ZBX-18386] fixed server crash after removing snmp host interface from parent host (arimdjonoks)
+...G...... [ZBX-18199] changed the default log filename for agent2 on windows (arimdjonoks)
+...G...... [ZBX-18366] fixed agent reporting absence of 'Processor Information' counter on old Windows systems (arimdjonoks)
+..F....... [ZBX-18238] fixed JavaScript error when "invalid URL" error is displayed (talbergs)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.4
