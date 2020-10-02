@@ -170,6 +170,9 @@ function getMainMenu(): CMenu {
 					(new CMenuItem(_('User groups')))
 						->setAction('usergroup.list')
 						->setAliases(['usergroup.edit']),
+					(new CMenuItem(_('User roles')))
+						->setAction('userrole.list')
+						->setAliases(['userrole.edit']),
 					(new CMenuItem(_('Users')))
 						->setAction('user.list')
 						->setAliases(['user.edit']),

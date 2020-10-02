@@ -202,6 +202,8 @@ class CRouter {
 		'usergroup.update'				=> ['CControllerUsergroupUpdate',					null,					null],
 		'userprofile.edit'				=> ['CControllerUserProfileEdit',					'layout.htmlpage',		'administration.user.edit'],
 		'userprofile.update'			=> ['CControllerUserProfileUpdate',					null,					null],
+		'userrole.delete'				=> ['CControllerUserroleDelete',					null,					null],
+		'userrole.list'					=> ['CControllerUserroleList',						'layout.htmlpage',		'administration.userrole.list'],
 		'valuemap.create'				=> ['CControllerValuemapCreate',					null,					null],
 		'valuemap.delete'				=> ['CControllerValuemapDelete',					null,					null],
 		'valuemap.edit'					=> ['CControllerValuemapEdit',						'layout.htmlpage',		'administration.valuemap.edit'],
