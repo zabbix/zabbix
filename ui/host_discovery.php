@@ -375,8 +375,10 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+		'request' => [
+			'itemid' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -695,10 +697,18 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('g_hostdruleid')
-	]);
+	$tasks = [];
+
+	foreach (getRequest('g_hostdruleid') as $taskid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'itemid' => $taskid
+			]
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows($checkbox_hash);
