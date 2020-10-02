@@ -995,6 +995,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
+	scriptitem_es_engine_init();
+
 #ifdef HAVE_NETSNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 		zbx_init_snmp();
@@ -1062,5 +1064,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+
+	scriptitem_es_engine_destroy();
 #undef STAT_INTERVAL
 }

@@ -3657,6 +3657,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->preprocops, &iter);
+
 	while (NULL != (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL == zbx_hashset_search(&ids, &preproc->item_preprocid))
@@ -3824,6 +3825,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->itemscript_params, &iter);
+
 	while (NULL != (itemscript_params = (zbx_dc_scriptitem_param_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL == zbx_hashset_search(&ids, &itemscript_params->item_script_paramid))

@@ -23,6 +23,8 @@
 #include "common.h"
 #include "dbcache.h"
 
+void	scriptitem_es_engine_init(void);
+void	scriptitem_es_engine_destroy(void);
 int	get_value_script(DC_ITEM *item, AGENT_RESULT *result);
 
 #endif
