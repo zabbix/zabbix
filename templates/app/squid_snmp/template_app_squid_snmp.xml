@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-02T12:23:49Z</date>
+   <date>2020-10-02T14:50:01Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -91,7 +91,7 @@ Template tooling version used: 0.38</description>
                <key>squid[cacheCurrentFileDescrMax]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Highest file descriptors in use</description>
+               <description>Highest number of file descriptors in use</description>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -230,14 +230,14 @@ Template tooling version used: 0.38</description>
                </preprocessing>
             </item>
             <item>
-               <name>Squid: DNS service time per 5 minute</name>
+               <name>Squid: DNS service time per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.8.5</snmp_oid>
                <key>squid[cacheDnsSvcTime.5]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>DNS service time per 5 minute</description>
+               <description>DNS service time per 5 minutes</description>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -332,14 +332,14 @@ Template tooling version used: 0.38</description>
                </preprocessing>
             </item>
             <item>
-               <name>Squid: HTTP all service time per 5 minute</name>
+               <name>Squid: HTTP all service time per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.2.5</snmp_oid>
                <key>squid[cacheHttpAllSvcTime.5]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>HTTP all service time per 5 minute</description>
+               <description>HTTP all service time per 5 minutes</description>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -414,14 +414,14 @@ Template tooling version used: 0.38</description>
                </preprocessing>
             </item>
             <item>
-               <name>Squid: HTTP miss service time per 5 minute</name>
+               <name>Squid: HTTP miss service time per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.5.5</snmp_oid>
                <key>squid[cacheHttpHitSvcTime.5]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>HTTP hit service time per 5 minute</description>
+               <description>HTTP hit service time per 5 minutes</description>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -481,14 +481,14 @@ Template tooling version used: 0.38</description>
                </preprocessing>
             </item>
             <item>
-               <name>Squid: HTTP miss service time per 5 minute</name>
+               <name>Squid: HTTP miss service time per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.3.5</snmp_oid>
                <key>squid[cacheHttpMissSvcTime.5]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>HTTP miss service time per 5 minute</description>
+               <description>HTTP miss service time per 5 minutes</description>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -638,14 +638,14 @@ Template tooling version used: 0.38</description>
                </preprocessing>
             </item>
             <item>
-               <name>Squid: ICP query service time per 5 minute</name>
+               <name>Squid: ICP query service time per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.6.5</snmp_oid>
                <key>squid[cacheIcpQuerySvcTime.5]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>ICP query service time per 5 minute</description>
+               <description>ICP query service time per 5 minutes</description>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -680,14 +680,14 @@ Template tooling version used: 0.38</description>
                </preprocessing>
             </item>
             <item>
-               <name>Squid: ICP reply service time per 5 minute</name>
+               <name>Squid: ICP reply service time per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.7.5</snmp_oid>
                <key>squid[cacheIcpReplySvcTime.5]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>ICP reply service time per 5 minute</description>
+               <description>ICP reply service time per 5 minutes</description>
                <applications>
                   <application>
                      <name>Squid</name>
@@ -893,7 +893,7 @@ Template tooling version used: 0.38</description>
                </applications>
             </item>
             <item>
-               <name>Squid: Byte hit ratio per 5 minute</name>
+               <name>Squid: Byte hit ratio per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.10.5</snmp_oid>
                <key>squid[cacheRequestByteRatio.5]</key>
@@ -935,7 +935,7 @@ Template tooling version used: 0.38</description>
                </applications>
             </item>
             <item>
-               <name>Squid: Request hit ratio per 5 minute</name>
+               <name>Squid: Request hit ratio per 5 minutes</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.9.5</snmp_oid>
                <key>squid[cacheRequestHitRatio.5]</key>
@@ -1113,7 +1113,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$SQUID.SNMP.COMMUNITY}</macro>
                <value>public</value>
-               <description>SNMP community alowed by ACL in squid.conf</description>
+               <description>SNMP community allowed by ACL in squid.conf</description>
             </macro>
             <macro>
                <macro>{$SQUID.SNMP.PORT}</macro>
