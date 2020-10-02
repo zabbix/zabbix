@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-01T14:21:56Z</date>
+   <date>2020-10-02T12:12:29Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template DB Apache Cassandra JMX</template>
-         <name>Template DB Apache Cassandra JMX</name>
+         <template>Template DB Apache Cassandra by JMX</template>
+         <name>Template DB Apache Cassandra by JMX</name>
          <description>The template to monitor Apache Cassandra by Zabbix that work without any external scripts.&#13;
 It works with both standalone and cluster instances.&#13;
 The metrics are collected by JMX.&#13;
@@ -32,7 +32,7 @@ Template tooling version used: 0.38</description>
          </applications>
          <items>
             <item>
-               <name>Cassandra: Cluster: Name</name>
+               <name>Cluster: Name</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.db:type=StorageService","ClusterName"]</key>
                <history>7d</history>
@@ -54,7 +54,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Version</name>
+               <name>Version</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]</key>
                <history>7d</history>
@@ -77,15 +77,15 @@ Template tooling version used: 0.38</description>
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <name>Cassandra: Version has changed (new version: {ITEM.VALUE})</name>
+                     <name>Version has changed (new version: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
-                     <description>Cassandra version has changed. Ack to close.</description>
+                     <description>__RESOURCE__ version has changed. Ack to close.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
             </item>
             <item>
-               <name>Cassandra: Compaction: Number of completed tasks</name>
+               <name>Compaction: Number of completed tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=CompletedTasks,type=Compaction","Value"]</key>
                <history>7d</history>
@@ -100,7 +100,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Commitlog: Pending tasks</name>
+               <name>Commitlog: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=PendingTasks,type=CommitLog","Value"]</key>
                <history>7d</history>
@@ -115,7 +115,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Read median</name>
+               <name>Latency: Read median</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","50thPercentile"]</key>
                <history>7d</history>
@@ -138,7 +138,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Read 75 percentile</name>
+               <name>Latency: Read 75 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","75thPercentile"]</key>
                <history>7d</history>
@@ -161,7 +161,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Read 95 percentile</name>
+               <name>Latency: Read 95 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","95thPercentile"]</key>
                <history>7d</history>
@@ -184,7 +184,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Commitlog: Total size</name>
+               <name>Commitlog: Total size</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=TotalCommitLogSize,type=CommitLog","Value"]</key>
                <history>7d</history>
@@ -200,7 +200,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Compaction: Total compactions completed</name>
+               <name>Compaction: Total compactions completed</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=TotalCompactionsCompleted,type=Compaction","Count"]</key>
                <history>7d</history>
@@ -215,7 +215,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Write median</name>
+               <name>Latency: Write median</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","50thPercentile"]</key>
                <history>7d</history>
@@ -238,7 +238,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Write 75 percentile</name>
+               <name>Latency: Write 75 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","75thPercentile"]</key>
                <history>7d</history>
@@ -261,7 +261,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Write 95 percentile</name>
+               <name>Latency: Write 95 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","95thPercentile"]</key>
                <history>7d</history>
@@ -284,7 +284,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: KeyCache: Capacity</name>
+               <name>KeyCache: Capacity</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Capacity","Value"]</key>
                <history>7d</history>
@@ -300,7 +300,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: KeyCache: Entries</name>
+               <name>KeyCache: Entries</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Entries","Value"]</key>
                <history>7d</history>
@@ -315,7 +315,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: KeyCache: HitRate</name>
+               <name>KeyCache: HitRate</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=HitRate","Value"]</key>
                <history>7d</history>
@@ -338,7 +338,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: KeyCache: Hits per second</name>
+               <name>KeyCache: Hits per second</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Hits","Count"]</key>
                <history>7d</history>
@@ -360,11 +360,12 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: KeyCache: requests per second</name>
+               <name>KeyCache: requests per second</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Requests","Count"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
+               <units>rps</units>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>Rate of cache requests.</description>
@@ -382,7 +383,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: KeyCache: Size</name>
+               <name>KeyCache: Size</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Size","Value"]</key>
                <history>7d</history>
@@ -398,7 +399,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Client connections: Native</name>
+               <name>Client connections: Native</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Client,name=connectedNativeClients","Value"]</key>
                <history>7d</history>
@@ -413,7 +414,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Client connections: Trifts</name>
+               <name>Client connections: Trifts</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Client,name=connectedThriftClients","Value"]</key>
                <history>7d</history>
@@ -428,7 +429,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Client request read median</name>
+               <name>Latency: Client request read median</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","50thPercentile"]</key>
                <history>7d</history>
@@ -451,7 +452,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Client request read 75 percentile</name>
+               <name>Latency: Client request read 75 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","75thPercentile"]</key>
                <history>7d</history>
@@ -474,7 +475,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Client request read 95 percentile</name>
+               <name>Latency: Client request read 95 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","95thPercentile"]</key>
                <history>7d</history>
@@ -497,11 +498,12 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Client request: Read per second</name>
+               <name>Client request: Read per second</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","Count"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
+               <units>rps</units>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>The number of client requests per second.</description>
@@ -519,7 +521,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Client request write median</name>
+               <name>Latency: Client request write median</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","50thPercentile"]</key>
                <history>7d</history>
@@ -542,7 +544,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Client request write 75 percentile</name>
+               <name>Latency: Client request write 75 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","75thPercentile"]</key>
                <history>7d</history>
@@ -565,7 +567,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Latency: Client request write 95 percentile</name>
+               <name>Latency: Client request write 95 percentile</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","95thPercentile"]</key>
                <history>7d</history>
@@ -588,11 +590,12 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Client request: Write per second</name>
+               <name>Client request: Write per second</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","Count"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
+               <units>rps</units>
                <username>{$CASSANDRA.USER}</username>
                <password>{$CASSANDRA.PASSWORD}</password>
                <description>The number of local write requests per second.</description>
@@ -610,7 +613,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Client request: Write Timeouts</name>
+               <name>Client request: Write Timeouts</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Timeouts","Count"]</key>
                <history>7d</history>
@@ -625,7 +628,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Compaction: Pending tasks</name>
+               <name>Compaction: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -640,25 +643,25 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <triggers>
                   <trigger>
-                     <expression>{min(15m)}&gt;{$CASSANDRA.PENDING.TASKS.MAX.WARN}</expression>
-                     <name>Cassandra: Too many pending tasks (over {$CASSANDRA.PENDING.TASKS.MAX.WARN} for 15m)</name>
+                     <expression>{min(15m)}&gt;{$CASSANDRA.PENDING_TASKS.MAX.WARN}</expression>
+                     <name>Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m)</name>
                      <priority>WARNING</priority>
                      <dependencies>
                         <dependency>
-                           <name>Cassandra: Too many pending tasks (over {$CASSANDRA.PENDING.TASKS.MAX.HIGH} for 15m)</name>
-                           <expression>{Template DB Apache Cassandra JMX:jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"].min(15m)}&gt;{$CASSANDRA.PENDING.TASKS.MAX.HIGH}</expression>
+                           <name>Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)</name>
+                           <expression>{Template DB Apache Cassandra by JMX:jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"].min(15m)}&gt;{$CASSANDRA.PENDING_TASKS.MAX.HIGH}</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
                   <trigger>
-                     <expression>{min(15m)}&gt;{$CASSANDRA.PENDING.TASKS.MAX.HIGH}</expression>
-                     <name>Cassandra: Too many pending tasks (over {$CASSANDRA.PENDING.TASKS.MAX.HIGH} for 15m)</name>
+                     <expression>{min(15m)}&gt;{$CASSANDRA.PENDING_TASKS.MAX.HIGH}</expression>
+                     <name>Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)</name>
                      <priority>AVERAGE</priority>
                   </trigger>
                </triggers>
             </item>
             <item>
-               <name>Cassandra: Dropped messages: Write (Mutation)</name>
+               <name>Dropped messages: Write (Mutation)</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=MUTATION,name=Dropped","Count"]</key>
                <history>7d</history>
@@ -673,7 +676,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Dropped messages: Read</name>
+               <name>Dropped messages: Read</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=READ,name=Dropped","Count"]</key>
                <history>7d</history>
@@ -688,7 +691,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Storage: Errors</name>
+               <name>Storage: Errors</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"]</key>
                <history>7d</history>
@@ -704,13 +707,13 @@ Template tooling version used: 0.38</description>
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;0</expression>
-                     <name>Cassandra: Too many storage exceptions</name>
+                     <name>Too many storage exceptions</name>
                      <priority>WARNING</priority>
                   </trigger>
                </triggers>
             </item>
             <item>
-               <name>Cassandra: Storage: Used (bytes)</name>
+               <name>Storage: Used (bytes)</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"]</key>
                <history>7d</history>
@@ -726,7 +729,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Storage: Hints</name>
+               <name>Storage: Hints</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=Storage,name=TotalHints","Count"]</key>
                <history>7d</history>
@@ -741,7 +744,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.HintsDispatcher: Currently blocked task</name>
+               <name>Thread pool HintsDispatcher: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=HintsDispatcher,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -757,7 +760,7 @@ HintsDispatcher:	Performs hinted handoff.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.HintsDispatcher: Pending tasks</name>
+               <name>Thread pool HintsDispatcher: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=HintsDispatcher,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -773,7 +776,7 @@ HintsDispatcher:	Performs hinted handoff.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.HintsDispatcher: Total blocked tasks</name>
+               <name>Thread pool HintsDispatcher: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=HintsDispatcher,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -789,7 +792,7 @@ HintsDispatcher:	Performs hinted handoff.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MemtableFlushWriter: Currently blocked task</name>
+               <name>Thread pool MemtableFlushWriter: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtableFlushWriter,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -805,7 +808,7 @@ MemtableFlushWriter:	Writes memtables to disk.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MemtableFlushWriter: Pending tasks</name>
+               <name>Thread pool MemtableFlushWriter: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtableFlushWriter,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -821,7 +824,7 @@ MemtableFlushWriter:	Writes memtables to disk.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MemtableFlushWriter: Total blocked tasks</name>
+               <name>Thread pool MemtableFlushWriter: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtableFlushWriter,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -837,7 +840,7 @@ MemtableFlushWriter:	Writes memtables to disk.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MemtablePostFlush: Currently blocked task</name>
+               <name>Thread pool MemtablePostFlush: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtablePostFlush,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -853,7 +856,7 @@ MemtablePostFlush:	Cleans up commit log after memtable is written to disk.</desc
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MemtablePostFlush: Pending tasks</name>
+               <name>Thread pool MemtablePostFlush: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtablePostFlush,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -869,7 +872,7 @@ MemtablePostFlush:	Cleans up commit log after memtable is written to disk.</desc
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MemtablePostFlush: Total blocked tasks</name>
+               <name>Thread pool MemtablePostFlush: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MemtablePostFlush,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -885,7 +888,7 @@ MemtablePostFlush:	Cleans up commit log after memtable is written to disk.</desc
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MigrationStage: Currently blocked task</name>
+               <name>Thread pool MigrationStage: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MigrationStage,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -901,7 +904,7 @@ MigrationStage:	Runs schema migrations.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MigrationStage: Pending tasks</name>
+               <name>Thread pool MigrationStage: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MigrationStage,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -917,7 +920,7 @@ MigrationStage:	Runs schema migrations.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MigrationStage: Total blocked tasks</name>
+               <name>Thread pool MigrationStage: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MigrationStage,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -933,7 +936,7 @@ MigrationStage:	Runs schema migrations.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MiscStage: Currently blocked task</name>
+               <name>Thread pool MiscStage: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MiscStage,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -949,7 +952,7 @@ MiscStage:	Misceleneous tasks run here.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MiscStage: Pending tasks</name>
+               <name>Thread pool MiscStage: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MiscStage,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -965,7 +968,7 @@ MiscStage:	Misceleneous tasks run here.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MiscStage: Total blocked tasks</name>
+               <name>Thread pool MiscStage: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=MiscStage,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -981,7 +984,7 @@ MiscStage:	Misceleneous tasks run here.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.SecondaryIndexManagement: Currently blocked task</name>
+               <name>Thread pool SecondaryIndexManagement: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=SecondaryIndexManagement,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -997,7 +1000,7 @@ SecondaryIndexManagement:	Performs updates to secondary indexes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.SecondaryIndexManagement: Pending tasks</name>
+               <name>Thread pool SecondaryIndexManagement: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=SecondaryIndexManagement,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -1013,7 +1016,7 @@ SecondaryIndexManagement:	Performs updates to secondary indexes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.SecondaryIndexManagement: Total blocked tasks</name>
+               <name>Thread pool SecondaryIndexManagement: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=internal,scope=SecondaryIndexManagement,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1029,7 +1032,7 @@ SecondaryIndexManagement:	Performs updates to secondary indexes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.CounterMutationStage: Currently blocked task</name>
+               <name>Thread pool CounterMutationStage: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=CounterMutationStage,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1045,7 +1048,7 @@ CounterMutationStage:	Responsible for counter writes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.CounterMutationStage: Pending tasks</name>
+               <name>Thread pool CounterMutationStage: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=CounterMutationStage,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -1061,7 +1064,7 @@ CounterMutationStage:	Responsible for counter writes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.CounterMutationStage: Total blocked tasks</name>
+               <name>Thread pool CounterMutationStage: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=CounterMutationStage,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1077,7 +1080,7 @@ CounterMutationStage:	Responsible for counter writes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MutationStage: Currently blocked task</name>
+               <name>Thread pool MutationStage: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=MutationStage,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1093,7 +1096,7 @@ MutationStage:	Responsible for writes (exclude materialized and counter writes).
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Thread pool.MutationStage: Pending tasks</name>
+               <name>Thread pool.MutationStage: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=MutationStage,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -1109,7 +1112,7 @@ MutationStage:	Responsible for writes (exclude materialized and counter writes).
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.MutationStage: Total blocked tasks</name>
+               <name>Thread pool MutationStage: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=MutationStage,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1125,7 +1128,7 @@ MutationStage:	Responsible for writes (exclude materialized and counter writes).
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.ReadStage: Currently blocked task</name>
+               <name>Thread pool ReadStage: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ReadStage,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1141,7 +1144,7 @@ ReadStage:	Local reads run on this thread pool.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.ReadStage: Pending tasks</name>
+               <name>Thread pool ReadStage: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ReadStage,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -1157,7 +1160,7 @@ ReadStage:	Local reads run on this thread pool.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.ReadStage: Total blocked tasks</name>
+               <name>Thread pool ReadStage: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ReadStage,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1173,7 +1176,7 @@ ReadStage:	Local reads run on this thread pool.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.ViewMutationStage: Currently blocked task</name>
+               <name>Thread pool ViewMutationStage: Currently blocked task</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ViewMutationStage,name=CurrentlyBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1189,7 +1192,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.ViewMutationStage: Pending tasks</name>
+               <name>Thread pool ViewMutationStage: Pending tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ViewMutationStage,name=PendingTasks","Value"]</key>
                <history>7d</history>
@@ -1205,7 +1208,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: ThreadPool.ViewMutationStage: Total blocked tasks</name>
+               <name>Thread pool ViewMutationStage: Total blocked tasks</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.metrics:type=ThreadPools,path=request,scope=ViewMutationStage,name=TotalBlockedTasks","Count"]</key>
                <history>7d</history>
@@ -1221,7 +1224,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Cassandra: Cluster: Nodes down</name>
+               <name>Cluster: Nodes down</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"]</key>
                <history>7d</history>
@@ -1236,13 +1239,13 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <triggers>
                   <trigger>
                      <expression>{last()}&gt;0</expression>
-                     <name>Cassandra: There are down nodes in cluster</name>
+                     <name>There are down nodes in cluster</name>
                      <priority>AVERAGE</priority>
                   </trigger>
                </triggers>
             </item>
             <item>
-               <name>Cassandra: Cluster: Nodes up</name>
+               <name>Cluster: Nodes up</name>
                <type>JMX</type>
                <key>jmx["org.apache.cassandra.net:type=FailureDetector","UpEndpointCount"]</key>
                <history>7d</history>
@@ -1257,7 +1260,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <triggers>
                   <trigger>
                      <expression>{nodata(15m)}=1</expression>
-                     <name>Cassandra: Failed to fetch info data (or no data for 15m)</name>
+                     <name>Failed to fetch info data (or no data for 15m)</name>
                      <priority>WARNING</priority>
                      <description>Zabbix has not received data for items for the last 15 minutes</description>
                   </trigger>
@@ -1278,12 +1281,12 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                   <conditions>
                      <condition>
                         <macro>{#JMXKEYSPACE}</macro>
-                        <value>{$CASSANDRA.LLD.FILTER.KEY.SPACE.MATCHES}</value>
+                        <value>{$CASSANDRA.KEY_SPACE.MATCHES}</value>
                         <formulaid>A</formulaid>
                      </condition>
                      <condition>
                         <macro>{#JMXKEYSPACE}</macro>
-                        <value>{$CASSANDRA.LLD.FILTER.KEY.SPACE.NOT_MATCHES}</value>
+                        <value>{$CASSANDRA.KEY_SPACE.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>B</formulaid>
                      </condition>
@@ -1292,7 +1295,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <description>Info about keyspaces and tables</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Bloom Filter False ratio</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Bloom filter false ratio</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=BloomFilterFalseRatio","Value"]</key>
                      <history>7d</history>
@@ -1308,7 +1311,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Bytes flushed</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Bytes flushed</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=BytesFlushed","Count"]</key>
                      <history>7d</history>
@@ -1324,7 +1327,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Col Update Time Delta 75 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Col update time delta75 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ColUpdateTimeDeltaHistogram","75thPercentile"]</key>
                      <history>7d</history>
@@ -1347,7 +1350,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Col Update Time Delta 95 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Col update time delta 95 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ColUpdateTimeDeltaHistogram","95thPercentile"]</key>
                      <history>7d</history>
@@ -1370,7 +1373,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Compaction bytes written</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Compaction bytes written</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=CompactionBytesWritten","Count"]</key>
                      <history>7d</history>
@@ -1387,7 +1390,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Compression ratio</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Compression ratio</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=CompressionRatio","Value"]</key>
                      <history>7d</history>
@@ -1403,7 +1406,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: KeyCache hit rate</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: KeyCache hit rate</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=KeyCacheHitRate","Value"]</key>
                      <history>7d</history>
@@ -1419,7 +1422,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Live disk space used</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Live disk space used</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=LiveDiskSpaceUsed","Count"]</key>
                      <history>7d</history>
@@ -1435,7 +1438,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Live SS Table</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Live SS Table</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=LiveSSTableCount","Value"]</key>
                      <history>7d</history>
@@ -1450,7 +1453,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Max sartition size</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Max sartition size</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=MaxPartitionSize","Value"]</key>
                      <history>7d</history>
@@ -1466,7 +1469,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Mean partition size</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Mean partition size</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=MeanPartitionSize","Value"]</key>
                      <history>7d</history>
@@ -1482,7 +1485,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: PendingCompactions</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Pending compactions</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=PendingCompactions","Value"]</key>
                      <history>7d</history>
@@ -1497,7 +1500,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Pending flushes</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Pending flushes</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=PendingFlushes","Count"]</key>
                      <history>7d</history>
@@ -1512,7 +1515,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Read latency 75 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Read latency 75 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","75thPercentile"]</key>
                      <history>7d</history>
@@ -1535,7 +1538,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Read latency 95 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Read latency 95 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","95thPercentile"]</key>
                      <history>7d</history>
@@ -1558,11 +1561,12 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Read per second</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Read per second</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","Count"]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
+                     <units>rps</units>
                      <username>{$CASSANDRA.USER}</username>
                      <password>{$CASSANDRA.PASSWORD}</password>
                      <description>The number of client requests per second.</description>
@@ -1580,7 +1584,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Row cache hits</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Row cache hits</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=RowCacheHit","Count"]</key>
                      <history>7d</history>
@@ -1595,7 +1599,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Out of row cache hits</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Out of row cache hits</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=RowCacheHitOutOfRange","Count"]</key>
                      <history>7d</history>
@@ -1610,7 +1614,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Row cache misses</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Row cache misses</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=RowCacheMiss","Count"]</key>
                      <history>7d</history>
@@ -1625,7 +1629,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Snapshots size</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Snapshots size</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=SnapshotsSize","Value"]</key>
                      <history>7d</history>
@@ -1641,7 +1645,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: SS Tables Per Read 75 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: SS Tables per read 75 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=SSTablesPerReadHistogram","75thPercentile"]</key>
                      <history>7d</history>
@@ -1657,7 +1661,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: SS Tables Per Read 95 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: SS Tables per read 95 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=SSTablesPerReadHistogram","95thPercentile"]</key>
                      <history>7d</history>
@@ -1673,7 +1677,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Tombstone Scanned 75 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Tombstone scanned 75 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=TombstoneScannedHistogram","75thPercentile"]</key>
                      <history>7d</history>
@@ -1689,7 +1693,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Tombstone Scanned 95 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Tombstone scanned 95 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=TombstoneScannedHistogram","95thPercentile"]</key>
                      <history>7d</history>
@@ -1705,7 +1709,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Disk space used</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Disk space used</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=TotalDiskSpaceUsed","Count"]</key>
                      <history>7d</history>
@@ -1721,7 +1725,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Waiting On Free Memtable Space 75 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Waiting on free memtable space 75 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WaitingOnFreeMemtableSpace","75thPercentile"]</key>
                      <history>7d</history>
@@ -1744,7 +1748,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Waiting On Free Memtable Space 95 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Waiting on free memtable space95 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WaitingOnFreeMemtableSpace","95thPercentile"]</key>
                      <history>7d</history>
@@ -1767,7 +1771,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Write latency 75 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Write latency 75 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","75thPercentile"]</key>
                      <history>7d</history>
@@ -1790,7 +1794,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Write latency 95 percentile</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Write latency 95 percentile</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","95thPercentile"]</key>
                      <history>7d</history>
@@ -1813,11 +1817,12 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Write per second</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Write per second</name>
                      <type>JMX</type>
                      <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","Count"]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
+                     <units>rps</units>
                      <username>{$CASSANDRA.USER}</username>
                      <password>{$CASSANDRA.PASSWORD}</password>
                      <description>The number of local write requests per second.</description>
@@ -1838,12 +1843,12 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Read\Write latency</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Read\Write latency</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Apache Cassandra JMX</host>
+                              <host>Template DB Apache Cassandra by JMX</host>
                               <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","75thPercentile"]</key>
                            </item>
                         </graph_item>
@@ -1851,7 +1856,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Apache Cassandra JMX</host>
+                              <host>Template DB Apache Cassandra by JMX</host>
                               <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","95thPercentile"]</key>
                            </item>
                         </graph_item>
@@ -1859,7 +1864,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template DB Apache Cassandra JMX</host>
+                              <host>Template DB Apache Cassandra by JMX</host>
                               <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","75thPercentile"]</key>
                            </item>
                         </graph_item>
@@ -1867,19 +1872,19 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Template DB Apache Cassandra JMX</host>
+                              <host>Template DB Apache Cassandra by JMX</host>
                               <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","95thPercentile"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                   <graph_prototype>
-                     <name>Cassandra {#JMXKEYSPACE}.{#JMXSCOPE}: Requests rate</name>
+                     <name>{#JMXKEYSPACE}.{#JMXSCOPE}: Requests rate</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Apache Cassandra JMX</host>
+                              <host>Template DB Apache Cassandra by JMX</host>
                               <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=WriteLatency","Count"]</key>
                            </item>
                         </graph_item>
@@ -1887,7 +1892,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Apache Cassandra JMX</host>
+                              <host>Template DB Apache Cassandra by JMX</host>
                               <key>jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=ReadLatency","Count"]</key>
                            </item>
                         </graph_item>
@@ -1898,12 +1903,12 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
          </discovery_rules>
          <macros>
             <macro>
-               <macro>{$CASSANDRA.LLD.FILTER.KEY.SPACE.MATCHES}</macro>
+               <macro>{$CASSANDRA.KEY_SPACE.MATCHES}</macro>
                <value>.*</value>
                <description>Filter of discoverable key spaces</description>
             </macro>
             <macro>
-               <macro>{$CASSANDRA.LLD.FILTER.KEY.SPACE.NOT_MATCHES}</macro>
+               <macro>{$CASSANDRA.KEY_SPACE.NOT_MATCHES}</macro>
                <value>(system|system_auth|system_distributed|system_schema)</value>
                <description>Filter to exclude discovered key spaces</description>
             </macro>
@@ -1912,11 +1917,11 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <value>zabbix</value>
             </macro>
             <macro>
-               <macro>{$CASSANDRA.PENDING.TASKS.MAX.HIGH}</macro>
+               <macro>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}</macro>
                <value>500</value>
             </macro>
             <macro>
-               <macro>{$CASSANDRA.PENDING.TASKS.MAX.WARN}</macro>
+               <macro>{$CASSANDRA.PENDING_TASKS.MAX.WARN}</macro>
                <value>350</value>
             </macro>
             <macro>
@@ -1928,13 +1933,13 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
    </templates>
    <graphs>
       <graph>
-         <name>Cassandra: Client connections</name>
+         <name>Client connections</name>
          <graph_items>
             <graph_item>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=Client,name=connectedNativeClients","Value"]</key>
                </item>
             </graph_item>
@@ -1943,20 +1948,20 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=Client,name=connectedThriftClients","Value"]</key>
                </item>
             </graph_item>
          </graph_items>
       </graph>
       <graph>
-         <name>Cassandra: Client requests rate</name>
+         <name>Client requests rate</name>
          <graph_items>
             <graph_item>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","Count"]</key>
                </item>
             </graph_item>
@@ -1965,20 +1970,20 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","Count"]</key>
                </item>
             </graph_item>
          </graph_items>
       </graph>
       <graph>
-         <name>Cassandra: Client requests Read\Write latency</name>
+         <name>Client requests Read\Write latency</name>
          <graph_items>
             <graph_item>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","50thPercentile"]</key>
                </item>
             </graph_item>
@@ -1987,7 +1992,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","50thPercentile"]</key>
                </item>
             </graph_item>
@@ -1995,7 +2000,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","75thPercentile"]</key>
                </item>
             </graph_item>
@@ -2003,7 +2008,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Read,name=Latency","95thPercentile"]</key>
                </item>
             </graph_item>
@@ -2011,7 +2016,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","75thPercentile"]</key>
                </item>
             </graph_item>
@@ -2019,20 +2024,20 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","95thPercentile"]</key>
                </item>
             </graph_item>
          </graph_items>
       </graph>
       <graph>
-         <name>Cassandra: Dropped Messages</name>
+         <name>Dropped Messages</name>
          <graph_items>
             <graph_item>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=READ,name=Dropped","Count"]</key>
                </item>
             </graph_item>
@@ -2041,20 +2046,20 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=MUTATION,name=Dropped","Count"]</key>
                </item>
             </graph_item>
          </graph_items>
       </graph>
       <graph>
-         <name>Cassandra: KeyCache Hit rate</name>
+         <name>KeyCache Hit rate</name>
          <graph_items>
             <graph_item>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Hits","Count"]</key>
                </item>
             </graph_item>
@@ -2063,19 +2068,19 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Requests","Count"]</key>
                </item>
             </graph_item>
          </graph_items>
       </graph>
       <graph>
-         <name>Cassandra: Nodes state</name>
+         <name>Nodes state</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.net:type=FailureDetector","UpEndpointCount"]</key>
                </item>
             </graph_item>
@@ -2083,20 +2088,20 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"]</key>
                </item>
             </graph_item>
          </graph_items>
       </graph>
       <graph>
-         <name>Cassandra: Tables Read\Write latency</name>
+         <name>Tables Read\Write latency</name>
          <graph_items>
             <graph_item>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","50thPercentile"]</key>
                </item>
             </graph_item>
@@ -2105,7 +2110,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","50thPercentile"]</key>
                </item>
             </graph_item>
@@ -2113,7 +2118,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","75thPercentile"]</key>
                </item>
             </graph_item>
@@ -2121,7 +2126,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:name=ReadLatency,type=Table","95thPercentile"]</key>
                </item>
             </graph_item>
@@ -2129,7 +2134,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","75thPercentile"]</key>
                </item>
             </graph_item>
@@ -2137,7 +2142,7 @@ ViewMutationStage:	Responsible for materialized view writes.</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template DB Apache Cassandra JMX</host>
+                  <host>Template DB Apache Cassandra by JMX</host>
                   <key>jmx["org.apache.cassandra.metrics:name=WriteLatency,type=Table","95thPercentile"]</key>
                </item>
             </graph_item>
