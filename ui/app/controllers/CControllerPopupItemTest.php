@@ -781,13 +781,15 @@ abstract class CControllerPopupItemTest extends CController {
 							unset($data['interface']['details']['authprotocol'],
 								$data['interface']['details']['authpassphrase'],
 								$data['interface']['details']['privprotocol'],
-								$data['interface']['details']['privpassphrase']);
+								$data['interface']['details']['privpassphrase']
+							);
 						}
 						elseif (
 							$data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
 						) {
 							unset($data['interface']['details']['privprotocol'],
-								$data['interface']['details']['privpassphrase']);
+								$data['interface']['details']['privpassphrase']
+							);
 						}
 					}
 					else {
@@ -797,7 +799,8 @@ abstract class CControllerPopupItemTest extends CController {
 							$data['interface']['details']['authprotocol'],
 							$data['interface']['details']['authpassphrase'],
 							$data['interface']['details']['privprotocol'],
-							$data['interface']['details']['privpassphrase']);
+							$data['interface']['details']['privpassphrase']
+						);
 					}
 				}
 

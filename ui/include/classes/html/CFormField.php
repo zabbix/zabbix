@@ -19,8 +19,8 @@
 **/
 
 
-class CFormField extends CTag
-{
+class CFormField extends CTag {
+
 	/**
 	 * Default CSS class name for HTML root element.
 	 */
@@ -35,8 +35,7 @@ class CFormField extends CTag
 	/**
 	 * @param CTag|CTag[]|null $items
 	 */
-	public function __construct($items = null)
-	{
+	public function __construct($items = null) {
 		parent::__construct('div', true);
 
 		$this

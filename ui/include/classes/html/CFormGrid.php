@@ -19,8 +19,8 @@
 **/
 
 
-class CFormGrid extends CTag
-{
+class CFormGrid extends CTag {
+
 	/**
 	 * Default CSS class name for HTML root element.
 	 */
@@ -29,8 +29,7 @@ class CFormGrid extends CTag
 	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
 	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
 
-	public function __construct()
-	{
+	public function __construct() {
 		parent::__construct('div', true);
 
 		$this->addClass(self::ZBX_STYLE_CLASS);
