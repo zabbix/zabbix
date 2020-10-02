@@ -800,6 +800,8 @@ abstract class CControllerPopupItemTest extends CController {
 							$data['interface']['details']['privpassphrase']);
 					}
 				}
+
+				unset($data['interface']['type']);
 			}
 			elseif ($key === 'query_fields') {
 				if ($value === '[]') {
