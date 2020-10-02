@@ -310,14 +310,14 @@ static int	DBpatch_5010033(void)
 
 static int	DBpatch_5010034(void)
 {
-	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("item_parameter", 1, &field);
+	return DBcreate_index("item_parameter", "item_parameter_1", "itemid", 1);
 }
 
 static int	DBpatch_5010035(void)
 {
-	return DBcreate_index("item_parameter", "item_parameter_1", "itemid", 1);
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_parameter", 1, &field);
 }
 
 #endif
