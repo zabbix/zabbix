@@ -1653,7 +1653,7 @@ class CHost extends CHostGeneral {
 				foreach ($result as &$host) {
 					foreach ($hosts_templates[$host['hostid']] as $templateid) {
 						foreach ($dashboards as $dashboard) {
-							if ($dashboard['templateid'] == $templateid) {
+							if ($dashboard['templateid'] === $templateid) {
 								$host['dashboards'][] = $dashboard;
 							}
 						}
@@ -1672,7 +1672,7 @@ class CHost extends CHostGeneral {
 					$result[$hostid]['dashboards'] = 0;
 
 					foreach ($dashboards as $dashboard) {
-						if (in_array($dashboard['templateid'], $hosts_templates[$hostid])) {
+						if (in_array($dashboard['templateid'], $hosts_templates[$hostid], true)) {
 							$result[$hostid]['dashboards'] += $dashboard['rowscount'];
 						}
 					}
