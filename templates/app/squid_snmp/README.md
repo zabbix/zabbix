@@ -41,7 +41,7 @@ No specific Zabbix configuration is required.
 |{$SQUID.FILE.DESC.WARN.MIN} |<p>The threshold for minimum number of avaliable file descriptors</p> |`100` |
 |{$SQUID.HTTP.PORT} |<p>http_port configured in squid.conf (Default: 3128)</p> |`3128` |
 |{$SQUID.PAGE.FAULT.WARN} |<p>The threshold for sys page faults rate in percent of recieved HTTP requests</p> |`90` |
-|{$SQUID.SNMP.COMMUNITY} |<p>SNMP community alowed by ACL in squid.conf</p> |`public` |
+|{$SQUID.SNMP.COMMUNITY} |<p>SNMP community allowed by ACL in squid.conf</p> |`public` |
 |{$SQUID.SNMP.PORT} |<p>snmp_port configured in squid.conf (Default: 3401)</p> |`3401` |
 
 ## Template links
@@ -67,7 +67,7 @@ There are no template links in this template.
 |Squid |Squid: Cache swap directory size |<p>The total of the cache_dir space allocated</p> |SNMP |squid[cacheSwapMaxSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Squid |Squid: Cache swap current size |<p>Storage Swap Size</p> |SNMP |squid[cacheCurrentSwapSize]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Squid |Squid: File descriptor count - current used |<p>Number of file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrCnt] |
-|Squid |Squid: File descriptor count - current maximum |<p>Highest file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrMax] |
+|Squid |Squid: File descriptor count - current maximum |<p>Highest number of file descriptors in use</p> |SNMP |squid[cacheCurrentFileDescrMax] |
 |Squid |Squid: File descriptor count - current reserved |<p>Reserved number of file descriptors</p> |SNMP |squid[cacheCurrentResFileDescrCnt] |
 |Squid |Squid: File descriptor count - current available |<p>Available number of file descriptors</p> |SNMP |squid[cacheCurrentUnusedFDescrCnt] |
 |Squid |Squid: Byte hit ratio per 1 minute |<p>Byte Hit Ratios</p> |SNMP |squid[cacheRequestByteRatio.1] |
@@ -86,8 +86,8 @@ There are no template links in this template.
 |Squid |Squid: ICP messages received per second |<p>Number of ICP messages received</p> |SNMP |squid[cacheIcpPktsRecv]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: ICP traffic transmitted per second |<p>Number of ICP traffic transmitted</p> |SNMP |squid[cacheIcpKbSent]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: ICP traffic received per second |<p>Number of ICP traffic received</p> |SNMP |squid[cacheIcpKbRecv]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: DNS server requests per second |<p>Number of external dns server requests</p> |SNMP |squid[cacheDnsRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: DNS server replies per second |<p>Number of external dns server replies</p> |SNMP |squid[cacheDnsReplies]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: DNS server requests per second |<p>Number of external DNS server requests</p> |SNMP |squid[cacheDnsRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: DNS server replies per second |<p>Number of external DNS server replies</p> |SNMP |squid[cacheDnsReplies]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: FQDN cache requests per second |<p>Number of FQDN Cache requests</p> |SNMP |squid[cacheFqdnRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: FQDN cache hits per second |<p>Number of FQDN Cache hits</p> |SNMP |squid[cacheFqdnHits]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: FQDN cache misses per second |<p>Number of FQDN Cache misses</p> |SNMP |squid[cacheFqdnMisses]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
@@ -97,17 +97,17 @@ There are no template links in this template.
 |Squid |Squid: Objects count |<p>Number of objects stored by the cache</p> |SNMP |squid[cacheNumObjCount] |
 |Squid |Squid: Objects LRU expiration age |<p>Storage LRU Expiration Age</p> |SNMP |squid[cacheCurrentLRUExpiration]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
 |Squid |Squid: Objects unlinkd requests |<p>Requests given to unlinkd</p> |SNMP |squid[cacheCurrentUnlinkRequests] |
-|Squid |Squid: HTTP all service time per 5 minute |<p>HTTP all service time per 5 minute</p> |SNMP |squid[cacheHttpAllSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Squid |Squid: HTTP all service time per 5 minute |<p>HTTP all service time per 5 minutes</p> |SNMP |squid[cacheHttpAllSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: HTTP all service time per hour |<p>HTTP all service time per hour</p> |SNMP |squid[cacheHttpAllSvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Squid |Squid: HTTP miss service time per 5 minute |<p>HTTP miss service time per 5 minute</p> |SNMP |squid[cacheHttpMissSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Squid |Squid: HTTP miss service time per 5 minute |<p>HTTP miss service time per 5 minutes</p> |SNMP |squid[cacheHttpMissSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: HTTP miss service time per hour |<p>HTTP miss service time per hour</p> |SNMP |squid[cacheHttpMissSvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Squid |Squid: HTTP miss service time per 5 minute |<p>HTTP hit service time per 5 minute</p> |SNMP |squid[cacheHttpHitSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Squid |Squid: HTTP miss service time per 5 minute |<p>HTTP hit service time per 5 minutes</p> |SNMP |squid[cacheHttpHitSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: HTTP hit service time per hour |<p>HTTP hit service time per hour</p> |SNMP |squid[cacheHttpHitSvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Squid |Squid: ICP query service time per 5 minute |<p>ICP query service time per 5 minute</p> |SNMP |squid[cacheIcpQuerySvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Squid |Squid: ICP query service time per 5 minute |<p>ICP query service time per 5 minutes</p> |SNMP |squid[cacheIcpQuerySvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: ICP query service time per hour |<p>ICP query service time per hour</p> |SNMP |squid[cacheIcpQuerySvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Squid |Squid: ICP reply service time per 5 minute |<p>ICP reply service time per 5 minute</p> |SNMP |squid[cacheIcpReplySvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Squid |Squid: ICP reply service time per 5 minute |<p>ICP reply service time per 5 minutes</p> |SNMP |squid[cacheIcpReplySvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: ICP reply service time per hour |<p>ICP reply service time per hour</p> |SNMP |squid[cacheIcpReplySvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Squid |Squid: DNS service time per 5 minute |<p>DNS service time per 5 minute</p> |SNMP |squid[cacheDnsSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Squid |Squid: DNS service time per 5 minute |<p>DNS service time per 5 minutes</p> |SNMP |squid[cacheDnsSvcTime.5]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Squid |Squid: DNS service time per hour |<p>DNS service time per hour</p> |SNMP |squid[cacheDnsSvcTime.60]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 
 ## Triggers
