@@ -29,6 +29,8 @@
 #include "alert_syncer.h"
 #include "alerter_protocol.h"
 
+#include "../../libs/zbxalgo/vectorimpl.h"
+
 #define ZBX_POLL_INTERVAL	1
 
 #define ZBX_ALERT_BATCH_SIZE		1000
@@ -462,20 +464,19 @@ static int	am_db_compare_tags(const void *d1, const void *d2)
 	return strcmp(tag1->value, tag2->value);
 }
 
+ZBX_VECTOR_DECL(tags, zbx_tag_t*)
+ZBX_VECTOR_IMPL(tags, zbx_tag_t*)
+
 typedef struct
 {
 	zbx_uint64_t		eventid;
-	zbx_vector_ptr_t	tags;
+	zbx_vector_tags_t	tags;
 	int			need_to_add_problem_tag;
 }
 zbx_event_tags_t;
 
-static unsigned	zbx_event_tags_hash_func(const void *data)
-{
-	const zbx_event_tags_t	*event_tags = (const zbx_event_tags_t *)data;
-
-	return ZBX_DEFAULT_UINT64_HASH_ALGO(&event_tags->eventid, sizeof(zbx_uint64_t), ZBX_DEFAULT_HASH_SEED);
-}
+ZBX_VECTOR_DECL(events_tags, zbx_event_tags_t*)
+ZBX_VECTOR_IMPL(events_tags, zbx_event_tags_t*)
 
 static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 {
@@ -485,20 +486,14 @@ static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 	return event_tags_1->eventid > event_tags_2->eventid;
 }
 
-static void	clean_events_tags(zbx_hashset_t *events_tags)
+static void	clean_events_tags(zbx_vector_events_tags_t *events_tags)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_event_tags_t	*local_event_tags;
+	int	i;
 
-	zbx_hashset_iter_reset(events_tags, &iter);
+	for (i = 0; i < events_tags->values_num; i++)
+		zbx_vector_tags_destroy(&((events_tags->values[i])->tags));
 
-	while (NULL != (local_event_tags = (zbx_event_tags_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_vector_ptr_clear_ext(&(local_event_tags->tags), (zbx_clean_func_t)zbx_free_tag);
-		zbx_vector_ptr_destroy(&(local_event_tags->tags));
-	}
-
-	zbx_hashset_destroy(events_tags);
+	zbx_vector_events_tags_destroy(events_tags);
 }
 
 /******************************************************************************
@@ -507,15 +502,15 @@ static void	clean_events_tags(zbx_hashset_t *events_tags)
  *                                                                            *
  * Purpose: adds event tags to sql query                                      *
  *                                                                            *
- * Parameters: events_tags - [OUT] hash of events with tags                   *
- *             eventid     - [IN] problem_tag update db event                 *
+ * Parameters: eventid     - [IN] problem_tag update db event                 *
  *             params      - [IN] values to process                           *
+ *             events_tags - [OUT] vector of events with tags                 *
  *                                                                            *
  * Comments: The event tags are in json object format.                        *
  *                                                                            *
  ******************************************************************************/
-static void	am_db_update_event_tags(zbx_hashset_t *events_tags, zbx_uint64_t eventid,
-		const char *params)
+static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params,
+		zbx_vector_events_tags_t *events_tags)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -523,7 +518,7 @@ static void	am_db_update_event_tags(zbx_hashset_t *events_tags, zbx_uint64_t eve
 	const char		*pnext = NULL;
 	char			key[TAG_NAME_LEN * 4 + 1], value[TAG_VALUE_LEN * 4 + 1];
 	zbx_tag_t		*tag, tag_local = {.tag = key, .value = value};
-	int			need_to_add_problem_tag = 0, i;
+	int			event_tag_index, need_to_add_problem_tag = 0;
 	zbx_event_tags_t	*event_tags, local_event_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " tags:%s", __func__, eventid, params);
@@ -555,15 +550,20 @@ static void	am_db_update_event_tags(zbx_hashset_t *events_tags, zbx_uint64_t eve
 	}
 
 	local_event_tags.eventid = eventid;
-	event_tags = (zbx_event_tags_t*)zbx_hashset_search(events_tags, &local_event_tags);
 
-	if (NULL == event_tags)
+	event_tag_index = zbx_vector_events_tags_search(events_tags, &local_event_tags,
+			zbx_event_tags_compare_func);
+
+	if (FAIL == event_tag_index)
 	{
-		zbx_vector_ptr_create(&(local_event_tags.tags));
-		event_tags = (zbx_event_tags_t*)zbx_hashset_insert(events_tags, &local_event_tags,
-				sizeof(local_event_tags));
+		event_tags = (zbx_event_tags_t*) zbx_malloc(NULL, sizeof(zbx_event_tags_t));
+		event_tags->eventid = eventid;
+		zbx_vector_tags_create(&(event_tags->tags));
 		event_tags->need_to_add_problem_tag = need_to_add_problem_tag;
+		zbx_vector_events_tags_append(events_tags, event_tags);
 	}
+	else
+		event_tags = events_tags->values[event_tag_index];
 
 	while (NULL != (pnext = zbx_json_pair_next(&jp_tags, pnext, key, sizeof(key))))
 	{
@@ -584,12 +584,12 @@ static void	am_db_update_event_tags(zbx_hashset_t *events_tags, zbx_uint64_t eve
 		zbx_rtrim(key, ZBX_WHITESPACE);
 		zbx_rtrim(value, ZBX_WHITESPACE);
 
-		if (FAIL == zbx_vector_ptr_search(&(event_tags->tags), &tag_local, am_db_compare_tags))
+		if (FAIL == zbx_vector_tags_search(&(event_tags->tags), &tag_local, am_db_compare_tags))
 		{
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, key);
 			tag->value = zbx_strdup(NULL, value);
-			zbx_vector_ptr_append(&(event_tags->tags), tag);
+			zbx_vector_tags_append(&(event_tags->tags), tag);
 		}
 	}
 out:
@@ -605,28 +605,28 @@ out:
  * Purpose: removes duplicate event tags and checks if problem tags need to   *
  *          be updated                                                        *
  *                                                                            *
- * Parameters: update_event_tags - [IN/OUT] hash of events with tags          *
+ * Parameters: update_event_tags - [IN/OUT] vector of pointers to events with *
+ *                                          tags                              *
  *             db_event          - [IN/OUT] event_tag update db event         *
  *             db_problem        - [IN/OUT] problem_tag update db event       *
  *                                                                            *
  ******************************************************************************/
-static void	am_db_validate_tags_for_update(zbx_hashset_t *update_events_tags, zbx_db_insert_t *db_event,
+static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_events_tags, zbx_db_insert_t *db_event,
 		zbx_db_insert_t *db_problem)
 {
-	int			index, i;
+	int			index, i, j;
 	char			key[TAG_NAME_LEN * 4 + 1], value[TAG_VALUE_LEN * 4 + 1];
 	zbx_tag_t		tag_local = {.tag = key, .value = value}, *tag;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_hashset_iter_t	iter;
 	zbx_event_tags_t	*local_event_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_iter_reset(update_events_tags, &iter);
-
-	while (NULL != (local_event_tags = (zbx_event_tags_t *)zbx_hashset_iter_next(&iter)))
+	for (i = 0; i < update_events_tags->values_num; i++)
 	{
+		local_event_tags = update_events_tags->values[i];
+
 		/* remove duplicate tags */
 		if (0 != local_event_tags->tags.values_num)
 		{
@@ -638,20 +638,20 @@ static void	am_db_validate_tags_for_update(zbx_hashset_t *update_events_tags, zb
 				tag_local.tag = row[0];
 				tag_local.value = row[1];
 
-				if (FAIL != (index = zbx_vector_ptr_search(&(local_event_tags->tags), &tag_local,
+				if (FAIL != (index = zbx_vector_tags_search(&(local_event_tags->tags), &tag_local,
 						am_db_compare_tags)))
 				{
 					zbx_free_tag(local_event_tags->tags.values[index]);
-					zbx_vector_ptr_remove_noorder(&(local_event_tags->tags), index);
+					zbx_vector_tags_remove_noorder(&(local_event_tags->tags), index);
 				}
 			}
 
 			DBfree_result(result);
 		}
 
-		for (i = 0; i < local_event_tags->tags.values_num; i++)
+		for (j = 0; j < local_event_tags->tags.values_num; j++)
 		{
-			tag = (zbx_tag_t *)(local_event_tags->tags).values[i];
+			tag = (zbx_tag_t *)(local_event_tags->tags).values[j];
 			zbx_db_insert_add_values(db_event, __UINT64_C(0), local_event_tags->eventid, tag->tag,
 					tag->value);
 
@@ -678,10 +678,10 @@ static void	am_db_validate_tags_for_update(zbx_hashset_t *update_events_tags, zb
  ******************************************************************************/
 static int	am_db_flush_results(zbx_am_db_t *amdb)
 {
-	zbx_ipc_message_t	message;
-	zbx_am_result_t		**results;
-	int			results_num;
-	zbx_hashset_t		update_events_tags;
+	int				results_num;
+	zbx_vector_events_tags_t	update_events_tags;
+	zbx_ipc_message_t		message;
+	zbx_am_result_t			**results;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -712,8 +712,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 			zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value",
 					NULL);
 
-			zbx_hashset_create(&update_events_tags, 10, zbx_event_tags_hash_func,
-					zbx_event_tags_compare_func);
+			zbx_vector_events_tags_create(&update_events_tags);
 
 			for (i = 0; i < results_num; i++)
 			{
@@ -742,8 +741,8 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 					mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid);
 					if (NULL != mediatype && 0 != mediatype->process_tags)
 					{
-						am_db_update_event_tags(&update_events_tags, result->eventid,
-								result->value);
+						am_db_update_event_tags( result->eventid, result->value,
+								&update_events_tags);
 					}
 				}
 				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
