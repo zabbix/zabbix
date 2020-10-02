@@ -32,7 +32,7 @@ extern int	CONFIG_TIMEOUT;
 void	zbx_init_snmp(void);
 int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type);
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type);
-void	zbx_clear_cache_snmp(void);
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 #endif
 
 #endif
