@@ -230,10 +230,12 @@
 		 * Allow only one option with value "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED" to be enabled.
 		 */
 		function updateTypeOptionsAvailability() {
-			let type_selects = $('[name^="preprocessing["][name$="[type]"] option[value="<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>"]');
+			const type_selects = $('[name^="preprocessing["][name$="[type]"] option[value="<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>"]');
 
 			if (type_selects.filter(':selected').length) {
-				type_selects.not(':selected').prop('disabled', true);
+				type_selects
+					.not(':selected')
+					.prop('disabled', true);
 			}
 			else {
 				type_selects.prop('disabled', false);
