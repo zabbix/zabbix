@@ -820,6 +820,7 @@ extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VAR
 			}
 			else
 				zbx_json_addfloat(jdoc, prop_json, (double)vtProp->llVal);
+
 			break;
 		default:
 			char *str;
