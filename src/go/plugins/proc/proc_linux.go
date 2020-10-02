@@ -723,6 +723,6 @@ func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
 func init() {
 	plugin.RegisterMetrics(&impl, "Proc",
 		"proc.cpu.util", "Process CPU utilisation percentage.",
-		"proc.mem", "Process CPU utilisation percentage.",
+		"proc.mem", "Process memory utilisation values.",
 	)
 }
