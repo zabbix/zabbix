@@ -191,25 +191,27 @@ class CMacrosResolverHelper {
 		];
 
 		foreach ($interfaces as $index => $interface) {
+			$hostid = $interface['hostid'];
+
 			if (array_key_exists('details', $interface)) {
 				if (array_key_exists('securityname', $interface['details'])) {
-					$data['securityname'][$index][] = $interface['details']['securityname'];
+					$data['securityname'][$hostid][$index] = $interface['details']['securityname'];
 				}
 
 				if (array_key_exists('authpassphrase', $interface['details'])) {
-					$data['authpassphrase'][$index][] = $interface['details']['authpassphrase'];
+					$data['authpassphrase'][$hostid][$index] = $interface['details']['authpassphrase'];
 				}
 
 				if (array_key_exists('privpassphrase', $interface['details'])) {
-					$data['privpassphrase'][$index][] = $interface['details']['privpassphrase'];
+					$data['privpassphrase'][$hostid][$index] = $interface['details']['privpassphrase'];
 				}
 
 				if (array_key_exists('contextname', $interface['details'])) {
-					$data['contextname'][$index][] = $interface['details']['contextname'];
+					$data['contextname'][$hostid][$index] = $interface['details']['contextname'];
 				}
 
 				if (array_key_exists('community', $interface['details'])) {
-					$data['community'][$index][] = $interface['details']['community'];
+					$data['community'][$hostid][$index] = $interface['details']['community'];
 				}
 			}
 		}
@@ -240,25 +242,27 @@ class CMacrosResolverHelper {
 		]);
 
 		foreach ($interfaces as $index => $interface) {
+			$hostid = $interface['hostid'];
+
 			if (array_key_exists('details', $interface)) {
 				if (array_key_exists('securityname', $interface['details'])) {
-					$interfaces[$index]['details']['securityname'] = $resolved_securityname[$index][0];
+					$interfaces[$index]['details']['securityname'] = $resolved_securityname[$hostid][$index];
 				}
 
 				if (array_key_exists('authpassphrase', $interface['details'])) {
-					$interfaces[$index]['details']['authpassphrase'] = $resolved_authpassphrase[$index][0];
+					$interfaces[$index]['details']['authpassphrase'] = $resolved_authpassphrase[$hostid][$index];
 				}
 
 				if (array_key_exists('privpassphrase', $interface['details'])) {
-					$interfaces[$index]['details']['privpassphrase'] = $resolved_privpassphrase[$index][0];
+					$interfaces[$index]['details']['privpassphrase'] = $resolved_privpassphrase[$hostid][$index];
 				}
 
 				if (array_key_exists('contextname', $interface['details'])) {
-					$interfaces[$index]['details']['contextname'] = $resolved_contextname[$index][0];
+					$interfaces[$index]['details']['contextname'] = $resolved_contextname[$hostid][$index];
 				}
 
 				if (array_key_exists('community', $interface['details'])) {
-					$interfaces[$index]['details']['community'] = $resolved_community[$index][0];
+					$interfaces[$index]['details']['community'] = $resolved_community[$hostid][$index];
 				}
 			}
 		}
