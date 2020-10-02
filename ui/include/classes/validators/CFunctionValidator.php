@@ -308,6 +308,19 @@ class CFunctionValidator extends CValidator {
 					['type' => 'period_shift', 'mandat' => true]
 				],
 				'value_types' => $valueTypesNum
+			],
+			'fmttime' => [
+				'args' => [
+					['type' => 'string', 'mandat' => true],
+					['type' => 'time_shift', 'mandat' => false]
+				],
+				'value_types' => $valueTypesChar + $valueTypesInt
+			],
+			'fmtnum' => [
+				'args' => [
+					['type' => 'num_unsigned', 'mandat' => true]
+				],
+				'value_types' => $valueTypesInt
 			]
 		];
 	}
@@ -453,6 +466,9 @@ class CFunctionValidator extends CValidator {
 
 			case 'period_shift':
 				return $this->validatePeriodShift($param);
+
+			case 'time_shift':
+				return (timeUnitToSeconds($param, true) !== null);
 		}
 
 		return true;
