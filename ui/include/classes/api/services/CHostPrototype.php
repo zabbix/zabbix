@@ -30,7 +30,6 @@ class CHostPrototype extends CHostBase {
 	 * Get host prototypes.
 	 *
 	 * @param array         $options
-	 * @param array         $options['interfaceids']      Select host prototypes by interface IDs.
 	 * @param bool          $options['selectMacros']      Array of macros fields to be selected or string "extend".
 	 * @param string|array  $options['selectInterfaces']  Return an "interfaces" property with host interfaces.
 	 *
@@ -45,13 +44,12 @@ class CHostPrototype extends CHostBase {
 		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
 		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
 		$hostmacro_fields = array_keys($this->getTableSchema('hostmacro')['fields']);
-		$interface_fields = array_merge(array_keys($this->getTableSchema('interface')['fields']), ['details']);
+		$interface_fields = ['hostid', 'type', 'useip', 'ip', 'dns', 'port', 'main', 'details'];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'discoveryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'interfaceids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -474,7 +472,7 @@ class CHostPrototype extends CHostBase {
 			'selectDiscoveryRule' => ['itemid'],
 			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
 			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
-			'selectInterfaces' => ['interfaceid', 'type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
+			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -607,7 +605,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$host_prototypes = $this->updateReal($host_prototypes);
-		$this->updateInterfaces($host_prototypes, $db_host_prototypes);
+		$this->updateInterfaces($host_prototypes);
 		$this->inherit($host_prototypes);
 
 		foreach ($db_host_prototypes as &$db_host_prototype) {
@@ -1278,13 +1276,6 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		if ($options['interfaceids'] !== null) {
-			$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
-			$sqlParts['where'][] = dbConditionId('hi.interfaceid', $options['interfaceids']);
-		}
-
 		// inherited
 		if ($options['inherited'] !== null) {
 			$sqlParts['where'][] = ($options['inherited']) ? 'h.templateid IS NOT NULL' : 'h.templateid IS NULL';
@@ -1473,9 +1464,8 @@ class CHostPrototype extends CHostBase {
 
 				foreach ($interfaces as $interface) {
 					$hostid = $interface['hostid'];
-					$interface = $this->unsetExtraFields([$interface], ['hostid', 'interfaceid'],
-						$options['selectInterfaces']
-					);
+					unset($interface['interfaceid']);
+					$interface = $this->unsetExtraFields([$interface], ['hostid'], $options['selectInterfaces']);
 					$result[$hostid]['interfaces'][] = reset($interface);
 				}
 			}
@@ -1762,15 +1752,17 @@ class CHostPrototype extends CHostBase {
 	 * @param array $db_host_prototypes                  Array of host prototypes from DB.
 	 * @param array $db_host_prototypes[]['interfaces']  Host prototype interfaces data from DB.
 	 */
-	private function updateInterfaces(array $host_prototypes, array $db_host_prototypes = []): void {
-		if (!$db_host_prototypes) {
-			$db_host_prototypes = $this->get([
-				'output' => ['hostid', 'name'],
-				'selectInterfaces' => ['interfaceid', 'type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
-				'hostids' => array_column($host_prototypes, 'hostid'),
-				'editable' => true,
-				'preservekeys' => true
-			]);
+	private function updateInterfaces(array $host_prototypes): void {
+		// We need to get interfaces with their interfaceid's.
+		$interfaces = API::HostInterface()->get([
+			'output' => ['hostid', 'interfaceid', 'type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
+			'hostids' => array_column($host_prototypes, 'hostid'),
+			'nopermissions' => true
+		]);
+
+		$db_host_prototype_interfaces = [];
+		foreach($interfaces as $interface) {
+			$db_host_prototype_interfaces[$interface['hostid']][] = $interface;
 		}
 
 		$interfaces_to_create = [];
@@ -1778,7 +1770,9 @@ class CHostPrototype extends CHostBase {
 		$interfaceids_to_delete = [];
 
 		foreach ($host_prototypes as $host_prototype) {
-			$db_interfaces = $db_host_prototypes[$host_prototype['hostid']]['interfaces'];
+			$db_interfaces = array_key_exists($host_prototype['hostid'], $db_host_prototype_interfaces)
+				? $db_host_prototype_interfaces[$host_prototype['hostid']]
+				: [];
 
 			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
 				if (array_key_exists('interfaces', $host_prototype)) {

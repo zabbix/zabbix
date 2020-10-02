@@ -98,7 +98,7 @@ if (getRequest('parent_discoveryid')) {
 			'selectParentHost' => ['hostid'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
-			'selectInterfaces' => ['interfaceid', 'type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
+			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);

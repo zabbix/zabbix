@@ -190,7 +190,13 @@
 
 			Object
 				.entries(new_data)
-				.forEach(([_, value]) => this.interfaces[value.interfaceid] = value);
+				.forEach(([_, value]) => {
+					if (!('interfaceid' in value)) {
+						value.interfaceid = this.generateId();
+					}
+
+					this.interfaces[value.interfaceid] = value;
+				});
 
 			return this;
 		}
