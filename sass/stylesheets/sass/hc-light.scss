@@ -1265,3 +1265,16 @@ td.inactive-bg {
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
 }
+
+// Dashboard list table.
+.dashboard-list {
+	.dashboard-list-item {
+		.status-green,
+		.status-grey,
+		.status-yellow {
+			background-color: #555555;
+			border-color: #555555;
+		}
+
+	}
+}

@@ -6339,3 +6339,9 @@ td.inactive-bg {
 
 .btn-undo.is-focused {
   box-shadow: 0 1px 0px #ffffff, 0 -1px 0px #ffffff; }
+
+.dashboard-list .dashboard-list-item .status-green,
+.dashboard-list .dashboard-list-item .status-grey,
+.dashboard-list .dashboard-list-item .status-yellow {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0; }
