@@ -5188,25 +5188,9 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(itemid, row[1]);
-
-		if (NULL == scriptitem || itemid != scriptitem->itemid)
-		{
-			if (NULL == (scriptitem =
-					(ZBX_DC_SCRIPTITEM *) zbx_hashset_search(&config->scriptitems, &itemid)))
-			{
-				ZBX_DC_SCRIPTITEM	scriptitem_local;
-
-				scriptitem_local.itemid = itemid;
-
-				scriptitem = (ZBX_DC_SCRIPTITEM *) zbx_hashset_insert(&config->scriptitems,
-						&scriptitem_local, sizeof(scriptitem_local));
-				zbx_vector_ptr_create_ext(&scriptitem->params, __config_mem_malloc_func,
-						__config_mem_realloc_func, __config_mem_free_func);
-			}
-		}
-
 		ZBX_STR2UINT64(item_script_paramid, row[0]);
 
+		scriptitem = (ZBX_DC_SCRIPTITEM *) zbx_hashset_search(&config->scriptitems, &itemid);
 		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
 				item_script_paramid, sizeof(zbx_dc_scriptitem_param_t), &found);
 
