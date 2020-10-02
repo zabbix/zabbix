@@ -454,7 +454,7 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 
 	meminfo, err := readAll("/proc/meminfo")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to read meminfo file: %s", err.Error())
 	}
 
 	var mem float64
@@ -506,7 +506,7 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 
 		data, err := readAll("/proc/" + pid + "/status")
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Failed to read status file for pid '%s': %s", pid, err.Error())
 		}
 
 		switch memtype {
@@ -608,7 +608,7 @@ func getMin(a, b float64) float64 {
 	return b
 }
 
-func checkProcname(cmd, stats, name string) bool {
+func checkProcessName(cmd, stats, name string) bool {
 	if name == "" {
 		return true
 	}
@@ -692,12 +692,13 @@ func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
 		return false
 	}
 
-	if !checkProcname(cmd, stats, name) {
+	if !checkProcessName(cmd, stats, name) {
 		return false
 	}
 
 	uid, err := p.getProcessUserID(pid)
 	if err != nil {
+		p.Logger.Debugf("failed to get proccess user id for pid '%s': %s", pid, err.Error())
 		return false
 	}
 
