@@ -526,9 +526,13 @@ jQuery(document).ready(function($) {
 												.show();
 											break;
 									}
+
+									overlays_stack.end().centerDialog();
 								}).trigger('change');
 								break;
 						}
+
+						overlays_stack.end().centerDialog();
 					}).trigger('change');
 				<?php endif ?>
 			}
