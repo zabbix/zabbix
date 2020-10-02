@@ -77,6 +77,10 @@ $menu-user-disabled-color: #787878;
 // Sidebar
 $sidebar-server-name-color: #787878;
 
+// Dashboard list table.
+$dashboard-shared-bg-color: #e0e0e0;
+$dashboard-my-bg-color: #e0e0e0;
+
 $menu-main-icons: (
 		dashboard: -600px -664px,
 		problems: -600px -688px,
@@ -203,6 +207,10 @@ $ok-ack-fg-color: #00ff00;
 
 // Multiselect
 $multiselect-selected-bg-color: #222222;
+
+// Dashboard list table.
+$dashboard-shared-bg-color: #e0e0e0;
+$dashboard-my-bg-color: #e0e0e0;
 
 // Important! @import string should come after variables.
 @import 'screen.scss';
@@ -1433,17 +1441,4 @@ td.inactive-bg {
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
-}
-
-// Dashboard list table.
-.dashboard-list {
-	.dashboard-list-item {
-		.status-green,
-		.status-grey,
-		.status-yellow {
-			background-color: #e0e0e0;
-			border-color: #e0e0e0;
-		}
-
-	}
 }

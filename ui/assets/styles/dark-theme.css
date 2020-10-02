@@ -5636,6 +5636,12 @@ table.preprocessing-test-results .rel-container {
 .dashboard-list .dashboard-list-item {
   display: flex;
   justify-content: space-between; }
+  .dashboard-list .dashboard-list-item .status-green {
+    background-color: #2f9f5e;
+    border-color: #2f9f5e; }
+  .dashboard-list .dashboard-list-item .status-yellow {
+    background-color: #e79e0b;
+    border-color: #e79e0b; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }

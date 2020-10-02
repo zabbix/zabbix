@@ -187,6 +187,10 @@ $ok-ack-fg-color: #009900;
 // Multiselect
 $multiselect-selected-bg-color: #777777;
 
+// Dashboard list table.
+$dashboard-shared-bg-color: #555555;
+$dashboard-my-bg-color: #555555;
+
 // Important! @import string should come after variables
 @import 'screen.scss';
 
@@ -1264,17 +1268,4 @@ td.inactive-bg {
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
-}
-
-// Dashboard list table.
-.dashboard-list {
-	.dashboard-list-item {
-		.status-green,
-		.status-grey,
-		.status-yellow {
-			background-color: #555555;
-			border-color: #555555;
-		}
-
-	}
 }

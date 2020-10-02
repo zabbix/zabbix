@@ -5580,6 +5580,12 @@ table.preprocessing-test-results .rel-container {
 .dashboard-list .dashboard-list-item {
   display: flex;
   justify-content: space-between; }
+  .dashboard-list .dashboard-list-item .status-green {
+    background-color: #e0e0e0;
+    border-color: #e0e0e0; }
+  .dashboard-list .dashboard-list-item .status-yellow {
+    background-color: #e0e0e0;
+    border-color: #e0e0e0; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
@@ -6339,9 +6345,3 @@ td.inactive-bg {
 
 .btn-undo.is-focused {
   box-shadow: 0 1px 0px #ffffff, 0 -1px 0px #ffffff; }
-
-.dashboard-list .dashboard-list-item .status-green,
-.dashboard-list .dashboard-list-item .status-grey,
-.dashboard-list .dashboard-list-item .status-yellow {
-  background-color: #e0e0e0;
-  border-color: #e0e0e0; }
