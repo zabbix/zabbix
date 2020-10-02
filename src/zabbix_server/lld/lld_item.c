@@ -877,7 +877,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ip.item_paramteterid,ip.itemid,ip.name,ip.value"
+			"select ip.item_parameterid,ip.itemid,ip.name,ip.value"
 			" from item_discovery id"
 				" join item_parameter ip"
 					" on id.itemid=ip.itemid"
@@ -2873,12 +2873,6 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 
 			ipdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_DISCOVERED;
 
-			if (ipdst->name != ipsrc->name)
-			{
-				ipdst->name = ipsrc->name;
-				ipdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_NAME;
-			}
-
 			buffer = zbx_strdup(buffer, ipsrc->name);
 			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
@@ -2891,12 +2885,6 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 			}
 			else
 				zbx_free(buffer);
-
-			if (ipdst->value != ipsrc->value)
-			{
-				ipdst->value = ipsrc->value;
-				ipdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_VALUE;
-			}
 
 			buffer = zbx_strdup(buffer, ipsrc->value);
 			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
@@ -3578,6 +3566,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 		for (j = 0; j < item->preproc_ops.values_num; j++)
 		{
 			preproc_op = (zbx_lld_item_preproc_t *)item->preproc_ops.values[j];
+
 			if (0 == (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED))
 			{
 				zbx_vector_uint64_append(&deleteids, preproc_op->item_preprocid);
@@ -3764,6 +3753,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		for (j = 0; j < item->item_params.values_num; j++)
 		{
 			item_param = (zbx_lld_item_param_t *)item->item_params.values[j];
+
 			if (0 == (item_param->flags & ZBX_FLAG_LLD_ITEM_PARAM_DISCOVERED))
 			{
 				zbx_vector_uint64_append(&deleteids, item_param->item_parameterid);
