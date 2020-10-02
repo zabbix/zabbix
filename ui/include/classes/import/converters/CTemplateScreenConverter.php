@@ -381,6 +381,7 @@ class CTemplateScreenConverter extends CConverter {
 		// Convert graph inner height to outer height.
 		if (in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH,
 				SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH])) {
+			// Transform graph screen item with height of at least 100px to occupy minimum 5 grid rows.
 			$height += self::SCREEN_LEGEND_HEIGHT;
 		}
 
