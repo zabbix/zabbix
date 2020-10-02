@@ -26,6 +26,11 @@
 
 	const ZBX_MACRO_TYPE_TEXT = 0;
 	const ZBX_MACRO_TYPE_SECRET = 1;
+	const ZBX_MACRO_TYPE_VAULT = 2;
+
+	const ZBX_STYLE_MACRO_VALUE_TEXT = 'macro-value-text';
+	const ZBX_STYLE_MACRO_VALUE_SECRET = 'macro-value-secret';
+	const ZBX_STYLE_MACRO_VALUE_VAULT = 'macro-value-vault';
 
 	function btnUndoFocusEventHandle() {
 		$(this)
@@ -74,60 +79,86 @@
 		$this.hide();
 	}
 
+	function getCurrentValueType($container) {
+		if ($container.hasClass(ZBX_STYLE_MACRO_VALUE_VAULT)) {
+			return ZBX_MACRO_TYPE_VAULT;
+		}
+		else if ($container.hasClass(ZBX_STYLE_MACRO_VALUE_SECRET)) {
+			return ZBX_MACRO_TYPE_SECRET;
+		}
+		else {
+			return ZBX_MACRO_TYPE_TEXT;
+		}
+	}
+
 	function inputDropdownValueChangeEventHandle() {
 		var $this = $(this),
 			value_type = $this.val(),
 			$container = $this.closest('.input-group'),
-			$input_container = $('.input-secret', $container),
-			$textarea = $('.textarea-flexible', $container);
+			curr_value_type = getCurrentValueType($container);
 
-		if ((value_type == ZBX_MACRO_TYPE_TEXT && $textarea.length)
-				|| (value_type == ZBX_MACRO_TYPE_SECRET && $input_container.length)) {
+		if (value_type == curr_value_type) {
 			return false;
 		}
 
-		if (value_type == ZBX_MACRO_TYPE_TEXT) {
-			var $input = $('input[type=password]', $input_container);
+		if (curr_value_type == ZBX_MACRO_TYPE_SECRET) {
+			$container.removeClass(ZBX_STYLE_MACRO_VALUE_SECRET);
 
-			if (!$input_container.data('is-activated')) {
+			var $curr_control = $('.input-secret', $container),
+				$input = $('input[type=password]', $curr_control);
+		}
+		else {
+			$container.removeClass(ZBX_STYLE_MACRO_VALUE_TEXT + ' ' + ZBX_STYLE_MACRO_VALUE_VAULT);
+
+			var $curr_control = $('.textarea-flexible', $container),
+				$input = $curr_control;
+		}
+
+		if (value_type == ZBX_MACRO_TYPE_SECRET) {
+			$container.addClass(ZBX_STYLE_MACRO_VALUE_SECRET);
+
+			$curr_control.replaceWith($('<div>')
+				.addClass('input-secret')
+				.append(
+					$('<input>')
+						.attr({
+							id: $input.attr('id'),
+							name: $input.attr('name'),
+							type: 'password',
+							value: $input.val(),
+							placeholder: t('value'),
+							maxlength: $input.attr('maxlength'),
+							autocomplete: 'off'
+						})
+						.on('focus blur', btnUndoFocusEventHandle)
+				)
+				.inputSecret()
+			);
+		}
+		else {
+			$container.addClass((value_type == ZBX_MACRO_TYPE_VAULT)
+				? ZBX_STYLE_MACRO_VALUE_VAULT
+				: ZBX_STYLE_MACRO_VALUE_TEXT
+			);
+
+			if (!$curr_control.data('is-activated')) {
 				$('.btn-undo', $container).show();
-				$input_container.data('is-activated', true);
+				$curr_control.data('is-activated', true);
 			}
 
-			$input_container.replaceWith(
-				$('<textarea>')
-					.addClass('textarea-flexible')
-					.attr({
-						id: $input.attr('id'),
-						name: $input.attr('name'),
-						placeholder: $input.attr('placeholder'),
-						maxlength: $input.attr('maxlength')
-					})
-					.text($input.is(':disabled') ? '' : $input.val())
-					.on('focus blur', btnUndoFocusEventHandle)
+			$curr_control.replaceWith($('<textarea>')
+				.addClass('textarea-flexible')
+				.attr({
+					id: $input.attr('id'),
+					name: $input.attr('name'),
+					placeholder: (value_type == ZBX_MACRO_TYPE_VAULT) ? t('path/to/secret:key') : t('value'),
+					maxlength: $input.attr('maxlength')
+				})
+				.text($input.is(':disabled') ? '' : $input.val())
+				.on('focus blur', btnUndoFocusEventHandle)
 			);
 
 			$('.textarea-flexible', $container).textareaFlexible();
-		}
-		else {
-			$textarea.replaceWith(
-				$('<div>')
-					.addClass('input-secret')
-					.append(
-						$('<input>')
-							.attr({
-								id: $textarea.attr('id'),
-								name: $textarea.attr('name'),
-								type: 'password',
-								value: $textarea.val(),
-								placeholder: $textarea.attr('placeholder'),
-								maxlength: $textarea.attr('maxlength'),
-								autocomplete: 'off'
-							})
-							.on('focus blur', btnUndoFocusEventHandle)
-					)
-					.inputSecret()
-			);
 		}
 	}
 

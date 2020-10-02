@@ -84,4 +84,18 @@ header {
 			line-height: 22px;
 		}
 	}
+
+	z-select {
+		> button {
+			line-height: normal;
+		}
+
+		.list {
+			text-align: left;
+
+			li:first-child {
+				padding: 5px;
+			}
+		}
+	}
 }

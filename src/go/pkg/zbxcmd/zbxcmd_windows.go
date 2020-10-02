@@ -94,8 +94,8 @@ func Execute(s string, timeout time.Duration, path string) (out string, err erro
 		return "", fmt.Errorf("Timeout while executing a shell script.")
 	}
 
-	if maxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024)
+	if MaxExecuteOutputLenB <= len(b.String()) {
+		return "", fmt.Errorf("Command output exceeded limit of %d KB", MaxExecuteOutputLenB/1024)
 	}
 
 	return strings.TrimRight(b.String(), " \t\r\n"), nil

@@ -649,7 +649,7 @@ class testFormItemTest extends CWebTest {
 				// Check value fields.
 				$this->checkValueFields($data);
 
-				// Change interface fileds in testing form.
+				// Change interface fields in testing form.
 				if (CTestArrayHelper::get($data, 'interface')) {
 					$elements['address']->fill($data['interface']['address']);
 					$elements['port']->fill($data['interface']['port']);

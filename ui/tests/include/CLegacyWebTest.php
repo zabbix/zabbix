@@ -362,36 +362,12 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestDropdownSelect($id, $string) {
-		// Simplified escaping of xpath string.
-		if (strpos($string, '"') !== false) {
-			$string = '\''.$string.'\'';
-		}
-		else {
-			$string = '"'.$string.'"';
-		}
-
-		$option = $this->getDropdown($id)->query('xpath:.//option[text()='.$string.']')->one();
-
-		if (!$option->isSelected()) {
-			$option->click();
-
-			return $option;
-		}
-
-		return null;
+		return $this->getDropdown($id)->select($string);
 	}
 
 	public function zbxTestDropdownSelectWait($id, $string) {
-		$option = $this->zbxTestDropdownSelect($id, $string);
-
-		if ($option !== null) {
-			try {
-				$option->waitUntilSelected();
-			} catch (StaleElementReferenceException $e) {
-				// Element not found in the cache, looks like page changed.
-				$this->zbxTestWaitForPageToLoad();
-			}
-		}
+		$this->zbxTestDropdownSelect($id, $string);
+		$this->zbxTestWaitForPageToLoad();
 	}
 
 	public function zbxTestDropdownAssertSelected($name, $text) {
@@ -399,11 +375,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestGetSelectedLabel($id) {
-		foreach ($this->getDropdownOptions($id) as $option) {
-			if ($option->isSelected()) {
-				return $option->getText();
-			}
-		}
+		return $this->getDropdown($id)->getText();
 	}
 
 	public function zbxTestElementPresentId($id) {
@@ -696,8 +668,12 @@ class CLegacyWebTest extends CWebTest {
 	protected function getDropdown($id) {
 		foreach (['id', 'name'] as $type) {
 			foreach ($this->query($type, $id)->all() as $element) {
-				if ($element->getTagName() === 'select') {
-					return $element;
+				switch ($element->getTagName()) {
+					case 'select':
+						return $element->asDropdown();
+
+					case 'z-select':
+						return $element->asZDropdown();
 				}
 			}
 		}
@@ -713,7 +689,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @return array of WebDriverElement
 	 */
 	protected function getDropdownOptions($id) {
-		return $this->getDropdown($id)->findElements(WebDriverBy::tagName('option'));
+		return $this->getDropdown($id)->getOptions();
 	}
 
 	public function __get($attribute) {
