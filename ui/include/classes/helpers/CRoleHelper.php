@@ -534,7 +534,7 @@ class CRoleHelper {
 	 *
 	 * @static
 	 *
-	 * @param int $user_type
+	 * @param int|null $user_type
 	 *
 	 * @return array
 	 */

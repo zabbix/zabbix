@@ -113,7 +113,7 @@ class CControllerUserList extends CController {
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['users'] = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname', 'roleid', 'autologout', 'attempt_failed'],
+			'output' => ['userid', 'alias', 'name', 'surname', 'autologout', 'attempt_failed', 'roleid'],
 			'selectUsrgrps' => ['name', 'gui_access', 'users_status'],
 			'selectRole' => ['name'],
 			'search' => [
