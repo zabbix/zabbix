@@ -148,6 +148,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 		else {
 			$data['change_password'] = true;
+			$data['roleid'] = $this->getInput('roleid', '');
 		}
 
 		// Overwrite with input variables.
@@ -170,7 +171,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
-		if ($data['roleid'] != $this->user['roleid']) {
+		if (($data['userid'] == 0 && $data['roleid'] !== '')
+				|| ($data['userid'] != 0 && $data['roleid'] != $this->user['roleid'])) {
 			$roles = API::Role()->get([
 				'output' => ['name', 'type'],
 				'roleids' => $data['roleid']

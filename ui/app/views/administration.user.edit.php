@@ -386,94 +386,98 @@ if ($data['action'] === 'user.edit') {
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
-		->addInfo(_('Permissions can be assigned for user groups only.'))
-		->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
+		->addInfo(_('Permissions can be assigned for user groups only.'));
 
-	foreach (CRoleHelper::getUiSectionsLabels($data['user_type']) as $section_name => $section_label) {
-		$elements = [];
+	if ($data['roleid']) {
+		$permissions_form_list
+			->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
 
-		foreach (CRoleHelper::getUiSectionRulesLabels($section_name, $data['user_type']) as $rule_name => $rule_label) {
-			$elements[] = (new CSpan($rule_label))->addClass(
-				CRoleHelper::checkAccess($rule_name, $data['roleid']) ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			);
+		foreach (CRoleHelper::getUiSectionsLabels($data['user_type']) as $section_name => $section_label) {
+			$elements = [];
+
+			foreach (CRoleHelper::getUiSectionRulesLabels($section_name, $data['user_type']) as $rule_name => $rule_label) {
+				$elements[] = (new CSpan($rule_label))->addClass(
+					CRoleHelper::checkAccess($rule_name, $data['roleid']) ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				);
+			}
+
+			if ($elements) {
+				$permissions_form_list->addRow($section_label, (new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+				);
+			}
 		}
 
-		if ($elements) {
-			$permissions_form_list->addRow($section_label, (new CDiv($elements))
+		$permissions_form_list->addRow((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header'));
+
+		if (!$data['modules']) {
+			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
+		}
+		else {
+			$elements = [];
+
+			foreach ($data['modules'] as $moduleid => $module) {
+				$elements[] = (new CSpan($module['id']))->addClass(
+					CRoleHelper::checkAccess(CRoleHelper::MODULES_MODULE.$moduleid, $data['roleid'])
+						? ZBX_STYLE_STATUS_GREEN
+						: ZBX_STYLE_STATUS_GREY
+				);
+			}
+
+			if ($elements) {
+				$permissions_form_list->addRow((new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+				);
+			}
+		}
+
+		$api_access_enabled = CRoleHelper::checkAccess(CRoleHelper::API, $data['roleid']);
+		$permissions_form_list
+			->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
+			->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
+					$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
 			);
+
+		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+
+		if ($api_methods) {
+			$api_access_mode_allowed = CRoleHelper::checkAccess(CRoleHelper::API_ACCESS_MODE, $data['roleid']);
+			$elements = [];
+
+			foreach ($api_methods as $api_method) {
+				$elements[] = (new CSpan($api_method))->addClass(
+					$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				);
+			}
+
+			$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+				(new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
 		}
-	}
 
-	$permissions_form_list->addRow((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header'));
-
-	if (!$data['modules']) {
-		$permissions_form_list->addRow(italic(_('No enabled modules found.')));
-	}
-	else {
+		$permissions_form_list->addRow((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header'));
 		$elements = [];
 
-		foreach ($data['modules'] as $moduleid => $module) {
-			$elements[] = (new CSpan($module['id']))->addClass(
-				CRoleHelper::checkAccess(CRoleHelper::MODULES_MODULE.$moduleid, $data['roleid'])
+		foreach (CRoleHelper::getActionsLabels($data['user_type']) as $rule_name => $rule_label) {
+			$elements[] = (new CSpan($rule_label))
+				->addClass(CRoleHelper::checkAccess($rule_name, $data['roleid'])
 					? ZBX_STYLE_STATUS_GREEN
 					: ZBX_STYLE_STATUS_GREY
-			);
+				);
 		}
 
-		if ($elements) {
-			$permissions_form_list->addRow((new CDiv($elements))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->addClass('rules-status-container')
-			);
-		}
-	}
-
-	$api_access_enabled = CRoleHelper::checkAccess(CRoleHelper::API, $data['roleid']);
-	$permissions_form_list
-		->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
-		->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
-				$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			)))
+		$permissions_form_list->addRow((new CDiv($elements))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->addClass('rules-status-container')
 		);
-
-	$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
-
-	if ($api_methods) {
-		$api_access_mode_allowed = CRoleHelper::checkAccess(CRoleHelper::API_ACCESS_MODE, $data['roleid']);
-		$elements = [];
-
-		foreach ($api_methods as $api_method) {
-			$elements[] = (new CSpan($api_method))->addClass(
-				$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			);
-		}
-
-		$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
-			(new CDiv($elements))
-				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->addClass('rules-status-container')
-		);
 	}
-
-	$permissions_form_list->addRow((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header'));
-	$elements = [];
-
-	foreach (CRoleHelper::getActionsLabels($data['user_type']) as $rule_name => $rule_label) {
-		$elements[] = (new CSpan($rule_label))
-			->addClass(CRoleHelper::checkAccess($rule_name, $data['roleid'])
-				? ZBX_STYLE_STATUS_GREEN
-				: ZBX_STYLE_STATUS_GREY
-			);
-	}
-
-	$permissions_form_list->addRow((new CDiv($elements))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-		->addClass('rules-status-container')
-	);
 
 	$tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 }
