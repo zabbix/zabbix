@@ -124,6 +124,23 @@ class CWebUser {
 	}
 
 	/**
+	 * Checks access of authenticated user to specific access rule.
+	 *
+	 * @static
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return bool  Returns true if user has access to specified rule, false - otherwise.
+	 */
+	public static function checkAccess(string $rule_name): bool {
+		if (empty(self::$data)) {
+			return false;
+		}
+
+		return CRoleHelper::checkAccess($rule_name, self::$data['roleid']);
+	}
+
+	/**
 	 * Sets user data defaults.
 	 *
 	 * @static
