@@ -329,31 +329,31 @@ class CTemplateScreenConverter extends CConverter {
 		$dimensions_sum = array_sum($dimensions);
 
 		while ($dimensions_sum != $target) {
-			$potential = [];
-			foreach (array_unique($dimensions, SORT_NUMERIC) as $index => $size) {
-				$potential[$index] = $size / $dimensions_min[$index];
-			}
+			$potential_index = null;
+			$potential_value = null;
 
-			if ($dimensions_sum > $target) {
-				arsort($potential);
-			}
-			else {
-				asort($potential);
-			}
+			foreach ($dimensions as $index => $size) {
+				$value = $size / $dimensions_min[$index];
 
-			$index = array_keys($potential)[0];
+				if ($potential_index === null
+						|| $dimensions_sum > $target && $value > $potential_value
+						|| $dimensions_sum < $target && $value < $potential_value) {
+					$potential_index = $index;
+					$potential_value = $value;
+				}
+			}
 
 			// Further shrinking not possible?
-			if ($dimensions_sum > $target && $dimensions[$index] == $dimensions_min[$index]) {
+			if ($dimensions_sum > $target && $dimensions[$potential_index] == $dimensions_min[$potential_index]) {
 				break;
 			}
 
 			if ($dimensions_sum > $target) {
-				$dimensions[$index]--;
+				$dimensions[$potential_index]--;
 				$dimensions_sum--;
 			}
 			else {
-				$dimensions[$index]++;
+				$dimensions[$potential_index]++;
 				$dimensions_sum++;
 			}
 		}
