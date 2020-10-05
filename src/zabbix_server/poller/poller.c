@@ -1060,11 +1060,11 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 
+	scriptitem_es_engine_destroy();
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	scriptitem_es_engine_destroy();
 #undef STAT_INTERVAL
 }
