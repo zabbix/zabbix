@@ -83,7 +83,7 @@ class CApiServiceFactory extends CRegistryFactory {
 	public function __construct(array $objects = []) {
 		parent::__construct(array_merge([
 			// a generic API class
-			'api' => 'CApiService'
+			'api' => CApiService::class
 		], self::API_SERVICES, $objects));
 	}
 }
