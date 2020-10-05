@@ -1805,9 +1805,6 @@ class CHostPrototype extends CHostBase {
 					$db_interfaces = [];
 				}
 			}
-			else {
-				// Do nothing, because in case of inherited interfaces, all $db_interfaces sould be deleted.
-			}
 
 			$interfaceids_to_delete += array_flip(array_column($db_interfaces, 'interfaceid'));
 		}
@@ -1844,8 +1841,7 @@ class CHostPrototype extends CHostBase {
 		foreach ($interface_fields as $field) {
 			if (array_key_exists($field, $db_interface)
 					&& (!array_key_exists($field, $host_interface)
-						|| $host_interface[$field] != $db_interface[$field])
-			) {
+						|| $host_interface[$field] != $db_interface[$field])) {
 				return false;
 			}
 		}
@@ -1854,8 +1850,7 @@ class CHostPrototype extends CHostBase {
 			foreach ($snmp_fields as $field) {
 				if (array_key_exists($field, $db_interface['details'])
 						&& (!array_key_exists($field, $host_interface['details'])
-							|| $host_interface['details'][$field] != $db_interface['details'][$field])
-				) {
+							|| $host_interface['details'][$field] != $db_interface['details'][$field])) {
 					return false;
 				}
 			}
