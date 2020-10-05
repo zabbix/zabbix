@@ -600,11 +600,24 @@ class CTabFilter extends CBaseComponent {
 					return;
 				}
 
-				let path = ev.path || (ev.composedPath && ev.composedPath());
+				let path = ev.path || (ev.composedPath && ev.composedPath()),
+					focused_item = this._active_item,
+					index;
 
 				if (path && path.indexOf(this._target.querySelector('nav')) > -1) {
-					this._events[(ev.key === 'ArrowRight') ? 'selectNextTab' : 'selectPrevTab']();
-					this._active_item.setFocused();
+					for (const item of this._items) {
+						if (item._target.parentNode.classList.contains(TABFILTERITEM_STYLE_FOCUSED)) {
+							focused_item = item;
+							break;
+						}
+					}
+
+					index = focused_item._index + ((ev.key === 'ArrowRight') ? 1 : -1);
+
+					if (this._items[index] instanceof CTabFilterItem && this._items[index] !== this._timeselector) {
+						this._items[index].setFocused();
+					}
+
 					cancelEvent(ev);
 				}
 			},
