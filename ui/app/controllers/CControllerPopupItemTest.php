@@ -1112,16 +1112,18 @@ abstract class CControllerPopupItemTest extends CController {
 
 
 	/**
+	 * Validates interface object in context of current item type.
+	 *
 	 * @param array $interface
 	 * @param array $interface['address']               (optional)
 	 * @param array $interface['port']                  (optional)
 	 * @param array $interface['details']               (optional)
-	 * @param array $interface['details']['version']    (optional)
+	 * @param array $interface['details']['version']
 	 * @param array $interface['details']['community']  (optional)
 	 *
 	 * @return bool
 	 */
-	protected final function validateInterface(array $interface): bool {
+	final protected function validateInterface(array $interface): bool {
 		if ($this->items_require_interface[$this->item_type]['details']) {
 			if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
 					&& (!array_key_exists('community', $interface['details'])
