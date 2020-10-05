@@ -2856,6 +2856,8 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 
 				substitute_lld_macros(&ipdst->value, &item->lld_row->jp_row,
 						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+				substitute_lld_macros(&ipdst->name, &item->lld_row->jp_row,
+						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
 				zbx_vector_ptr_append(&item->item_params, ipdst);
 				continue;
