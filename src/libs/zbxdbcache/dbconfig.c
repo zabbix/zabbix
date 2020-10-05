@@ -5174,7 +5174,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 	unsigned char			tag;
 	zbx_uint64_t			item_script_paramid, itemid;
 	int				found, ret, i, index;
-	ZBX_DC_SCRIPTITEM		*scriptitem = NULL;
+	ZBX_DC_SCRIPTITEM		*scriptitem;
 	zbx_dc_scriptitem_param_t	*scriptitem_params;
 	zbx_vector_ptr_t		items;
 

@@ -226,6 +226,9 @@ typedef struct
 }
 zbx_lld_item_preproc_t;
 
+#define ZBX_ITEM_PARAMETER_FIELD_NAME	1
+#define ZBX_ITEM_PARAMETER_FIELD_VALUE	2
+
 typedef struct
 {
 	zbx_uint64_t	item_parameterid;
@@ -936,6 +939,37 @@ static int	is_user_macro(const char *str)
 			0 == (token.type & ZBX_TOKEN_USER_MACRO) ||
 			0 != token.loc.l || '\0' != str[token.loc.r + 1])
 	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_validate_item_param                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_item_param(zbx_uint64_t itemid, int type, size_t len, char *param, char **error)
+{
+	if (SUCCEED != zbx_is_utf8(param))
+	{
+		char	*param_utf8;
+
+		param_utf8 = zbx_strdup(NULL, param);
+		zbx_replace_invalid_utf8(param_utf8);
+		*error = zbx_strdcatf(*error, "Cannot %s item: parameter's %s \"%s\" has invalid UTF-8 sequence.\n",
+				(0 != itemid ? "update" : "create"),
+				(ZBX_ITEM_PARAMETER_FIELD_NAME != type ? "name" : "value"), param_utf8);
+		zbx_free(param_utf8);
+		return FAIL;
+	}
+
+	if (zbx_strlen_utf8(param) > len)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item: parameter's %s \"%s\" is too long.\n",
+				(0 != itemid ? "update" : "create"),
+				(ZBX_ITEM_PARAMETER_FIELD_NAME != type ? "name" : "value"), param);
 		return FAIL;
 	}
 
@@ -1682,6 +1716,29 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	}
 
 	zbx_hashset_destroy(&items_keys);
+
+	/* check item parameters for new and updated discovered items */
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			continue;
+
+		for (j = 0; j < item->item_params.values_num; j++)
+		{
+			zbx_lld_item_param_t	*item_param = (zbx_lld_item_param_t *)item->item_params.values[j];
+
+			if (SUCCEED != lld_validate_item_param(item->itemid, ZBX_ITEM_PARAMETER_FIELD_NAME,
+					ITEM_PARAMETER_NAME_LEN, item_param->name, error) ||
+					SUCCEED != lld_validate_item_param(item->itemid, ZBX_ITEM_PARAMETER_FIELD_VALUE,
+					ITEM_PARAMETER_VALUE_LEN, item_param->value, error))
+			{
+				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+				break;
+			}
+		}
+	}
 
 	/* check preprocessing steps for new and updated discovered items */
 	for (i = 0; i < items->values_num; i++)
@@ -2854,9 +2911,9 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 				ipdst->name = zbx_strdup(NULL, ipsrc->name);
 				ipdst->value = zbx_strdup(NULL, ipsrc->value);
 
-				substitute_lld_macros(&ipdst->value, &item->lld_row->jp_row,
-						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 				substitute_lld_macros(&ipdst->name, &item->lld_row->jp_row,
+						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+				substitute_lld_macros(&ipdst->value, &item->lld_row->jp_row,
 						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
 				zbx_vector_ptr_append(&item->item_params, ipdst);
