@@ -308,19 +308,6 @@ class CFunctionValidator extends CValidator {
 					['type' => 'period_shift', 'mandat' => true]
 				],
 				'value_types' => $valueTypesNum
-			],
-			'fmttime' => [
-				'args' => [
-					['type' => 'string', 'mandat' => true],
-					['type' => 'time_shift', 'mandat' => false]
-				],
-				'value_types' => $valueTypesChar + $valueTypesInt
-			],
-			'fmtnum' => [
-				'args' => [
-					['type' => 'num_unsigned', 'mandat' => true]
-				],
-				'value_types' => $valueTypesInt
 			]
 		];
 	}

@@ -1286,24 +1286,6 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			// trendavg() - (period, period_shift) [float, int]
 			self::parameterPeriod_TestCases('trendavg', $valueTypesNum, ['', 'now/h']),
 			self::parameterPeriodShift_TestCases('trendavg', $valueTypesNum, ['1h', ''], 1),
-
-			[
-				['fmtnum', ['5'], ITEM_VALUE_TYPE_UINT64, [], true],
-				['fmtnum', ['-9'], ITEM_VALUE_TYPE_UINT64, [], false],
-				['fmtnum', [], ITEM_VALUE_TYPE_UINT64, [], false],
-				['fmtnum', ['7', '7'], ITEM_VALUE_TYPE_UINT64, [], false],
-				['fmtnum', ['5'], ITEM_VALUE_TYPE_FLOAT, [], false],
-				['fmtnum', ['5.3'], ITEM_VALUE_TYPE_UINT64, [], false],
-				['fmtnum', ['NaN'], ITEM_VALUE_TYPE_STR, [], false],
-				['fmtnum', ['NaN'], ITEM_VALUE_TYPE_TEXT, [], false],
-			],
-			[
-				['fmttime', ['%B', '-1M'], ITEM_VALUE_TYPE_STR, [], true],
-				['fmttime', ['"%m-%Y"', '1M'], ITEM_VALUE_TYPE_STR, [], true],
-				['fmttime', ['no_strftime_syntax_validation', '1M'], ITEM_VALUE_TYPE_STR, [], true],
-				['fmttime', ['%s', '1K'], ITEM_VALUE_TYPE_STR, [], false],
-				['fmttime', ['%B', '"-1M"'], ITEM_VALUE_TYPE_STR, [], false],
-			]
 		);
 	}
 
