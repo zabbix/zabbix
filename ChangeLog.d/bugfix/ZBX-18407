@@ -1,0 +1,1 @@
+.......PS. [ZBX-18407] fixed dependent items not working if it's master item is calculated and host is monitored by Zabbix proxy (vso)
