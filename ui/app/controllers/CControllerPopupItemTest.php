@@ -1114,12 +1114,12 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Validates interface object in context of current item type.
 	 *
-	 * @param array $interface
-	 * @param array $interface['address']               (optional)
-	 * @param array $interface['port']                  (optional)
-	 * @param array $interface['details']               (optional)
-	 * @param array $interface['details']['version']
-	 * @param array $interface['details']['community']  (optional)
+	 * @param array  $interface
+	 * @param string $interface['address']               (optional)
+	 * @param string $interface['port']                  (optional)
+	 * @param array  $interface['details']               (optional)
+	 * @param int    $interface['details']['version']
+	 * @param string $interface['details']['community']  (optional)
 	 *
 	 * @return bool
 	 */
