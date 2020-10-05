@@ -910,6 +910,8 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		request->value.result_ptr->refcount = 1;
 		request->value.result_ptr->result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
 		init_result(request->value.result_ptr->result);
+		zbx_free(request->value.error);
+		request->value.state = ITEM_STATE_NORMAL;
 		ret = FAIL;
 
 		goto out;
