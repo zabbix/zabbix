@@ -26,14 +26,15 @@
 if (array_key_exists('filter_options', $data)) { ?>
 	<script type="text/javascript">
 	$(function() {
-		var filter = new CTabFilter($('#monitoring_problem_filter')[0], <?= json_encode($data['filter_options']) ?>),
+		var options = <?= json_encode($data['filter_options']) ?>,
+			filter = new CTabFilter($('#monitoring_problem_filter')[0], options),
 			refresh_interval = <?= $data['refresh_interval'] ?>,
 			refresh_url = '<?= $data['refresh_url'] ?>',
 			refresh_timer,
 			active_filter = filter._active_item,
 			global_timerange = {
-				from: filter._timeselector._data.from,
-				to: filter._timeselector._data.to
+				from: options.timeselector.from,
+				to: options.timeselector.to
 			};
 
 		filter.on(TABFILTER_EVENT_URLSET, () => {
@@ -52,6 +53,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 
 		function refreshResults() {
 			let url = new Curl(),
+				screen = window.flickerfreeScreen.screens['problem'],
 				data = $.extend(<?= json_encode($data['filter_defaults']) ?>,
 					global_timerange, url.getArgumentsObject()
 				);
@@ -71,11 +73,18 @@ if (array_key_exists('filter_options', $data)) { ?>
 				delete data.page;
 			}
 
-			window.flickerfreeScreen.screens['problem'].data.filter = data;
-			window.flickerfreeScreen.screens['problem'].data.sort = data.sort;
-			window.flickerfreeScreen.screens['problem'].data.sortorder = data.sortorder;
-			window.flickerfreeScreen.screens['problem'].timeline.from = data.from;
-			window.flickerfreeScreen.screens['problem'].timeline.to = data.to;
+			if (data.filter_custom_time) {
+				screen.timeline.from = data.from;
+				screen.timeline.to = data.to;
+			}
+			else {
+				screen.timeline.from = global_timerange.from;
+				screen.timeline.to = global_timerange.to;
+			}
+
+			screen.data.filter = data;
+			screen.data.sort = data.sort;
+			screen.data.sortorder = data.sortorder;
 
 			// Close all opened hint boxes otherwise flicker free screen will not refresh it content.
 			for (var i = overlays_stack.length - 1; i >= 0; i--) {
@@ -87,7 +96,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 				}
 			}
 
-			window.flickerfreeScreen.refresh('problem');
+			window.flickerfreeScreen.refresh(screen.id);
 		}
 
 		function refreshCounters() {
