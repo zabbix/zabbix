@@ -123,7 +123,7 @@ class CControllerProblemView extends CControllerProblem {
 			'tabfilter_options' => [
 				'idx' => static::FILTER_IDX,
 				'selected' => $profile->selected,
-				'support_custom_time' => true,
+				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
 				'timeselector' => [

@@ -106,7 +106,7 @@ class CControllerHostView extends CControllerHost {
 			'tabfilter_options' => [
 				'idx' => static::FILTER_IDX,
 				'selected' => $profile->selected,
-				'support_custom_time' => false,
+				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page']
 			],

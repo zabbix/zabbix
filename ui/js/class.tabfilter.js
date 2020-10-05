@@ -566,7 +566,8 @@ class CTabFilter extends CBaseComponent {
 			buttonSaveAsAction: (ev) => {
 				this._active_item.openPropertiesDialog({
 					create: 1,
-					idx2: this._items.length
+					idx2: this._items.length,
+					support_custom_time: this._options.support_custom_time
 				}, ev.target);
 			},
 

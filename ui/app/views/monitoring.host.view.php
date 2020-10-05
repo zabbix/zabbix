@@ -46,7 +46,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CTabFilter())
 		->setId('monitoring_hosts_filter')
 		->setOptions($data['tabfilter_options'])
-		->setSupportCustomTime(false)
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 	foreach ($data['filter_tabs'] as $tab) {

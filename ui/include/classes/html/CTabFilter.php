@@ -54,7 +54,7 @@ class CTabFilter extends CDiv {
 		'idx' => '',
 		'selected' => 0,
 		'expanded' => false,
-		'support_custom_time' => true,
+		'support_custom_time' => 1,
 		'data' => [],
 		'page' => null
 	];
@@ -140,10 +140,10 @@ class CTabFilter extends CDiv {
 	/**
 	 * Set status of custom time range support.
 	 *
-	 * @param bool $value  Either to enable custom time usage in filter tabs.
+	 * @param int $value  Either to enable custom time usage in filter tabs.
 	 */
-	public function setSupportCustomTime(bool $value) {
-		$this->options['support_custom_time'] = $value;
+	public function setSupportCustomTime($value) {
+		$this->options['support_custom_time'] = (int) $value;
 
 		return $this;
 	}
