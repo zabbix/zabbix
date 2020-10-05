@@ -53,33 +53,27 @@ abstract class CControllerPopupItemTest extends CController {
 	protected $items_require_interface = [
 		ITEM_TYPE_ZABBIX => [
 			'address' => true,
-			'port' => true,
-			'details' => false
+			'port' => true
 		],
 		ITEM_TYPE_IPMI => [
 			'address' => true,
-			'port' => true,
-			'details' => false
+			'port' => true
 		],
 		ITEM_TYPE_SIMPLE => [
 			'address' => true,
-			'port' => false,
-			'details' => false
+			'port' => false
 		],
 		ITEM_TYPE_SNMP => [
 			'address' => true,
-			'port' => true,
-			'details' => true
+			'port' => true
 		],
 		ITEM_TYPE_SSH => [
 			'address' => true,
-			'port' => false,
-			'details' => false
+			'port' => false
 		],
 		ITEM_TYPE_TELNET => [
 			'address' => true,
-			'port' => false,
-			'details' => false
+			'port' => false
 		]
 	];
 
@@ -1124,7 +1118,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @return bool
 	 */
 	final protected function validateInterface(array $interface): bool {
-		if ($this->items_require_interface[$this->item_type]['details']) {
+		if ($this->item_type == ITEM_TYPE_SNMP) {
 			if (($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C)
 					&& (!array_key_exists('community', $interface['details'])
 						|| $interface['details']['community'] === '')) {

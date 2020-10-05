@@ -303,15 +303,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 		unset($step);
 
-		$show_snmp_form = false;
-		if (array_key_exists('interface', $inputs) && array_key_exists('type', $inputs['interface'])
-				&& $inputs['interface']['type'] == INTERFACE_TYPE_SNMP) {
-			$show_snmp_form = true;
-		}
-		elseif ($inputs['type'] == ITEM_TYPE_SNMP) {
-			$show_snmp_form = true;
-		}
-
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test item'),
 			'steps' => $preprocessing_steps,
@@ -340,7 +331,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interface_port_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['port']
 			),
-			'show_snmp_form' => $show_snmp_form,
+			'show_snmp_form' => ($this->item_type == ITEM_TYPE_SNMP),
 			'show_warning' => $show_warning,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
