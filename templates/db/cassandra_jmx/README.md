@@ -1,5 +1,5 @@
 
-# Template DB Apache Cassandra by JMX
+# Apache Cassandra by JMX
 
 ## Overview
 
@@ -53,8 +53,8 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Cassandra |Cluster: Nodes down |<p>-</p> |JMX |jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"] |
-|Cassandra |Cluster: Nodes up |<p>-</p> |JMX |jmx["org.apache.cassandra.net:type=FailureDetector","UpEndpointCount"] |
+|Cassandra |Cluster: Nodes down |<p>-</p> |JMX |jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Cassandra |Cluster: Nodes up |<p>-</p> |JMX |jmx["org.apache.cassandra.net:type=FailureDetector","UpEndpointCount"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Cassandra |Cluster: Name |<p>-</p> |JMX |jmx["org.apache.cassandra.db:type=StorageService","ClusterName"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Cassandra |Version |<p>-</p> |JMX |jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Cassandra |Dropped messages: Write (Mutation) |<p>Number of dropped regular writes messages.</p> |JMX |jmx["org.apache.cassandra.metrics:type=DroppedMessage,scope=MUTATION,name=Dropped","Count"] |
@@ -156,8 +156,8 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |There are down nodes in cluster |<p>-</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"].last()}>0` |AVERAGE | |
-|Failed to fetch info data (or no data for 15m) |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.net:type=FailureDetector","UpEndpointCount"].nodata(15m)}=1` |WARNING | |
 |Version has changed (new version: {ITEM.VALUE}) |<p>__RESOURCE__ version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"].diff()}=1 and {TEMPLATE_NAME:jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"].strlen()}>0` |INFO |<p>Manual close: YES</p> |
+|Failed to fetch info data (or no data for 15m) |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"].nodata(15m)}=1` |WARNING | |
 |Too many storage exceptions |<p>-</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"].min(5m)}>0` |WARNING | |
 |Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m) |<p>-</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"].min(15m)}>{$CASSANDRA.PENDING_TASKS.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)</p> |
 |Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m) |<p>-</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"].min(15m)}>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}` |AVERAGE | |
