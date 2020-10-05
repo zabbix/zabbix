@@ -593,7 +593,7 @@ static char	*lw_array_to_str(zbx_vector_char_t *v)
 	{
 		if (POS_EMPTY != v->values[i])
 		{
-			len = zbx_snprintf(ptr, max, "%d->%d ", i, (int)v->values[i]);
+			len = zbx_snprintf(ptr, max, "%d:%d ", i, (int)v->values[i]);
 			ptr += len;
 			max -= len;
 		}
@@ -646,40 +646,6 @@ static zbx_vector_char_t	*lw_array_create_fill(int start, size_t num)
 		v->values[i] = POS_TAKEN;
 
 	return v;
-}
-
-static int	lw_array_idx_for_max_val(zbx_vector_char_t *v)
-{
-	int	i, c = -1, n = -1;
-
-	for (i = 0; i < v->values_num; i++)
-	{
-		SKIP_EMPTY(v, i);
-		if (v->values[i] > c)
-		{
-			c = v->values[i];
-			n = i;
-		}
-	}
-
-	return n;
-}
-
-static int	lw_array_idx_for_min_val(zbx_vector_char_t *v)
-{
-	int	i, c = 127, n = -1;
-
-	for (i = 0; i < v->values_num; i++)
-	{
-		SKIP_EMPTY(v, i);
-		if (v->values[i] < c)
-		{
-			c = v->values[i];
-			n = i;
-		}
-	}
-
-	return n;
 }
 
 static zbx_vector_char_t	*lw_array_diff(zbx_vector_char_t *a, zbx_vector_char_t *b)
@@ -849,8 +815,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 }
 
 /* modifies widget units in first argument */
-static void	DBpatch_adjust_axis_dimensions(zbx_vector_char_t *d, zbx_vector_char_t *d_min,
-		int target)
+static void	DBpatch_adjust_axis_dimensions(zbx_vector_char_t *d, zbx_vector_char_t *d_min, int target)
 {
 	int	dimensions_sum, i;
 
@@ -861,33 +826,38 @@ static void	DBpatch_adjust_axis_dimensions(zbx_vector_char_t *d, zbx_vector_char
 
 	while (dimensions_sum != target)
 	{
-		zbx_vector_char_t	*potential;
-
-		potential = lw_array_create();
+		int	potential_index = -1, potential_value;
 
 		for (i = 0; i < d->values_num; i++)
 		{
+			int	value;
+
 			SKIP_EMPTY(d, i);
-			potential->values[i] = d->values[i] / d_min->values[i];
+			value = d->values[i] / d_min->values[i];
+
+			if (0 > potential_index ||
+					(dimensions_sum > target && value > potential_value) ||
+					(dimensions_sum < target && value < potential_value))
+			{
+				potential_index = i;
+				potential_value = value;
+			}
 		}
 
-		zabbix_log(LOG_LEVEL_TRACE, "dimensions_sum:%d potential:%s", dimensions_sum, lw_array_to_str(potential));
+		zabbix_log(LOG_LEVEL_TRACE, "dimensions_sum:%d potential_index/value:%d/%d", dimensions_sum,
+				potential_index, potential_value);
 
-		i = dimensions_sum > target ? lw_array_idx_for_max_val(potential) : lw_array_idx_for_min_val(potential);
-
-		lw_array_free(potential);
-
-		if (dimensions_sum > target && d->values[i] == d_min->values[i])
+		if (dimensions_sum > target && d->values[potential_index] == d_min->values[potential_index])
 			break;
 
 		if (dimensions_sum > target)
 		{
-			d->values[i]--;
+			d->values[potential_index]--;
 			dimensions_sum--;
 		}
 		else
 		{
-			d->values[i]++;
+			d->values[potential_index]++;
 			dimensions_sum++;
 		}
 	}
@@ -1298,7 +1268,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		zbx_db_screen_item_t	*si;
 
 		si = screen_items.values[i];
-		memset((void*)&w, 0, sizeof(zbx_db_widget_t));
+		memset((void *)&w, 0, sizeof(zbx_db_widget_t));
 		w.x = offsets_x->values[si->x];
 		w.y = offsets_y->values[si->y];
 		w.width = offsets_x->values[si->x + si->colspan] - offsets_x->values[si->x];
