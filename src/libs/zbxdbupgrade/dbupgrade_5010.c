@@ -1292,10 +1292,16 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		zbx_free(w.type);
 	}
 
-	zbx_vector_ptr_destroy(&screen_items);
 	zbx_free(dashboard.name);
-	lw_array_free(dim_x);
-	lw_array_free(dim_y);
+
+	if (screen_items.values_num > 0)
+	{
+		lw_array_free(dim_x);
+		lw_array_free(dim_y);
+	}
+
+	zbx_vector_ptr_destroy(&screen_items);
+
 	lw_array_free(offsets_x);
 	lw_array_free(offsets_y);
 
