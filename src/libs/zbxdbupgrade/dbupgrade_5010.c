@@ -479,7 +479,7 @@ static size_t	DBpatch_array_max_used_index(char *array, size_t arr_size)
 
 	for (i = 0; i < arr_size; i++)
 	{
-		if (0 != array[i] && i > m)
+		if (0 != array[i])
 			m = i;
 	}
 
@@ -921,7 +921,8 @@ static void	DBpatch_get_dashboard_dimensions(zbx_vector_ptr_t *scr_items, zbx_ve
 
 	dim_x_pref = DBpatch_get_axis_dimensions(&items_x_pref);
 	dim_x_min = DBpatch_get_axis_dimensions(&items_x_min);
-	zabbix_log(LOG_LEVEL_TRACE, "%s: dim_x_pref:%p dim_x_min:%p", __func__, dim_x_pref, dim_x_min);
+	zabbix_log(LOG_LEVEL_TRACE, "%s: dim_x_pref:%s dim_x_min:%s", __func__, lw_array_to_str(dim_x_pref),
+			lw_array_to_str(dim_x_min));
 	DBpatch_adjust_axis_dimensions(dim_x_pref, dim_x_min, DASHBOARD_MAX_COLS);
 
 	dim_y_pref = DBpatch_get_axis_dimensions(&items_y_pref);
@@ -1081,7 +1082,8 @@ static void	DBpatch_trace_screen_item(zbx_db_screen_item_t *item)
 			item->screenitemid, item->screenid);
 	zabbix_log(LOG_LEVEL_TRACE, "        resourcetype: %s resourceid:" ZBX_FS_UI64,
 			DBpatch_resourcetype_str(item->resourcetype), item->resourceid);
-	zabbix_log(LOG_LEVEL_TRACE, "        w/h: %dx%d (x,y): (%d,%d)", item->width, item->height, item->x, item->y);
+	zabbix_log(LOG_LEVEL_TRACE, "        w/h: %dx%d (x,y): (%d,%d) (c,rspan): (%d,%d)",
+			item->width, item->height, item->x, item->y, item->colspan, item->rowspan);
 }
 
 static void	DBpatch_trace_widget(zbx_db_widget_t *w)
@@ -1228,8 +1230,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discarding screen item " ZBX_FS_UI64
 					" because it is not convertible", scr_item->screenitemid);
-			zbx_free(scr_item->url);
-			zbx_free(scr_item);
+			DBpatch_screen_item_free(scr_item);
 			continue;
 		}
 
