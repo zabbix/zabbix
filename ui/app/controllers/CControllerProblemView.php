@@ -130,7 +130,7 @@ class CControllerProblemView extends CControllerProblem {
 					'from' => $profile->from,
 					'to' => $profile->to,
 					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
-				]
+				] + getTimeselectorActions($profile->from, $profile->to)
 			],
 			'filter_tabs' => $filter_tabs,
 			'refresh_url' => $refresh_curl->getUrl(),

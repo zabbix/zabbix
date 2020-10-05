@@ -2447,6 +2447,29 @@ function getTimeSelectorPeriod(array $options) {
 }
 
 /**
+ * Get array of action statuses avaiable for defined time range. For incorrect "from" or "to" all actions will be set to
+ * false.
+ *
+ * @param string $from      Relative or absolute time, cannot be null.
+ * @param string $to        Relative or absolute time, cannot be null.
+ */
+function getTimeselectorActions($from, $to): array {
+	$ts_now = time();
+	$parser = new CRangeTimeParser();
+	$ts_from = ($parser->parse($from) !== CParser::PARSE_FAIL) ? $parser->getDateTime(true)->getTimestamp() : null;
+	$ts_to = ($parser->parse($to) !== CParser::PARSE_FAIL) ? $parser->getDateTime(false)->getTimestamp() : null;
+	$valid = ($ts_from !== null & $ts_to !== null);
+	$parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+	$max_period = 1 + $ts_now - $parser->getDateTime(true)->getTimestamp();
+
+	return [
+		'can_zoomout' => ($valid && ($ts_to - $ts_from + 1 < $max_period)),
+		'can_decrement' => ($valid && ($ts_from > 0)),
+		'can_increment' => ($valid && ($ts_to < $ts_now - ZBX_MIN_PERIOD))
+	];
+}
+
+/**
  * Convert relative date range string to translated string. Function does not check is passed date range correct.
  *
  * @param string $from     Start date of date range.

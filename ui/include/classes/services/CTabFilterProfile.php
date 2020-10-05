@@ -258,6 +258,21 @@ class CTabFilterProfile {
 	public function read() {
 		$from = array_key_exists('from', $this->filter_defaults) ? $this->filter_defaults['from'] : null;
 		$to = array_key_exists('to', $this->filter_defaults) ? $this->filter_defaults['to'] : null;
+
+		/*
+		 * It is impossible to define "from" as is set system wide default value because constant cannot contain
+		 * calculated values. Therefore empty string "from" or "to" value will be initialized equal system wide
+		 * defined default value.
+		 */
+
+		if ($from === '') {
+			$from = 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT);
+		}
+
+		if ($to === '') {
+			$to = 'now';
+		}
+
 		$this->from = CProfile::get($this->namespace.'.from', $from);
 		$this->to = CProfile::get($this->namespace.'.to', $to);
 		$this->selected = (int) CProfile::get($this->namespace.'.selected', 0);

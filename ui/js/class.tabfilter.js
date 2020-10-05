@@ -43,6 +43,11 @@ class CTabFilter extends CBaseComponent {
 		if (this._active_item instanceof CTabFilterItem) {
 			this._active_item.setFocused();
 		}
+
+		if (this._timeselector instanceof CTabFilterItem) {
+			this._timeselector._data = options.timeselector;
+			this.updateTimeselector(this._active_item, this._timeselector._data.disabled);
+		}
 	}
 
 	init(options) {
@@ -197,18 +202,34 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
-			buttons = this._target.querySelectorAll('button.btn-time-left, button.btn-time-out, button.btn-time-right');
+			buttons = {
+				decrement_button: this._target.querySelector('button.btn-time-left'),
+				increment_button: this._target.querySelector('button.btn-time-right'),
+				zoomout_button: this._target.querySelector('button.btn-time-out')
+			};
 
 		this._timeselector.setDisabled(disabled);
 		this._timeselector._target.setAttribute('tabindex', disabled ? -1 : 0);
 
-		for (const button of buttons) {
-			if (disabled) {
-				button.setAttribute('disabled', 'disabled');
-			}
-			else {
-				button.removeAttribute('disabled');
-			}
+		if (disabled || !this._timeselector._data.can_decrement) {
+			buttons.decrement_button.setAttribute('disabled', 'disabled');
+		}
+		else {
+			buttons.decrement_button.removeAttribute('disabled');
+		}
+
+		if (disabled || !this._timeselector._data.can_increment) {
+			buttons.increment_button.setAttribute('disabled', 'disabled');
+		}
+		else {
+			buttons.increment_button.removeAttribute('disabled');
+		}
+
+		if (disabled || !this._timeselector._data.can_zoomout) {
+			buttons.zoomout_button.setAttribute('disabled', 'disabled');
+		}
+		else {
+			buttons.zoomout_button.removeAttribute('disabled');
 		}
 	}
 
@@ -642,6 +663,12 @@ class CTabFilter extends CBaseComponent {
 		this.on('submit', (ev) => {
 			ev.preventDefault();
 			this._filters_footer.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));
+		});
+
+		// Timeselector uses jQuery object as pub sub.
+		$.subscribe('timeselector.rangeupdate', (e, data) => {
+			Object.assign(this._timeselector._data, data);
+			this.updateTimeselector(this._active_item, false);
 		});
 	}
 }
