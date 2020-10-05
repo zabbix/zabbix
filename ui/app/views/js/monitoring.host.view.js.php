@@ -47,11 +47,11 @@
 					this.start();
 				});
 				this.filter.on(TABFILTER_EVENT_UPDATE, (ev) => {
-					if (!filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
+					if (!this.filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
 						return;
 					}
 
-					var filter_item = filter._active_item;
+					var filter_item = this.filter._active_item;
 
 					$.post('zabbix.php', {
 						action: 'host.view.refresh',
