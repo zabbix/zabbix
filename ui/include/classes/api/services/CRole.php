@@ -291,7 +291,7 @@ class CRole extends CApiService {
 		}
 
 		$db_roles = $this->get([
-			'output' => ['roleid', 'name', 'type'],
+			'output' => ['roleid', 'name', 'type', 'readonly'],
 			'preservekeys' => true
 		]);
 
@@ -307,7 +307,15 @@ class CRole extends CApiService {
 				);
 			}
 
-			if ($role['name'] !== $db_roles[$role['roleid']]['name']) {
+			$db_role = $db_roles[$role['roleid']];
+
+			if ($db_role['readonly'] == 1) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot update readonly user role "%1$s".', $db_role['name'])
+				);
+			}
+
+			if ($role['name'] !== $db_role['name']) {
 				$names[] = $role['name'];
 			}
 		}
@@ -540,7 +548,7 @@ class CRole extends CApiService {
 
 			if ($db_role['readonly'] == 1) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Cannot delete readonly user role "%1$s"', $db_role['name'])
+					_s('Cannot delete readonly user role "%1$s".', $db_role['name'])
 				);
 			}
 
