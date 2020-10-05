@@ -366,7 +366,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestDropdownSelectWait($id, $string) {
-		$dropdown = $this->zbxTestDropdownSelect($id, $string);
+		$this->zbxTestDropdownSelect($id, $string);
 		$this->zbxTestWaitForPageToLoad();
 	}
 

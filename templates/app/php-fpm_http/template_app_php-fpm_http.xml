@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-09-10T13:30:29Z</date>
+   <date>2020-09-21T10:39:13Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template App PHP-FPM by HTTP</name>
          <description>Get PHP-FPM metrics using Zabbix agent running on Linux.&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -508,8 +508,7 @@ Template tooling version used: 0.37</description>
                      <type>REGEX</type>
                      <params>^[.\s\S]*X-Powered-By: PHP/([.\d]{1,})
 \1</params>
-                     <error_handler>CUSTOM_VALUE</error_handler>
-                     <error_handler_params>Unknown</error_handler_params>
+                     <error_handler>DISCARD_VALUE</error_handler>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -564,7 +563,7 @@ Template tooling version used: 0.37</description>
             <macro>
                <macro>{$PHP_FPM.STATUS.PAGE}</macro>
                <value>status</value>
-               <description>The path of PHP-FPM ping page.</description>
+               <description>The path of PHP-FPM status page.</description>
             </macro>
          </macros>
       </template>
