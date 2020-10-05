@@ -1641,7 +1641,7 @@ class CHostPrototype extends CHostBase {
 								));
 							}
 						}
-						elseif (array_key_exists('details', $interface)) {
+						elseif (array_key_exists('details', $interface) && $interface['details']) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
 								_s('unexpected parameter "%1$s"', 'details')
 							));

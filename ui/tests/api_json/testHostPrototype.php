@@ -387,7 +387,9 @@ class testHostPrototype extends CAPITest {
 							'ip' => '127.0.0.0',
 							'port' => '1234',
 							'main' => 1,
-							'details' => []
+							'details' => [
+								'version' => SNMP_V1
+							]
 						]
 					]
 				],
@@ -400,6 +402,27 @@ class testHostPrototype extends CAPITest {
 						'groupid' => 50014
 					]],
 					'host' => 'new {#HOST} 23',
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1,
+							'details' => []
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'request' => [
+					'ruleid' => 40066,
+					'groupLinks' => [[
+						'groupid' => 50014
+					]],
+					'host' => 'new {#HOST} 24',
 					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
 					'interfaces' => [
 						[
@@ -426,7 +449,7 @@ class testHostPrototype extends CAPITest {
 					'groupLinks' => [[
 						'groupid' => 50014
 					]],
-					'host' => 'new {#HOST} 24',
+					'host' => 'new {#HOST} 25',
 					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
 					'interfaces' => [
 						[
@@ -453,7 +476,7 @@ class testHostPrototype extends CAPITest {
 					'groupLinks' => [[
 						'groupid' => 50014
 					]],
-					'host' => 'new {#HOST} 25',
+					'host' => 'new {#HOST} 26',
 					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
 					'interfaces' => [
 						[
