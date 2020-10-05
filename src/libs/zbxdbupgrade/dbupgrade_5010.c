@@ -1244,6 +1244,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discarding screen item " ZBX_FS_UI64
 					" because it is not convertible", scr_item->screenitemid);
+			zbx_free(scr_item->url);
 			zbx_free(scr_item);
 			continue;
 		}
