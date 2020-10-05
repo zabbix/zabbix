@@ -336,6 +336,7 @@ class CUser extends CApiService {
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
+		$this->checkRoles(array_column($users, 'roleid'));
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -457,7 +458,18 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		]);
 
+		// Get readonly super admin role ID and name.
+		$db_roles = DBfetchArray(DBselect(
+			'SELECT roleid,name'.
+			' FROM role'.
+			' WHERE type='.USER_TYPE_SUPER_ADMIN.
+				' AND readonly=1'
+		));
+		$readonly_superadmin_role = $db_roles[0];
+
+		$superadmins_to_update = 0;
 		$aliases = [];
+		$check_roleids = [];
 
 		foreach ($users as &$user) {
 			if (array_key_exists('user_medias', $user)) {
@@ -503,13 +515,37 @@ class CUser extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set theme for user "guest".'));
 				}
 			}
+
+			if (array_key_exists('roleid', $user) && $user['roleid'] != $db_user['roleid']) {
+				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
+					$superadmins_to_update++;
+				}
+
+				$check_roleids[] = $user['roleid'];
+			}
 		}
 		unset($user);
+
+		// Check that at least one user will remain with readonly super admin role.
+		if ($superadmins_to_update) {
+			$db_superadmin_count = DBfetchColumn(DBselect(
+				'SELECT COUNT(*) AS rowscount FROM users WHERE roleid='.zbx_dbstr($readonly_superadmin_role['roleid'])
+			), 'rowscount')[0];
+
+			if ($superadmins_to_update == $db_superadmin_count) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('At least one user must exist with role "%1$s".', $readonly_superadmin_role['name'])
+				);
+			}
+		}
 
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
+		if ($check_roleids) {
+			$this->checkRoles($check_roleids);
+		}
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -608,6 +644,27 @@ class CUser extends CApiService {
 		foreach ($languages as $lang) {
 			if ($lang !== LANG_DEFAULT && !setlocale(LC_MONETARY, zbx_locale_variants($lang))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Language "%1$s" is not supported.', $lang));
+			}
+		}
+	}
+
+	/**
+	 * Check for valid user roles.
+	 *
+	 * @param array $roleids
+	 *
+	 * @throws APIException
+	 */
+	private function checkRoles(array $roleids): void {
+		$db_roles = DB::select('role', [
+			'output' => ['roleid'],
+			'roleids' => $roleids,
+			'preservekeys' => true
+		]);
+
+		foreach ($roleids as $roleid) {
+			if (!array_key_exists($roleid, $db_roles)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User role with ID "%1$s" is not available.', $roleid));
 			}
 		}
 	}
@@ -1028,11 +1085,22 @@ class CUser extends CApiService {
 		}
 
 		$db_users = $this->get([
-			'output' => ['userid', 'alias'],
+			'output' => ['userid', 'alias', 'roleid'],
 			'userids' => $userids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		// Get readonly super admin role ID and name.
+		$db_roles = DBfetchArray(DBselect(
+			'SELECT roleid,name'.
+			' FROM role'.
+			' WHERE type='.USER_TYPE_SUPER_ADMIN.
+				' AND readonly=1'
+		));
+		$readonly_superadmin_role = $db_roles[0];
+
+		$superadmins_to_delete = 0;
 
 		foreach ($userids as $userid) {
 			if (!array_key_exists($userid, $db_users)) {
@@ -1050,6 +1118,23 @@ class CUser extends CApiService {
 			if ($db_user['alias'] == ZBX_GUEST_USER) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER)
+				);
+			}
+
+			if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
+				$superadmins_to_delete++;
+			}
+		}
+
+		// Check that at least one user will remain with readonly super admin role.
+		if ($superadmins_to_delete) {
+			$db_superadmin_count = DBfetchColumn(DBselect(
+				'SELECT COUNT(*) AS rowscount FROM users WHERE roleid='.zbx_dbstr($readonly_superadmin_role['roleid'])
+			), 'rowscount')[0];
+
+			if ($superadmins_to_delete == $db_superadmin_count) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('At least one user must exist with role "%1$s".', $readonly_superadmin_role['name'])
 				);
 			}
 		}
