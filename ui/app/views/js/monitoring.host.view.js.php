@@ -59,7 +59,7 @@
 						counter_index: filter_item._index
 					}).done((json) => {
 						if (json.filter_counters) {
-							filter_item.updateCounter(response.filter_counters.pop());
+							filter_item.updateCounter(json.filter_counters.pop());
 						}
 					});
 				});
