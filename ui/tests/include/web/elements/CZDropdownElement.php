@@ -59,7 +59,7 @@ class CZDropdownElement extends CElement {
 
 		for ($i = 0; $i < 2; $i++) {
 			try {
-				$this->click();
+				$this->waitUntilClickable()->click();
 				$option = $this->query($xpath)->waitUntilVisible()->one();
 
 				break;
@@ -77,6 +77,8 @@ class CZDropdownElement extends CElement {
 		else {
 			throw new Exception('Cannot select disabled dropdown element.');
 		}
+
+		return $this;
 	}
 
 	/**

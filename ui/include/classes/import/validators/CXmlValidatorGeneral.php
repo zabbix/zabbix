@@ -22,50 +22,86 @@
 /**
  * General XML validator
  */
-class CXmlValidatorGeneral {
+abstract class CXmlValidatorGeneral {
 
-	/**
-	 * Validation rules.
-	 *
-	 * @var array
-	 */
-	private $rules;
+	public const YAML = 'yaml';
+	public const XML = 'xml';
+	public const JSON = 'json';
 
 	/**
 	 * Format of import source.
 	 *
 	 * @var string
 	 */
-	private $format;
+	protected $format;
 
 	/**
-	 * @param array  $rules   Validation rules.
+	 * Key validation for XML_INDEXED_ARRAY containers.
+	 *
+	 * @var bool
+	 */
+	protected $strict = false;
+
+	/**
 	 * @param string $format  Format of import source.
 	 */
-	public function __construct(array $rules, $format) {
-		$this->rules = $rules;
+	public function __construct(string $format) {
 		$this->format = $format;
 	}
 
 	/**
-	 * Base validation method.
+	 * Get key validation for XML_INDEXED_ARRAY containers.
+	 *
+	 * @return bool
+	 */
+	public function getStrict(): bool {
+		return $this->strict;
+	}
+
+	/**
+	 * Set key validation for XML_INDEXED_ARRAY containers.
+	 *
+	 * @param bool $strict
+	 *
+	 * @return self
+	 */
+	public function setStrict(bool $strict): self {
+		$this->strict = $strict;
+
+		return $this;
+	}
+
+	/**
+	 * Validate import data.
 	 *
 	 * @param array|string $data  Import data.
 	 * @param string       $path  XML path (for error reporting).
 	 *
+	 * @return mixed  Validator does some manipulations for the incoming data. For example, converts empty tags to an
+	 *                array, if desired. Converted data is returned.
+	 */
+	abstract public function validate(array $data, string $path);
+
+	/**
+	 * Validate import data against the rules.
+	 *
+	 * @param array        $rules  Validation rules.
+	 * @param array|string $data   Import data.
+	 * @param string       $path   XML path (for error reporting).
+	 *
 	 * @throws Exception if $data does not correspond to validation rules.
 	 *
-	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
-	 *                array, if desired. Converted array is returned.
+	 * @return mixed  Validator does some manipulations for the incoming data. For example, converts empty tags to an
+	 *                array, if desired. Converted data is returned.
 	 */
-	public function validate($data, $path) {
-		$this->validateData($this->rules, $data, null, $path);
+	protected function doValidate(array $rules, $data, string $path) {
+		$this->doValidateRecursive($rules, $data, null, $path);
 
 		return $data;
 	}
 
 	/**
-	 * Validate import data.
+	 * Validate import data recursively.
 	 *
 	 * @param array        $rules        Validation rules.
 	 * @param array|string $data         Import data.
@@ -74,7 +110,7 @@ class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if $data does not correspond to validation $rules.
 	 */
-	public function validateData(array $rules, &$data, array $parent_data = null, $path) {
+	private function doValidateRecursive(array $rules, &$data, ?array $parent_data, string $path): void {
 		if (array_key_exists('preprocessor', $rules)) {
 			$data = call_user_func($rules['preprocessor'], $data);
 		}
@@ -110,7 +146,7 @@ class CXmlValidatorGeneral {
 
 				if (array_key_exists($tag, $data)) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->validateData($rule, $data[$tag], $data, $subpath);
+					$this->doValidateRecursive($rule, $data[$tag], $data, $subpath);
 				}
 				elseif (($rule['type'] & XML_REQUIRED) || (array_key_exists('ex_required', $rule)
 						&& call_user_func($rule['ex_required'], $data))) {
@@ -142,31 +178,33 @@ class CXmlValidatorGeneral {
 			foreach ($data as $tag => &$value) {
 				if (array_key_exists('extra', $rules) && $rules['extra'] == $tag) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->validateData($rules['rules'][$tag], $value, $data, $subpath);
+					$this->doValidateRecursive($rules['rules'][$tag], $value, $data, $subpath);
 					continue;
 				}
 
-				switch ($this->format) {
-					case CImportReaderFactory::XML:
-						$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
-						break;
+				if ($this->strict) {
+					switch ($this->format) {
+						case self::XML:
+							$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
+							break;
 
-					case CImportReaderFactory::YAML:
-					case CImportReaderFactory::JSON:
-						$is_valid_tag = ctype_digit(strval($tag));
-						break;
+						case self::YAML:
+						case self::JSON:
+							$is_valid_tag = ctype_digit(strval($tag));
+							break;
 
-					default:
-						throw new Exception(_('Internal error.'));
-				}
+						default:
+							throw new Exception(_('Internal error.'));
+					}
 
-				if (!$is_valid_tag) {
-					throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected tag "%1$s"', $tag)));
+					if (!$is_valid_tag) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected tag "%1$s"', $tag)));
+					}
 				}
 
 				$index++;
 				$subpath = ($path === '/' ? $path : $path.'/').$prefix.'('.$index.')';
-				$this->validateData($rules['rules'][$prefix], $value, $data, $subpath);
+				$this->doValidateRecursive($rules['rules'][$prefix], $value, $data, $subpath);
 			}
 			unset($value);
 
@@ -197,7 +235,7 @@ class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if this $value is not a character string.
 	 */
-	private function validateString($value, $path) {
+	private function validateString($value, string $path): void {
 		if (!is_string($value)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('a character string is expected')));
 		}
@@ -211,7 +249,7 @@ class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if this $value is not an array.
 	 */
-	private function validateArray($value, $path) {
+	private function validateArray($value, string $path): void {
 		if (!is_array($value)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('an array is expected')));
 		}
@@ -226,7 +264,7 @@ class CXmlValidatorGeneral {
 	 *
 	 * @throws Exception if this $value is an invalid constant.
 	 */
-	private function validateConstant($value, $rules, $path) {
+	private function validateConstant($value, array $rules, string $path): void {
 		if (array_key_exists('in', $rules) && !in_array($value, array_values($rules['in']))) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant "%1$s"', $value)));
 		}

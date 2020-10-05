@@ -814,7 +814,7 @@ if (hasRequest('form')) {
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
-		// Sort overides to be listed in step order.
+		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], [
 			['field' => 'step', 'order' => ZBX_SORT_UP]
 		]);

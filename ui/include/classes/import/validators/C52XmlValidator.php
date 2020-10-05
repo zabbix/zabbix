@@ -22,7 +22,7 @@
 /**
  * Validate import data from Zabbix 5.2.x.
  */
-class C52XmlValidator {
+class C52XmlValidator extends CXmlValidatorGeneral {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
@@ -337,20 +337,6 @@ class C52XmlValidator {
 		CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL,
 		CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC
 	];
-
-	/**
-	 * Format of import source.
-	 *
-	 * @var string
-	 */
-	private $format;
-
-	/**
-	 * @param string $format  Format of import source.
-	 */
-	public function __construct($format) {
-		$this->format = $format;
-	}
 
 	/**
 	 * Get validation rules schema.
@@ -1850,7 +1836,7 @@ class C52XmlValidator {
 							'selementid1' =>			['type' => XML_STRING | XML_REQUIRED],
 							'selementid2' =>			['type' => XML_STRING | XML_REQUIRED],
 							'linktriggers' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => [
-								'linktrigger' =>			['type' => XML_ARRAY, 'rules' => [
+								'linktrigger' =>            ['type' => XML_ARRAY, 'rules' => [
 									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
 									'color' =>					['type' => XML_STRING | XML_REQUIRED],
 									'trigger' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1929,9 +1915,7 @@ class C52XmlValidator {
 	 *                array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data, $path) {
-		$rules = $this->getSchema();
-
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($this->getSchema(), $data, $path);
 	}
 
 	/**
@@ -1990,7 +1974,7 @@ class C52XmlValidator {
 	public function validateMapElements($data, array $parent_data = null, $path) {
 		$rules = $this->getMapElementsExtendedRules($parent_data);
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2054,7 +2038,7 @@ class C52XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -2087,7 +2071,7 @@ class C52XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2117,7 +2101,7 @@ class C52XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2134,7 +2118,7 @@ class C52XmlValidator {
 	public function validateMediaTypeParameters($data, array $parent_data, $path) {
 		$rules = $this->getMediaTypeParametersExtendedRules($parent_data);
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2174,7 +2158,7 @@ class C52XmlValidator {
 			$rules = ['type' => XML_STRING, 'default' => ''];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2196,7 +2180,7 @@ class C52XmlValidator {
 			$rules['rules']['key']['type'] |= XML_REQUIRED;
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -2213,7 +2197,7 @@ class C52XmlValidator {
 	public function validateAuthType($data, array $parent_data = null, $path) {
 		$rules = $this->getAuthTypeExtendedRules($parent_data);
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**

@@ -2147,8 +2147,10 @@ static void	zbx_shutdown_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-void	zbx_clear_cache_snmp(void)
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
+	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]", get_process_type_string(process_type),
+			process_num);
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
 	zbx_init_snmp();

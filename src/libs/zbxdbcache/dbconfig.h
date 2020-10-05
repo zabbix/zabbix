@@ -136,6 +136,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*units;
 	unsigned char	trends;
+	int		trends_sec;
 }
 ZBX_DC_NUMITEM;
 
