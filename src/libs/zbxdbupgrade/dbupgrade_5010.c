@@ -462,9 +462,9 @@ static void	DBpatch_widget_field_free(zbx_db_widget_field_t *field)
 
 static int	DBpatch_is_convertible_screen_item(int rt)
 {
-	return rt == SCREEN_RESOURCE_CLOCK || rt == SCREEN_RESOURCE_GRAPH || rt == SCREEN_RESOURCE_SIMPLE_GRAPH ||
-			rt == SCREEN_RESOURCE_LLD_GRAPH || rt == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH ||
-			rt == SCREEN_RESOURCE_PLAIN_TEXT || rt == SCREEN_RESOURCE_URL;
+	return SCREEN_RESOURCE_CLOCK == rt || SCREEN_RESOURCE_GRAPH  == rt || SCREEN_RESOURCE_SIMPLE_GRAPH == rt ||
+			SCREEN_RESOURCE_LLD_GRAPH == rt || SCREEN_RESOURCE_LLD_SIMPLE_GRAPH == rt ||
+			SCREEN_RESOURCE_PLAIN_TEXT == rt || SCREEN_RESOURCE_URL == rt;
 }
 
 static size_t	DBpatch_array_max_used_index(char *array, size_t arr_size)
@@ -540,8 +540,14 @@ static void	DBpatch_get_preferred_widget_size(zbx_db_screen_item_t *item, int *w
 	*w = item->width;
 	*h = item->height;
 
-	if (item->resourcetype == SCREEN_RESOURCE_LLD_GRAPH || item->resourcetype == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH)
+	if (SCREEN_RESOURCE_LLD_GRAPH == item->resourcetype || SCREEN_RESOURCE_LLD_SIMPLE_GRAPH == item->resourcetype)
 		*w *= item->max_columns;
+
+	if (SCREEN_RESOURCE_LLD_GRAPH == item->resourcetype || SCREEN_RESOURCE_LLD_SIMPLE_GRAPH == item->resourcetype ||
+			SCREEN_RESOURCE_GRAPH == item->resourcetype || SCREEN_RESOURCE_SIMPLE_GRAPH == item->resourcetype)
+	{
+		*h += 215;	/* SCREEN_LEGEND_HEIGHT */
+	}
 
 	*w = *w * DASHBOARD_MAX_COLS / 1920;	/* DISPLAY_WIDTH */
 	*h = *h / 70;	/* WIDGET_ROW_HEIGHT */
