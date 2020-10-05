@@ -1448,42 +1448,24 @@ class CHostPrototype extends CHostBase {
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
-		if ($options['selectInterfaces'] !== null) {
-			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
-				$interfaces = API::HostInterface()->get([
-					'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
-					'hostids' => $hostPrototypeIds,
-					'sortfield' => 'interfaceid',
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
+		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+			$interfaces = API::HostInterface()->get([
+				'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
+				'hostids' => $hostPrototypeIds,
+				'sortfield' => 'interfaceid',
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
 
-				foreach (array_keys($result) as $hostid) {
-					$result[$hostid]['interfaces'] = [];
-				}
-
-				foreach ($interfaces as $interface) {
-					$hostid = $interface['hostid'];
-					unset($interface['interfaceid']);
-					$interface = $this->unsetExtraFields([$interface], ['hostid'], $options['selectInterfaces']);
-					$result[$hostid]['interfaces'][] = reset($interface);
-				}
+			foreach (array_keys($result) as $hostid) {
+				$result[$hostid]['interfaces'] = [];
 			}
-			else {
-				$interfaces = API::HostInterface()->get([
-					'hostids' => $hostPrototypeIds,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
 
-				$interfaces = zbx_toHash($interfaces, 'hostid');
-
-				foreach (array_keys($result) as $hostid) {
-					$result[$hostid]['interfaces'] = array_key_exists($hostid, $interfaces)
-						? $interfaces[$hostid]['rowscount']
-						: '0';
-				}
+			foreach ($interfaces as $interface) {
+				$hostid = $interface['hostid'];
+				unset($interface['interfaceid']);
+				$interface = $this->unsetExtraFields([$interface], ['hostid'], $options['selectInterfaces']);
+				$result[$hostid]['interfaces'][] = reset($interface);
 			}
 		}
 
