@@ -336,8 +336,8 @@ class CTemplateScreenConverter extends CConverter {
 				$value = $size / $dimensions_min[$index];
 
 				if ($potential_index === null
-						|| $dimensions_sum > $target && $value > $potential_value
-						|| $dimensions_sum < $target && $value < $potential_value) {
+						|| ($dimensions_sum > $target && $value > $potential_value)
+						|| ($dimensions_sum < $target && $value < $potential_value)) {
 					$potential_index = $index;
 					$potential_value = $value;
 				}
