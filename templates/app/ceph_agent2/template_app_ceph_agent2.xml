@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.2</version>
-   <date>2020-10-05T10:18:45Z</date>
+   <date>2020-10-05T14:57:55Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1271,12 +1271,12 @@ Template tooling version used: 0.38</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100</expression>
+                           <expression>{min(15m)} &gt; {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100</expression>
                            <name>Ceph: OSD osd.{#OSDNAME} is full</name>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{min(15m)} &gt; {Template App Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100</expression>
+                           <expression>{min(15m)} &gt; {Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100</expression>
                            <name>Ceph: Ceph OSD osd.{#OSDNAME} is near full</name>
                            <priority>WARNING</priority>
                            <dependencies>
