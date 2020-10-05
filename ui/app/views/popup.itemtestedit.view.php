@@ -405,7 +405,7 @@ $templates = [
 ];
 
 $warning_message = [[
-	'message' => _('Item contains user defined macros with type "Secret text". Values of these macros should be entered manually.')
+	'message' => _('Item contains user-defined macros with secret values. Values of these macros should be entered manually.')
 ]];
 $warning_box = $data['show_warning']
 	? makeMessageBox(false, $warning_message, null, true, false)
