@@ -355,23 +355,18 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, u
 		return FAIL;
 	}
 
-	if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
+	if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
+			DCget_disable_until(item, host)))
 	{
-
-
-		if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
-				DCget_disable_until(item, host)))
-		{
-			item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
-					custom_intervals, disable_until);
-		}
-		else
-		{
-			/* supported items and items that could not have been scheduled previously, but had */
-			/* their update interval fixed, should be scheduled using their update intervals */
-			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
-					custom_intervals, now);
-		}
+		item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
+				custom_intervals, disable_until);
+	}
+	else
+	{
+		/* supported items and items that could not have been scheduled previously, but had */
+		/* their update interval fixed, should be scheduled using their update intervals */
+		item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
+				custom_intervals, now);
 	}
 
 	zbx_custom_interval_free(custom_intervals);
