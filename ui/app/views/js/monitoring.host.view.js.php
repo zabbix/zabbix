@@ -46,6 +46,23 @@
 					this.stop();
 					this.start();
 				});
+				this.filter.on(TABFILTER_EVENT_UPDATE, (ev) => {
+					if (!filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
+						return;
+					}
+
+					var filter_item = filter._active_item;
+
+					$.post('zabbix.php', {
+						action: 'host.view.refresh',
+						filter_counters: 1,
+						counter_index: filter_item._index
+					}).done((json) => {
+						if (json.filter_counters) {
+							filter_item.updateCounter(response.filter_counters.pop());
+						}
+					});
+				});
 			}
 		}
 

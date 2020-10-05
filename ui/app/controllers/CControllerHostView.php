@@ -45,7 +45,8 @@ class CControllerHostView extends CControllerHost {
 			'filter_name' =>			'string',
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
-			'filter_counters' =>		'in 1'
+			'filter_counters' =>		'in 1',
+			'counter_index' =>			'ge 0'
 		];
 
 		$ret = $this->validateInput($fields);

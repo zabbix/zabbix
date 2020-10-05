@@ -31,12 +31,17 @@ if (array_key_exists('filter_options', $data)) { ?>
 			refresh_interval = <?= $data['refresh_interval'] ?>,
 			refresh_url = '<?= $data['refresh_url'] ?>',
 			refresh_timer,
+			filter_item,
+			filter_counter_fetch,
 			active_filter = filter._active_item,
 			global_timerange = {
 				from: options.timeselector.from,
 				to: options.timeselector.to
 			};
 
+		/**
+		 * Update on filter changes.
+		 */
 		filter.on(TABFILTER_EVENT_URLSET, () => {
 			let url = new Curl();
 
@@ -51,6 +56,35 @@ if (array_key_exists('filter_options', $data)) { ?>
 			}
 		});
 
+		/**
+		 * Update filter item counter when filter settings updated.
+		 */
+		filter.on(TABFILTER_EVENT_UPDATE, (ev) => {
+			if (!filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
+				return;
+			}
+
+			if (filter_counter_fetch) {
+				filter_counter_fetch.abort();
+			}
+
+			filter_counter_fetch = new AbortController();
+			filter_item = filter._active_item;
+
+			fetch(refresh_url, {
+				method: 'POST',
+				signal: filter_counter_fetch.signal,
+				body: new URLSearchParams({filter_counters: 1, counter_index: filter_item._index})
+			})
+				.then(response => response.json())
+				.then(response => {
+					filter_item.updateCounter(response.filter_counters.pop());
+				});
+		});
+
+		/**
+		 * Refresh results table via window.flickerfreeScreen.refresh call.
+		 */
 		function refreshResults() {
 			let url = new Curl(),
 				screen = window.flickerfreeScreen.screens['problem'],
@@ -112,6 +146,10 @@ if (array_key_exists('filter_options', $data)) { ?>
 						filter.updateCounters(response.filter_counters);
 					}
 
+					refresh_timer = setTimeout(refreshCounters, refresh_interval);
+				})
+				.catch(() => {
+					// On error restart refresh timer.
 					refresh_timer = setTimeout(refreshCounters, refresh_interval);
 				});
 		}

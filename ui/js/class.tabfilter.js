@@ -19,6 +19,7 @@
 
 
 const TABFILTER_EVENT_URLSET = 'urlset.tabfilter';
+const TABFILTER_EVENT_UPDATE = 'update.tabfilter';
 
 class CTabFilter extends CBaseComponent {
 
@@ -212,7 +213,7 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Updates filter values in user profile. Aborts any previous unfinished updates.
+	 * Updates filter values in user profile. Aborts previous unfinished update of property.
 	 *
 	 * @param {string} property  Filter property to be updated: 'selected', 'expanded', 'properties', 'taborder'.
 	 * @param {object} body      Key value pair of data to be passed to profile.update action.
@@ -224,6 +225,7 @@ class CTabFilter extends CBaseComponent {
 			signal = null;
 
 		url.setArgument('action', 'tabfilter.profile.update');
+		this.fire(TABFILTER_EVENT_UPDATE, {filter_property: property});
 
 		if (this._fetch[property] && ('abort' in this._fetch[property]) && !this._fetch[property].aborted) {
 			this._fetch[property].abort();
@@ -258,15 +260,9 @@ class CTabFilter extends CBaseComponent {
 		counters.forEach((value, index) => {
 			let item = this._items[index];
 
-			if (!item) {
+			if (item) {
+				item.updateCounter(value);
 				return;
-			}
-
-			if (item._data.filter_show_counter) {
-				item.setCounter(value);
-			}
-			else {
-				item.removeCounter();
 			}
 		});
 
@@ -453,6 +449,7 @@ class CTabFilter extends CBaseComponent {
 				}
 				else {
 					this.setSelectedItem(item);
+					this.fire(TABFILTER_EVENT_UPDATE, {filter_property: 'properties'});
 				}
 			},
 

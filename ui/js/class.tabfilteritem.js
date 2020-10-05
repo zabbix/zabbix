@@ -18,13 +18,13 @@
 **/
 
 
-const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.tabfilter';
-const TABFILTERITEM_EVENT_EXPAND = 'expand.tabfilter';
-const TABFILTERITEM_EVENT_SELECT = 'select.tabfilter';
-const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
-const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
-const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter';
-const TABFILTERITEM_EVENT_DELETE = 'delete.tabfilter';
+const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.item.tabfilter';
+const TABFILTERITEM_EVENT_EXPAND = 'expand.item.tabfilter';
+const TABFILTERITEM_EVENT_SELECT = 'select.item.tabfilter';
+const TABFILTERITEM_EVENT_RENDER = 'render.item.tabfilter';
+const TABFILTERITEM_EVENT_URLSET = 'urlset.item.tabfilter';
+const TABFILTERITEM_EVENT_UPDATE = 'update.item.tabfilter';
+const TABFILTERITEM_EVENT_DELETE = 'delete.item.tabfilter';
 
 const TABFILTERITEM_STYLE_UNSAVED = 'unsaved';
 const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit';
@@ -86,6 +86,27 @@ class CTabFilterItem extends CBaseComponent {
 	 */
 	removeCounter() {
 		this._target.removeAttribute('data-counter');
+	}
+
+	/**
+	 * Update item label counter when "show counter" is enabled otherwise will remove counter attribute.
+	 *
+	 * @param {string} value  Value to be shown in item label when "show counter" is enabled.
+	 */
+	updateCounter(value) {
+		if (this._data.filter_show_counter) {
+			this.setCounter(value);
+		}
+		else {
+			this.removeCounter();
+		}
+	}
+
+	/**
+	 * Return item state of "show counter".
+	 */
+	hasCounter() {
+		return parseInt(this._data.filter_show_counter) == 1;
 	}
 
 	/**

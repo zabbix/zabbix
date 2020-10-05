@@ -30,9 +30,12 @@ class CControllerHostViewRefresh extends CControllerHostView {
 
 		if ($this->getInput('filter_counters', 0)) {
 			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+			$filters = $this->hasInput('counter_index')
+				? [$profile->getTabFilter($this->getInput('counter_index'))]
+				: $profile->getTabsWithDefaults();
 			$show_counters = [];
 
-			foreach ($profile->getTabsWithDefaults() as $index => $tabfilter) {
+			foreach ($filters as $index => $tabfilter) {
 				$show_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
 
