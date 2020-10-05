@@ -341,33 +341,28 @@ typedef struct
 	int		resourcetype;
 	uint64_t	resourceid;
 	int		width, height;
-	int		x, y;
-	int		colspan, rowspan;
+	int		x;
+	int		y;
+	int		colspan;
+	int		rowspan;
 	int		elements;
-	int		valign, halign;
 	int		style;
 	char		*url;
-	int		dynamic;
-	int		sort_triggers;
-	char		*application;
 	int		max_columns;
 }
-db_screen_item_t;
+zbx_db_screen_item_t;
 
 typedef struct
 {
 	uint64_t	widget_fieldid;
-	uint64_t	widgetid;
 	int		type;
 	char		*name;
 	int		value_int;
 	char		*value_str;
-	uint64_t	value_groupid;
 	uint64_t	value_itemid;
 	uint64_t	value_graphid;
-	uint64_t	value_sysmapid;
 }
-db_widget_field_t;
+zbx_db_widget_field_t;
 
 typedef struct
 {
@@ -375,7 +370,7 @@ typedef struct
 	int	span;
 	int	size;
 }
-screen_item_dim_t;
+zbx_screen_item_dim_t;
 
 typedef struct
 {
@@ -385,7 +380,7 @@ typedef struct
 	int		private;
 	uint64_t	templateid;
 }
-db_dashboard_t;
+zbx_db_dashboard_t;
 
 typedef struct
 {
@@ -393,11 +388,13 @@ typedef struct
 	uint64_t	dashboardid;
 	char		*type;
 	char		*name;
-	int		x, y;
-	int		width, height;
+	int		x;
+	int		y;
+	int		width;
+	int		height;
 	int		view_mode;
 }
-db_widget_t;
+zbx_db_widget_t;
 
 #define DASHBOARD_MAX_COLS			(24)
 #define DASHBOARD_MAX_ROWS			(64)
@@ -442,28 +439,21 @@ db_widget_t;
 #define POS_EMPTY	(-1)
 #define POS_TAKEN	(1)
 
-ZBX_VECTOR_DECL(scitem_dim, screen_item_dim_t);
-ZBX_VECTOR_IMPL(scitem_dim, screen_item_dim_t);
+ZBX_VECTOR_DECL(scitem_dim, zbx_screen_item_dim_t);
+ZBX_VECTOR_IMPL(scitem_dim, zbx_screen_item_dim_t);
 ZBX_VECTOR_DECL(char, char);
 ZBX_VECTOR_IMPL(char, char);
 
 #define SKIP_EMPTY(vector,index)	if (POS_EMPTY == vector->values[index]) continue
 
-static void	DBpatch_init_dashboard(db_dashboard_t *dashboard, char *name, uint64_t templateid)
+static void	DBpatch_init_dashboard(zbx_db_dashboard_t *dashboard, char *name, uint64_t templateid)
 {
-	memset((void *)dashboard, 0, sizeof(db_dashboard_t));
+	memset((void *)dashboard, 0, sizeof(zbx_db_dashboard_t));
 	dashboard->templateid = templateid;
 	dashboard->name = zbx_strdup(NULL, name);
 }
 
-static void	DBpatch_widget_free(db_widget_t *widget)
-{
-	zbx_free(widget->type);
-	zbx_free(widget->name);
-	zbx_free(widget);
-}
-
-static void	DBpatch_widget_field_free(db_widget_field_t *field)
+static void	DBpatch_widget_field_free(zbx_db_widget_field_t *field)
 {
 	zbx_free(field->name);
 	zbx_free(field->value_str);
@@ -477,12 +467,12 @@ static int	DBpatch_is_convertible_screen_item(int rt)
 			rt == SCREEN_RESOURCE_PLAIN_TEXT || rt == SCREEN_RESOURCE_URL;
 }
 
-static size_t	DBpatch_array_max_used_index(const char *array, size_t arr_size)
+static size_t	DBpatch_array_max_used_index(char *array, size_t arr_size)
 {
 	size_t	i, m = 0;
 
 	for (i = 0; i < arr_size; i++)
-		if ('\0' != array[i] && i > m)
+		if (0 != array[i] && i > m)
 			m = i;
 
 	return m;
@@ -501,7 +491,7 @@ static void DBpatch_normalize_screen_items_pos(zbx_vector_ptr_t *scr_items)
 
 	for (i = 0; i < scr_items->values_num; i++)
 	{
-		db_screen_item_t	*c = (db_screen_item_t *)scr_items->values[i];
+		zbx_db_screen_item_t	*c = (zbx_db_screen_item_t *)scr_items->values[i];
 
 		for (n = c->x; n < c->x + c->colspan && n < SCREEN_MAX_COLS; n++)
 			used_x[n] = 1;
@@ -516,25 +506,25 @@ static void DBpatch_normalize_screen_items_pos(zbx_vector_ptr_t *scr_items)
 			keep_y[c->y + c->rowspan] = 1;
 	}
 
-#define COMPRESS_SCREEN_ITEMS(axis, span, a_size)						\
-												\
-do {												\
-	for (x = DBpatch_array_max_used_index(keep_ ## axis, a_size); x >= 0; x--)		\
-	{											\
-		if ('\0' != keep_ ## axis[x] && '\0' != used_ ## axis[x])			\
-			continue;								\
-												\
-		for (i = 0; i < scr_items->values_num; i++)					\
-		{										\
-			db_screen_item_t	*c = (db_screen_item_t *)scr_items->values[i];	\
-												\
-			if (x < c->axis)							\
-				c->axis--;							\
-												\
-			if (x > c->axis && x < c->axis + c->span)				\
-				c->span--;							\
-		}										\
-	}											\
+#define COMPRESS_SCREEN_ITEMS(axis, span, a_size)							\
+													\
+do {													\
+	for (x = DBpatch_array_max_used_index(keep_ ## axis, a_size); x >= 0; x--)			\
+	{												\
+		if (0 != keep_ ## axis[x] && 0 != used_ ## axis[x])					\
+			continue;									\
+													\
+		for (i = 0; i < scr_items->values_num; i++)						\
+		{											\
+			zbx_db_screen_item_t	*c = (zbx_db_screen_item_t *)scr_items->values[i];	\
+													\
+			if (x < c->axis)								\
+				c->axis--;								\
+													\
+			if (x > c->axis && x < c->axis + c->span)					\
+				c->span--;								\
+		}											\
+	}												\
 } while (0)
 
 	COMPRESS_SCREEN_ITEMS(x, colspan, SCREEN_MAX_COLS);
@@ -543,7 +533,7 @@ do {												\
 #undef COMPRESS_SCREEN_ITEMS
 }
 
-static void	DBpatch_get_preferred_widget_size(db_screen_item_t *item, int *w, int *h)
+static void	DBpatch_get_preferred_widget_size(zbx_db_screen_item_t *item, int *w, int *h)
 {
 	*w = item->width;
 	*h = item->height;
@@ -558,7 +548,7 @@ static void	DBpatch_get_preferred_widget_size(db_screen_item_t *item, int *w, in
 	*h = MIN(DASHBOARD_WIDGET_MAX_ROWS, MAX(DASHBOARD_WIDGET_MIN_ROWS, *h));
 }
 
-static void	DBpatch_get_min_widget_size(db_screen_item_t *item, int *w, int *h)
+static void	DBpatch_get_min_widget_size(zbx_db_screen_item_t *item, int *w, int *h)
 {
 	switch (item->resourcetype)
 	{
@@ -587,16 +577,16 @@ static char	*lw_array_to_str(zbx_vector_char_t *v)
 	int		i, max = MAX_STRING_LEN, len;
 
 	ptr = str;
-	zbx_snprintf(ptr, max, "[ ");
-	ptr += (len = strlen(ptr));
+	len = zbx_snprintf(ptr, max, "[ ");
+	ptr += len;
 	max -= len;
 
 	for (i = 0; 0 < max && i < v->values_num; i++)
 	{
-		if (v->values[i] != POS_EMPTY)
+		if (POS_EMPTY != v->values[i])
 		{
-			zbx_snprintf(ptr, max, "%d->%d ", i, (int)v->values[i]);
-			ptr += (len = strlen(ptr));
+			len = zbx_snprintf(ptr, max, "%d->%d ", i, (int)v->values[i]);
+			ptr += len;
 			max -= len;
 		}
 	}
@@ -617,7 +607,7 @@ static zbx_vector_char_t	*lw_array_create(void)
 	zbx_vector_char_t	*v;
 	static char		fill[SCREEN_MAX_ROWS];
 
-	if ('\0' == fill[0])
+	if (0 == fill[0])
 		memset(fill, POS_EMPTY, SCREEN_MAX_ROWS);
 
 	v = (zbx_vector_char_t *)malloc(sizeof(zbx_vector_char_t));
@@ -692,8 +682,10 @@ static zbx_vector_char_t	*lw_array_diff(zbx_vector_char_t *a, zbx_vector_char_t 
 	v = lw_array_create();
 
 	for (i = 0; i < a->values_num; i++)
+	{
 		if (a->values[i] != b->values[i])
 			v->values[i] = a->values[i];
+	}
 
 	return v;
 }
@@ -706,8 +698,10 @@ static zbx_vector_char_t	*lw_array_intersect(zbx_vector_char_t *a, zbx_vector_ch
 	v = lw_array_create();
 
 	for (i = 0; i < a->values_num; i++)
+	{
 		if (a->values[i] == b->values[i])
 			v->values[i] = a->values[i];
+	}
 
 	return v;
 }
@@ -717,8 +711,10 @@ static int	lw_array_count(zbx_vector_char_t *v)
 	int	i, c = 0;
 
 	for (i = 0; i < v->values_num; i++)
+	{
 		if (POS_EMPTY != v->values[i])
 			c++;
+	}
 
 	return c;
 }
@@ -728,8 +724,10 @@ static int	lw_array_sum(zbx_vector_char_t *v)
 	int	i, c = 0;
 
 	for (i = 0; i < v->values_num; i++)
+	{
 		if (POS_EMPTY != v->values[i])
 			c += v->values[i];
+	}
 
 	return c;
 }
@@ -831,6 +829,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 
 		lw_array_free(block->r_block);
 		zbx_free(block);
+		lw_array_free(block_unsized);
 		zbx_vector_ptr_remove(&blocks, 0);
 	}
 
@@ -908,8 +907,8 @@ static void	DBpatch_get_dashboard_dimensions(zbx_vector_ptr_t *scr_items, zbx_ve
 	{
 		int			pref_size_w, pref_size_h;
 		int			min_size_w, min_size_h;
-		screen_item_dim_t	item;
-		db_screen_item_t	*si;
+		zbx_screen_item_dim_t	item;
+		zbx_db_screen_item_t	*si;
 
 		si = scr_items->values[i];
 		DBpatch_get_preferred_widget_size(si, &pref_size_w, &pref_size_h);
@@ -946,8 +945,8 @@ static void	DBpatch_get_dashboard_dimensions(zbx_vector_ptr_t *scr_items, zbx_ve
 	if (DASHBOARD_MAX_ROWS < lw_array_sum(dim_y_pref))
 		DBpatch_adjust_axis_dimensions(dim_y_pref, dim_y_min, DASHBOARD_MAX_ROWS);
 
-	zbx_vector_char_destroy(dim_x_min);
-	zbx_vector_char_destroy(dim_y_min);
+	lw_array_free(dim_x_min);
+	lw_array_free(dim_y_min);
 	zbx_vector_scitem_dim_destroy(&items_x_pref);
 	zbx_vector_scitem_dim_destroy(&items_y_pref);
 	zbx_vector_scitem_dim_destroy(&items_x_min);
@@ -959,13 +958,12 @@ static void	DBpatch_get_dashboard_dimensions(zbx_vector_ptr_t *scr_items, zbx_ve
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): x:%s y:%s", __func__, lw_array_to_str(*x), lw_array_to_str(*y));
 }
 
-static db_widget_field_t	*DBpatch_make_widget_field(int type, char *name, void *value)
+static zbx_db_widget_field_t	*DBpatch_make_widget_field(int type, char *name, void *value)
 {
-	db_widget_field_t	*wf;
+	zbx_db_widget_field_t	*wf;
 
-	wf = (db_widget_field_t *)zbx_calloc(NULL, 1, sizeof(db_widget_field_t));
+	wf = (zbx_db_widget_field_t *)zbx_calloc(NULL, 1, sizeof(zbx_db_widget_field_t));
 	wf->name = zbx_strdup(NULL, name);
-	wf->value_str = zbx_strdup(NULL, "");
 	wf->type = type;
 
 	switch (type)
@@ -988,12 +986,15 @@ static db_widget_field_t	*DBpatch_make_widget_field(int type, char *name, void *
 			zabbix_log(LOG_LEVEL_WARNING, "%s: unknown field type: %d", __func__, type);
 	}
 
+	if (NULL == wf->value_str)
+		wf->value_str = zbx_strdup(NULL, "");
+
 	return wf;
 }
 
-static void DBpatch_widget_from_screen_item(db_screen_item_t *si, db_widget_t *w, zbx_vector_ptr_t *fields)
+static void DBpatch_widget_from_screen_item(zbx_db_screen_item_t *si, zbx_db_widget_t *w, zbx_vector_ptr_t *fields)
 {
-	db_widget_field_t	*f;
+	zbx_db_widget_field_t	*f;
 	int			tmp;
 
 	w->name = zbx_strdup(NULL, "");
@@ -1090,7 +1091,7 @@ static char	*DBpatch_resourcetype_str(int rtype)
 	return "*unknown*";
 }
 
-static void	DBpatch_trace_screen_item(db_screen_item_t *item)
+static void	DBpatch_trace_screen_item(zbx_db_screen_item_t *item)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "    screenitemid:" ZBX_FS_UI64 " screenid:" ZBX_FS_UI64,
 			item->screenitemid, item->screenid);
@@ -1099,7 +1100,7 @@ static void	DBpatch_trace_screen_item(db_screen_item_t *item)
 	zabbix_log(LOG_LEVEL_TRACE, "        w/h: %dx%d (x,y): (%d,%d)", item->width, item->height, item->x, item->y);
 }
 
-static void	DBpatch_trace_widget(db_widget_t *w)
+static void	DBpatch_trace_widget(zbx_db_widget_t *w)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "    widgetid:" ZBX_FS_UI64 " type:" ZBX_FS_UI64 " type:%s",
 			w->widgetid, w->dashboardid, w->type);
@@ -1108,24 +1109,27 @@ static void	DBpatch_trace_widget(db_widget_t *w)
 }
 
 /* adds new dashboard to the DB, sets new dashboardid in the struct */
-static int 	DBpatch_add_dashboard(db_dashboard_t *dashboard)
+static int 	DBpatch_add_dashboard(zbx_db_dashboard_t *dashboard)
 {
+	char	*name_esc;
+	int	res;
+
 	dashboard->dashboardid = DBget_maxid("dashboard");
+	name_esc = DBdyn_escape_string(dashboard->name);
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding dashboard id:" ZBX_FS_UI64, dashboard->dashboardid);
 
-	if (ZBX_DB_OK > DBexecute("insert into dashboard (dashboardid,name,templateid) values ("
-			ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")", dashboard->dashboardid, dashboard->name,
-			dashboard->templateid))
-	{
-		return FAIL;
-	}
+	res = DBexecute("insert into dashboard (dashboardid,name,templateid) values ("
+			ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")", dashboard->dashboardid, name_esc,
+			dashboard->templateid);
 
-	return SUCCEED;
+	zbx_free(name_esc);
+
+	return ZBX_DB_OK > res ? FAIL : SUCCEED;
 }
 
 /* adds new widget and widget fields to the DB */
-static int	DBpatch_add_widget(uint64_t dashboardid, db_widget_t *widget, zbx_vector_ptr_t *fields)
+static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx_vector_ptr_t *fields)
 {
 	uint64_t	new_fieldid;
 	int		i, ret = SUCCEED;
@@ -1151,10 +1155,10 @@ static int	DBpatch_add_widget(uint64_t dashboardid, db_widget_t *widget, zbx_vec
 
 	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
 	{
-		db_widget_field_t	*f;
+		zbx_db_widget_field_t	*f;
 		char			s1[ZBX_MAX_UINT64_LEN + 1], s2[ZBX_MAX_UINT64_LEN + 1];
 
-		f = (db_widget_field_t *)fields->values[i];
+		f = (zbx_db_widget_field_t *)fields->values[i];
 		name_esc = DBdyn_escape_string(f->name);
 		url_esc = DBdyn_escape_string(f->value_str);
 
@@ -1198,26 +1202,26 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			i, ret = SUCCEED;
-	db_screen_item_t	*scr_item;
-	db_dashboard_t		dashboard;
-	zbx_vector_ptr_t	widget_fields, screen_items;
+	int			i, ret;
+	zbx_db_screen_item_t	*scr_item;
+	zbx_db_dashboard_t	dashboard;
+	zbx_vector_ptr_t	screen_items;
 	zbx_vector_char_t	*dim_x, *dim_y, *offsets_x = NULL, *offsets_y = NULL;
+
+	result = DBselect(
+			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
+			",elements,style,url,max_columns from screens_items where screenid=" ZBX_FS_UI64,
+			screenid);
+
+	if (NULL == result)
+		return FAIL;
 
 	zbx_vector_ptr_create(&screen_items);
 	DBpatch_init_dashboard(&dashboard, name, templateid);
 
-	result = DBselect(
-			"select screenitemid,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan"
-			",elements,valign,halign,style,url,dynamic,sort_triggers,application,max_columns"
-			" from screens_items where screenid=" ZBX_FS_UI64, screenid);
-
-	if (NULL == result)
-		ret = FAIL;
-
 	while (NULL != (row = DBfetch(result)))
 	{
-		scr_item = (db_screen_item_t*)zbx_calloc(NULL, 1, sizeof(db_screen_item_t));
+		scr_item = (zbx_db_screen_item_t*)zbx_calloc(NULL, 1, sizeof(zbx_db_screen_item_t));
 
 		ZBX_DBROW2UINT64(scr_item->screenitemid, row[0]);
 		ZBX_DBROW2UINT64(scr_item->screenid, row[1]);
@@ -1230,21 +1234,17 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		scr_item->colspan = atoi(row[8]);
 		scr_item->rowspan = atoi(row[9]);
 		scr_item->elements = atoi(row[10]);
-		scr_item->valign = atoi(row[11]);
-		scr_item->halign = atoi(row[12]);
-		scr_item->style = atoi(row[13]);
-		scr_item->url = zbx_strdup(NULL, row[14]);
-		scr_item->dynamic = atoi(row[15]);
-		scr_item->sort_triggers = atoi(row[16]);
-		scr_item->application = zbx_strdup(NULL, row[17]);
-		scr_item->max_columns = atoi(row[18]);
+		scr_item->style = atoi(row[11]);
+		scr_item->url = zbx_strdup(NULL, row[12]);
+		scr_item->max_columns = atoi(row[13]);
 
 		DBpatch_trace_screen_item(scr_item);
 
 		if (0 == DBpatch_is_convertible_screen_item(scr_item->resourcetype))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "screen item " ZBX_FS_UI64 "is not convertible",
-					scr_item->screenitemid);
+			zabbix_log(LOG_LEVEL_WARNING, "discarding screen item " ZBX_FS_UI64
+					" because it is not convertible", scr_item->screenitemid);
+			zbx_free(scr_item);
 			continue;
 		}
 
@@ -1280,42 +1280,43 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		lw_array_debug("offsets_y", offsets_y);
 	}
 
-	if (SUCCEED == ret)
-		ret = DBpatch_add_dashboard(&dashboard);
+	ret = DBpatch_add_dashboard(&dashboard);
 
 	for (i = 0; SUCCEED == ret && i < screen_items.values_num; i++)
 	{
-		db_widget_t		*w;
-		db_screen_item_t	*si;
+		zbx_db_widget_t		w;
+		zbx_vector_ptr_t	widget_fields;
+		zbx_db_screen_item_t	*si;
 
 		si = screen_items.values[i];
-		w = (db_widget_t *)zbx_calloc(NULL, 1, sizeof(db_widget_t));
-		w->x = offsets_x->values[si->x];
-		w->y = offsets_y->values[si->y];
-		w->width = offsets_x->values[si->x + si->colspan] - offsets_x->values[si->x];
-		w->height = offsets_y->values[si->y + si->rowspan] - offsets_y->values[si->y];
+		memset((void*)&w, 0, sizeof(zbx_db_widget_t));
+		w.x = offsets_x->values[si->x];
+		w.y = offsets_y->values[si->y];
+		w.width = offsets_x->values[si->x + si->colspan] - offsets_x->values[si->x];
+		w.height = offsets_y->values[si->y + si->rowspan] - offsets_y->values[si->y];
 
 		/* skip screen items not fitting on the dashboard */
-		if (w->x + w->width > DASHBOARD_MAX_COLS || w->y + w->height > DASHBOARD_MAX_ROWS)
-		{
-			zbx_free(w);
+		if (w.x + w.width > DASHBOARD_MAX_COLS || w.y + w.height > DASHBOARD_MAX_ROWS)
 			continue;
-		}
 
 		zbx_vector_ptr_create(&widget_fields);
 
-		DBpatch_widget_from_screen_item(si, w, &widget_fields);
+		DBpatch_widget_from_screen_item(si, &w, &widget_fields);
 
-		DBpatch_trace_widget(w);
+		DBpatch_trace_widget(&w);
 
-		ret = DBpatch_add_widget(dashboard.dashboardid, w, &widget_fields);
+		ret = DBpatch_add_widget(dashboard.dashboardid, &w, &widget_fields);
 
 		zbx_vector_ptr_clear_ext(&widget_fields, (zbx_clean_func_t)DBpatch_widget_field_free);
 		zbx_vector_ptr_destroy(&widget_fields);
-		DBpatch_widget_free(w);
+		zbx_free(w.name);
+		zbx_free(w.type);
 	}
 
 	zbx_vector_ptr_destroy(&screen_items);
+	zbx_free(dashboard.name);
+	lw_array_free(dim_x);
+	lw_array_free(dim_y);
 	lw_array_free(offsets_x);
 	lw_array_free(offsets_y);
 
