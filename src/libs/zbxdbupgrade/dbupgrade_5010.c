@@ -825,8 +825,8 @@ static void	DBpatch_adjust_axis_dimensions(zbx_vector_char_t *d, zbx_vector_char
 {
 	int	dimensions_sum, i;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s(): d(%p):%s", __func__, d, lw_array_to_str(d));
-	zabbix_log(LOG_LEVEL_TRACE, "  d_min(%p):%s", d_min, lw_array_to_str(d_min));
+	zabbix_log(LOG_LEVEL_TRACE, "In %s(): d:%s", __func__, lw_array_to_str(d));
+	zabbix_log(LOG_LEVEL_TRACE, "  d_min:%s", lw_array_to_str(d_min));
 
 	dimensions_sum = lw_array_sum(d);
 
