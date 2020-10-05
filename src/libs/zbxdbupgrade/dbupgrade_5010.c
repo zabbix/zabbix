@@ -472,8 +472,10 @@ static size_t	DBpatch_array_max_used_index(char *array, size_t arr_size)
 	size_t	i, m = 0;
 
 	for (i = 0; i < arr_size; i++)
+	{
 		if (0 != array[i] && i > m)
 			m = i;
+	}
 
 	return m;
 }
