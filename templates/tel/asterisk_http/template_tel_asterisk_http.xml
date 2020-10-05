@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-01T08:03:50Z</date>
+   <date>2020-10-05T15:03:53Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/Telephony</name>
       </group>
    </groups>
    <templates>
@@ -15,12 +15,12 @@
 Enable the mini-HTTP Server, add the option webenabled=yes in the general section of manager.conf file and create Asterisk Manager user.&#13;
 Do not forget to define {$AMI.USERNAME} and {$AMI.SECRET} macros.&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/Telephony</name>
             </group>
          </groups>
          <applications>
@@ -308,6 +308,9 @@ arr_elements.forEach(function (element) {
             asterisk.sip.unmonitored_online++;
         } else {
             asterisk.sip.monitored_online++;
+            if (element.Status.search('^OK') != -1) {
+                element.Status = element.Status.split(' ')[0]
+            }
         }
     }
 });
@@ -323,6 +326,9 @@ asterisk.iax.trunks = arr_elements.filter(function (element) {
     return element.ObjectName.search(Ami.params.trunk) != -1;
 });
 arr_elements.forEach(function (element) {
+    if (element.Status.search('^OK') != -1) {
+        element.Status = element.Status.split(' ')[0]
+    }
     switch (element.Status) {
         case 'Unmonitored':
             asterisk.iax.unmonitored++;
@@ -825,10 +831,10 @@ return JSON.stringify(asterisk);
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(10m)}&gt;{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
+                           <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
                            <name>IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m</name>
                            <priority>WARNING</priority>
-                           <description>The IAX trunk can be unable to process new calls.</description>
+                           <description>The IAX trunk may not be able to process new calls.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -923,10 +929,10 @@ OK</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(10m)}&gt;{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
+                           <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
                            <name>PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m</name>
                            <priority>WARNING</priority>
-                           <description>The PJSIP trunk can be unable to process new calls.</description>
+                           <description>The PJSIP trunk may not be able to process new calls.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1045,7 +1051,7 @@ In use</description>
                            <expression>{min(10m)}&gt;{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}</expression>
                            <name>"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m</name>
                            <priority>WARNING</priority>
-                           <description>The high number of calls in the queue.</description>
+                           <description>There is a large number of calls in the queue.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1122,10 +1128,10 @@ In use</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(10m)}&gt;{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
+                           <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
                            <name>SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m</name>
                            <priority>WARNING</priority>
-                           <description>The SIP trunk can be unable to process new calls.</description>
+                           <description>The SIP trunk may not be able to process new calls.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1216,7 +1222,7 @@ OK</description>
             <macro>
                <macro>{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN}</macro>
                <value>28</value>
-               <description>The maximum number of callers in a queue for trigger expression.</description>
+               <description>The maximum number of busy channels for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$AMI.TRUNK_REGEXP}</macro>
@@ -1226,7 +1232,7 @@ OK</description>
             <macro>
                <macro>{$AMI.URL}</macro>
                <value>http://asterisk:8088/asterisk/rawman</value>
-               <description>The Asterisk Manager API URL in format &lt;scheme&gt;://&lt;host&gt;:&lt;port&gt;/&lt;prefix&gt;/rawman.</description>
+               <description>The Asterisk Manager API URL in the format `&lt;scheme&gt;://&lt;host&gt;:&lt;port&gt;/&lt;prefix&gt;/rawman`.</description>
             </macro>
             <macro>
                <macro>{$AMI.USERNAME}</macro>
