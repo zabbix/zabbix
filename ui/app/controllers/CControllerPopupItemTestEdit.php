@@ -236,7 +236,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		if (array_key_exists('interface', $inputs)) {
 			if (array_key_exists('address', $inputs['interface'])
-					&& $inputs['interface']['address'] === ZBX_SECRET_MASK) {
+					&& strstr($inputs['interface']['address'], ZBX_SECRET_MASK) !== false) {
 				$inputs['interface']['address'] = '';
 				$show_warning = true;
 			}
@@ -248,7 +248,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 			if (array_key_exists('details', $inputs['interface'])) {
 				foreach ($inputs['interface']['details'] as $field => $value) {
-					if ($value === ZBX_SECRET_MASK) {
+					if (strstr($value, ZBX_SECRET_MASK) !== false) {
 						$inputs['interface']['details'][$field] = '';
 						$show_warning = true;
 					}
