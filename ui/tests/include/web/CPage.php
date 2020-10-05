@@ -179,23 +179,23 @@ class CPage {
 
 		if (self::$cookie !== null) {
 			$cookie = json_decode(base64_decode(self::$cookie['value']), true);
+		}
 
-			if ($sessionid !== $cookie['sessionid']) {
-				$data = ['sessionid' => $sessionid];
+		if (self::$cookie === null || $sessionid !== $cookie['sessionid']) {
+			$data = ['sessionid' => $sessionid];
 
-				$config = CDBHelper::getRow('select session_key from config where configid=1');
-				$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
+			$config = CDBHelper::getRow('select session_key from config where configid=1');
+			$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
 
-				$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
-				self::$cookie = [
-					'name' => 'zbx_session',
-					'value' => base64_encode(json_encode($data)),
-					'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
-					'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
-				];
+			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
+			self::$cookie = [
+				'name' => 'zbx_session',
+				'value' => base64_encode(json_encode($data)),
+				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
+				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
+			];
 
-				$this->driver->get(PHPUNIT_URL);
-			}
+			$this->driver->get(PHPUNIT_URL);
 		}
 
 		$this->driver->manage()->addCookie(self::$cookie);
