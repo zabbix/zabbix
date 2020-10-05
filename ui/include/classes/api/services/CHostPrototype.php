@@ -44,7 +44,7 @@ class CHostPrototype extends CHostBase {
 		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
 		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
 		$hostmacro_fields = array_keys($this->getTableSchema('hostmacro')['fields']);
-		$interface_fields = ['hostid', 'type', 'useip', 'ip', 'dns', 'port', 'main', 'details'];
+		$interface_fields = ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
@@ -1463,9 +1463,8 @@ class CHostPrototype extends CHostBase {
 
 			foreach ($interfaces as $interface) {
 				$hostid = $interface['hostid'];
-				unset($interface['interfaceid']);
-				$interface = $this->unsetExtraFields([$interface], ['hostid'], $options['selectInterfaces']);
-				$result[$hostid]['interfaces'][] = reset($interface);
+				unset($interface['hostid'], $interface['interfaceid']);
+				$result[$hostid]['interfaces'][] = $interface;
 			}
 		}
 
