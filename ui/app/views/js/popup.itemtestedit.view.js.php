@@ -520,8 +520,7 @@ jQuery(document).ready(function($) {
 												.show();
 											break;
 										case '<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>':
-											$(`
-												.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,
+											$(`.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,
 												.js-popup-row-snmpv3-privprotocol, .js-popup-row-snmpv3-privpassphrase`)
 												.show();
 											break;
