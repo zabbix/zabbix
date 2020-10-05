@@ -1,5 +1,5 @@
 
-# Template App Ceph by Zabbix Agent2
+# Ceph by Zabbix Agent2
 
 ## Overview
 
@@ -129,10 +129,12 @@ There are no template links in this template.
 |Ceph: Cluster in WARNING state |<p>-</p> |`{TEMPLATE_NAME:ceph.overall_status.last()}=1`<p>Recovery expression:</p>`{TEMPLATE_NAME:ceph.overall_status.last()}=0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Ceph: Cluster in ERROR state</p> |
 |Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE}) |<p>Ceph version has changed. Ack to close.</p> |`{TEMPLATE_NAME:ceph.min_mon_release_name.diff()}=1 and {TEMPLATE_NAME:ceph.min_mon_release_name.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Ceph: OSD osd.{#OSDNAME} is down |<p>OSD osd.{#OSDNAME} is marked "down" in the osdmap.</p><p>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},up].last()} = 0` |AVERAGE | |
-|Ceph: OSD osd.{#OSDNAME} is full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100` |AVERAGE | |
-|Ceph: Ceph OSD osd.{#OSDNAME} is near full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Template App Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD osd.{#OSDNAME} is full</p> |
+|Ceph: OSD osd.{#OSDNAME} is full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100` |AVERAGE | |
+|Ceph: Ceph OSD osd.{#OSDNAME} is near full |<p>-</p> |`{TEMPLATE_NAME:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD osd.{#OSDNAME} is full</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
+
+You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph).
 

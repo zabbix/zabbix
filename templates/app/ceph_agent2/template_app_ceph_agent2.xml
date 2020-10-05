@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-02T13:24:27Z</date>
+   <date>2020-10-05T09:09:39Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,7 +11,9 @@
       <template>
          <template>Template App Ceph by Zabbix Agent2</template>
          <name>Template App Ceph by Zabbix Agent2</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph&#13;
+&#13;
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
