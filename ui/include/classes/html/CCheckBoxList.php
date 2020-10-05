@@ -126,12 +126,14 @@ class CCheckBoxList extends CList {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
+		$uniqid = ($this->uniqid === '') ? '' : '_'.$this->uniqid;
+
 		foreach ($this->values as $value) {
 			$checkbox = (new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
 				->setLabel($value['name'])
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
-			$checkbox->setId($checkbox->getId().'_'.$this->uniqid);
+			$checkbox->setId($checkbox->getId().$uniqid);
 
 			parent::addItem($checkbox);
 		}
