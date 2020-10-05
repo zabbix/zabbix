@@ -460,6 +460,12 @@ static void	DBpatch_widget_field_free(zbx_db_widget_field_t *field)
 	zbx_free(field);
 }
 
+static void	DBpatch_screen_item_free(zbx_db_screen_item_t *si)
+{
+	zbx_free(si->url);
+	zbx_free(si);
+}
+
 static int	DBpatch_is_convertible_screen_item(int rt)
 {
 	return SCREEN_RESOURCE_CLOCK == rt || SCREEN_RESOURCE_GRAPH  == rt || SCREEN_RESOURCE_SIMPLE_GRAPH == rt ||
@@ -950,7 +956,7 @@ static zbx_db_widget_field_t	*DBpatch_make_widget_field(int type, char *name, vo
 			wf->value_int = *((int *)value);
 			break;
 		case ZBX_WIDGET_FIELD_TYPE_STR:
-			wf->value_str = (char *)value;
+			wf->value_str = zbx_strdup(NULL, (char *)value);
 			break;
 		case ZBX_WIDGET_FIELD_TYPE_ITEM:
 		case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
@@ -1300,6 +1306,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		lw_array_free(dim_y);
 	}
 
+	zbx_vector_ptr_clear_ext(&screen_items, (zbx_clean_func_t)DBpatch_screen_item_free);
 	zbx_vector_ptr_destroy(&screen_items);
 
 	lw_array_free(offsets_x);
