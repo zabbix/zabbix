@@ -3705,32 +3705,6 @@ static int	dbsync_compare_maintenance(const zbx_dc_maintenance_t *maintenance, c
 
 /******************************************************************************
  *                                                                            *
- * Function: dbsync_item_script_param_preproc_row                             *
- *                                                                            *
- * Purpose: applies necessary preprocessing before row is compared/used       *
- *                                                                            *
- * Parameter: row - [IN] the row to preprocess                                *
- *                                                                            *
- * Return value: the preprocessed row of item_script_param table              *
- *                                                                            *
- * Comments: The row preprocessing can be used to expand user macros in       *
- *           some columns.                                                    *
- *                                                                            *
- ******************************************************************************/
-static char	**dbsync_item_script_param_preproc_row(char **row)
-{
-	zbx_uint64_t	hostid;
-
-	ZBX_STR2UINT64(hostid, row[4]);
-
-	if (SUCCEED == dbsync_check_row_macros(row, 3))
-		row[3] = dc_expand_user_macros(row[3], &hostid, 1);
-
-	return row;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dbsync_compare_itemscript_param                                  *
  *                                                                            *
  * Purpose: compares item script params table row with cached configuration   *
@@ -3761,7 +3735,7 @@ static int	dbsync_compare_itemscript_param(const zbx_dc_scriptitem_param_t *scri
  *                                                                            *
  * Function: zbx_dbsync_compare_item_script_param                             *
  *                                                                            *
- * Purpose: compares item_script_param table with cached configuration data   *
+ * Purpose: compares item_parameter table with cached configuration data      *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
  *                                                                            *
@@ -3793,7 +3767,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 5, dbsync_item_script_param_preproc_row);
+	dbsync_prepare(sync, 5, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
