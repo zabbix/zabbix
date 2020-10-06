@@ -1,9 +1,9 @@
 
-# Template Net TP-LINK SNMP
+# TP-LINK SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.0 and higher  
 Link to MIBs: http://www.tp-linkru.com/download/T2600G-28TS.html#MIBs_Files
 Sample device overview page: http://www.tp-linkru.com/products/details/cat-39_T2600G-28TS.html#overview
 emulation page(web): http://www.tp-linkru.com/resources/simulator/T2600G-28TS(UN)_1.0/Index.htm
@@ -31,8 +31,8 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Generic SNMP |
-|Template Module Interfaces Simple SNMP |
+|Generic SNMP |
+|Interfaces Simple SNMP |
 
 ## Discovery rules
 
