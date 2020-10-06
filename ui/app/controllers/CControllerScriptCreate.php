@@ -57,7 +57,7 @@ class CControllerScriptCreate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS);
 	}
 
 	protected function doAction() {

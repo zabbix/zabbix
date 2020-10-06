@@ -196,11 +196,11 @@ class CRoleHelper {
 			'roleids' => $roleid
 		]);
 
-		$role = reset($roles);
-
-		if (!$role) {
+		if ($roles === false) {
 			throw new Exception(_('Specified role was not found.'));
 		}
+
+		$role = $roles[0];
 
 		$rules = ['api_methods' => []];
 		$modules = [];

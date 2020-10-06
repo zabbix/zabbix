@@ -62,7 +62,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA);
 	}
 
 	protected function doAction() {

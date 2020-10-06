@@ -133,7 +133,7 @@ class CWebUser {
 	 * @return bool  Returns true if user has access to specified rule, false - otherwise.
 	 */
 	public static function checkAccess(string $rule_name): bool {
-		if (empty(self::$data)) {
+		if (empty(self::$data) || self::$data['roleid'] == 0) {
 			return false;
 		}
 
@@ -152,7 +152,8 @@ class CWebUser {
 			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
 			'type' => 0,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
-			'debug_mode' => false
+			'debug_mode' => false,
+			'roleid' => 0
 		];
 	}
 

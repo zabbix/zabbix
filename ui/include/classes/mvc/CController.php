@@ -70,7 +70,7 @@ abstract class CController {
 	 */
 	protected function composeMenu() {
 		$menu = APP::Component()->get('menu.main');
-		$user_type = CWebUser::getType();
+		$user_type = $this->getUserType();
 
 		if ($user_type === 0) {
 			return;
@@ -155,6 +155,17 @@ abstract class CController {
 	 */
 	public function getUserType() {
 		return CWebUser::getType();
+	}
+
+	/**
+	 * Checks access of current user to specific access rule.
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return bool  Returns true if user has access to rule, false - otherwise.
+	 */
+	public function checkAccess(string $rule_name): bool {
+		return CWebUser::checkAccess($rule_name);
 	}
 
 	/**

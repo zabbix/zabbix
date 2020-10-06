@@ -77,7 +77,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS);
 	}
 
 	protected function doAction() {
