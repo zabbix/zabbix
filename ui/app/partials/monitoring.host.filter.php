@@ -235,9 +235,14 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Show hosts in maintenance events.
-		$('[name="maintenance_status"]', container).click(function () {
+		let maintenance_checkbox = $('[name="maintenance_status"]', container).click(function () {
 			$('[name="show_suppressed"]', container).prop('disabled', !this.checked);
 		});
+
+		if (maintenance_checkbox.attr('unchecked-value') === data['maintenance_status']) {
+			maintenance_checkbox.removeAttr('checked');
+			$('[name="show_suppressed"]', container).prop('disabled', true);
+		}
 
 		// Tags table
 		if (data.tags.length == 0) {
@@ -255,7 +260,7 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Input, radio and single checkboxes.
-		['name', 'ip', 'dns', 'port', 'status', 'evaltype', 'maintenance_status', 'show_suppressed'].forEach((key) => {
+		['name', 'ip', 'dns', 'port', 'status', 'evaltype', 'show_suppressed'].forEach((key) => {
 			var elm = $('[name="' + key + '"]', container);
 
 			if (elm.is(':radio,:checkbox')) {
