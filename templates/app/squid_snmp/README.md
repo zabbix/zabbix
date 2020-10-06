@@ -1,9 +1,9 @@
 
-# Template App Squid SNMP
+# Squid SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.0 and higher  
 
 This template was tested on:
 
@@ -117,10 +117,10 @@ There are no template links in this template.
 |Squid: Port {$SQUID.HTTP.PORT} is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[tcp,,{$SQUID.HTTP.PORT}].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Squid: Squid has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:squid[cacheUptime].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Squid: Squid version has been changed |<p>Squid version has changed. Ack to close.</p> |`{TEMPLATE_NAME:squid[cacheVersionId].diff()}=1 and {TEMPLATE_NAME:squid[cacheVersionId].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Template App Squid SNMP:squid[cacheSwapLowWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
-|Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Template App Squid SNMP:squid[cacheSwapHighWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
+|Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapLowWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
+|Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
 |Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN}) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentUnusedFDescrCnt].last()}<{$SQUID.FILE.DESC.WARN.MIN}` |WARNING | |
-|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Template App Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
+|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
 
 ## Feedback
 
