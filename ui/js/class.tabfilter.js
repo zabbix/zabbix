@@ -593,6 +593,15 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
+			 * Trigger TABFILTERITEM_EVENT_ACTION on active item passing clicked button name as action parameter.
+			 */
+			buttonActionNotify: (ev) => {
+				if (ev.target instanceof HTMLButtonElement && this._active_item instanceof CTabFilterItem) {
+					this._active_item.fire(TABFILTERITEM_EVENT_ACTION, {action: ev.target.getAttribute('name')});
+				}
+			},
+
+			/**
 			 * Keydown handler for keyboard navigation support.
 			 */
 			keydown: (ev) => {
@@ -670,6 +679,7 @@ class CTabFilter extends CBaseComponent {
 			.addEventListener('click', this._events.buttonApplyAction);
 		this._filters_footer.querySelector('[name="filter_reset"]')
 			.addEventListener('click', this._events.buttonResetAction);
+		this._filters_footer.addEventListener('click', this._events.buttonActionNotify);
 
 		this.on('keydown', this._events.keydown);
 		this.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateActiveFilterTab);

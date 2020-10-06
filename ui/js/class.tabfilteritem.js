@@ -25,6 +25,7 @@ const TABFILTERITEM_EVENT_RENDER = 'render.item.tabfilter';
 const TABFILTERITEM_EVENT_URLSET = 'urlset.item.tabfilter';
 const TABFILTERITEM_EVENT_UPDATE = 'update.item.tabfilter';
 const TABFILTERITEM_EVENT_DELETE = 'delete.item.tabfilter';
+const TABFILTERITEM_EVENT_ACTION = 'action.item.tabfilter';
 const TABFILTERITEM_EVENT_FOCUS = 'focus.item.tabfilter';
 
 const TABFILTERITEM_STYLE_UNSAVED = 'unsaved';

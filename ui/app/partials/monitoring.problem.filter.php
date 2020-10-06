@@ -549,6 +549,7 @@ if (array_key_exists('render_html', $data)) {
 
 		// Initialize src_url.
 		this.resetUnsavedState();
+		this.on(TABFILTERITEM_EVENT_ACTION, update.bind(this));
 	}
 
 	function expand(data, container) {
@@ -568,6 +569,33 @@ if (array_key_exists('render_html', $data)) {
 		else if (this._parent) {
 			// Template is not rendered, use input data.
 			this._parent.updateTimeselector(this, (data.show != <?= TRIGGERS_OPTION_ALL ?>));
+		}
+	}
+
+	/**
+	 * On filter apply or update buttons press update disabled UI fields.
+	 *
+	 * @param {CustomEvent} ev    CustomEvent object.
+	 */
+	function update(ev) {
+		let action = ev.detail.action,
+			container = this._content_container;
+
+		if (action !== 'filter_apply' && action !== 'filter_update') {
+			return;
+		}
+
+		$('[name="highlight_row"],[name="details"],[name="show_timeline"]', container)
+			.filter(':disabled')
+			.prop('checked', false);
+
+		$('[name="show_opdata"]:disabled', container)
+			.prop('checked', false)
+			.filter('[value="' + <?= CControllerProblem::FILTER_FIELDS_DEFAULT['show_opdata'] ?> +'"]')
+			.prop('checked', true);
+
+		if ($('[name="age_state"]', container).not(':checked').length) {
+			$('[name="age"]').val(<?= CControllerProblem::FILTER_FIELDS_DEFAULT['age'] ?>);
 		}
 	}
 
