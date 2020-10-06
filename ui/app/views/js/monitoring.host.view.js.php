@@ -43,8 +43,6 @@
 
 					url.setArgument('action', 'host.view.refresh');
 					this.refresh_url = url.getUrl();
-					this.stop();
-					this.start();
 				});
 				this.filter.on(TABFILTER_EVENT_UPDATE, (ev) => {
 					if (!this.filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
@@ -188,5 +186,6 @@
 		};
 
 		window.host_page = new hostPage();
+		window.host_page.start();
 	});
 </script>
