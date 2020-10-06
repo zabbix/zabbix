@@ -79,6 +79,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 		(new CCol(
 			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))
 				->removeId()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
@@ -99,9 +100,10 @@ if ($data['is_item_testable']) {
 			->addClass('js-host-address-row'),
 		(new CFormField(
 			$data['interface_address_enabled']
-				? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				: (new CTextBox('interface[address]'))
+				? (new CTextBox('interface[address]', $data['inputs']['interface']['address'], false,
+						CControllerPopupItemTest::INPUT_MAX_LENGTH
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				: (new CTextBox('interface[address]', '', false, CControllerPopupItemTest::INPUT_MAX_LENGTH))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setEnabled(false)
 		))->addClass('js-host-address-row'),
@@ -134,7 +136,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmp-community'),
 			(new CFormField(
 				(new CTextBox('interface[details][community]', $data['inputs']['interface']['details']['community'],
-					false, DB::getFieldLength('interface_snmp', 'community')
+					false, CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
@@ -146,7 +148,7 @@ if ($data['is_item_testable']) {
 				->addClass('js-popup-row-snmpv3-contextname'),
 			(new CFormField(
 				(new CTextBox('interface[details][contextname]', $data['inputs']['interface']['details']['contextname'],
-					false, DB::getFieldLength('interface_snmp', 'contextname')
+					false, CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -157,7 +159,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][securityname]',
 					$data['inputs']['interface']['details']['securityname'], false,
-					DB::getFieldLength('interface_snmp', 'securityname')
+					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -195,7 +197,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][authpassphrase]',
 					$data['inputs']['interface']['details']['authpassphrase'], false,
-					DB::getFieldLength('interface_snmp', 'authpassphrase')
+					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -219,7 +221,7 @@ if ($data['is_item_testable']) {
 			(new CFormField(
 				(new CTextBox('interface[details][privpassphrase]',
 					$data['inputs']['interface']['details']['privpassphrase'], false,
-					DB::getFieldLength('interface_snmp', 'privpassphrase')
+					CControllerPopupItemTest::INPUT_MAX_LENGTH
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)

@@ -31,6 +31,13 @@ abstract class CControllerPopupItemTest extends CController {
 	const ZBX_TEST_TYPE_LLD = 2;
 
 	/**
+	 * Max-length of input fields that can contain resolved macro values. Used in views for input fields.
+	 *
+	 * @var int
+	 */
+	public const INPUT_MAX_LENGTH = 2048;
+
+	/**
 	 * Define a set of item types allowed to test and item properties needed to collect for each item type.
 	 *
 	 * @var array
