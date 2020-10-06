@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:16Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:00Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,20 +9,20 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Intel_Qlogic Infiniband SNMP</template>
-         <name>Template Net Intel_Qlogic Infiniband SNMP</name>
+         <template>Intel_Qlogic Infiniband SNMP</template>
+         <name>Intel_Qlogic Infiniband SNMP</name>
          <description>Template Net Intel_Qlogic Infiniband&#13;
 &#13;
 MIBs used:&#13;
 ICS-CHASSIS-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -149,6 +149,7 @@ The operational status of the fan unit.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -201,13 +202,14 @@ Actual status of the power supply:&#13;
                            <dependencies>
                               <dependency>
                                  <name>{#SNMPVALUE}: Power supply is in critical state</name>
-                                 <expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Intel_Qlogic Infiniband SNMP:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -273,24 +275,25 @@ The current value read from the sensor.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+                     <expression>{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}</expression>
+{Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+                     <expression>{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
 or&#13;
-{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
+{Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
@@ -298,10 +301,10 @@ or&#13;
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+                           <expression>{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}</expression>
-                           <recovery_expression>{Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+{Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
+                           <recovery_expression>{Intel_Qlogic Infiniband SNMP:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -357,6 +360,7 @@ The serial number of the FRU.  If not available, this value is a zero-length str
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

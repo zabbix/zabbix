@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-08-24T15:27:11Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:52Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Mikrotik SNMP</template>
-         <name>Template Net Mikrotik SNMP</name>
+         <template>Mikrotik SNMP</template>
+         <name>Mikrotik SNMP</name>
          <description>Template Net Mikrotik&#13;
 &#13;
 MIBs used:&#13;
@@ -26,13 +26,13 @@ Known Issues:&#13;
   Version: RouterOS 6.38.5&#13;
   Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -303,7 +303,7 @@ The average, over the last minute, of the percentage of time that this processor
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Net Mikrotik SNMP</host>
+                              <host>Mikrotik SNMP</host>
                               <key>system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -353,8 +353,8 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                            <dependencies>
                               <dependency>
                                  <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                                 <expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
-                                 <recovery_expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                                 <expression>{Mikrotik SNMP:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                                 <recovery_expression>{Mikrotik SNMP:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -424,8 +424,8 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                            <dependencies>
                               <dependency>
                                  <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
-                                 <expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
-                                 <recovery_expression>{Template Net Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+                                 <expression>{Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+                                 <recovery_expression>{Mikrotik SNMP:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -763,8 +763,8 @@ The amount of the storage represented by this entry that is allocated, in units 
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and&#13;
-(({Template Net Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Net Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;5G or {Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and&#13;
+(({Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;5G or {Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>Disk-{#SNMPINDEX}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
@@ -775,8 +775,8 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and&#13;
-(({Template Net Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Net Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;10G or {Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and&#13;
+(({Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;10G or {Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>Disk-{#SNMPINDEX}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
@@ -788,8 +788,8 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <dependencies>
                         <dependency>
                            <name>Disk-{#SNMPINDEX}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)</name>
-                           <expression>{Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and&#13;
-(({Template Net Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Net Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;5G or {Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                           <expression>{Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and&#13;
+(({Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;5G or {Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -807,7 +807,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                            <calc_fnc>LAST</calc_fnc>
                            <type>GRAPH_SUM</type>
                            <item>
-                              <host>Template Net Mikrotik SNMP</host>
+                              <host>Mikrotik SNMP</host>
                               <key>vfs.fs.total[hrStorageSize.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -816,7 +816,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                            <color>C80000</color>
                            <calc_fnc>LAST</calc_fnc>
                            <item>
-                              <host>Template Net Mikrotik SNMP</host>
+                              <host>Mikrotik SNMP</host>
                               <key>vfs.fs.used[hrStorageSize.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -875,7 +875,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Mikrotik SNMP</host>
+                  <host>Mikrotik SNMP</host>
                   <key>vm.memory.util[memoryUsedPercentage.Memory]</key>
                </item>
             </graph_item>

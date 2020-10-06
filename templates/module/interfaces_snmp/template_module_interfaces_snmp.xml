@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:27:52Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:01Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -9,14 +9,14 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module Interfaces SNMP</template>
-         <name>Template Module Interfaces SNMP</name>
+         <template>Interfaces SNMP</template>
+         <name>Interfaces SNMP</name>
          <description>Template Module Interfaces&#13;
 &#13;
 MIBs used:&#13;
 IF-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -347,22 +347,23 @@ through updating the syntax of the IANAifType textual convention.</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&lt;0 and {Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0&#13;
+                     <expression>{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&lt;0 and {Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0&#13;
 and (&#13;
-{Template Module Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=6 or&#13;
-{Template Module Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=7 or&#13;
-{Template Module Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=11 or&#13;
-{Template Module Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=62 or&#13;
-{Template Module Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=69 or&#13;
-{Template Module Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=117&#13;
+{Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=6 or&#13;
+{Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=7 or&#13;
+{Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=11 or&#13;
+{Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=62 or&#13;
+{Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=69 or&#13;
+{Interfaces SNMP:net.if.type[ifType.{#SNMPINDEX}].last()}=117&#13;
 )&#13;
 and&#13;
-({Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2)</expression>
+({Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2)</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>({Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&gt;0 and {Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].prev()}&gt;0) or&#13;
-({Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2)</recovery_expression>
+                     <recovery_expression>({Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&gt;0 and {Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].prev()}&gt;0) or&#13;
+({Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before</name>
                      <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
@@ -371,18 +372,18 @@ and&#13;
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
+                           <recovery_expression>{Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>({Template Module Interfaces SNMP:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} or&#13;
-{Template Module Interfaces SNMP:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}) and&#13;
-{Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0</expression>
+                     <expression>({Interfaces SNMP:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} or&#13;
+{Interfaces SNMP:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}) and&#13;
+{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Interfaces SNMP:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and&#13;
-{Template Module Interfaces SNMP:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}</recovery_expression>
+                     <recovery_expression>{Interfaces SNMP:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and&#13;
+{Interfaces SNMP:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Interfaces SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
@@ -391,17 +392,17 @@ and&#13;
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
+                           <recovery_expression>{Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Interfaces SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
-or {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <expression>{Interfaces SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Interfaces SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
-and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <recovery_expression>{Interfaces SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
@@ -410,8 +411,8 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
+                           <recovery_expression>{Interfaces SNMP:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -424,7 +425,7 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Interfaces SNMP</host>
+                              <host>Interfaces SNMP</host>
                               <key>net.if.in[ifHCInOctets.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -433,7 +434,7 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                            <drawtype>BOLD_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Interfaces SNMP</host>
+                              <host>Interfaces SNMP</host>
                               <key>net.if.out[ifHCOutOctets.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -442,7 +443,7 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                            <color>F63100</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Interfaces SNMP</host>
+                              <host>Interfaces SNMP</host>
                               <key>net.if.out.errors[ifOutErrors.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -451,7 +452,7 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                            <color>A54F10</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Interfaces SNMP</host>
+                              <host>Interfaces SNMP</host>
                               <key>net.if.in.errors[ifInErrors.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -460,7 +461,7 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                            <color>FC6EA3</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Interfaces SNMP</host>
+                              <host>Interfaces SNMP</host>
                               <key>net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -469,7 +470,7 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                            <color>6C59DC</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Interfaces SNMP</host>
+                              <host>Interfaces SNMP</host>
                               <key>net.if.in.discards[ifInDiscards.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -555,7 +556,7 @@ and {Template Module Interfaces SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}]
                      <style>0</style>
                      <resource>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
-                        <host>Template Module Interfaces SNMP</host>
+                        <host>Interfaces SNMP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>

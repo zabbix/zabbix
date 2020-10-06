@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:30:24Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:03Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -9,14 +9,14 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module HOST-RESOURCES-MIB CPU SNMP</template>
-         <name>Template Module HOST-RESOURCES-MIB CPU SNMP</name>
+         <template>HOST-RESOURCES-MIB CPU SNMP</template>
+         <name>HOST-RESOURCES-MIB CPU SNMP</name>
          <description>Requires Zabbix server 4.0.14, 4.2.8, 4.4.0 or newer (JSONPath function avg() used with types autoconversion).&#13;
 &#13;
 MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -69,12 +69,12 @@ Implementations may approximate this one minute smoothing period if necessary.</
          </macros>
       </template>
       <template>
-         <template>Template Module HOST-RESOURCES-MIB memory SNMP</template>
-         <name>Template Module HOST-RESOURCES-MIB memory SNMP</name>
+         <template>HOST-RESOURCES-MIB memory SNMP</template>
+         <name>HOST-RESOURCES-MIB memory SNMP</name>
          <description>MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -189,6 +189,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#MEMNAME}: Memory utilization</name>
@@ -199,7 +200,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module HOST-RESOURCES-MIB memory SNMP</host>
+                              <host>HOST-RESOURCES-MIB memory SNMP</host>
                               <key>vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -237,20 +238,20 @@ The amount of the storage represented by this entry that is allocated, in units 
          </macros>
       </template>
       <template>
-         <template>Template Module HOST-RESOURCES-MIB SNMP</template>
-         <name>Template Module HOST-RESOURCES-MIB SNMP</name>
+         <template>HOST-RESOURCES-MIB SNMP</template>
+         <name>HOST-RESOURCES-MIB SNMP</name>
          <description>HOST-RESOURCES-MIB: CPU, memory and storage(vfs.fs.file) linked together.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module HOST-RESOURCES-MIB CPU SNMP</name>
+               <name>HOST-RESOURCES-MIB CPU SNMP</name>
             </template>
             <template>
-               <name>Template Module HOST-RESOURCES-MIB memory SNMP</name>
+               <name>HOST-RESOURCES-MIB memory SNMP</name>
             </template>
             <template>
-               <name>Template Module HOST-RESOURCES-MIB storage SNMP</name>
+               <name>HOST-RESOURCES-MIB storage SNMP</name>
             </template>
          </templates>
          <groups>
@@ -269,7 +270,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>CPU utilization</name>
-                        <host>Template Module HOST-RESOURCES-MIB SNMP</host>
+                        <host>HOST-RESOURCES-MIB SNMP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -291,7 +292,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>{#MEMNAME}: Memory utilization</name>
-                        <host>Template Module HOST-RESOURCES-MIB SNMP</host>
+                        <host>HOST-RESOURCES-MIB SNMP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -313,7 +314,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>{#FSNAME}: Disk space usage</name>
-                        <host>Template Module HOST-RESOURCES-MIB SNMP</host>
+                        <host>HOST-RESOURCES-MIB SNMP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -335,12 +336,12 @@ Template tooling version used: 0.36</description>
          </screens>
       </template>
       <template>
-         <template>Template Module HOST-RESOURCES-MIB storage SNMP</template>
-         <name>Template Module HOST-RESOURCES-MIB storage SNMP</name>
+         <template>HOST-RESOURCES-MIB storage SNMP</template>
+         <name>HOST-RESOURCES-MIB storage SNMP</name>
          <description>MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -447,10 +448,11 @@ The amount of the storage represented by this entry that is allocated, in units 
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
@@ -461,8 +463,8 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;10G or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
+(({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;10G or {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
@@ -474,8 +476,8 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
-                           <expression>{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                           <expression>{HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -493,7 +495,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                            <calc_fnc>LAST</calc_fnc>
                            <type>GRAPH_SUM</type>
                            <item>
-                              <host>Template Module HOST-RESOURCES-MIB storage SNMP</host>
+                              <host>HOST-RESOURCES-MIB storage SNMP</host>
                               <key>vfs.fs.total[hrStorageSize.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -502,7 +504,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                            <color>C80000</color>
                            <calc_fnc>LAST</calc_fnc>
                            <item>
-                              <host>Template Module HOST-RESOURCES-MIB storage SNMP</host>
+                              <host>HOST-RESOURCES-MIB storage SNMP</host>
                               <key>vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -553,7 +555,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module HOST-RESOURCES-MIB CPU SNMP</host>
+                  <host>HOST-RESOURCES-MIB CPU SNMP</host>
                   <key>system.cpu.util</key>
                </item>
             </graph_item>

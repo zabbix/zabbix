@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template DB PostgreSQL</template>
-            <name>Template DB PostgreSQL</name>
+            <template>PostgreSQL</template>
+            <name>PostgreSQL</name>
             <description/>
             <groups>
                 <group>
@@ -4896,7 +4896,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template DB PostgreSQL:pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;].min(5m)} &gt; {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
+                            <expression>{PostgreSQL:pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;].min(5m)} &gt; {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Database {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
@@ -4912,7 +4912,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template DB PostgreSQL:pgsql.locks.total[&quot;{#DBNAME}&quot;].min(5m)}&gt;{$PG.LOCKS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
+                            <expression>{PostgreSQL:pgsql.locks.total[&quot;{#DBNAME}&quot;].min(5m)}&gt;{$PG.LOCKS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Database {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
@@ -4928,7 +4928,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template DB PostgreSQL:pgsql.dbstat.conflicts.rate[&quot;{#DBNAME}&quot;].min(5m)} &gt; {$PG.CONFLICTS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
+                            <expression>{PostgreSQL:pgsql.dbstat.conflicts.rate[&quot;{#DBNAME}&quot;].min(5m)} &gt; {$PG.CONFLICTS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Database {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
@@ -4945,7 +4945,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template DB PostgreSQL:pgsql.queries.query.slow_count[&quot;{#DBNAME}&quot;].min(5m)}&gt;{$PG.SLOW_QUERIES.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
+                            <expression>{PostgreSQL:pgsql.queries.query.slow_count[&quot;{#DBNAME}&quot;].min(5m)}&gt;{$PG.SLOW_QUERIES.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Database {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
@@ -4961,7 +4961,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template DB PostgreSQL:pgsql.frozenxid.prc_before_stop[&quot;{#DBNAME}&quot;].last()}&lt;{$PG.FROZENXID_PCT_STOP.MIN.HIGH:&quot;{#DBNAME}&quot;}</expression>
+                            <expression>{PostgreSQL:pgsql.frozenxid.prc_before_stop[&quot;{#DBNAME}&quot;].last()}&lt;{$PG.FROZENXID_PCT_STOP.MIN.HIGH:&quot;{#DBNAME}&quot;}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Database {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:&quot;{#DBNAME}&quot;} %)</name>
@@ -5005,7 +5005,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.blks_hit.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5017,7 +5017,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.blks_read.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5049,7 +5049,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.db.size[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;,&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5081,7 +5081,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.xact_commit.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5093,7 +5093,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.conflicts.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5105,7 +5105,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5117,7 +5117,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.xact_rollback.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5149,7 +5149,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.locks.total[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5181,7 +5181,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.mro.time_max[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5193,7 +5193,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.query.time_max[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5205,7 +5205,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.tx.time_max[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5217,7 +5217,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.mro.time_sum[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5229,7 +5229,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.query.time_sum[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5241,7 +5241,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.tx.time_sum[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5273,7 +5273,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.mro.slow_count[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5285,7 +5285,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.query.slow_count[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5297,7 +5297,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.queries.tx.slow_count[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5329,7 +5329,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.temp_bytes.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5341,7 +5341,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.temp_files.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5373,7 +5373,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.tup_deleted.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5385,7 +5385,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.tup_fetched.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5397,7 +5397,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.tup_inserted.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5409,7 +5409,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.tup_returned.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5421,7 +5421,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template DB PostgreSQL</host>
+                                        <host>PostgreSQL</host>
                                         <key>pgsql.dbstat.tup_updated.rate[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
@@ -5563,7 +5563,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Tuples</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5585,7 +5585,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Events</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5607,7 +5607,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Block hit/read</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5629,7 +5629,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Temp files</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5651,7 +5651,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Locks</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5673,7 +5673,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Database size</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5695,7 +5695,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Queries</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5717,7 +5717,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>DB {#DBNAME}: Slow queries</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5746,7 +5746,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL connections</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5768,7 +5768,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL transactions</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5790,7 +5790,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL ping</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5812,7 +5812,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL uptime</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5834,7 +5834,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL replication lag</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5856,7 +5856,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL WAL</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5878,7 +5878,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL bgwriter</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5900,7 +5900,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>PostgreSQL checkpoints</name>
-                                <host>Template DB PostgreSQL</host>
+                                <host>PostgreSQL</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -5913,7 +5913,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.cache.hit[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].max(5m)} &lt; {$PG.CACHE_HITRATIO.MIN.WARN}</expression>
+            <expression>{PostgreSQL:pgsql.cache.hit[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].max(5m)} &lt; {$PG.CACHE_HITRATIO.MIN.WARN}</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)</name>
@@ -5929,7 +5929,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.config.hash[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].diff()}=1 and {Template DB PostgreSQL:pgsql.config.hash[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].strlen()}&gt;0</expression>
+            <expression>{PostgreSQL:pgsql.config.hash[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].diff()}=1 and {PostgreSQL:pgsql.config.hash[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].strlen()}&gt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Configuration has changed</name>
@@ -5945,7 +5945,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.bgwriter[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].nodata(30m)} = 1</expression>
+            <expression>{PostgreSQL:pgsql.bgwriter[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].nodata(30m)} = 1</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Failed to get items (no data for 30m)</name>
@@ -5960,14 +5960,14 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
             <dependencies>
                 <dependency>
                     <name>PostgreSQL: Service is down</name>
-                    <expression>{Template DB PostgreSQL:pgsql.ping[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} = 0</expression>
+                    <expression>{PostgreSQL:pgsql.ping[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} = 0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.replication.status[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].max(5m)}=0</expression>
+            <expression>{PostgreSQL:pgsql.replication.status[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].max(5m)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Replication is down</name>
@@ -5983,7 +5983,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.bgwriter.checkpoints_req.rate.last()} &gt; {$PG.CHECKPOINTS_REQ.MAX.WARN}</expression>
+            <expression>{PostgreSQL:pgsql.bgwriter.checkpoints_req.rate.last()} &gt; {$PG.CHECKPOINTS_REQ.MAX.WARN}</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Required checkpoints occurs too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})</name>
@@ -6000,7 +6000,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.ping.time[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].min(5m)} &gt; {$PG.PING_TIME.MAX.WARN}</expression>
+            <expression>{PostgreSQL:pgsql.ping.time[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].min(5m)} &gt; {$PG.PING_TIME.MAX.WARN}</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})</name>
@@ -6015,14 +6015,14 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             <dependencies>
                 <dependency>
                     <name>PostgreSQL: Service is down</name>
-                    <expression>{Template DB PostgreSQL:pgsql.ping[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} = 0</expression>
+                    <expression>{PostgreSQL:pgsql.ping[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} = 0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.uptime[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} &lt; 10m</expression>
+            <expression>{PostgreSQL:pgsql.uptime[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} &lt; 10m</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Service has been restarted (uptime &lt; 10m)</name>
@@ -6038,7 +6038,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.ping[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} = 0</expression>
+            <expression>{PostgreSQL:pgsql.ping[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].last()} = 0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Service is down</name>
@@ -6054,7 +6054,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.replication.lag.sec[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].min(5m)} &gt; {$PG.REPL_LAG.MAX.WARN}</expression>
+            <expression>{PostgreSQL:pgsql.replication.lag.sec[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].min(5m)} &gt; {$PG.REPL_LAG.MAX.WARN}</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Streaming lag with {#MASTER} is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)</name>
@@ -6070,7 +6070,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.connections.sum.total_pct.min(5m)} &gt; {$PG.CONN_TOTAL_PCT.MAX.WARN}</expression>
+            <expression>{PostgreSQL:pgsql.connections.sum.total_pct.min(5m)} &gt; {$PG.CONN_TOTAL_PCT.MAX.WARN}</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)</name>
@@ -6086,7 +6086,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template DB PostgreSQL:pgsql.version[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].diff()}=1 and {Template DB PostgreSQL:pgsql.version[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].strlen()}&gt;0</expression>
+            <expression>{PostgreSQL:pgsql.version[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].diff()}=1 and {PostgreSQL:pgsql.version[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;].strlen()}&gt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})</name>
@@ -6129,7 +6129,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.buffers_alloc.rate</key>
                     </item>
                 </graph_item>
@@ -6141,7 +6141,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.buffers_clean.rate</key>
                     </item>
                 </graph_item>
@@ -6153,7 +6153,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.buffers_backend.rate</key>
                     </item>
                 </graph_item>
@@ -6165,7 +6165,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.buffers_checkpoint.rate</key>
                     </item>
                 </graph_item>
@@ -6177,7 +6177,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.maxwritten_clean.rate</key>
                     </item>
                 </graph_item>
@@ -6189,7 +6189,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.buffers_backend_fsync.rate</key>
                     </item>
                 </graph_item>
@@ -6221,7 +6221,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.checkpoints_timed.rate</key>
                     </item>
                 </graph_item>
@@ -6233,7 +6233,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.checkpoints_req.rate</key>
                     </item>
                 </graph_item>
@@ -6245,7 +6245,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.checkpoint_sync_time</key>
                     </item>
                 </graph_item>
@@ -6257,7 +6257,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.bgwriter.checkpoint_write_time</key>
                     </item>
                 </graph_item>
@@ -6289,7 +6289,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.connections.sum.total</key>
                     </item>
                 </graph_item>
@@ -6301,7 +6301,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.connections.sum.total_pct</key>
                     </item>
                 </graph_item>
@@ -6313,7 +6313,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.connections.sum.active</key>
                     </item>
                 </graph_item>
@@ -6325,7 +6325,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.connections.sum.idle</key>
                     </item>
                 </graph_item>
@@ -6337,7 +6337,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.connections.sum.idle_in_transaction</key>
                     </item>
                 </graph_item>
@@ -6349,7 +6349,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.connections.sum.prepared</key>
                     </item>
                 </graph_item>
@@ -6361,7 +6361,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.connections.sum.waiting</key>
                     </item>
                 </graph_item>
@@ -6393,7 +6393,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.ping[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;]</key>
                     </item>
                 </graph_item>
@@ -6405,7 +6405,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.ping.time[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;]</key>
                     </item>
                 </graph_item>
@@ -6437,7 +6437,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.replication.lag.sec[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;]</key>
                     </item>
                 </graph_item>
@@ -6469,7 +6469,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.transactions.active</key>
                     </item>
                 </graph_item>
@@ -6481,7 +6481,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.transactions.idle</key>
                     </item>
                 </graph_item>
@@ -6493,7 +6493,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.transactions.prepared</key>
                     </item>
                 </graph_item>
@@ -6505,7 +6505,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.transactions.waiting</key>
                     </item>
                 </graph_item>
@@ -6537,7 +6537,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.uptime[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;]</key>
                     </item>
                 </graph_item>
@@ -6549,7 +6549,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.cache.hit[&quot;{$PG.HOST}&quot;,&quot;{$PG.PORT}&quot;,&quot;{$PG.USER}&quot;,&quot;{$PG.DB}&quot;]</key>
                     </item>
                 </graph_item>
@@ -6581,7 +6581,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.wal.write</key>
                     </item>
                 </graph_item>
@@ -6593,7 +6593,7 @@ https://www.postgresql.org/docs/current/wal-configuration.html</description>
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template DB PostgreSQL</host>
+                        <host>PostgreSQL</host>
                         <key>pgsql.wal.count</key>
                     </item>
                 </graph_item>

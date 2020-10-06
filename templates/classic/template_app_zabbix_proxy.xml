@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App Zabbix Proxy</template>
-            <name>Template App Zabbix Proxy</name>
+            <template>Zabbix Proxy</template>
+            <name>Zabbix Proxy</name>
             <description/>
             <groups>
                 <group>
@@ -2106,7 +2106,7 @@
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>Zabbix proxy performance</name>
-                                <host>Template App Zabbix Proxy</host>
+                                <host>Zabbix Proxy</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -2128,7 +2128,7 @@
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>Zabbix data gathering process busy %</name>
-                                <host>Template App Zabbix Proxy</host>
+                                <host>Zabbix Proxy</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -2150,7 +2150,7 @@
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>Zabbix internal process busy %</name>
-                                <host>Template App Zabbix Proxy</host>
+                                <host>Zabbix Proxy</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -2172,7 +2172,7 @@
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>Zabbix cache usage, % used</name>
-                                <host>Template App Zabbix Proxy</host>
+                                <host>Zabbix Proxy</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -2185,7 +2185,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[rcache,buffer,pused].max(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[rcache,buffer,pused].max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>More than 75% used in the configuration cache</name>
@@ -2201,7 +2201,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[wcache,history,pused].max(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[wcache,history,pused].max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>More than 75% used in the history cache</name>
@@ -2217,7 +2217,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[wcache,index,pused].max(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[wcache,index,pused].max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>More than 75% used in the history index cache</name>
@@ -2233,7 +2233,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[vmware,buffer,pused].max(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[vmware,buffer,pused].max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>More than 75% used in the vmware cache</name>
@@ -2249,7 +2249,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[queue,10m].min(10m)}&gt;100</expression>
+            <expression>{Zabbix Proxy:zabbix[queue,10m].min(10m)}&gt;100</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>More than 100 items having missing data for more than 10 minutes</name>
@@ -2265,9 +2265,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,configuration syncer,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,configuration syncer,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,configuration syncer,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,configuration syncer,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix configuration syncer processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2281,9 +2281,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,data sender,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,data sender,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,data sender,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,data sender,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix data sender processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2297,9 +2297,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,discoverer,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,discoverer,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,discoverer,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,discoverer,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix discoverer processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2313,9 +2313,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,heartbeat sender,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,heartbeat sender,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,heartbeat sender,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,heartbeat sender,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix heartbeat sender processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2329,9 +2329,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,history syncer,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,history syncer,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,history syncer,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,history syncer,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix history syncer processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2345,9 +2345,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,housekeeper,avg,busy].avg(30m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,housekeeper,avg,busy].avg(30m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,housekeeper,avg,busy].avg(30m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,housekeeper,avg,busy].avg(30m)}&lt;65</recovery_expression>
             <name>Zabbix housekeeper processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2361,9 +2361,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,http poller,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,http poller,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,http poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,http poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix http poller processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2377,9 +2377,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,icmp pinger,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,icmp pinger,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,icmp pinger,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,icmp pinger,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix icmp pinger processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2393,9 +2393,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,ipmi manager,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,ipmi manager,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,ipmi manager,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,ipmi manager,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix ipmi manager processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2409,9 +2409,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,ipmi poller,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,ipmi poller,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,ipmi poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,ipmi poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix ipmi poller processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2425,9 +2425,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,java poller,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,java poller,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,java poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,java poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix java poller processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2441,9 +2441,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,poller,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,poller,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix poller processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2457,9 +2457,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,preprocessing manager,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,preprocessing manager,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,preprocessing manager,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,preprocessing manager,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix preprocessing manager processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2473,9 +2473,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,preprocessing worker,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,preprocessing worker,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,preprocessing worker,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,preprocessing worker,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix preprocessing worker processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2489,9 +2489,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,self-monitoring,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,self-monitoring,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,self-monitoring,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,self-monitoring,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix self-monitoring processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2505,9 +2505,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,snmp trapper,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,snmp trapper,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,snmp trapper,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,snmp trapper,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix snmp trapper processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2521,9 +2521,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,task manager,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,task manager,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,task manager,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,task manager,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix task manager processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2537,9 +2537,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,trapper,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,trapper,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,trapper,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,trapper,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix trapper processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2553,9 +2553,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,unreachable poller,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,unreachable poller,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,unreachable poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,unreachable poller,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix unreachable poller processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2569,9 +2569,9 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[process,vmware collector,avg,busy].avg(10m)}&gt;75</expression>
+            <expression>{Zabbix Proxy:zabbix[process,vmware collector,avg,busy].avg(10m)}&gt;75</expression>
             <recovery_mode>1</recovery_mode>
-            <recovery_expression>{Template App Zabbix Proxy:zabbix[process,vmware collector,avg,busy].avg(10m)}&lt;65</recovery_expression>
+            <recovery_expression>{Zabbix Proxy:zabbix[process,vmware collector,avg,busy].avg(10m)}&lt;65</recovery_expression>
             <name>Zabbix vmware collector processes more than 75% busy</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
@@ -2612,7 +2612,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[rcache,buffer,pused]</key>
                     </item>
                 </graph_item>
@@ -2624,7 +2624,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[wcache,index,pused]</key>
                     </item>
                 </graph_item>
@@ -2636,7 +2636,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[wcache,history,pused]</key>
                     </item>
                 </graph_item>
@@ -2648,7 +2648,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[vmware,buffer,pused]</key>
                     </item>
                 </graph_item>
@@ -2680,7 +2680,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,trapper,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2692,7 +2692,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,poller,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2704,7 +2704,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,ipmi poller,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2716,7 +2716,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,discoverer,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2728,7 +2728,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,icmp pinger,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2740,7 +2740,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,http poller,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2752,7 +2752,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,unreachable poller,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2764,7 +2764,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,java poller,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2776,7 +2776,7 @@
                     <calc_fnc>7</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,snmp trapper,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2788,7 +2788,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,vmware collector,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2820,7 +2820,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,housekeeper,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2832,7 +2832,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,configuration syncer,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2844,7 +2844,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,history syncer,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2856,7 +2856,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,self-monitoring,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2868,7 +2868,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,heartbeat sender,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2880,7 +2880,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,data sender,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2892,7 +2892,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,task manager,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2904,7 +2904,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,ipmi manager,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2916,7 +2916,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,preprocessing manager,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2928,7 +2928,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[process,preprocessing worker,avg,busy]</key>
                     </item>
                 </graph_item>
@@ -2960,7 +2960,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[preprocessing_queue]</key>
                     </item>
                 </graph_item>
@@ -2992,7 +2992,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[wcache,values]</key>
                     </item>
                 </graph_item>
@@ -3004,7 +3004,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App Zabbix Proxy</host>
+                        <host>Zabbix Proxy</host>
                         <key>zabbix[queue]</key>
                     </item>
                 </graph_item>
