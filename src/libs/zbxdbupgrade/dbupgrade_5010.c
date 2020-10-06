@@ -305,7 +305,7 @@ static int	DBpatch_5010034(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
-	return DBmodify_field_type("dashboard", &field, NULL);
+	return DBdrop_not_null("dashboard", &field);
 }
 
 static int	DBpatch_5010035(void)
