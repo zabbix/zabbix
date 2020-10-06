@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testHostPrototype extends CAPITest {
 
+	private $interface_update_hostid = null;
+
 	public static function hostprototype_create() {
 		return [
 			[
@@ -393,7 +395,7 @@ class testHostPrototype extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => "Invalid parameter \"/1/interfaces/1\": unexpected parameter \"details\"."
+				'expected_error' => "Invalid parameter \"/1/interfaces/1/details\": unexpected parameter \"version\"."
 			],
 			[
 				'request' => [
@@ -495,7 +497,7 @@ class testHostPrototype extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => "No default interface for \"JMX\" type on \"new {#HOST} 25\"."
+				'expected_error' => "No default interface for \"JMX\" type on \"new {#HOST} 26\"."
 			],
 		];
 	}
@@ -505,5 +507,248 @@ class testHostPrototype extends CAPITest {
 	 */
 	public function testHostPrototype_Create($request, $expected_error) {
 		$this->call('hostprototype.create', $request, $expected_error);
+	}
+
+	public static function hostprototype_update_interfaces() {
+		return [
+			[
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 0
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 0
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 0
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.0',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V1,
+								'community' => 'community'
+							]
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_INHERIT,
+					'interfaces' => []
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public function after_update_interfaces() {
+		if ($this->interface_update_hostid !== null) {
+			$this->call('hostprototype.delete', [$this->interface_update_hostid]);
+			$this->interface_update_hostid = null;
+		}
+	}
+
+	/**
+	 * @dataProvider hostprototype_update_interfaces
+	 * @on-after after_update_interfaces
+	 */
+	public function testHostPrototype_Update_Interfaces($create_interfaces, $update_interfaces, $expected_error) {
+		$host_prototype = $this->call('hostprototype.create', [
+			'ruleid' => 40066,
+			'groupLinks' => [[
+				'groupid' => 50014
+			]],
+			'host' => 'update_interfaces {#HOST} 1',
+			'custom_interfaces' => $create_interfaces['custom_interfaces'],
+			'interfaces' => $create_interfaces['interfaces']
+		]);
+		$this->interface_update_hostid = reset($host_prototype['result']['hostids']);
+
+		$old_interfaces = $this->call('hostinterface.get', [
+			'output' => ['interfaceid'],
+			'hostids' => $this->interface_update_hostid
+		]);
+		$old_interfaces = $old_interfaces['result'];
+
+		$update = [
+			'hostid' => $this->interface_update_hostid
+		];
+
+		if ($update_interfaces['custom_interfaces'] !== null) {
+			$update['custom_interfaces'] = $update_interfaces['custom_interfaces'];
+		}
+
+		if ($update_interfaces['interfaces'] !== null) {
+			$update['interfaces'] = $update_interfaces['interfaces'];
+		}
+
+		$this->call('hostprototype.update', $update, $expected_error);
+
+		$new_interfaces = $this->call('hostinterface.get', [
+			'output' => ['interfaceid', 'type'],
+			'hostids' => $this->interface_update_hostid
+		]);
+		$new_interfaces = $new_interfaces['result'];
+
+		$expected_old_interface_count = ($create_interfaces['custom_interfaces'] === HOST_PROT_INTERFACES_CUSTOM)
+			? count($create_interfaces['interfaces'])
+			: 0;
+		$expected_new_interface_count = ($update_interfaces['custom_interfaces'] === HOST_PROT_INTERFACES_CUSTOM)
+			? count($update_interfaces['interfaces'])
+			: 0;
+
+		$this->assertCount($expected_new_interface_count, $new_interfaces, 'Incorrect number of updated interfaces.');
+
+		$old_interfaceids = array_column($old_interfaces, 'interfaceid');
+		$new_interfaceids = array_column($new_interfaces, 'interfaceid');
+
+		$this->assertEquals(
+			min($expected_old_interface_count, $expected_new_interface_count),
+			count(array_intersect($old_interfaceids, $new_interfaceids)),
+			'Interfaceid\'s not preserved, when updating interfaces.'
+		);
+
+		foreach ($new_interfaces as $interface) {
+			$db_result = DBSelect(
+				'SELECT count(interfaceid) as rowcount'.
+				' FROM interface_snmp'.
+				' WHERE interfaceid='.zbx_dbstr($interface['interfaceid'])
+			);
+			$db_row = DBFetch($db_result);
+
+			$this->assertEquals(($interface['type'] === INTERFACE_TYPE_SNMP) ? 1 : 0, $db_row['rowcount']);
+		}
 	}
 }
