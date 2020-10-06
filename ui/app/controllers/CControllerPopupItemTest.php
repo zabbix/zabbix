@@ -682,19 +682,27 @@ abstract class CControllerPopupItemTest extends CController {
 			]
 		];
 
+		if ($this->item_type != ITEM_TYPE_SNMP) {
+			unset($interface_data['details'], $inputs['details']);
+		}
+
 		// Get values from database; resolve macros.
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
 				&& array_key_exists('interfaceid', $inputs)) {
+			$output_details = ($this->item_type == ITEM_TYPE_SNMP) ? ['details'] : [];
 			$interfaces = API::HostInterface()->get([
-				'output' => ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip', 'details'],
+				'output' => array_merge(['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'], $output_details),
 				'interfaceids' => $inputs['interfaceid'],
 				'hostids' => $this->host['hostid']
 			]);
 
-			if (count($interfaces) > 0) {
+			if (count($interfaces) != 0) {
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
-				$details = $interfaces[0]['details'] + $interface_data['details'];
-				$interface_data = [
+				$interface_data = ($this->item_type == ITEM_TYPE_SNMP)
+					? ['details' => $interfaces[0]['details'] + $interface_data['details']]
+					: [];
+
+				$interface_data += [
 					'address' => ($interfaces[0]['useip'] == INTERFACE_USE_IP)
 						? $interfaces[0]['ip']
 						: $interfaces[0]['dns'],
@@ -703,8 +711,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'type' => $interfaces[0]['type'],
 					'ip' => $interfaces[0]['ip'],
 					'dns' => $interfaces[0]['dns'],
-					'interfaceid' => $interfaces[0]['interfaceid'],
-					'details' => $details
+					'interfaceid' => $interfaces[0]['interfaceid']
 				];
 			}
 		}
