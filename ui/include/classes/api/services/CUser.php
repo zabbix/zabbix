@@ -1292,10 +1292,7 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-
-		CSessionHelper::regenerateId();
-
-		$db_user = self::createSession($db_user);
+		$db_user = self::createSession($user['user'], $db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1350,10 +1347,7 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-
-		CSessionHelper::regenerateId();
-
-		$db_user = self::createSession($db_user);
+		$db_user = self::createSession($alias, $db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1397,7 +1391,7 @@ class CUser extends CApiService {
 		// If session not created.
 		if (!$db_sessions) {
 			// After created new session return empty array.
-			return [];
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
 		$db_session = $db_sessions[0];
@@ -1567,8 +1561,8 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function createSession(array $db_user): array {
-		$db_user['sessionid'] = CSessionHelper::getId();
+	private static function createSession($alias, array $db_user): array {
+		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],

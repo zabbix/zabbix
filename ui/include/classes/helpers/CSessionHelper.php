@@ -109,14 +109,17 @@ class CSessionHelper {
 	}
 
 	/**
-	 * Regenerate session id.
+	 * Set session id.
 	 *
 	 * @static
 	 *
+	 * @param $session_id
+	 *
 	 * @return void
 	 */
-	public static function regenerateId(): void {
-		session_regenerate_id(false);
-		self::set('sessionid', self::getId());
+	public static function setId($session_id): void
+	{
+		session_id($session_id);
+		self::set('sessionid', $session_id);
 	}
 }

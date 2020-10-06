@@ -231,6 +231,7 @@ try {
 
 		if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 			CSessionHelper::unset(['saml_data']);
+			CSessionHelper::setId($user['sessionid']);
 
 			throw new Exception(_('GUI access disabled.'));
 		}

@@ -68,6 +68,7 @@ if ($http_user) {
 		);
 
 		if ($user) {
+			CSessionHelper::setId($user['sessionid']);
 			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
 			redirect(reset($redirect));
 		}
