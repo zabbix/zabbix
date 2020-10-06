@@ -824,6 +824,8 @@ abstract class CTriggerGeneral extends CApiService {
 			return;
 		}
 
+		$eventname_validator = new CEventNameValidator();
+
 		switch (get_class($this)) {
 			case 'CTrigger':
 				$error_duplicate = _('Duplicate trigger with name "%1$s".');
@@ -866,6 +868,12 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if (array_key_exists('url', $trigger) && $trigger['url'] && !CHtmlUrlValidator::validate($trigger['url'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+			}
+
+			if (array_key_exists('event_name', $trigger) && !$eventname_validator->validate($trigger['event_name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'event_name', $eventname_validator->getError())
+				);
 			}
 
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
@@ -996,6 +1004,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$class = get_class($this);
+		$eventname_validator = new CEventNameValidator();
 
 		switch ($class) {
 			case 'CTrigger':
@@ -1091,6 +1100,13 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_update, $description);
 			if ($_db_trigger['templateid'] != 0) {
 				$this->checkNoParameters($trigger, $read_only_fields_tmpl, $error_cannot_update_tmpl, $description);
+			}
+
+			if (array_key_exists('event_name', $trigger) && $db_triggers['event_name'] !== $trigger['event_name']
+					&& !$eventname_validator->validate($trigger['event_name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'event_name', $eventname_validator->getError())
+				);
 			}
 
 			if ($class === 'CTrigger') {

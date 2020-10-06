@@ -22,7 +22,7 @@
 /**
  *  A parser for function macros like "{?<trigger expression>}".
  */
-class CExpressionMacroParser extends CMacroParser {
+class CExpressionMacroParser extends CParser {
 
 	/**
 	 * @var CTriggerExpression
@@ -50,24 +50,25 @@ class CExpressionMacroParser extends CMacroParser {
 
 		$p = $pos;
 
-		if (!isset($source[$p]) || $source[$p] !== '{') {
-			return CParser::PARSE_FAIL;
-		}
-		$p++;
+		if (!isset($source[$p]) || substr($source, $p, 2) !== '{?') {
+			$this->errorPos($source, $p);
 
-		if (!isset($source[$p]) || $source[$p] !== '?') {
 			return CParser::PARSE_FAIL;
 		}
-		$p++;
+		$p += 2;
 
 		$this->trigger_expression_parser->parse(substr($source, $p));
 
 		if ($this->trigger_expression_parser->error_type !== CTriggerExpression::ERROR_UNPARSED_CONTENT) {
+			$this->errorPos($source, $p + $this->trigger_expression_parser->error_pos);
+
 			return CParser::PARSE_FAIL;
 		}
 		$p += $this->trigger_expression_parser->error_pos;
 
 		if (!isset($source[$p]) || $source[$p] !== '}') {
+			$this->errorPos($source, $p);
+
 			return CParser::PARSE_FAIL;
 		}
 		$p++;
