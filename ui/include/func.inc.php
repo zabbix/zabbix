@@ -2447,18 +2447,20 @@ function getTimeSelectorPeriod(array $options) {
 }
 
 /**
- * Get array of action statuses avaiable for defined time range. For incorrect "from" or "to" all actions will be set to
- * false.
+ * Get array of action statuses available for defined time range. For incorrect "from" or "to" all actions will be set
+ * to false.
  *
  * @param string $from      Relative or absolute time, cannot be null.
  * @param string $to        Relative or absolute time, cannot be null.
+ *
+ * @return array
  */
 function getTimeselectorActions($from, $to): array {
 	$ts_now = time();
 	$parser = new CRangeTimeParser();
 	$ts_from = ($parser->parse($from) !== CParser::PARSE_FAIL) ? $parser->getDateTime(true)->getTimestamp() : null;
 	$ts_to = ($parser->parse($to) !== CParser::PARSE_FAIL) ? $parser->getDateTime(false)->getTimestamp() : null;
-	$valid = ($ts_from !== null & $ts_to !== null);
+	$valid = ($ts_from !== null && $ts_to !== null);
 	$parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
 	$max_period = 1 + $ts_now - $parser->getDateTime(true)->getTimestamp();
 
