@@ -178,10 +178,6 @@
 					this.running = true;
 					this.refresh();
 				}
-			},
-			stop: function() {
-				this.running = false;
-				this.unscheduleRefresh();
 			}
 		};
 
