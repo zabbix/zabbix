@@ -116,50 +116,6 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Set zero based index of selected tab.
-	 *
-	 * @param int $value  Index of selected tab.
-	 */
-	public function setSelected(int $value) {
-		$this->options['selected'] = $value;
-
-		return $this;
-	}
-
-	/**
-	 * Update expanded or collapsed state of selected tab.
-	 *
-	 * @param bool $value  Expanded when true, collapsed otherwise.
-	 */
-	public function setExpanded(bool $value) {
-		$this->options['expanded'] = $value;
-
-		return $this;
-	}
-
-	/**
-	 * Set status of custom time range support.
-	 *
-	 * @param int $value  Either to enable custom time usage in filter tabs.
-	 */
-	public function setSupportCustomTime($value) {
-		$this->options['support_custom_time'] = (int) $value;
-
-		return $this;
-	}
-
-	/**
-	 * Set idx namespace used by tab filter.
-	 *
-	 * @param string $idx  Idx string without ending dot.
-	 */
-	public function setIdx(string $idx) {
-		$this->options['idx'] = $idx;
-
-		return $this;
-	}
-
-	/**
 	 * Add template for browser side rendered tabs.
 	 *
 	 * @param CPartial $template  Template object.
