@@ -59,13 +59,12 @@ abstract class CControllerHost extends CController {
 	 * @param string $filter['evaltype']            Filter hosts by tags.
 	 * @param string $filter['tags']                Filter hosts by tag names and values.
 	 * @param string $filter['severities']          Filter problems on hosts by severities.
-	 * @param string $filter['show_suppressed']     Filter supressed problems.
+	 * @param string $filter['show_suppressed']     Filter suppressed problems.
 	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
-	 * @param int    $filter['page']                Page number.
 	 *
 	 * @return int
 	 */
-	protected function getCount(array $filter) {
+	protected function getCount(array $filter): int {
 		$child_groups = [];
 
 		if ($filter['groupids']) {
@@ -99,8 +98,8 @@ abstract class CControllerHost extends CController {
 			$groupids = array_keys($filter_groups);
 		}
 
-		$count = API::Host()->get([
-			'output' => ['hostid', 'name', 'status'],
+		return (int) API::Host()->get([
+			'countOutput' => true,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'inheritedTags' => true,
@@ -119,13 +118,10 @@ abstract class CControllerHost extends CController {
 				'port' => ($filter['port'] === '') ? null : $filter['port'],
 				'maintenance_status' => ($filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 					? null
-					: HOST_MAINTENANCE_STATUS_OFF,
+					: HOST_MAINTENANCE_STATUS_OFF
 			],
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
-			'countOutput' => true
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		]);
-
-		return $count;
 	}
 
 	/**

@@ -33,13 +33,17 @@ class CControllerHostViewRefresh extends CControllerHostView {
 			$filters = $this->hasInput('counter_index')
 				? [$profile->getTabFilter($this->getInput('counter_index'))]
 				: $profile->getTabsWithDefaults();
-			$show_counters = [];
+			$filter_counters = [];
 
 			foreach ($filters as $index => $tabfilter) {
-				$show_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+				$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
 
-			$data['filter_counters'] = $show_counters;
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['filter_counters' => $filter_counters])
+				]))->disableView()
+			);
 		}
 		else {
 			$this->getInputs($filter, array_keys($filter));
@@ -56,9 +60,9 @@ class CControllerHostViewRefresh extends CControllerHostView {
 				'sort' => $filter['sort'],
 				'sortorder' => $filter['sortorder']
 			] + $prepared_data;
-		}
 
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+			$response = new CControllerResponseData($data);
+			$this->setResponse($response);
+		}
 	}
 }

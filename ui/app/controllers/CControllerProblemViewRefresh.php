@@ -22,12 +22,14 @@
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
 	protected function doAction() {
+		$data = [];
+
 		if ($this->getInput('filter_counters', 0)) {
 			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 			$filters = $this->hasInput('counter_index')
 				? [$profile->getTabFilter($this->getInput('counter_index'))]
 				: $profile->getTabsWithDefaults();
-			$show_counters = [];
+			$data['filter_counters'] = [];
 
 			foreach ($filters as $index => $tabfilter) {
 				if (!$tabfilter['filter_custom_time']) {
@@ -37,13 +39,14 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 					] + $tabfilter;
 				}
 
-				$show_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+				$data['filter_counters'][$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
-
-			$data['filter_counters'] = $show_counters;
 		}
 
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		if (($messages = getMessages()) !== null) {
+			$data['messages'] = $messages->toString();
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }
