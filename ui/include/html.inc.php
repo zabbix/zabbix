@@ -603,7 +603,7 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 function getHostAvailabilityTable($host) {
 	$container = (new CDiv())->addClass(ZBX_STYLE_STATUS_CONTAINER);
 
-	foreach (['zbx' => '', 'snmp' => 'snmp_', 'jmx' => 'jmx_', 'ipmi' => 'ipmi_'] as $type => $prefix) {
+	foreach (['ZBX' => '', 'SNMP' => 'snmp_', 'JMX' => 'jmx_', 'IPMI' => 'ipmi_'] as $type => $prefix) {
 		switch ($host[$prefix.'available']) {
 			case HOST_AVAILABLE_TRUE:
 				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);

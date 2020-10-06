@@ -5102,7 +5102,6 @@ a.link-action {
 %status {
 	padding: 2px 3px 1px;
 	font-size: $font-h3-size;
-	text-transform: $font-transform;
 	text-align: center;
 	min-width: .7em;
 	line-height: 1em;
@@ -7375,6 +7374,25 @@ z-select,
 			.description:not(:empty) {
 				color: $form-disabled-font-color;
 			}
+		}
+	}
+}
+
+// Dashboard list table.
+.dashboard-list {
+	.dashboard-list-item {
+		display: flex;
+		justify-content: space-between;
+		height: 18px;
+
+		.status-green {
+			background-color: $dashboard-my-bg-color;
+			border-color: $dashboard-my-bg-color;
+		}
+
+		.status-yellow {
+			background-color: $dashboard-shared-bg-color;
+			border-color: $dashboard-shared-bg-color;
 		}
 	}
 }

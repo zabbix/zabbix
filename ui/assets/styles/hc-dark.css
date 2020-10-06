@@ -4091,7 +4091,6 @@ a.link-action {
 .status-container .status-disaster-bg, .status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-disabled-bg {
   padding: 2px 3px 1px;
   font-size: 0.917em;
-  text-transform: uppercase;
   text-align: center;
   min-width: .7em;
   line-height: 1em;
@@ -5709,6 +5708,17 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .z-select.z-select-host-interface[disabled] .description:not(:empty),
 .z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   color: #7d7d7d; }
+
+.dashboard-list .dashboard-list-item {
+  display: flex;
+  justify-content: space-between;
+  height: 18px; }
+  .dashboard-list .dashboard-list-item .status-green {
+    background-color: #e0e0e0;
+    border-color: #e0e0e0; }
+  .dashboard-list .dashboard-list-item .status-yellow {
+    background-color: #e0e0e0;
+    border-color: #e0e0e0; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
