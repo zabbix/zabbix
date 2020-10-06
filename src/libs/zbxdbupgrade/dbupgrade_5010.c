@@ -340,7 +340,8 @@ typedef struct
 	uint64_t	screenid;
 	int		resourcetype;
 	uint64_t	resourceid;
-	int		width, height;
+	int		width;
+	int		height;
 	int		x;
 	int		y;
 	int		colspan;
@@ -663,7 +664,8 @@ static zbx_vector_char_t	*lw_array_diff(zbx_vector_char_t *a, zbx_vector_char_t 
 
 	for (i = 0; i < a->values_num; i++)
 	{
-		if (a->values[i] != b->values[i])
+		SKIP_EMPTY(a, i);
+		if (POS_EMPTY == b->values[i])
 			v->values[i] = a->values[i];
 	}
 
@@ -679,7 +681,8 @@ static zbx_vector_char_t	*lw_array_intersect(zbx_vector_char_t *a, zbx_vector_ch
 
 	for (i = 0; i < a->values_num; i++)
 	{
-		if (a->values[i] == b->values[i])
+		SKIP_EMPTY(a, i);
+		if (POS_EMPTY != b->values[i])
 			v->values[i] = a->values[i];
 	}
 
@@ -798,7 +801,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 				double	factor;
 				int	new_dimension;
 
-				SKIP_EMPTY(r_block, i);
+				SKIP_EMPTY(r_block, n);
 				factor = (double)(size_overflow + block_dimensions_sum) / block_dimensions_sum;
 				new_dimension = (int)(factor * dimensions->values[n]);
 				block_dimensions_sum -= dimensions->values[n];
@@ -832,14 +835,15 @@ static void	DBpatch_adjust_axis_dimensions(zbx_vector_char_t *d, zbx_vector_char
 
 	while (dimensions_sum != target)
 	{
-		int	potential_index = -1, potential_value;
+		int	potential_index = -1;
+		double	potential_value;
 
 		for (i = 0; i < d->values_num; i++)
 		{
-			int	value;
+			double	value;
 
 			SKIP_EMPTY(d, i);
-			value = d->values[i] / d_min->values[i];
+			value = (double)d->values[i] / d_min->values[i];
 
 			if (0 > potential_index ||
 					(dimensions_sum > target && value > potential_value) ||
@@ -850,7 +854,7 @@ static void	DBpatch_adjust_axis_dimensions(zbx_vector_char_t *d, zbx_vector_char
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_TRACE, "dimensions_sum:%d potential_index/value:%d/%d", dimensions_sum,
+		zabbix_log(LOG_LEVEL_TRACE, "dim_sum:%d pot_idx/val:%d/%.2lf", dimensions_sum,
 				potential_index, potential_value);
 
 		if (dimensions_sum > target && d->values[potential_index] == d_min->values[potential_index])
@@ -921,12 +925,15 @@ static void	DBpatch_get_dashboard_dimensions(zbx_vector_ptr_t *scr_items, zbx_ve
 
 	dim_x_pref = DBpatch_get_axis_dimensions(&items_x_pref);
 	dim_x_min = DBpatch_get_axis_dimensions(&items_x_min);
-	zabbix_log(LOG_LEVEL_TRACE, "%s: dim_x_pref:%s dim_x_min:%s", __func__, lw_array_to_str(dim_x_pref),
-			lw_array_to_str(dim_x_min));
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s: dim_x_pref:%s", __func__, lw_array_to_str(dim_x_pref));
+	zabbix_log(LOG_LEVEL_TRACE, "  dim_x_min:%s", lw_array_to_str(dim_x_min));
+
 	DBpatch_adjust_axis_dimensions(dim_x_pref, dim_x_min, DASHBOARD_MAX_COLS);
 
 	dim_y_pref = DBpatch_get_axis_dimensions(&items_y_pref);
 	dim_y_min = DBpatch_get_axis_dimensions(&items_y_min);
+
 	if (DASHBOARD_MAX_ROWS < lw_array_sum(dim_y_pref))
 		DBpatch_adjust_axis_dimensions(dim_y_pref, dim_y_min, DASHBOARD_MAX_ROWS);
 
@@ -1283,7 +1290,11 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 
 		/* skip screen items not fitting on the dashboard */
 		if (w.x + w.width > DASHBOARD_MAX_COLS || w.y + w.height > DASHBOARD_MAX_ROWS)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "skipping screenitemid " ZBX_FS_UI64
+					" (too wide, tall or offscreen)", si->screenitemid);
 			continue;
+		}
 
 		zbx_vector_ptr_create(&widget_fields);
 
