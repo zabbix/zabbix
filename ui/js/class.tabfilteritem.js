@@ -26,7 +26,6 @@ const TABFILTERITEM_EVENT_URLSET = 'urlset.item.tabfilter';
 const TABFILTERITEM_EVENT_UPDATE = 'update.item.tabfilter';
 const TABFILTERITEM_EVENT_DELETE = 'delete.item.tabfilter';
 const TABFILTERITEM_EVENT_ACTION = 'action.item.tabfilter';
-const TABFILTERITEM_EVENT_FOCUS = 'focus.item.tabfilter';
 
 const TABFILTERITEM_STYLE_UNSAVED = 'unsaved';
 const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit';
@@ -474,7 +473,6 @@ class CTabFilterItem extends CBaseComponent {
 		this
 			.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand)
 			.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse)
-			.on(TABFILTERITEM_EVENT_FOCUS, this._events.focusin)
 			.on('focusin', this._events.focusin)
 			.on('focusout', this._events.focusout)
 			.on('click', this._events.click);
