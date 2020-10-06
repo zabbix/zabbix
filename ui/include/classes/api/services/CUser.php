@@ -467,7 +467,7 @@ class CUser extends CApiService {
 		));
 		$readonly_superadmin_role = $db_roles[0];
 
-		$superadmins_to_update = 0;
+		$superadminids_to_update = [];
 		$aliases = [];
 		$check_roleids = [];
 
@@ -518,7 +518,7 @@ class CUser extends CApiService {
 
 			if (array_key_exists('roleid', $user) && $user['roleid'] != $db_user['roleid']) {
 				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
-					$superadmins_to_update++;
+					$superadminids_to_update[] = $user['userid'];
 				}
 
 				$check_roleids[] = $user['roleid'];
@@ -526,15 +526,28 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
-		// Check that at least one user will remain with readonly super admin role.
-		if ($superadmins_to_update) {
-			$db_superadmin_count = DBfetchColumn(DBselect(
-				'SELECT COUNT(*) AS rowscount FROM users WHERE roleid='.zbx_dbstr($readonly_superadmin_role['roleid'])
-			), 'rowscount')[0];
+		// Check that at least one active user will remain with readonly super admin role.
+		if ($superadminids_to_update) {
+			$db_superadmins = DBselect(
+				'SELECT NULL'.
+				' FROM users u'.
+				' WHERE u.roleid='.$readonly_superadmin_role['roleid'].
+					' AND '.dbConditionId('u.userid', $superadminids_to_update, true).
+					' AND EXISTS('.
+						'SELECT NULL'.
+						' FROM usrgrp g,users_groups ug'.
+						' WHERE g.usrgrpid=ug.usrgrpid'.
+							' AND ug.userid=u.userid'.
+						' GROUP BY ug.userid'.
+						' HAVING MAX(g.gui_access)<'.GROUP_GUI_ACCESS_DISABLED.
+							' AND MAX(g.users_status)='.GROUP_STATUS_ENABLED.
+					')'.
+				' LIMIT 1'
+			);
 
-			if ($superadmins_to_update == $db_superadmin_count) {
+			if (!DBfetch($db_superadmins)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('At least one user must exist with role "%1$s".', $readonly_superadmin_role['name'])
+					_s('At least one active user must exist with role "%1$s".', $readonly_superadmin_role['name'])
 				);
 			}
 		}
@@ -1100,7 +1113,7 @@ class CUser extends CApiService {
 		));
 		$readonly_superadmin_role = $db_roles[0];
 
-		$superadmins_to_delete = 0;
+		$superadminids_to_delete = [];
 
 		foreach ($userids as $userid) {
 			if (!array_key_exists($userid, $db_users)) {
@@ -1122,19 +1135,32 @@ class CUser extends CApiService {
 			}
 
 			if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
-				$superadmins_to_delete++;
+				$superadminids_to_delete[] = $userid;
 			}
 		}
 
 		// Check that at least one user will remain with readonly super admin role.
-		if ($superadmins_to_delete) {
-			$db_superadmin_count = DBfetchColumn(DBselect(
-				'SELECT COUNT(*) AS rowscount FROM users WHERE roleid='.zbx_dbstr($readonly_superadmin_role['roleid'])
-			), 'rowscount')[0];
+		if ($superadminids_to_delete) {
+			$db_superadmins = DBselect(
+				'SELECT NULL'.
+				' FROM users u'.
+				' WHERE u.roleid='.$readonly_superadmin_role['roleid'].
+					' AND '.dbConditionId('u.userid', $superadminids_to_delete, true).
+					' AND EXISTS('.
+						'SELECT NULL'.
+						' FROM usrgrp g,users_groups ug'.
+						' WHERE g.usrgrpid=ug.usrgrpid'.
+							' AND ug.userid=u.userid'.
+						' GROUP BY ug.userid'.
+						' HAVING MAX(g.gui_access)<'.GROUP_GUI_ACCESS_DISABLED.
+							' AND MAX(g.users_status)='.GROUP_STATUS_ENABLED.
+					')'.
+				' LIMIT 1'
+			);
 
-			if ($superadmins_to_delete == $db_superadmin_count) {
+			if (!DBfetch($db_superadmins)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('At least one user must exist with role "%1$s".', $readonly_superadmin_role['name'])
+					_s('At least one active user must exist with role "%1$s".', $readonly_superadmin_role['name'])
 				);
 			}
 		}
