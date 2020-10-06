@@ -48,6 +48,7 @@ type Connector struct {
 	clientID    uint64
 	input       chan interface{}
 	address     string
+	hostname    string
 	localAddr   net.Addr
 	lastError   error
 	resultCache resultcache.ResultCache
@@ -125,7 +126,7 @@ func (c *Connector) refreshActiveChecks() {
 
 	a := activeChecksRequest{
 		Request: "active checks",
-		Host:    c.options.Hostname,
+		Host:    c.hostname,
 		Version: version.Short(),
 	}
 
@@ -166,8 +167,8 @@ func (c *Connector) refreshActiveChecks() {
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("[%d] active check configuration update from [%s] started to fail (%s)", c.clientID,
-				c.address, err)
+			log.Warningf("[%d] active check configuration update from [%s %s] started to fail (%s)", c.clientID,
+				c.address, c.hostname, err)
 			c.lastError = err
 		}
 		return
@@ -329,10 +330,11 @@ func (c *Connector) updateOptions(options *agent.AgentOptions) {
 	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
-func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOptions) (connector *Connector, err error) {
+func New(taskManager scheduler.Scheduler, address string, hostname string, options *agent.AgentOptions) (connector *Connector, err error) {
 	c := &Connector{
 		taskManager: taskManager,
 		address:     address,
+		hostname:    hostname,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
 	}
@@ -344,6 +346,7 @@ func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOp
 
 	ac := &activeConnection{
 		address:   address,
+		hostname:  hostname,
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
 	}
@@ -396,4 +399,8 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 	}
 
 	return value, nil
+}
+
+func (c *Connector) ClientID() uint64 {
+	return c.clientID
 }

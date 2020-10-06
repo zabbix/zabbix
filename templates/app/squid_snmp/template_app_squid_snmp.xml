@@ -1,0 +1,1434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-10-02T14:50:01Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template App Squid SNMP</template>
+         <name>Template App Squid SNMP</name>
+         <description>Template for monitoring Squid caching proxy via SNMP&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Squid</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Squid: Service ping</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service[tcp,,{$SQUID.HTTP.PORT}]</key>
+               <history>7d</history>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>Squid: Port {$SQUID.HTTP.PORT} is down</name>
+                     <priority>AVERAGE</priority>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Squid: CPU usage</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.5.0</snmp_oid>
+               <key>squid[cacheCpuUsage]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The percentage use of the CPU</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: File descriptor count - current used</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.12.0</snmp_oid>
+               <key>squid[cacheCurrentFileDescrCnt]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of file descriptors in use</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: File descriptor count - current maximum</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.13.0</snmp_oid>
+               <key>squid[cacheCurrentFileDescrMax]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Highest number of file descriptors in use</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Objects LRU expiration age</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.8.0</snmp_oid>
+               <key>squid[cacheCurrentLRUExpiration]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>Storage LRU Expiration Age</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: File descriptor count - current reserved</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.11.0</snmp_oid>
+               <key>squid[cacheCurrentResFileDescrCnt]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Reserved number of file descriptors</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Cache swap current size</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.14.0</snmp_oid>
+               <key>squid[cacheCurrentSwapSize]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Storage Swap Size</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1048576</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Objects unlinkd requests</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.9.0</snmp_oid>
+               <key>squid[cacheCurrentUnlinkRequests]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Requests given to unlinkd</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: File descriptor count - current available</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.10.0</snmp_oid>
+               <key>squid[cacheCurrentUnusedFDescrCnt]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Available number of file descriptors</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;{$SQUID.FILE.DESC.WARN.MIN}</expression>
+                     <name>Squid: Squid is running out of file descriptors (&lt;{$SQUID.FILE.DESC.WARN.MIN})</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Squid: DNS server replies per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.3.2.0</snmp_oid>
+               <key>squid[cacheDnsReplies]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of external dns server replies</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: DNS server requests per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.3.1.0</snmp_oid>
+               <key>squid[cacheDnsRequests]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of external dns server requests</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: DNS service time per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.8.5</snmp_oid>
+               <key>squid[cacheDnsSvcTime.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>DNS service time per 5 minutes</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: DNS service time per hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.8.60</snmp_oid>
+               <key>squid[cacheDnsSvcTime.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>DNS service time per hour</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: FQDN cache hits per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.2.3.0</snmp_oid>
+               <key>squid[cacheFqdnHits]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of FQDN Cache hits</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: FQDN cache misses per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.2.6.0</snmp_oid>
+               <key>squid[cacheFqdnMisses]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of FQDN Cache misses</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: FQDN cache requests per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.2.2.0</snmp_oid>
+               <key>squid[cacheFqdnRequests]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of FQDN Cache requests</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP all service time per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.2.5</snmp_oid>
+               <key>squid[cacheHttpAllSvcTime.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>HTTP all service time per 5 minutes</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP all service time per hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.2.60</snmp_oid>
+               <key>squid[cacheHttpAllSvcTime.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>HTTP all service time per hour</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP Errors sent per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.3.0</snmp_oid>
+               <key>squid[cacheHttpErrors]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of HTTP Errors sent to clients</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP Hits sent from cache per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.2.0</snmp_oid>
+               <key>squid[cacheHttpHits]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of HTTP Hits sent to clients from cache</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP miss service time per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.5.5</snmp_oid>
+               <key>squid[cacheHttpHitSvcTime.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>HTTP hit service time per 5 minutes</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP hit service time per hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.5.60</snmp_oid>
+               <key>squid[cacheHttpHitSvcTime.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>HTTP hit service time per hour</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP traffic received per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.4.0</snmp_oid>
+               <key>squid[cacheHttpInKb]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Number of HTTP traffic received from clients</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP miss service time per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.3.5</snmp_oid>
+               <key>squid[cacheHttpMissSvcTime.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>HTTP miss service time per 5 minutes</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP miss service time per hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.3.60</snmp_oid>
+               <key>squid[cacheHttpMissSvcTime.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>HTTP miss service time per hour</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: HTTP traffic sent per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.5.0</snmp_oid>
+               <key>squid[cacheHttpOutKb]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Number of HTTP traffic sent to clients</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP traffic received per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.9.0</snmp_oid>
+               <key>squid[cacheIcpKbRecv]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Number of ICP traffic received</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP traffic transmitted per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.8.0</snmp_oid>
+               <key>squid[cacheIcpKbSent]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Number of ICP traffic transmitted</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP messages received per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.7.0</snmp_oid>
+               <key>squid[cacheIcpPktsRecv]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of ICP messages received</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP messages sent per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.6.0</snmp_oid>
+               <key>squid[cacheIcpPktsSent]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of ICP messages sent</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP query service time per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.6.5</snmp_oid>
+               <key>squid[cacheIcpQuerySvcTime.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>ICP query service time per 5 minutes</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP query service time per hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.6.60</snmp_oid>
+               <key>squid[cacheIcpQuerySvcTime.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>ICP query service time per hour</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP reply service time per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.7.5</snmp_oid>
+               <key>squid[cacheIcpReplySvcTime.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>ICP reply service time per 5 minutes</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: ICP reply service time per hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.7.60</snmp_oid>
+               <key>squid[cacheIcpReplySvcTime.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>ICP reply service time per hour</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: IP cache hits per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.1.3.0</snmp_oid>
+               <key>squid[cacheIpHits]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of IP Cache hits</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: IP cache misses per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.1.6.0</snmp_oid>
+               <key>squid[cacheIpMisses]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of IP Cache misses</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: IP cache requests per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.4.1.2.0</snmp_oid>
+               <key>squid[cacheIpRequests]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of IP Cache requests</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Memory maximum resident size</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.6.0</snmp_oid>
+               <key>squid[cacheMaxResSize]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Maximum Resident Size</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Memory maximum cache size</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.2.5.1.0</snmp_oid>
+               <key>squid[cacheMemMaxSize]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>The value of the cache_mem parameter</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1048576</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Memory cache usage</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.3.0</snmp_oid>
+               <key>squid[cacheMemUsage]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Total accounted memory</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Objects count</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.7.0</snmp_oid>
+               <key>squid[cacheNumObjCount]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of objects stored by the cache</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: HTTP requests received per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.1.1.0</snmp_oid>
+               <key>squid[cacheProtoClientHttpRequests]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of HTTP requests received</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Byte hit ratio per 1 minute</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.10.1</snmp_oid>
+               <key>squid[cacheRequestByteRatio.1]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Byte Hit Ratios</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Byte hit ratio per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.10.5</snmp_oid>
+               <key>squid[cacheRequestByteRatio.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Byte Hit Ratios</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Byte hit ratio per 1 hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.10.60</snmp_oid>
+               <key>squid[cacheRequestByteRatio.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Byte Hit Ratios</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Request hit ratio per 1 minute</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.9.1</snmp_oid>
+               <key>squid[cacheRequestHitRatio.1]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Byte Hit Ratios</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Request hit ratio per 5 minutes</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.9.5</snmp_oid>
+               <key>squid[cacheRequestHitRatio.5]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Byte Hit Ratios</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Request hit ratio per 1 hour</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.2.2.1.9.60</snmp_oid>
+               <key>squid[cacheRequestHitRatio.60]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Byte Hit Ratios</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Cache swap high water mark</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.2.5.3.0</snmp_oid>
+               <key>squid[cacheSwapHighWM]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Cache Swap High Water Mark</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Cache swap low water mark</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.2.5.4.0</snmp_oid>
+               <key>squid[cacheSwapLowWM]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Cache Swap Low Water Mark</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Squid: Cache swap directory size</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.2.5.2.0</snmp_oid>
+               <key>squid[cacheSwapMaxSize]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>The total of the cache_dir space allocated</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1048576</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Sys page faults per second</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.3.1.1.0</snmp_oid>
+               <key>squid[cacheSysPageFaults]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Page faults with physical I/O</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Squid: Uptime</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.1.3.0</snmp_oid>
+               <key>squid[cacheUptime]</key>
+               <delay>5m</delay>
+               <history>7d</history>
+               <units>s</units>
+               <description>The Uptime of the cache in timeticks (in hundredths of a second) with preprocessing</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Squid: Squid has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Squid: Version</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.3495.1.2.3.0</snmp_oid>
+               <key>squid[cacheVersionId]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>Cache Software Version</description>
+               <applications>
+                  <application>
+                     <name>Squid</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Squid: Squid version has been changed</name>
+                     <priority>INFO</priority>
+                     <description>Squid version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <macros>
+            <macro>
+               <macro>{$SQUID.FILE.DESC.WARN.MIN}</macro>
+               <value>100</value>
+               <description>The threshold for minimum number of avaliable file descriptors</description>
+            </macro>
+            <macro>
+               <macro>{$SQUID.HTTP.PORT}</macro>
+               <value>3128</value>
+               <description>http_port configured in squid.conf (Default: 3128)</description>
+            </macro>
+            <macro>
+               <macro>{$SQUID.PAGE.FAULT.WARN}</macro>
+               <value>90</value>
+               <description>The threshold for sys page faults rate in percent of recieved HTTP requests</description>
+            </macro>
+            <macro>
+               <macro>{$SQUID.SNMP.COMMUNITY}</macro>
+               <value>public</value>
+               <description>SNMP community allowed by ACL in squid.conf</description>
+            </macro>
+            <macro>
+               <macro>{$SQUID.SNMP.PORT}</macro>
+               <value>3401</value>
+               <description>snmp_port configured in squid.conf (Default: 3401)</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <triggers>
+      <trigger>
+         <expression>{Template App Squid SNMP:squid[cacheSysPageFaults].avg(5m)}&gt;{Template App Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}</expression>
+         <name>Squid: High sys page faults rate (&gt;{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests)</name>
+         <priority>WARNING</priority>
+      </trigger>
+      <trigger>
+         <expression>{Template App Squid SNMP:squid[cacheCurrentSwapSize].last()}&gt;{Template App Squid SNMP:squid[cacheSwapHighWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100</expression>
+         <name>Squid: Swap usage is more than high watermark (&gt;{ITEM.VALUE2}%)</name>
+         <opdata>Used: {ITEM.LASTVALUE1}</opdata>
+         <priority>HIGH</priority>
+      </trigger>
+      <trigger>
+         <expression>{Template App Squid SNMP:squid[cacheCurrentSwapSize].last()}&gt;{Template App Squid SNMP:squid[cacheSwapLowWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100</expression>
+         <name>Squid: Swap usage is more than low watermark (&gt;{ITEM.VALUE2}%)</name>
+         <opdata>Used: {ITEM.LASTVALUE1}</opdata>
+         <priority>WARNING</priority>
+      </trigger>
+   </triggers>
+   <graphs>
+      <graph>
+         <name>Squid: DNS lookup statistics</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheDnsRequests]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheDnsReplies]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Squid: Domain name (FQDN) cache ctatistics</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheFqdnRequests]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheFqdnHits]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheFqdnMisses]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Squid: File descriptor usage</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheCurrentFileDescrCnt]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheCurrentUnusedFDescrCnt]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheCurrentResFileDescrCnt]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Squid: HTTP Traffic</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpInKb]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpOutKb]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Squid: IP address cache statistics</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheIpRequests]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheIpHits]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheIpMisses]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Squid: Memory</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheMaxResSize]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheMemMaxSize]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheMemUsage]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Squid: Objects cache statistics</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheNumObjCount]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheCurrentUnlinkRequests]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Squid: Service timing statistics</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpAllSvcTime.5]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpAllSvcTime.60]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpMissSvcTime.5]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpMissSvcTime.60]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpHitSvcTime.5]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>5</sortorder>
+               <color>6C59DC</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheHttpHitSvcTime.60]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>6</sortorder>
+               <color>AC8C14</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheIcpQuerySvcTime.5]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>7</sortorder>
+               <color>611F27</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheIcpQuerySvcTime.60]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>8</sortorder>
+               <color>F230E0</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheIcpReplySvcTime.5]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>9</sortorder>
+               <color>FFAD40</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheIcpReplySvcTime.60]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>10</sortorder>
+               <color>40CDFF</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheDnsSvcTime.5]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>11</sortorder>
+               <color>40FFA0</color>
+               <item>
+                  <host>Template App Squid SNMP</host>
+                  <key>squid[cacheDnsSvcTime.60]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

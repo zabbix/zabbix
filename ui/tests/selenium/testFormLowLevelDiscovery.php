@@ -302,18 +302,18 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					);
 					if ($dbInterfaces) {
 						foreach ($dbInterfaces as $host_interface) {
-							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
-							$host_interface['ip'].' : '.$host_interface['port'].'"]');
+							$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.
+									$host_interface['ip'].' : '.$host_interface['port'].'"]');
 						}
 					}
 					else {
 						$this->zbxTestTextPresent('No interface found');
-						$this->zbxTestAssertNotVisibleId('interfaceid');
+						$this->zbxTestAssertNotVisibleId('interface-select');
 					}
 					break;
 				default:
 					$this->zbxTestTextNotVisible(['Host interface', 'No interface found']);
-					$this->zbxTestAssertNotVisibleId('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interface-select');
 					break;
 			}
 		}
@@ -1199,6 +1199,17 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'dbCheck' => true
 				]
 			],
+			// Update and custom intervals are hidden if item key is mqtt.get
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix agent (active)',
+					'name' => 'Zabbix agent (active) mqtt',
+					'key' => 'mqtt.get[0]',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1484,10 +1495,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			case 'SSH agent':
 			case 'TELNET agent':
 			case 'JMX agent':
-				$interfaceid = $this->zbxTestGetText("//select[@id='interfaceid']/optgroup/option[not(@disabled)]");
+				$interfaceid = $this->zbxTestGetText('//z-select[@id="interface-select"]//li[not(@disabled)]');
 				break;
 			default:
-				$this->zbxTestAssertNotVisibleId('interfaceid');
+				$this->zbxTestAssertNotVisibleId('interface-select');
 		}
 
 		if (isset($data['name'])) {
@@ -1523,6 +1534,15 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		if (array_key_exists('snmp_oid', $data))	{
 			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
+		}
+
+		// Check hidden update and custom interval for mqtt.get key.
+		if (CTestArrayHelper::get($data, 'type') === 'Zabbix agent (active)'
+				&& substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
+			$this->zbxTestTextNotVisible('Update interval');
+			$this->zbxTestAssertNotVisibleId('row_delay');
+			$this->zbxTestTextNotVisible('Custom intervals');
+			$this->zbxTestAssertNotVisibleId('row_flex_intervals');
 		}
 
 		$itemFlexFlag = true;
@@ -1602,10 +1622,26 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				case 'SSH agent':
 				case 'TELNET agent':
 				case 'JMX agent':
-					$this->zbxTestAssertElementPresentXpath("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.$interfaceid.'"]');
+					break;
+				case 'Zabbix agent (active)':
+					$this->zbxTestAssertNotVisibleId('interfaceid');
+					// Check hidden update and custom interval for mqtt.get key.
+					if (substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
+						$this->zbxTestTextNotVisible('Update interval');
+						$this->zbxTestAssertNotVisibleId('row_delay');
+						$this->zbxTestTextNotVisible('Custom intervals');
+						$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+					}
+					else {
+						$this->zbxTestTextVisible('Update interval');
+						$this->zbxTestAssertVisibleId('row_delay');
+						$this->zbxTestTextVisible('Custom intervals');
+						$this->zbxTestAssertVisibleId('row_flex_intervals');
+					}
 					break;
 				default:
-					$this->zbxTestAssertNotVisibleId('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interface-select');
 			}
 
 			// "Check now" button availability

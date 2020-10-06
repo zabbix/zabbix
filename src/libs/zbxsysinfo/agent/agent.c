@@ -20,7 +20,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
-extern char	*CONFIG_HOSTNAME;
+extern char			*CONFIG_HOSTNAMES;
+extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -39,7 +40,16 @@ static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
+	if (NULL == CONFIG_HOSTNAME)
+	{
+		char	*p;
+
+		SET_STR_RESULT(result, NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ?
+				zbx_dsprintf(NULL, "%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
+				zbx_strdup(NULL, CONFIG_HOSTNAMES));
+	}
+	else
+		SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
 
 	return SYSINFO_RET_OK;
 }

@@ -2054,8 +2054,22 @@ static const char	*ex_macros[] =
 static const char	*simple_host_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, NULL};
 static const char	*simple_key_macros[] = {MVAR_ITEM_KEY, MVAR_TRIGGER_KEY, NULL};
 
+typedef struct
+{
+	char	*macro;
+	char	*functions;
+}
+zbx_macro_functions_t;
+
 /* macros that can be modified using macro functions */
-static const char	*mod_macros[] = {MVAR_ITEM_VALUE, MVAR_ITEM_LASTVALUE, NULL};
+static zbx_macro_functions_t	mod_macros[] =
+{
+	{MVAR_ITEM_VALUE, "regsub,iregsub,fmtnum"},
+	{MVAR_ITEM_LASTVALUE, "regsub,iregsub,fmtnum"},
+	{MVAR_TIME, "fmttime"},
+	{"?", "fmtnum"},
+	{NULL, NULL}
+};
 
 typedef struct
 {
@@ -2658,6 +2672,54 @@ static const char	*macro_in_list(const char *str, zbx_strloc_t strloc, const cha
 
 /******************************************************************************
  *                                                                            *
+ * Function: func_macro_in_list                                               *
+ *                                                                            *
+ * Purpose: check if a macro function one in the list for the macro           *
+ *                                                                            *
+ * Parameters: str          - [IN] string containing potential macro          *
+ *             fm           - [IN] function macro to check                    *
+ *             N_functionid - [OUT] index of the macro in string (if valid)   *
+ *                                                                            *
+ * Return value: unindexed macro from the allowed list or NULL                *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+{
+	int	i;
+
+	for (i = 0; NULL != mod_macros[i].macro; i++)
+	{
+		size_t	len, fm_len;
+
+		len = strlen(mod_macros[i].macro);
+		fm_len = fm->macro.r - fm->macro.l + 1;
+
+		if (len > fm_len || 0 != strncmp(mod_macros[i].macro, str + fm->macro.l, len - 1))
+			continue;
+
+		if (len != fm_len)
+		{
+			if (SUCCEED != is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
+					sizeof(*N_functionid), 1, 9))
+			{
+				continue;
+			}
+		}
+		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + len - 1])
+			continue;
+
+		if (SUCCEED == str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
+				','))
+		{
+			return mod_macros[i].macro;
+		}
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_trigger_function_value                                       *
  *                                                                            *
  * Purpose: trying to evaluate a trigger function                             *
@@ -2982,8 +3044,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
 				indexed_macro = is_indexed_macro(*data, &token);
-				if (NULL == (m = macro_in_list(*data, token.data.func_macro.macro, mod_macros,
-						&N_functionid)))
+				if (NULL == (m = func_macro_in_list(*data, &token.data.func_macro, &N_functionid)))
 				{
 					/* Ignore functions with macros not supporting them, but do not skip the */
 					/* whole token, nested macro should be resolved in this case. */
@@ -3215,7 +3276,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_PROXY_DESCRIPTION);
 				}
-				else if (0 == strcmp(m, MVAR_TIME))
+				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
@@ -3464,7 +3525,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_PROXY_DESCRIPTION);
 				}
-				else if (0 == strcmp(m, MVAR_TIME))
+				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
@@ -5903,7 +5964,7 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (NULL != macro_in_list(*data, token.data.func_macro.macro, mod_macros, NULL))
+					if (NULL != func_macro_in_list(*data, &token.data.func_macro, NULL))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, lld_macro_paths,
 								error, max_error_len);

@@ -417,7 +417,7 @@ class CApiService {
 	 *
 	 * @return string
 	 */
-	private static function dbDistinct(array $sql_parts) {
+	protected static function dbDistinct(array $sql_parts) {
 		$count = count($sql_parts['from']);
 
 		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {

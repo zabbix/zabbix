@@ -315,7 +315,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 				memset(&host, 0, sizeof(host));
 				host.addr = strdup(ip);
 
-				if (SUCCEED != do_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
+				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
 					ret = FAIL;
 
 				zbx_free(host.addr);
@@ -925,7 +925,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #ifdef HAVE_NETSNMP
 		if (1 == snmp_cache_reload_requested)
 		{
-			zbx_clear_cache_snmp();
+			zbx_clear_cache_snmp(process_type, process_num);
 			snmp_cache_reload_requested = 0;
 		}
 #endif

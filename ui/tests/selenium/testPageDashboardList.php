@@ -156,7 +156,7 @@ class testPageDashboardList extends CWebTest {
 	}
 
 	/**
-	 * Check that My and Sharing tags displays corectly in Dashboard Lists for Admin.
+	 * Check that My and Sharing tags displays correctly in Dashboard Lists for Admin.
 	 */
 	public function testPageDashboardList_CheckOwners() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');

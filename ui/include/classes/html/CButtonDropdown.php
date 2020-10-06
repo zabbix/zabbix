@@ -77,7 +77,8 @@ class CButtonDropdown extends CButton {
 						'items' => $this->dropdown_items,
 						'toggle_class' => ZBX_STYLE_BTN_TOGGLE
 					]
-				]))
+				])
+			)
 			->addItem((new CInput('hidden', $name, $this->getAttribute('value')))
 				->addClass(self::ZBX_STYLE_BTN_VALUE)
 		);
