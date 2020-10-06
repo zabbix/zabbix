@@ -30,7 +30,8 @@ void	scriptitem_es_engine_init(void)
 
 void	scriptitem_es_engine_destroy(void)
 {
-	zbx_es_destroy(&es_engine);
+	if (SUCCEED == zbx_es_is_env_initialized(&es_engine))
+		zbx_es_destroy(&es_engine);
 }
 
 int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
