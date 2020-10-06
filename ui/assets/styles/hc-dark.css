@@ -5579,7 +5579,8 @@ table.preprocessing-test-results .rel-container {
 
 .dashboard-list .dashboard-list-item {
   display: flex;
-  justify-content: space-between; }
+  justify-content: space-between;
+  line-height: 17px; }
   .dashboard-list .dashboard-list-item .status-green {
     background-color: #e0e0e0;
     border-color: #e0e0e0; }

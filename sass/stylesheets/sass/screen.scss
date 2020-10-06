@@ -7345,6 +7345,7 @@ table.preprocessing-test-results {
 	.dashboard-list-item {
 		display: flex;
 		justify-content: space-between;
+		line-height: 17px;
 
 		.status-green {
 			background-color: $dashboard-my-bg-color;
