@@ -1,9 +1,9 @@
 
-# Template Net Mikrotik SNMP
+# Mikrotik SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -31,8 +31,8 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -81,8 +81,8 @@ No specific Zabbix configuration is required.
 |Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.serialnumber.diff()}=1 and {TEMPLATE_NAME:system.hw.serialnumber.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.firmware.diff()}=1 and {TEMPLATE_NAME:system.hw.firmware.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[memoryUsedPercentage.Memory].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and (({Template Net Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Net Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})<5G or {TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
-|Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and (({Template Net Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Net Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})<10G or {TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)</p> |
+|Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and (({Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})<5G or {TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
+|Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and (({Mikrotik SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Mikrotik SNMP:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})<10G or {TEMPLATE_NAME:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)</p> |
 |CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"CPU"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"CPU"}-3` |WARNING |<p>**Depends on**:</p><p>- CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}</p> |
 |CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3` |HIGH | |
 |CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"} |<p>-</p> |`{TEMPLATE_NAME:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].avg(5m)}<{$TEMP_CRIT_LOW:"CPU"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}].min(5m)}>{$TEMP_CRIT_LOW:"CPU"}+3` |AVERAGE | |

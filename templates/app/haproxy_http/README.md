@@ -7,7 +7,7 @@ For Zabbix version: 5.2 and higher
 The template to monitor HAProxy by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`HAProxy by HTTP` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/)  with HTTP agent remotely:
+Template `HAProxy by HTTP` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/)  with HTTP agent remotely:
 
 Note that this solution supports https and redirects.
 

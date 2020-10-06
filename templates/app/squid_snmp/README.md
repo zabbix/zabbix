@@ -1,9 +1,9 @@
 
-# Template App Squid SNMP
+# Squid SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 This template was tested on:
 
@@ -86,8 +86,8 @@ There are no template links in this template.
 |Squid |Squid: ICP messages received per second |<p>Number of ICP messages received</p> |SNMP |squid[cacheIcpPktsRecv]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: ICP traffic transmitted per second |<p>Number of ICP traffic transmitted</p> |SNMP |squid[cacheIcpKbSent]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: ICP traffic received per second |<p>Number of ICP traffic received</p> |SNMP |squid[cacheIcpKbRecv]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: DNS server requests per second |<p>Number of external DNS server requests</p> |SNMP |squid[cacheDnsRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Squid |Squid: DNS server replies per second |<p>Number of external DNS server replies</p> |SNMP |squid[cacheDnsReplies]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: DNS server requests per second |<p>Number of external dns server requests</p> |SNMP |squid[cacheDnsRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Squid |Squid: DNS server replies per second |<p>Number of external dns server replies</p> |SNMP |squid[cacheDnsReplies]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: FQDN cache requests per second |<p>Number of FQDN Cache requests</p> |SNMP |squid[cacheFqdnRequests]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: FQDN cache hits per second |<p>Number of FQDN Cache hits</p> |SNMP |squid[cacheFqdnHits]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Squid |Squid: FQDN cache misses per second |<p>Number of FQDN Cache misses</p> |SNMP |squid[cacheFqdnMisses]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
@@ -117,10 +117,10 @@ There are no template links in this template.
 |Squid: Port {$SQUID.HTTP.PORT} is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[tcp,,{$SQUID.HTTP.PORT}].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Squid: Squid has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:squid[cacheUptime].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Squid: Squid version has been changed |<p>Squid version has changed. Ack to close.</p> |`{TEMPLATE_NAME:squid[cacheVersionId].diff()}=1 and {TEMPLATE_NAME:squid[cacheVersionId].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Template App Squid SNMP:squid[cacheSwapLowWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
-|Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Template App Squid SNMP:squid[cacheSwapHighWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
+|Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapLowWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
+|Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
 |Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN}) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentUnusedFDescrCnt].last()}<{$SQUID.FILE.DESC.WARN.MIN}` |WARNING | |
-|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Template App Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
+|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
 
 ## Feedback
 

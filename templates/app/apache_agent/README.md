@@ -1,12 +1,12 @@
 
-# Template App Apache by Zabbix agent
+# Apache by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor Apache HTTPD by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
-`Template App Apache by Zabbix agent` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
+Template `Apache by Zabbix agent` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
 
 ```text
 127.0.0.1
@@ -59,7 +59,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Setup [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html)
 
@@ -138,7 +138,7 @@ There are no template links in this template.
 |Apache |Apache: Connections total |<p>Number of total connections</p> |DEPENDENT |apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p> |
 |Apache |Apache: Bytes per request |<p>Average number of client requests per second</p> |DEPENDENT |apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p> |
 |Apache |Apache: Number of async processes |<p>Number of async processes</p> |DEPENDENT |apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p> |
-|Zabbix_raw_items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p> |ZABBIX_PASSIVE |web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `// Convert Apache status to JSON var lines = value.split('\n'); var output = {},     workers = {         '_': 0, 'S': 0, 'R': 0, 'W': 0,         'K': 0, 'D': 0, 'C': 0, 'L': 0,         'G': 0, 'I': 0, '.': 0     }; // Get all "Key: Value" pairs as an object for (var i = 0; i < lines.length; i++) {     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);     if (line !== null) {         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);     } } // Multiversion metrics output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime; output.ServerVersion = output.Server || output.ServerVersion; // Parse "Scoreboard" to get worker count. if (typeof output.Scoreboard === 'string') {     for (var i = 0; i < output.Scoreboard.length; i++) {         var char = output.Scoreboard[i];         workers[char]++;     } } // Add worker data to the output output.Workers = {     waiting: workers['_'], starting: workers['S'], reading: workers['R'],     sending: workers['W'], keepalive: workers['K'], dnslookup: workers['D'],     closing: workers['C'], logging: workers['L'], finishing: workers['G'],     cleanup: workers['I'], slot: workers['.'] }; // Return JSON string return JSON.stringify(output);`</p> |
+|Zabbix_raw_items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p> |ZABBIX_PASSIVE |web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 
 ## Triggers
 
