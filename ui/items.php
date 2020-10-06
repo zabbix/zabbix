@@ -56,8 +56,10 @@ $fields = [
 									],
 	'delay' =>						[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 										'(isset({add}) || isset({update})) && isset({type})'.
-											' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
-											' && {type} != '.ITEM_TYPE_DEPENDENT,
+											' && ({type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
+											' && {type} != '.ITEM_TYPE_DEPENDENT.
+											' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
+												' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0))',
 										_('Update interval')
 									],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -513,7 +515,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP && hasRequest('delay_flex')) {
+	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
+			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
 		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
@@ -861,8 +865,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+		'request' => [
+			'itemid' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -1016,7 +1022,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 			if ($items) {
 				$item = [
-					'interfaceid' => getRequest('interfaceid'),
+					'interfaceid' => getRequest('interfaceid', 0),
 					'description' => getRequest('description'),
 					'delay' => $delay,
 					'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
@@ -1047,7 +1053,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'posts' => getRequest('posts'),
 					'headers' => getRequest('headers', []),
 					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => getRequest('timeout')
 				];
 
 				if ($item['headers']) {
@@ -1191,6 +1198,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					if ($type != ITEM_TYPE_JMX) {
 						unset($update_item['jmx_endpoint']);
 					}
+
+					if ($type != ITEM_TYPE_HTTPAGENT) {
+						unset($update_item['timeout']);
+					}
 				}
 				unset($update_item);
 
@@ -1301,8 +1312,12 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 
 		if ($items) {
 			// Check items belong only to hosts.
-			$hosts_status = array_unique(array_column(array_column(array_column($items, 'hosts'), 0), 'status'));
-			if (in_array(HOST_STATUS_TEMPLATE, $hosts_status)) {
+			$hosts_status = [];
+			foreach ($items as $item) {
+				$hosts_status[$item['hosts'][0]['status']] = true;
+			}
+
+			if (array_key_exists(HOST_STATUS_TEMPLATE, $hosts_status)) {
 				$result = false;
 			}
 			else {
@@ -1343,10 +1358,18 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('group_itemid')
-	]);
+	$tasks = [];
+
+	foreach (getRequest('group_itemid') as $itemid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'itemid' => $itemid
+			]
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));
@@ -1539,7 +1562,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
-		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
+		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
 	];
 
 	foreach ($data['preprocessing'] as &$step) {
@@ -1790,7 +1814,7 @@ else {
 	if (hasRequest('filter_delay')) {
 		$filter_delay = getRequest('filter_delay');
 		$filter_type = getRequest('filter_type');
-
+		$filter_key = getRequest('filter_key');
 		if ($filter_delay !== '') {
 			if ($filter_type == -1 && $filter_delay == 0) {
 				$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,  ITEM_TYPE_INTERNAL,
@@ -1801,7 +1825,8 @@ else {
 				$options['filter']['delay'] = $filter_delay;
 			}
 			elseif ($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP
-					|| $filter_type == ITEM_TYPE_DEPENDENT) {
+					|| $filter_type == ITEM_TYPE_DEPENDENT
+					|| ($filter_type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter_key, 'mqtt.get', 8) === 0)) {
 				$options['filter']['delay'] = -1;
 			}
 			else {
@@ -1872,7 +1897,8 @@ else {
 			$delay = $item['delay'];
 
 			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-					|| $item['type'] == ITEM_TYPE_DEPENDENT) {
+					|| $item['type'] == ITEM_TYPE_DEPENDENT
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 				$delay = '';
 			}
 			else {
@@ -2018,9 +2044,12 @@ else {
 
 	// Set is_template false, when one of hosts is not template.
 	if ($data['items']) {
-		$hosts_status = array_unique(array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status'));
-		foreach ($hosts_status as $value) {
-			if ($value != HOST_STATUS_TEMPLATE) {
+		$hosts_status = [];
+		foreach ($data['items'] as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
+		}
+		foreach ($hosts_status as $key => $value) {
+			if ($key != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;
 				break;
 			}

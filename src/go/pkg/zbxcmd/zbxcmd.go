@@ -19,4 +19,4 @@
 
 package zbxcmd
 
-const maxExecuteOutputLenB = 512 * 1024
+const MaxExecuteOutputLenB = 512 * 1024

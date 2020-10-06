@@ -81,7 +81,7 @@ class testAuditLog extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Extend selectDetails and ouptut.
+			// Extend selectDetails and output.
 			[
 				'api_request' => [
 					'userids' => '1',

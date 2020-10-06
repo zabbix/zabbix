@@ -372,41 +372,23 @@ $form_list
 	);
 
 // Append interfaces to form list.
+$select_interface = getInterfaceSelect($data['interfaces'])
+	->setId('interface-select')
+	->setValue($data['interfaceid'])
+	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+	->setFocusableElementId('interfaceid')
+	->setAriaRequired();
+
 if ($data['display_interfaces']) {
-	$interfaces_combobox = (new CComboBox('interfaceid', $data['interfaceid']))->setAriaRequired();
-
-	// Set up interface groups sorted by priority.
-	$interface_types = zbx_objectValues($data['interfaces'], 'type');
-	$interface_groups = [];
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		if (in_array($interface_type, $interface_types)) {
-			$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
-		}
-	}
-
-	// add interfaces to groups
-	foreach ($data['interfaces'] as $interface) {
-		$option = new CComboItem($interface['interfaceid'],
-			$interface['useip']
-				? $interface['ip'].' : '.$interface['port']
-				: $interface['dns'].' : '.$interface['port'],
-			($interface['interfaceid'] == $data['interfaceid'])
-		);
-		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interface_groups[$interface['type']]->addItem($option);
-	}
-	foreach ($interface_groups as $interface_group) {
-		$interfaces_combobox->addItem($interface_group);
-	}
-
-	$form_list->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(),
-		[$interfaces_combobox,
+	$form_list->addRow(
+		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))->setAsteriskMark(),
+		[
+			$select_interface,
 			(new CSpan(_('No interface found')))
 				->addClass(ZBX_STYLE_RED)
 				->setId('interface_not_defined')
 				->setAttribute('style', 'display: none;')
-		], 'interface_row'
-	);
+		], 'interface_row');
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $form_list

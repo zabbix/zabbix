@@ -33,6 +33,7 @@ class testUserMacro extends CAPITest {
 				'hostmacro' => [
 					'macro' => '{$ADD_1}',
 					'value' => 'test',
+					'type' => '0',
 					'hostid' => '90020',
 					'description' => 'text'
 				],
@@ -42,7 +43,9 @@ class testUserMacro extends CAPITest {
 				'hostmacro' => [
 					'macro' => '{$ADD_2}',
 					'value' => 'test',
-					'hostid' => '90020'
+					'type' => '0',
+					'hostid' => '90020',
+					'description' => ''
 				],
 				'expected_error' => null,
 				'expect_db_row' => [
@@ -52,6 +55,42 @@ class testUserMacro extends CAPITest {
 					'hostid' => '90020',
 					'description' => ''
 				]
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$VAULT}',
+					'value' => 'a/b:c',
+					'type' => '2',
+					'hostid' => '90020'
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$VAULT: "context"}',
+					'value' => 'a/b:c',
+					'type' => '2',
+					'hostid' => '90020'
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$VAULT: "empty"}',
+					'value' => '',
+					'type' => '2',
+					'hostid' => '90020'
+				],
+				'expected_error' => 'Invalid value for macro "{$VAULT: "empty"}": cannot be empty.'
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$VAULT: "invalid"}',
+					'value' => '/',
+					'type' => '2',
+					'hostid' => '90020'
+				],
+				'expected_error' => 'Invalid value for macro "{$VAULT: "invalid"}": incorrect syntax near "/".'
 			]
 		];
 	}
@@ -68,6 +107,7 @@ class testUserMacro extends CAPITest {
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['macro'], $hostmacro['macro']);
 				$this->assertEquals($dbRow['value'], $hostmacro['value']);
+				$this->assertEquals($dbRow['type'], $hostmacro['type']);
 
 				if (array_key_exists('description', $hostmacro)) {
 					$this->assertEquals($dbRow['description'], $hostmacro['description']);
@@ -152,6 +192,16 @@ class testUserMacro extends CAPITest {
 						'macro' => '{$MACRO:"A"}',
 						'value' => 'test'
 					],
+				],
+				'expected_error' => null
+			],
+			[
+				'globalmacro' => [
+					[
+						'macro' => '{$VAULT}',
+						'value' => 'a/b:c',
+						'type' => '2'
+					]
 				],
 				'expected_error' => null
 			],
@@ -316,6 +366,22 @@ class testUserMacro extends CAPITest {
 					'value' => str_repeat('坏', 2049)
 				],
 				'expected_error' => 'Invalid parameter "/1/value": value is too long.'
+			],
+			[
+				'globalmacro' => [
+					'macro' => '{$VAULT: "empty"}',
+					'value' => '',
+					'type' => '2'
+				],
+				'expected_error' => 'Invalid value for macro "{$VAULT: "empty"}": cannot be empty.'
+			],
+			[
+				'globalmacro' => [
+					'macro' => '{$VAULT: "cute"}',
+					'value' => ':)',
+					'type' => '2'
+				],
+				'expected_error' => 'Invalid value for macro "{$VAULT: "cute"}": incorrect syntax near ":)".'
 			]
 		];
 	}

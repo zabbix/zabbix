@@ -256,7 +256,8 @@ int	zbx_is_counted_in_item_queue(unsigned char type, const char *key)
 		case ITEM_TYPE_ZABBIX_ACTIVE:
 			if (0 == strncmp(key, "log[", 4) ||
 					0 == strncmp(key, "logrt[", 6) ||
-					0 == strncmp(key, "eventlog[", 9))
+					0 == strncmp(key, "eventlog[", 9) ||
+					0 == strncmp(key, "mqtt.get[", ZBX_CONST_STRLEN("mqtt.get[")))
 			{
 				return FAIL;
 			}
@@ -2986,6 +2987,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 				trends_sec = config->config->hk.trends;
 
 			numitem->trends = (0 != trends_sec);
+			numitem->trends_sec = trends_sec;
 
 			DCstrpool_replace(found, &numitem->units, row[26]);
 		}
@@ -7012,6 +7014,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
 
 			dst_item->trends = numitem->trends;
+			dst_item->trends_sec = numitem->trends_sec;
 			dst_item->units = zbx_strdup(NULL, numitem->units);
 			break;
 		case ITEM_VALUE_TYPE_LOG:

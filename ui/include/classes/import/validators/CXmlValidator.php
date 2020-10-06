@@ -22,28 +22,14 @@
 /**
  * Base XML validation class.
  */
-class CXmlValidator {
+class CXmlValidator extends CXmlValidatorGeneral {
 
-	/**
-	 * Accepted versions.
-	 *
-	 * @var CXmlValidator[]
-	 */
-	protected $versionValidators = [];
+	private $factory;
 
-	public function __construct() {
-		$this->versionValidators = [
-			'1.0' => 'C10XmlValidator',
-			'2.0' => 'C20XmlValidator',
-			'3.0' => 'C30XmlValidator',
-			'3.2' => 'C32XmlValidator',
-			'3.4' => 'C34XmlValidator',
-			'4.0' => 'C40XmlValidator',
-			'4.2' => 'C42XmlValidator',
-			'4.4' => 'C44XmlValidator',
-			'5.0' => 'C50XmlValidator',
-			'5.2' => 'C52XmlValidator'
-		];
+	public function __construct(CRegistryFactory $factory, string $format) {
+		parent::__construct($format);
+
+		$this->factory = $factory;
 	}
 
 	/**
@@ -57,23 +43,29 @@ class CXmlValidator {
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $format) {
+	public function validate(array $data, string $path): array {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
 			'zabbix_export' => ['type' => XML_ARRAY | XML_REQUIRED, 'check_unexpected' => false, 'rules' => [
 				'version' => ['type' => XML_STRING | XML_REQUIRED]
 			]]
 		]];
 
-		$data = (new CXmlValidatorGeneral($rules, $format))->validate($data, '/');
+		$strict = $this->getStrict();
+
+		$data = $this
+			->setStrict(true)
+			->doValidate($rules, $data, $path);
+
 		$version = $data['zabbix_export']['version'];
 
-		if (!array_key_exists($version, $this->versionValidators)) {
+		if (!$this->factory->hasObject($version)) {
 			throw new Exception(
 				_s('Invalid tag "%1$s": %2$s.', '/zabbix_export/version', _('unsupported version number'))
 			);
 		}
 
-		$data['zabbix_export'] = (new $this->versionValidators[$version]($format))
+		$data['zabbix_export'] = $this->factory->getObject($version)
+			->setStrict($strict)
 			->validate($data['zabbix_export'], '/zabbix_export');
 
 		return $data;

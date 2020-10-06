@@ -1,4 +1,5 @@
-<?php
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,14 +19,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/agent/AgentTests.php';
+package main
 
-class All {
-	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('Project');
-
-		$suite->addTest(AgentTests::suite());
-
-		return $suite;
-	}
+func loadOSDependentItems() error {
+	return nil
 }

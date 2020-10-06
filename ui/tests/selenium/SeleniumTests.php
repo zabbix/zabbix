@@ -116,6 +116,7 @@ require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
 require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
+require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testFormTagsHost.php';
 require_once dirname(__FILE__).'/testFormTagsHostPrototype.php';
 require_once dirname(__FILE__).'/testFormTagsTemplate.php';
@@ -263,6 +264,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormSysmap');
+		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
 		$suite->addTestSuite('testFormTagsTemplate');

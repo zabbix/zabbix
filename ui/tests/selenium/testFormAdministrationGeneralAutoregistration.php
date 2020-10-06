@@ -33,7 +33,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Autoregistration');
 
-		// Check elements dafault state.
+		// Check elements default state.
 		$form = $this->query('id:autoreg-form')->asForm()->one();
 		$this->assertEquals(['No encryption'], $form->getField('Encryption level')->getValue());
 		$this->assertFalse($form->query('id:tls_psk_identity')->one()->isDisplayed());

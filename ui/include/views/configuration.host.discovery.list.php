@@ -98,6 +98,7 @@ $filter_column1 = (new CFormList())
 $filter_type_visibility = [];
 $cmb_type = new CComboBox('filter_type', $data['filter']['type'], null, [-1 => _('all')]);
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
+zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
 
 $lld_types = item_type2str();
 unset($lld_types[ITEM_TYPE_AGGREGATE], $lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED],
@@ -109,6 +110,7 @@ $cmb_type->addItems($lld_types);
 foreach ($lld_types as $type => $name) {
 	if ($type != ITEM_TYPE_TRAPPER) {
 		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay_row');
+		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay');
 	}
 	if ($type == ITEM_TYPE_SNMP) {
 		zbx_subarray_push($filter_type_visibility, $type, 'filter_snmp_oid_row');
@@ -231,7 +233,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
-			|| $discovery['type'] == ITEM_TYPE_DEPENDENT) {
+			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+				&& strncmp($discovery['key_'], 'mqtt.get', 8) === 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {

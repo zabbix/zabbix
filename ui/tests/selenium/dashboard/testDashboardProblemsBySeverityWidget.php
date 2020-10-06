@@ -587,7 +587,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				[
 					'widget to update' => 'Reference widget 2',
 					'fields' => [
-						'Name' => 'Hide timeline and groupt without problems',
+						'Name' => 'Hide timeline and grouped without problems',
 						'Refresh interval' => 'Default (1 minute)',
 						'Hide groups without problems' => true,
 						'Show operational data' => 'With problem name',

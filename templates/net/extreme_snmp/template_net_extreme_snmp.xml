@@ -105,7 +105,7 @@ Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-supp
                            <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                            <expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Template Net Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last()}={$TEMP_CRIT_STATUS}</expression>
                            <recovery_expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
@@ -536,7 +536,7 @@ Status of the power supply {#SNMPVALUE}</description>
       <trigger>
          <expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Template Net Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last()}={$TEMP_CRIT_STATUS}</expression>
          <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
          <recovery_expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
          <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>

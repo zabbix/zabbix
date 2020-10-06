@@ -688,7 +688,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:baseboard_temp.last(0)}&lt;5 or {Template Server Intel SR1630 IPMI:baseboard_temp.last(0)}&gt;90</expression>
+            <expression>{Template Server Intel SR1630 IPMI:baseboard_temp.last()}&lt;5 or {Template Server Intel SR1630 IPMI:baseboard_temp.last()}&gt;90</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Baseboard Temp Critical [{ITEM.VALUE}]</name>
@@ -703,14 +703,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:baseboard_temp.last(0)}&lt;10 or {Template Server Intel SR1630 IPMI:baseboard_temp.last(0)}&gt;83</expression>
+            <expression>{Template Server Intel SR1630 IPMI:baseboard_temp.last()}&lt;10 or {Template Server Intel SR1630 IPMI:baseboard_temp.last()}&gt;83</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Baseboard Temp Non-Critical [{ITEM.VALUE}]</name>
@@ -725,19 +725,19 @@
             <dependencies>
                 <dependency>
                     <name>Baseboard Temp Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:baseboard_temp.last(0)}&lt;5 or {Template Server Intel SR1630 IPMI:baseboard_temp.last(0)}&gt;90</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:baseboard_temp.last()}&lt;5 or {Template Server Intel SR1630 IPMI:baseboard_temp.last()}&gt;90</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_1.05v_pch.last(0)}&lt;0.953 or {Template Server Intel SR1630 IPMI:bb_1.05v_pch.last(0)}&gt;1.149</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_1.05v_pch.last()}&lt;0.953 or {Template Server Intel SR1630 IPMI:bb_1.05v_pch.last()}&gt;1.149</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +1.05V PCH Critical [{ITEM.VALUE}]</name>
@@ -752,14 +752,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_1.05v_pch.last(0)}&lt;0.985 or {Template Server Intel SR1630 IPMI:bb_1.05v_pch.last(0)}&gt;1.117</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_1.05v_pch.last()}&lt;0.985 or {Template Server Intel SR1630 IPMI:bb_1.05v_pch.last()}&gt;1.117</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +1.05V PCH Non-Critical [{ITEM.VALUE}]</name>
@@ -774,19 +774,19 @@
             <dependencies>
                 <dependency>
                     <name>BB +1.05V PCH Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:bb_1.05v_pch.last(0)}&lt;0.953 or {Template Server Intel SR1630 IPMI:bb_1.05v_pch.last(0)}&gt;1.149</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:bb_1.05v_pch.last()}&lt;0.953 or {Template Server Intel SR1630 IPMI:bb_1.05v_pch.last()}&gt;1.149</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last(0)}&lt;0.683 or {Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last(0)}&gt;1.543</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}&lt;0.683 or {Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}&gt;1.543</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +1.1V P1 Vccp Critical [{ITEM.VALUE}]</name>
@@ -801,14 +801,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last(0)}&lt;0.708 or {Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last(0)}&gt;1.501</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}&lt;0.708 or {Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}&gt;1.501</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +1.1V P1 Vccp Non-Critical [{ITEM.VALUE}]</name>
@@ -823,19 +823,19 @@
             <dependencies>
                 <dependency>
                     <name>BB +1.1V P1 Vccp Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last(0)}&lt;0.683 or {Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last(0)}&gt;1.543</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}&lt;0.683 or {Template Server Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}&gt;1.543</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last(0)}&lt;1.362 or {Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last(0)}&gt;1.635</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}&lt;1.362 or {Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}&gt;1.635</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +1.5V P1 DDR3 Critical [{ITEM.VALUE}]</name>
@@ -850,14 +850,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last(0)}&lt;1.401 or {Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last(0)}&gt;1.589</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}&lt;1.401 or {Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}&gt;1.589</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +1.5V P1 DDR3 Non-Critical [{ITEM.VALUE}]</name>
@@ -872,19 +872,19 @@
             <dependencies>
                 <dependency>
                     <name>BB +1.5V P1 DDR3 Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last(0)}&lt;1.362 or {Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last(0)}&gt;1.635</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}&lt;1.362 or {Template Server Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}&gt;1.635</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v.last(0)}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v.last(0)}&gt;3.625</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v.last()}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v.last()}&gt;3.625</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +3.3V Critical [{ITEM.VALUE}]</name>
@@ -899,14 +899,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v.last(0)}&lt;3.067 or {Template Server Intel SR1630 IPMI:bb_3.3v.last(0)}&gt;3.525</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v.last()}&lt;3.067 or {Template Server Intel SR1630 IPMI:bb_3.3v.last()}&gt;3.525</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +3.3V Non-Critical [{ITEM.VALUE}]</name>
@@ -921,19 +921,19 @@
             <dependencies>
                 <dependency>
                     <name>BB +3.3V Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:bb_3.3v.last(0)}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v.last(0)}&gt;3.625</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:bb_3.3v.last()}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v.last()}&gt;3.625</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v_stby.last(0)}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v_stby.last(0)}&gt;3.625</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v_stby.last()}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v_stby.last()}&gt;3.625</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +3.3V STBY Critical [{ITEM.VALUE}]</name>
@@ -949,7 +949,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v_stby.last(0)}&lt;3.067 or {Template Server Intel SR1630 IPMI:bb_3.3v_stby.last(0)}&gt;3.525</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_3.3v_stby.last()}&lt;3.067 or {Template Server Intel SR1630 IPMI:bb_3.3v_stby.last()}&gt;3.525</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +3.3V STBY Non-Critical [{ITEM.VALUE}]</name>
@@ -964,14 +964,14 @@
             <dependencies>
                 <dependency>
                     <name>BB +3.3V STBY Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:bb_3.3v_stby.last(0)}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v_stby.last(0)}&gt;3.625</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:bb_3.3v_stby.last()}&lt;2.982 or {Template Server Intel SR1630 IPMI:bb_3.3v_stby.last()}&gt;3.625</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_5.0v.last(0)}&lt;4.471 or {Template Server Intel SR1630 IPMI:bb_5.0v.last(0)}&gt;5.538</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_5.0v.last()}&lt;4.471 or {Template Server Intel SR1630 IPMI:bb_5.0v.last()}&gt;5.538</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +5.0V Critical [{ITEM.VALUE}]</name>
@@ -986,14 +986,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:bb_5.0v.last(0)}&lt;4.630 or {Template Server Intel SR1630 IPMI:bb_5.0v.last(0)}&gt;5.380</expression>
+            <expression>{Template Server Intel SR1630 IPMI:bb_5.0v.last()}&lt;4.630 or {Template Server Intel SR1630 IPMI:bb_5.0v.last()}&gt;5.380</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>BB +5.0V Non-Critical [{ITEM.VALUE}]</name>
@@ -1008,19 +1008,19 @@
             <dependencies>
                 <dependency>
                     <name>BB +5.0V Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:bb_5.0v.last(0)}&lt;4.471 or {Template Server Intel SR1630 IPMI:bb_5.0v.last(0)}&gt;5.538</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:bb_5.0v.last()}&lt;4.471 or {Template Server Intel SR1630 IPMI:bb_5.0v.last()}&gt;5.538</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:front_panel_temp.last(0)}&lt;0 or {Template Server Intel SR1630 IPMI:front_panel_temp.last(0)}&gt;48</expression>
+            <expression>{Template Server Intel SR1630 IPMI:front_panel_temp.last()}&lt;0 or {Template Server Intel SR1630 IPMI:front_panel_temp.last()}&gt;48</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Front Panel Temp Critical [{ITEM.VALUE}]</name>
@@ -1035,14 +1035,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:front_panel_temp.last(0)}&lt;5 or {Template Server Intel SR1630 IPMI:front_panel_temp.last(0)}&gt;44</expression>
+            <expression>{Template Server Intel SR1630 IPMI:front_panel_temp.last()}&lt;5 or {Template Server Intel SR1630 IPMI:front_panel_temp.last()}&gt;44</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Front Panel Temp Non-Critical [{ITEM.VALUE}]</name>
@@ -1057,19 +1057,19 @@
             <dependencies>
                 <dependency>
                     <name>Front Panel Temp Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:front_panel_temp.last(0)}&lt;0 or {Template Server Intel SR1630 IPMI:front_panel_temp.last(0)}&gt;48</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:front_panel_temp.last()}&lt;0 or {Template Server Intel SR1630 IPMI:front_panel_temp.last()}&gt;48</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+            <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Power</name>
@@ -1085,7 +1085,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:system_fan_2.last(0)}&lt;324</expression>
+            <expression>{Template Server Intel SR1630 IPMI:system_fan_2.last()}&lt;324</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>System Fan 2 Critical [{ITEM.VALUE}]</name>
@@ -1100,14 +1100,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:system_fan_2.last(0)}&lt;378</expression>
+            <expression>{Template Server Intel SR1630 IPMI:system_fan_2.last()}&lt;378</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>System Fan 2 Non-Critical [{ITEM.VALUE}]</name>
@@ -1122,19 +1122,19 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>System Fan 2 Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:system_fan_2.last(0)}&lt;324</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:system_fan_2.last()}&lt;324</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:system_fan_3.last(0)}&lt;324</expression>
+            <expression>{Template Server Intel SR1630 IPMI:system_fan_3.last()}&lt;324</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>System Fan 3 Critical [{ITEM.VALUE}]</name>
@@ -1149,14 +1149,14 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template Server Intel SR1630 IPMI:system_fan_3.last(0)}&lt;378</expression>
+            <expression>{Template Server Intel SR1630 IPMI:system_fan_3.last()}&lt;378</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>System Fan 3 Non-Critical [{ITEM.VALUE}]</name>
@@ -1171,12 +1171,12 @@
             <dependencies>
                 <dependency>
                     <name>Power</name>
-                    <expression>{Template Server Intel SR1630 IPMI:power.last(0)}=0</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:power.last()}=0</expression>
                     <recovery_expression/>
                 </dependency>
                 <dependency>
                     <name>System Fan 3 Critical [{ITEM.VALUE}]</name>
-                    <expression>{Template Server Intel SR1630 IPMI:system_fan_3.last(0)}&lt;324</expression>
+                    <expression>{Template Server Intel SR1630 IPMI:system_fan_3.last()}&lt;324</expression>
                     <recovery_expression/>
                 </dependency>
             </dependencies>
