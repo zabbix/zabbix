@@ -143,7 +143,7 @@ class CCookieSession implements \SessionHandlerInterface {
 		}
 
 		$sessionid = $this->extractSessionId($session_data);
-		session_id($sessionid ?: bin2hex(openssl_random_pseudo_bytes(16)));
+		session_id($sessionid ?: CSessionHelper::generateId());
 
 		return session_start();
 	}

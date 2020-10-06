@@ -1561,7 +1561,12 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private static function createSession(array $db_user): array {
-		$db_user['sessionid'] = CSessionHelper::getId();
+		$sessionid = CSessionHelper::getId();
+		if (!$sessionid) {
+			$sessionid = CSessionHelper::generateId();
+		}
+
+		$db_user['sessionid'] = $sessionid;
 
 		DB::delete('sessions', [
 			'sessionid' => $db_user['sessionid']

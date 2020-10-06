@@ -208,9 +208,6 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-
-				new CEncryptedCookieSession();
-
 				$this->initLocales('en_gb');
 				break;
 
