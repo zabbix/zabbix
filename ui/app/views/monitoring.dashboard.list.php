@@ -36,12 +36,14 @@ $widget = (new CWidget())
 	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(new CRedirectButton(_('Create dashboard'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'dashboard.view')
-					->setArgument('new', '1')
-					->getUrl()
-			))
+			->addItem(
+				(new CRedirectButton(_('Create dashboard'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'dashboard.view')
+						->setArgument('new', '1')
+						->getUrl()
+				))->setEnabled(CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS))
+			)
 		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))
 		->setAttribute('aria-label', _('Content controls'))

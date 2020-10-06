@@ -56,6 +56,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return false;
 		}
 
+		if ($this->hasInput('new')) {
+			return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		}
+
 		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0) {
 			$hosts = API::Host()->get([
 				'output' => [],
@@ -208,6 +212,10 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					$this->prepareEditableFlag($dashboards);
 					$dashboard = array_shift($dashboards);
 					$dashboard['owner'] = self::getOwnerData($dashboard['userid']);
+					$dashboard['has_edit_access'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+					if ($dashboard['editable'] && !$dashboard['has_edit_access']) {
+						$dashboard['editable'] = false;
+					}
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}

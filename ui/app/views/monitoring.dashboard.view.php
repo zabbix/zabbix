@@ -96,6 +96,7 @@ else {
 						->addClass(ZBX_STYLE_BTN_ACTION)
 						->setId('dashbrd-actions')
 						->setTitle(_('Actions'))
+						->setEnabled($data['dashboard']['has_edit_access'])
 						->setAttribute('aria-haspopup', true)
 						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
 					)
