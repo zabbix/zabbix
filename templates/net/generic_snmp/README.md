@@ -1,9 +1,9 @@
 
-# Template Net Network Generic Device SNMP
+# Network Generic Device SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 Use this template if you can't find the template for specific vendor or device family.
 
 ## Setup
@@ -19,9 +19,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module EtherLike-MIB SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces Simple SNMP |
+|EtherLike-MIB SNMP |
+|Generic SNMP |
+|Interfaces Simple SNMP |
 
 ## Discovery rules
 
