@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.2</version>
-   <date>2020-10-05T10:44:12Z</date>
+   <date>2020-10-06T01:32:09Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -2628,7 +2628,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second</name>
-                        <host>Template App HAProxy by HTTP</host>
+                        <host>HAProxy by HTTP</host>
                      </resource>
                      <width>750</width>
                      <height>100</height>
@@ -2657,7 +2657,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} Requests and sessions per second</name>
-                        <host>Template App HAProxy by HTTP</host>
+                        <host>HAProxy by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2679,7 +2679,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} Errors and denials per second</name>
-                        <host>Template App HAProxy by HTTP</host>
+                        <host>HAProxy by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2701,7 +2701,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} Responses by HTTP code</name>
-                        <host>Template App HAProxy by HTTP</host>
+                        <host>HAProxy by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2723,7 +2723,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} In/Out traffic</name>
-                        <host>Template App HAProxy by HTTP</host>
+                        <host>HAProxy by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2752,7 +2752,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue</name>
-                        <host>Template App HAProxy by HTTP</host>
+                        <host>HAProxy by HTTP</host>
                      </resource>
                      <width>750</width>
                      <height>100</height>

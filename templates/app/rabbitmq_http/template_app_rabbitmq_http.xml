@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:51Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,13 +9,13 @@
    </groups>
    <templates>
       <template>
-         <template>Template App RabbitMQ cluster by HTTP</template>
-         <name>Template App RabbitMQ cluster by HTTP</name>
+         <template>RabbitMQ cluster by HTTP</template>
+         <name>RabbitMQ cluster by HTTP</name>
          <description>Get cluster metrics from RabbitMQ management plugin provided an HTTP-based API using HTTP agent.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1061,6 +1061,7 @@ Template tooling version used: 0.34</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <master_item>
                   <key>rabbitmq.get_exchanges</key>
                </master_item>
@@ -1121,7 +1122,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Messages</name>
-                        <host>Template App RabbitMQ cluster by HTTP</host>
+                        <host>RabbitMQ cluster by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1143,7 +1144,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Connections</name>
-                        <host>Template App RabbitMQ cluster by HTTP</host>
+                        <host>RabbitMQ cluster by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1165,7 +1166,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Messages status</name>
-                        <host>Template App RabbitMQ cluster by HTTP</host>
+                        <host>RabbitMQ cluster by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1187,7 +1188,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Queues</name>
-                        <host>Template App RabbitMQ cluster by HTTP</host>
+                        <host>RabbitMQ cluster by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1209,7 +1210,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Messages per second</name>
-                        <host>Template App RabbitMQ cluster by HTTP</host>
+                        <host>RabbitMQ cluster by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1231,13 +1232,13 @@ Template tooling version used: 0.34</description>
          </screens>
       </template>
       <template>
-         <template>Template App RabbitMQ node by HTTP</template>
-         <name>Template App RabbitMQ node by HTTP</name>
+         <template>RabbitMQ node by HTTP</template>
+         <name>RabbitMQ node by HTTP</name>
          <description>Get node metrics from RabbitMQ management plugin provided an HTTP-based API using HTTP agent.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1273,7 +1274,7 @@ Template tooling version used: 0.34</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{Template App RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1352,7 +1353,7 @@ Template tooling version used: 0.34</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{Template App RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1766,7 +1767,7 @@ Template tooling version used: 0.34</description>
                      <dependencies>
                         <dependency>
                            <name>RabbitMQ: Service is down</name>
-                           <expression>{Template App RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
+                           <expression>{RabbitMQ node by HTTP:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -2317,6 +2318,7 @@ Template tooling version used: 0.34</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages per second</name>
@@ -2324,7 +2326,7 @@ Template tooling version used: 0.34</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2332,7 +2334,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.ack.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2340,7 +2342,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.deliver.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2348,7 +2350,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.deliver_get.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2356,7 +2358,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.publish.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2364,7 +2366,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>5</sortorder>
                            <color>6C59DC</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages_ready.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2372,7 +2374,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>6</sortorder>
                            <color>AC8C14</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.redeliver.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2380,7 +2382,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>7</sortorder>
                            <color>611F27</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages_unacknowledged.rate["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2392,7 +2394,7 @@ Template tooling version used: 0.34</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2400,7 +2402,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.ack["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2408,7 +2410,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.deliver["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2416,7 +2418,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.deliver_get["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2424,7 +2426,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.publish["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2432,7 +2434,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>5</sortorder>
                            <color>6C59DC</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages_ready["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2440,7 +2442,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>6</sortorder>
                            <color>AC8C14</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages.redeliver["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2448,7 +2450,7 @@ Template tooling version used: 0.34</description>
                            <sortorder>7</sortorder>
                            <color>611F27</color>
                            <item>
-                              <host>Template App RabbitMQ node by HTTP</host>
+                              <host>RabbitMQ node by HTTP</host>
                               <key>rabbitmq.queue.messages_unacknowledged["{#VHOST}/{#QUEUE}"]</key>
                            </item>
                         </graph_item>
@@ -2530,7 +2532,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Node status</name>
-                        <host>Template App RabbitMQ node by HTTP</host>
+                        <host>RabbitMQ node by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2552,7 +2554,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Uptime</name>
-                        <host>Template App RabbitMQ node by HTTP</host>
+                        <host>RabbitMQ node by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2574,7 +2576,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Disk free</name>
-                        <host>Template App RabbitMQ node by HTTP</host>
+                        <host>RabbitMQ node by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2596,7 +2598,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Memory used</name>
-                        <host>Template App RabbitMQ node by HTTP</host>
+                        <host>RabbitMQ node by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2618,7 +2620,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: File descriptors</name>
-                        <host>Template App RabbitMQ node by HTTP</host>
+                        <host>RabbitMQ node by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2640,7 +2642,7 @@ Template tooling version used: 0.34</description>
                      <style>0</style>
                      <resource>
                         <name>RabbitMQ: Sockets</name>
-                        <host>Template App RabbitMQ node by HTTP</host>
+                        <host>RabbitMQ node by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2669,7 +2671,7 @@ Template tooling version used: 0.34</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.object_totals.connections</key>
                </item>
             </graph_item>
@@ -2677,7 +2679,7 @@ Template tooling version used: 0.34</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.object_totals.channels</key>
                </item>
             </graph_item>
@@ -2685,7 +2687,7 @@ Template tooling version used: 0.34</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.object_totals.consumers</key>
                </item>
             </graph_item>
@@ -2698,7 +2700,7 @@ Template tooling version used: 0.34</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.disk_free</key>
                </item>
             </graph_item>
@@ -2707,7 +2709,7 @@ Template tooling version used: 0.34</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>FF0000</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.disk_free_limit</key>
                </item>
             </graph_item>
@@ -2719,7 +2721,7 @@ Template tooling version used: 0.34</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.fd_used</key>
                </item>
             </graph_item>
@@ -2732,7 +2734,7 @@ Template tooling version used: 0.34</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.mem_used</key>
                </item>
             </graph_item>
@@ -2741,7 +2743,7 @@ Template tooling version used: 0.34</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>FF0000</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.mem_limit</key>
                </item>
             </graph_item>
@@ -2753,7 +2755,7 @@ Template tooling version used: 0.34</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.queue_totals.messages</key>
                </item>
             </graph_item>
@@ -2761,7 +2763,7 @@ Template tooling version used: 0.34</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.queue_totals.messages.ready</key>
                </item>
             </graph_item>
@@ -2769,7 +2771,7 @@ Template tooling version used: 0.34</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.queue_totals.messages.unacknowledged</key>
                </item>
             </graph_item>
@@ -2781,7 +2783,7 @@ Template tooling version used: 0.34</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.publish.rate</key>
                </item>
             </graph_item>
@@ -2789,7 +2791,7 @@ Template tooling version used: 0.34</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.ack.rate</key>
                </item>
             </graph_item>
@@ -2797,7 +2799,7 @@ Template tooling version used: 0.34</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.confirm.rate</key>
                </item>
             </graph_item>
@@ -2805,7 +2807,7 @@ Template tooling version used: 0.34</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.deliver_get.rate</key>
                </item>
             </graph_item>
@@ -2813,7 +2815,7 @@ Template tooling version used: 0.34</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.publish_in.rate</key>
                </item>
             </graph_item>
@@ -2821,7 +2823,7 @@ Template tooling version used: 0.34</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.publish_out.rate</key>
                </item>
             </graph_item>
@@ -2829,7 +2831,7 @@ Template tooling version used: 0.34</description>
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.redeliver.rate</key>
                </item>
             </graph_item>
@@ -2837,7 +2839,7 @@ Template tooling version used: 0.34</description>
                <sortorder>7</sortorder>
                <color>611F27</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.return_unroutable.rate</key>
                </item>
             </graph_item>
@@ -2849,7 +2851,7 @@ Template tooling version used: 0.34</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.publish</key>
                </item>
             </graph_item>
@@ -2857,7 +2859,7 @@ Template tooling version used: 0.34</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.ack</key>
                </item>
             </graph_item>
@@ -2865,7 +2867,7 @@ Template tooling version used: 0.34</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.confirm</key>
                </item>
             </graph_item>
@@ -2873,7 +2875,7 @@ Template tooling version used: 0.34</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.deliver_get</key>
                </item>
             </graph_item>
@@ -2881,7 +2883,7 @@ Template tooling version used: 0.34</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.publish_in</key>
                </item>
             </graph_item>
@@ -2889,7 +2891,7 @@ Template tooling version used: 0.34</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.publish_out</key>
                </item>
             </graph_item>
@@ -2897,7 +2899,7 @@ Template tooling version used: 0.34</description>
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.redeliver</key>
                </item>
             </graph_item>
@@ -2905,7 +2907,7 @@ Template tooling version used: 0.34</description>
                <sortorder>7</sortorder>
                <color>611F27</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.messages.return_unroutable</key>
                </item>
             </graph_item>
@@ -2918,7 +2920,7 @@ Template tooling version used: 0.34</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.running</key>
                </item>
             </graph_item>
@@ -2927,7 +2929,7 @@ Template tooling version used: 0.34</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.healthcheck</key>
                </item>
             </graph_item>
@@ -2940,7 +2942,7 @@ Template tooling version used: 0.34</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ cluster by HTTP</host>
+                  <host>RabbitMQ cluster by HTTP</host>
                   <key>rabbitmq.overview.object_totals.queues</key>
                </item>
             </graph_item>
@@ -2953,7 +2955,7 @@ Template tooling version used: 0.34</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.sockets_used</key>
                </item>
             </graph_item>
@@ -2961,7 +2963,7 @@ Template tooling version used: 0.34</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.sockets_total</key>
                </item>
             </graph_item>
@@ -2973,7 +2975,7 @@ Template tooling version used: 0.34</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App RabbitMQ node by HTTP</host>
+                  <host>RabbitMQ node by HTTP</host>
                   <key>rabbitmq.node.uptime</key>
                </item>
             </graph_item>
