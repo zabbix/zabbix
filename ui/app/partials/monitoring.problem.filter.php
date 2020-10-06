@@ -428,6 +428,9 @@ if (array_key_exists('render_html', $data)) {
 			}
 		});
 
+		// Show timeline default value is checked and it will be rendered in template therefore initalize if unchecked.
+		$('[name="show_timeline"][unchecked-value="' + data['show_timeline'] + '"]', container).removeAttr('checked');
+
 		// Severities checkboxes.
 		for (const value in data.severities) {
 			$('[name="severities[' + value + ']"]', container).attr('checked', true);
