@@ -57,8 +57,6 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			CSessionHelper::setId(self::$data['sessionid']);
-
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				error(_('GUI access disabled.'));
 				throw new Exception();
@@ -117,8 +115,6 @@ class CWebUser {
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				throw new Exception();
 			}
-
-			CSessionHelper::setId(self::$data['sessionid']);
 
 			return true;
 		}

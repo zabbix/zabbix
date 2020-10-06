@@ -107,19 +107,4 @@ class CSessionHelper {
 	public static function getAll(): array {
 		return $_SESSION;
 	}
-
-	/**
-	 * Set session id.
-	 *
-	 * @static
-	 *
-	 * @param $session_id
-	 *
-	 * @return void
-	 */
-	public static function setId($session_id): void
-	{
-		session_id($session_id);
-		self::set('sessionid', $session_id);
-	}
 }

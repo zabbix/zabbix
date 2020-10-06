@@ -76,9 +76,7 @@ class CEncryptedCookieSession extends CCookieSession {
 		}
 
 		$sessionid = $this->extractSessionId($session_data);
-		if ($sessionid) {
-			session_id($sessionid);
-		}
+		session_id($sessionid ?: md5(microtime().mt_rand()));
 
 		return session_start();
 	}
