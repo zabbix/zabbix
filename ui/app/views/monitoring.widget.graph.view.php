@@ -93,8 +93,7 @@ else {
 
 			'if (typeof zbx_graph_widget_edit_start !== typeof(Function)) {'.
 				'function zbx_graph_widget_edit_start(img_id) {'.
-					'var $img = jQuery("#" + img_id),'.
-						'$link = $img.parent();'.
+					'var $link = jQuery("#" + img_id).parent();'.
 
 					'$link'.
 						'.attr("href", "javascript:void(0)")'.
