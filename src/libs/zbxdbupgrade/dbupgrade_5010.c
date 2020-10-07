@@ -556,8 +556,8 @@ static void	DBpatch_get_preferred_widget_size(zbx_db_screen_item_t *item, int *w
 		*h += 215;	/* SCREEN_LEGEND_HEIGHT */
 	}
 
-	*w = *w * DASHBOARD_MAX_COLS / 1920;	/* DISPLAY_WIDTH */
-	*h = *h / 70;	/* WIDGET_ROW_HEIGHT */
+	*w = (int)round((double)*w / 1920 * DASHBOARD_MAX_COLS);	/* DISPLAY_WIDTH */
+	*h = (int)round((double)*h / 70);				/* WIDGET_ROW_HEIGHT */
 
 	*w = MIN(DASHBOARD_MAX_COLS, MAX(1, *w));
 	*h = MIN(DASHBOARD_WIDGET_MAX_ROWS, MAX(DASHBOARD_WIDGET_MIN_ROWS, *h));
@@ -803,7 +803,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 
 				SKIP_EMPTY(r_block, n);
 				factor = (double)(size_overflow + block_dimensions_sum) / block_dimensions_sum;
-				new_dimension = (int)(factor * dimensions->values[n]);
+				new_dimension = (int)round(factor * dimensions->values[n]);
 				block_dimensions_sum -= dimensions->values[n];
 				size_overflow -= new_dimension - dimensions->values[n];
 				dimensions->values[n] = new_dimension;
@@ -1095,7 +1095,7 @@ static void	DBpatch_trace_screen_item(zbx_db_screen_item_t *item)
 
 static void	DBpatch_trace_widget(zbx_db_widget_t *w)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "    widgetid:" ZBX_FS_UI64 " type:" ZBX_FS_UI64 " type:%s",
+	zabbix_log(LOG_LEVEL_TRACE, "    widgetid:" ZBX_FS_UI64 " dbid:" ZBX_FS_UI64 " type:%s",
 			w->widgetid, w->dashboardid, w->type);
 	zabbix_log(LOG_LEVEL_TRACE, "    widget type: %s w/h: %dx%d (x,y): (%d,%d)",
 			w->type, w->width, w->height, w->x, w->y);
@@ -1129,14 +1129,15 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 	char		*name_esc = NULL, *url_esc = NULL;
 
 	widget->widgetid = DBget_maxid("widget");
+	widget->dashboardid = dashboardid;
 	name_esc = DBdyn_escape_string(widget->name);
 
 	zabbix_log(LOG_LEVEL_TRACE, "adding widget id: " ZBX_FS_UI64 ", type: %s", widget->widgetid, widget->type);
 
 	if (ZBX_DB_OK > DBexecute("insert into widget (widgetid,dashboardid,type,name,x,y,width,height,view_mode) "
 			"values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,%d,%d,%d,%d)",
-			widget->widgetid, dashboardid, widget->type, name_esc, widget->x, widget->y, widget->width,
-			widget->height, widget->view_mode))
+			widget->widgetid, widget->dashboardid, widget->type, name_esc, widget->x, widget->y,
+			widget->width, widget->height, widget->view_mode))
 	{
 		ret = FAIL;
 	}
@@ -1300,9 +1301,9 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 
 		DBpatch_widget_from_screen_item(si, &w, &widget_fields);
 
-		DBpatch_trace_widget(&w);
-
 		ret = DBpatch_add_widget(dashboard.dashboardid, &w, &widget_fields);
+
+		DBpatch_trace_widget(&w);
 
 		zbx_vector_ptr_clear_ext(&widget_fields, (zbx_clean_func_t)DBpatch_widget_field_free);
 		zbx_vector_ptr_destroy(&widget_fields);
