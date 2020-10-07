@@ -364,6 +364,8 @@ class CFunctionValidator extends CValidator {
 			$lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
 
+		$func_args = [];
+
 		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
 			// mandatory check
 			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$aNum])) {
@@ -395,6 +397,44 @@ class CFunctionValidator extends CValidator {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.',
 					$value['function']).' '.$paramLabels[$aNum]);
 				return false;
+			}
+
+			$func_args[$arg['type']] = $value['functionParamList'][$aNum];
+		}
+
+		if (array_key_exists('period', $func_args) && array_key_exists('period_shift', $func_args)
+				&& !$this->validateTrendPeriods($func_args['period'], $func_args['period_shift'])) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate trend* function used period and period_shift arguments.
+	 *
+	 * @param string $period_value        Value of period, first argument for trend* function.
+	 * @param string $period_shift_value  Value of period shift, second argument for trend* function.
+	 *
+	 * @return bool
+	 */
+	private function validateTrendPeriods($period_value, $period_shift_value): bool {
+		$precisions = 'hdwMy';
+		$period = strpos($precisions, substr($period_value, -1));
+
+		if ($period !== false) {
+			$relative_time_parser = new CRelativeTimeParser();
+			$relative_time_parser->parse($period_shift_value);
+
+			foreach ($relative_time_parser->getTokens() as $token) {
+				if ($token['type'] !== CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
+					continue;
+				}
+
+				if (strpos($precisions, $token['suffix']) < $period) {
+					$this->setError(_('Time units in period shift must be greater or equal to period time unit.'));
+					return false;
+				}
 			}
 		}
 
@@ -453,9 +493,6 @@ class CFunctionValidator extends CValidator {
 
 			case 'period_shift':
 				return $this->validatePeriodShift($param);
-
-			case 'time_shift':
-				return (timeUnitToSeconds($param, true) !== null);
 		}
 
 		return true;
