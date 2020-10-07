@@ -351,7 +351,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+			if ($edit_mode || ($is_template_dashboard && !$this->hasInput('dynamic_hostid'))) {
 				$item_graph_url = null;
 			}
 			else {
