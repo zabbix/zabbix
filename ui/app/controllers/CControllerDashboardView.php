@@ -56,7 +56,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return false;
 		}
 
-		if ($this->hasInput('new')) {
+		if ($this->hasInput('new') || $this->hasInput('source_dashboardid')) {
 			return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 
@@ -111,7 +111,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				'widget_defaults' => CWidgetConfig::getDefaults(),
 				'show_timeselector' => self::showTimeSelector($widgets),
 				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
-				'timeline' => getTimeSelectorPeriod($timeselector_options)
+				'timeline' => getTimeSelectorPeriod($timeselector_options),
+				'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 			];
 
 			$data['timeControlData'] = [
@@ -212,10 +213,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					$this->prepareEditableFlag($dashboards);
 					$dashboard = array_shift($dashboards);
 					$dashboard['owner'] = self::getOwnerData($dashboard['userid']);
-					$dashboard['has_edit_access'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
-					if ($dashboard['editable'] && !$dashboard['has_edit_access']) {
-						$dashboard['editable'] = false;
-					}
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}

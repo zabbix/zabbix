@@ -183,7 +183,8 @@ class CControllerDashboardUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 	}
 
 	protected function doAction() {
