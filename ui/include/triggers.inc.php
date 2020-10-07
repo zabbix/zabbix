@@ -1930,7 +1930,13 @@ function get_item_function_info($expr) {
 		'strlen' => $rules['string_as_uint'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],
-		'timeleft' => $rules['numeric_as_float']
+		'timeleft' => $rules['numeric_as_float'],
+		'trendavg' => $rules['numeric'],
+		'trendcount' => $rules['numeric'],
+		'trenddelta' => $rules['numeric'],
+		'trendmax' => $rules['numeric'],
+		'trendmin' => $rules['numeric'],
+		'trendsum' => $rules['numeric']
 	];
 
 	$expr_data = new CTriggerExpression();
