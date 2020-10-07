@@ -90,7 +90,7 @@ class CSetupWizard extends CForm {
 	 *
 	 * @param array $keys  List of keys to unset.
 	 */
-	function unsetConfig(array $keys): void {
+	protected function unsetConfig(array $keys): void {
 		CSessionHelper::unset($keys);
 	}
 
