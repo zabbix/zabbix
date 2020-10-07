@@ -777,37 +777,34 @@ abstract class CControllerPopupItemTest extends CController {
 					unset($data[$key]);
 				}
 			}
-			elseif ($key === 'interface') {
-				if ($data['interface']['type'] == INTERFACE_TYPE_SNMP) {
+			elseif ($key === 'interface' && $this->item_type == ITEM_TYPE_SNMP) {
+				if ($data['interface']['details']['version'] == SNMP_V3) {
+					unset($data['interface']['details']['community']);
 
-					if ($data['interface']['details']['version'] == SNMP_V3) {
-						unset($data['interface']['details']['community']);
-
-						if ($data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-							unset($data['interface']['details']['authprotocol'],
-								$data['interface']['details']['authpassphrase'],
-								$data['interface']['details']['privprotocol'],
-								$data['interface']['details']['privpassphrase']
-							);
-						}
-						elseif (
-							$data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-						) {
-							unset($data['interface']['details']['privprotocol'],
-								$data['interface']['details']['privpassphrase']
-							);
-						}
-					}
-					else {
-						unset($data['interface']['details']['contextname'],
-							$data['interface']['details']['securityname'],
-							$data['interface']['details']['securitylevel'],
-							$data['interface']['details']['authprotocol'],
+					if ($data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+						unset($data['interface']['details']['authprotocol'],
 							$data['interface']['details']['authpassphrase'],
 							$data['interface']['details']['privprotocol'],
 							$data['interface']['details']['privpassphrase']
 						);
 					}
+					elseif (
+						$data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
+					) {
+						unset($data['interface']['details']['privprotocol'],
+							$data['interface']['details']['privpassphrase']
+						);
+					}
+				}
+				else {
+					unset($data['interface']['details']['contextname'],
+						$data['interface']['details']['securityname'],
+						$data['interface']['details']['securitylevel'],
+						$data['interface']['details']['authprotocol'],
+						$data['interface']['details']['authpassphrase'],
+						$data['interface']['details']['privprotocol'],
+						$data['interface']['details']['privpassphrase']
+					);
 				}
 
 				unset($data['interface']['type']);
