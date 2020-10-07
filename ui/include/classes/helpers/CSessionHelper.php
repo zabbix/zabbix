@@ -107,16 +107,4 @@ class CSessionHelper {
 	public static function getAll(): array {
 		return $_SESSION;
 	}
-
-	/**
-	 * Generate new unique id.
-	 *
-	 * @static
-	 *
-	 * @return string
-	 */
-	public static function generateId(): string
-	{
-		return bin2hex(openssl_random_pseudo_bytes(16));
-	}
 }

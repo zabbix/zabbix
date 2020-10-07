@@ -207,6 +207,9 @@ class ZBase {
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
+
+				CUser::$auth = CEncryptHelper::generateKey();
+
 				$this->initDB();
 				$this->initLocales('en_gb');
 				break;
@@ -461,9 +464,6 @@ class ZBase {
 		if (!CWebUser::checkAuthentication(CSessionHelper::getId())) {
 			CWebUser::setDefault();
 		}
-
-		// set the authentication token for the API
-		API::getWrapper()->auth = CSessionHelper::getId();
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();

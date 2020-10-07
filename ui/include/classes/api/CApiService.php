@@ -21,6 +21,18 @@
 
 class CApiService {
 
+	/**
+	 * Authentication token.
+	 *
+	 * @var string
+	 */
+	public static $auth;
+
+	/**
+	 * Authorized user data.
+	 *
+	 * @var array
+	 */
 	public static $userData;
 
 	/**

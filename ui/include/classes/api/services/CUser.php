@@ -1172,16 +1172,10 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sessionid = self::$userData['sessionid'];
-
-		if (!$sessionid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
-		}
-
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
-				'sessionid' => $sessionid,
+				'sessionid' => self::$auth,
 				'status' => ZBX_SESSION_ACTIVE
 			],
 			'limit' => 1
@@ -1197,7 +1191,7 @@ class CUser extends CApiService {
 		]);
 		DB::update('sessions', [
 			'values' => ['status' => ZBX_SESSION_PASSIVE],
-			'where' => ['sessionid' => $sessionid]
+			'where' => ['sessionid' => self::$auth]
 		]);
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
@@ -1292,7 +1286,7 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user = self::createSession($db_user);
+		$db_user = $this->createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1347,7 +1341,7 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-		$db_user = self::createSession($db_user);
+		$db_user = $this->createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1373,27 +1367,31 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sessionid = $session['sessionid'];
+		self::$auth = $session['sessionid'];
 
 		// access DB only once per page load
-		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
+		if (self::$userData !== null && self::$userData['sessionid'] === self::$auth) {
 			return self::$userData;
 		}
 
 		$time = time();
 
 		$db_sessions = DB::select('sessions', [
-			'output' => ['userid', 'lastaccess'],
-			'sessionids' => $sessionid,
-			'filter' => ['status' => ZBX_SESSION_ACTIVE]
+			'output' => ['userid', 'lastaccess', 'status'],
+			'sessionids' => self::$auth
 		]);
 
 		// If session not created.
 		if (!$db_sessions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			return [];
 		}
 
 		$db_session = $db_sessions[0];
+
+		// If session not active.
+		if ($db_session['status'] != ZBX_SESSION_ACTIVE) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+		}
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
@@ -1411,7 +1409,7 @@ class CUser extends CApiService {
 
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
-		$db_user['sessionid'] = $sessionid;
+		$db_user['sessionid'] = self::$auth;
 		$db_user['debug_mode'] = $usrgrps['debug_mode'];
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
@@ -1437,7 +1435,7 @@ class CUser extends CApiService {
 			]);
 			DB::update('sessions', [
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
-				'where' => ['sessionid' => $sessionid]
+				'where' => ['sessionid' => self::$auth]
 			]);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
@@ -1446,7 +1444,7 @@ class CUser extends CApiService {
 		if ($session['extend'] && $time != $db_session['lastaccess']) {
 			DB::update('sessions', [
 				'values' => ['lastaccess' => $time],
-				'where' => ['sessionid' => $sessionid]
+				'where' => ['sessionid' => self::$auth]
 			]);
 		}
 
@@ -1560,13 +1558,8 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function createSession(array $db_user): array {
-		$sessionid = CSessionHelper::getId();
-		if (!$sessionid) {
-			$sessionid = CSessionHelper::generateId();
-		}
-
-		$db_user['sessionid'] = $sessionid;
+	private function createSession(array $db_user): array {
+		$db_user['sessionid'] = self::$auth;
 
 		DB::delete('sessions', [
 			'sessionid' => $db_user['sessionid']
