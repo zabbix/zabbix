@@ -34,6 +34,7 @@
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -1298,6 +1299,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
+	CONFIG_HOSTNAME = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->hostname);
 
 	zbx_free(args);
 

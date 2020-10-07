@@ -1,0 +1,1 @@
+.......PS. [ZBX-18364] fixed inconsistency with autoregistration behaviour for hosts without metadata on Oracle compared to other databases (viktors)

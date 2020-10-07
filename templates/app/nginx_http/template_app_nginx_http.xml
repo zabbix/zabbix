@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-07-14T12:30:33Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:53Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,15 +9,15 @@
    </groups>
    <templates>
       <template>
-         <template>Template App Nginx by HTTP</template>
-         <name>Template App Nginx by HTTP</name>
+         <template>Nginx by HTTP</template>
+         <name>Nginx by HTTP</name>
          <description>Get metrics from stub status module using HTTP agent&#13;
 https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html.&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -53,7 +53,7 @@ Template tooling version used: 0.37</description>
                      <dependencies>
                         <dependency>
                            <name>Nginx: Service is down</name>
-                           <expression>{Template App Nginx by HTTP:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0</expression>
+                           <expression>{Nginx by HTTP:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -177,7 +177,7 @@ if (a) {
                      <dependencies>
                         <dependency>
                            <name>Nginx: Service is down</name>
-                           <expression>{Template App Nginx by HTTP:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0</expression>
+                           <expression>{Nginx by HTTP:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -314,7 +314,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                      <dependencies>
                         <dependency>
                            <name>Nginx: Service is down</name>
-                           <expression>{Template App Nginx by HTTP:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0</expression>
+                           <expression>{Nginx by HTTP:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -447,7 +447,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                      <style>0</style>
                      <resource>
                         <name>Nginx: Connections by state</name>
-                        <host>Template App Nginx by HTTP</host>
+                        <host>Nginx by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -469,7 +469,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                      <style>0</style>
                      <resource>
                         <name>Nginx: Requests per second</name>
-                        <host>Template App Nginx by HTTP</host>
+                        <host>Nginx by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -491,7 +491,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                      <style>0</style>
                      <resource>
                         <name>Nginx: Connections per second</name>
-                        <host>Template App Nginx by HTTP</host>
+                        <host>Nginx by HTTP</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -521,7 +521,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.connections.active</key>
                </item>
             </graph_item>
@@ -529,7 +529,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.connections.waiting</key>
                </item>
             </graph_item>
@@ -537,7 +537,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.connections.writing</key>
                </item>
             </graph_item>
@@ -545,7 +545,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.connections.reading</key>
                </item>
             </graph_item>
@@ -557,7 +557,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.connections.accepted.rate</key>
                </item>
             </graph_item>
@@ -565,7 +565,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.connections.handled.rate</key>
                </item>
             </graph_item>
@@ -573,7 +573,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.connections.dropped.rate</key>
                </item>
             </graph_item>
@@ -586,7 +586,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Nginx by HTTP</host>
+                  <host>Nginx by HTTP</host>
                   <key>nginx.requests.total.rate</key>
                </item>
             </graph_item>

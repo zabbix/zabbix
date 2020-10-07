@@ -922,6 +922,9 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					case ITEM_TYPE_SNMPTRAP:
 					case ITEM_TYPE_DEPENDENT:
 						return;
+					case ITEM_TYPE_ZABBIX_ACTIVE:
+						if (0 == strncmp(item->key, "mqtt.get[", ZBX_CONST_STRLEN("mqtt.get[")))
+							return;
 				}
 
 				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
@@ -4868,6 +4871,46 @@ static void	lld_items_applications_make(const zbx_vector_ptr_t *item_prototypes,
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_validate_application_with_links                              *
+ *                                                                            *
+ * Purpose: mark applications with no links to item_prototypes not to be      *
+ *          discovered                                                        *
+ *                                                                            *
+ * Parameters: applications       - [IN/OUT] the applications                 *
+ *             items_applications - [IN] the item-application links           *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_validate_application_with_links(zbx_vector_ptr_t *applications, zbx_hashset_t *items_applications)
+{
+	zbx_lld_item_application_t	*link;
+	zbx_hashset_iter_t		iter;
+	int				i;
+
+	for (i = 0; i < applications->values_num; i++)
+	{
+		zbx_lld_application_t	*app = (zbx_lld_application_t *)applications->values[i];
+
+		if (0 != app->applicationid)
+			continue;
+
+		zbx_hashset_iter_reset(items_applications, &iter);
+
+		while (NULL != (link = (zbx_lld_item_application_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (app == link->application_ref.application
+					&& 0 != (link->flags & ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED))
+			{
+				break;
+			}
+		}
+
+		if (NULL == link)
+			app->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_item_prototypes_get                                          *
  *                                                                            *
  * Purpose: load discovery rule item prototypes                               *
@@ -5105,6 +5148,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 
 	lld_items_applications_get(lld_ruleid, &items_applications);
 	lld_items_applications_make(&item_prototypes, &items, &applications_index, &items_applications);
+	lld_validate_application_with_links(&applications, &items_applications);
 
 	DBbegin();
 

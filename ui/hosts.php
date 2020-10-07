@@ -26,7 +26,7 @@ $page['title'] = _('Configuration of hosts');
 $page['file'] = 'hosts.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
-	'inputsecret.js', 'macrovalue.js'
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -748,7 +748,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				// Proccess SNMP interface fields.
+				// Process SNMP interface fields.
 				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 					if (!array_key_exists('details', $interface)) {
 						unset($interface[$key]);

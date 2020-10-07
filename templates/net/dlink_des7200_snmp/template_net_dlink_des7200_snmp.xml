@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:15Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:53Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net D-Link DES 7200 SNMP</template>
-         <name>Template Net D-Link DES 7200 SNMP</name>
+         <template>D-Link DES 7200 SNMP</template>
+         <name>D-Link DES 7200 SNMP</name>
          <description>Template D-Link DES 7200&#13;
 &#13;
 MIBs used:&#13;
@@ -20,13 +20,13 @@ MY-MEMORY-MIB&#13;
 ENTITY-MIB&#13;
 MY-SYSTEM-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -230,6 +230,7 @@ networking software.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Memory Discovery</name>
@@ -263,6 +264,7 @@ This is the memory pool utilization currently.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPINDEX}: Memory utilization</name>
@@ -273,7 +275,7 @@ This is the memory pool utilization currently.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Net D-Link DES 7200 SNMP</host>
+                              <host>D-Link DES 7200 SNMP</host>
                               <key>vm.memory.util[myMemoryPoolCurrentUtilization.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -316,6 +318,7 @@ This is the memory pool utilization currently.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -351,8 +354,8 @@ Return the current temperature of the FastSwitch.The temperature display is not 
                            <dependencies>
                               <dependency>
                                  <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Template Net D-Link DES 7200 SNMP:sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Template Net D-Link DES 7200 SNMP:sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{D-Link DES 7200 SNMP:sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{D-Link DES 7200 SNMP:sensor.temp.value[mySystemTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -376,6 +379,7 @@ Return the current temperature of the FastSwitch.The temperature display is not 
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -420,7 +424,7 @@ Return the current temperature of the FastSwitch.The temperature display is not 
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net D-Link DES 7200 SNMP</host>
+                  <host>D-Link DES 7200 SNMP</host>
                   <key>system.cpu.util[myCPUUtilization5Min.0]</key>
                </item>
             </graph_item>

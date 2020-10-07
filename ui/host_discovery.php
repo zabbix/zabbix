@@ -26,7 +26,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js',
+	'class.tab-indicators.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -56,7 +58,9 @@ $fields = [
 	'delay' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 									'(isset({add}) || isset({update})) && isset({type})'.
 										' && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP.
-										' && {type} != '.ITEM_TYPE_DEPENDENT,
+										' && {type} != '.ITEM_TYPE_DEPENDENT.
+										' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
+											' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 									_('Update interval')
 								],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -161,7 +165,7 @@ $fields = [
 								],
 	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
 									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-										HTTPTEST_AUTH_KERBEROS
+										HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
 									]),
 									null
 								],
@@ -169,14 +173,18 @@ $fields = [
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+											' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+										')',
 									_('Username')
 								],
 	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
-											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+											' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
+										')',
 									_('Password')
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
@@ -375,8 +383,10 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+		'request' => [
+			'itemid' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -391,7 +401,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP && hasRequest('delay_flex')) {
+	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
+			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
 		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
@@ -695,10 +707,18 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('g_hostdruleid')
-	]);
+	$tasks = [];
+
+	foreach (getRequest('g_hostdruleid') as $taskid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'itemid' => $taskid
+			]
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows($checkbox_hash);
@@ -777,7 +797,7 @@ if (hasRequest('form')) {
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
-		// Sort overides to be listed in step order.
+		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], [
 			['field' => 'step', 'order' => ZBX_SORT_UP]
 		]);
@@ -863,7 +883,8 @@ else {
 			];
 			$options['filter']['delay'] = $filter['delay'];
 		}
-		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT) {
+		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT
+				|| ($filter['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) === 0)) {
 			$options['filter']['delay'] = -1;
 		}
 		else {
@@ -908,11 +929,12 @@ else {
 
 	// Set is_template false, when one of hosts is not template.
 	if ($data['discoveries']) {
-		$hosts_status = array_unique(
-			array_column(array_column(array_column($data['discoveries'], 'hosts'), 0), 'status')
-		);
-		foreach ($hosts_status as $value) {
-			if ($value != HOST_STATUS_TEMPLATE) {
+		$hosts_status = [];
+		foreach ($data['discoveries'] as $discovery) {
+			$hosts_status[$discovery['hosts'][0]['status']] = true;
+		}
+		foreach ($hosts_status as $key => $value) {
+			if ($key != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;
 				break;
 			}

@@ -24,10 +24,12 @@
  */
 
 $this->includeJsFile('administration.usergroup.edit.js.php');
+$this->addJsFile('class.tab-indicators.js');
 
 $widget = (new CWidget())->setTitle(_('User groups'));
 
 $form = (new CForm())
+	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
@@ -63,20 +65,22 @@ $form_list = (new CFormList())
 	);
 
 if ($data['can_update_group']) {
-	$form_list->addRow(
-		(new CLabel(_('Frontend access'), 'gui_access')),
-		(new CComboBox('gui_access', $data['gui_access'], null, [
+	$select_gui_access = (new CSelect('gui_access'))
+		->setValue($data['gui_access'])
+		->setFocusableElementId('gui-access')
+		->addOptions(CSelect::createOptionsFromArray([
 			GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
 			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
 			GROUP_GUI_ACCESS_LDAP => user_auth_type2str(GROUP_GUI_ACCESS_LDAP),
 			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
-		]))
-	);
-	$form_list->addRow(_('Enabled'),
-		(new CCheckBox('users_status', GROUP_STATUS_ENABLED))
+		]));
+
+	$form_list
+		->addRow((new CLabel(_('Frontend access'), $select_gui_access->getFocusableElementId())), $select_gui_access)
+		->addRow(_('Enabled'), (new CCheckBox('users_status', GROUP_STATUS_ENABLED))
 			->setUncheckedValue(GROUP_STATUS_DISABLED)
 			->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
-	);
+		);
 }
 else {
 	$form_list
@@ -201,8 +205,8 @@ $tag_filter_form_list->addRow(null,
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_list)
-	->addTab('permissions_tab', _('Permissions'), $permissions_form_list)
-	->addTab('tag_filter_tab', _('Tag filter'), $tag_filter_form_list);
+	->addTab('permissions_tab', _('Permissions'), $permissions_form_list, TAB_INDICATOR_PERMISSIONS)
+	->addTab('tag_filter_tab', _('Tag filter'), $tag_filter_form_list, TAB_INDICATOR_TAG_FILTER);
 if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
 }

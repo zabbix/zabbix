@@ -70,6 +70,7 @@ $availableJScripts = [
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
 	// classes
+	'component.z-select.js' => '',
 	'class.base-component.js' => '',
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -109,10 +110,12 @@ $availableJScripts = [
 	'class.tabfilteritem.js' => '',
 	'class.template.js' => '',
 	'init.js' => '',
+	'class.tab-indicators.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
 	'items.js' => 'pages/',
+	'setup.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/'
 ];
@@ -324,7 +327,8 @@ $tranStrings = [
 	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
-		'No interface found' => _('No interface found')
+		'No interface found' => _('No interface found'),
+		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'class.cnavtree.js' => [
 		'Edit' => _('Edit'),
@@ -347,8 +351,13 @@ $tranStrings = [
 	'common.js' => [
 		'Cancel' => _('Cancel')
 	],
+	'component.z-select.js' => [
+		'All' => _('All')
+	],
 	'macrovalue.js' => [
-		'Set new value' => _('Set new value')
+		'Set new value' => _('Set new value'),
+		'path/to/secret:key' => _('path/to/secret:key'),
+		'value' => _('value')
 	]
 ];
 
@@ -359,6 +368,7 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
+		'component.z-select.js',
 		'class.base-component.js',
 		'class.cdebug.js',
 		'class.overlaycollection.js',

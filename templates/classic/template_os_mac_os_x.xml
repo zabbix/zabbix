@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template OS Mac OS X</template>
-            <name>Template OS Mac OS X</name>
+            <template>Mac OS X</template>
+            <name>Mac OS X</name>
             <description/>
             <groups>
                 <group>
@@ -1380,7 +1380,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template OS Mac OS X:vfs.fs.size[{#FSNAME},pfree].last(0)}&lt;20</expression>
+                            <expression>{Mac OS X:vfs.fs.size[{#FSNAME},pfree].last()}&lt;20</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Free disk space is less than 20% on volume {#FSNAME}</name>
@@ -1396,7 +1396,7 @@
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template OS Mac OS X:vfs.fs.inode[{#FSNAME},pfree].last(0)}&lt;20</expression>
+                            <expression>{Mac OS X:vfs.fs.inode[{#FSNAME},pfree].last()}&lt;20</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Free inodes is less than 20% on volume {#FSNAME}</name>
@@ -1439,7 +1439,7 @@
                                     <calc_fnc>2</calc_fnc>
                                     <type>2</type>
                                     <item>
-                                        <host>Template OS Mac OS X</host>
+                                        <host>Mac OS X</host>
                                         <key>vfs.fs.size[{#FSNAME},total]</key>
                                     </item>
                                 </graph_item>
@@ -1451,7 +1451,7 @@
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template OS Mac OS X</host>
+                                        <host>Mac OS X</host>
                                         <key>vfs.fs.size[{#FSNAME},free]</key>
                                     </item>
                                 </graph_item>
@@ -1483,7 +1483,7 @@
             <macros/>
             <templates>
                 <template>
-                    <name>Template Module Zabbix agent</name>
+                    <name>Zabbix agent</name>
                 </template>
             </templates>
             <screens>
@@ -1509,7 +1509,7 @@
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>CPU load</name>
-                                <host>Template OS Mac OS X</host>
+                                <host>Mac OS X</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -1531,7 +1531,7 @@
                             <sort_triggers>0</sort_triggers>
                             <resource>
                                 <name>Memory usage</name>
-                                <host>Template OS Mac OS X</host>
+                                <host>Mac OS X</host>
                             </resource>
                             <max_columns>3</max_columns>
                             <application/>
@@ -1543,7 +1543,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template OS Mac OS X:vfs.file.cksum[/etc/passwd].diff(0)}&gt;0</expression>
+            <expression>{Mac OS X:vfs.file.cksum[/etc/passwd].diff(0)}&gt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>/etc/passwd has been changed on {HOST.NAME}</name>
@@ -1559,7 +1559,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Mac OS X:kernel.maxfiles.last(0)}&lt;1024</expression>
+            <expression>{Mac OS X:kernel.maxfiles.last()}&lt;1024</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Configured max number of opened files is too low on {HOST.NAME}</name>
@@ -1575,7 +1575,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Mac OS X:kernel.maxproc.last(0)}&lt;256</expression>
+            <expression>{Mac OS X:kernel.maxproc.last()}&lt;256</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Configured max number of processes is too low on {HOST.NAME}</name>
@@ -1591,7 +1591,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Mac OS X:system.uname.diff(0)}&gt;0</expression>
+            <expression>{Mac OS X:system.uname.diff(0)}&gt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Host information was changed on {HOST.NAME}</name>
@@ -1607,7 +1607,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Mac OS X:system.hostname.diff(0)}&gt;0</expression>
+            <expression>{Mac OS X:system.hostname.diff(0)}&gt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Hostname was changed on {HOST.NAME}</name>
@@ -1623,7 +1623,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Mac OS X:vm.memory.size[available].last(0)}&lt;20M</expression>
+            <expression>{Mac OS X:vm.memory.size[available].last()}&lt;20M</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Lack of available memory on server {HOST.NAME}</name>
@@ -1639,7 +1639,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Mac OS X:system.cpu.load[percpu,avg1].avg(5m)}&gt;5</expression>
+            <expression>{Mac OS X:system.cpu.load[percpu,avg1].avg(5m)}&gt;5</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Processor load is too high on {HOST.NAME}</name>
@@ -1655,7 +1655,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template OS Mac OS X:system.uptime.change(0)}&lt;0</expression>
+            <expression>{Mac OS X:system.uptime.change(0)}&lt;0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>{HOST.NAME} has just been restarted</name>
@@ -1698,7 +1698,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template OS Mac OS X</host>
+                        <host>Mac OS X</host>
                         <key>system.cpu.load[percpu,avg1]</key>
                     </item>
                 </graph_item>
@@ -1710,7 +1710,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template OS Mac OS X</host>
+                        <host>Mac OS X</host>
                         <key>system.cpu.load[percpu,avg5]</key>
                     </item>
                 </graph_item>
@@ -1722,7 +1722,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template OS Mac OS X</host>
+                        <host>Mac OS X</host>
                         <key>system.cpu.load[percpu,avg15]</key>
                     </item>
                 </graph_item>
@@ -1745,7 +1745,7 @@
             <ymax_type_1>2</ymax_type_1>
             <ymin_item_1>0</ymin_item_1>
             <ymax_item_1>
-                <host>Template OS Mac OS X</host>
+                <host>Mac OS X</host>
                 <key>vm.memory.size[total]</key>
             </ymax_item_1>
             <graph_items>
@@ -1757,7 +1757,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template OS Mac OS X</host>
+                        <host>Mac OS X</host>
                         <key>vm.memory.size[available]</key>
                     </item>
                 </graph_item>
@@ -1789,7 +1789,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template OS Mac OS X</host>
+                        <host>Mac OS X</host>
                         <key>net.if.in[en0]</key>
                     </item>
                 </graph_item>
@@ -1801,7 +1801,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template OS Mac OS X</host>
+                        <host>Mac OS X</host>
                         <key>net.if.out[en0]</key>
                     </item>
                 </graph_item>

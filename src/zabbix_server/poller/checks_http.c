@@ -31,14 +31,6 @@
 #define HTTP_STORE_RAW		0
 #define HTTP_STORE_JSON		1
 
-typedef struct
-{
-	char	*data;
-	size_t	allocated;
-	size_t	offset;
-}
-zbx_http_response_t;
-
 static const char	*zbx_request_string(int result)
 {
 	switch (result)
@@ -54,25 +46,6 @@ static const char	*zbx_request_string(int result)
 		default:
 			return "unknown";
 	}
-}
-
-static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	size_t			r_size = size * nmemb;
-	zbx_http_response_t	*response;
-
-	response = (zbx_http_response_t*)userdata;
-	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
-
-	return r_size;
-}
-
-static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	ZBX_UNUSED(ptr);
-	ZBX_UNUSED(userdata);
-
-	return size * nmemb;
 }
 
 static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned char request_method, char **error)
@@ -166,10 +139,10 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 	if (retrieve_mode != ZBX_RETRIEVE_MODE_CONTENT)
 		zbx_json_addobject(&json, "header");
 
-	while (NULL != (line = zbx_http_get_header(&headers)))
+	while (NULL != (line = zbx_http_parse_header(&headers)))
 	{
-		if (0 == json_content && 0 == strncmp(line, "Content-Type:",
-				ZBX_CONST_STRLEN("Content-Type:")) &&
+		if (0 == json_content &&
+				0 == zbx_strncasecmp(line, "Content-Type:", ZBX_CONST_STRLEN("Content-Type:")) &&
 				NULL != strstr(line, "application/json"))
 		{
 			json_content = 1;
@@ -234,10 +207,10 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
 		case ZBX_RETRIEVE_MODE_BOTH:
-			curl_body_cb = curl_write_cb;
+			curl_body_cb = zbx_curl_write_cb;
 			break;
 		case ZBX_RETRIEVE_MODE_HEADERS:
-			curl_body_cb = curl_ignore_cb;
+			curl_body_cb = zbx_curl_ignore_cb;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -245,35 +218,10 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, curl_write_cb)))
+	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_write_cb, curl_body_cb, errbuf,
+			&error))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set header function: %s",
-				curl_easy_strerror(err)));
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERDATA, &header)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set header callback: %s",
-				curl_easy_strerror(err)));
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_body_cb)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set write function: %s", curl_easy_strerror(err)));
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &body)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set write callback: %s", curl_easy_strerror(err)));
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set error buffer: %s", curl_easy_strerror(err)));
+		SET_MSG_RESULT(result, error);
 		goto clean;
 	}
 
@@ -330,7 +278,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	headers = item->headers;
-	while (NULL != (line = zbx_http_get_header(&headers)))
+	while (NULL != (line = zbx_http_parse_header(&headers)))
 	{
 		headers_slist = curl_slist_append(headers_slist, line);
 
@@ -436,7 +384,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 				zbx_json_addobject(&json, "header");
 				headers = header.data;
-				while (NULL != (line = zbx_http_get_header(&headers)))
+				while (NULL != (line = zbx_http_parse_header(&headers)))
 				{
 					http_add_json_header(&json, line);
 					zbx_free(line);

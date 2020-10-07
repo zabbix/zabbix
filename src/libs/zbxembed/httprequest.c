@@ -28,6 +28,8 @@
 
 #ifdef HAVE_LIBCURL
 
+extern char	*CONFIG_SOURCE_IP;
+
 typedef struct
 {
 	CURL			*handle;
@@ -169,6 +171,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP, err);
 
 	duk_push_pointer(ctx, request);
 	duk_put_prop_string(ctx, -2, "\xff""\xff""d");
@@ -474,7 +477,7 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	if (0 == request->headers_in_offset)
 		return 1;
 
-	for (ptr = request->headers_in; NULL != (header = zbx_http_get_header(&ptr)); )
+	for (ptr = request->headers_in; NULL != (header = zbx_http_parse_header(&ptr)); )
 	{
 		es_put_header(ctx, idx, header);
 		zbx_free(header);

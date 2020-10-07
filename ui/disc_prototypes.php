@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
 $page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js',
-	'textareaflexible.js'
+	'textareaflexible.js', 'class.tab-indicators.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -56,7 +56,9 @@ $fields = [
 										'(isset({add}) || isset({update}))'.
 											' && isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.
 												' && {type} != '.ITEM_TYPE_SNMPTRAP.
-												' && {type} != '.ITEM_TYPE_DEPENDENT,
+												' && {type} != '.ITEM_TYPE_DEPENDENT.
+												' && !({type} == '.ITEM_TYPE_ZABBIX_ACTIVE.
+													' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 										_('Update interval')
 									],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -207,7 +209,7 @@ $fields = [
 									],
 	'http_authtype' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
-											HTTPTEST_AUTH_KERBEROS
+											HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST
 										]),
 										null
 									],
@@ -216,6 +218,7 @@ $fields = [
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
 												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
 											')',
 										_('Username')
 									],
@@ -224,6 +227,7 @@ $fields = [
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
 												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.
+												' || {http_authtype} == '.HTTPTEST_AUTH_DIGEST.
 											')',
 										_('Password')
 									],
@@ -340,7 +344,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP && hasRequest('delay_flex')) {
+	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
+			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser([
 			'usermacros' => true,
@@ -852,7 +858,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'posts' => getRequest('posts'),
 					'headers' => getRequest('headers', []),
 					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => getRequest('timeout')
 				];
 
 				if ($item_prototype['headers']) {
@@ -1095,6 +1102,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					if ($type != ITEM_TYPE_JMX) {
 						unset($update_item_prototype['jmx_endpoint']);
 					}
+
+					if ($type != ITEM_TYPE_HTTPAGENT) {
+						unset($update_item_prototype['timeout']);
+					}
 				}
 				unset($update_item_prototype);
 
@@ -1286,7 +1297,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_ACTION_ADD),
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
-		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
+		'timeout' =>  getRequest('timeout', DB::getDefault('items', 'timeout'))
 	];
 
 	foreach ($data['preprocessing'] as &$step) {
@@ -1368,7 +1380,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 	$data['hosts'] = API::Host()->get([
 		'output' => ['hostid'],
 		'itemids' => $data['item_prototypeids'],
-		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port']
+		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
 	]);
 
 	$data['display_interfaces'] = true;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2020-04-17T09:24:27Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:08Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template App HAProxy by Zabbix agent</template>
-         <name>Template App HAProxy by Zabbix agent</name>
+         <template>HAProxy by Zabbix agent</template>
+         <name>HAProxy by Zabbix agent</name>
          <description>Get metrics from status page using Zabbix agent&#13;
 https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/.&#13;
 Example configuration of HAProxy:        &#13;
@@ -23,7 +23,7 @@ Example configuration of HAProxy:        &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -135,7 +135,7 @@ catch (error) {
                      <dependencies>
                         <dependency>
                            <name>HAProxy: Service is down</name>
-                           <expression>{Template App HAProxy by Zabbix agent:net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"].last()}=0</expression>
+                           <expression>{HAProxy by Zabbix agent:net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -512,6 +512,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: TCP Backend {#PXNAME} Redispatched requests and retried connections per second</name>
@@ -519,7 +520,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.backend_tcp.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -527,7 +528,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.backend_tcp.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -855,6 +856,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second</name>
@@ -862,7 +864,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.backend.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -870,7 +872,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.backend.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1164,6 +1166,7 @@ catch (error) {
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: TCP Frontend {#PXNAME} Errors and denials per second</name>
@@ -1171,7 +1174,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend_tcp.ereq.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1179,7 +1182,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend_tcp.dreq.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1192,7 +1195,7 @@ catch (error) {
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend_tcp.bin[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1201,7 +1204,7 @@ catch (error) {
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend_tcp.bout[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1213,7 +1216,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend_tcp.req_rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1221,7 +1224,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend_tcp.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1645,6 +1648,7 @@ catch (error) {
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: Frontend {#PXNAME} Errors and denials per second</name>
@@ -1652,7 +1656,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.ereq.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1660,7 +1664,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.dreq.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1673,7 +1677,7 @@ catch (error) {
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.bin[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1682,7 +1686,7 @@ catch (error) {
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.bout[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1694,7 +1698,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.req_rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1702,7 +1706,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1715,7 +1719,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.hrsp_1xx.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1723,7 +1727,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.hrsp_2xx.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1731,7 +1735,7 @@ catch (error) {
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.hrsp_3xx.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1739,7 +1743,7 @@ catch (error) {
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.hrsp_4xx.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -1747,7 +1751,7 @@ catch (error) {
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.frontend.hrsp_5xx.rate[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -2076,6 +2080,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: TCP {#PXNAME} {#SVNAME} Response time and time in queue</name>
@@ -2083,7 +2088,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.server_tcp.rtime[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -2091,7 +2096,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.server_tcp.qtime[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -2472,6 +2477,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue</name>
@@ -2479,7 +2485,7 @@ catch (error) {
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.server.rtime[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -2487,7 +2493,7 @@ catch (error) {
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App HAProxy by Zabbix agent</host>
+                              <host>HAProxy by Zabbix agent</host>
                               <key>haproxy.server.qtime[{#PXNAME}:{#SVNAME}]</key>
                            </item>
                         </graph_item>
@@ -2601,9 +2607,9 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second</name>
-                        <host>Template App HAProxy by Zabbix agent</host>
+                        <host>HAProxy by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -2630,7 +2636,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} Requests and sessions per second</name>
-                        <host>Template App HAProxy by Zabbix agent</host>
+                        <host>HAProxy by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2652,7 +2658,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} Errors and denials per second</name>
-                        <host>Template App HAProxy by Zabbix agent</host>
+                        <host>HAProxy by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2674,7 +2680,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} Responses by HTTP code</name>
-                        <host>Template App HAProxy by Zabbix agent</host>
+                        <host>HAProxy by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2696,7 +2702,7 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: Frontend {#PXNAME} In/Out traffic</name>
-                        <host>Template App HAProxy by Zabbix agent</host>
+                        <host>HAProxy by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2725,9 +2731,9 @@ catch (error) {
                      <style>0</style>
                      <resource>
                         <name>HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue</name>
-                        <host>Template App HAProxy by Zabbix agent</host>
+                        <host>HAProxy by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>

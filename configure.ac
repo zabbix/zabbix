@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[5.2.0alpha3])
+AC_INIT([Zabbix],[5.2.0beta2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -1358,6 +1358,7 @@ have_ipmi="no"
 have_ipv6="no"
 have_ssh="no"
 have_tls="no"
+have_libmodbus="no"
 
 
 if test "x$ipv6" = "xyes"; then
@@ -1729,6 +1730,20 @@ SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 ZBXJS_LDFLAGS="$ZLIB_LDFLAGS $TLS_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $TLS_LIBS"
 
+dnl Check for libmodbus [by default - skip]
+if test "x$agent" = "xyes"; then
+	LIBMODBUS_CHECK_CONFIG([3.0.0])
+	if test "x$want_libmodbus" = "xyes"; then
+		if test "x$found_libmodbus" = "xyes"; then
+			have_libmodbus="yes"
+		fi
+	fi
+	LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
+	CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
+	LIBS="$LIBS $LIBMODBUS_LIBS"
+fi
+AM_CONDITIONAL(HAVE_LIBMODBUS, [test "x$have_libmodbus" = "xyes"])
+
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
 	if test "x$GO" = "xno"; then
@@ -1997,6 +2012,7 @@ AC_OUTPUT([
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
+	src/libs/zbxvault/Makefile
 	src/libs/zbxdiag/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
@@ -2110,6 +2126,10 @@ if test "x$SSH_CFLAGS" != "x"; then
 	echo "    libssh:                ${SSH_CFLAGS}"
 fi
 
+if test "x$LIBMODBUS_CFLAGS" != "x"; then
+	echo "    libmodbus:                ${LIBMODBUS_CFLAGS}"
+fi
+
 if test "x$TLS_CFLAGS" != "x"; then
 	echo "    TLS:                   ${TLS_CFLAGS}"
 fi
@@ -2188,6 +2208,7 @@ if test "x$agent" != "xno"; then
 
 echo "  Agent details:
     TLS:                   ${have_tls}
+    Modbus:                ${have_libmodbus}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}
     Configuration file:    ${AGENT_CONFIG_FILE}

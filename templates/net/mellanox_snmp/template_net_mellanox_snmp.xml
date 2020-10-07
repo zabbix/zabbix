@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:15Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:52Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Mellanox SNMP</template>
-         <name>Template Net Mellanox SNMP</name>
+         <template>Mellanox SNMP</template>
+         <name>Mellanox SNMP</name>
          <description>Template Net Mellanox&#13;
 &#13;
 MIBs used:&#13;
@@ -18,16 +18,16 @@ ENTITY-SENSORS-MIB&#13;
 ENTITY-STATE-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module HOST-RESOURCES-MIB SNMP</name>
+               <name>HOST-RESOURCES-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -121,6 +121,7 @@ Template tooling version used: 0.36</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Fan Discovery</name>
@@ -185,6 +186,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -231,6 +233,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -318,13 +321,14 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+                     <expression>{Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
 or&#13;
-{Template Net Mellanox SNMP:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Mellanox SNMP:sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
@@ -332,8 +336,8 @@ or&#13;
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>

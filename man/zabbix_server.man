@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SERVER 8 "2019\-01\-29" Zabbix
+.TH ZABBIX_SERVER 8 "2020\-09\-04" Zabbix
 .SH NAME
 zabbix_server \- Zabbix server daemon
 .SH SYNOPSIS
@@ -80,6 +80,12 @@ Reload SNMP cache.
 .B housekeeper_execute
 Execute the housekeeper.
 Ignored if housekeeper is being currently executed.
+.RE
+.RS 4
+.TP 4
+.B secrets_reload
+Reload secrets from Vault.
+Ignored if configuration cache or secrets are being currently loaded.
 .RE
 .RS 4
 .TP 4

@@ -151,7 +151,7 @@ class testDashboardGraphWidget extends CWebTest {
 				$form->selectTab($tab);
 				$this->fillOverrides(CTestArrayHelper::get($data, 'Overrides'));
 
-				// Remove all overide options.
+				// Remove all override options.
 				if (CTestArrayHelper::get($data, 'remove_override_options', false)) {
 					$form->query('xpath://button[@class="subfilter-disable-btn"]')->all()->click();
 				}
@@ -419,7 +419,7 @@ class testDashboardGraphWidget extends CWebTest {
 			$data[] = $item;
 		}
 
-		// Add aditional test cases to data provider.
+		// Add additional test cases to data provider.
 		return array_merge($data, [
 			// Empty host and/or item field.
 			[
@@ -1442,7 +1442,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'check_form' => true
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'main_fields' => [
@@ -1729,7 +1729,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'check_form' => true
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'main_fields' => [
@@ -1924,7 +1924,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Fill "Data sets" with specified data.
 	 */
 	private function fillDatasets($data_sets) {
-		$form = $this->query('id:widget_dialogue_form')->asForm()->one();
+		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 		if ($data_sets) {
 			if (CTestArrayHelper::isAssociative($data_sets)) {
 				$data_sets = [$data_sets];
@@ -1969,7 +1969,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Fill "Overrides" with specified data.
 	 */
 	private function fillOverrides($overrides) {
-		$form = $this->query('id:widget_dialogue_form')->asForm()->one();
+		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 
 		// Check if override already exist in list, if not, add new override.
 		$items = $form->query('class:overrides-list-item')->all();
@@ -2026,7 +2026,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Check widget field values after creating or updating.
 	 */
 	private function checkWidgetForm($data) {
-		$form = $this->query('id:widget_dialogue_form')->asForm()->one();
+		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 
 		// Check values in "Data set" tab.
 		if (CTestArrayHelper::isAssociative($data['Data set'])) {
@@ -2129,7 +2129,7 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'main_fields' => [
-						'Name' => 'Add new graph widget and cancle dashboard update'
+						'Name' => 'Add new graph widget and cancel dashboard update'
 					],
 					'Data set' => [
 						'host' => 'Zabbix*, new widget',
@@ -2440,7 +2440,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @param boolean $id			is used field id instead of field name
 	 */
 	private function assertEnabledFields($fields, $enabled = true) {
-		$form = $this->query('id:widget_dialogue_form')->asForm()->one();
+		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 
 		if (!is_array($fields)) {
 			$fields = [$fields];

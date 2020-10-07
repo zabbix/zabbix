@@ -336,6 +336,7 @@ abstract class CItemGeneral extends CApiService {
 
 			// Validate update interval.
 			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+					&& ($fullItem['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($fullItem['key_'], 'mqtt.get', 8) !== 0)
 					&& !validateDelay($update_interval_parser, 'delay', $fullItem['delay'], $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
@@ -583,7 +584,9 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('type', $item) &&
-				($item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_TRAPPER)) {
+				($item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_TRAPPER
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && array_key_exists('key_', $item)
+						&& strncmp($item['key_'], 'mqtt.get', 8) === 0))) {
 			$item['delay'] = 0;
 		}
 
@@ -2140,7 +2143,8 @@ abstract class CItemGeneral extends CApiService {
 			'authtype' => [
 				'type' => API_INT32,
 				'in' => implode(',', [
-					HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS
+					HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
+					HTTPTEST_AUTH_DIGEST
 				])
 			]
 		];
@@ -2149,7 +2153,7 @@ abstract class CItemGeneral extends CApiService {
 
 		if (array_key_exists('authtype', $data)
 				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM
-					|| $data['authtype'] == HTTPTEST_AUTH_KERBEROS)) {
+					|| $data['authtype'] == HTTPTEST_AUTH_KERBEROS || $data['authtype'] == HTTPTEST_AUTH_DIGEST)) {
 			$rules += [
 				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]
@@ -2302,5 +2306,76 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Remove NCLOB value type fields from resulting query SELECT part if DISTINCT will be used.
+	 *
+	 * @param string $table_name     Table name.
+	 * @param string $table_alias    Table alias value.
+	 * @param array  $options        Array of query options.
+	 * @param array  $sql_parts      Array of query parts already initialized from $options.
+	 *
+	 * @return array    The resulting SQL parts array.
+	 */
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
+		if (!$options['countOutput'] && self::dbDistinct($sql_parts)) {
+			$schema = $this->getTableSchema();
+			$nclob_fields = [];
+
+			foreach ($schema['fields'] as $field_name => $field) {
+				if ($field['type'] == DB::FIELD_TYPE_NCLOB
+						&& $this->outputIsRequested($field_name, $options['output'])) {
+					$nclob_fields[] = $field_name;
+				}
+			}
+
+			if ($nclob_fields) {
+				$output = ($options['output'] === API_OUTPUT_EXTEND)
+					? array_keys($schema['fields'])
+					: $options['output'];
+
+				$options['output'] = array_diff($output, $nclob_fields);
+			}
+		}
+
+		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+	}
+
+	/**
+	 * Add NCLOB type fields if there was DISTINCT in query.
+	 *
+	 * @param array $options    Array of query options.
+	 * @param array $result     Query results.
+	 *
+	 * @return array    The result array with added NCLOB fields.
+	 */
+	protected function addNclobFieldValues(array $options, array $result): array {
+		$schema = $this->getTableSchema();
+		$nclob_fields = [];
+
+		foreach ($schema['fields'] as $field_name => $field) {
+			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
+				$nclob_fields[] = $field_name;
+			}
+		}
+
+		if (!$nclob_fields) {
+			return $result;
+		}
+
+		$pk = $schema['key'];
+		$options = [
+			'output' => $nclob_fields,
+			'filter' => [$pk => array_keys($result)]
+		];
+
+		$db_items = DBselect(DB::makeSql($this->tableName, $options));
+
+		while ($db_item = DBfetch($db_items)) {
+			$result[$db_item[$pk]] += $db_item;
+		}
+
+		return $result;
 	}
 }

@@ -136,6 +136,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*units;
 	unsigned char	trends;
+	int		trends_sec;
 }
 ZBX_DC_NUMITEM;
 
@@ -407,10 +408,26 @@ ZBX_DC_HTMPL;
 
 typedef struct
 {
+	const char	*key;
+	const char	*value;
+	int		refcount;
+}
+zbx_dc_kv_t;
+
+typedef struct
+{
+	const char	*path;
+	zbx_hashset_t	kvs;
+}
+zbx_dc_kvs_path_t;
+
+typedef struct
+{
 	zbx_uint64_t	globalmacroid;
 	const char	*macro;
 	const char	*context;
 	const char	*value;
+	zbx_dc_kv_t	*kv;
 	unsigned char	type;
 	unsigned char	context_op;
 }
@@ -430,6 +447,7 @@ typedef struct
 	const char	*macro;
 	const char	*context;
 	const char	*value;
+	zbx_dc_kv_t	*kv;
 	unsigned char	type;
 	unsigned char	context_op;
 }
@@ -812,7 +830,8 @@ typedef struct
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
 	zbx_hashset_t		hostgroups;
-	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
+	zbx_vector_ptr_t	hostgroups_name;	/* host groups sorted by name */
+	zbx_vector_ptr_t	kvs_paths;
 	zbx_hashset_t		preprocops;
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;

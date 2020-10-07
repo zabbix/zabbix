@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:09Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:42Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net D-Link DES_DGS Switch SNMP</template>
-         <name>Template Net D-Link DES_DGS Switch SNMP</name>
+         <template>D-Link DES_DGS Switch SNMP</template>
+         <name>D-Link DES_DGS Switch SNMP</name>
          <description>Template D-Link DES_DGS Switch&#13;
 &#13;
 MIBs used:&#13;
@@ -25,16 +25,16 @@ Known Issues:&#13;
   Version: Firmware: 1.73R008,hardware revision: B1&#13;
   Device: DGS-3420-26SC Gigabit Ethernet Switch&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module EtherLike-MIB SNMP</name>
+               <name>EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -254,6 +254,7 @@ speed-high  : Fan spin using the highest speed.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Memory Discovery</name>
@@ -287,6 +288,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: Memory utilization</name>
@@ -297,7 +299,7 @@ The percentage of used DRAM memory of the total DRAM memory available.The value 
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Net D-Link DES_DGS Switch SNMP</host>
+                              <host>D-Link DES_DGS Switch SNMP</host>
                               <key>vm.memory.util[agentDRAMutilization.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -358,6 +360,7 @@ disconnect : The power unit is not connected.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -393,8 +396,8 @@ The shelf current temperature.</description>
                            <dependencies>
                               <dependency>
                                  <name>#{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Template Net D-Link DES_DGS Switch SNMP:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Template Net D-Link DES_DGS Switch SNMP:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{D-Link DES_DGS Switch SNMP:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{D-Link DES_DGS Switch SNMP:sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -418,6 +421,7 @@ The shelf current temperature.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -462,7 +466,7 @@ The shelf current temperature.</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net D-Link DES_DGS Switch SNMP</host>
+                  <host>D-Link DES_DGS Switch SNMP</host>
                   <key>system.cpu.util[agentCPUutilizationIn1min.0]</key>
                </item>
             </graph_item>

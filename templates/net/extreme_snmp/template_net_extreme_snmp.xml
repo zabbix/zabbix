@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:19Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:03Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Extreme EXOS SNMP</template>
-         <name>Template Net Extreme EXOS SNMP</name>
+         <template>Extreme EXOS SNMP</template>
+         <name>Extreme EXOS SNMP</name>
          <description>Template Extreme EXOS&#13;
 &#13;
 MIBs used:&#13;
@@ -18,16 +18,16 @@ EXTREME-SOFTWARE-MONITOR-MIB&#13;
 EXTREME-SYSTEM-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module EtherLike-MIB SNMP</name>
+               <name>EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -103,10 +103,10 @@ Reference: https://gtacknowledge.extremenetworks.com/articles/Q_A/Does-EXOS-supp
                      <dependencies>
                         <dependency>
                            <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+                           <expression>{Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
-                           <recovery_expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+{Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
+                           <recovery_expression>{Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -342,6 +342,7 @@ Operational status of a cooling fan.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Memory Discovery</name>
@@ -416,6 +417,7 @@ Total amount of DRAM in Kbytes in the system.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: Memory usage</name>
@@ -425,7 +427,7 @@ Total amount of DRAM in Kbytes in the system.</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Net Extreme EXOS SNMP</host>
+                              <host>Extreme EXOS SNMP</host>
                               <key>vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -434,7 +436,7 @@ Total amount of DRAM in Kbytes in the system.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Net Extreme EXOS SNMP</host>
+                              <host>Extreme EXOS SNMP</host>
                               <key>vm.memory.available[extremeMemoryMonitorSystemFree.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -449,7 +451,7 @@ Total amount of DRAM in Kbytes in the system.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Net Extreme EXOS SNMP</host>
+                              <host>Extreme EXOS SNMP</host>
                               <key>vm.memory.util[{#SNMPVALUE}]</key>
                            </item>
                         </graph_item>
@@ -494,6 +496,7 @@ Status of the power supply {#SNMPVALUE}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -534,11 +537,11 @@ Status of the power supply {#SNMPVALUE}</description>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+         <expression>{Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}</expression>
          <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-         <recovery_expression>{Template Net Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+         <recovery_expression>{Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
          <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
          <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
          <priority>HIGH</priority>
@@ -555,7 +558,7 @@ or&#13;
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Extreme EXOS SNMP</host>
+                  <host>Extreme EXOS SNMP</host>
                   <key>system.cpu.util[extremeCpuMonitorTotalUtilization.0]</key>
                </item>
             </graph_item>

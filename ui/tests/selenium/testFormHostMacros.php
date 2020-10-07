@@ -593,4 +593,194 @@ class testFormHostMacros extends testFormMacros {
 		];
 		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
 	}
+
+	public function getCreateVaultMacrosData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO}',
+						'value' => [
+							'text' => 'secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description'
+					],
+					'title' => 'Host updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO2}',
+						'value' => [
+							'text' => 'one/two/three/four/five/six:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description7'
+					],
+					'title' => 'Host updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO3}',
+						'value' => [
+							'text' => 'secret/path:',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description2'
+					],
+					'title' => 'Cannot update host',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "path:".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO4}',
+						'value' => [
+							'text' => '/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description3'
+					],
+					'title' => 'Cannot update host',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "/path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO5}',
+						'value' => [
+							'text' => 'path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description4'
+					],
+					'title' => 'Cannot update host',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near "path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO6}',
+						'value' => [
+							'text' => ':key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description5'
+					],
+					'title' => 'Cannot update host',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near ":key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO7}',
+						'value' => [
+							'text' => 'secret/path',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description6'
+					],
+					'title' => 'Cannot update host',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO7}": incorrect syntax near "path".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO8}',
+						'value' => [
+							'text' => '/secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description8'
+					],
+					'title' => 'Cannot update host',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO9}',
+						'value' => [
+							'text' => '',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description9'
+					],
+					'title' => 'Cannot update host',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateVaultMacrosData
+	 */
+	public function testFormHostMacros_CreateVaultMacros($data) {
+		$this->createVaultMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
+	}
+
+	public function getUpdateVaultMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 2,
+					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
+					'value' => [
+						'text' => 'secret/path:key'
+					],
+					'description' => ''
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 2,
+					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					],
+					'description' => ''
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 2,
+					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					],
+					'description' => 'Changing description'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateVaultMacrosData
+	 */
+	public function testFormHostMacros_UpdateVaultMacros($data) {
+		$this->updateVaultMacros($data, 'hosts.php?form=update&hostid=99011', 'hosts');
+	}
 }

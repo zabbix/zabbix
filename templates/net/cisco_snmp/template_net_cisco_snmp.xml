@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-04T08:49:35Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:01Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -12,14 +12,14 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module Cisco CISCO-ENVMON-MIB SNMP</template>
-         <name>Template Module Cisco CISCO-ENVMON-MIB SNMP</name>
+         <template>Cisco CISCO-ENVMON-MIB SNMP</template>
+         <name>Cisco CISCO-ENVMON-MIB SNMP</name>
          <description>Template Cisco CISCO-ENVMON-MIB&#13;
 &#13;
 MIBs used:&#13;
 CISCO-ENVMON-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -79,13 +79,14 @@ Template tooling version used: 0.36</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_INFO}: Fan is in critical state</name>
-                                 <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                                 <expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"critical"},eq)}=1 or {Cisco CISCO-ENVMON-MIB SNMP:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"shutdown"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -129,13 +130,14 @@ Template tooling version used: 0.36</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_INFO}: Power supply is in critical state</name>
-                                 <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"shutdown"},eq)}=1</expression>
+                                 <expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Cisco CISCO-ENVMON-MIB SNMP:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"shutdown"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -192,26 +194,27 @@ The current measurement of the test point being instrumented.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPVALUE}"}&#13;
+                     <expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPVALUE}"}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPVALUE}"}-3</recovery_expression>
+                     <recovery_expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPVALUE}"}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"{#SNMPVALUE}"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"{#SNMPVALUE}"}&#13;
+                     <expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"{#SNMPVALUE}"}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"{#SNMPVALUE}"}-3</recovery_expression>
+                     <recovery_expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"{#SNMPVALUE}"}-3</recovery_expression>
                      <name>{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"{#SNMPVALUE}"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
@@ -219,12 +222,12 @@ or&#13;
                      <dependencies>
                         <dependency>
                            <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"{#SNMPVALUE}"}</name>
-                           <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPVALUE}"}&#13;
+                           <expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPVALUE}"}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
-                           <recovery_expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPVALUE}"}-3</recovery_expression>
+{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+                           <recovery_expression>{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPVALUE}"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -299,14 +302,14 @@ or&#13;
          </macros>
       </template>
       <template>
-         <template>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP</template>
-         <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
+         <template>Cisco CISCO-MEMORY-POOL-MIB SNMP</template>
+         <name>Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
          <description>Template Cisco CISCO-MEMORY-POOL-MIB&#13;
 &#13;
 MIBs used:&#13;
 CISCO-MEMORY-POOL-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -383,6 +386,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: Memory utilization</name>
@@ -393,7 +397,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP</host>
+                              <host>Cisco CISCO-MEMORY-POOL-MIB SNMP</host>
                               <key>vm.memory.util[vm.memory.util.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -410,14 +414,14 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
          </macros>
       </template>
       <template>
-         <template>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</template>
-         <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</name>
+         <template>Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</template>
+         <name>Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</name>
          <description>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5&#13;
 &#13;
 MIBs used:&#13;
 CISCO-PROCESS-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -473,6 +477,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
@@ -483,7 +488,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</host>
+                              <host>Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</host>
                               <key>system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -500,14 +505,14 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
          </macros>
       </template>
       <template>
-         <template>Template Module Cisco CISCO-PROCESS-MIB SNMP</template>
-         <name>Template Module Cisco CISCO-PROCESS-MIB SNMP</name>
+         <template>Cisco CISCO-PROCESS-MIB SNMP</template>
+         <name>Cisco CISCO-PROCESS-MIB SNMP</name>
          <description>Template Cisco CISCO-PROCESS-MIB&#13;
 &#13;
 MIBs used:&#13;
 CISCO-PROCESS-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -559,6 +564,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -569,7 +575,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Cisco CISCO-PROCESS-MIB SNMP</host>
+                              <host>Cisco CISCO-PROCESS-MIB SNMP</host>
                               <key>system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -586,15 +592,15 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
          </macros>
       </template>
       <template>
-         <template>Template Module Cisco Inventory SNMP</template>
-         <name>Template Module Cisco Inventory SNMP</name>
+         <template>Cisco Inventory SNMP</template>
+         <name>Cisco Inventory SNMP</name>
          <description>Template Cisco Inventory&#13;
 &#13;
 MIBs used:&#13;
 ENTITY-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -755,18 +761,19 @@ Template tooling version used: 0.36</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
       </template>
       <template>
-         <template>Template Module Cisco OLD-CISCO-CPU-MIB SNMP</template>
-         <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMP</name>
+         <template>Cisco OLD-CISCO-CPU-MIB SNMP</template>
+         <name>Cisco OLD-CISCO-CPU-MIB SNMP</name>
          <description>Template Cisco OLD-CISCO-CPU-MIB&#13;
 &#13;
 MIBs used:&#13;
 OLD-CISCO-CPU-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -814,26 +821,26 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
          </macros>
       </template>
       <template>
-         <template>Template Net Cisco IOS prior to 12.0_3_T SNMP</template>
-         <name>Template Net Cisco IOS prior to 12.0_3_T SNMP</name>
+         <template>Cisco IOS prior to 12.0_3_T SNMP</template>
+         <name>Cisco IOS prior to 12.0_3_T SNMP</name>
          <description>Cisco IOS Software releases prior to 12.0(3)T&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Cisco CISCO-ENVMON-MIB SNMP</name>
+               <name>Cisco CISCO-ENVMON-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
+               <name>Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco Inventory SNMP</name>
+               <name>Cisco Inventory SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMP</name>
+               <name>Cisco OLD-CISCO-CPU-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
          </templates>
          <groups>
@@ -843,8 +850,8 @@ Template tooling version used: 0.36</description>
          </groups>
       </template>
       <template>
-         <template>Template Net Cisco IOS SNMP</template>
-         <name>Template Net Cisco IOS SNMP</name>
+         <template>Cisco IOS SNMP</template>
+         <name>Cisco IOS SNMP</name>
          <description>Template Cisco IOS Software releases 12.2(3.5) or later&#13;
 &#13;
 Known Issues:&#13;
@@ -853,28 +860,28 @@ Known Issues:&#13;
   Version: IOS for example: 12.1(22)EA11, 15.4(3)M2&#13;
   Device: C2911, C7600&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Cisco CISCO-ENVMON-MIB SNMP</name>
+               <name>Cisco CISCO-ENVMON-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
+               <name>Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco CISCO-PROCESS-MIB SNMP</name>
+               <name>Cisco CISCO-PROCESS-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco Inventory SNMP</name>
+               <name>Cisco Inventory SNMP</name>
             </template>
             <template>
-               <name>Template Module EtherLike-MIB SNMP</name>
+               <name>EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -884,29 +891,29 @@ Template tooling version used: 0.36</description>
          </groups>
       </template>
       <template>
-         <template>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP</template>
-         <name>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP</name>
+         <template>Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP</template>
+         <name>Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP</name>
          <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5)&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Cisco CISCO-ENVMON-MIB SNMP</name>
+               <name>Cisco CISCO-ENVMON-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
+               <name>Cisco CISCO-MEMORY-POOL-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</name>
+               <name>Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP</name>
             </template>
             <template>
-               <name>Template Module Cisco Inventory SNMP</name>
+               <name>Cisco Inventory SNMP</name>
             </template>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -926,7 +933,7 @@ Template tooling version used: 0.36</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Cisco OLD-CISCO-CPU-MIB SNMP</host>
+                  <host>Cisco OLD-CISCO-CPU-MIB SNMP</host>
                   <key>system.cpu.util[avgBusy5]</key>
                </item>
             </graph_item>

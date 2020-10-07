@@ -109,6 +109,7 @@ class CXmlConstantName {
 	const BASIC = 'BASIC';
 	const NTLM = 'NTLM';
 	const KERBEROS = 'KERBEROS';
+	const DIGEST = 'DIGEST';
 
 	const ALIAS = 'ALIAS';
 	const ASSET_TAG = 'ASSET_TAG';
@@ -298,6 +299,7 @@ class CXmlConstantName {
 
 	const MACRO_TYPE_TEXT = 'TEXT';
 	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
+	const MACRO_TYPE_VAULT = 'VAULT';
 
 	// Constants for low-level discovery rule overrides.
 	const LLD_OVERRIDE_STOP_NO = 'NO_STOP';

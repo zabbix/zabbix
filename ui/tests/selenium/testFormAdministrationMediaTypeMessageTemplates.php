@@ -74,7 +74,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	public function getDefaultMessageTemplateData() {
 		return [
-			// Defult messages for plain text Email media type
+			// Default messages for plain text Email media type
 			[
 				[
 					'media_type' => [
@@ -145,7 +145,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					]
 				]
 			],
-			// Defult messages for HTML text Email media type
+			// Default messages for HTML text Email media type
 			[
 				[
 					'media_type' => [
@@ -210,7 +210,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					]
 				]
 			],
-			// Defult messages for SMS media type
+			// Default messages for SMS media type
 			[
 				[
 					'media_type' => [
@@ -560,10 +560,10 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		else {
 			$this->modifyMessageTemplates($data);
 		}
-		$this->query('id:media_type_form')->asForm()->one()->submit();
+		$this->query('id:media-type-form')->asForm()->one()->submit();
 		// Open message template list of the edited media type and check that message template updates took place.
 		$this->query('link', $data['media_type'])->one()->WaitUntilClickable()->click();
-		$media_form = $this->query('id:media_type_form')->asForm()->one();
+		$media_form = $this->query('id:media-type-form')->asForm()->one();
 		$media_form->selectTab('Message templates');
 		$templates_list->invalidate();
 		if (array_key_exists('remove_all', $data)) {
@@ -585,7 +585,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		$templates_list->findRow('Message type', 'Problem')->query('button:Edit')->one()->click();
 		$this->query('id:mediatype_message_form')->waitUntilVisible()->asForm()->one()->submit();
-		$this->query('id:media_type_form')->asForm()->one()->submit();
+		$this->query('id:media-type-form')->asForm()->one()->submit();
 
 		// Check that no DB changes took place.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -652,7 +652,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				case 'Edit':
 				case 'Add':
 				case 'Skip':
-					// Open the correspondig message template and check its content according to the values in data provider.
+					// Open the corresponding message template and check its content according to the values in data provider.
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					$form = $this->query('id:mediatype_message_form')->asForm()->one();
@@ -678,7 +678,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
 			$this->query('link', $media_type)->one()->WaitUntilClickable()->click();
 		}
-		$media_form = $this->query('id:media_type_form')->asForm()->one();
+		$media_form = $this->query('id:media-type-form')->asForm()->one();
 		if ($media_type_fields !== null) {
 			$media_form->fill($media_type_fields);
 		}

@@ -30,6 +30,7 @@ $widget = (new CWidget())
 	));
 
 $form = (new CForm())
+	->setId('host-discovery-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -275,12 +276,9 @@ $form_list
 		new CLabel(_('HTTP authentication'), 'http_authtype'),
 		[
 			$data['limited'] ? new CVar('http_authtype', $data['http_authtype']) : null,
-			(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null, [
-				HTTPTEST_AUTH_NONE => _('None'),
-				HTTPTEST_AUTH_BASIC => _('Basic'),
-				HTTPTEST_AUTH_NTLM => _('NTLM'),
-				HTTPTEST_AUTH_KERBEROS => _('Kerberos')
-			]))->setEnabled(!$data['limited'])
+			(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null,
+				httptest_authentications()
+			))->setEnabled(!$data['limited'])
 		],
 		'http_authtype_row'
 	)
@@ -374,41 +372,23 @@ $form_list
 	);
 
 // Append interfaces to form list.
+$select_interface = getInterfaceSelect($data['interfaces'])
+	->setId('interface-select')
+	->setValue($data['interfaceid'])
+	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+	->setFocusableElementId('interfaceid')
+	->setAriaRequired();
+
 if ($data['display_interfaces']) {
-	$interfaces_combobox = (new CComboBox('interfaceid', $data['interfaceid']))->setAriaRequired();
-
-	// Set up interface groups sorted by priority.
-	$interface_types = zbx_objectValues($data['interfaces'], 'type');
-	$interface_groups = [];
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		if (in_array($interface_type, $interface_types)) {
-			$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
-		}
-	}
-
-	// add interfaces to groups
-	foreach ($data['interfaces'] as $interface) {
-		$option = new CComboItem($interface['interfaceid'],
-			$interface['useip']
-				? $interface['ip'].' : '.$interface['port']
-				: $interface['dns'].' : '.$interface['port'],
-			($interface['interfaceid'] == $data['interfaceid'])
-		);
-		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interface_groups[$interface['type']]->addItem($option);
-	}
-	foreach ($interface_groups as $interface_group) {
-		$interfaces_combobox->addItem($interface_group);
-	}
-
-	$form_list->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(),
-		[$interfaces_combobox,
+	$form_list->addRow(
+		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))->setAsteriskMark(),
+		[
+			$select_interface,
 			(new CSpan(_('No interface found')))
 				->addClass(ZBX_STYLE_RED)
 				->setId('interface_not_defined')
 				->setAttribute('style', 'display: none;')
-		], 'interface_row'
-	);
+		], 'interface_row');
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $form_list
@@ -764,11 +744,12 @@ $tab = (new CTabView())
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
 				getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
-			)
+			),
+		TAB_INDICATOR_PREPROCESSING
 	)
-	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
-	->addTab('macroTab', _('Filters'), $conditionFormList)
-	->addTab('overridesTab', _('Overrides'), $overrides_form_list);
+	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list, TAB_INDICATOR_LLD_MACROS)
+	->addTab('macroTab', _('Filters'), $conditionFormList, TAB_INDICATOR_FILTERS)
+	->addTab('overridesTab', _('Overrides'), $overrides_form_list, TAB_INDICATOR_OVERRIDES);
 
 if (!hasRequest('form_refresh')) {
 	$tab->setSelected(0);

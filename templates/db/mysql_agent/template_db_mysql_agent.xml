@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-17T12:31:10Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:55Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template DB MySQL by Zabbix agent</template>
-         <name>Template DB MySQL by Zabbix agent</name>
+         <template>MySQL by Zabbix agent</template>
+         <name>MySQL by Zabbix agent</name>
          <description>Requirements for template operation:&#13;
 1.Install Zabbix agent and MySQL client.&#13;
 2.Copy template_db_mysql.conf into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). Don't forget restart zabbix-agent. &#13;
@@ -26,7 +26,7 @@ password='&lt;password&gt;'&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -103,7 +103,7 @@ Template tooling version used: 0.37</description>
                      <dependencies>
                         <dependency>
                            <name>MySQL: Refused connections (max_connections limit reached)</name>
-                           <expression>{Template DB MySQL by Zabbix agent:mysql.connection_errors_max_connections.rate.last()}&gt;0</expression>
+                           <expression>{MySQL by Zabbix agent:mysql.connection_errors_max_connections.rate.last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1140,7 +1140,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <dependencies>
                         <dependency>
                            <name>MySQL: Service is down</name>
-                           <expression>{Template DB MySQL by Zabbix agent:mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"].last()}=0</expression>
+                           <expression>{MySQL by Zabbix agent:mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1218,6 +1218,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1323,7 +1324,7 @@ explicitly stopped it with STOP SLAVE.</description>
                            <dependencies>
                               <dependency>
                                  <name>MySQL: The slave I/O thread is not running</name>
-                                 <expression>{Template DB MySQL by Zabbix agent:mysql.slave_io_running["{#MASTERHOST}"].count(#1,"No",eq)}=1</expression>
+                                 <expression>{MySQL by Zabbix agent:mysql.slave_io_running["{#MASTERHOST}"].count(#1,"No",eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1366,7 +1367,7 @@ As with the I/O thread, this should normally be Yes.</description>
                            <dependencies>
                               <dependency>
                                  <name>MySQL: The slave I/O thread is not running</name>
-                                 <expression>{Template DB MySQL by Zabbix agent:mysql.slave_io_running["{#MASTERHOST}"].count(#1,"No",eq)}=1</expression>
+                                 <expression>{MySQL by Zabbix agent:mysql.slave_io_running["{#MASTERHOST}"].count(#1,"No",eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1386,6 +1387,7 @@ As with the I/O thread, this should normally be Yes.</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1461,7 +1463,7 @@ return '[]';</params>
                      <style>0</style>
                      <resource>
                         <name>MySQL: Operations</name>
-                        <host>Template DB MySQL by Zabbix agent</host>
+                        <host>MySQL by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1483,7 +1485,7 @@ return '[]';</params>
                      <style>0</style>
                      <resource>
                         <name>MySQL: Queries</name>
-                        <host>Template DB MySQL by Zabbix agent</host>
+                        <host>MySQL by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1505,7 +1507,7 @@ return '[]';</params>
                      <style>0</style>
                      <resource>
                         <name>MySQL: Connections</name>
-                        <host>Template DB MySQL by Zabbix agent</host>
+                        <host>MySQL by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1527,7 +1529,7 @@ return '[]';</params>
                      <style>0</style>
                      <resource>
                         <name>MySQL: Bandwidth</name>
-                        <host>Template DB MySQL by Zabbix agent</host>
+                        <host>MySQL by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1549,7 +1551,7 @@ return '[]';</params>
                      <style>0</style>
                      <resource>
                         <name>MySQL: InnoDB buffer pool</name>
-                        <host>Template DB MySQL by Zabbix agent</host>
+                        <host>MySQL by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1571,7 +1573,7 @@ return '[]';</params>
                      <style>0</style>
                      <resource>
                         <name>MySQL: Threads</name>
-                        <host>Template DB MySQL by Zabbix agent</host>
+                        <host>MySQL by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1601,7 +1603,7 @@ return '[]';</params>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.bytes_received.rate</key>
                </item>
             </graph_item>
@@ -1610,7 +1612,7 @@ return '[]';</params>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.bytes_sent.rate</key>
                </item>
             </graph_item>
@@ -1622,7 +1624,7 @@ return '[]';</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.aborted_clients.rate</key>
                </item>
             </graph_item>
@@ -1630,7 +1632,7 @@ return '[]';</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.aborted_connects.rate</key>
                </item>
             </graph_item>
@@ -1638,7 +1640,7 @@ return '[]';</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.connections.rate</key>
                </item>
             </graph_item>
@@ -1646,7 +1648,7 @@ return '[]';</params>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.max_used_connections</key>
                </item>
             </graph_item>
@@ -1658,7 +1660,7 @@ return '[]';</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.innodb_buffer_pool_pages_free</key>
                </item>
             </graph_item>
@@ -1666,7 +1668,7 @@ return '[]';</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.innodb_buffer_pool_pages_total</key>
                </item>
             </graph_item>
@@ -1674,7 +1676,7 @@ return '[]';</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.innodb_buffer_pool_read_requests.rate</key>
                </item>
             </graph_item>
@@ -1682,7 +1684,7 @@ return '[]';</params>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.innodb_buffer_pool_reads.rate</key>
                </item>
             </graph_item>
@@ -1694,7 +1696,7 @@ return '[]';</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.com_delete.rate</key>
                </item>
             </graph_item>
@@ -1702,7 +1704,7 @@ return '[]';</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.com_insert.rate</key>
                </item>
             </graph_item>
@@ -1710,7 +1712,7 @@ return '[]';</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.com_select.rate</key>
                </item>
             </graph_item>
@@ -1718,7 +1720,7 @@ return '[]';</params>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.com_update.rate</key>
                </item>
             </graph_item>
@@ -1730,7 +1732,7 @@ return '[]';</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.queries.rate</key>
                </item>
             </graph_item>
@@ -1738,7 +1740,7 @@ return '[]';</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.questions.rate</key>
                </item>
             </graph_item>
@@ -1746,7 +1748,7 @@ return '[]';</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.slow_queries.rate</key>
                </item>
             </graph_item>
@@ -1758,7 +1760,7 @@ return '[]';</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.threads_cached</key>
                </item>
             </graph_item>
@@ -1766,7 +1768,7 @@ return '[]';</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.threads_connected</key>
                </item>
             </graph_item>
@@ -1774,7 +1776,7 @@ return '[]';</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.threads_created.rate</key>
                </item>
             </graph_item>
@@ -1782,7 +1784,7 @@ return '[]';</params>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB MySQL by Zabbix agent</host>
+                  <host>MySQL by Zabbix agent</host>
                   <key>mysql.threads_running</key>
                </item>
             </graph_item>

@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.2.0alpha3');
+define('ZABBIX_VERSION',		'5.2.0beta2');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010030);
+define('ZABBIX_DB_VERSION',		5010034);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -56,6 +56,9 @@ define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
+
+// TTL timeout in seconds used to invalidate data cache of Vault response. Set 0 to disable Vault response caching.
+define('ZBX_DATA_CACHE_TTL', 60);
 
 define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
@@ -140,6 +143,9 @@ define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
 define('ORACLE_MAX_STRING_SIZE', 4000);
 define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
 define('ORACLE_CESU8_CHARSET', 'UTF8');
+
+define('DB_STORE_CREDS_CONFIG', 0);
+define('DB_STORE_CREDS_VAULT', 1);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -894,6 +900,7 @@ define('HTTPTEST_AUTH_NONE',		0);
 define('HTTPTEST_AUTH_BASIC',		1);
 define('HTTPTEST_AUTH_NTLM',		2);
 define('HTTPTEST_AUTH_KERBEROS',	3);
+define('HTTPTEST_AUTH_DIGEST',		4);
 
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
@@ -962,9 +969,13 @@ define('ZBX_EVENT_HISTORY_ALERT',				3);
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
 define('ZBX_TM_TASK_CHECK_NOW',		6);
+define('ZBX_TM_TASK_DATA',			7);
 
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
+
+define('ZBX_TM_DATA_TYPE_DIAGINFO',		1);
+define('ZBX_TM_DATA_TYPE_CHECK_NOW',	6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
@@ -1349,6 +1360,7 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
+define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in HashiCorp Vault).
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
@@ -1544,6 +1556,39 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 define('ZBX_POPUP_CONDITION_TYPE_EVENT_CORR', 0);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
+
+// Tab indicator names.
+define('TAB_INDICATOR_MACROS', 'macros');
+define('TAB_INDICATOR_LINKED_TEMPLATE', 'linked-template');
+define('TAB_INDICATOR_TAGS', 'tags');
+define('TAB_INDICATOR_AUTH_HTTP', 'http');
+define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
+define('TAB_INDICATOR_AUTH_SAML', 'saml');
+define('TAB_INDICATOR_INVENTORY', 'inventory');
+define('TAB_INDICATOR_ENCRYPTION', 'encryption');
+define('TAB_INDICATOR_GROUPS', 'groups');
+define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
+define('TAB_INDICATOR_DEPENDENCY', 'dependency');
+define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
+define('TAB_INDICATOR_FILTERS', 'filters');
+define('TAB_INDICATOR_OVERRIDES', 'overrides');
+define('TAB_INDICATOR_STEPS', 'steps');
+define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
+define('TAB_INDICATOR_OPERATIONS', 'operations');
+define('TAB_INDICATOR_SERVICE_DEPENDENCY', 'service-dependency');
+define('TAB_INDICATOR_TIME', 'time');
+define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
+define('TAB_INDICATOR_MEDIA', 'media');
+define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
+define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_SHARING', 'sharing');
+define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
+define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
+define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
+define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
+define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
+define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
+define('TAB_INDICATOR_PERMISSIONS', 'permissions');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
@@ -1887,6 +1932,12 @@ define('ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE', 'interface-btn-toggle');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE', 'interface-btn-remove');
 define('ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE', 'interface-btn-main-interface');
 define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
+
+define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
+
+// Dashboard list table classes.
+define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
+define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
