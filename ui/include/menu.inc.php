@@ -46,7 +46,7 @@ function getMainMenu(): CMenu {
 					->setAliases(['history.php', 'chart.php']),
 				(new CMenuItem(_('Screens')))
 					->setUrl(new CUrl('screens.php'), 'screens.php')
-					->setAliases(['screenconf.php?!templateid=*', 'screenedit.php?!templateid=*', 'screen.import.php',
+					->setAliases(['screenconf.php', 'screenedit.php', 'screen.import.php',
 						'slides.php', 'slideconf.php'
 					]),
 				(new CMenuItem(_('Maps')))

@@ -290,7 +290,7 @@ if ($data['admin']) {
 				),
 				$dashboard_count
 			]
-			: [_('Screens'), $dashboard_count];
+			: [_('Dashboards'), $dashboard_count];
 
 		$discovery_link = $template['editable']
 			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
