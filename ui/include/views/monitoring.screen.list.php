@@ -27,7 +27,7 @@ $widget = (new CWidget())->setTitle(_('Screens'));
 
 $form = (new CForm('get'))->cleanItems();
 
-$content_control = (new CList())->addItem(new CSubmit('form', _('Create screen')));
+$content_control = (new CList())->addItem((new CSubmit('form', _('Create screen')))->setEnabled($data['allowed_edit']));
 
 if ($data['templateid']) {
 	$form->addItem((new CVar('templateid', $data['templateid']))->removeId());
@@ -45,6 +45,7 @@ else {
 
 	$content_control->addItem(
 		(new CButton('form', _('Import')))
+			->setEnabled($data['allowed_edit'])
 			->onClick('redirect("screen.import.php?rules_preset=screen")')
 			->removeId()
 	);
@@ -96,9 +97,9 @@ foreach ($data['screens'] as $screen) {
 			|| $screen['editable']) {
 		$checkbox = new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']);
 		$action = new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'));
-		$constructor = new CLink(_('Constructor'),
-			'screenedit.php?screenid='.$screen['screenid'].url_param('templateid')
-		);
+		$constructor = $data['allowed_edit']
+			? new CLink(_('Constructor'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))
+			: _('Constructor');
 	}
 	else {
 		$checkbox = (new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']))

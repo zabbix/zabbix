@@ -99,10 +99,16 @@ else {
 	$screen = [];
 }
 
+$allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
 /*
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	DBstart();
 
 	if (hasRequest('update')) {
@@ -238,6 +244,10 @@ if (hasRequest('add') || hasRequest('update')) {
 }
 elseif ((hasRequest('delete') && hasRequest('screenid'))
 		|| (hasRequest('action') && getRequest('action') === 'screen.massdelete' && hasRequest('screens'))) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$screenids = getRequest('screens', []);
 	if (hasRequest('screenid')) {
 		$screenids[] = getRequest('screenid');
@@ -293,6 +303,10 @@ if (hasRequest('form')) {
 
 	if (!hasRequest('templateid') && !array_key_exists('templateid', $screen)) {
 		if (!hasRequest('screenid') || hasRequest('form_refresh')) {
+			if (!$allowed_edit) {
+				access_deny(ACCESS_DENY_PAGE);
+			}
+
 			// Screen owner.
 			$screen_owner = getRequest('userid', $current_userid);
 			$userids[$screen_owner] = true;
@@ -356,6 +370,7 @@ if (hasRequest('form')) {
 	$data['form'] = getRequest('form');
 	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh');
+	$data['allowed_edit'] = hasRequest('templateid') || $allowed_edit;
 
 	// render view
 	echo (new CView('monitoring.screen.edit', $data))->getOutput();
@@ -372,7 +387,8 @@ else {
 	$data = [
 		'templateid' => getRequest('templateid'),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'allowed_edit' => hasRequest('templateid') || $allowed_edit
 	];
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 

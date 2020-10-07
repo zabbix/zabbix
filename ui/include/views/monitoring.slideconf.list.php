@@ -38,7 +38,7 @@ $widget = (new CWidget())
 			->cleanItems()
 			->addItem(
 				(new CList())
-					->addItem(new CSubmit('form', _('Create slide show')))
+					->addItem((new CSubmit('form', _('Create slide show')))->setEnabled($data['allowed_edit']))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))

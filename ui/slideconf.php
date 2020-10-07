@@ -94,10 +94,16 @@ if (hasRequest('action')) {
 	}
 }
 
+$allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
 /*
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	DBstart();
 
 	$slides = getRequest('slides', []);
@@ -170,6 +176,10 @@ if (hasRequest('add') || hasRequest('update')) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	DBstart();
 
 	$result = delete_slideshow($_REQUEST['slideshowid']);
@@ -187,6 +197,10 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	show_messages($result, _('Slide show deleted'), _('Cannot delete slide show'));
 }
 elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' && hasRequest('shows')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$result = true;
 
 	$shows = getRequest('shows');
@@ -218,7 +232,8 @@ if (hasRequest('form')) {
 
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh', 0)
+		'form_refresh' => getRequest('form_refresh', 0),
+		'allowed_edit' => $allowed_edit
 	];
 
 	if (!hasRequest('slideshowid') || hasRequest('form_refresh')) {
@@ -373,7 +388,8 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'profileIdx' => 'web.slideconf.filter',
-		'active_tab' => CProfile::get('web.slideconf.filter.active', 1)
+		'active_tab' => CProfile::get('web.slideconf.filter.active', 1),
+		'allowed_edit' => $allowed_edit
 	];
 
 	if ($data['filter']['name'] !== '') {

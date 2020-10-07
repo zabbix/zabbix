@@ -56,7 +56,8 @@ $multiselect_data = [
 	'name' => 'userid',
 	'object_name' => 'users',
 	'multiple' => false,
-	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+	'disabled' => (!$data['allowed_edit'] && $user_type != USER_TYPE_SUPER_ADMIN
+			&& $user_type != USER_TYPE_ZABBIX_ADMIN),
 	'data' => [],
 	'popup' => [
 		'parameters' => [
@@ -99,12 +100,14 @@ $slideshow_tab
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled')
 	)
 	->addRow(
 		(new CLabel(_('Default delay'), 'delay'))->setAsteriskMark(),
 		(new CTextBox('delay', $data['slideshow']['delay']))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled')
 	);
 
 // append slide table
@@ -133,12 +136,14 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 			$data['slideshow']['screens'][$slides['screenid']]['name'],
 			(new CTextBox('slides['.$key.'][delay]', $slides['delay']))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAttribute('placeholder', _('default')),
+				->setAttribute('placeholder', _('default'))
+				->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled'),
 			(new CCol(
 				(new CButton('remove_'.$key, _('Remove')))
 					->onClick('javascript: removeSlide(this);')
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->setAttribute('remove_slide', $key)
+					->setEnabled($data['allowed_edit'])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
@@ -157,6 +162,7 @@ $addButtonColumn = (new CCol(
 				]).', null, this);'
 			)
 			->addClass(ZBX_STYLE_BTN_LINK)
+			->setEnabled($data['allowed_edit'])
 	))->setColSpan(5);
 
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
@@ -187,7 +193,8 @@ $add_user_group_btn = ([(new CButton(null, _('Add')))
 			'multiselect' => '1'
 		]).', null, this);'
 	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->setEnabled($data['allowed_edit'])]);
 
 $user_group_shares_table->addRow(
 	(new CRow(
@@ -225,7 +232,8 @@ $add_user_btn = ([(new CButton(null, _('Add')))
 			'multiselect' => '1'
 		]).', null, this);'
 	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->setEnabled($data['allowed_edit'])]);
 
 $user_shares_table->addRow(
 	(new CRow(
@@ -256,6 +264,7 @@ $sharing_tab = (new CFormList('sharing_form'))
 		->addValue(_('Private'), PRIVATE_SHARING)
 		->addValue(_('Public'), PUBLIC_SHARING)
 		->setModern(true)
+		->setEnabled($data['allowed_edit'])
 	)
 	->addRow(_('List of user group shares'),
 		(new CDiv($user_group_shares_table))
@@ -274,10 +283,13 @@ $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
 // append buttons to form
 if (isset($data['slideshow']['slideshowid'])) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('update', _('Update')))->setEnabled($data['allowed_edit']),
 		[
-			(new CSimpleButton(_('Clone')))->setId('clone'),
-			new CButtonDelete(_('Delete slide show?'), url_params(['form', 'slideshowid'])),
+			(new CSimpleButton(_('Clone')))
+				->setId('clone')
+				->setEnabled($data['allowed_edit']),
+			(new CButtonDelete(_('Delete slide show?'), url_params(['form', 'slideshowid'])))
+				->setEnabled($data['allowed_edit']),
 			new CRedirectButton(_('Cancel'), 'slides.php')
 		]
 	));
