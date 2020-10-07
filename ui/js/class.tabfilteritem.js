@@ -47,6 +47,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._template = options.template;
 		this._expanded = options.expanded;
 		this._support_custom_time = options.support_custom_time;
+		this._options = options;
 		this._template_rendered = false;
 		this._src_url = null;
 		this._apply_url = null;
@@ -135,7 +136,8 @@ class CTabFilterItem extends CBaseComponent {
 			filter_custom_time: this._data.filter_custom_time,
 			tabfilter_from: this._data.from || '',
 			tabfilter_to: this._data.to || '',
-			support_custom_time: +this._support_custom_time
+			support_custom_time: +this._options.support_custom_time,
+			allow_set_custom_time: +this._support_custom_time
 		};
 
 		if (this._data.filter_name !== '') {

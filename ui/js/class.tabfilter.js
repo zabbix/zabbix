@@ -567,7 +567,8 @@ class CTabFilter extends CBaseComponent {
 				this._active_item.openPropertiesDialog({
 					create: 1,
 					idx2: this._items.length,
-					support_custom_time: this._options.support_custom_time
+					support_custom_time: +this._options.support_custom_time,
+					allow_set_custom_time: +this._active_item._support_custom_time
 				}, ev.target);
 			},
 

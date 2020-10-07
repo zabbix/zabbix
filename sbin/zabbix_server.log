@@ -1,0 +1,367 @@
+ 19736:20200902:095354.290 Starting Zabbix Server. Zabbix 5.2.0alpha3 (revision {ZABBIX_REVISION}).
+ 19736:20200902:095354.290 ****** Enabled features ******
+ 19736:20200902:095354.290 SNMP monitoring:            NO
+ 19736:20200902:095354.290 IPMI monitoring:            NO
+ 19736:20200902:095354.290 Web monitoring:             NO
+ 19736:20200902:095354.290 VMware monitoring:          NO
+ 19736:20200902:095354.290 SMTP authentication:        NO
+ 19736:20200902:095354.290 ODBC:                       NO
+ 19736:20200902:095354.290 SSH support:                NO
+ 19736:20200902:095354.290 IPv6 support:               NO
+ 19736:20200902:095354.290 TLS support:                NO
+ 19736:20200902:095354.290 ******************************
+ 19736:20200902:095354.290 using configuration file: /home/gcalenko/git.zabbix.com/feature/ZBXNEXT-710-5.2/sbin/zabbix_server.conf
+ 19736:20200902:095354.337 current database version (mandatory/optional): 05010008/05010008
+ 19736:20200902:095354.337 required mandatory version: 05010030
+ 19736:20200902:095354.337 starting automatic database upgrade
+ 19736:20200902:095354.560 completed 4% of database upgrade
+ 19736:20200902:095354.743 completed 9% of database upgrade
+ 19736:20200902:095354.941 completed 13% of database upgrade
+ 19736:20200902:095355.121 completed 18% of database upgrade
+ 19736:20200902:095355.301 completed 22% of database upgrade
+ 19736:20200902:095355.480 completed 27% of database upgrade
+ 19736:20200902:095355.669 completed 31% of database upgrade
+ 19736:20200902:095355.850 completed 36% of database upgrade
+ 19736:20200902:095356.049 completed 40% of database upgrade
+ 19736:20200902:095356.232 completed 45% of database upgrade
+ 19736:20200902:095356.423 completed 50% of database upgrade
+ 19736:20200902:095356.604 completed 54% of database upgrade
+ 19736:20200902:095356.788 completed 59% of database upgrade
+ 19736:20200902:095356.972 completed 63% of database upgrade
+ 19736:20200902:095357.164 completed 68% of database upgrade
+ 19736:20200902:095357.347 completed 72% of database upgrade
+ 19736:20200902:095357.372 completed 77% of database upgrade
+ 19736:20200902:095357.407 completed 81% of database upgrade
+ 19736:20200902:095357.427 completed 86% of database upgrade
+ 19736:20200902:095357.444 completed 90% of database upgrade
+ 19736:20200902:095357.463 completed 95% of database upgrade
+ 19736:20200902:095357.473 completed 100% of database upgrade
+ 19736:20200902:095357.473 database upgrade fully completed
+ 19736:20200902:095357.608 server #0 started [main process]
+ 19748:20200902:095357.609 server #1 started [configuration syncer #1]
+ 19749:20200902:095357.753 server #2 started [housekeeper #1]
+ 19750:20200902:095357.753 server #3 started [timer #1]
+ 19751:20200902:095357.753 server #4 started [http poller #1]
+ 19752:20200902:095357.754 server #5 started [discoverer #1]
+ 19754:20200902:095357.754 server #7 started [history syncer #2]
+ 19753:20200902:095357.754 server #6 started [history syncer #1]
+ 19755:20200902:095357.755 server #8 started [history syncer #3]
+ 19757:20200902:095357.755 server #10 started [escalator #1]
+ 19759:20200902:095357.755 server #12 started [self-monitoring #1]
+ 19758:20200902:095357.755 server #11 started [proxy poller #1]
+ 19761:20200902:095357.756 server #14 started [poller #1]
+ 19769:20200902:095357.757 server #22 started [trapper #3]
+ 19772:20200902:095357.757 server #25 started [icmp pinger #1]
+ 19773:20200902:095357.758 server #26 started [alert manager #1]
+ 19760:20200902:095357.758 server #13 started [task manager #1]
+ 19756:20200902:095357.759 server #9 started [history syncer #4]
+ 19774:20200902:095357.759 server #27 started [alerter #1]
+ 19776:20200902:095357.759 server #29 started [alerter #3]
+ 19762:20200902:095357.759 server #15 started [poller #2]
+ 19775:20200902:095357.760 server #28 started [alerter #2]
+ 19766:20200902:095357.760 server #19 started [unreachable poller #1]
+ 19767:20200902:095357.760 server #20 started [trapper #1]
+ 19764:20200902:095357.760 server #17 started [poller #4]
+ 19765:20200902:095357.760 server #18 started [poller #5]
+ 19777:20200902:095357.761 server #30 started [preprocessing manager #1]
+ 19782:20200902:095357.761 server #35 started [lld worker #1]
+ 19784:20200902:095357.761 server #37 started [alert syncer #1]
+ 19771:20200902:095357.761 server #24 started [trapper #5]
+ 19781:20200902:095357.761 server #34 started [lld manager #1]
+ 19768:20200902:095357.762 server #21 started [trapper #2]
+ 19770:20200902:095357.762 server #23 started [trapper #4]
+ 19783:20200902:095357.762 server #36 started [lld worker #2]
+ 19763:20200902:095357.763 server #16 started [poller #3]
+ 19779:20200902:095357.767 server #32 started [preprocessing worker #2]
+ 19778:20200902:095357.859 server #31 started [preprocessing worker #1]
+ 19780:20200902:095357.859 server #33 started [preprocessing worker #3]
+ 19749:20200902:102358.064 executing housekeeper
+ 19749:20200902:102358.935 housekeeper [deleted 2744 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.827502 sec, idle for 1 hour(s)]
+ 19749:20200902:112359.469 executing housekeeper
+ 19749:20200902:112400.270 housekeeper [deleted 5108 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.764210 sec, idle for 1 hour(s)]
+ 19749:20200902:122400.791 executing housekeeper
+ 19749:20200902:122401.604 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.786046 sec, idle for 1 hour(s)]
+ 19749:20200902:132402.083 executing housekeeper
+ 19749:20200902:132402.972 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.847251 sec, idle for 1 hour(s)]
+ 19749:20200902:142403.509 executing housekeeper
+ 19749:20200902:142404.386 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.825915 sec, idle for 1 hour(s)]
+ 19749:20200902:152404.908 executing housekeeper
+ 19749:20200902:152405.768 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.808340 sec, idle for 1 hour(s)]
+ 19749:20200902:162406.231 executing housekeeper
+ 19749:20200902:162407.055 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.802030 sec, idle for 1 hour(s)]
+ 19749:20200902:172407.614 executing housekeeper
+ 19749:20200902:172408.483 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.818871 sec, idle for 1 hour(s)]
+ 19749:20200902:182409.025 executing housekeeper
+ 19749:20200902:182409.870 housekeeper [deleted 5052 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.800549 sec, idle for 1 hour(s)]
+ 19749:20200902:192410.468 executing housekeeper
+ 19749:20200902:192411.309 housekeeper [deleted 4989 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.798289 sec, idle for 1 hour(s)]
+ 19749:20200902:202411.910 executing housekeeper
+ 19749:20200902:202412.750 housekeeper [deleted 4989 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.793205 sec, idle for 1 hour(s)]
+ 19749:20200902:212413.317 executing housekeeper
+ 19749:20200902:212414.114 housekeeper [deleted 4990 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.774716 sec, idle for 1 hour(s)]
+ 19749:20200902:222414.743 executing housekeeper
+ 19749:20200902:222415.591 housekeeper [deleted 4990 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.800189 sec, idle for 1 hour(s)]
+ 19749:20200902:232416.152 executing housekeeper
+ 19749:20200902:232417.025 housekeeper [deleted 4990 hist/trends, 0 items/triggers, 0 events, 2 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.819382 sec, idle for 1 hour(s)]
+ 19749:20200903:002417.625 executing housekeeper
+ 19749:20200903:002418.475 housekeeper [deleted 4990 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.822662 sec, idle for 1 hour(s)]
+ 19749:20200903:012419.025 executing housekeeper
+ 19749:20200903:012419.850 housekeeper [deleted 4991 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.778868 sec, idle for 1 hour(s)]
+ 19749:20200903:022420.422 executing housekeeper
+ 19749:20200903:022421.250 housekeeper [deleted 4989 hist/trends, 0 items/triggers, 0 events, 2 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.787536 sec, idle for 1 hour(s)]
+ 19749:20200903:032421.839 executing housekeeper
+ 19749:20200903:032422.657 housekeeper [deleted 4989 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.766091 sec, idle for 1 hour(s)]
+ 19749:20200903:042423.212 executing housekeeper
+ 19749:20200903:042424.075 housekeeper [deleted 4991 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.816219 sec, idle for 1 hour(s)]
+ 19749:20200903:052424.689 executing housekeeper
+ 19749:20200903:052425.520 housekeeper [deleted 4995 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.784014 sec, idle for 1 hour(s)]
+ 19749:20200903:062426.074 executing housekeeper
+ 19749:20200903:062426.907 housekeeper [deleted 4991 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.779084 sec, idle for 1 hour(s)]
+ 19749:20200903:072427.487 executing housekeeper
+ 19749:20200903:072428.334 housekeeper [deleted 4990 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.789673 sec, idle for 1 hour(s)]
+ 19749:20200903:082428.914 executing housekeeper
+ 19749:20200903:082429.744 housekeeper [deleted 4989 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.781382 sec, idle for 1 hour(s)]
+ 19749:20200903:092430.275 executing housekeeper
+ 19749:20200903:092431.131 housekeeper [deleted 5042 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.829464 sec, idle for 1 hour(s)]
+ 19749:20200903:102431.689 executing housekeeper
+ 19749:20200903:102432.586 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.875741 sec, idle for 1 hour(s)]
+ 19749:20200903:112433.080 executing housekeeper
+ 19749:20200903:112433.924 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.808351 sec, idle for 1 hour(s)]
+ 19749:20200903:122434.390 executing housekeeper
+ 19749:20200903:122435.224 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.794324 sec, idle for 1 hour(s)]
+ 19749:20200903:132435.785 executing housekeeper
+ 19749:20200903:132436.632 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.826739 sec, idle for 1 hour(s)]
+ 19749:20200903:142437.102 executing housekeeper
+ 19749:20200903:142437.921 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.807159 sec, idle for 1 hour(s)]
+ 19749:20200903:152438.502 executing housekeeper
+ 19749:20200903:152439.346 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.803041 sec, idle for 1 hour(s)]
+ 19749:20200903:162439.949 executing housekeeper
+ 19749:20200903:162440.819 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.817266 sec, idle for 1 hour(s)]
+ 19749:20200903:172441.335 executing housekeeper
+ 19749:20200903:172442.184 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.824218 sec, idle for 1 hour(s)]
+ 19749:20200903:182442.654 executing housekeeper
+ 19749:20200903:182443.481 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.804197 sec, idle for 1 hour(s)]
+ 19749:20200903:192444.038 executing housekeeper
+ 19749:20200903:192444.828 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.777000 sec, idle for 1 hour(s)]
+ 19749:20200903:202445.418 executing housekeeper
+ 19749:20200903:202446.277 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.833001 sec, idle for 1 hour(s)]
+ 19749:20200903:212446.897 executing housekeeper
+ 19749:20200903:212447.756 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.815402 sec, idle for 1 hour(s)]
+ 19749:20200903:222448.313 executing housekeeper
+ 19749:20200903:222449.182 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.814646 sec, idle for 1 hour(s)]
+ 19749:20200903:232449.771 executing housekeeper
+ 19749:20200903:232450.607 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.807860 sec, idle for 1 hour(s)]
+ 19749:20200904:002451.147 executing housekeeper
+ 19749:20200904:002452.001 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.808783 sec, idle for 1 hour(s)]
+ 19749:20200904:012452.567 executing housekeeper
+ 19749:20200904:012453.455 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.836690 sec, idle for 1 hour(s)]
+ 19749:20200904:022454.024 executing housekeeper
+ 19749:20200904:022454.856 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.810863 sec, idle for 1 hour(s)]
+ 19749:20200904:032455.435 executing housekeeper
+ 19749:20200904:032456.294 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.820506 sec, idle for 1 hour(s)]
+ 19749:20200904:042456.919 executing housekeeper
+ 19749:20200904:042457.792 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.821918 sec, idle for 1 hour(s)]
+ 19749:20200904:052458.357 executing housekeeper
+ 19749:20200904:052459.190 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.810822 sec, idle for 1 hour(s)]
+ 19749:20200904:062459.831 executing housekeeper
+ 19749:20200904:062500.719 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.861715 sec, idle for 1 hour(s)]
+ 19749:20200904:072501.294 executing housekeeper
+ 19749:20200904:072502.142 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.799696 sec, idle for 1 hour(s)]
+ 19749:20200904:082502.772 executing housekeeper
+ 19749:20200904:082503.597 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.801969 sec, idle for 1 hour(s)]
+ 19749:20200904:092504.128 executing housekeeper
+ 19749:20200904:092505.311 housekeeper [deleted 5119 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 1.159062 sec, idle for 1 hour(s)]
+ 19749:20200904:102505.834 executing housekeeper
+ 19749:20200904:102506.655 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.802640 sec, idle for 1 hour(s)]
+ 19749:20200904:112507.100 executing housekeeper
+ 19749:20200904:112507.914 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.801001 sec, idle for 1 hour(s)]
+ 19749:20200904:122508.413 executing housekeeper
+ 19749:20200904:122509.240 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.802309 sec, idle for 1 hour(s)]
+ 19749:20200904:132509.762 executing housekeeper
+ 19749:20200904:132510.592 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.807119 sec, idle for 1 hour(s)]
+ 19749:20200904:142511.108 executing housekeeper
+ 19749:20200904:142511.950 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.801787 sec, idle for 1 hour(s)]
+ 19749:20200904:152512.415 executing housekeeper
+ 19749:20200904:152513.292 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.833866 sec, idle for 1 hour(s)]
+ 19749:20200904:162513.763 executing housekeeper
+ 19749:20200904:162514.588 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.801314 sec, idle for 1 hour(s)]
+ 19749:20200904:172515.059 executing housekeeper
+ 19749:20200904:172515.922 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.819816 sec, idle for 1 hour(s)]
+ 19749:20200904:182516.438 executing housekeeper
+ 19749:20200904:182517.277 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.818849 sec, idle for 1 hour(s)]
+ 19749:20200904:192517.958 executing housekeeper
+ 19749:20200904:192518.779 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.799012 sec, idle for 1 hour(s)]
+ 19749:20200904:202519.451 executing housekeeper
+ 19749:20200904:202520.268 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.795365 sec, idle for 1 hour(s)]
+ 19749:20200904:212520.957 executing housekeeper
+ 19749:20200904:212521.800 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.816449 sec, idle for 1 hour(s)]
+ 19749:20200904:222522.446 executing housekeeper
+ 19749:20200904:222523.299 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 2 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.830427 sec, idle for 1 hour(s)]
+ 19749:20200904:232524.003 executing housekeeper
+ 19749:20200904:232524.867 housekeeper [deleted 5118 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.841849 sec, idle for 1 hour(s)]
+ 19749:20200905:002525.504 executing housekeeper
+ 19749:20200905:002526.332 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.805656 sec, idle for 1 hour(s)]
+ 19749:20200905:012526.985 executing housekeeper
+ 19749:20200905:012527.825 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.817469 sec, idle for 1 hour(s)]
+ 19749:20200905:022528.503 executing housekeeper
+ 19749:20200905:022529.315 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.799489 sec, idle for 1 hour(s)]
+ 19749:20200905:032530.004 executing housekeeper
+ 19749:20200905:032530.821 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.795426 sec, idle for 1 hour(s)]
+ 19749:20200905:042531.473 executing housekeeper
+ 19749:20200905:042532.295 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.800227 sec, idle for 1 hour(s)]
+ 19749:20200905:052533.002 executing housekeeper
+ 19749:20200905:052533.878 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.823987 sec, idle for 1 hour(s)]
+ 19749:20200905:062534.554 executing housekeeper
+ 19749:20200905:062535.366 housekeeper [deleted 5115 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.791660 sec, idle for 1 hour(s)]
+ 19749:20200905:072536.024 executing housekeeper
+ 19749:20200905:072536.849 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.803166 sec, idle for 1 hour(s)]
+ 19749:20200905:082537.499 executing housekeeper
+ 19749:20200905:082538.350 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.827881 sec, idle for 1 hour(s)]
+ 19749:20200905:092539.038 executing housekeeper
+ 19749:20200905:092539.938 housekeeper [deleted 5120 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.877669 sec, idle for 1 hour(s)]
+ 19749:20200905:102540.591 executing housekeeper
+ 19749:20200905:102541.479 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 2 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.867649 sec, idle for 1 hour(s)]
+ 19749:20200905:112542.137 executing housekeeper
+ 19749:20200905:112542.998 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.840422 sec, idle for 1 hour(s)]
+ 19749:20200905:122543.671 executing housekeeper
+ 19749:20200905:122544.496 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.807592 sec, idle for 1 hour(s)]
+ 19749:20200905:132545.128 executing housekeeper
+ 19749:20200905:132545.971 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.795223 sec, idle for 1 hour(s)]
+ 19749:20200905:142546.628 executing housekeeper
+ 19749:20200905:142547.461 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.811237 sec, idle for 1 hour(s)]
+ 19749:20200905:152548.121 executing housekeeper
+ 19749:20200905:152548.997 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.831105 sec, idle for 1 hour(s)]
+ 19749:20200905:162549.640 executing housekeeper
+ 19749:20200905:162550.477 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.816542 sec, idle for 1 hour(s)]
+ 19749:20200905:172551.130 executing housekeeper
+ 19749:20200905:172551.988 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.835577 sec, idle for 1 hour(s)]
+ 19749:20200905:182552.681 executing housekeeper
+ 19749:20200905:182553.529 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.825875 sec, idle for 1 hour(s)]
+ 19749:20200905:192554.189 executing housekeeper
+ 19749:20200905:192555.047 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.834645 sec, idle for 1 hour(s)]
+ 19749:20200905:202555.718 executing housekeeper
+ 19749:20200905:202556.559 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.820173 sec, idle for 1 hour(s)]
+ 19749:20200905:212557.204 executing housekeeper
+ 19749:20200905:212558.046 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.819557 sec, idle for 1 hour(s)]
+ 19749:20200905:222558.741 executing housekeeper
+ 19749:20200905:222559.609 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.841313 sec, idle for 1 hour(s)]
+ 19749:20200905:232600.272 executing housekeeper
+ 19749:20200905:232601.125 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.810924 sec, idle for 1 hour(s)]
+ 19749:20200906:002601.822 executing housekeeper
+ 19749:20200906:002602.630 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.786637 sec, idle for 1 hour(s)]
+ 19749:20200906:012603.301 executing housekeeper
+ 19749:20200906:012604.160 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.816799 sec, idle for 1 hour(s)]
+ 19749:20200906:022604.858 executing housekeeper
+ 19749:20200906:022605.715 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.839189 sec, idle for 1 hour(s)]
+ 19749:20200906:032606.376 executing housekeeper
+ 19749:20200906:032607.244 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.822136 sec, idle for 1 hour(s)]
+ 19749:20200906:042607.957 executing housekeeper
+ 19749:20200906:042608.788 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.811692 sec, idle for 1 hour(s)]
+ 19749:20200906:052609.436 executing housekeeper
+ 19749:20200906:052610.305 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.844607 sec, idle for 1 hour(s)]
+ 19749:20200906:062610.987 executing housekeeper
+ 19749:20200906:062611.898 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.858678 sec, idle for 1 hour(s)]
+ 19749:20200906:072612.573 executing housekeeper
+ 19749:20200906:072613.388 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.793081 sec, idle for 1 hour(s)]
+ 19749:20200906:082614.049 executing housekeeper
+ 19749:20200906:082614.920 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.819213 sec, idle for 1 hour(s)]
+ 19749:20200906:092615.595 executing housekeeper
+ 19749:20200906:092616.452 housekeeper [deleted 5116 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.829030 sec, idle for 1 hour(s)]
+ 19749:20200906:102617.091 executing housekeeper
+ 19749:20200906:102617.962 housekeeper [deleted 5116 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.852405 sec, idle for 1 hour(s)]
+ 19749:20200906:112618.610 executing housekeeper
+ 19749:20200906:112619.445 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.810005 sec, idle for 1 hour(s)]
+ 19749:20200906:122620.090 executing housekeeper
+ 19749:20200906:122620.991 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.844335 sec, idle for 1 hour(s)]
+ 19749:20200906:132621.668 executing housekeeper
+ 19749:20200906:132622.506 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.816033 sec, idle for 1 hour(s)]
+ 19749:20200906:142623.144 executing housekeeper
+ 19749:20200906:142624.036 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.838726 sec, idle for 1 hour(s)]
+ 19749:20200906:152624.736 executing housekeeper
+ 19749:20200906:152625.621 housekeeper [deleted 5116 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.830402 sec, idle for 1 hour(s)]
+ 19749:20200906:162626.257 executing housekeeper
+ 19749:20200906:162627.097 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 2 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.813843 sec, idle for 1 hour(s)]
+ 19749:20200906:172627.816 executing housekeeper
+ 19749:20200906:172628.699 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.836233 sec, idle for 1 hour(s)]
+ 19749:20200906:182629.331 executing housekeeper
+ 19749:20200906:182630.240 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.858823 sec, idle for 1 hour(s)]
+ 19749:20200906:192630.873 executing housekeeper
+ 19749:20200906:192631.697 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.807503 sec, idle for 1 hour(s)]
+ 19749:20200906:202632.311 executing housekeeper
+ 19749:20200906:202633.153 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.791119 sec, idle for 1 hour(s)]
+ 19749:20200906:212633.849 executing housekeeper
+ 19749:20200906:212634.702 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.831670 sec, idle for 1 hour(s)]
+ 19749:20200906:222635.337 executing housekeeper
+ 19749:20200906:222636.161 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.802351 sec, idle for 1 hour(s)]
+ 19749:20200906:232636.841 executing housekeeper
+ 19749:20200906:232637.681 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.817134 sec, idle for 1 hour(s)]
+ 19749:20200907:002638.334 executing housekeeper
+ 19749:20200907:002639.184 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.828442 sec, idle for 1 hour(s)]
+ 19749:20200907:012639.906 executing housekeeper
+ 19749:20200907:012640.748 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.820062 sec, idle for 1 hour(s)]
+ 19749:20200907:022641.451 executing housekeeper
+ 19749:20200907:022642.265 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.792171 sec, idle for 1 hour(s)]
+ 19749:20200907:032642.981 executing housekeeper
+ 19749:20200907:032643.809 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.812450 sec, idle for 1 hour(s)]
+ 19749:20200907:042644.507 executing housekeeper
+ 19749:20200907:042645.373 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.842392 sec, idle for 1 hour(s)]
+ 19749:20200907:052646.074 executing housekeeper
+ 19749:20200907:052646.913 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.820219 sec, idle for 1 hour(s)]
+ 19749:20200907:062647.599 executing housekeeper
+ 19749:20200907:062648.424 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.803821 sec, idle for 1 hour(s)]
+ 19749:20200907:072649.092 executing housekeeper
+ 19749:20200907:072649.941 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.826257 sec, idle for 1 hour(s)]
+ 19749:20200907:082650.646 executing housekeeper
+ 19749:20200907:082651.512 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.811297 sec, idle for 1 hour(s)]
+ 19749:20200907:092652.073 executing housekeeper
+ 19749:20200907:092652.916 housekeeper [deleted 3698 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.811621 sec, idle for 1 hour(s)]
+ 19749:20200907:102653.400 executing housekeeper
+ 19749:20200907:102654.283 housekeeper [deleted 5116 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.855641 sec, idle for 1 hour(s)]
+ 19749:20200907:112654.815 executing housekeeper
+ 19749:20200907:112655.719 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.857162 sec, idle for 1 hour(s)]
+ 19749:20200907:122656.270 executing housekeeper
+ 19749:20200907:122657.136 housekeeper [deleted 5114 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.844219 sec, idle for 1 hour(s)]
+ 19749:20200907:132657.661 executing housekeeper
+ 19749:20200907:132658.538 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.842113 sec, idle for 1 hour(s)]
+ 19749:20200907:142659.029 executing housekeeper
+ 19749:20200907:142659.944 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.872068 sec, idle for 1 hour(s)]
+ 19749:20200907:152700.531 executing housekeeper
+ 19749:20200907:152701.355 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.801106 sec, idle for 1 hour(s)]
+ 19749:20200907:162701.835 executing housekeeper
+ 19749:20200907:162702.679 housekeeper [deleted 5109 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.819355 sec, idle for 1 hour(s)]
+ 19749:20200907:172703.156 executing housekeeper
+ 19749:20200907:172703.998 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.819564 sec, idle for 1 hour(s)]
+ 19749:20200907:182704.633 executing housekeeper
+ 19749:20200907:182705.446 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.790040 sec, idle for 1 hour(s)]
+ 19749:20200907:192706.107 executing housekeeper
+ 19749:20200907:192706.947 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.818256 sec, idle for 1 hour(s)]
+ 19749:20200907:202707.663 executing housekeeper
+ 19749:20200907:202708.519 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.834891 sec, idle for 1 hour(s)]
+ 19749:20200907:212709.193 executing housekeeper
+ 19749:20200907:212710.028 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.822860 sec, idle for 1 hour(s)]
+ 19749:20200907:222710.746 executing housekeeper
+ 19749:20200907:222711.615 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.826623 sec, idle for 1 hour(s)]
+ 19749:20200907:232712.252 executing housekeeper
+ 19749:20200907:232713.082 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.808280 sec, idle for 1 hour(s)]
+ 19749:20200908:002713.797 executing housekeeper
+ 19749:20200908:002714.646 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.827447 sec, idle for 1 hour(s)]
+ 19749:20200908:012715.319 executing housekeeper
+ 19749:20200908:012716.141 housekeeper [deleted 5112 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.799377 sec, idle for 1 hour(s)]
+ 19749:20200908:022716.861 executing housekeeper
+ 19749:20200908:022717.720 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.828163 sec, idle for 1 hour(s)]
+ 19749:20200908:032718.385 executing housekeeper
+ 19749:20200908:032719.234 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.827276 sec, idle for 1 hour(s)]
+ 19749:20200908:042719.920 executing housekeeper
+ 19749:20200908:042720.752 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.810224 sec, idle for 1 hour(s)]
+ 19749:20200908:052721.413 executing housekeeper
+ 19749:20200908:052722.275 housekeeper [deleted 5111 hist/trends, 0 items/triggers, 0 events, 1 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.839528 sec, idle for 1 hour(s)]
+ 19749:20200908:062722.977 executing housekeeper
+ 19749:20200908:062723.819 housekeeper [deleted 5110 hist/trends, 0 items/triggers, 0 events, 2 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.819689 sec, idle for 1 hour(s)]
+ 19749:20200908:072724.523 executing housekeeper
+ 19749:20200908:072725.349 housekeeper [deleted 5118 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.804024 sec, idle for 1 hour(s)]
+ 19749:20200908:082726.028 executing housekeeper
+ 19749:20200908:082726.860 housekeeper [deleted 5113 hist/trends, 0 items/triggers, 0 events, 0 problems, 0 sessions, 0 alarms, 0 audit, 0 records in 0.809683 sec, idle for 1 hour(s)]
+ 19736:20200908:085245.588 One child process died (PID:19762,exitcode/signal:1). Exiting ...
+ 19736:20200908:085246.243 syncing trend data...
+ 19736:20200908:085246.339 syncing trend data done
+ 19736:20200908:085246.345 Zabbix Server stopped. Zabbix 5.2.0alpha3 (revision {ZABBIX_REVISION}).
