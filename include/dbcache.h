@@ -700,9 +700,9 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 #define ZBX_HK_TRENDS_MIN	SEC_PER_DAY
 #define ZBX_HK_PERIOD_MAX	(25 * SEC_PER_YEAR)
 
-void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+void	DCrequeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num);
-void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 int	DCconfig_activate_host(DC_ITEM *item);

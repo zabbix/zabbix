@@ -380,14 +380,12 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	if (0 != itemids.values_num)
 	{
 		DC_ITEM		*dc_items;
-		int		*errcodes, now;
+		int		*errcodes;
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-
-		now = time(NULL);
 
 		for (i = 0; i < itemids.values_num; i++)
 		{
@@ -621,14 +619,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (0 != itemids.values_num)
 	{
 		DC_ITEM		*dc_items;
-		int		*errcodes, now, delay;
+		int		*errcodes, delay;
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-
-		now = time(NULL);
 
 		for (i = 0; i < itemids.values_num; i++)
 		{

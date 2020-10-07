@@ -61,7 +61,6 @@ type client struct {
 	exporters map[uint64]exporterTaskAccessor
 	// plugins used by client
 	pluginsInfo map[*pluginAgent]*pluginInfo
-	// server refresh unsupported value
 	// server global regular expression bundle
 	globalRegexp unsafe.Pointer
 	// plugin result sink, can be nil for bulk passive checks (in future)
@@ -138,7 +137,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
 
-			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false); err != nil {
+			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now); err != nil {
 				return err
 			}
 			if tacc, ok = c.exporters[r.Itemid]; ok {
