@@ -803,8 +803,6 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 				break;
 			case ITEM_TYPE_SCRIPT:
 				zbx_free(items[i].timeout);
-				zbx_free(items[i].params);
-				zbx_free(items[i].script_params);
 				break;
 			case ITEM_TYPE_SSH:
 				zbx_free(items[i].publickey);
