@@ -402,9 +402,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Block devices discovery',
-						'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
-						'Template Module Linux network interfaces by Zabbix agent: Network interface discovery'
+						'Linux block devices by Zabbix agent: Block devices discovery',
+						'Linux filesystems by Zabbix agent: Mounted filesystem discovery',
+						'Linux network interfaces by Zabbix agent: Network interface discovery'
 					]
 				]
 			],
@@ -415,7 +415,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Block devices discovery'
+						'Linux block devices by Zabbix agent: Block devices discovery'
 					]
 				]
 			],

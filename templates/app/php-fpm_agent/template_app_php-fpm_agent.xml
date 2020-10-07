@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-09-10T13:30:19Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:39Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,11 +9,11 @@
    </groups>
    <templates>
       <template>
-         <template>Template App PHP-FPM by Zabbix agent</template>
-         <name>Template App PHP-FPM by Zabbix agent</name>
+         <template>PHP-FPM by Zabbix agent</template>
+         <name>PHP-FPM by Zabbix agent</name>
          <description>Get PHP-FPM metrics using Zabbix agent running on Linux.&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -233,7 +233,7 @@ Template tooling version used: 0.37</description>
                      <dependencies>
                         <dependency>
                            <name>PHP-FPM: Process is not running</name>
-                           <expression>{Template App PHP-FPM by Zabbix agent:proc.num["{$PHP_FPM.PROCESS_NAME}"].last()}=0</expression>
+                           <expression>{PHP-FPM by Zabbix agent:proc.num["{$PHP_FPM.PROCESS_NAME}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -453,7 +453,7 @@ Template tooling version used: 0.37</description>
                      <dependencies>
                         <dependency>
                            <name>PHP-FPM: Process is not running</name>
-                           <expression>{Template App PHP-FPM by Zabbix agent:proc.num["{$PHP_FPM.PROCESS_NAME}"].last()}=0</expression>
+                           <expression>{PHP-FPM by Zabbix agent:proc.num["{$PHP_FPM.PROCESS_NAME}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -485,8 +485,7 @@ Template tooling version used: 0.37</description>
                      <type>REGEX</type>
                      <params>^[.\s\S]*X-Powered-By: PHP/([.\d]{1,})
 \1</params>
-                     <error_handler>CUSTOM_VALUE</error_handler>
-                     <error_handler_params>Unknown</error_handler_params>
+                     <error_handler>DISCARD_VALUE</error_handler>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -627,7 +626,7 @@ Template tooling version used: 0.37</description>
             <macro>
                <macro>{$PHP_FPM.STATUS.PAGE}</macro>
                <value>status</value>
-               <description>The path of PHP-FPM ping page.</description>
+               <description>The path of PHP-FPM status page.</description>
             </macro>
          </macros>
       </template>
@@ -639,7 +638,7 @@ Template tooling version used: 0.37</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App PHP-FPM by Zabbix agent</host>
+                  <host>PHP-FPM by Zabbix agent</host>
                   <key>php-fpm.processes_max_active</key>
                </item>
             </graph_item>
@@ -647,7 +646,7 @@ Template tooling version used: 0.37</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App PHP-FPM by Zabbix agent</host>
+                  <host>PHP-FPM by Zabbix agent</host>
                   <key>php-fpm.processes_idle</key>
                </item>
             </graph_item>
@@ -655,7 +654,7 @@ Template tooling version used: 0.37</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App PHP-FPM by Zabbix agent</host>
+                  <host>PHP-FPM by Zabbix agent</host>
                   <key>php-fpm.processes_total</key>
                </item>
             </graph_item>
@@ -663,7 +662,7 @@ Template tooling version used: 0.37</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App PHP-FPM by Zabbix agent</host>
+                  <host>PHP-FPM by Zabbix agent</host>
                   <key>php-fpm.processes_active</key>
                </item>
             </graph_item>
@@ -675,7 +674,7 @@ Template tooling version used: 0.37</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App PHP-FPM by Zabbix agent</host>
+                  <host>PHP-FPM by Zabbix agent</host>
                   <key>php-fpm.listen_queue_len</key>
                </item>
             </graph_item>
@@ -683,7 +682,7 @@ Template tooling version used: 0.37</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App PHP-FPM by Zabbix agent</host>
+                  <host>PHP-FPM by Zabbix agent</host>
                   <key>php-fpm.listen_queue</key>
                </item>
             </graph_item>
@@ -691,7 +690,7 @@ Template tooling version used: 0.37</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App PHP-FPM by Zabbix agent</host>
+                  <host>PHP-FPM by Zabbix agent</host>
                   <key>php-fpm.listen_queue_max</key>
                </item>
             </graph_item>

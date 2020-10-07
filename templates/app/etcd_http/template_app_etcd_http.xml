@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-05-26T12:09:15Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:58Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,11 +9,11 @@
    </groups>
    <templates>
       <template>
-         <template>Template App Etcd by HTTP</template>
-         <name>Template App Etcd by HTTP</name>
+         <template>Etcd by HTTP</template>
+         <name>Etcd by HTTP</name>
          <description>Get Etcd metrics by HTTP agent.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -418,7 +418,7 @@ return valueArr.reduce(function(acc,obj){
                      <dependencies>
                         <dependency>
                            <name>Etcd: Service is unavailable</name>
-                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
+                           <expression>{Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -578,7 +578,7 @@ return valueArr.reduce(function(acc,obj){
                      <dependencies>
                         <dependency>
                            <name>Etcd: Service is unavailable</name>
-                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
+                           <expression>{Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1301,11 +1301,11 @@ return valueArr.reduce(function(acc,obj){
                            <expression>{min(5m)}&gt;{$ETCD.GRPC.ERRORS.MAX.WARN}</expression>
                            <name>Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)</name>
                            <priority>WARNING</priority>
-                           <discover>NO_DISCOVER</discover>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <master_item>
                   <key>etcd.get_metrics</key>
                </master_item>
@@ -1489,6 +1489,7 @@ return JSON.stringify(result);</params>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <master_item>
                   <key>etcd.get_metrics</key>
                </master_item>
@@ -1573,7 +1574,7 @@ return JSON.stringify(result);</params>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template App Etcd by HTTP:etcd.open.fds.min(5m)}/{Template App Etcd by HTTP:etcd.max.fds.last()}*100&gt;{$ETCD.OPEN.FDS.MAX.WARN}</expression>
+         <expression>{Etcd by HTTP:etcd.open.fds.min(5m)}/{Etcd by HTTP:etcd.max.fds.last()}*100&gt;{$ETCD.OPEN.FDS.MAX.WARN}</expression>
          <name>Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)</name>
          <priority>WARNING</priority>
          <description>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. &#13;
@@ -1588,7 +1589,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.open.fds</key>
                </item>
             </graph_item>
@@ -1597,7 +1598,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.max.fds</key>
                </item>
             </graph_item>
@@ -1609,7 +1610,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.network.grpc.received.rate</key>
                </item>
             </graph_item>
@@ -1617,7 +1618,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.network.grpc.sent.rate</key>
                </item>
             </graph_item>
@@ -1629,7 +1630,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.grpc.received.rate</key>
                </item>
             </graph_item>
@@ -1637,7 +1638,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.grpc.sent.rate</key>
                </item>
             </graph_item>
@@ -1645,7 +1646,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.grpc.started.rate</key>
                </item>
             </graph_item>
@@ -1657,7 +1658,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.http.requests.4xx.rate</key>
                </item>
             </graph_item>
@@ -1665,7 +1666,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.http.requests.5xx.rate</key>
                </item>
             </graph_item>
@@ -1673,7 +1674,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.http.requests.rate</key>
                </item>
             </graph_item>
@@ -1686,7 +1687,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.res.bytes</key>
                </item>
             </graph_item>
@@ -1695,7 +1696,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.virtual.bytes</key>
                </item>
             </graph_item>
@@ -1707,7 +1708,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.proposals.failed.rate</key>
                </item>
             </graph_item>
@@ -1715,7 +1716,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.proposals.committed.rate</key>
                </item>
             </graph_item>
@@ -1723,7 +1724,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.proposals.applied.rate</key>
                </item>
             </graph_item>
@@ -1733,7 +1734,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <color>A54F10</color>
                <yaxisside>RIGHT</yaxisside>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.proposals.pending</key>
                </item>
             </graph_item>
@@ -1745,7 +1746,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.reads.rate</key>
                </item>
             </graph_item>
@@ -1753,7 +1754,7 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Etcd by HTTP</host>
+                  <host>Etcd by HTTP</host>
                   <key>etcd.writes.rate</key>
                </item>
             </graph_item>

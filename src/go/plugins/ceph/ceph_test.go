@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,14 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/agent/AgentTests.php';
+package ceph
 
-class All {
-	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('Project');
+import (
+	"io/ioutil"
+	"log"
+	"os"
+	"strings"
+	"testing"
+)
 
-		$suite->addTest(AgentTests::suite());
+var fixtures map[command][]byte
 
-		return $suite;
+const cmdBroken command = "broken"
+
+func TestMain(m *testing.M) {
+	var err error
+
+	fixtures = make(map[command][]byte)
+
+	for _, cmd := range []command{cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth, cmdStatus} {
+		fixtures[cmd], err = ioutil.ReadFile("testdata/" + strings.ReplaceAll(string(cmd), " ", "_") + ".json")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
+	fixtures[cmdBroken] = []byte{1, 2, 3, 4, 5}
+
+	os.Exit(m.Run())
 }

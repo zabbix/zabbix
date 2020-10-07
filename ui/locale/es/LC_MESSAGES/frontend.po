@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-28 12:40+0300\n"
+"POT-Creation-Date: 2020-10-02 19:59+0300\n"
 "PO-Revision-Date: 2018-05-04 09:32+0300\n"
 "Last-Translator: Oscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -22,17 +22,17 @@ msgstr ""
 msgid "\"%1$s\" instead \"%2$s\""
 msgstr ""
 
-#: include/classes/import/validators/C10XmlValidator.php:358
-#: include/classes/import/validators/C10XmlValidator.php:375
-#: include/classes/import/validators/C20XmlValidator.php:833
-#: include/classes/import/validators/C30XmlValidator.php:896
-#: include/classes/import/validators/C32XmlValidator.php:1007
-#: include/classes/import/validators/C34XmlValidator.php:1111
-#: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1350
-#: include/classes/import/validators/C44XmlValidator.php:1757
-#: include/classes/import/validators/C50XmlValidator.php:1900
-#: include/classes/import/validators/C52XmlValidator.php:1912
+#: include/classes/import/validators/C10XmlValidator.php:346
+#: include/classes/import/validators/C10XmlValidator.php:363
+#: include/classes/import/validators/C20XmlValidator.php:821
+#: include/classes/import/validators/C30XmlValidator.php:884
+#: include/classes/import/validators/C32XmlValidator.php:995
+#: include/classes/import/validators/C34XmlValidator.php:1099
+#: include/classes/import/validators/C40XmlValidator.php:1278
+#: include/classes/import/validators/C42XmlValidator.php:1336
+#: include/classes/import/validators/C44XmlValidator.php:1741
+#: include/classes/import/validators/C50XmlValidator.php:1884
+#: include/classes/import/validators/C52XmlValidator.php:1896
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "se esperaba \"%1$s\""
@@ -53,9 +53,9 @@ msgstr ""
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
 msgstr ""
 
-#: include/classes/import/validators/C10XmlValidator.php:393
-#: include/classes/import/validators/C10XmlValidator.php:415
-#: include/classes/import/validators/C10XmlValidator.php:436
+#: include/classes/import/validators/C10XmlValidator.php:381
+#: include/classes/import/validators/C10XmlValidator.php:403
+#: include/classes/import/validators/C10XmlValidator.php:424
 msgid "\"host:key\" pair is expected"
 msgstr "Se espera un par \"equipo:clave\""
 
@@ -85,7 +85,7 @@ msgid "%1$d matches for %2$s found"
 msgstr ""
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
-#: include/classes/screens/CScreenHostTriggers.php:200
+#: include/classes/screens/CScreenHostTriggers.php:195
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
@@ -408,7 +408,7 @@ msgstr[1] "Cuenta bloqueada durante %1$s segundos."
 
 #: app/views/monitoring.widget.problems.view.php:64
 #: include/actions.inc.php:155 include/blocks.inc.php:761
-#: include/classes/screens/CScreenHostTriggers.php:215
+#: include/classes/screens/CScreenHostTriggers.php:210
 #: include/classes/screens/CScreenProblem.php:874
 #: include/classes/screens/CScreenProblem.php:899
 #: include/classes/screens/CScreenProblem.php:1145 include/events.inc.php:246
@@ -557,7 +557,7 @@ msgstr "Acción actualizada"
 #: app/views/administration.mediatype.edit.php:277
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:762
-#: include/classes/screens/CScreenHostTriggers.php:215
+#: include/classes/screens/CScreenHostTriggers.php:210
 #: include/classes/screens/CScreenProblem.php:875
 #: include/classes/screens/CScreenProblem.php:900
 #: include/classes/screens/CScreenProblem.php:1146
@@ -828,7 +828,7 @@ msgstr "Administración"
 msgid "Advanced labels"
 msgstr "Etiquetas avanzadas"
 
-#: include/classes/screens/CScreenHostTriggers.php:215
+#: include/classes/screens/CScreenHostTriggers.php:210
 #: include/events.inc.php:244
 msgid "Age"
 msgstr "Edad"
@@ -4302,7 +4302,7 @@ msgstr "Diapositivas personalizadas"
 msgid "Czech (cs_CZ)"
 msgstr "Checo (cs_CZ)"
 
-#: include/classes/import/validators/C10XmlValidator.php:358
+#: include/classes/import/validators/C10XmlValidator.php:346
 msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr "DD.MM.AA"
@@ -7346,7 +7346,7 @@ msgstr "Alineación horizontal"
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
-#: include/classes/screens/CScreenHostTriggers.php:180
+#: include/classes/screens/CScreenHostTriggers.php:175
 #: include/classes/screens/CScreenHttpTest.php:105
 #: include/classes/screens/CScreenProblem.php:869
 #: include/classes/screens/CScreenProblem.php:893
@@ -9308,7 +9308,7 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1833 include/actions.inc.php:1916
 #: include/blocks.inc.php:756 include/classes/screens/CScreenActions.php:117
-#: include/classes/screens/CScreenHostTriggers.php:215
+#: include/classes/screens/CScreenHostTriggers.php:210
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:892
 #: include/views/administration.auditacts.list.php:68
@@ -9453,7 +9453,7 @@ msgstr "Periodo de almacenamiento de datos internos"
 #: include/classes/api/services/CTriggerGeneral.php:1553
 #: include/classes/api/services/CTriggerGeneral.php:1915
 #: include/classes/core/CJsonRpc.php:208
-#: include/classes/import/validators/CXmlValidatorGeneral.php:160
+#: include/classes/import/validators/CXmlValidatorGeneral.php:197
 #: include/classes/widgets/fields/CWidgetField.php:103
 msgid "Internal error."
 msgstr "Error interno."
@@ -9728,50 +9728,50 @@ msgstr ""
 #: include/classes/import/readers/CXmlImportReader.php:77
 #: include/classes/import/readers/CXmlImportReader.php:116
 #: include/classes/import/readers/CXmlImportReader.php:134
-#: include/classes/import/validators/C10XmlValidator.php:358
-#: include/classes/import/validators/C10XmlValidator.php:375
-#: include/classes/import/validators/C10XmlValidator.php:393
-#: include/classes/import/validators/C10XmlValidator.php:397
-#: include/classes/import/validators/C10XmlValidator.php:415
-#: include/classes/import/validators/C10XmlValidator.php:419
-#: include/classes/import/validators/C10XmlValidator.php:436
-#: include/classes/import/validators/C20XmlValidator.php:833
-#: include/classes/import/validators/C30XmlValidator.php:896
-#: include/classes/import/validators/C32XmlValidator.php:1007
-#: include/classes/import/validators/C34XmlValidator.php:1111
-#: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1350
-#: include/classes/import/validators/C44XmlValidator.php:1757
-#: include/classes/import/validators/C44XmlValidator.php:2039
-#: include/classes/import/validators/C44XmlValidator.php:2149
-#: include/classes/import/validators/C44XmlValidator.php:2169
-#: include/classes/import/validators/C44XmlValidator.php:2193
-#: include/classes/import/validators/C44XmlValidator.php:2235
-#: include/classes/import/validators/C44XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:1900
-#: include/classes/import/validators/C50XmlValidator.php:2182
-#: include/classes/import/validators/C50XmlValidator.php:2292
-#: include/classes/import/validators/C50XmlValidator.php:2312
-#: include/classes/import/validators/C50XmlValidator.php:2336
-#: include/classes/import/validators/C50XmlValidator.php:2378
-#: include/classes/import/validators/C50XmlValidator.php:2439
-#: include/classes/import/validators/C52XmlValidator.php:1912
-#: include/classes/import/validators/C52XmlValidator.php:2194
-#: include/classes/import/validators/C52XmlValidator.php:2304
-#: include/classes/import/validators/C52XmlValidator.php:2324
-#: include/classes/import/validators/C52XmlValidator.php:2348
-#: include/classes/import/validators/C52XmlValidator.php:2390
-#: include/classes/import/validators/C52XmlValidator.php:2451
-#: include/classes/import/validators/C52XmlValidator.php:2484
-#: include/classes/import/validators/C52XmlValidator.php:2490
-#: include/classes/import/validators/CXmlValidatorGeneral.php:98
-#: include/classes/import/validators/CXmlValidatorGeneral.php:117
-#: include/classes/import/validators/CXmlValidatorGeneral.php:136
-#: include/classes/import/validators/CXmlValidatorGeneral.php:164
-#: include/classes/import/validators/CXmlValidatorGeneral.php:202
-#: include/classes/import/validators/CXmlValidatorGeneral.php:216
-#: include/classes/import/validators/CXmlValidatorGeneral.php:231
-#: include/classes/import/validators/CXmlValidator.php:72
+#: include/classes/import/validators/C10XmlValidator.php:346
+#: include/classes/import/validators/C10XmlValidator.php:363
+#: include/classes/import/validators/C10XmlValidator.php:381
+#: include/classes/import/validators/C10XmlValidator.php:385
+#: include/classes/import/validators/C10XmlValidator.php:403
+#: include/classes/import/validators/C10XmlValidator.php:407
+#: include/classes/import/validators/C10XmlValidator.php:424
+#: include/classes/import/validators/C20XmlValidator.php:821
+#: include/classes/import/validators/C30XmlValidator.php:884
+#: include/classes/import/validators/C32XmlValidator.php:995
+#: include/classes/import/validators/C34XmlValidator.php:1099
+#: include/classes/import/validators/C40XmlValidator.php:1278
+#: include/classes/import/validators/C42XmlValidator.php:1336
+#: include/classes/import/validators/C44XmlValidator.php:1741
+#: include/classes/import/validators/C44XmlValidator.php:2023
+#: include/classes/import/validators/C44XmlValidator.php:2133
+#: include/classes/import/validators/C44XmlValidator.php:2153
+#: include/classes/import/validators/C44XmlValidator.php:2177
+#: include/classes/import/validators/C44XmlValidator.php:2219
+#: include/classes/import/validators/C44XmlValidator.php:2280
+#: include/classes/import/validators/C50XmlValidator.php:1884
+#: include/classes/import/validators/C50XmlValidator.php:2166
+#: include/classes/import/validators/C50XmlValidator.php:2276
+#: include/classes/import/validators/C50XmlValidator.php:2296
+#: include/classes/import/validators/C50XmlValidator.php:2320
+#: include/classes/import/validators/C50XmlValidator.php:2362
+#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C52XmlValidator.php:1896
+#: include/classes/import/validators/C52XmlValidator.php:2178
+#: include/classes/import/validators/C52XmlValidator.php:2288
+#: include/classes/import/validators/C52XmlValidator.php:2308
+#: include/classes/import/validators/C52XmlValidator.php:2332
+#: include/classes/import/validators/C52XmlValidator.php:2374
+#: include/classes/import/validators/C52XmlValidator.php:2435
+#: include/classes/import/validators/C52XmlValidator.php:2468
+#: include/classes/import/validators/C52XmlValidator.php:2474
+#: include/classes/import/validators/CXmlValidatorGeneral.php:134
+#: include/classes/import/validators/CXmlValidatorGeneral.php:153
+#: include/classes/import/validators/CXmlValidatorGeneral.php:172
+#: include/classes/import/validators/CXmlValidatorGeneral.php:201
+#: include/classes/import/validators/CXmlValidatorGeneral.php:240
+#: include/classes/import/validators/CXmlValidatorGeneral.php:254
+#: include/classes/import/validators/CXmlValidatorGeneral.php:269
+#: include/classes/import/validators/CXmlValidator.php:63
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr ""
@@ -9819,7 +9819,7 @@ msgstr ""
 msgid "Is online?"
 msgstr "¿Está conectado?"
 
-#: include/classes/screens/CScreenHostTriggers.php:181
+#: include/classes/screens/CScreenHostTriggers.php:176
 #, fuzzy
 msgid "Issue"
 msgstr "Problema"
@@ -10382,7 +10382,7 @@ msgstr ""
 msgid "Last 7 days"
 msgstr ""
 
-#: include/classes/screens/CScreenHostTriggers.php:182
+#: include/classes/screens/CScreenHostTriggers.php:177
 msgid "Last change"
 msgstr "Último cambio"
 
@@ -11103,7 +11103,7 @@ msgstr ""
 #: app/controllers/CControllerTimeSelectorUpdate.php:254
 #: include/classes/mvc/CController.php:239
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:457
-#: include/validate.inc.php:475
+#: include/validate.inc.php:477
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
@@ -11337,7 +11337,7 @@ msgstr "Gravedad mínima"
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:232
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:452
-#: include/validate.inc.php:468
+#: include/validate.inc.php:470
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
@@ -11848,7 +11848,7 @@ msgstr ""
 #: app/views/popup.lldoperation.php:79 app/views/popup.lldoperation.php:91
 #: include/actions.inc.php:33 include/blocks.inc.php:618
 #: include/blocks.inc.php:696 include/blocks.inc.php:862
-#: include/classes/screens/CScreenHostTriggers.php:256
+#: include/classes/screens/CScreenHostTriggers.php:251
 #: include/classes/screens/CScreenProblem.php:1090
 #: include/classes/screens/CScreenProblem.php:1228 include/events.inc.php:171
 #: include/events.inc.php:347 include/events.inc.php:579
@@ -13433,7 +13433,7 @@ msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr ""
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
-#: include/validate.inc.php:433
+#: include/validate.inc.php:435
 msgid "Page received incorrect data"
 msgstr ""
 
@@ -14659,26 +14659,26 @@ msgid "Resolved by"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:135
-#: include/classes/screens/CScreenHostTriggers.php:231
+#: include/classes/screens/CScreenHostTriggers.php:226
 #: include/classes/screens/CScreenProblem.php:985
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "Resuelto por la regla de correlación \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:138
-#: include/classes/screens/CScreenHostTriggers.php:234
+#: include/classes/screens/CScreenHostTriggers.php:229
 #: include/classes/screens/CScreenProblem.php:988
 msgid "Resolved by correlation rule."
 msgstr "Resuelto por regla de correlación."
 
 #: app/views/monitoring.widget.problems.view.php:145
-#: include/classes/screens/CScreenHostTriggers.php:241
+#: include/classes/screens/CScreenHostTriggers.php:236
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:144
-#: include/classes/screens/CScreenHostTriggers.php:240
+#: include/classes/screens/CScreenHostTriggers.php:235
 #: include/classes/screens/CScreenProblem.php:994
 #, c-format
 msgid "Resolved by user \"%1$s\"."
@@ -17954,12 +17954,12 @@ msgid_plural "Unsupported charset or collation for tables: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/import/readers/CImportReaderFactory.php:77
+#: include/classes/import/readers/CImportReaderFactory.php:79
 #, c-format
 msgid "Unsupported import file extension \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/readers/CImportReaderFactory.php:50
+#: include/classes/import/readers/CImportReaderFactory.php:51
 #, c-format
 msgid "Unsupported import format \"%1$s\"."
 msgstr ""
@@ -19291,15 +19291,15 @@ msgstr ""
 msgid "YYYY-MM-DD hh:mm"
 msgstr ""
 
-#: include/classes/import/validators/C20XmlValidator.php:833
-#: include/classes/import/validators/C30XmlValidator.php:896
-#: include/classes/import/validators/C32XmlValidator.php:1007
-#: include/classes/import/validators/C34XmlValidator.php:1111
-#: include/classes/import/validators/C40XmlValidator.php:1290
-#: include/classes/import/validators/C42XmlValidator.php:1350
-#: include/classes/import/validators/C44XmlValidator.php:1757
-#: include/classes/import/validators/C50XmlValidator.php:1900
-#: include/classes/import/validators/C52XmlValidator.php:1912
+#: include/classes/import/validators/C20XmlValidator.php:821
+#: include/classes/import/validators/C30XmlValidator.php:884
+#: include/classes/import/validators/C32XmlValidator.php:995
+#: include/classes/import/validators/C34XmlValidator.php:1099
+#: include/classes/import/validators/C40XmlValidator.php:1278
+#: include/classes/import/validators/C42XmlValidator.php:1336
+#: include/classes/import/validators/C44XmlValidator.php:1741
+#: include/classes/import/validators/C50XmlValidator.php:1884
+#: include/classes/import/validators/C52XmlValidator.php:1896
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr ""
@@ -19320,7 +19320,7 @@ msgstr "Anual"
 #: app/views/popup.lldoperation.php:78 app/views/popup.lldoperation.php:90
 #: include/actions.inc.php:32 include/blocks.inc.php:618
 #: include/blocks.inc.php:862
-#: include/classes/screens/CScreenHostTriggers.php:256
+#: include/classes/screens/CScreenHostTriggers.php:251
 #: include/classes/screens/CScreenProblem.php:1090
 #: include/classes/screens/CScreenProblem.php:1228 include/events.inc.php:171
 #: include/events.inc.php:347 include/events.inc.php:579
@@ -19555,7 +19555,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:513
 #: include/classes/api/services/CTriggerGeneral.php:529
 #: include/classes/api/services/CUser.php:711
-#: include/classes/import/validators/CXmlValidatorGeneral.php:202
+#: include/classes/import/validators/CXmlValidatorGeneral.php:240
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:262
 #: include/classes/validators/CEventCorrCondValidator.php:91
@@ -19628,7 +19628,7 @@ msgstr ""
 #: app/controllers/CControllerPopupLldOperation.php:154
 #: include/classes/validators/CApiInputValidator.php:1568
 #: include/classes/validators/CNewValidator.php:524
-#: include/validate.inc.php:213 include/validate.inc.php:592
+#: include/validate.inc.php:213 include/validate.inc.php:594
 msgid "a time unit is expected"
 msgstr ""
 
@@ -19683,17 +19683,17 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2200
 #: include/classes/api/services/CItemGeneral.php:2222
 #: include/classes/api/services/CModule.php:291
-#: include/classes/import/validators/C44XmlValidator.php:2149
-#: include/classes/import/validators/C44XmlValidator.php:2169
-#: include/classes/import/validators/C44XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:2292
-#: include/classes/import/validators/C50XmlValidator.php:2312
-#: include/classes/import/validators/C50XmlValidator.php:2439
-#: include/classes/import/validators/C52XmlValidator.php:2304
-#: include/classes/import/validators/C52XmlValidator.php:2324
-#: include/classes/import/validators/C52XmlValidator.php:2451
-#: include/classes/import/validators/C52XmlValidator.php:2490
-#: include/classes/import/validators/CXmlValidatorGeneral.php:216
+#: include/classes/import/validators/C44XmlValidator.php:2133
+#: include/classes/import/validators/C44XmlValidator.php:2153
+#: include/classes/import/validators/C44XmlValidator.php:2280
+#: include/classes/import/validators/C50XmlValidator.php:2276
+#: include/classes/import/validators/C50XmlValidator.php:2296
+#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C52XmlValidator.php:2288
+#: include/classes/import/validators/C52XmlValidator.php:2308
+#: include/classes/import/validators/C52XmlValidator.php:2435
+#: include/classes/import/validators/C52XmlValidator.php:2474
+#: include/classes/import/validators/CXmlValidatorGeneral.php:254
 #: include/classes/validators/CApiInputValidator.php:429
 #: include/classes/validators/CApiInputValidator.php:561
 #: include/classes/validators/CApiInputValidator.php:654
@@ -19709,8 +19709,8 @@ msgstr ""
 msgid "an array or a character string is expected"
 msgstr ""
 
-#: include/classes/import/validators/C10XmlValidator.php:397
-#: include/classes/import/validators/C10XmlValidator.php:419
+#: include/classes/import/validators/C10XmlValidator.php:385
+#: include/classes/import/validators/C10XmlValidator.php:407
 msgid "an empty string is expected"
 msgstr ""
 
@@ -20149,7 +20149,7 @@ msgstr ""
 msgid "hh"
 msgstr "hh"
 
-#: include/classes/import/validators/C10XmlValidator.php:375
+#: include/classes/import/validators/C10XmlValidator.php:363
 msgctxt "XML time format"
 msgid "hh.mm"
 msgstr ""
@@ -20814,11 +20814,11 @@ msgid "the table \"%1$s\" was not found"
 msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:78
-#: include/classes/import/validators/C44XmlValidator.php:2039
-#: include/classes/import/validators/C50XmlValidator.php:2182
-#: include/classes/import/validators/C52XmlValidator.php:2194
-#: include/classes/import/validators/CXmlValidatorGeneral.php:118
-#: include/classes/import/validators/CXmlValidatorGeneral.php:137
+#: include/classes/import/validators/C44XmlValidator.php:2023
+#: include/classes/import/validators/C50XmlValidator.php:2166
+#: include/classes/import/validators/C52XmlValidator.php:2178
+#: include/classes/import/validators/CXmlValidatorGeneral.php:154
+#: include/classes/import/validators/CXmlValidatorGeneral.php:173
 #, c-format
 msgid "the tag \"%1$s\" is missing"
 msgstr ""
@@ -20874,19 +20874,19 @@ msgstr "pulse aquí para buscar"
 msgid "unacceptable URL"
 msgstr ""
 
-#: include/classes/import/validators/C44XmlValidator.php:2236
-#: include/classes/import/validators/C50XmlValidator.php:2379
-#: include/classes/import/validators/C52XmlValidator.php:2391
-#: include/classes/import/validators/CXmlValidatorGeneral.php:231
+#: include/classes/import/validators/C44XmlValidator.php:2220
+#: include/classes/import/validators/C50XmlValidator.php:2363
+#: include/classes/import/validators/C52XmlValidator.php:2375
+#: include/classes/import/validators/CXmlValidatorGeneral.php:269
 #, c-format
 msgid "unexpected constant \"%1$s\""
 msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:110
 #: include/classes/import/converters/CConstantImportConverter.php:60
-#: include/classes/import/validators/C44XmlValidator.php:2194
-#: include/classes/import/validators/C50XmlValidator.php:2337
-#: include/classes/import/validators/C52XmlValidator.php:2349
+#: include/classes/import/validators/C44XmlValidator.php:2178
+#: include/classes/import/validators/C50XmlValidator.php:2321
+#: include/classes/import/validators/C52XmlValidator.php:2333
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr ""
@@ -20910,8 +20910,8 @@ msgstr ""
 msgid "unexpected parameter \"%1$s\""
 msgstr ""
 
-#: include/classes/import/validators/CXmlValidatorGeneral.php:99
-#: include/classes/import/validators/CXmlValidatorGeneral.php:164
+#: include/classes/import/validators/CXmlValidatorGeneral.php:135
+#: include/classes/import/validators/CXmlValidatorGeneral.php:201
 #, c-format
 msgid "unexpected tag \"%1$s\""
 msgstr ""
@@ -20951,7 +20951,7 @@ msgstr ""
 msgid "unsupported time suffix"
 msgstr ""
 
-#: include/classes/import/validators/CXmlValidator.php:72
+#: include/classes/import/validators/CXmlValidator.php:63
 msgid "unsupported version number"
 msgstr ""
 
@@ -21052,11 +21052,11 @@ msgstr ""
 #: include/classes/api/services/CMap.php:681
 #: include/classes/api/services/CMap.php:1140
 #: include/classes/api/services/CMap.php:1146
-#: include/classes/import/validators/C52XmlValidator.php:2485
+#: include/classes/import/validators/C52XmlValidator.php:2469
 #: include/classes/validators/CApiInputValidator.php:391
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CNewValidator.php:517
-#: include/validate.inc.php:585
+#: include/validate.inc.php:587
 #, c-format
 msgid "value must be one of %1$s"
 msgstr ""

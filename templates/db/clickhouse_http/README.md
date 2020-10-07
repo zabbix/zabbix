@@ -1,12 +1,11 @@
 
-# Template DB ClickHouse by HTTP
+# ClickHouse by HTTP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor ClickHouse by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-
 
 
 
@@ -16,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Create a user to monitor the service:
 
@@ -166,7 +165,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |ClickHouse: There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds |<p>-</p> |`{TEMPLATE_NAME:clickhouse.process.elapsed.last()}>{$CLICKHOUSE.QUERY_TIME.MAX.WARN}` |AVERAGE |<p>Manual close: YES</p> |
 |ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
-|ClickHouse: Service is down |<p>-</p> |`{TEMPLATE_NAME:clickhouse.ping.last()}=0 or {Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</p> |
+|ClickHouse: Service is down |<p>-</p> |`{TEMPLATE_NAME:clickhouse.ping.last()}=0 or {ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</p> |
 |ClickHouse: Version has changed (new version: {ITEM.VALUE}) |<p>ClickHouse version has changed. Ack to close.</p> |`{TEMPLATE_NAME:clickhouse.version.diff()}=1 and {TEMPLATE_NAME:clickhouse.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |ClickHouse: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:clickhouse.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |ClickHouse: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:clickhouse.uptime.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Service is down</p> |
@@ -178,7 +177,7 @@ There are no template links in this template.
 |ClickHouse: {#DB}.{#TABLE} Replica is readonly |<p>This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</p> |`{TEMPLATE_NAME:clickhouse.replica.is_readonly["{#DB}.{#TABLE}"].min(5m)}=1` |WARNING | |
 |ClickHouse: {#DB}.{#TABLE} Replica session is expired |<p>This mode is turned on if the config doesn’t have sections with ZooKeeper, if an unknown error occurred when reinitializing sessions in ZooKeeper, and during session reinitialization in ZooKeeper.</p> |`{TEMPLATE_NAME:clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"].min(5m)}=1` |WARNING | |
 |ClickHouse: {#DB}.{#TABLE}: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m) |<p>-</p> |`{TEMPLATE_NAME:clickhouse.replica.queue_size["{#DB}.{#TABLE}"].min(5m)}>{$CLICKHOUSE.QUEUE.SIZE.MAX.WARN:"{#TABLE}"}` |WARNING | |
-|ClickHouse: {#DB}.{#TABLE}: Number of active replicas less than number of total replicas |<p>-</p> |`{TEMPLATE_NAME:clickhouse.replica.active_replicas["{#DB}.{#TABLE}"].max(5m)} < {Template DB ClickHouse by HTTP:clickhouse.replica.total_replicas["{#DB}.{#TABLE}"].last()}` |WARNING | |
+|ClickHouse: {#DB}.{#TABLE}: Number of active replicas less than number of total replicas |<p>-</p> |`{TEMPLATE_NAME:clickhouse.replica.active_replicas["{#DB}.{#TABLE}"].max(5m)} < {ClickHouse by HTTP:clickhouse.replica.total_replicas["{#DB}.{#TABLE}"].last()}` |WARNING | |
 |ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} for 5m)  |<p>-</p> |`{TEMPLATE_NAME:clickhouse.replica.lag["{#DB}.{#TABLE}"].min(5m)} > {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}` |WARNING | |
 |ClickHouse: Too many ZooKeeper sessions opened |<p>"Number of sessions (connections) to ZooKeeper. </p><p>Should be no more than one, because using more than one connection to ZooKeeper may lead to bugs due to lack of linearizability (stale reads) that ZooKeeper consistency model allows."</p> |`{TEMPLATE_NAME:clickhouse.zookeper.session.min(5m)}>1` |WARNING | |
 |ClickHouse: Configuration has been changed |<p>ClickHouse configuration has been changed. Ack to close.</p> |`{TEMPLATE_NAME:clickhouse.system.settings.diff()}=1 and {TEMPLATE_NAME:clickhouse.system.settings.strlen()}>0` |INFO |<p>Manual close: YES</p> |

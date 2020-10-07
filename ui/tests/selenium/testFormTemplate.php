@@ -29,7 +29,7 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormTemplate extends CLegacyWebTest {
 	public $template = 'Form test template';
 	public $template_edit_name = 'Template-layout-test-001';
-	public $template_clone = 'Template OS Linux by Zabbix agent';
+	public $template_clone = 'Linux by Zabbix agent';
 	public $template_full_delete = 'Inheritance test template';
 
 	public static function create() {
@@ -225,8 +225,11 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_UpdateTemplateName() {
 		$new_template_name = 'Changed template name';
 
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
+		$this->zbxTestWaitForPageToLoad();
+		$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickLinkTextWait($this->template_edit_name);
 		$this->zbxTestInputTypeOverwrite('template_name', $new_template_name);
 		$this->zbxTestClickWait('update');

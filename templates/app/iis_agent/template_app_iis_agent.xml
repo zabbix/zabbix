@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-05-28T08:09:15Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:03Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,14 +9,14 @@
    </groups>
    <templates>
       <template>
-         <template>Template App IIS by Zabbix agent</template>
-         <name>Template App IIS by Zabbix agent</name>
+         <template>IIS by Zabbix agent</template>
+         <name>IIS by Zabbix agent</name>
          <description>Get metrics from IIS using Zabbix agent running on Windows&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -56,7 +56,7 @@ Template tooling version used: 0.35</description>
                      <dependencies>
                         <dependency>
                            <name>IIS: The World Wide Web Publishing Service (W3SVC) is not running</name>
-                           <expression>{Template App IIS by Zabbix agent:service_state[W3SVC].last()}&lt;&gt;0</expression>
+                           <expression>{IIS by Zabbix agent:service_state[W3SVC].last()}&lt;&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -673,7 +673,7 @@ Template tooling version used: 0.35</description>
                      <dependencies>
                         <dependency>
                            <name>IIS: Windows process Activation Service (WAS) is not the running</name>
-                           <expression>{Template App IIS by Zabbix agent:service_state[WAS].last()}&lt;&gt;0</expression>
+                           <expression>{IIS by Zabbix agent:service_state[WAS].last()}&lt;&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -829,13 +829,14 @@ Template tooling version used: 0.35</description>
                            <dependencies>
                               <dependency>
                                  <name>IIS: Application pool {#APPPOOL} is not in Running state</name>
-                                 <expression>{Template App IIS by Zabbix agent:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}&lt;&gt;3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1</expression>
+                                 <expression>{IIS by Zabbix agent:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}&lt;&gt;3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <lld_macro_paths>
                   <lld_macro_path>
                      <lld_macro>{#APPPOOL}</lld_macro>
@@ -891,7 +892,7 @@ Template tooling version used: 0.35</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service Cache\URI Cache Hits %"]</key>
                </item>
             </graph_item>
@@ -900,7 +901,7 @@ Template tooling version used: 0.35</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service Cache\File Cache Hits %"]</key>
                </item>
             </graph_item>
@@ -912,7 +913,7 @@ Template tooling version used: 0.35</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service Cache\URI Cache Misses"]</key>
                </item>
             </graph_item>
@@ -920,7 +921,7 @@ Template tooling version used: 0.35</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service Cache\File Cache Misses"]</key>
                </item>
             </graph_item>
@@ -932,7 +933,7 @@ Template tooling version used: 0.35</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -940,7 +941,7 @@ Template tooling version used: 0.35</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]</key>
                </item>
             </graph_item>
@@ -948,7 +949,7 @@ Template tooling version used: 0.35</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -956,7 +957,7 @@ Template tooling version used: 0.35</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -964,7 +965,7 @@ Template tooling version used: 0.35</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -972,7 +973,7 @@ Template tooling version used: 0.35</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -980,7 +981,7 @@ Template tooling version used: 0.35</description>
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -988,7 +989,7 @@ Template tooling version used: 0.35</description>
                <sortorder>7</sortorder>
                <color>611F27</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>IIS by Zabbix agent</host>
                   <key>perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]</key>
                </item>
             </graph_item>

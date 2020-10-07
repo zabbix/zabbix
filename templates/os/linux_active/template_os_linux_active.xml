@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-04T17:53:49Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:54Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module Linux block devices by Zabbix agent active</template>
-         <name>Template Module Linux block devices by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <template>Linux block devices by Zabbix agent active</template>
+         <name>Linux block devices by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -285,9 +285,10 @@
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Linux block devices by Zabbix agent active:vfs.dev.read.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Template Module Linux block devices by Zabbix agent active:vfs.dev.write.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
+                     <expression>{Linux block devices by Zabbix agent active:vfs.dev.read.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Linux block devices by Zabbix agent active:vfs.dev.write.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
                      <name>{#DEVNAME}: Disk read/write request responses are too high (read &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)</name>
                      <priority>WARNING</priority>
                      <description>This trigger might indicate disk {#DEVNAME} saturation.</description>
@@ -301,7 +302,7 @@
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Linux block devices by Zabbix agent active</host>
+                              <host>Linux block devices by Zabbix agent active</host>
                               <key>vfs.dev.read.await[{#DEVNAME}]</key>
                            </item>
                         </graph_item>
@@ -310,7 +311,7 @@
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Linux block devices by Zabbix agent active</host>
+                              <host>Linux block devices by Zabbix agent active</host>
                               <key>vfs.dev.write.await[{#DEVNAME}]</key>
                            </item>
                         </graph_item>
@@ -322,7 +323,7 @@
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Linux block devices by Zabbix agent active</host>
+                              <host>Linux block devices by Zabbix agent active</host>
                               <key>vfs.dev.read.rate[{#DEVNAME}]</key>
                            </item>
                         </graph_item>
@@ -331,7 +332,7 @@
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Linux block devices by Zabbix agent active</host>
+                              <host>Linux block devices by Zabbix agent active</host>
                               <key>vfs.dev.write.rate[{#DEVNAME}]</key>
                            </item>
                         </graph_item>
@@ -344,7 +345,7 @@
                            <color>1A7C11</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Linux block devices by Zabbix agent active</host>
+                              <host>Linux block devices by Zabbix agent active</host>
                               <key>vfs.dev.queue_size[{#DEVNAME}]</key>
                            </item>
                         </graph_item>
@@ -353,7 +354,7 @@
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Linux block devices by Zabbix agent active</host>
+                              <host>Linux block devices by Zabbix agent active</host>
                               <key>vfs.dev.util[{#DEVNAME}]</key>
                            </item>
                         </graph_item>
@@ -392,9 +393,9 @@
          </macros>
       </template>
       <template>
-         <template>Template Module Linux CPU by Zabbix agent active</template>
-         <name>Template Module Linux CPU by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <template>Linux CPU by Zabbix agent active</template>
+         <name>Linux CPU by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -529,9 +530,9 @@ return (100 - value)</params>
                      <dependencies>
                         <dependency>
                            <name>Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)</name>
-                           <expression>{Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg1].min(5m)}/{Template Module Linux CPU by Zabbix agent active:system.cpu.num.last()}&gt;{$LOAD_AVG_PER_CPU.MAX.WARN}&#13;
-and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg5].last()}&gt;0&#13;
-and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15].last()}&gt;0</expression>
+                           <expression>{Linux CPU by Zabbix agent active:system.cpu.load[all,avg1].min(5m)}/{Linux CPU by Zabbix agent active:system.cpu.num.last()}&gt;{$LOAD_AVG_PER_CPU.MAX.WARN}&#13;
+and {Linux CPU by Zabbix agent active:system.cpu.load[all,avg5].last()}&gt;0&#13;
+and {Linux CPU by Zabbix agent active:system.cpu.load[all,avg15].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -691,9 +692,9 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
          </macros>
       </template>
       <template>
-         <template>Template Module Linux filesystems by Zabbix agent active</template>
-         <name>Template Module Linux filesystems by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <template>Linux filesystems by Zabbix agent active</template>
+         <name>Linux filesystems by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -770,7 +771,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                            <dependencies>
                               <dependency>
                                  <name>{#FSNAME}: Running out of free inodes (free &lt; {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)</name>
-                                 <expression>{Template Module Linux filesystems by Zabbix agent active:vfs.fs.inode[{#FSNAME},pfree].min(5m)}&lt;{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}</expression>
+                                 <expression>{Linux filesystems by Zabbix agent active:vfs.fs.inode[{#FSNAME},pfree].min(5m)}&lt;{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -817,10 +818,11 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
@@ -831,8 +833,8 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
+(({Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
@@ -844,8 +846,8 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
-                           <expression>{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+                           <expression>{Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -863,7 +865,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                            <calc_fnc>LAST</calc_fnc>
                            <type>GRAPH_SUM</type>
                            <item>
-                              <host>Template Module Linux filesystems by Zabbix agent active</host>
+                              <host>Linux filesystems by Zabbix agent active</host>
                               <key>vfs.fs.size[{#FSNAME},total]</key>
                            </item>
                         </graph_item>
@@ -872,7 +874,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                            <color>C80000</color>
                            <calc_fnc>LAST</calc_fnc>
                            <item>
-                              <host>Template Module Linux filesystems by Zabbix agent active</host>
+                              <host>Linux filesystems by Zabbix agent active</host>
                               <key>vfs.fs.size[{#FSNAME},used]</key>
                            </item>
                         </graph_item>
@@ -921,9 +923,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
          </macros>
       </template>
       <template>
-         <template>Template Module Linux generic by Zabbix agent active</template>
-         <name>Template Module Linux generic by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <template>Linux generic by Zabbix agent active</template>
+         <name>Linux generic by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -996,7 +998,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <dependencies>
                         <dependency>
                            <name>Getting closer to process limit (over 80% used)</name>
-                           <expression>{Template Module Linux generic by Zabbix agent active:proc.num.last()}/{Template Module Linux generic by Zabbix agent active:kernel.maxproc.last()}*100&gt;80</expression>
+                           <expression>{Linux generic by Zabbix agent active:proc.num.last()}/{Linux generic by Zabbix agent active:kernel.maxproc.last()}*100&gt;80</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1148,7 +1150,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <dependencies>
                         <dependency>
                            <name>System name has changed (new name: {ITEM.VALUE})</name>
-                           <expression>{Template Module Linux generic by Zabbix agent active:system.hostname.diff()}=1 and {Template Module Linux generic by Zabbix agent active:system.hostname.strlen()}&gt;0</expression>
+                           <expression>{Linux generic by Zabbix agent active:system.hostname.diff()}=1 and {Linux generic by Zabbix agent active:system.hostname.strlen()}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1259,11 +1261,11 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <dependencies>
                         <dependency>
                            <name>Operating system description has changed</name>
-                           <expression>{Template Module Linux generic by Zabbix agent active:system.sw.os.diff()}=1 and {Template Module Linux generic by Zabbix agent active:system.sw.os.strlen()}&gt;0</expression>
+                           <expression>{Linux generic by Zabbix agent active:system.sw.os.diff()}=1 and {Linux generic by Zabbix agent active:system.sw.os.strlen()}&gt;0</expression>
                         </dependency>
                         <dependency>
                            <name>System name has changed (new name: {ITEM.VALUE})</name>
-                           <expression>{Template Module Linux generic by Zabbix agent active:system.hostname.diff()}=1 and {Template Module Linux generic by Zabbix agent active:system.hostname.strlen()}&gt;0</expression>
+                           <expression>{Linux generic by Zabbix agent active:system.hostname.diff()}=1 and {Linux generic by Zabbix agent active:system.hostname.strlen()}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1286,9 +1288,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
          </macros>
       </template>
       <template>
-         <template>Template Module Linux memory by Zabbix agent active</template>
-         <name>Template Module Linux memory by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <template>Linux memory by Zabbix agent active</template>
+         <name>Linux memory by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1412,7 +1414,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <dependencies>
                         <dependency>
                            <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-                           <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
+                           <expression>{Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1437,13 +1439,13 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
          </macros>
       </template>
       <template>
-         <template>Template Module Linux network interfaces by Zabbix agent active</template>
-         <name>Template Module Linux network interfaces by Zabbix agent active</name>
+         <template>Linux network interfaces by Zabbix agent active</template>
+         <name>Linux network interfaces by Zabbix agent active</name>
          <description>Known Issues:&#13;
 &#13;
   Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1686,17 +1688,18 @@ Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net<
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&lt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}&gt;0&#13;
+                     <expression>{Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&lt;0 and {Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}&gt;0&#13;
 and&#13;
-({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=6&#13;
-or {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=1)&#13;
+({Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=6&#13;
+or {Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=1)&#13;
 and&#13;
-({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2)</expression>
+({Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2)</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&gt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}&gt;0) or&#13;
-({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)</recovery_expression>
+                     <recovery_expression>({Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&gt;0 and {Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}&gt;0) or&#13;
+({Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}: Ethernet has changed to lower speed than it was before</name>
                      <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
@@ -1705,17 +1708,17 @@ and&#13;
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}: Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
+                           <recovery_expression>{Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
-or {Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <expression>{Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
-and {Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <recovery_expression>{Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Interface {#IFNAME}: High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
@@ -1724,8 +1727,8 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}: Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
+                           <recovery_expression>{Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1738,7 +1741,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Linux network interfaces by Zabbix agent active</host>
+                              <host>Linux network interfaces by Zabbix agent active</host>
                               <key>net.if.in["{#IFNAME}"]</key>
                            </item>
                         </graph_item>
@@ -1747,7 +1750,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                            <drawtype>BOLD_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Linux network interfaces by Zabbix agent active</host>
+                              <host>Linux network interfaces by Zabbix agent active</host>
                               <key>net.if.out["{#IFNAME}"]</key>
                            </item>
                         </graph_item>
@@ -1756,7 +1759,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                            <color>F63100</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Linux network interfaces by Zabbix agent active</host>
+                              <host>Linux network interfaces by Zabbix agent active</host>
                               <key>net.if.out["{#IFNAME}",errors]</key>
                            </item>
                         </graph_item>
@@ -1765,7 +1768,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                            <color>A54F10</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Linux network interfaces by Zabbix agent active</host>
+                              <host>Linux network interfaces by Zabbix agent active</host>
                               <key>net.if.in["{#IFNAME}",errors]</key>
                            </item>
                         </graph_item>
@@ -1774,7 +1777,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                            <color>FC6EA3</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Linux network interfaces by Zabbix agent active</host>
+                              <host>Linux network interfaces by Zabbix agent active</host>
                               <key>net.if.out["{#IFNAME}",dropped]</key>
                            </item>
                         </graph_item>
@@ -1783,7 +1786,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                            <color>6C59DC</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Linux network interfaces by Zabbix agent active</host>
+                              <host>Linux network interfaces by Zabbix agent active</host>
                               <key>net.if.in["{#IFNAME}",dropped]</key>
                            </item>
                         </graph_item>
@@ -1822,7 +1825,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
                      <style>0</style>
                      <resource>
                         <name>Interface {#IFNAME}: Network traffic</name>
-                        <host>Template Module Linux network interfaces by Zabbix agent active</host>
+                        <host>Linux network interfaces by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1844,8 +1847,8 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
          </screens>
       </template>
       <template>
-         <template>Template OS Linux by Zabbix agent active</template>
-         <name>Template OS Linux by Zabbix agent active</name>
+         <template>Linux by Zabbix agent active</template>
+         <name>Linux by Zabbix agent active</name>
          <description>Official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.&#13;
 &#13;
 Known Issues:&#13;
@@ -1854,28 +1857,28 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Linux block devices by Zabbix agent active</name>
+               <name>Linux block devices by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Linux CPU by Zabbix agent active</name>
+               <name>Linux CPU by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Linux filesystems by Zabbix agent active</name>
+               <name>Linux filesystems by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Linux generic by Zabbix agent active</name>
+               <name>Linux generic by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Linux memory by Zabbix agent active</name>
+               <name>Linux memory by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Linux network interfaces by Zabbix agent active</name>
+               <name>Linux network interfaces by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Zabbix agent active</name>
+               <name>Zabbix agent</name>
             </template>
          </templates>
          <groups>
@@ -1894,7 +1897,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>System load</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1916,7 +1919,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>CPU usage</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1938,7 +1941,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>Memory usage</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1960,7 +1963,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>Swap usage</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1982,7 +1985,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>{#FSNAME}: Disk space usage</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2004,7 +2007,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>{#DEVNAME}: Disk read/write rates</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2026,7 +2029,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>{#DEVNAME}: Disk average waiting time</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2048,7 +2051,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>{#DEVNAME}: Disk utilization and queue</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2070,7 +2073,7 @@ Template tooling version used: 0.36</description>
                      <style>0</style>
                      <resource>
                         <name>Interface {#IFNAME}: Network traffic</name>
-                        <host>Template OS Linux by Zabbix agent active</host>
+                        <host>Linux by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2094,13 +2097,13 @@ Template tooling version used: 0.36</description>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template Module Linux generic by Zabbix agent active:proc.num.last()}/{Template Module Linux generic by Zabbix agent active:kernel.maxproc.last()}*100&gt;80</expression>
+         <expression>{Linux generic by Zabbix agent active:proc.num.last()}/{Linux generic by Zabbix agent active:kernel.maxproc.last()}*100&gt;80</expression>
          <name>Getting closer to process limit (over 80% used)</name>
          <opdata>{ITEM.LASTVALUE1} active, {ITEM.LASTVALUE2} limit.</opdata>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Template Module Linux memory by Zabbix agent active:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
+         <expression>{Linux memory by Zabbix agent active:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Linux memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
@@ -2108,24 +2111,24 @@ Template tooling version used: 0.36</description>
          <dependencies>
             <dependency>
                <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
-               <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.utilization.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+               <expression>{Linux memory by Zabbix agent active:vm.memory.utilization.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
                <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-               <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
+               <expression>{Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
-         <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
+         <expression>{Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
          <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>
       <trigger>
-         <expression>{Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg1].min(5m)}/{Template Module Linux CPU by Zabbix agent active:system.cpu.num.last()}&gt;{$LOAD_AVG_PER_CPU.MAX.WARN}&#13;
-and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg5].last()}&gt;0&#13;
-and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15].last()}&gt;0</expression>
+         <expression>{Linux CPU by Zabbix agent active:system.cpu.load[all,avg1].min(5m)}/{Linux CPU by Zabbix agent active:system.cpu.num.last()}&gt;{$LOAD_AVG_PER_CPU.MAX.WARN}&#13;
+and {Linux CPU by Zabbix agent active:system.cpu.load[all,avg5].last()}&gt;0&#13;
+and {Linux CPU by Zabbix agent active:system.cpu.load[all,avg15].last()}&gt;0</expression>
          <name>Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)</name>
          <opdata>Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
@@ -2139,7 +2142,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.switches</key>
                </item>
             </graph_item>
@@ -2147,7 +2150,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.intr</key>
                </item>
             </graph_item>
@@ -2162,7 +2165,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,system]</key>
                </item>
             </graph_item>
@@ -2170,7 +2173,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,user]</key>
                </item>
             </graph_item>
@@ -2178,7 +2181,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,nice]</key>
                </item>
             </graph_item>
@@ -2186,7 +2189,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,iowait]</key>
                </item>
             </graph_item>
@@ -2194,7 +2197,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,steal]</key>
                </item>
             </graph_item>
@@ -2202,7 +2205,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,interrupt]</key>
                </item>
             </graph_item>
@@ -2210,7 +2213,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,softirq]</key>
                </item>
             </graph_item>
@@ -2218,7 +2221,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>7</sortorder>
                <color>611F27</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,guest]</key>
                </item>
             </graph_item>
@@ -2226,7 +2229,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>8</sortorder>
                <color>F230E0</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util[,guest_nice]</key>
                </item>
             </graph_item>
@@ -2241,7 +2244,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.util</key>
                </item>
             </graph_item>
@@ -2255,7 +2258,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux memory by Zabbix agent active</host>
+                  <host>Linux memory by Zabbix agent active</host>
                   <key>vm.memory.size[total]</key>
                </item>
             </graph_item>
@@ -2264,7 +2267,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Linux memory by Zabbix agent active</host>
+                  <host>Linux memory by Zabbix agent active</host>
                   <key>vm.memory.size[available]</key>
                </item>
             </graph_item>
@@ -2279,7 +2282,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux memory by Zabbix agent active</host>
+                  <host>Linux memory by Zabbix agent active</host>
                   <key>vm.memory.utilization</key>
                </item>
             </graph_item>
@@ -2291,7 +2294,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux generic by Zabbix agent active</host>
+                  <host>Linux generic by Zabbix agent active</host>
                   <key>proc.num</key>
                </item>
             </graph_item>
@@ -2299,7 +2302,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Linux generic by Zabbix agent active</host>
+                  <host>Linux generic by Zabbix agent active</host>
                   <key>proc.num[,,run]</key>
                </item>
             </graph_item>
@@ -2307,7 +2310,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template Module Linux generic by Zabbix agent active</host>
+                  <host>Linux generic by Zabbix agent active</host>
                   <key>kernel.maxproc</key>
                </item>
             </graph_item>
@@ -2319,7 +2322,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux memory by Zabbix agent active</host>
+                  <host>Linux memory by Zabbix agent active</host>
                   <key>system.swap.size[,free]</key>
                </item>
             </graph_item>
@@ -2327,7 +2330,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Linux memory by Zabbix agent active</host>
+                  <host>Linux memory by Zabbix agent active</host>
                   <key>system.swap.size[,total]</key>
                </item>
             </graph_item>
@@ -2340,7 +2343,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.load[all,avg1]</key>
                </item>
             </graph_item>
@@ -2348,7 +2351,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.load[all,avg5]</key>
                </item>
             </graph_item>
@@ -2356,7 +2359,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.load[all,avg15]</key>
                </item>
             </graph_item>
@@ -2365,7 +2368,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <color>A54F10</color>
                <yaxisside>RIGHT</yaxisside>
                <item>
-                  <host>Template Module Linux CPU by Zabbix agent active</host>
+                  <host>Linux CPU by Zabbix agent active</host>
                   <key>system.cpu.num</key>
                </item>
             </graph_item>

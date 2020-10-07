@@ -57,7 +57,7 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');
-		foreach (['zbx', 'snmp', 'jmx', 'ipmi'] as $text) {
+		foreach (['ZBX', 'SNMP', 'JMX', 'IPMI'] as $text) {
 			$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="'.$text.'"]');
 		}
 

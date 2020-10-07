@@ -1,13 +1,13 @@
 
-# Template App RabbitMQ cluster by HTTP
+# RabbitMQ cluster by HTTP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template App RabbitMQ Cluster — collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
+Template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
 
 
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Enable the RabbitMQ management plugin. See [RabbitMQ’s documentation](https://www.rabbitmq.com/management.html) to enable it.
 
@@ -119,15 +119,15 @@ Please report any issues with the template at https://support.zabbix.com
 
 You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
 
-# Template App RabbitMQ node by HTTP
+# RabbitMQ node by HTTP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template App RabbitMQ Node — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
+Template `RabbitMQ Node` — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
 
 
 

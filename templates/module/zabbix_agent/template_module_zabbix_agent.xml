@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:41Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -9,11 +9,11 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module Zabbix agent</template>
-         <name>Template Module Zabbix agent</name>
+         <template>Zabbix agent</template>
+         <name>Zabbix agent</name>
          <description>Use this template for agents reachable from Zabbix server/proxy (passive mode).&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -133,11 +133,11 @@ Template tooling version used: 0.34</description>
          </macros>
       </template>
       <template>
-         <template>Template Module Zabbix agent active</template>
-         <name>Template Module Zabbix agent active</name>
+         <template>Zabbix agent active</template>
+         <name>Zabbix agent active</name>
          <description>Use this template instead of 'Template Module Zabbix agent' for agents running in active mode only.&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
