@@ -167,9 +167,10 @@ else {
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
 		'widget-min-rows' => DASHBOARD_WIDGET_MIN_ROWS,
 		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
-		'editable' => $data['dashboard']['editable'],
+		'editable' => $data['allowed_edit'] && $data['dashboard']['editable'],
 		'edit_mode' => $data['dashboard_edit_mode'],
-		'kioskmode' => ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE)
+		'kioskmode' => ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE),
+		'allowed_edit' => $data['allowed_edit']
 	];
 	if ($data['dashboard']['dashboardid'] != 0) {
 		$dashboard_data['id'] = $data['dashboard']['dashboardid'];

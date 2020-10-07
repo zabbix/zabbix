@@ -555,19 +555,22 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
-		widget_actions = [];
+		widget_actions = [],
+		menu;
 
 	options.widgetid = widgetid;
-	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
+	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
 
-	widget_actions.push({
-		label: t('S_COPY'),
-		clickCallback: function() {
-			jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
-			jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			jQuery('#dashbrd-paste-widget').attr('disabled', false);
-		}
-	});
+	if ($dashboard.data('dashboardGrid')['options']['allowed_edit']) {
+		widget_actions.push({
+			label: t('S_COPY'),
+			clickCallback: function() {
+				jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+				jQuery('#dashbrd-paste-widget').attr('disabled', false);
+			}
+		});
+	}
 
 	if (editMode) {
 		widget_actions.push({
