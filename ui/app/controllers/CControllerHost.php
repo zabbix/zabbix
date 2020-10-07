@@ -65,14 +65,12 @@ abstract class CControllerHost extends CController {
 	 * @return int
 	 */
 	protected function getCount(array $filter): int {
-		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
-
 		return (int) API::Host()->get([
 			'countOutput' => true,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'inheritedTags' => true,
-			'groupids' => $groupids ? $groupids : null,
+			'groupids' => $filter['groupids'] ? getSubGroups($filter['groupids']) : null,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
 			'withProblemsSuppressed' => $filter['severities']
 				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
@@ -115,15 +113,13 @@ abstract class CControllerHost extends CController {
 	 * @return array
 	 */
 	protected function getData(array $filter): array {
-		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids'], $filter_groups) : null;
-
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status'],
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'inheritedTags' => true,
-			'groupids' => $groupids ? $groupids : null,
+			'groupids' => $filter['groupids'] ? getSubGroups($filter['groupids']) : null,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
 			'withProblemsSuppressed' => $filter['severities']
 				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
