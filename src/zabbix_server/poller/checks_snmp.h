@@ -29,6 +29,13 @@ extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;
 
 #ifdef HAVE_NETSNMP
+
+#define ZBX_SNMP_STR_HEX	0x01
+#define ZBX_SNMP_STR_STRING	0x02
+#define ZBX_SNMP_STR_OID	0x04
+#define ZBX_SNMP_STR_BITS	0x08
+#define ZBX_SNMP_STR_ASCII	0x10
+
 void	zbx_init_snmp(void);
 int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type);
 void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type);

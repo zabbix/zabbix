@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:23Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:08Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Brocade FC SNMP</template>
-         <name>Template Net Brocade FC SNMP</name>
+         <template>Brocade FC SNMP</template>
+         <name>Brocade FC SNMP</name>
          <description>Template Net Brocade FC&#13;
 &#13;
 MIBs used:&#13;
@@ -22,13 +22,13 @@ Known Issues:&#13;
   Version: v6.3.1c, v7.0.0c,  v7.4.1c&#13;
   Device: all&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -188,7 +188,7 @@ faulty(4) means the switch is not operational.</description>
                      <dependencies>
                         <dependency>
                            <name>System status is in critical state</name>
-                           <expression>{Template Net Brocade FC SNMP:system.status[swOperStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Brocade FC SNMP:system.status[swOperStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -287,13 +287,14 @@ The fan value will be in RPM(revolution per minute)</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_INFO}: Fan is in critical state</name>
-                                 <expression>{Template Net Brocade FC SNMP:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Brocade FC SNMP:sensor.fan.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -346,13 +347,14 @@ The fan value will be in RPM(revolution per minute)</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_INFO}: Power supply is in critical state</name>
-                                 <expression>{Template Net Brocade FC SNMP:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Brocade FC SNMP:sensor.psu.status[swSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -426,13 +428,14 @@ Temperature readings of testpoint: {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+                     <expression>{Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
 or&#13;
-{Template Net Brocade FC SNMP:sensor.temp.status[swSensorStatus.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
+{Brocade FC SNMP:sensor.temp.status[swSensorStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
@@ -440,8 +443,8 @@ or&#13;
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Brocade FC SNMP:sensor.temp.value[swSensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -514,7 +517,7 @@ or&#13;
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Brocade FC SNMP</host>
+                  <host>Brocade FC SNMP</host>
                   <key>system.cpu.util[swCpuUsage.0]</key>
                </item>
             </graph_item>
@@ -529,7 +532,7 @@ or&#13;
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Brocade FC SNMP</host>
+                  <host>Brocade FC SNMP</host>
                   <key>vm.memory.util[swMemUsage.0]</key>
                </item>
             </graph_item>

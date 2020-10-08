@@ -1,9 +1,9 @@
 
-# Template Net Intel_Qlogic Infiniband SNMP
+# Intel_Qlogic Infiniband SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -30,8 +30,8 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -63,8 +63,8 @@ No specific Zabbix configuration is required.
 |{#ENT_NAME}: Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}].diff()}=1 and {TEMPLATE_NAME:system.hw.serialnumber[icsChassisSystemUnitFruSerialNumber.{#SNMPINDEX}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#SNMPVALUE}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1` |AVERAGE | |
 |{#SNMPVALUE}: Power supply is in warning state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[icsChassisPowerSupplyEntry.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS},eq)}=1` |WARNING |<p>**Depends on**:</p><p>- {#SNMPVALUE}: Power supply is in critical state</p> |
-|{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""} or {Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}</p> |
-|{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""} or {Template Net Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3` |HIGH | |
+|{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""} or {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}</p> |
+|{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""} or {Intel_Qlogic Infiniband SNMP:sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3` |HIGH | |
 |{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""} |<p>-</p> |`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].avg(5m)}<{$TEMP_CRIT_LOW:""}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}].min(5m)}>{$TEMP_CRIT_LOW:""}+3` |AVERAGE | |
 
 ## Feedback

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-29T22:48:19Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:06Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,14 +9,14 @@
    </groups>
    <templates>
       <template>
-         <template>Template App Apache by Zabbix agent</template>
-         <name>Template App Apache by Zabbix agent</name>
+         <template>Apache by Zabbix agent</template>
+         <name>Apache by Zabbix agent</name>
          <description>Get metrics from mod_status module using HTTP agent.&#13;
 https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -517,11 +517,11 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                      <dependencies>
                         <dependency>
                            <name>Apache: Process is not running</name>
-                           <expression>{Template App Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0</expression>
+                           <expression>{Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0</expression>
                         </dependency>
                         <dependency>
                            <name>Apache: Service is down</name>
-                           <expression>{Template App Apache by Zabbix agent:net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
+                           <expression>{Apache by Zabbix agent:net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -554,7 +554,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                      <dependencies>
                         <dependency>
                            <name>Apache: Process is not running</name>
-                           <expression>{Template App Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0</expression>
+                           <expression>{Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -683,11 +683,11 @@ return JSON.stringify(output);</params>
                      <dependencies>
                         <dependency>
                            <name>Apache: Process is not running</name>
-                           <expression>{Template App Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0</expression>
+                           <expression>{Apache by Zabbix agent:proc.num["{$APACHE.PROCESS_NAME}"].last()}=0</expression>
                         </dependency>
                         <dependency>
                            <name>Apache: Service is down</name>
-                           <expression>{Template App Apache by Zabbix agent:net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
+                           <expression>{Apache by Zabbix agent:net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -846,7 +846,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App Apache by Zabbix agent</host>
+                              <host>Apache by Zabbix agent</host>
                               <key>apache.connections[async_closing{#SINGLETON}]</key>
                            </item>
                         </graph_item>
@@ -854,7 +854,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App Apache by Zabbix agent</host>
+                              <host>Apache by Zabbix agent</host>
                               <key>apache.connections[async_keep_alive{#SINGLETON}]</key>
                            </item>
                         </graph_item>
@@ -862,7 +862,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Template App Apache by Zabbix agent</host>
+                              <host>Apache by Zabbix agent</host>
                               <key>apache.connections[async_writing{#SINGLETON}]</key>
                            </item>
                         </graph_item>
@@ -871,7 +871,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>A54F10</color>
                            <item>
-                              <host>Template App Apache by Zabbix agent</host>
+                              <host>Apache by Zabbix agent</host>
                               <key>apache.connections[total{#SINGLETON}]</key>
                            </item>
                         </graph_item>
@@ -884,7 +884,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App Apache by Zabbix agent</host>
+                              <host>Apache by Zabbix agent</host>
                               <key>apache.process[num{#SINGLETON}]</key>
                            </item>
                         </graph_item>
@@ -949,7 +949,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <style>0</style>
                      <resource>
                         <name>Apache: Requests per second</name>
-                        <host>Template App Apache by Zabbix agent</host>
+                        <host>Apache by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -971,7 +971,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <style>0</style>
                      <resource>
                         <name>Apache: Workers total</name>
-                        <host>Template App Apache by Zabbix agent</host>
+                        <host>Apache by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -993,7 +993,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <style>0</style>
                      <resource>
                         <name>Apache: Current async connections{#SINGLETON}</name>
-                        <host>Template App Apache by Zabbix agent</host>
+                        <host>Apache by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1015,7 +1015,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <style>0</style>
                      <resource>
                         <name>Apache: Current async processes{#SINGLETON}</name>
-                        <host>Template App Apache by Zabbix agent</host>
+                        <host>Apache by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1037,7 +1037,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <style>0</style>
                      <resource>
                         <name>Apache: Worker states</name>
-                        <host>Template App Apache by Zabbix agent</host>
+                        <host>Apache by Zabbix agent</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1066,7 +1066,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>proc.mem["{$APACHE.PROCESS_NAME}",,,,vsize]</key>
                </item>
             </graph_item>
@@ -1074,7 +1074,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>proc.mem["{$APACHE.PROCESS_NAME}",,,,rss]</key>
                </item>
             </graph_item>
@@ -1087,7 +1087,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.requests.rate</key>
                </item>
             </graph_item>
@@ -1099,7 +1099,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.dnslookup</key>
                </item>
             </graph_item>
@@ -1107,7 +1107,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.cleanup</key>
                </item>
             </graph_item>
@@ -1115,7 +1115,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.logging</key>
                </item>
             </graph_item>
@@ -1123,7 +1123,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.reading</key>
                </item>
             </graph_item>
@@ -1131,7 +1131,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.sending</key>
                </item>
             </graph_item>
@@ -1139,7 +1139,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.starting</key>
                </item>
             </graph_item>
@@ -1147,7 +1147,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.closing</key>
                </item>
             </graph_item>
@@ -1155,7 +1155,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>7</sortorder>
                <color>611F27</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.finishing</key>
                </item>
             </graph_item>
@@ -1163,7 +1163,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>8</sortorder>
                <color>F230E0</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.keepalive</key>
                </item>
             </graph_item>
@@ -1171,7 +1171,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>9</sortorder>
                <color>FFAD40</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.slot</key>
                </item>
             </graph_item>
@@ -1179,7 +1179,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>10</sortorder>
                <color>40CDFF</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers.waiting</key>
                </item>
             </graph_item>
@@ -1192,7 +1192,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers_total.busy</key>
                </item>
             </graph_item>
@@ -1200,7 +1200,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Apache by Zabbix agent</host>
+                  <host>Apache by Zabbix agent</host>
                   <key>apache.workers_total.idle</key>
                </item>
             </graph_item>

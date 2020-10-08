@@ -1,9 +1,9 @@
 
-# Template Net HP Comware HH3C SNMP
+# HP Comware HH3C SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 http://certifiedgeek.weebly.com/blog/hp-comware-snmp-mib-for-cpu-memory-and-temperature
 http://www.h3c.com.hk/products___solutions/technology/system_management/configuration_example/200912/656451_57_0.htm
 
@@ -39,9 +39,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module EtherLike-MIB SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|EtherLike-MIB SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 

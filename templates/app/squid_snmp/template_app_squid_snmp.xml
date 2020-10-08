@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-10-02T14:50:01Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T02:07:03Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template App Squid SNMP</template>
-         <name>Template App Squid SNMP</name>
+         <template>Squid SNMP</template>
+         <name>Squid SNMP</name>
          <description>Template for monitoring Squid caching proxy via SNMP&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid&#13;
@@ -1125,18 +1125,18 @@ Template tooling version used: 0.38</description>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template App Squid SNMP:squid[cacheSysPageFaults].avg(5m)}&gt;{Template App Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}</expression>
+         <expression>{Squid SNMP:squid[cacheSysPageFaults].avg(5m)}&gt;{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}</expression>
          <name>Squid: High sys page faults rate (&gt;{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests)</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Template App Squid SNMP:squid[cacheCurrentSwapSize].last()}&gt;{Template App Squid SNMP:squid[cacheSwapHighWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100</expression>
+         <expression>{Squid SNMP:squid[cacheCurrentSwapSize].last()}&gt;{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100</expression>
          <name>Squid: Swap usage is more than high watermark (&gt;{ITEM.VALUE2}%)</name>
          <opdata>Used: {ITEM.LASTVALUE1}</opdata>
          <priority>HIGH</priority>
       </trigger>
       <trigger>
-         <expression>{Template App Squid SNMP:squid[cacheCurrentSwapSize].last()}&gt;{Template App Squid SNMP:squid[cacheSwapLowWM].last()}*{Template App Squid SNMP:squid[cacheSwapMaxSize].last()}/100</expression>
+         <expression>{Squid SNMP:squid[cacheCurrentSwapSize].last()}&gt;{Squid SNMP:squid[cacheSwapLowWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100</expression>
          <name>Squid: Swap usage is more than low watermark (&gt;{ITEM.VALUE2}%)</name>
          <opdata>Used: {ITEM.LASTVALUE1}</opdata>
          <priority>WARNING</priority>
@@ -1149,7 +1149,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheDnsRequests]</key>
                </item>
             </graph_item>
@@ -1157,7 +1157,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheDnsReplies]</key>
                </item>
             </graph_item>
@@ -1169,7 +1169,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheFqdnRequests]</key>
                </item>
             </graph_item>
@@ -1177,7 +1177,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheFqdnHits]</key>
                </item>
             </graph_item>
@@ -1185,7 +1185,7 @@ Template tooling version used: 0.38</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheFqdnMisses]</key>
                </item>
             </graph_item>
@@ -1197,7 +1197,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheCurrentFileDescrCnt]</key>
                </item>
             </graph_item>
@@ -1205,7 +1205,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheCurrentUnusedFDescrCnt]</key>
                </item>
             </graph_item>
@@ -1213,7 +1213,7 @@ Template tooling version used: 0.38</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheCurrentResFileDescrCnt]</key>
                </item>
             </graph_item>
@@ -1225,7 +1225,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpInKb]</key>
                </item>
             </graph_item>
@@ -1233,7 +1233,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpOutKb]</key>
                </item>
             </graph_item>
@@ -1245,7 +1245,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheIpRequests]</key>
                </item>
             </graph_item>
@@ -1253,7 +1253,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheIpHits]</key>
                </item>
             </graph_item>
@@ -1261,7 +1261,7 @@ Template tooling version used: 0.38</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheIpMisses]</key>
                </item>
             </graph_item>
@@ -1273,7 +1273,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheMaxResSize]</key>
                </item>
             </graph_item>
@@ -1281,7 +1281,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheMemMaxSize]</key>
                </item>
             </graph_item>
@@ -1289,7 +1289,7 @@ Template tooling version used: 0.38</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheMemUsage]</key>
                </item>
             </graph_item>
@@ -1301,7 +1301,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheNumObjCount]</key>
                </item>
             </graph_item>
@@ -1309,7 +1309,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheCurrentUnlinkRequests]</key>
                </item>
             </graph_item>
@@ -1321,7 +1321,7 @@ Template tooling version used: 0.38</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpAllSvcTime.5]</key>
                </item>
             </graph_item>
@@ -1329,7 +1329,7 @@ Template tooling version used: 0.38</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpAllSvcTime.60]</key>
                </item>
             </graph_item>
@@ -1337,7 +1337,7 @@ Template tooling version used: 0.38</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpMissSvcTime.5]</key>
                </item>
             </graph_item>
@@ -1345,7 +1345,7 @@ Template tooling version used: 0.38</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpMissSvcTime.60]</key>
                </item>
             </graph_item>
@@ -1353,7 +1353,7 @@ Template tooling version used: 0.38</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpHitSvcTime.5]</key>
                </item>
             </graph_item>
@@ -1361,7 +1361,7 @@ Template tooling version used: 0.38</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheHttpHitSvcTime.60]</key>
                </item>
             </graph_item>
@@ -1369,7 +1369,7 @@ Template tooling version used: 0.38</description>
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheIcpQuerySvcTime.5]</key>
                </item>
             </graph_item>
@@ -1377,7 +1377,7 @@ Template tooling version used: 0.38</description>
                <sortorder>7</sortorder>
                <color>611F27</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheIcpQuerySvcTime.60]</key>
                </item>
             </graph_item>
@@ -1385,7 +1385,7 @@ Template tooling version used: 0.38</description>
                <sortorder>8</sortorder>
                <color>F230E0</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheIcpReplySvcTime.5]</key>
                </item>
             </graph_item>
@@ -1393,7 +1393,7 @@ Template tooling version used: 0.38</description>
                <sortorder>9</sortorder>
                <color>FFAD40</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheIcpReplySvcTime.60]</key>
                </item>
             </graph_item>
@@ -1401,7 +1401,7 @@ Template tooling version used: 0.38</description>
                <sortorder>10</sortorder>
                <color>40CDFF</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheDnsSvcTime.5]</key>
                </item>
             </graph_item>
@@ -1409,7 +1409,7 @@ Template tooling version used: 0.38</description>
                <sortorder>11</sortorder>
                <color>40FFA0</color>
                <item>
-                  <host>Template App Squid SNMP</host>
+                  <host>Squid SNMP</host>
                   <key>squid[cacheDnsSvcTime.60]</key>
                </item>
             </graph_item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:44Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,13 +9,13 @@
    </groups>
    <templates>
       <template>
-         <template>Template DB Redis</template>
-         <name>Template DB Redis</name>
+         <template>Redis</template>
+         <name>Redis</name>
          <description>Get Redis metrics from plugin for the New Zabbix Agent (zabbix-agent2).&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/389050-discussion-thread-for-official-zabbix-template-redis&#13;
 &#13;
-Template tooling version used: 0.33</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -192,7 +192,6 @@ Once the limit is reached Redis will close all the new connections sending an er
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Redis: Configuration has changed</name>
                      <priority>INFO</priority>
                      <description>Redis configuration has changed. Ack to close.</description>
@@ -317,7 +316,7 @@ Once the limit is reached Redis will close all the new connections sending an er
                      <dependencies>
                         <dependency>
                            <name>Redis: Service is down</name>
-                           <expression>{Template DB Redis:redis.ping["{$REDIS.CONN.URI}"].last()}=0</expression>
+                           <expression>{Redis:redis.ping["{$REDIS.CONN.URI}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1129,7 +1128,6 @@ https://redis.io/topics/memory-optimization</description>
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Redis: Version has changed (new version: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
                      <description>Redis version has changed. Ack to close.</description>
@@ -1729,6 +1727,7 @@ https://redis.io/topics/clients</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Redis: Memory usage{#SINGLETON}</name>
@@ -1736,7 +1735,7 @@ https://redis.io/topics/clients</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Redis</host>
+                              <host>Redis</host>
                               <key>proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,vsize]</key>
                            </item>
                         </graph_item>
@@ -1744,7 +1743,7 @@ https://redis.io/topics/clients</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Redis</host>
+                              <host>Redis</host>
                               <key>proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,rss]</key>
                            </item>
                         </graph_item>
@@ -1853,6 +1852,7 @@ https://redis.io/topics/clients</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>DB {#DB}: Keys</name>
@@ -1861,7 +1861,7 @@ https://redis.io/topics/clients</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Redis</host>
+                              <host>Redis</host>
                               <key>redis.db.keys["{#DB}"]</key>
                            </item>
                         </graph_item>
@@ -1870,7 +1870,7 @@ https://redis.io/topics/clients</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Redis</host>
+                              <host>Redis</host>
                               <key>redis.db.expires["{#DB}"]</key>
                            </item>
                         </graph_item>
@@ -1991,7 +1991,7 @@ https://redis.io/topics/clients</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}/{Template DB Redis:redis.memory.used_memory.last()}*100&gt;{$REDIS.MEM.PUSED.MAX.WARN}</expression>
+                           <expression>{min(5m)}/{Redis:redis.memory.used_memory.last()}*100&gt;{$REDIS.MEM.PUSED.MAX.WARN}</expression>
                            <name>Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>
@@ -2402,6 +2402,7 @@ https://redis.io/topics/clients</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <master_item>
                   <key>redis.info["{$REDIS.CONN.URI}"]</key>
                </master_item>
@@ -2790,6 +2791,7 @@ https://redis.io/topics/clients</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <master_item>
                   <key>redis.info["{$REDIS.CONN.URI}"]</key>
                </master_item>
@@ -2973,6 +2975,7 @@ https://redis.io/topics/clients</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <master_item>
                   <key>redis.info["{$REDIS.CONN.URI}"]</key>
                </master_item>
@@ -3026,6 +3029,7 @@ return res;</params>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Redis slave {#SLAVE_IP}:{#SLAVE_PORT}: Replication lag bytes</name>
@@ -3034,7 +3038,7 @@ return res;</params>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Redis</host>
+                              <host>Redis</host>
                               <key>redis.replication.lag_bytes["{#SLAVE_IP}:{#SLAVE_PORT}"]</key>
                            </item>
                         </graph_item>
@@ -3269,6 +3273,7 @@ return JSON.stringify(Object.keys(repl)
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Redis: Replication lag time{#SINGLETON}</name>
@@ -3277,7 +3282,7 @@ return JSON.stringify(Object.keys(repl)
                            <drawtype>BOLD_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Redis</host>
+                              <host>Redis</host>
                               <key>redis.replication.master_last_io_seconds_ago[{#SINGLETON}]</key>
                            </item>
                         </graph_item>
@@ -3360,7 +3365,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Clients</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3382,7 +3387,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Keyspace</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3404,7 +3409,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Commands</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3426,7 +3431,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Expired keys</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3448,7 +3453,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Persistence</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3470,7 +3475,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Slaves</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3492,7 +3497,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Slowlog</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3514,7 +3519,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Uptime</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3536,7 +3541,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Replication lag time{#SINGLETON}</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3565,7 +3570,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: CPU</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3587,7 +3592,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Network</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3609,7 +3614,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Memory</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3631,7 +3636,7 @@ return JSON.stringify(Object.keys(repl)
                      <style>0</style>
                      <resource>
                         <name>Redis: Memory fragmentation</name>
-                        <host>Template DB Redis</host>
+                        <host>Redis</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -3655,7 +3660,7 @@ return JSON.stringify(Object.keys(repl)
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template DB Redis:redis.clients.connected.min(5m)}/{Template DB Redis:redis.config.maxclients.last()}*100&gt;{$REDIS.CLIENTS.PRC.MAX.WARN}</expression>
+         <expression>{Redis:redis.clients.connected.min(5m)}/{Redis:redis.config.maxclients.last()}*100&gt;{$REDIS.CLIENTS.PRC.MAX.WARN}</expression>
          <name>Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)</name>
          <priority>WARNING</priority>
          <description>When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.&#13;
@@ -3671,7 +3676,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.clients.connected</key>
                </item>
             </graph_item>
@@ -3680,7 +3685,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.clients.blocked</key>
                </item>
             </graph_item>
@@ -3692,7 +3697,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.stats.instantaneous_ops.rate</key>
                </item>
             </graph_item>
@@ -3705,7 +3710,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.cpu.sys</key>
                </item>
             </graph_item>
@@ -3713,7 +3718,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.cpu.sys_children</key>
                </item>
             </graph_item>
@@ -3722,7 +3727,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.cpu.user</key>
                </item>
             </graph_item>
@@ -3730,7 +3735,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.cpu.user_children</key>
                </item>
             </graph_item>
@@ -3743,7 +3748,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.stats.expired_keys</key>
                </item>
             </graph_item>
@@ -3752,7 +3757,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.stats.evicted_keys</key>
                </item>
             </graph_item>
@@ -3764,7 +3769,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.stats.keyspace_hits</key>
                </item>
             </graph_item>
@@ -3772,7 +3777,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.stats.keyspace_misses</key>
                </item>
             </graph_item>
@@ -3785,7 +3790,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.memory.used_memory</key>
                </item>
             </graph_item>
@@ -3794,7 +3799,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.memory.used_memory_rss</key>
                </item>
             </graph_item>
@@ -3803,7 +3808,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.memory.used_memory_peak</key>
                </item>
             </graph_item>
@@ -3816,7 +3821,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.memory.fragmentation_ratio</key>
                </item>
             </graph_item>
@@ -3829,7 +3834,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.stats.instantaneous_input.rate</key>
                </item>
             </graph_item>
@@ -3838,7 +3843,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.stats.instantaneous_output.rate</key>
                </item>
             </graph_item>
@@ -3851,7 +3856,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.persistence.rdb_last_bgsave_time_sec</key>
                </item>
             </graph_item>
@@ -3860,7 +3865,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.persistence.aof_last_rewrite_time_sec</key>
                </item>
             </graph_item>
@@ -3873,7 +3878,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.replication.connected_slaves</key>
                </item>
             </graph_item>
@@ -3886,7 +3891,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.slowlog.count["{$REDIS.CONN.URI}"]</key>
                </item>
             </graph_item>
@@ -3898,7 +3903,7 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Redis</host>
+                  <host>Redis</host>
                   <key>redis.server.uptime</key>
                </item>
             </graph_item>

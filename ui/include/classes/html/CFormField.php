@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,14 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/agent/AgentTests.php';
 
-class All {
-	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('Project');
+class CFormField extends CTag {
 
-		$suite->addTest(AgentTests::suite());
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	private const ZBX_STYLE_CLASS = 'form-field';
 
-		return $suite;
+	public const ZBX_STYLE_FORM_FIELD_OFFSET_1 = 'offset-1';
+	public const ZBX_STYLE_FORM_FIELD_OFFSET_2 = 'offset-2';
+	public const ZBX_STYLE_FORM_FIELD_OFFSET_3 = 'offset-3';
+
+	public const ZBX_STYLE_FORM_FIELD_FLUID    = 'field-fluid';
+
+	/**
+	 * @param CTag|CTag[]|null $items
+	 */
+	public function __construct($items = null) {
+		parent::__construct('div', true);
+
+		$this
+			->addClass(self::ZBX_STYLE_CLASS)
+			->addItem($items);
 	}
 }

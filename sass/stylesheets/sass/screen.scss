@@ -23,6 +23,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/header";
 @import "layout/footer";
 @import "layout/sidebar";
+@import "layout/form-grid";
 
 @import "components/form-search";
 @import "components/menu-main";
@@ -4087,15 +4088,6 @@ $form-icon-btn: (
 		}
 	}
 
-	.hintbox-scrollable {
-		overflow: auto;
-		width: 100%;
-		max-height: calc(100vh - 190px);
-		max-width: 45vw;
-		white-space: nowrap;
-		@extend %webkit-scrollbar;
-	}
-
 	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
@@ -5102,7 +5094,6 @@ a.link-action {
 %status {
 	padding: 2px 3px 1px;
 	font-size: $font-h3-size;
-	text-transform: $font-transform;
 	text-align: center;
 	min-width: .7em;
 	line-height: 1em;
@@ -6809,17 +6800,6 @@ $range-input-width: 31px;
 	font-size: 0;
 }
 
-.item-test-popup-value-row,
-.preproc-test-popup-value-row {
-	display: flex;
-
-	label {
-		padding: 0 10px;
-		margin-left: auto;
-		line-height: 24px;
-	}
-}
-
 table.preprocessing-test-results {
 	td {
 		vertical-align: top !important;
@@ -7375,6 +7355,25 @@ z-select,
 			.description:not(:empty) {
 				color: $form-disabled-font-color;
 			}
+		}
+	}
+}
+
+// Dashboard list table.
+.dashboard-list {
+	.dashboard-list-item {
+		display: flex;
+		justify-content: space-between;
+		height: 18px;
+
+		.status-green {
+			background-color: $dashboard-my-bg-color;
+			border-color: $dashboard-my-bg-color;
+		}
+
+		.status-yellow {
+			background-color: $dashboard-shared-bg-color;
+			border-color: $dashboard-shared-bg-color;
 		}
 	}
 }

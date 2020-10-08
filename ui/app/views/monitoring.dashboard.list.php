@@ -71,6 +71,7 @@ $form = (new CForm())->setName('dashboardForm');
 
 // Create dashboard table.
 $table = (new CTableInfo())
+	->addClass(ZBX_STYLE_DASHBOARD_LIST)
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_dashboards'))
@@ -90,29 +91,26 @@ foreach ($data['dashboards'] as $dashboard) {
 	$tags = [];
 
 	if ($dashboard['userid'] == CWebUser::$data['userid']) {
-		$tags[] = (new CSpan(_('My')))
-			->addClass(ZBX_STYLE_TAG)
-			->addClass(ZBX_STYLE_GREEN_BG);
+		$tags[] = (new CSpan(_('My')))->addClass(ZBX_STYLE_STATUS_GREEN);
 
 		if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
 				|| count($dashboard['userGroups']) > 0) {
-			$tags[] = (new CSpan(_('Shared')))
-				->addClass(ZBX_STYLE_TAG)
-				->addClass(ZBX_STYLE_YELLOW_BG);
+			$tags[] = ' ';
+			$tags[] = (new CSpan(_('Shared')))->addClass(ZBX_STYLE_STATUS_YELLOW);
 		}
 	}
 
 	$table->addRow([
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
-		[
+		(new CDiv([
 			new CLink($dashboard['name'],
 				$url
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
 			),
-			$tags ? (new CDiv($tags))->addStyle('float: right') : null
-		]
+			$tags ? new CDiv($tags) : null
+		]))->addClass(ZBX_STYLE_DASHBOARD_LIST_ITEM)
 	]);
 }
 

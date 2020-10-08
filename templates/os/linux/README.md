@@ -1,9 +1,9 @@
 
-# Template Module Linux CPU by Zabbix agent
+# Linux CPU by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -53,18 +53,18 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m) |<p>Per CPU load average is too high. Your system may be slow to respond.</p> |`{TEMPLATE_NAME:system.cpu.load[all,avg1].min(5m)}/{Template Module Linux CPU by Zabbix agent:system.cpu.num.last()}>{$LOAD_AVG_PER_CPU.MAX.WARN} and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg5].last()}>0 and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()}>0` |AVERAGE | |
+|Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m) |<p>Per CPU load average is too high. Your system may be slow to respond.</p> |`{TEMPLATE_NAME:system.cpu.load[all,avg1].min(5m)}/{Linux CPU by Zabbix agent:system.cpu.num.last()}>{$LOAD_AVG_PER_CPU.MAX.WARN} and {Linux CPU by Zabbix agent:system.cpu.load[all,avg5].last()}>0 and {Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()}>0` |AVERAGE | |
 |High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:system.cpu.util.min(5m)}>{$CPU.UTIL.CRIT}` |WARNING |<p>**Depends on**:</p><p>- Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Linux filesystems by Zabbix agent
+# Linux filesystems by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -110,8 +110,8 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})<5G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
-|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})<10G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p> |
+|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})<5G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
+|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Linux filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})<10G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p> |
 |{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%) |<p>It may become impossible to write to disk if there are no index nodes left.</p><p>As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</p> |`{TEMPLATE_NAME:vfs.fs.inode[{#FSNAME},pfree].min(5m)}<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}` |AVERAGE | |
 |{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%) |<p>It may become impossible to write to disk if there are no index nodes left.</p><p>As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</p> |`{TEMPLATE_NAME:vfs.fs.inode[{#FSNAME},pfree].min(5m)}<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}` |WARNING |<p>**Depends on**:</p><p>- {#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)</p> |
 
@@ -119,11 +119,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Linux memory by Zabbix agent
+# Linux memory by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -165,18 +165,18 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.utilization.min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE |<p>**Depends on**:</p><p>- Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p> |
-|Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2}) |<p>-</p> |`{TEMPLATE_NAME:vm.memory.size[available].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent:vm.memory.size[total].last()}>0` |AVERAGE | |
-|High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free) |<p>This trigger is ignored, if there is no swap configured</p> |`{TEMPLATE_NAME:system.swap.size[,pfree].min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory by Zabbix agent:system.swap.size[,total].last()}>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p><p>- Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p> |
+|Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2}) |<p>-</p> |`{TEMPLATE_NAME:vm.memory.size[available].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {Linux memory by Zabbix agent:vm.memory.size[total].last()}>0` |AVERAGE | |
+|High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free) |<p>This trigger is ignored, if there is no swap configured</p> |`{TEMPLATE_NAME:system.swap.size[,pfree].min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Linux memory by Zabbix agent:system.swap.size[,total].last()}>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p><p>- Lack of available memory ( < {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Linux block devices by Zabbix agent
+# Linux block devices by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -223,17 +223,17 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m) |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`{TEMPLATE_NAME:vfs.dev.read.await[{#DEVNAME}].min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Template Module Linux block devices by Zabbix agent:vfs.dev.write.await[{#DEVNAME}].min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
+|{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m) |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`{TEMPLATE_NAME:vfs.dev.read.await[{#DEVNAME}].min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Linux block devices by Zabbix agent:vfs.dev.write.await[{#DEVNAME}].min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Linux network interfaces by Zabbix agent
+# Linux network interfaces by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -272,16 +272,16 @@ There are no template links in this template.
 |Network_interfaces |Interface {#IFNAME}: Inbound packets with errors | |ZABBIX_PASSIVE |net.if.in["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |Interface {#IFNAME}: Outbound packets discarded | |ZABBIX_PASSIVE |net.if.out["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |Interface {#IFNAME}: Inbound packets discarded | |ZABBIX_PASSIVE |net.if.in["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}: Operational status |<p>Indicates the interface RFC2863 operational state as a string.</p><p>Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_PASSIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var newvalue; switch(value) {   case "up":     newvalue = 1;     break;   case "down":     newvalue = 2;     break;   case "testing":     newvalue = 4;     break;   case "unknown":     newvalue = 5;     break;   case "dormant":     newvalue = 6;     break;   case "notPresent":     newvalue = 7;     break;   default:     newvalue = "Problem parsing interface operstate in JS"; } return newvalue;`</p> |
+|Network_interfaces |Interface {#IFNAME}: Operational status |<p>Indicates the interface RFC2863 operational state as a string.</p><p>Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_PASSIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Network_interfaces |Interface {#IFNAME}: Interface type |<p>Indicates the interface protocol type as a decimal value.</p><p>See include/uapi/linux/if_arp.h for all possible values.</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_PASSIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/type"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Interface {#IFNAME}: High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m) |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"} or {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}: Link down</p> |
+|Interface {#IFNAME}: High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m) |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"} or {Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and {Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}: Link down</p> |
 |Interface {#IFNAME}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p><p>3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and ({TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)`<p>Recovery expression:</p>`{TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}<>2 or {$IFCONTROL:"{#IFNAME}"}=0` |AVERAGE |<p>Manual close: YES</p> |
-|Interface {#IFNAME}: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`{TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}<0 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}>0 and ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=6 or {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=1) and ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}<>2)`<p>Recovery expression:</p>`({TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}>0 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}>0) or ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}: Link down</p> |
+|Interface {#IFNAME}: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`{TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}<0 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}>0 and ({Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=6 or {Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=1) and ({Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}<>2)`<p>Recovery expression:</p>`({TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}>0 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}>0) or ({Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}: Link down</p> |
 
 ## Feedback
 
@@ -291,11 +291,11 @@ Please report any issues with the template at https://support.zabbix.com
 
 - Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.
 
-# Template Module Linux generic by Zabbix agent
+# Linux generic by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -347,7 +347,7 @@ There are no template links in this template.
 |System name has changed (new name: {ITEM.VALUE}) |<p>System name has changed. Ack to close.</p> |`{TEMPLATE_NAME:system.hostname.diff()}=1 and {TEMPLATE_NAME:system.hostname.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN}) |<p>-</p> |`{TEMPLATE_NAME:kernel.maxfiles.last()}<{$KERNEL.MAXFILES.MIN}` |INFO | |
 |Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN}) |<p>-</p> |`{TEMPLATE_NAME:kernel.maxproc.last()}<{$KERNEL.MAXPROC.MIN}` |INFO |<p>**Depends on**:</p><p>- Getting closer to process limit (over 80% used)</p> |
-|Getting closer to process limit (over 80% used) |<p>-</p> |`{TEMPLATE_NAME:proc.num.last()}/{Template Module Linux generic by Zabbix agent:kernel.maxproc.last()}*100>80` |WARNING | |
+|Getting closer to process limit (over 80% used) |<p>-</p> |`{TEMPLATE_NAME:proc.num.last()}/{Linux generic by Zabbix agent:kernel.maxproc.last()}*100>80` |WARNING | |
 |Operating system description has changed |<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p> |`{TEMPLATE_NAME:system.sw.os.diff()}=1 and {TEMPLATE_NAME:system.sw.os.strlen()}>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed (new name: {ITEM.VALUE})</p> |
 |/etc/passwd has been changed |<p>-</p> |`{TEMPLATE_NAME:vfs.file.cksum[/etc/passwd].diff()}>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Operating system description has changed</p><p>- System name has changed (new name: {ITEM.VALUE})</p> |
 |{HOST.NAME} has been restarted (uptime < 10m) |<p>The host uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:system.uptime.last()}<10m` |WARNING |<p>Manual close: YES</p> |
@@ -356,11 +356,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template OS Linux by Zabbix agent
+# Linux by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
 
 ## Setup
@@ -376,13 +376,13 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Linux CPU by Zabbix agent |
-|Template Module Linux block devices by Zabbix agent |
-|Template Module Linux filesystems by Zabbix agent |
-|Template Module Linux generic by Zabbix agent |
-|Template Module Linux memory by Zabbix agent |
-|Template Module Linux network interfaces by Zabbix agent |
-|Template Module Zabbix agent |
+|Linux CPU by Zabbix agent |
+|Linux block devices by Zabbix agent |
+|Linux filesystems by Zabbix agent |
+|Linux generic by Zabbix agent |
+|Linux memory by Zabbix agent |
+|Linux network interfaces by Zabbix agent |
+|Zabbix agent |
 
 ## Discovery rules
 
