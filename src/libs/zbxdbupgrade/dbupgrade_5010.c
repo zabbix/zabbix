@@ -547,9 +547,6 @@ static void	DBpatch_get_preferred_widget_size(zbx_db_screen_item_t *item, int *w
 	*w = item->width;
 	*h = item->height;
 
-	if (SCREEN_RESOURCE_LLD_GRAPH == item->resourcetype || SCREEN_RESOURCE_LLD_SIMPLE_GRAPH == item->resourcetype)
-		*w *= item->max_columns;
-
 	if (SCREEN_RESOURCE_LLD_GRAPH == item->resourcetype || SCREEN_RESOURCE_LLD_SIMPLE_GRAPH == item->resourcetype ||
 			SCREEN_RESOURCE_GRAPH == item->resourcetype || SCREEN_RESOURCE_SIMPLE_GRAPH == item->resourcetype)
 	{
