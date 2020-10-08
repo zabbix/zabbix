@@ -67,6 +67,12 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (9, 50011, '', 50014, NULL);
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
 INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 8, 'API discovery group {#HV.NAME}');
+-- host prototype for delete
+INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1);
+INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NULL,40066);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (12, 50015, '', 50014, NULL);
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50028,50015,1,2,1,'127.0.0.1','','10050');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (50028, 2, 1, '{$SNMP_COMMUNITY}');
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'API user group for update');

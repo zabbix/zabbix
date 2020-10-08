@@ -293,6 +293,13 @@ static int	DBpatch_5010032(void)
 
 static int	DBpatch_5010033(void)
 {
+	const ZBX_FIELD	field = {"custom_interfaces", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_5010034(void)
+{
 	const ZBX_TABLE	table =
 			{"item_parameter", "item_parameterid", 0,
 				{
@@ -308,12 +315,12 @@ static int	DBpatch_5010033(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5010034(void)
+static int	DBpatch_5010035(void)
 {
 	return DBcreate_index("item_parameter", "item_parameter_1", "itemid", 1);
 }
 
-static int	DBpatch_5010035(void)
+static int	DBpatch_5010036(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -362,5 +369,6 @@ DBPATCH_ADD(5010032, 0, 1)
 DBPATCH_ADD(5010033, 0, 1)
 DBPATCH_ADD(5010034, 0, 1)
 DBPATCH_ADD(5010035, 0, 1)
+DBPATCH_ADD(5010036, 0, 1)
 
 DBPATCH_END()

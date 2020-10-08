@@ -1190,7 +1190,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'inventory_mode' => '0',
 							'templates' => [],
 							'macros' => [],
-							'tags' => []
+							'tags' => [],
+							'custom_interfaces' => '0'
 						]
 					],
 					'jmx_endpoint' => '',
@@ -1583,7 +1584,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'discover' => '0',
 							'templates' => [],
 							'macros' => [],
-							'tags' => []
+							'tags' => [],
+							'custom_interfaces' => '0'
 						]
 					],
 					'jmx_endpoint' => '',

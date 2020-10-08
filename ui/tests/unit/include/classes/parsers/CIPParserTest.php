@@ -30,150 +30,269 @@ class CIPParserTest extends PHPUnit_Framework_TestCase {
 	public static function testProvider() {
 		return [
 			[
-				'192.168.3.4', 0, true,
+				'192.168.3.4', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '192.168.3.4'
 				]
 			],
 			[
-				'192.168.3.4,192.168.5.0', 0, true,
+				'192.168.3.4,192.168.5.0', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '192.168.3.4'
 				]
 			],
 			[
-				'192.168.3.4,192.168.5.0', 12, true,
+				'192.168.3.4,192.168.5.0', 12, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '192.168.5.0'
 				]
 			],
 			[
-				'192.168.3.4,192.168.5.0/24', 12, true,
+				'192.168.3.4,192.168.5.0/24', 12, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '192.168.5.0'
 				]
 			],
 			[
-				'192.168.3.256', 0, true,
+				'192.168.3.256', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'192.168.3.256', 0, true,
+				'192.168.3.256', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'192.168..4', 0, true,
+				'192.168..4', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'', 0, true,
+				'', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'::', 0, true,
+				'::', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '::'
 				]
 			],
 			[
-				'::', 0, false,
+				'::', 0, ['v6' => false],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'::1', 0, true,
+				'::1', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '::1'
 				]
 			],
 			[
-				'0000:0000:0000:0000:0000:0000:0000:0001', 0, true,
+				'0000:0000:0000:0000:0000:0000:0000:0001', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '0000:0000:0000:0000:0000:0000:0000:0001'
 				]
 			],
 			[
-				'0000:0000:0000:0000:0000:0000:FFFF:FFFF', 0, true,
+				'0000:0000:0000:0000:0000:0000:FFFF:FFFF', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '0000:0000:0000:0000:0000:0000:FFFF:FFFF'
 				]
 			],
 			[
-				'0000:0000:0000:0000:0000:0000:127.0.0.1', 0, true,
+				'0000:0000:0000:0000:0000:0000:127.0.0.1', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '0000:0000:0000:0000:0000:0000:127.0.0.1'
 				]
 			],
 			[
-				'::FFFF:127.0.0.1', 0, true,
+				'::FFFF:127.0.0.1', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '::FFFF:127.0.0.1'
 				]
 			],
 			[
-				'1234:5678:90ab:cdef:ABCD:EF00:127.0.0.1', 0, true,
+				'1234:5678:90ab:cdef:ABCD:EF00:127.0.0.1', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '1234:5678:90ab:cdef:ABCD:EF00:127.0.0.1'
 				]
 			],
 			[
-				'random text.....1234:5678:90ab:cdef:ABCD:EF00:127.0.0.1....text', 16, true,
+				'random text.....1234:5678:90ab:cdef:ABCD:EF00:127.0.0.1....text', 16, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '1234:5678:90ab:cdef:ABCD:EF00:127.0.0.1'
 				]
 			],
 			[
-				'::127.0.0.1', 0, true,
+				'::127.0.0.1', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '::127.0.0.1'
 				]
 			],
 			[
-				'FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:255.255.255.255', 0, true,
+				'FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:255.255.255.255', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => 'FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:255.255.255.255'
 				]
 			],
 			[
-				'0000:0000:0000:0000:0000:0000:127.0.0.256', 0, true,
+				'0000:0000:0000:0000:0000:0000:127.0.0.256', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
 			[
-				'0000:0000:0000:0000:0000:0000:FFFG:FFFF', 0, true,
+				'0000:0000:0000:0000:0000:0000:FFFG:FFFF', 0, ['v6' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
+				]
+			],
+			[
+				'2001:db8::8a2e:370:7334', 0, ['v6' => false],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$MACRO}', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$MACRO}'
+				]
+			],
+			[
+				'text{$MACRO}', 4, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$MACRO}'
+				]
+			],
+			[
+				'{$MACRO}text', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$MACRO}'
+				]
+			],
+			[
+				'{$MACRO:"test"}', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$MACRO:"test"}'
+				]
+			],
+			[
+				'{#MACRO}', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{#MACRO}', 0, ['v6' => true, 'lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#MACRO}'
+				]
+			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'test{#MACRO}', 4, ['v6' => true, 'lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#MACRO}'
+				]
+			],
+			[
+				'{#MACRO}test', 0, ['v6' => true, 'lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{#MACRO}'
+				]
+			],
+			[
+				'{HOST.HOST}', 0, ['v6' => true, 'usermacros' => true, 'lldmacros' => true, 'macros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{HOST.HOST}'
+				]
+			],
+			[
+				'{HOST.HOST}', 0, ['v6' => true, 'macros' => []],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{HOST.HOST}', 0, ['v6' => true, 'macros' => false],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{HOST.HOST}', 0, ['v6' => true, 'macros' => ['{HOST.NAME}', '{HOST.HOST}', '{HOST.DNS}']],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{HOST.HOST}'
+				]
+			],
+			[
+				'test{HOST.HOST}', 4, ['v6' => true, 'macros' => ['{HOST.NAME}', '{HOST.HOST}', '{HOST.DNS}']],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{HOST.HOST}'
+				]
+			],
+			[
+				'{HOST.HOST}test', 0, ['v6' => true, 'macros' => ['{HOST.NAME}', '{HOST.HOST}', '{HOST.DNS}']],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{HOST.HOST}'
 				]
 			]
 		];
@@ -184,17 +303,17 @@ class CIPParserTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $source
 	 * @param int    $pos
-	 * @param bool   $v6
+	 * @param array  $options
 	 * @param array  $expected
 	*/
-	public function testParse($source, $pos, $v6, $expected) {
-		$ipv6_parser = new CIPParser(['v6' => $v6]);
+	public function testParse($source, $pos, $options, $expected) {
+		$ip_parser = new CIPParser($options);
 
 		$this->assertSame($expected, [
-			'rc' => $ipv6_parser->parse($source, $pos),
-			'match' => $ipv6_parser->getMatch()
+			'rc' => $ip_parser->parse($source, $pos),
+			'match' => $ip_parser->getMatch()
 		]);
-		$this->assertSame(strlen($expected['match']), $ipv6_parser->getLength());
+		$this->assertSame(strlen($expected['match']), $ip_parser->getLength());
 	}
 
 }
