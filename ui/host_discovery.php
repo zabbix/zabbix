@@ -608,8 +608,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			DBstart();
 
 			// Unset equal values if item script type and parameters have not changed.
+			$compare = function($arr, $arr2) {
+				return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
+					array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
+				);
+			};
 			if ($newItem['type'] == ITEM_TYPE_SCRIPT && $newItem['type'] == $item['type']
-					&& $item['parameters'] == $newItem['parameters']) {
+					&& $compare($item['parameters'], $newItem['parameters'])) {
 				unset($newItem['parameters']);
 			}
 

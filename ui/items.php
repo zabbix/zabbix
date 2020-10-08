@@ -856,7 +856,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				$item = prepareScriptItemFormData($script_item) + $item;
 				if ($db_item['type'] == getRequest('type')) {
-					if ($db_item['parameters'] == $item['parameters']) {
+					$compare = function($arr, $arr2) {
+						return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
+							array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
+						);
+					};
+
+					if ($compare($db_item['parameters'], $item['parameters'])) {
 						unset($item['parameters']);
 					}
 					if ($db_item['timeout'] === $item['timeout']) {
