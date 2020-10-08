@@ -768,6 +768,10 @@ class CScreenProblem extends CScreenBase {
 			$args['to'] = $this->timeline['to'];
 		}
 
+		if (array_key_exists('severities', $args)) {
+			$args['severities'] = array_combine($args['severities'], $args['severities']);
+		}
+
 		array_map([$url, 'setArgument'], array_keys($args), $args);
 
 		$data = self::getData($this->data['filter'], true);
