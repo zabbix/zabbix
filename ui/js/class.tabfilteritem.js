@@ -47,7 +47,6 @@ class CTabFilterItem extends CBaseComponent {
 		this._template = options.template;
 		this._expanded = options.expanded;
 		this._support_custom_time = options.support_custom_time;
-		this._options = options;
 		this._template_rendered = false;
 		this._src_url = null;
 		this._apply_url = null;
@@ -112,6 +111,13 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Return filter form HTML element.
+	 */
+	getForm() {
+		return this._content_container.querySelector('form');
+	}
+
+	/**
 	 * Render tab template with data. Fire TABFILTERITEM_EVENT_RENDER on template container binding this as event this.
 	 */
 	renderContentTemplate() {
@@ -136,8 +142,7 @@ class CTabFilterItem extends CBaseComponent {
 			filter_custom_time: this._data.filter_custom_time,
 			tabfilter_from: this._data.from || '',
 			tabfilter_to: this._data.to || '',
-			support_custom_time: +this._options.support_custom_time,
-			allow_set_custom_time: +this._support_custom_time
+			support_custom_time: +this._support_custom_time
 		};
 
 		if (this._data.filter_name !== '') {
@@ -281,7 +286,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {object} data  Updated tab properties object.
 	 */
 	update(data) {
-		var form = this._content_container.querySelector('form'),
+		var form = this.getForm(),
 			fields = {
 				filter_name: form.querySelector('[name="filter_name"]'),
 				filter_show_counter: form.querySelector('[name="filter_show_counter"]'),
@@ -323,7 +328,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * @return {URLSearchParams}
 	 */
 	getFilterParams() {
-		let form = this._content_container.querySelector('form'),
+		let form = this.getForm(),
 			params = null;
 
 		if (form instanceof HTMLFormElement) {

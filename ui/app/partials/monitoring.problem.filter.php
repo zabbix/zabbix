@@ -391,7 +391,6 @@ if (array_key_exists('render_html', $data)) {
 
 					$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
 					$('[name="age_state"]', container).attr('disabled', !filter_show);
-					this._support_custom_time = !filter_show;
 
 					if (this._parent) {
 						this._parent.updateTimeselector(this, filter_show);
@@ -550,6 +549,27 @@ if (array_key_exists('render_html', $data)) {
 		// Initialize src_url.
 		this.resetUnsavedState();
 		this.on(TABFILTERITEM_EVENT_ACTION, update.bind(this));
+
+		if (this._parent) {
+			this._parent.on(TABFILTER_EVENT_UPDATE, (ev) => {
+				let form = this.getForm();
+
+				if ($(form).find('[name="filter_custom_time"]').val() == 1) {
+					$('[name="show"][value="<?= TRIGGERS_OPTION_ALL ?>"]', form).prop('checked', true);
+					$('#show_' + this._data.uniqid, form).trigger('change');
+					this.updateUnsavedState();
+					this.setBrowserLocationToApplyUrl();
+				}
+			});
+
+			this._parent.on(TABFILTER_EVENT_NEWITEM, () => {
+				let form = this.getForm();
+
+				if ($(form).find('[name="filter_custom_time"]').val() == 1) {
+					$('[name="show"][value="<?= TRIGGERS_OPTION_ALL ?>"]', form).prop('checked', true);
+				}
+			});
+		}
 	}
 
 	function expand(data, container) {

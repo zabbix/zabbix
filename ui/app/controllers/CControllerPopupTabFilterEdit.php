@@ -38,7 +38,6 @@ class CControllerPopupTabFilterEdit extends CController {
 			'tabfilter_from' =>			'string',
 			'tabfilter_to' =>			'string',
 			'support_custom_time' =>	'in 0,1',
-			'allow_set_custom_time' =>	'in 0,1',
 			'create' =>					'in 0,1'
 		];
 
@@ -102,7 +101,6 @@ class CControllerPopupTabFilterEdit extends CController {
 			'tabfilter_from' => '',
 			'tabfilter_to' => '',
 			'support_custom_time' => 0,
-			'allow_set_custom_time' => 0,
 			'create' => 0
 		];
 		$this->getInputs($data, array_keys($data));

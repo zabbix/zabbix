@@ -20,6 +20,7 @@
 
 const TABFILTER_EVENT_URLSET = 'urlset.tabfilter';
 const TABFILTER_EVENT_UPDATE = 'update.tabfilter';
+const TABFILTER_EVENT_NEWITEM = 'newitem.tabfilter';
 
 class CTabFilter extends CBaseComponent {
 
@@ -352,6 +353,8 @@ class CTabFilter extends CBaseComponent {
 					if (item.isSelected()) {
 						this.profileUpdate('expanded', {
 							value_int: item._expanded ? 0 : 1
+						}).then(() => {
+							this._options.expanded = +item._expanded;
 						});
 					}
 					else {
@@ -359,6 +362,8 @@ class CTabFilter extends CBaseComponent {
 						item.initUnsavedState();
 						this.profileUpdate('selected', {
 							value_int: item._index
+						}).then(() => {
+							this._options.selected = item._index;
 						});
 						this.scrollIntoView(item);
 					}
@@ -448,16 +453,20 @@ class CTabFilter extends CBaseComponent {
 			 * Event handler for 'Save as' button and on filter modal close.
 			 */
 			updateActiveFilterTab: (ev) => {
-				var item = this.getSelectedItem();
+				var item = this.getSelectedItem(),
+					params;
 
 				if (ev.detail.create == '1') {
 					item = this.create(item._target.parentNode.cloneNode(true), {});
 				}
 
 				item.update(ev.detail);
-				var params = item.getFilterParams();
 
 				if (ev.detail.create == '1') {
+					// Allow to tab filter initialization code modify values of new created filter.
+					this.fire(TABFILTER_EVENT_NEWITEM, {item: item});
+					params = item.getFilterParams();
+
 					// Popup were created by 'Save as' button, reload page for simplicity.
 					this.profileUpdate('properties', {
 						'idx2': ev.detail.idx2,
@@ -469,8 +478,18 @@ class CTabFilter extends CBaseComponent {
 					});
 				}
 				else {
+					params = item.getFilterParams();
 					this.setSelectedItem(item);
 					this.fire(TABFILTER_EVENT_UPDATE, {filter_property: 'properties'});
+
+					if (this._timeselector instanceof CTabFilterItem && this._timeselector._expanded
+							&& params.get('filter_custom_time') == 1) {
+						this._timeselector.fire(TABFILTERITEM_EVENT_COLLAPSE);
+
+						if (this._options.expanded) {
+							item.fire(TABFILTERITEM_EVENT_EXPAND);
+						}
+					}
 				}
 			},
 
@@ -567,8 +586,7 @@ class CTabFilter extends CBaseComponent {
 				this._active_item.openPropertiesDialog({
 					create: 1,
 					idx2: this._items.length,
-					support_custom_time: +this._options.support_custom_time,
-					allow_set_custom_time: +this._active_item._support_custom_time
+					support_custom_time: this._options.support_custom_time
 				}, ev.target);
 			},
 

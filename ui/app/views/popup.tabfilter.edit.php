@@ -40,7 +40,6 @@ if ($data['support_custom_time']) {
 		->addRow(_('Set custom time period'),
 			(new CCheckBox('filter_custom_time', 1))
 				->setChecked($data['filter_custom_time'])
-				->setEnabled((bool) $data['allow_set_custom_time'])
 		)
 		->addRow(new CLabel(_('From'), 'tabfilter_from'),
 			(new CDateSelector('tabfilter_from', $data['tabfilter_from']))
