@@ -18,6 +18,12 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
+|{$IFNAME.LTEMODEM.MATCHES} |<p>This macro is used in LTE modem discovery. It can be overridden on the host.</p> |`^lte` |
+|{$IFNAME.WIFI.MATCHES} |<p>This macro is used in CAPsMAN AP channel discovery. It can be overridden on the host level.</p> |`WIFI` |
+|{$LTEMODEM.RSRP.MIN.WARN} |<p>The LTE modem RSRP minimum value for warning trigger expression.</p> |`-100` |
+|{$LTEMODEM.RSRQ.MIN.WARN} |<p>The LTE modem RSRQ minimum value for warning trigger expression.</p> |`-20` |
+|{$LTEMODEM.RSSI.MIN.WARN} |<p>The LTE modem RSSI minimum value for warning trigger expression.</p> |`-100` |
+|{$LTEMODEM.SINR.MIN.WARN} |<p>The LTE modem SINR minimum value for warning trigger expression.</p> |`0` |
 |{$MEMORY.UTIL.MAX} |<p>-</p> |`90` |
 |{$TEMP_CRIT:"CPU"} |<p>-</p> |`75` |
 |{$TEMP_CRIT_LOW} |<p>-</p> |`5` |
@@ -41,8 +47,9 @@ No specific Zabbix configuration is required.
 |CPU discovery |<p>HOST-RESOURCES-MIB::hrProcessorTable discovery</p> |SNMP |hrProcessorLoad.discovery |
 |Temperature CPU discovery |<p>MIKROTIK-MIB::mtxrHlProcessorTemperature</p><p>Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p> |SNMP |mtxrHlProcessorTemperature.discovery |
 |Temperature sensor discovery |<p>MIKROTIK-MIB::mtxrHlTemperature</p><p>Since temperature sensor is not available on all Mikrotik hardware,</p><p>this is done to avoid unsupported items.</p> |SNMP |mtxrHlTemperature.discovery |
+|LTE modem discovery |<p>MIKROTIK-MIB::mtxrLTEModemInterfaceIndex</p> |SNMP |mtxrLTEModem.discovery<p>**Filter**:</p>AND <p>- A: {#IFTYPE} MATCHES_REGEX `^1$`</p><p>- B: {#IFNAME} MATCHES_REGEX `{$IFNAME.LTEMODEM.MATCHES}`</p> |
 |AP channel discovery |<p>MIKROTIK-MIB::mtxrWlAp</p> |SNMP |mtxrWlAp.discovery<p>**Filter**:</p>AND <p>- A: {#IFTYPE} MATCHES_REGEX `^71$`</p><p>- B: {#IFADMINSTATUS} MATCHES_REGEX `^1$`</p> |
-|CAPsMAN AP channel discovery |<p>MIKROTIK-MIB::mtxrWlCMChannel</p> |SNMP |mtxrWlCMChannel.discovery<p>**Filter**:</p>AND <p>- A: {#IFTYPE} MATCHES_REGEX `^1$`</p> |
+|CAPsMAN AP channel discovery |<p>MIKROTIK-MIB::mtxrWlCMChannel</p> |SNMP |mtxrWlCMChannel.discovery<p>**Filter**:</p>AND <p>- A: {#IFTYPE} MATCHES_REGEX `^1$`</p><p>- B: {#IFNAME} MATCHES_REGEX `{$IFNAME.WIFI.MATCHES}`</p> |
 |Storage discovery |<p>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</p> |SNMP |storage.discovery<p>**Filter**:</p>OR <p>- B: {#STORAGE_TYPE} MATCHES_REGEX `.+4$`</p><p>- A: {#STORAGE_TYPE} MATCHES_REGEX `.+hrStorageFixedDisk`</p> |
 
 ## Items collected
@@ -62,6 +69,10 @@ No specific Zabbix configuration is required.
 |Storage |Disk-{#SNMPINDEX}: Space utilization |<p>Space utilization in % for Disk-{#SNMPINDEX}</p> |CALCULATED |vfs.fs.pused[hrStorageSize.{#SNMPINDEX}]<p>**Expression**:</p>`(last("vfs.fs.used[hrStorageSize.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100` |
 |Temperature |CPU: Temperature |<p>MIB: MIKROTIK-MIB</p><p>(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</p> |SNMP |sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p> |
 |Temperature |Device: Temperature |<p>MIB: MIKROTIK-MIB</p><p>(mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</p><p>Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</p> |SNMP |sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p> |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI |<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSSI</p> |SNMP |lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}] |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP |<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSRP</p> |SNMP |lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}] |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ |<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSRQ</p> |SNMP |lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}] |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): LTE modem SINR |<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalSINR</p> |SNMP |lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}] |
 |Wireless |Interface {#IFNAME}({#IFALIAS}): SSID |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApSsid</p> |SNMP |ssid.name[mtxrWlApSsid.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Wireless |Interface {#IFNAME}({#IFALIAS}): AP band |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApBand</p> |SNMP |ssid.band[mtxrWlApBand.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Wireless |Interface {#IFNAME}({#IFALIAS}): AP noise floor |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApNoiseFloor</p> |SNMP |ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
@@ -89,6 +100,10 @@ No specific Zabbix configuration is required.
 |Device: Temperature is above warning threshold: >{$TEMP_WARN:"Device"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"Device"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"Device"}-3` |WARNING |<p>**Depends on**:</p><p>- Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}</p> |
 |Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Device"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Device"}-3` |HIGH | |
 |Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"} |<p>-</p> |`{TEMPLATE_NAME:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].avg(5m)}<{$TEMP_CRIT_LOW:"Device"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}].min(5m)}>{$TEMP_CRIT_LOW:"Device"}+3` |AVERAGE | |
+|Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m) |<p>-</p> |`{TEMPLATE_NAME:lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}].max(5m)} < {$LTEMODEM.RSSI.MIN.WARN}` |WARNING | |
+|Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m) |<p>-</p> |`{TEMPLATE_NAME:lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}].max(5m)} < {$LTEMODEM.RSRP.MIN.WARN}` |WARNING | |
+|Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m) |<p>-</p> |`{TEMPLATE_NAME:lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}].max(5m)} < {$LTEMODEM.RSRQ.MIN.WARN}` |WARNING | |
+|Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m) |<p>-</p> |`{TEMPLATE_NAME:lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}].max(5m)} < {$LTEMODEM.SINR.MIN.WARN}` |WARNING | |
 |Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running |<p>Access point interface can be not running by different reasons - disabled interface, power off, network link down.</p> |`{TEMPLATE_NAME:ssid.state[mtxrWlCMState.{#SNMPINDEX}].last()}<>"running-ap"` |WARNING | |
 
 ## Feedback
