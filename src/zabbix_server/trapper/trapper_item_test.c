@@ -202,7 +202,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items, "ssl_key_password",
 			item.ssl_key_password_orig, sizeof(item.ssl_key_password_orig));
 
-	if (SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
+	if (ITEM_TYPE_SCRIPT == item.type &&
+			SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
 	{
 		item.script_params = zbx_dsprintf(NULL, "%.*s",
 				(int)(jp_script_params.end - jp_script_params.start + 1), jp_script_params.start);
