@@ -23,6 +23,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/header";
 @import "layout/footer";
 @import "layout/sidebar";
+@import "layout/form-grid";
 
 @import "components/form-search";
 @import "components/menu-main";
@@ -4087,15 +4088,6 @@ $form-icon-btn: (
 		}
 	}
 
-	.hintbox-scrollable {
-		overflow: auto;
-		width: 100%;
-		max-height: calc(100vh - 190px);
-		max-width: 45vw;
-		white-space: nowrap;
-		@extend %webkit-scrollbar;
-	}
-
 	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
@@ -6806,17 +6798,6 @@ $range-input-width: 31px;
 // Screen reader.
 .inline-sr-only {
 	font-size: 0;
-}
-
-.item-test-popup-value-row,
-.preproc-test-popup-value-row {
-	display: flex;
-
-	label {
-		padding: 0 10px;
-		margin-left: auto;
-		line-height: 24px;
-	}
 }
 
 table.preprocessing-test-results {

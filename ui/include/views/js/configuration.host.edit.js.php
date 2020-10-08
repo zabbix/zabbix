@@ -73,7 +73,7 @@
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_BODY ?>">
 		<?= (new CFormList('snmp_details_#{iface.interfaceid}'))
 				->cleanItems()
-				->addRow((new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]')),
+				->addRow(new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'),
 					new CComboBox('interfaces[#{iface.interfaceid}][details][version]', SNMP_V2C, null, [SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]),
 					'row_snmp_version_#{iface.interfaceid}'
 				)

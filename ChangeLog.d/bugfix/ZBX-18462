@@ -1,0 +1,1 @@
+.......PS. [ZBX-18462] fixed inconsistent auto-registration behaviour for hosts without metadata on Oracle DB compared to other databases when using Zabbix proxy (viktors)
