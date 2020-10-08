@@ -43,6 +43,8 @@
 
 					url.setArgument('action', 'host.view.refresh');
 					this.refresh_url = url.getUrl();
+					this.unscheduleRefresh();
+					this.refresh();
 				});
 				this.filter.on(TABFILTER_EVENT_UPDATE, (ev) => {
 					if (!this.filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
