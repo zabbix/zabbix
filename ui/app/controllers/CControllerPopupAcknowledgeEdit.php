@@ -55,6 +55,13 @@ class CControllerPopupAcknowledgeEdit extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)) {
+			return false;
+		}
+
 		$events = API::Event()->get([
 			'countOutput' => true,
 			'eventids' => $this->getInput('eventids'),
@@ -78,7 +85,11 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
-			'problem_severity_can_be_changed' => false
+			'problem_severity_can_be_changed' => false,
+			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
+			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
 		];
 
 		// Select events.

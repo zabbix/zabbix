@@ -62,14 +62,17 @@ class CRoleHelper {
 	public const MODULES_MODULE = 'modules.module.';
 	public const MODULES_MODULE_STATUS = 'modules.module.status.';
 	public const MODULES_DEFAULT_ACCESS = 'modules.default_access';
-	public const API = 'api';
-	public const API_ACCESS_MODE = 'api.access.mode';
+	public const API_ACCESS = 'api.access';
+	public const API_MODE = 'api.mode';
 	public const API_METHOD = 'api.method.';
-	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit.dashboards';
-	public const ACTIONS_EDIT_MAPS = 'actions.edit.maps';
-	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit.maintenance';
-	public const ACTIONS_UPDATE_PROBLEMS = 'actions.update.problems';
-	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute.scripts';
+	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
+	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
+	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit_maintenance';
+	public const ACTIONS_ACKNOWLEDGE_PROBLEMS = 'actions.acknowledge_problems';
+	public const ACTIONS_CLOSE_PROBLEMS = 'actions.close_problems';
+	public const ACTIONS_CHANGE_SEVERITY = 'actions.change_severity';
+	public const ACTIONS_ADD_PROBLEM_COMMENTS = 'actions.add_problem_comments';
+	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 
 	public const SECTION_UI = 'ui';
@@ -139,7 +142,7 @@ class CRoleHelper {
 		$role_rule_is_enabled = false;
 
 		if ($section_name === self::SECTION_API || $rule_name === $section_name.'.default_access') {
-			if ($rule_name === self::API_ACCESS_MODE) {
+			if ($rule_name === self::API_MODE) {
 				$role_rule_is_enabled = $role_rule_exists ? (bool) $role_rules[$rule_name] : false;
 			}
 			else {
@@ -254,7 +257,7 @@ class CRoleHelper {
 				self::$section_rules[$section_name][$user_type] = self::getAllModules($user_type);
 				break;
 			case self::SECTION_API:
-				$rules = [self::API, self::API_ACCESS_MODE];
+				$rules = [self::API_ACCESS, self::API_MODE];
 				self::$section_rules[$section_name][$user_type] = $rules;
 				break;
 			case self::SECTION_ACTIONS:
@@ -356,7 +359,8 @@ class CRoleHelper {
 	 */
 	public static function getAllActions(int $user_type): array {
 		$rules = [
-			self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS, self::ACTIONS_UPDATE_PROBLEMS,
+			self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS, self::ACTIONS_ACKNOWLEDGE_PROBLEMS,
+			self::ACTIONS_CLOSE_PROBLEMS, self::ACTIONS_CHANGE_SEVERITY, self::ACTIONS_ADD_PROBLEM_COMMENTS,
 			self::ACTIONS_EXECUTE_SCRIPTS
 		];
 
@@ -522,7 +526,10 @@ class CRoleHelper {
 		}
 
 		$labels += [
-			self::ACTIONS_UPDATE_PROBLEMS => _('Acknowledge problems'),
+			self::ACTIONS_ACKNOWLEDGE_PROBLEMS => _('Acknowledge problems'),
+			self::ACTIONS_CLOSE_PROBLEMS => _('Close problems'),
+			self::ACTIONS_CHANGE_SEVERITY => ('Change severity'),
+			self::ACTIONS_ADD_PROBLEM_COMMENTS => _('Add problem comments'),
 			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts')
 		];
 

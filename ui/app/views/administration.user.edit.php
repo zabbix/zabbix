@@ -434,7 +434,7 @@ if ($data['action'] === 'user.edit') {
 			}
 		}
 
-		$api_access_enabled = CRoleHelper::checkAccess(CRoleHelper::API, $data['roleid']);
+		$api_access_enabled = CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $data['roleid']);
 		$permissions_form_list
 			->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
 			->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
@@ -447,7 +447,7 @@ if ($data['action'] === 'user.edit') {
 		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
 
 		if ($api_methods) {
-			$api_access_mode_allowed = CRoleHelper::checkAccess(CRoleHelper::API_ACCESS_MODE, $data['roleid']);
+			$api_access_mode_allowed = CRoleHelper::checkAccess(CRoleHelper::API_MODE, $data['roleid']);
 			$elements = [];
 
 			foreach ($api_methods as $api_method) {

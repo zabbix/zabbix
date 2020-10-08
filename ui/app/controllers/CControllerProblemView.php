@@ -316,7 +316,11 @@ class CControllerProblemView extends CController {
 				'highlight_row' => CProfile::get('web.problem.filter.highlight_row', 0),
 				'show_opdata' => CProfile::get('web.problem.filter.show_opdata', 0)
 			],
-			'active_tab' => $active_tab
+			'active_tab' => $active_tab,
+			'allowed_ack' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
 		];
 
 		if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {

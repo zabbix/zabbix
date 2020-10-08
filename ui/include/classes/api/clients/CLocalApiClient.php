@@ -267,11 +267,11 @@ class CLocalApiClient extends CApiClient {
 			$rule_value = $db_rule[CRole::RULE_VALUE_TYPES[$db_rule['type']]];
 
 			if ($rule_value == 0 && (($db_rule['name'] !== '' && $db_rule['name'] === $action)
-					|| $db_rule['name'] === CRoleHelper::API)) {
+					|| $db_rule['name'] === CRoleHelper::API_ACCESS)) {
 				return false;
 			}
 
-			if ($db_rule['name'] === CRoleHelper::API_ACCESS_MODE) {
+			if ($db_rule['name'] === CRoleHelper::API_MODE) {
 				$api_access_mode = (bool) $rule_value;
 			}
 			elseif ($rule_value === $api.'.'.$method || in_array($rule_value, $api_method_masks)) {
