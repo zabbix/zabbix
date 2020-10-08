@@ -1126,7 +1126,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 						unset($update_item_prototype['jmx_endpoint']);
 					}
 
-					if ($type != ITEM_TYPE_HTTPAGENT) {
+					if ($type != ITEM_TYPE_HTTPAGENT && $type != ITEM_TYPE_SCRIPT) {
 						unset($update_item_prototype['timeout']);
 					}
 				}
