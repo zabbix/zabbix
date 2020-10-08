@@ -360,7 +360,7 @@ abstract class CItemGeneral extends CApiService {
 					],
 					'parameters' => ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 						'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
-						'value' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_parameter', 'value')]
+						'value' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_parameter', 'value'), 'default' => DB::getDefault('item_parameter', 'value')]
 					]]
 				]];
 
@@ -1781,91 +1781,84 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update item parameters.
 	 *
-	 * @param array $items                             Array of items.
-	 * @param array $items[]['itemid']                 Item ID.
-	 * @param array $items[]['parameters']             Item parameters.
-	 * @param array $items[]['parameters'][]['name']   Parameter name.
-	 * @param array $items[]['parameters'][]['value']  Parameter value.
+	 * @param array      $items                             Array of items.
+	 * @param int|string $items[]['itemid']                 Item ID.
+	 * @param int|string $items[]['type']                   Item type.
+	 * @param array      $items[]['parameters']             Item parameters.
+	 * @param array      $items[]['parameters'][]['name']   Parameter name.
+	 * @param array      $items[]['parameters'][]['value']  Parameter value.
 	 */
 	protected function updateItemParameters(array $items): void {
-		$items_parameters = [];
-		$del_item_parameters = [];
+		$db_item_parameters_by_itemid = [];
 
 		foreach ($items as $item) {
-			if ($item['type'] == ITEM_TYPE_SCRIPT) {
-				if (array_key_exists('parameters', $item)) {
-					if ($item['parameters']) {
-						$params = [];
+			if ($item['type'] != ITEM_TYPE_SCRIPT || array_key_exists('parameters', $item)) {
+				$db_item_parameters_by_itemid[$item['itemid']] = [];
+			}
+		}
 
-						foreach ($item['parameters'] as $param) {
-							$params[$param['name']] = $param['value'];
+		if (!$db_item_parameters_by_itemid) {
+			return;
+		}
+
+		$options = [
+			'output' => ['item_parameterid', 'itemid', 'name', 'value'],
+			'filter' => ['itemid' => array_keys($db_item_parameters_by_itemid)]
+		];
+		$result = DBselect(DB::makeSql('item_parameter', $options));
+
+		while ($row = DBfetch($result)) {
+			$db_item_parameters_by_itemid[$row['itemid']][$row['name']] = [
+				'item_parameterid' => $row['item_parameterid'],
+				'value' => $row['value']
+			];
+		}
+
+		$ins_item_parameters = [];
+		$upd_item_parameters = [];
+		$del_item_parameterids = [];
+
+		foreach ($db_item_parameters_by_itemid as $itemid => $db_item_parameters) {
+			$item = $items[$itemid];
+
+			if ($item['type'] == ITEM_TYPE_SCRIPT && array_key_exists('parameters', $item)) {
+				foreach ($item['parameters'] as $parameter) {
+					if (array_key_exists($parameter['name'], $db_item_parameters)) {
+						if ($db_item_parameters[$parameter['name']]['value'] !== $parameter['value']) {
+							$upd_item_parameters[] = [
+								'values' => ['value' => $parameter['value']],
+								'where' => [
+									'item_parameterid' => $db_item_parameters[$parameter['name']]['item_parameterid']
+								]
+							];
 						}
-
-						$items_parameters[$item['itemid']] = $params;
+						unset($db_item_parameters[$parameter['name']]);
 					}
 					else {
-						$del_item_parameters[$item['itemid']] = true;
+						$ins_item_parameters[] = [
+							'itemid' => $itemid,
+							'name' => $parameter['name'],
+							'value' => $parameter['value']
+						];
 					}
 				}
 			}
-			else {
-				$del_item_parameters[$item['itemid']] = true;
-			}
+
+			$del_item_parameterids = array_merge($del_item_parameterids,
+				array_column($db_item_parameters, 'item_parameterid')
+			);
 		}
 
-		if ($del_item_parameters) {
-			DB::delete('item_parameter', ['itemid' => array_keys($del_item_parameters)]);
+		if ($del_item_parameterids) {
+			DB::delete('item_parameter', ['item_parameterid' => $del_item_parameterids]);
 		}
 
-		if ($items_parameters) {
-			$ins_item_parameters = [];
-			$upd_item_parameters = [];
-			$del_item_parameters = [];
+		if ($upd_item_parameters) {
+			DB::update('item_parameter', $upd_item_parameters);
+		}
 
-			$db_item_parameters = DB::select('item_parameter', [
-				'output' => ['item_parameterid', 'itemid', 'name', 'value'],
-				'filter' => ['itemid' => array_keys($items_parameters)]
-			]);
-
-			foreach ($db_item_parameters as $param) {
-				$itemid = $param['itemid'];
-				if (!array_key_exists($itemid, $items_parameters)) {
-					$del_item_parameters[] = $param['item_parameterid'];
-				}
-				elseif (!array_key_exists($param['name'], $items_parameters[$itemid])) {
-					$del_item_parameters[] = $param['item_parameterid'];
-				}
-				elseif ($items_parameters[$itemid][$param['name']] !== $param['value']) {
-					$upd_item_parameters[] = [
-						'values' => ['value' => $items_parameters[$itemid][$param['name']]],
-						'where' => ['item_parameterid' => $param['item_parameterid']]
-					];
-					unset($items_parameters[$itemid][$param['name']]);
-				}
-				else {
-					unset($items_parameters[$itemid][$param['name']]);
-				}
-			}
-
-			$items_parameters = array_filter($items_parameters);
-
-			foreach ($items_parameters as $itemid => $params) {
-				foreach ($params as $name => $value) {
-					$ins_item_parameters[] = compact('itemid', 'name', 'value');
-				}
-			}
-
-			if ($del_item_parameters) {
-				DB::delete('item_parameter', ['item_parameterid' => array_keys(array_flip($del_item_parameters))]);
-			}
-
-			if ($upd_item_parameters) {
-				DB::update('item_parameter', $upd_item_parameters);
-			}
-
-			if ($ins_item_parameters) {
-				DB::insert('item_parameter', $ins_item_parameters);
-			}
+		if ($ins_item_parameters) {
+			DB::insertBatch('item_parameter', $ins_item_parameters);
 		}
 	}
 
