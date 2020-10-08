@@ -85,7 +85,7 @@ class CControllerUserroleList extends CController {
 			])
 		];
 
-		// data sort and pager
+		// Data sort and pager.
 		CArrayHelper::sort($data['roles'], [['field' => $sort_field, 'order' => $sort_order]]);
 
 		$page_num = getRequest('page', 1);
