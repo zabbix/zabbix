@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-07-15T20:19:25Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:02Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module Windows CPU by Zabbix agent active</template>
-         <name>Template Module Windows CPU by Zabbix agent active</name>
-         <description>Template tooling version used: 0.37</description>
+         <template>Windows CPU by Zabbix agent active</template>
+         <name>Windows CPU by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -72,7 +72,7 @@ hardware failure. This should never be higher than 20%.</description>
                      <dependencies>
                         <dependency>
                            <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                           <expression>{Template Module Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+                           <expression>{Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -103,11 +103,11 @@ functions of the Windows® Operating System.</description>
                      <dependencies>
                         <dependency>
                            <name>CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)</name>
-                           <expression>{Template Module Windows CPU by Zabbix agent active:perf_counter_en["\Processor Information(_total)\% Interrupt Time"].min(5m)}&gt;{$CPU.INTERRUPT.CRIT.MAX}</expression>
+                           <expression>{Windows CPU by Zabbix agent active:perf_counter_en["\Processor Information(_total)\% Interrupt Time"].min(5m)}&gt;{$CPU.INTERRUPT.CRIT.MAX}</expression>
                         </dependency>
                         <dependency>
                            <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                           <expression>{Template Module Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+                           <expression>{Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -218,9 +218,9 @@ and are waiting to be executed.</description>
          </macros>
       </template>
       <template>
-         <template>Template Module Windows filesystems by Zabbix agent active</template>
-         <name>Template Module Windows filesystems by Zabbix agent active</name>
-         <description>Template tooling version used: 0.37</description>
+         <template>Windows filesystems by Zabbix agent active</template>
+         <name>Windows filesystems by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -321,8 +321,8 @@ and are waiting to be executed.</description>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
@@ -333,8 +333,8 @@ and are waiting to be executed.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+                     <expression>{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
+(({Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
@@ -346,8 +346,8 @@ and are waiting to be executed.</description>
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
-                           <expression>{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
+                           <expression>{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -365,7 +365,7 @@ and are waiting to be executed.</description>
                            <calc_fnc>LAST</calc_fnc>
                            <type>GRAPH_SUM</type>
                            <item>
-                              <host>Template Module Windows filesystems by Zabbix agent active</host>
+                              <host>Windows filesystems by Zabbix agent active</host>
                               <key>vfs.fs.size[{#FSNAME},total]</key>
                            </item>
                         </graph_item>
@@ -374,7 +374,7 @@ and are waiting to be executed.</description>
                            <color>C80000</color>
                            <calc_fnc>LAST</calc_fnc>
                            <item>
-                              <host>Template Module Windows filesystems by Zabbix agent active</host>
+                              <host>Windows filesystems by Zabbix agent active</host>
                               <key>vfs.fs.size[{#FSNAME},used]</key>
                            </item>
                         </graph_item>
@@ -427,9 +427,9 @@ and are waiting to be executed.</description>
          </macros>
       </template>
       <template>
-         <template>Template Module Windows generic by Zabbix agent active</template>
-         <name>Template Module Windows generic by Zabbix agent active</name>
-         <description>Template tooling version used: 0.37</description>
+         <template>Windows generic by Zabbix agent active</template>
+         <name>Windows generic by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -600,9 +600,9 @@ and are waiting to be executed.</description>
          </macros>
       </template>
       <template>
-         <template>Template Module Windows memory by Zabbix agent active</template>
-         <name>Template Module Windows memory by Zabbix agent active</name>
-         <description>Template tooling version used: 0.37</description>
+         <template>Windows memory by Zabbix agent active</template>
+         <name>Windows memory by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -650,7 +650,7 @@ than 5,000, there may well be a memory leak or you running out of memory.</descr
                      <dependencies>
                         <dependency>
                            <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
-                           <expression>{Template Module Windows memory by Zabbix agent active:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+                           <expression>{Windows memory by Zabbix agent active:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -696,7 +696,7 @@ If the value is greater than 1,000, as a result of excessive paging, there may b
                      <dependencies>
                         <dependency>
                            <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
-                           <expression>{Template Module Windows memory by Zabbix agent active:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+                           <expression>{Windows memory by Zabbix agent active:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -857,9 +857,9 @@ A typical Event ID 2019 is recorded in the system event log.</description>
          </macros>
       </template>
       <template>
-         <template>Template Module Windows network by Zabbix agent active</template>
-         <name>Template Module Windows network by Zabbix agent active</name>
-         <description>Template tooling version used: 0.37</description>
+         <template>Windows network by Zabbix agent active</template>
+         <name>Windows network by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1164,20 +1164,20 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].change()}&lt;0 and {Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}&gt;0&#13;
+                     <expression>{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].change()}&lt;0 and {Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}&gt;0&#13;
 and (&#13;
-{Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=6 or&#13;
-{Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=7 or&#13;
-{Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=11 or&#13;
-{Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=62 or&#13;
-{Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=69 or&#13;
-{Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=117&#13;
+{Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=6 or&#13;
+{Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=7 or&#13;
+{Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=11 or&#13;
+{Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=62 or&#13;
+{Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=69 or&#13;
+{Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=117&#13;
 )&#13;
 and&#13;
-({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2)</expression>
+({Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2)</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>({Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].change()}&gt;0 and {Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].prev()}&gt;0) or&#13;
-({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2)</recovery_expression>
+                     <recovery_expression>({Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].change()}&gt;0 and {Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].prev()}&gt;0) or&#13;
+({Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before</name>
                      <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
@@ -1186,18 +1186,18 @@ and&#13;
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
+                           <recovery_expression>{Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>({Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} or&#13;
-{Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}) and&#13;
-{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}&gt;0</expression>
+                     <expression>({Windows network by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} or&#13;
+{Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}) and&#13;
+{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}&gt;0</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} and&#13;
-{Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}</recovery_expression>
+                     <recovery_expression>{Windows network by Zabbix agent active:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} and&#13;
+{Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
@@ -1206,17 +1206,17 @@ and&#13;
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
+                           <recovery_expression>{Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
-or {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <expression>{Windows network by Zabbix agent active:net.if.in["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
-and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <recovery_expression>{Windows network by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
@@ -1225,8 +1225,8 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 and {Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
+                           <recovery_expression>{Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1239,7 +1239,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Windows network by Zabbix agent active</host>
+                              <host>Windows network by Zabbix agent active</host>
                               <key>net.if.in["{#IFNAME}"]</key>
                            </item>
                         </graph_item>
@@ -1248,7 +1248,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <drawtype>BOLD_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Windows network by Zabbix agent active</host>
+                              <host>Windows network by Zabbix agent active</host>
                               <key>net.if.out["{#IFNAME}"]</key>
                            </item>
                         </graph_item>
@@ -1257,7 +1257,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <color>F63100</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Windows network by Zabbix agent active</host>
+                              <host>Windows network by Zabbix agent active</host>
                               <key>net.if.out["{#IFNAME}",errors]</key>
                            </item>
                         </graph_item>
@@ -1266,7 +1266,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <color>A54F10</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Windows network by Zabbix agent active</host>
+                              <host>Windows network by Zabbix agent active</host>
                               <key>net.if.in["{#IFNAME}",errors]</key>
                            </item>
                         </graph_item>
@@ -1275,7 +1275,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <color>FC6EA3</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Windows network by Zabbix agent active</host>
+                              <host>Windows network by Zabbix agent active</host>
                               <key>net.if.out["{#IFNAME}",dropped]</key>
                            </item>
                         </graph_item>
@@ -1284,7 +1284,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                            <color>6C59DC</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Windows network by Zabbix agent active</host>
+                              <host>Windows network by Zabbix agent active</host>
                               <key>net.if.in["{#IFNAME}",dropped]</key>
                            </item>
                         </graph_item>
@@ -1367,7 +1367,7 @@ return JSON.stringify({"data": output})</params>
                      <style>0</style>
                      <resource>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
-                        <host>Template Module Windows network by Zabbix agent active</host>
+                        <host>Windows network by Zabbix agent active</host>
                      </resource>
                      <width>750</width>
                      <height>100</height>
@@ -1389,9 +1389,9 @@ return JSON.stringify({"data": output})</params>
          </screens>
       </template>
       <template>
-         <template>Template Module Windows physical disks by Zabbix agent active</template>
-         <name>Template Module Windows physical disks by Zabbix agent active</name>
-         <description>Template tooling version used: 0.37</description>
+         <template>Windows physical disks by Zabbix agent active</template>
+         <name>Windows physical disks by Zabbix agent active</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1499,7 +1499,7 @@ return JSON.stringify({"data": output})</params>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <host>Windows physical disks by Zabbix agent active</host>
                               <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Reads/sec",60]</key>
                            </item>
                         </graph_item>
@@ -1508,7 +1508,7 @@ return JSON.stringify({"data": output})</params>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <host>Windows physical disks by Zabbix agent active</host>
                               <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Writes/sec",60]</key>
                            </item>
                         </graph_item>
@@ -1521,7 +1521,7 @@ return JSON.stringify({"data": output})</params>
                            <color>1A7C11</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <host>Windows physical disks by Zabbix agent active</host>
                               <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Current Disk Queue Length",60]</key>
                            </item>
                         </graph_item>
@@ -1530,7 +1530,7 @@ return JSON.stringify({"data": output})</params>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <host>Windows physical disks by Zabbix agent active</host>
                               <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]</key>
                            </item>
                         </graph_item>
@@ -1565,11 +1565,11 @@ return JSON.stringify({"data": output})</params>
          </macros>
       </template>
       <template>
-         <template>Template Module Windows services by Zabbix agent active</template>
-         <name>Template Module Windows services by Zabbix agent active</name>
+         <template>Windows services by Zabbix agent active</template>
+         <name>Windows services by Zabbix agent active</name>
          <description>Template Services OS Windows&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1665,38 +1665,38 @@ Template tooling version used: 0.37</description>
          </macros>
       </template>
       <template>
-         <template>Template OS Windows by Zabbix agent active</template>
-         <name>Template OS Windows by Zabbix agent active</name>
+         <template>Windows by Zabbix agent active</template>
+         <name>Windows by Zabbix agent active</name>
          <description>Official Windows template. Requires agent of Zabbix 4.4 and newer.&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Windows CPU by Zabbix agent active</name>
+               <name>Windows CPU by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Windows filesystems by Zabbix agent active</name>
+               <name>Windows filesystems by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Windows generic by Zabbix agent active</name>
+               <name>Windows generic by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Windows memory by Zabbix agent active</name>
+               <name>Windows memory by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Windows network by Zabbix agent active</name>
+               <name>Windows network by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Windows physical disks by Zabbix agent active</name>
+               <name>Windows physical disks by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Windows services by Zabbix agent active</name>
+               <name>Windows services by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Zabbix agent active</name>
+               <name>Zabbix agent</name>
             </template>
          </templates>
          <groups>
@@ -1715,7 +1715,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <name>CPU usage</name>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1737,7 +1737,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <key>perf_counter_en["\System\Processor Queue Length"]</key>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1759,7 +1759,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <name>Memory utilization</name>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1781,7 +1781,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <name>Swap usage</name>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1803,7 +1803,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <name>{#FSNAME}: Disk space usage</name>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1825,7 +1825,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <name>{#DEVNAME}: Disk read/write rates</name>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1847,7 +1847,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <name>{#DEVNAME}: Disk utilization and queue</name>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1869,7 +1869,7 @@ Template tooling version used: 0.37</description>
                      <style>0</style>
                      <resource>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
-                        <host>Template OS Windows by Zabbix agent active</host>
+                        <host>Windows by Zabbix agent active</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -1893,19 +1893,19 @@ Template tooling version used: 0.37</description>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template Module Windows CPU by Zabbix agent active:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Template Module Windows CPU by Zabbix agent active:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 &gt; {$CPU.QUEUE.CRIT.MAX}</expression>
+         <expression>{Windows CPU by Zabbix agent active:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Windows CPU by Zabbix agent active:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 &gt; {$CPU.QUEUE.CRIT.MAX}</expression>
          <name>CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)</name>
          <priority>WARNING</priority>
          <description>The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.</description>
          <dependencies>
             <dependency>
                <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-               <expression>{Template Module Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+               <expression>{Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
-         <expression>{Template Module Windows memory by Zabbix agent active:system.swap.pfree.min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
+         <expression>{Windows memory by Zabbix agent active:system.swap.pfree.min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
@@ -1913,7 +1913,7 @@ Template tooling version used: 0.37</description>
          <dependencies>
             <dependency>
                <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
-               <expression>{Template Module Windows memory by Zabbix agent active:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+               <expression>{Windows memory by Zabbix agent active:vm.memory.util.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
          </dependencies>
       </trigger>
@@ -1925,7 +1925,7 @@ Template tooling version used: 0.37</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Windows CPU by Zabbix agent active</host>
+                  <host>Windows CPU by Zabbix agent active</host>
                   <key>perf_counter_en["\System\Context Switches/sec"]</key>
                </item>
             </graph_item>
@@ -1933,7 +1933,7 @@ Template tooling version used: 0.37</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Windows CPU by Zabbix agent active</host>
+                  <host>Windows CPU by Zabbix agent active</host>
                   <key>perf_counter_en["\Processor Information(_total)\% Interrupt Time"]</key>
                </item>
             </graph_item>
@@ -1948,7 +1948,7 @@ Template tooling version used: 0.37</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Windows CPU by Zabbix agent active</host>
+                  <host>Windows CPU by Zabbix agent active</host>
                   <key>perf_counter_en["\Processor Information(_total)\% User Time"]</key>
                </item>
             </graph_item>
@@ -1956,7 +1956,7 @@ Template tooling version used: 0.37</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Windows CPU by Zabbix agent active</host>
+                  <host>Windows CPU by Zabbix agent active</host>
                   <key>perf_counter_en["\Processor Information(_total)\% Privileged Time"]</key>
                </item>
             </graph_item>
@@ -1971,7 +1971,7 @@ Template tooling version used: 0.37</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Windows CPU by Zabbix agent active</host>
+                  <host>Windows CPU by Zabbix agent active</host>
                   <key>system.cpu.util</key>
                </item>
             </graph_item>
@@ -1986,7 +1986,7 @@ Template tooling version used: 0.37</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Windows memory by Zabbix agent active</host>
+                  <host>Windows memory by Zabbix agent active</host>
                   <key>vm.memory.util</key>
                </item>
             </graph_item>
@@ -1998,7 +1998,7 @@ Template tooling version used: 0.37</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template Module Windows memory by Zabbix agent active</host>
+                  <host>Windows memory by Zabbix agent active</host>
                   <key>system.swap.free</key>
                </item>
             </graph_item>
@@ -2006,7 +2006,7 @@ Template tooling version used: 0.37</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template Module Windows memory by Zabbix agent active</host>
+                  <host>Windows memory by Zabbix agent active</host>
                   <key>system.swap.size[,total]</key>
                </item>
             </graph_item>

@@ -1,13 +1,13 @@
 
-# Template DB Redis
+# Redis
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor Redis server by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`Template Db Redis` — collects metrics by polling zabbix-agent2.
+Template `Redis` — collects metrics by polling zabbix-agent2.
 
 
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 Setup and configure zabbix-agent2 compiled with the Redis monitoring plugin (ZBXNEXT-5428-4.3).
 
@@ -51,10 +51,10 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Keyspace discovery |<p>Individual keyspace metrics</p> |DEPENDENT |redis.keyspace.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(Object.keys(JSON.parse(value).Keyspace)   .map(function (v){return {"{#DB}": v}}));`</p><p>**Filter**:</p>AND <p>- A: {#DB} MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.MATCHES}`</p><p>- B: {#DB} NOT_MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.NOT_MATCHES}`</p> |
-|AOF metrics discovery |<p>If AOF is activated, additional metrics will be added</p> |DEPENDENT |redis.persistence.aof.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(value).Persistence.aof_enabled === '1'   ? [{'{#SINGLETON}': ''}]   : []);`</p> |
-|Slave metrics discovery |<p>If the instance is a replica, additional metrics are provided</p> |DEPENDENT |redis.replication.slave.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(value).Replication.role === 'slave'   ? [{'{#SINGLETON}': ''}]   : []);`</p> |
-|Replication metrics discovery |<p>If the instance is the master and the slaves are connected, additional metrics are provided</p> |DEPENDENT |redis.replication.master.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var repl = JSON.parse(value).Replication; return JSON.stringify(Object.keys(repl)   .filter(function (v) {return v.match(/slave\d+/)})   .map(function (v){     return {"{#SLAVE_IP}": repl[v].ip, "{#SLAVE_PORT}": repl[v].port}   }));`</p> |
+|Keyspace discovery |<p>Individual keyspace metrics</p> |DEPENDENT |redis.keyspace.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- A: {#DB} MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.MATCHES}`</p><p>- B: {#DB} NOT_MATCHES_REGEX `{$REDIS.LLD.FILTER.DB.NOT_MATCHES}`</p> |
+|AOF metrics discovery |<p>If AOF is activated, additional metrics will be added</p> |DEPENDENT |redis.persistence.aof.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Slave metrics discovery |<p>If the instance is a replica, additional metrics are provided</p> |DEPENDENT |redis.replication.slave.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Replication metrics discovery |<p>If the instance is the master and the slaves are connected, additional metrics are provided</p> |DEPENDENT |redis.replication.master.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Process metrics discovery |<p>Collect metrics by Zabbix agent if it exists</p> |ZABBIX_PASSIVE |proc.num["{$REDIS.LLD.PROCESS_NAME}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value > 0 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Version 4+ metrics discovery |<p>Additional metrics for versions 4+</p> |DEPENDENT |redis.metrics.v4.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.Server.redis_version`</p><p>- JAVASCRIPT: `return JSON.stringify(parseInt(value.split('.')[0]) >= 4 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Version 5+ metrics discovery |<p>Additional metrics for versions 5+</p> |DEPENDENT |redis.metrics.v5.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.Server.redis_version`</p><p>- JAVASCRIPT: `return JSON.stringify(parseInt(value.split('.')[0]) >= 5 ? [{'{#SINGLETON}': ''}] : []);`</p> |
@@ -70,8 +70,8 @@ There are no template links in this template.
 |Redis |Redis: CPU user |<p>User CPU consumed by the Redis server</p> |DEPENDENT |redis.cpu.user<p>**Preprocessing**:</p><p>- JSONPATH: `$.CPU.used_cpu_user`</p> |
 |Redis |Redis: CPU user children |<p>User CPU consumed by the background processes</p> |DEPENDENT |redis.cpu.user_children<p>**Preprocessing**:</p><p>- JSONPATH: `$.CPU.used_cpu_user_children`</p> |
 |Redis |Redis: Blocked clients |<p>The number of connections waiting on a blocking call</p> |DEPENDENT |redis.clients.blocked<p>**Preprocessing**:</p><p>- JSONPATH: `$.Clients.blocked_clients`</p> |
-|Redis |Redis: Max input buffer |<p>The biggest input buffer among current client connections</p> |DEPENDENT |redis.clients.max_input_buffer<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var clients = JSON.parse(value).Clients return clients.client_recent_max_input_buffer || clients.client_biggest_input_buf`</p> |
-|Redis |Redis: Max output buffer |<p>The biggest output buffer among current client connections</p> |DEPENDENT |redis.clients.max_output_buffer<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var clients = JSON.parse(value).Clients return clients.client_recent_max_output_buffer || clients.client_longest_output_list`</p> |
+|Redis |Redis: Max input buffer |<p>The biggest input buffer among current client connections</p> |DEPENDENT |redis.clients.max_input_buffer<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Redis |Redis: Max output buffer |<p>The biggest output buffer among current client connections</p> |DEPENDENT |redis.clients.max_output_buffer<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Redis |Redis: Connected clients |<p>The number of connected clients</p> |DEPENDENT |redis.clients.connected<p>**Preprocessing**:</p><p>- JSONPATH: `$.Clients.connected_clients`</p> |
 |Redis |Redis: Cluster enabled |<p>Indicate Redis cluster is enabled</p> |DEPENDENT |redis.cluster.enabled<p>**Preprocessing**:</p><p>- JSONPATH: `$.Cluster.cluster_enabled`</p> |
 |Redis |Redis: Memory used |<p>Total number of bytes allocated by Redis using its allocator</p> |DEPENDENT |redis.memory.used_memory<p>**Preprocessing**:</p><p>- JSONPATH: `$.Memory.used_memory`</p> |
@@ -143,7 +143,7 @@ There are no template links in this template.
 |Redis |Redis: Slave replication offset{#SINGLETON} |<p>The replication offset of the replica instance</p> |DEPENDENT |redis.replication.slave_repl_offset[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Replication.slave_repl_offset`</p> |
 |Redis |Redis: Slave priority{#SINGLETON} |<p>The priority of the instance as a candidate for failover</p> |DEPENDENT |redis.replication.slave_priority[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Replication.slave_priority`</p> |
 |Redis |Redis: Slave priority{#SINGLETON} |<p>Flag indicating if the replica is read-only</p> |DEPENDENT |redis.replication.slave_read_only[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Replication.slave_read_only`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Redis |Redis slave {#SLAVE_IP}:{#SLAVE_PORT}: Replication lag in bytes |<p>Replication lag in bytes</p> |DEPENDENT |redis.replication.lag_bytes["{#SLAVE_IP}:{#SLAVE_PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var repl = JSON.parse(value).Replication; var res = Object.keys(repl)     .filter(function (v) {return v.match(/slave\d+/)})     .filter(function (v) {return (repl[v].ip === "{#SLAVE_IP}" && repl[v].port === "{#SLAVE_PORT}")})     .map(function (v) {return repl[v].offset})[0]; if (res === undefined) {     throw 'Slave {#SLAVE_IP}:{#SLAVE_PORT} is no longer available.'; } return res;`</p> |
+|Redis |Redis slave {#SLAVE_IP}:{#SLAVE_PORT}: Replication lag in bytes |<p>Replication lag in bytes</p> |DEPENDENT |redis.replication.lag_bytes["{#SLAVE_IP}:{#SLAVE_PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Redis |Redis: Number of processes running |<p>-</p> |ZABBIX_PASSIVE |proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"] |
 |Redis |Redis: Memory usage (rss) |<p>Resident set size memory used by process in bytes.</p> |ZABBIX_PASSIVE |proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,rss] |
 |Redis |Redis: Memory usage (vsize) |<p>Virtual memory size used by process in bytes.</p> |ZABBIX_PASSIVE |proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,vsize] |
@@ -195,7 +195,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Redis: Service is down |<p>-</p> |`{TEMPLATE_NAME:redis.ping["{$REDIS.CONN.URI}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Redis: Too many entries in the slowlog (over {$REDIS.SLOWLOG.COUNT.MAX.WARN} per second in 5m) |<p>-</p> |`{TEMPLATE_NAME:redis.slowlog.count["{$REDIS.CONN.URI}"].min(5m)}>{$REDIS.SLOWLOG.COUNT.MAX.WARN}` |INFO | |
-|Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m) |<p>When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.</p><p>https://redis.io/topics/clients#maximum-number-of-clients</p> |`{TEMPLATE_NAME:redis.clients.connected.min(5m)}/{Template DB Redis:redis.config.maxclients.last()}*100>{$REDIS.CLIENTS.PRC.MAX.WARN}` |WARNING | |
+|Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m) |<p>When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.</p><p>https://redis.io/topics/clients#maximum-number-of-clients</p> |`{TEMPLATE_NAME:redis.clients.connected.min(5m)}/{Redis:redis.config.maxclients.last()}*100>{$REDIS.CLIENTS.PRC.MAX.WARN}` |WARNING | |
 |Redis: Memory fragmentation ratio is too high (over {$REDIS.MEM.FRAG_RATIO.MAX.WARN} in 15m) |<p>This ratio is an indication of memory mapping efficiency:</p><p>  — Value over 1.0 indicate that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.</p><p>  — Value under 1.0 indicate that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.</p><p>Note: If your peak memory usage is much higher than your current memory usage, the memory fragmentation ratio may be unreliable.</p><p>https://redis.io/topics/memory-optimization</p> |`{TEMPLATE_NAME:redis.memory.fragmentation_ratio.min(15m)}>{$REDIS.MEM.FRAG_RATIO.MAX.WARN}` |WARNING | |
 |Redis: Last AOF write operation failed |<p>Detailed information about persistence: https://redis.io/topics/persistence</p> |`{TEMPLATE_NAME:redis.persistence.aof_last_write_status.last()}=0` |WARNING | |
 |Redis: Last RDB save operation failed |<p>Detailed information about persistence: https://redis.io/topics/persistence</p> |`{TEMPLATE_NAME:redis.persistence.rdb_last_bgsave_status.last()}=0` |WARNING | |
@@ -206,7 +206,7 @@ There are no template links in this template.
 |Redis: Connections are rejected |<p>The number of connections has reached the value of "maxclients".</p><p>https://redis.io/topics/clients</p> |`{TEMPLATE_NAME:redis.stats.rejected_connections.last()}>0` |HIGH | |
 |Redis: Replication lag with master is too high (over {$REDIS.REPL.LAG.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:redis.replication.master_last_io_seconds_ago[{#SINGLETON}].min(5m)}>{$REDIS.REPL.LAG.MAX.WARN}` |WARNING | |
 |Redis: Process is not running |<p>-</p> |`{TEMPLATE_NAME:proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"].last()}=0` |HIGH | |
-|Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m) |<p>-</p> |`{TEMPLATE_NAME:redis.memory.maxmemory[{#SINGLETON}].min(5m)}/{Template DB Redis:redis.memory.used_memory.last()}*100>{$REDIS.MEM.PUSED.MAX.WARN}` |WARNING | |
+|Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m) |<p>-</p> |`{TEMPLATE_NAME:redis.memory.maxmemory[{#SINGLETON}].min(5m)}/{Redis:redis.memory.used_memory.last()}*100>{$REDIS.MEM.PUSED.MAX.WARN}` |WARNING | |
 |Redis: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:redis.info["{$REDIS.CONN.URI}"].nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Redis: Service is down</p> |
 |Redis: Configuration has changed |<p>Redis configuration has changed. Ack to close.</p> |`{TEMPLATE_NAME:redis.config["{$REDIS.CONN.URI}"].diff()}=1 and {TEMPLATE_NAME:redis.config["{$REDIS.CONN.URI}"].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 

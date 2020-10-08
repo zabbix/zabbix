@@ -429,6 +429,22 @@ int	DBexecute_once(const char *fmt, ...)
 	return rc;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBis_null                                                        *
+ *                                                                            *
+ * Purpose: check if numeric field value is null                              *
+ *                                                                            *
+ * Parameters: field - [IN] field value to be checked                         *
+ *                                                                            *
+ * Return value: SUCCEED - field value is null                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: ATTENTION! This function should only be used with numeric fields *
+ *           since on Oracle empty string is returned instead of NULL and it  *
+ *           is not possible to differentiate empty string from NULL string   *
+ *                                                                            *
+ ******************************************************************************/
 int	DBis_null(const char *field)
 {
 	return zbx_db_is_null(field);

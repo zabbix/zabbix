@@ -206,7 +206,12 @@ func handleWindowsService(confPath string) error {
 				return err
 			}
 		}
-		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.Options.Hostname)
+		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+		if err != nil {
+			return fmt.Errorf("cannot parse the \"Hostname\" parameter: %s", err)
+		}
+		agent.FirstHostname = hostnames[0]
+		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.FirstHostname)
 	}
 
 	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
@@ -237,22 +242,22 @@ func resolveWindowsService(confPath string) error {
 		if err := svcInstall(confPath); err != nil {
 			return fmt.Errorf("failed to install %s as service: %s", serviceName, err)
 		}
-		msg = fmt.Sprintf("'%s' installed succesfully", serviceName)
+		msg = fmt.Sprintf("'%s' installed successfully", serviceName)
 	case svcUninstallFlag:
 		if err := svcUninstall(); err != nil {
 			return fmt.Errorf("failed to uninstall %s as service: %s", serviceName, err)
 		}
-		msg = fmt.Sprintf("'%s' uninstalled succesfully", serviceName)
+		msg = fmt.Sprintf("'%s' uninstalled successfully", serviceName)
 	case svcStartFlag:
 		if err := svcStart(confPath); err != nil {
 			return fmt.Errorf("failed to start %s service: %s", serviceName, err)
 		}
-		msg = fmt.Sprintf("'%s' started succesfully", serviceName)
+		msg = fmt.Sprintf("'%s' started successfully", serviceName)
 	case svcStopFlag:
 		if err := svcStop(); err != nil {
 			return fmt.Errorf("failed to stop %s service: %s", serviceName, err)
 		}
-		msg = fmt.Sprintf("'%s' stopped succesfully", serviceName)
+		msg = fmt.Sprintf("'%s' stopped successfully", serviceName)
 	}
 
 	msg = fmt.Sprintf("zabbix_agent2 [%d]: %s\n", os.Getpid(), msg)

@@ -601,7 +601,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
  *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb)
+void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb, zbx_vector_str_t *hostnames)
 {
 	char	*l = active_hosts, *r;
 
@@ -619,7 +619,7 @@ void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f 
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != cb(host, port))
+		if (SUCCEED != cb(host, port, hostnames))
 		{
 			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than"
 					" once", l);

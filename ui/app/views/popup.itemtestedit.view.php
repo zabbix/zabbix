@@ -269,7 +269,7 @@ $templates = [
 			(new CDiv(
 				(new CSpan('#{result}'))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint('#{result}', 'hintbox-scrollable', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;')
+					->setHint('#{result}', 'hintbox-wrap')
 			))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
@@ -283,7 +283,7 @@ $templates = [
 				(new CDiv(
 					(new CSpan('#{failed}'))
 						->addClass(ZBX_STYLE_LINK_ACTION)
-						->setHint('#{failed}', '', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px; ')
+						->setHint('#{failed}', 'hintbox-wrap')
 				))
 					->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)

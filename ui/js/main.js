@@ -428,7 +428,7 @@ var hintBox = {
 			hint_height = target.hintBoxItem.outerHeight(),
 			/*
 				Fix popup width and height since browsers will tend to reduce the size of the popup, if positioned further
-				than the width of window when horizontal scolling is active.
+				than the width of window when horizontal scrolling is active.
 			*/
 			css = {
 				width: target.hintBoxItem.width(),

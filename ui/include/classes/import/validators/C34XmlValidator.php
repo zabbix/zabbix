@@ -22,19 +22,7 @@
 /**
  * Validate import data from Zabbix 3.4.x.
  */
-class C34XmlValidator {
-
-	/**
-	 * @var string
-	 */
-	private $format;
-
-	/**
-	 * @param string $format format of import source
-	 */
-	public function __construct($format) {
-		$this->format = $format;
-	}
+class C34XmlValidator extends CXmlValidatorGeneral {
 
 	/**
 	 * Base validation function.
@@ -45,7 +33,7 @@ class C34XmlValidator {
 	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
 	 *						an array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $path) {
+	public function validate(array $data, string $path) {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
 			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
@@ -1094,7 +1082,7 @@ class C34XmlValidator {
 			]]
 		]];
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1178,7 +1166,7 @@ class C34XmlValidator {
 					$rules = ['type' => XML_ARRAY, 'rules' => []];
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -1244,7 +1232,7 @@ class C34XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+			$data = $this->doValidate($rules, $data, $path);
 		}
 
 		return $data;
@@ -1270,7 +1258,7 @@ class C34XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1293,7 +1281,7 @@ class C34XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1331,7 +1319,7 @@ class C34XmlValidator {
 			$rules = ['type' => XML_STRING];
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
@@ -1351,6 +1339,6 @@ class C34XmlValidator {
 			$rules['rules']['key']['type'] |= XML_REQUIRED;
 		}
 
-		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+		return $this->doValidate($rules, $data, $path);
 	}
 }

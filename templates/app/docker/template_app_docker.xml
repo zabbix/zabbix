@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-03-20T05:45:18Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:38Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,13 +9,13 @@
    </groups>
    <templates>
       <template>
-         <template>Template App Docker</template>
-         <name>Template App Docker</name>
+         <template>Docker</template>
+         <name>Docker</name>
          <description>Get Docker engine metrics from plugin for the New Zabbix Agent (zabbix-agent2).&#13;
 &#13;
 You can discuss this template or leave feedback on our forum &#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -840,7 +840,7 @@ Template tooling version used: 0.35</description>
                      <dependencies>
                         <dependency>
                            <name>Docker: Service is down</name>
-                           <expression>{Template App Docker:docker.ping.last()}=0</expression>
+                           <expression>{Docker:docker.ping.last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -2128,9 +2128,10 @@ false - Returns only running containers</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template App Docker:docker.container_info.state.exitcode["{#NAME}"].last()}&gt;0 and {Template App Docker:docker.container_info.state.running["{#NAME}"].last()}=0</expression>
+                     <expression>{Docker:docker.container_info.state.exitcode["{#NAME}"].last()}&gt;0 and {Docker:docker.container_info.state.running["{#NAME}"].last()}=0</expression>
                      <name>Container {#NAME}: Container has been stopped with error code</name>
                      <opdata>Exit code: {ITEM.LASTVALUE1}</opdata>
                      <priority>AVERAGE</priority>
@@ -2146,7 +2147,7 @@ false - Returns only running containers</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2155,7 +2156,7 @@ false - Returns only running containers</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.container_stats.cpu_usage.user.rate["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2164,7 +2165,7 @@ false - Returns only running containers</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>F63100</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.container_stats.cpu_usage.total.rate["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2177,7 +2178,7 @@ false - Returns only running containers</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.container_stats.memory.usage["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2186,7 +2187,7 @@ false - Returns only running containers</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.container_stats.memory.max_usage["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2199,7 +2200,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.rx_packets["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2208,7 +2209,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.tx_packets["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2217,7 +2218,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>F63100</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.rx_errors["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2226,7 +2227,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>A54F10</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.tx_errors["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2235,7 +2236,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.rx_dropped["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2244,7 +2245,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>6C59DC</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.tx_dropped["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2257,7 +2258,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.rx_bytes["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2266,7 +2267,7 @@ false - Returns only running containers</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template App Docker</host>
+                              <host>Docker</host>
                               <key>docker.networks.tx_bytes["{#NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2346,6 +2347,7 @@ false - Returns only running containers</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -2381,7 +2383,7 @@ false - Returns only running containers</description>
                      <style>0</style>
                      <resource>
                         <name>Docker: Containers</name>
-                        <host>Template App Docker</host>
+                        <host>Docker</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2403,7 +2405,7 @@ false - Returns only running containers</description>
                      <style>0</style>
                      <resource>
                         <name>Docker: Size</name>
-                        <host>Template App Docker</host>
+                        <host>Docker</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2425,7 +2427,7 @@ false - Returns only running containers</description>
                      <style>0</style>
                      <resource>
                         <name>Docker: Memory total</name>
-                        <host>Template App Docker</host>
+                        <host>Docker</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2447,7 +2449,7 @@ false - Returns only running containers</description>
                      <style>0</style>
                      <resource>
                         <name>Docker: Goroutines</name>
-                        <host>Template App Docker</host>
+                        <host>Docker</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2469,7 +2471,7 @@ false - Returns only running containers</description>
                      <style>0</style>
                      <resource>
                         <name>Docker: Images</name>
-                        <host>Template App Docker</host>
+                        <host>Docker</host>
                      </resource>
                      <width>500</width>
                      <height>100</height>
@@ -2499,7 +2501,7 @@ false - Returns only running containers</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.containers.running</key>
                </item>
             </graph_item>
@@ -2508,7 +2510,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.containers.paused</key>
                </item>
             </graph_item>
@@ -2517,7 +2519,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.containers.stopped</key>
                </item>
             </graph_item>
@@ -2526,7 +2528,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>A54F10</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.containers.total</key>
                </item>
             </graph_item>
@@ -2539,7 +2541,7 @@ false - Returns only running containers</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.goroutines</key>
                </item>
             </graph_item>
@@ -2552,7 +2554,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.images.top_level</key>
                </item>
             </graph_item>
@@ -2561,7 +2563,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.images.total</key>
                </item>
             </graph_item>
@@ -2574,7 +2576,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.mem.total</key>
                </item>
             </graph_item>
@@ -2587,7 +2589,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.images_size</key>
                </item>
             </graph_item>
@@ -2596,7 +2598,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.layers_size</key>
                </item>
             </graph_item>
@@ -2605,7 +2607,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.containers_size</key>
                </item>
             </graph_item>
@@ -2614,7 +2616,7 @@ false - Returns only running containers</description>
                <drawtype>BOLD_LINE</drawtype>
                <color>A54F10</color>
                <item>
-                  <host>Template App Docker</host>
+                  <host>Docker</host>
                   <key>docker.volumes_size</key>
                </item>
             </graph_item>

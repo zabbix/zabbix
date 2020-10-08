@@ -1,11 +1,46 @@
+Changes for 5.2.0beta2
+
+New features:
+.........T [ZBXNEXT-6180] added Squid template (tuskov)
+...G...... [ZBXNEXT-6142] added Ceph monitoring plugin (vadimipatov)
+
+Bug fixes:
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+...G...... [ZBX-18385] fixed segmentation violation in oracle plugin (vadimipatov)
+.......PS. [ZBX-18193] added logging for snmp_cache_reload (arimdjonoks)
+.......PS. [ZBX-18400] fixed http(s) requests from JavaScript to use SourceIP parameter in connections (Andris)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+A......... [ZBX-18417] fixed unexpected tag errors while importing JSON-exported data (averza)
+..F....... [ZBX-18425] fixed browser error "updateItemTestBtn is not defined" (talbergs)
+.......PS. [ZBX-17916] removed inserting of "wait" into "system.run[]" when executing frontend scripts (Andris)
+........S. [ZBX-18386] fixed server crash after removing snmp host interface from parent host (arimdjonoks)
+..F....... [ZBX-18238] fixed JavaScript error when "invalid URL" error is displayed (talbergs)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
+...G...... [ZBX-18199] changed the default log filename for agent2 on windows (arimdjonoks)
+...G...... [ZBX-18366] fixed agent reporting absence of 'Processor Information' counter on old Windows systems (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.0beta1
 
 New features:
+ADF.I..PS. [ZBXNEXT-1660] added ability to retrieve database credentials and macro values from HashiCorp Vault (miks, vso)
+...G...... [ZBXNEXT-2943] added support for multiple hosts in active check mode (akozlovs, asestakovs)
+A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history cache contents (miks, wiper)
+A...I..... [ZBXNEXT-6196] increased storage size of fields "description", "headers", "params" and "posts" for items, item prototypes and discovery rules for Oracle backend (gcalenko, Sasha)
+A.FG...PS. [ZBXNEXT-3950,ZBXNEXT-6092] added MQTT support for Zabbix agent 2 (esneiders, vmaksimovs, vso)
+.........T [ZBXNEXT-6159] added "Template App PHP-FPM by HTTP" and "Template App PHP-FPM by Zabbix agent" (ychukina)
+........S. [ZBXNEXT-6184] added formatting macro functions fmttime and fmtnum (viktors, wiper)
+..F....... [ZBXNEXT-6157] reworked UI for setup to simplify db encryption configuration (rlataria)
+..F....... [ZBXNEXT-6194] simplifed maintenance form by union all tabs to one form (rlataria)
+.........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
 ...G...... [ZBXNEXT-6171] added UserParameterDir config option to agent and agent2 (dimir, yurii)
 ...G...... [ZBXNEXT-6090] added modbus support for Zabbix agent 2 (MVekslers)
+...G...... [ZBXNEXT-6093] added modbus support for Zabbix agent (akozlovs, asestakovs)
 ...G...... [ZBXNEXT-6023] added Windows service support for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-17877] fixed details not displayed on SNMP interfaces within select element (ashubin, talbergs)
+....I..... [ZBX-18359] fixed long data row formatting for OracleDB (kalimulin, viktors)
 ...G...... [ZBX-18337] fixed potential crash due to printing NULL pointer (viktors)
 ........S. [ZBX-17993] fixed ZabbixWeb Test Item for Admin is not working (arimdjonoks)
 .........T [ZBX-13384] fixed minor template issues to follow guidelines (tuskov)
@@ -77,7 +112,7 @@ A......... [ZBX-18181] fixed undefined index when importing host with non-existi
 ..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
 ..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
 ..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
-..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS() function (averza)
 .........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
 .........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
 A......... [ZBX-17952] fixed compression availability not being checked when deleting history (talbergs)
@@ -102,6 +137,37 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.5rc1
+
+New features:
+.........T [ZBXNEXT-6180] added Squid template (tuskov)
+...G...... [ZBXNEXT-6142] added Ceph monitoring plugin (vadimipatov)
+A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history cache contents (miks, wiper)
+.........T [ZBXNEXT-6159] added "Template App PHP-FPM by HTTP" and "Template App PHP-FPM by Zabbix agent" (ychukina)
+..F....... [ZBXNEXT-6157] reworked UI for setup to simplify db encryption configuration (rlataria)
+.........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
+
+Bug fixes:
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+...G...... [ZBX-18385] fixed segmentation violation in oracle plugin (vadimipatov)
+.......PS. [ZBX-18193] added logging for snmp_cache_reload (arimdjonoks)
+.......PS. [ZBX-18400] fixed http(s) requests from JavaScript to use SourceIP parameter in connections (Andris)
+..F....... [ZBX-17877] fixed details not displayed on SNMP interfaces within select element (ashubin, talbergs)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+A......... [ZBX-18417] fixed unexpected tag errors while importing JSON-exported data (averza)
+.......PS. [ZBX-17916] removed inserting of "wait" into "system.run[]" when executing frontend scripts (Andris)
+........S. [ZBX-18386] fixed server crash after removing snmp host interface from parent host (arimdjonoks)
+...G...... [ZBX-18199] changed the default log filename for agent2 on windows (arimdjonoks)
+...G...... [ZBX-18366] fixed agent reporting absence of 'Processor Information' counter on old Windows systems (arimdjonoks)
+..F....... [ZBX-18238] fixed JavaScript error when "invalid URL" error is displayed (talbergs)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.4
+
+5.0.4rc1 was released as 5.0.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.4rc1
@@ -160,7 +226,7 @@ A......... [ZBX-18181] fixed undefined index when importing host with non-existi
 ..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
 ..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
 ..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
-..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS() function (averza)
 .........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
 .........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
 .........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
@@ -1843,6 +1909,21 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.26rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.25
+
+4.0.25rc1 was released as 4.0.25 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.25rc1

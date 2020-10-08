@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-09-14T15:10:30Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:47Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template DB Oracle by Zabbix Agent 2</template>
-         <name>Template DB Oracle by Zabbix Agent 2</name>
-         <description>Template tooling version used: 0.37</description>
+         <template>Oracle by Zabbix Agent 2</template>
+         <name>Oracle by Zabbix Agent 2</name>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -2005,7 +2005,7 @@
                            <dependencies>
                               <dependency>
                                  <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
+                                 <expression>{Oracle by Zabbix Agent 2:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2053,7 +2053,7 @@
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template DB Oracle by Zabbix Agent 2:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by Zabbix Agent 2:oracle.db_log_mode["{#DBNAME}"].last()} = 1</expression>
+                     <expression>{Oracle by Zabbix Agent 2:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Oracle by Zabbix Agent 2:oracle.db_log_mode["{#DBNAME}"].last()} = 1</expression>
                      <name>Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog</name>
                      <priority>WARNING</priority>
                      <description>Force Logging mode  - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all transactions to the REDO.</description>
@@ -2145,7 +2145,7 @@
                            <dependencies>
                               <dependency>
                                  <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
+                                 <expression>{Oracle by Zabbix Agent 2:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2166,7 +2166,7 @@
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <host>Oracle by Zabbix Agent 2</host>
                               <key>oracle.asm_free_size["{#DG_NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2174,7 +2174,7 @@
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <host>Oracle by Zabbix Agent 2</host>
                               <key>oracle.asm_total_size["{#DG_NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2384,7 +2384,7 @@
                            <dependencies>
                               <dependency>
                                  <name>Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
+                                 <expression>{Oracle by Zabbix Agent 2:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2421,7 +2421,7 @@
                            <dependencies>
                               <dependency>
                                  <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
-                                 <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                                 <expression>{Oracle by Zabbix Agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2441,7 +2441,7 @@
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <host>Oracle by Zabbix Agent 2</host>
                               <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
@@ -2449,7 +2449,7 @@
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Template DB Oracle by Zabbix Agent 2</host>
+                              <host>Oracle by Zabbix Agent 2</host>
                               <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
@@ -2578,25 +2578,25 @@
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.processes_limit.last()} &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
+         <expression>{Oracle by Zabbix Agent 2:oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.processes_limit.last()} &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
          <name>Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.session_count.min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.session_limit.last()} &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
+         <expression>{Oracle by Zabbix Agent 2:oracle.session_count.min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.session_limit.last()} &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
          <name>Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.db_files_limit.last()} &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
+         <expression>{Oracle by Zabbix Agent 2:oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"].min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.db_files_limit.last()} &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
          <name>Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.</description>
       </trigger>
       <trigger>
-         <expression>{Template DB Oracle by Zabbix Agent 2:oracle.total_pga_used.min(5m)} * 100 / {Template DB Oracle by Zabbix Agent 2:oracle.pga_target.last()} &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
+         <expression>{Oracle by Zabbix Agent 2:oracle.total_pga_used.min(5m)} * 100 / {Oracle by Zabbix Agent 2:oracle.pga_target.last()} &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
          <name>Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</description>
@@ -2609,7 +2609,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </item>
             </graph_item>
@@ -2617,7 +2617,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.db_files_limit</key>
                </item>
             </graph_item>
@@ -2629,7 +2629,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.total_pga_used</key>
                </item>
             </graph_item>
@@ -2637,7 +2637,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.pga_target</key>
                </item>
             </graph_item>
@@ -2645,7 +2645,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.total_pga_allocated</key>
                </item>
             </graph_item>
@@ -2657,7 +2657,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.physical_writes_rate</key>
                </item>
             </graph_item>
@@ -2665,7 +2665,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.physical_reads_rate</key>
                </item>
             </graph_item>
@@ -2677,7 +2677,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.physical_write_bytes_rate</key>
                </item>
             </graph_item>
@@ -2685,7 +2685,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.physical_read_bytes_rate</key>
                </item>
             </graph_item>
@@ -2697,7 +2697,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </item>
             </graph_item>
@@ -2705,7 +2705,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.processes_limit</key>
                </item>
             </graph_item>
@@ -2717,7 +2717,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.session_count</key>
                </item>
             </graph_item>
@@ -2725,7 +2725,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.session_active_background</key>
                </item>
             </graph_item>
@@ -2733,7 +2733,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.session_inactive_user</key>
                </item>
             </graph_item>
@@ -2741,7 +2741,7 @@
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.session_active_user</key>
                </item>
             </graph_item>
@@ -2749,7 +2749,7 @@
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.session_limit</key>
                </item>
             </graph_item>
@@ -2762,7 +2762,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.sga_java_pool</key>
                </item>
             </graph_item>
@@ -2770,7 +2770,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.sga_large_pool</key>
                </item>
             </graph_item>
@@ -2778,7 +2778,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.sga_shared_pool</key>
                </item>
             </graph_item>
@@ -2786,7 +2786,7 @@
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.sga_log_buffer</key>
                </item>
             </graph_item>
@@ -2794,7 +2794,7 @@
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.sga_fixed</key>
                </item>
             </graph_item>
@@ -2802,7 +2802,7 @@
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template DB Oracle by Zabbix Agent 2</host>
+                  <host>Oracle by Zabbix Agent 2</host>
                   <key>oracle.sga_buffer_cache</key>
                </item>
             </graph_item>

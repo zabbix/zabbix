@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:20Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:04Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net HP Enterprise Switch SNMP</template>
-         <name>Template Net HP Enterprise Switch SNMP</name>
+         <template>HP Enterprise Switch SNMP</template>
+         <name>HP Enterprise Switch SNMP</name>
          <description>Template Net HP Enterprise Switch&#13;
 &#13;
 MIBs used:&#13;
@@ -21,16 +21,16 @@ ENTITY-SENSORS-MIB&#13;
 ENTITY-MIB&#13;
 STATISTICS-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module EtherLike-MIB SNMP</name>
+               <name>EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -218,6 +218,7 @@ A    the function set available in your router&#13;
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -277,13 +278,14 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                            <dependencies>
                               <dependency>
                                  <name>{#ENT_DESCR}: Fan is in critical state</name>
-                                 <expression>{Template Net HP Enterprise Switch SNMP:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
+                                 <expression>{HP Enterprise Switch SNMP:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Memory Discovery</name>
@@ -362,6 +364,7 @@ The number of currently allocated bytes.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: Memory usage</name>
@@ -371,7 +374,7 @@ The number of currently allocated bytes.</description>
                            <drawtype>BOLD_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Net HP Enterprise Switch SNMP</host>
+                              <host>HP Enterprise Switch SNMP</host>
                               <key>vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -380,7 +383,7 @@ The number of currently allocated bytes.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Template Net HP Enterprise Switch SNMP</host>
+                              <host>HP Enterprise Switch SNMP</host>
                               <key>vm.memory.available[hpLocalMemFreeBytes.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -395,7 +398,7 @@ The number of currently allocated bytes.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Net HP Enterprise Switch SNMP</host>
+                              <host>HP Enterprise Switch SNMP</host>
                               <key>vm.memory.util[snmp.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -461,13 +464,14 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                            <dependencies>
                               <dependency>
                                  <name>{#ENT_DESCR}: Power supply is in critical state</name>
-                                 <expression>{Template Net HP Enterprise Switch SNMP:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
+                                 <expression>{HP Enterprise Switch SNMP:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -521,8 +525,8 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Template Net HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Template Net HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -546,6 +550,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temp Status Discovery</name>
@@ -590,6 +595,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      </valuemap>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -642,7 +648,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net HP Enterprise Switch SNMP</host>
+                  <host>HP Enterprise Switch SNMP</host>
                   <key>system.cpu.util[hpSwitchCpuStat.0]</key>
                </item>
             </graph_item>

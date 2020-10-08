@@ -74,19 +74,22 @@ $scriptFormList = (new CFormList())
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$user_groups = [0 => _('All')];
-foreach ($data['usergroups'] as $user_group) {
-	$user_groups[$user_group['usrgrpid']] = $user_group['name'];
-}
+$select_usrgrpid = (new CSelect('usrgrpid'))
+	->setValue($data['usrgrpid'])
+	->setFocusableElementId('usrgrpid')
+	->addOption(new CSelectOption(0, _('All')))
+	->addOptions(CSelect::createOptionsFromArray($data['usergroups']));
+
+$select_hgstype = (new CSelect('hgstype'))
+	->setId('hgstype-select')
+	->setValue($data['hgstype'])
+	->setFocusableElementId('hgstype')
+	->addOption(new CSelectOption(0, _('All')))
+	->addOption(new CSelectOption(1, _('Selected')));
+
 $scriptFormList
-	->addRow(_('User group'),
-		new CComboBox('usrgrpid', $data['usrgrpid'], null, $user_groups))
-	->addRow(_('Host group'),
-		new CComboBox('hgstype', $data['hgstype'], null, [
-			0 => _('All'),
-			1 => _('Selected')
-		])
-	)
+	->addRow(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()), $select_usrgrpid)
+	->addRow(new CLabel(_('Host group'), $select_hgstype->getFocusableElementId()), $select_hgstype)
 	->addRow(null, (new CMultiSelect([
 		'name' => 'groupid',
 		'object_name' => 'hostGroup',

@@ -1781,8 +1781,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 			// Add Type of calculation if there are more then 2 filters.
 			if (array_key_exists('Type of calculation', $override['Filters'])) {
-				$override_overlay->query('id:overrides_evaltype')->waitUntilPresent()->one()
-						->asDropdown()->fill($override['Filters']['Type of calculation']);
+				$override_overlay->query('name:overrides_evaltype')->waitUntilPresent()->one()
+						->asZDropdown()->fill($override['Filters']['Type of calculation']);
 
 				// Add formula if Type of calculation is Custom.
 				if (array_key_exists('formula', $override['Filters'])) {
@@ -1967,7 +1967,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 				// Check that Evaluation type is filled correctly.
 				if (array_key_exists('Type of calculation', $override['Filters'])) {
-					$evaluation_type = $override_overlay->query('id:overrides_evaltype')->one()->asDropdown()->getValue();
+					$evaluation_type = $override_overlay->query('name:overrides_evaltype')->one()->asZDropdown()->getValue();
 					$this->assertEquals($override['Filters']['Type of calculation'], $evaluation_type);
 
 					// Check that Formula is filled correctly.
