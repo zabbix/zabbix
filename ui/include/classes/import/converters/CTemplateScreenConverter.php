@@ -374,10 +374,6 @@ class CTemplateScreenConverter extends CConverter {
 		$width = $screen_item['width'];
 		$height = $screen_item['height'];
 
-		if (in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH])) {
-			$width *= $screen_item['max_columns'];
-		}
-
 		// Convert graph inner height to outer height.
 		if (in_array($screen_item['resourcetype'], [SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH,
 				SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH])) {
