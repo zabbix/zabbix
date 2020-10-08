@@ -4088,15 +4088,6 @@ $form-icon-btn: (
 		}
 	}
 
-	.hintbox-scrollable {
-		overflow: auto;
-		width: 100%;
-		max-height: calc(100vh - 190px);
-		max-width: 45vw;
-		white-space: nowrap;
-		@extend %webkit-scrollbar;
-	}
-
 	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
