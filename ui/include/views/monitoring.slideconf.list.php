@@ -80,8 +80,10 @@ foreach ($this->data['slides'] as $slide) {
 
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN || $slide['editable']) {
 		$checkbox = new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']);
-		$properties = (new CLink(_('Properties'), '?form=update&slideshowid='.$slide['slideshowid']))
-			->addClass('action');
+		$properties = $data['allowed_edit']
+			?(new CLink(_('Properties'), '?form=update&slideshowid='.$slide['slideshowid']))
+				->addClass('action')
+			: _('Properties');
 	}
 	else {
 		$checkbox = (new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']))

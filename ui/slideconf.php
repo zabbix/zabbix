@@ -226,6 +226,10 @@ elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' &
  * Display
  */
 if (hasRequest('form')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$current_userid = CWebUser::$data['userid'];
 	$userids[$current_userid] = true;
 	$user_groupids = [];

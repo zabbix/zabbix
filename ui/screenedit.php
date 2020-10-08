@@ -101,6 +101,10 @@ $fields = [
 check_fields($fields);
 $_REQUEST['dynamic'] = getRequest('dynamic', SCREEN_SIMPLE_ITEM);
 
+if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 /*
  * Permissions
  */

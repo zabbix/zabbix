@@ -96,7 +96,9 @@ foreach ($data['screens'] as $screen) {
 	if ($data['templateid'] || $user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
 			|| $screen['editable']) {
 		$checkbox = new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']);
-		$action = new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'));
+		$action = $data['allowed_edit']
+			? new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'))
+			: _('Properties');
 		$constructor = $data['allowed_edit']
 			? new CLink(_('Constructor'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))
 			: _('Constructor');

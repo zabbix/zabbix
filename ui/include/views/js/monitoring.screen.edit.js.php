@@ -34,15 +34,13 @@
 				(new CTag('ul', false, [
 					new CTag('li', false, [
 						(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ))
-							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ)
-							->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled'),
+							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ),
 						(new CTag('label', false, _('Read-only')))
 							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ)
 					]),
 					new CTag('li', false, [
 						(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ_WRITE))
-							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
-							->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled'),
+							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE),
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
 					])
@@ -51,7 +49,6 @@
 			(new CCol(
 				(new CButton('remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->setEnabled($data['allowed_edit'])
 					->onClick('removeUserGroupShares("#{usrgrpid}");')
 					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -71,15 +68,13 @@
 				(new CTag('ul', false, [
 					new CTag('li', false, [
 						(new CInput('radio', 'users[#{id}][permission]', PERM_READ))
-							->setId('user_#{id}_permission_'.PERM_READ)
-							->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled'),
+							->setId('user_#{id}_permission_'.PERM_READ),
 						(new CTag('label', false, _('Read-only')))
 							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ)
 					]),
 					new CTag('li', false, [
 						(new CInput('radio', 'users[#{id}][permission]', PERM_READ_WRITE))
-							->setId('user_#{id}_permission_'.PERM_READ_WRITE)
-							->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled'),
+							->setId('user_#{id}_permission_'.PERM_READ_WRITE),
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ_WRITE)
 					])
@@ -88,7 +83,6 @@
 			(new CCol(
 				(new CButton('remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->setEnabled($data['allowed_edit'])
 					->onClick('removeUserShares("#{id}");')
 					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)

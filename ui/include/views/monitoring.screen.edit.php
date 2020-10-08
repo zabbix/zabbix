@@ -66,8 +66,7 @@ if (!array_key_exists('templateid', $data['screen'])) {
 		'name' => 'userid',
 		'object_name' => 'users',
 		'multiple' => false,
-		'disabled' => (!$data['allowed_edit'] && $user_type != USER_TYPE_SUPER_ADMIN
-				&& $user_type != USER_TYPE_ZABBIX_ADMIN),
+		'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 		'data' => [],
 		'popup' => [
 			'parameters' => [
@@ -109,19 +108,16 @@ $screen_tab->addRow(
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled')
 	)
 	->addRow((new CLabel(_('Columns'), 'hsize'))->setAsteriskMark(),
 		(new CNumericBox('hsize', $data['screen']['hsize'], 3))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
-			->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled')
 	)
 	->addRow((new CLabel(_('Rows'), 'vsize'))->setAsteriskMark(),
 		(new CNumericBox('vsize', $data['screen']['vsize'], 3))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
-			->setAttribute('disabled', $data['allowed_edit'] ? null : 'disabled')
 	);
 
 // append tab to form
@@ -142,8 +138,7 @@ if (!array_key_exists('templateid', $data['screen'])) {
 				'multiselect' => '1'
 			]).', null, this);'
 		)
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->setEnabled($data['allowed_edit'])]);
+		->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$user_group_shares_table->addRow(
 		(new CRow(
@@ -179,8 +174,7 @@ if (!array_key_exists('templateid', $data['screen'])) {
 				'multiselect' => '1'
 			]).', null, this);'
 		)
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->setEnabled($data['allowed_edit'])]);
+		->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$user_shares_table->addRow(
 		(new CRow(
@@ -209,7 +203,6 @@ if (!array_key_exists('templateid', $data['screen'])) {
 			->addValue(_('Private'), PRIVATE_SHARING)
 			->addValue(_('Public'), PUBLIC_SHARING)
 			->setModern(true)
-			->setEnabled($data['allowed_edit'])
 		)
 		->addRow(_('List of user group shares'),
 			(new CDiv($user_group_shares_table))
@@ -228,14 +221,11 @@ if (!array_key_exists('templateid', $data['screen'])) {
 
 if ($data['form'] === 'update') {
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmit('update', _('Update')))->setEnabled($data['allowed_edit']),
+		new CSubmit('update', _('Update')),
 		[
-			(new CSimpleButton(_('Clone')))
-				->setId('clone')
-				->setEnabled($data['allowed_edit']),
-			(new CButton('full_clone', _('Full clone')))->setEnabled($data['allowed_edit']),
-			(new CButtonDelete(_('Delete screen?'), url_params(['form', 'screenid', 'templateid'])))
-				->setEnabled($data['allowed_edit']),
+			(new CSimpleButton(_('Clone')))->setId('clone'),
+			new CButton('full_clone', _('Full clone')),
+			new CButtonDelete(_('Delete screen?'), url_params(['form', 'screenid', 'templateid'])),
 			new CButtonCancel(url_param('templateid'))
 		]
 	));
