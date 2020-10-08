@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-<<<<<<< Updated upstream
-    <date>2020-10-08T00:00:00Z</date>
-=======
     <date>2020-10-08T14:28:24Z</date>
->>>>>>> Stashed changes
     <groups>
         <group>
             <name>Templates/Operating systems</name>
@@ -713,8 +709,6 @@
                     </graph_prototypes>
                 </discovery_rule>
             </discovery_rules>
-<<<<<<< Updated upstream
-=======
             <dashboards>
                 <dashboard>
                     <name>System performance</name>
@@ -806,7 +800,6 @@
                     </widgets>
                 </dashboard>
             </dashboards>
->>>>>>> Stashed changes
         </template>
     </templates>
     <graphs>

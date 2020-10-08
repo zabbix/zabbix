@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-<<<<<<< Updated upstream
-    <date>2020-10-08T00:00:00Z</date>
-=======
     <date>2020-10-08T14:30:05Z</date>
->>>>>>> Stashed changes
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -1455,8 +1451,6 @@ As with the I/O thread, this should normally be Yes.</description>
                     <description>MySQL username.</description>
                 </macro>
             </macros>
-<<<<<<< Updated upstream
-=======
             <dashboards>
                 <dashboard>
                     <name>MySQL performance</name>
@@ -1591,7 +1585,6 @@ As with the I/O thread, this should normally be Yes.</description>
                     </widgets>
                 </dashboard>
             </dashboards>
->>>>>>> Stashed changes
         </template>
     </templates>
     <graphs>
