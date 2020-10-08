@@ -101,12 +101,15 @@ foreach ($this->data['roles'] as $role) {
 	$table->addRow([
 		(new CCheckBox('roleids['.$role['roleid'].']', $role['roleid']))->setEnabled($role['readonly'] ? false : true),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[new CLink(_('Users'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'user.list')
-			->setArgument('filter_roles[]', $role['roleid'])
-			->setArgument('filter_set', 1)
-			->getUrl()
-		), CViewHelper::showNum($role['user_cnt'])],
+		[
+			new CLink(_('Users'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'user.list')
+					->setArgument('filter_roles[]', $role['roleid'])
+					->setArgument('filter_set', 1)
+					->getUrl()
+			), CViewHelper::showNum($role['user_cnt'])
+		],
 		$users
 	]);
 }

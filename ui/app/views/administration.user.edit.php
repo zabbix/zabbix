@@ -343,52 +343,53 @@ if ($data['action'] === 'user.edit') {
 	]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-		$permissions_form_list->addRow(_('Role'), (new CDiv([
+		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(),
+			(new CDiv([
 				$role_multiselect,
 				new CDiv(_('User can\'t change role for himself'))
 			]))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->addClass('multiselect-description-container')
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('multiselect-description-container')
 		);
 	}
 	else {
-		$permissions_form_list->addRow(_('Role'), $role_multiselect);
+		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(), $role_multiselect);
 	}
-
-	$permissions_form_list->addRow(_('User type'),
-		new CTextBox('user_type', user_type2str($data['user_type']), true)
-	);
-
-	$permissions_table = (new CTable())
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Host group'), _('Permissions')]);
-
-	if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-		$permissions_table->addRow([italic(_('All groups')), permissionText(PERM_READ_WRITE)]);
-	}
-	else {
-		foreach ($data['groups_rights'] as $groupid => $group_rights) {
-			if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
-				$group_name = ($groupid == 0)
-					? italic(_('All groups'))
-					: [$group_rights['name'], SPACE, italic('('._('including subgroups').')')];
-			}
-			else {
-				$group_name = $group_rights['name'];
-			}
-			$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
-		}
-	}
-
-	$permissions_form_list
-		->addRow(_('Permissions'),
-			(new CDiv($permissions_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		)
-		->addInfo(_('Permissions can be assigned for user groups only.'));
 
 	if ($data['roleid']) {
+		$permissions_form_list->addRow(_('User type'),
+			new CTextBox('user_type', user_type2str($data['user_type']), true)
+		);
+
+		$permissions_table = (new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader([_('Host group'), _('Permissions')]);
+
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+			$permissions_table->addRow([italic(_('All groups')), permissionText(PERM_READ_WRITE)]);
+		}
+		else {
+			foreach ($data['groups_rights'] as $groupid => $group_rights) {
+				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+					$group_name = ($groupid == 0)
+						? italic(_('All groups'))
+						: [$group_rights['name'], SPACE, italic('('._('including subgroups').')')];
+				}
+				else {
+					$group_name = $group_rights['name'];
+				}
+				$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
+			}
+		}
+
+		$permissions_form_list
+			->addRow(_('Permissions'),
+				(new CDiv($permissions_table))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			)
+			->addInfo(_('Permissions can be assigned for user groups only.'));
+
 		$permissions_form_list
 			->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
 

@@ -28,7 +28,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
-		$roleids = array_column(API::Role()->get(['output' => ['roleid']]), 'roleid');
+		$roleids = array_keys(API::Role()->get(['output' => ['roleid'], 'preservekeys' => true]));
 
 		$fields = [
 			'alias' =>			'required|db users.alias|not_empty',

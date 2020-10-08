@@ -126,7 +126,7 @@ class CControllerUserroleList extends CController {
 
 		$response = new CControllerResponseData($data);
 
-		$response->setTitle(_('Configuration of user groups'));
+		$response->setTitle(_('Configuration of user roles'));
 		$this->setResponse($response);
 	}
 }
