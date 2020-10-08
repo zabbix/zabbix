@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
+<<<<<<< Updated upstream
     <date>2020-10-08T00:00:00Z</date>
+=======
+    <date>2020-10-08T14:30:05Z</date>
+>>>>>>> Stashed changes
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -1451,6 +1455,143 @@ As with the I/O thread, this should normally be Yes.</description>
                     <description>MySQL username.</description>
                 </macro>
             </macros>
+<<<<<<< Updated upstream
+=======
+            <dashboards>
+                <dashboard>
+                    <name>MySQL performance</name>
+                    <widgets>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>MySQL: Operations</name>
+                                        <host>MySQL by ODBC</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <x>12</x>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>MySQL: Queries</name>
+                                        <host>MySQL by ODBC</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <y>5</y>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>MySQL: Connections</name>
+                                        <host>MySQL by ODBC</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <x>12</x>
+                            <y>5</y>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>MySQL: Bandwidth</name>
+                                        <host>MySQL by ODBC</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <y>10</y>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>MySQL: InnoDB buffer pool</name>
+                                        <host>MySQL by ODBC</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <x>12</x>
+                            <y>10</y>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>MySQL: Threads</name>
+                                        <host>MySQL by ODBC</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                    </widgets>
+                </dashboard>
+            </dashboards>
+>>>>>>> Stashed changes
         </template>
     </templates>
     <graphs>

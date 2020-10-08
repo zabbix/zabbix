@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
+<<<<<<< Updated upstream
     <date>2020-10-08T00:00:00Z</date>
+=======
+    <date>2020-10-08T14:28:24Z</date>
+>>>>>>> Stashed changes
     <groups>
         <group>
             <name>Templates/Operating systems</name>
@@ -709,6 +713,100 @@
                     </graph_prototypes>
                 </discovery_rule>
             </discovery_rules>
+<<<<<<< Updated upstream
+=======
+            <dashboards>
+                <dashboard>
+                    <name>System performance</name>
+                    <widgets>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>CPU load</name>
+                                        <host>FreeBSD</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <x>12</x>
+                            <width>12</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>CPU utilization</name>
+                                        <host>FreeBSD</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <y>5</y>
+                            <width>12</width>
+                            <height>7</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>Memory usage</name>
+                                        <host>FreeBSD</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                        <widget>
+                            <type>GRAPH_CLASSIC</type>
+                            <x>12</x>
+                            <y>5</y>
+                            <width>12</width>
+                            <height>7</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>0</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>Swap usage</name>
+                                        <host>FreeBSD</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                    </widgets>
+                </dashboard>
+            </dashboards>
+>>>>>>> Stashed changes
         </template>
     </templates>
     <graphs>

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
+<<<<<<< Updated upstream
     <date>2020-10-08T00:00:00Z</date>
+=======
+    <date>2020-10-08T14:29:28Z</date>
+>>>>>>> Stashed changes
     <groups>
         <group>
             <name>Templates/Modules</name>
@@ -524,6 +528,46 @@ and {Interfaces Simple SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}
                     <value>CHANGE_IF_NEEDED</value>
                 </macro>
             </macros>
+<<<<<<< Updated upstream
+=======
+            <dashboards>
+                <dashboard>
+                    <name>Network interfaces</name>
+                    <widgets>
+                        <widget>
+                            <type>GRAPH_PROTOTYPE</type>
+                            <width>24</width>
+                            <height>5</height>
+                            <fields>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>columns</name>
+                                    <value>1</value>
+                                </field>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>rows</name>
+                                    <value>1</value>
+                                </field>
+                                <field>
+                                    <type>INTEGER</type>
+                                    <name>source_type</name>
+                                    <value>2</value>
+                                </field>
+                                <field>
+                                    <type>GRAPH_PROTOTYPE</type>
+                                    <name>graphid</name>
+                                    <value>
+                                        <name>Interface {#IFDESCR}: Network traffic</name>
+                                        <host>Interfaces Simple SNMP</host>
+                                    </value>
+                                </field>
+                            </fields>
+                        </widget>
+                    </widgets>
+                </dashboard>
+            </dashboards>
+>>>>>>> Stashed changes
         </template>
     </templates>
     <value_maps>
