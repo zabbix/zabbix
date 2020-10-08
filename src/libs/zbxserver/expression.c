@@ -2526,7 +2526,8 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 					zbx_vector_ptr_t	ptr_tags;
 
 					zbx_vector_ptr_create(&ptr_tags);
-					zbx_vector_ptr_append_array(&ptr_tags, event->tags.values, event->tags.values_num);
+					zbx_vector_ptr_append_array(&ptr_tags, event->tags.values,
+							event->tags.values_num);
 					zbx_vector_ptr_sort(&ptr_tags, compare_tags);
 
 					for (i = 0; i < ptr_tags.values_num; i++)
