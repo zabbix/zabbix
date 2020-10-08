@@ -105,7 +105,9 @@ $form->addItem([
 	$slidesTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'shows', [
-		'slideshow.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected slide shows?')]
+		'slideshow.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'),
+			'disabled' => $data['allowed_edit'] ? null : 'disabled'
+		]
 	])
 ]);
 

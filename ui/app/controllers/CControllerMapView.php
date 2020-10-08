@@ -127,7 +127,8 @@ class CControllerMapView extends CController {
 		$response = new CControllerResponseData([
 			'map' => $map,
 			'severity_min' => $severity_min,
-			'severities' => $severities_dropdown
+			'severities' => $severities_dropdown,
+			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
 		]);
 
 		$response->setTitle(_('Network maps'));

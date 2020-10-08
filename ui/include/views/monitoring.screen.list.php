@@ -133,7 +133,9 @@ if (!$data['templateid']) {
 	];
 }
 
-$buttons['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?')];
+$buttons['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?'),
+	'disabled' => $data['allowed_edit'] ? null : 'disabled'
+];
 
 // append table to form
 $screenForm->addItem([

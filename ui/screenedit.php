@@ -33,6 +33,10 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 $knownResourceTypes = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
@@ -100,10 +104,6 @@ $fields = [
 ];
 check_fields($fields);
 $_REQUEST['dynamic'] = getRequest('dynamic', SCREEN_SIMPLE_ITEM);
-
-if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)) {
-	access_deny(ACCESS_DENY_PAGE);
-}
 
 /*
  * Permissions
