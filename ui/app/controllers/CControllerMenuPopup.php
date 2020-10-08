@@ -335,6 +335,8 @@ class CControllerMenuPopup extends CController {
 		}
 
 		CArrayHelper::sort($selement['urls'], ['name']);
+		$selement['urls'] = array_values($selement['urls']);
+
 		// Prepare urls for processing in menupopup.js.
 		$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
 
