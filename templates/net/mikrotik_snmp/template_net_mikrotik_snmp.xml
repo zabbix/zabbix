@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-08T08:03:42Z</date>
+   <date>2020-10-08T15:20:34Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -71,7 +71,7 @@ Template tooling version used: 0.38</description>
                <trends>0</trends>
                <value_type>CHAR</value_type>
                <description>MIB: MIKROTIK-MIB&#13;
-Current firmware version</description>
+Current firmware version.</description>
                <applications>
                   <application>
                      <name>Inventory</name>
@@ -126,7 +126,7 @@ Current firmware version</description>
                <trends>0</trends>
                <value_type>CHAR</value_type>
                <description>MIB: MIKROTIK-MIB&#13;
-RouterBOARD serial number</description>
+RouterBOARD serial number.</description>
                <inventory_link>SERIALNO_A</inventory_link>
                <applications>
                   <application>
@@ -159,7 +159,7 @@ RouterBOARD serial number</description>
                <trends>0</trends>
                <value_type>CHAR</value_type>
                <description>MIB: MIKROTIK-MIB&#13;
-Software version</description>
+Software version.</description>
                <inventory_link>OS</inventory_link>
                <applications>
                   <application>
@@ -329,7 +329,8 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</description>
+mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).&#13;
+Might be missing in entry models (RB750, RB450G..).</description>
                      <applications>
                         <application>
                            <name>Temperature</name>
@@ -399,7 +400,9 @@ this is done to avoid unsupported items.</description>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)&#13;
+mtxrHlTemperature Device temperature in Celsius (degrees C).&#13;
+Might be missing in entry models (RB750, RB450G..).&#13;
+&#13;
 Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <applications>
                         <application>
@@ -483,7 +486,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <value_type>FLOAT</value_type>
                      <units>dbm</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrLTEModemSignalRSRP</description>
+mtxrLTEModemSignalRSRP Reference Signal Received Power.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -506,7 +509,7 @@ mtxrLTEModemSignalRSRP</description>
                      <value_type>FLOAT</value_type>
                      <units>db</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrLTEModemSignalRSRQ</description>
+mtxrLTEModemSignalRSRQ Reference Signal Received Quality.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -529,7 +532,7 @@ mtxrLTEModemSignalRSRQ</description>
                      <value_type>FLOAT</value_type>
                      <units>dbm</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrLTEModemSignalRSSI</description>
+mtxrLTEModemSignalRSSI Received Signal Strength Indicator.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -552,7 +555,7 @@ mtxrLTEModemSignalRSSI</description>
                      <value_type>FLOAT</value_type>
                      <units>db</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrLTEModemSignalSINR</description>
+mtxrLTEModemSignalSINR Signal to Interference &amp; Noise Ratio.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -637,7 +640,7 @@ mtxrLTEModemSignalSINR</description>
                      <key>ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlApAuthClientCount) Number of authentication clients</description>
+mtxrWlApAuthClientCount Number of authentication clients.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -675,7 +678,7 @@ mtxrWlApBand</description>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrWlApSsid</description>
+mtxrWlApSsid Service Set Identifier.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -716,7 +719,7 @@ mtxrWlApNoiseFloor</description>
                      <key>ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlApClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</description>
+mtxrWlApClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -756,7 +759,7 @@ mtxrWlApNoiseFloor</description>
                      <key>ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlCMAuthClientCount) Number of authentication clients</description>
+mtxrWlCMAuthClientCount Number of authentication clients.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -792,7 +795,7 @@ mtxrWlCMChannel</description>
                      <key>ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlCMRegClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</description>
+mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -808,7 +811,7 @@ mtxrWlCMChannel</description>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlCMState) Wireless interface state</description>
+mtxrWlCMState Wireless interface state.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
