@@ -432,7 +432,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	DB_RESULT	result;
 
-#define SELECTED_CONFIG_FIELD_COUNT	34	/* number of columns in the following DBselect() */
+#define SELECTED_CONFIG_FIELD_COUNT	33	/* number of columns in the following DBselect() */
 
 	if (NULL == (result = DBselect("select discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
