@@ -34,31 +34,20 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	}
 
 	protected function doAction() {
-		// Editing template dashboard?
-		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_hostid')) {
-			$data = [
-				'header' => $this->getInput('name', _('Graph prototype')),
-				'children' => [],
-				'page' => 1,
-				'page_count' => 1
-			];
+		$fields = $this->getForm()->getFieldsData();
+
+		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
+			$data = $this->doGraphPrototype($fields);
+		}
+		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+			$data = $this->doSimpleGraphPrototype($fields);
 		}
 		else {
-			$fields = $this->getForm()->getFieldsData();
+			error(_('Page received incorrect data'));
+		}
 
-			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
-				$data = $this->doGraphPrototype($fields);
-			}
-			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-				$data = $this->doSimpleGraphPrototype($fields);
-			}
-			else {
-				error(_('Page received incorrect data'));
-			}
-
-			if (($messages = getMessages()) !== null) {
-				$data = ['messages' => $messages->toString()];
-			}
+		if (($messages = getMessages()) !== null) {
+			$data = ['messages' => $messages->toString()];
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
@@ -116,28 +105,31 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		$graphs_collected = [];
 
-		$graphs_created_all = API::Graph()->get([
-			'output' => ['graphid', 'name'],
-			'hostids' => [$graph_prototype['discoveryRule']['hostid']],
-			'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
-			'selectHosts' => ['name'],
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-			'expandName' => true
-		]);
+		// Do not collect graphs while editing a template dashboard.
+		if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
+			$graphs_created_all = API::Graph()->get([
+				'output' => ['graphid', 'name'],
+				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
+				'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
+				'selectHosts' => ['name'],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				'expandName' => true
+			]);
 
-		// Collect graphs based on the graph prototype.
-		foreach ($graphs_created_all as $graph) {
-			if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
-				$prepend_host_name = $is_template_dashboard
-					? false
-					: (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0);
+			// Collect graphs based on the graph prototype.
+			foreach ($graphs_created_all as $graph) {
+				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
+					$prepend_host_name = $is_template_dashboard
+						? false
+						: (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0);
 
-				$graphs_collected[$graph['graphid']] = $prepend_host_name
-					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
-					: $graph['name'];
+					$graphs_collected[$graph['graphid']] = $prepend_host_name
+						? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
+						: $graph['name'];
+				}
 			}
+			natsort($graphs_collected);
 		}
-		natsort($graphs_collected);
 
 		$page = $this->getIteratorPage(count($graphs_collected));
 		$page_count = $this->getIteratorPageCount(count($graphs_collected));
@@ -233,26 +225,29 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		$items_collected = [];
 
-		$items_created_all = API::Item()->get([
-			'output' => ['itemid', 'name', 'key_', 'hostid'],
-			'hostids' => [$item_prototype['discoveryRule']['hostid']],
-			'selectItemDiscovery' => ['itemid', 'parent_itemid'],
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-		]);
+		// Do not collect items while editing a template dashboard.
+		if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
+			$items_created_all = API::Item()->get([
+				'output' => ['itemid', 'name', 'key_', 'hostid'],
+				'hostids' => [$item_prototype['discoveryRule']['hostid']],
+				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
+			]);
 
-		// Collect items based on the item prototype.
-		$items_created = [];
-		foreach ($items_created_all as $item) {
-			if ($item['itemDiscovery']['parent_itemid'] === $item_prototype['itemid']) {
-				$items_created[] = $item;
+			// Collect items based on the item prototype.
+			$items_created = [];
+			foreach ($items_created_all as $item) {
+				if ($item['itemDiscovery']['parent_itemid'] === $item_prototype['itemid']) {
+					$items_created[] = $item;
+				}
 			}
+			foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
+				$items_collected[$item['itemid']] = $is_template_dashboard
+					? $item['name_expanded']
+					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+			}
+			natsort($items_collected);
 		}
-		foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
-			$items_collected[$item['itemid']] = $is_template_dashboard
-				? $item['name_expanded']
-				: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
-		}
-		natsort($items_collected);
 
 		$page = $this->getIteratorPage(count($items_collected));
 		$page_count = $this->getIteratorPageCount(count($items_collected));
