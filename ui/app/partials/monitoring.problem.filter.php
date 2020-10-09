@@ -392,6 +392,10 @@ if (array_key_exists('render_html', $data)) {
 					$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
 					$('[name="age_state"]', container).attr('disabled', !filter_show);
 
+					if (filter_show) {
+						this._data.filter_custom_time = 0;
+					}
+
 					if (this._parent) {
 						this._parent.updateTimeselector(this, filter_show);
 					}
