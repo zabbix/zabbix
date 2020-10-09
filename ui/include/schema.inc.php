@@ -8494,12 +8494,16 @@ return [
 	'trigger_queue' => [
 		'key' => '',
 		'fields' => [
-			'functionid' => [
+			'objectid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'functions',
-				'ref_field' => 'functionid',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 			'clock' => [
 				'null' => false,
