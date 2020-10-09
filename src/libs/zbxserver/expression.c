@@ -2516,18 +2516,31 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			if (SUCCEED == zbx_str_extract(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX),
 					strlen(macro) - ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX) - 1, &name))
 			{
-				int	i;
-
-				for (i = 0; i < event->tags.values_num; i++)
+				if (0 < event->tags.values_num)
 				{
-					zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+					int			i;
+					zbx_tag_t       	*tag;
+					zbx_vector_ptr_t	ptr_tags;
 
-					if (0 == strcmp(name, tag->tag))
+					zbx_vector_ptr_create(&ptr_tags);
+					zbx_vector_ptr_append_array(&ptr_tags, event->tags.values,
+							event->tags.values_num);
+					zbx_vector_ptr_sort(&ptr_tags, compare_tags);
+
+					for (i = 0; i < ptr_tags.values_num; i++)
 					{
-						*replace_to = zbx_strdup(*replace_to, tag->value);
-						break;
+						tag = (zbx_tag_t *)ptr_tags.values[i];
+
+						if (0 == strcmp(name, tag->tag))
+						{
+							*replace_to = zbx_strdup(*replace_to, tag->value);
+							break;
+						}
 					}
+
+					zbx_vector_ptr_destroy(&ptr_tags);
 				}
+
 				zbx_free(name);
 			}
 		}
