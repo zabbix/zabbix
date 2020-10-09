@@ -24,7 +24,6 @@ ROW   |2          |Zabbix server health        |1     |1      |NULL      |
 ROW   |3          |Apache performance          |NULL  |1      |10265     |
 ROW   |4          |Apache performance          |NULL  |1      |10264     |
 ROW   |5          |Docker overview             |NULL  |1      |10318     |
-ROW   |6          |Redis overview              |NULL  |1      |10310     |
 ROW   |7          |Redis performance           |NULL  |1      |10310     |
 ROW   |8          |RabbitMQ overview           |NULL  |1      |10300     |
 ROW   |9          |RabbitMQ node status        |NULL  |1      |10301     |
@@ -43,7 +42,6 @@ ROW   |21         |Netowrk interfaces          |NULL  |1      |10291     |
 ROW   |22         |System performance          |NULL  |1      |10081     |
 ROW   |23         |MySQL performance           |NULL  |1      |10316     |
 ROW   |24         |MySQL performance           |NULL  |1      |10320     |
-ROW   |25         |System performance          |NULL  |1      |10248     |
 ROW   |26         |Network interfaces          |NULL  |1      |10192     |
 ROW   |27         |Network interfaces          |NULL  |1      |10190     |
 ROW   |28         |Nginx performance           |NULL  |1      |10266     |
@@ -69,6 +67,8 @@ ROW   |51         |System performance          |NULL  |1      |10075     |
 ROW   |52         |System performance          |NULL  |1      |10077     |
 ROW   |53         |MySQL performance           |NULL  |1      |10317     |
 ROW   |54         |Network interfaces          |NULL  |1      |10188     |
+ROW   |55         |System performance          |NULL  |1      |10248     |
+ROW   |56         |Redis overview              |NULL  |1      |10310     |
 
 TABLE |dashboard_usrgrp
 FIELDS|dashboard_usrgrpid|dashboardid|usrgrpid|permission|
@@ -106,19 +106,6 @@ ROW   |32      |5          |graph         |                                 |12 
 ROW   |33      |5          |graph         |                                 |0   |5   |12   |5     |0        |
 ROW   |34      |5          |graph         |                                 |12  |5   |12   |5     |0        |
 ROW   |35      |5          |graph         |                                 |0   |10  |12   |5     |0        |
-ROW   |36      |6          |graph         |                                 |0   |0   |18   |5     |0        |
-ROW   |37      |6          |graph         |                                 |18  |0   |6    |5     |0        |
-ROW   |38      |6          |graph         |                                 |0   |5   |18   |5     |0        |
-ROW   |39      |6          |graph         |                                 |18  |5   |6    |5     |0        |
-ROW   |40      |6          |graph         |                                 |0   |10  |18   |5     |0        |
-ROW   |41      |6          |graph         |                                 |18  |10  |6    |5     |0        |
-ROW   |42      |6          |graph         |                                 |0   |15  |18   |5     |0        |
-ROW   |43      |6          |graph         |                                 |18  |15  |6    |5     |0        |
-ROW   |44      |6          |graphprototype|                                 |0   |20  |18   |5     |0        |
-ROW   |45      |7          |graph         |                                 |0   |0   |12   |5     |0        |
-ROW   |46      |7          |graph         |                                 |12  |0   |12   |5     |0        |
-ROW   |47      |7          |graph         |                                 |0   |5   |12   |5     |0        |
-ROW   |48      |7          |graph         |                                 |12  |5   |12   |5     |0        |
 ROW   |49      |8          |graph         |                                 |0   |0   |12   |5     |0        |
 ROW   |50      |8          |graph         |                                 |12  |0   |12   |5     |0        |
 ROW   |51      |8          |graph         |                                 |0   |5   |12   |5     |0        |
@@ -197,14 +184,6 @@ ROW   |142     |24         |graph         |                                 |0  
 ROW   |143     |24         |graph         |                                 |12  |5   |12   |5     |0        |
 ROW   |144     |24         |graph         |                                 |0   |10  |12   |5     |0        |
 ROW   |145     |24         |graph         |                                 |12  |10  |12   |5     |0        |
-ROW   |146     |25         |graph         |                                 |0   |0   |6    |5     |0        |
-ROW   |147     |25         |graphprototype|                                 |6   |0   |18   |5     |0        |
-ROW   |148     |25         |graph         |                                 |0   |5   |6    |5     |0        |
-ROW   |149     |25         |graph         |                                 |6   |5   |18   |5     |0        |
-ROW   |150     |25         |graphprototype|                                 |0   |10  |24   |5     |0        |
-ROW   |151     |25         |graphprototype|                                 |0   |15  |24   |5     |0        |
-ROW   |152     |25         |graphprototype|                                 |0   |20  |24   |5     |0        |
-ROW   |153     |25         |graphprototype|                                 |0   |25  |24   |5     |0        |
 ROW   |154     |26         |graphprototype|                                 |0   |0   |24   |5     |0        |
 ROW   |155     |27         |graphprototype|                                 |0   |0   |24   |5     |0        |
 ROW   |156     |28         |graph         |                                 |0   |0   |12   |5     |0        |
@@ -304,6 +283,27 @@ ROW   |367     |53         |graph         |                                 |12 
 ROW   |368     |53         |graph         |                                 |0   |10  |12   |5     |0        |
 ROW   |369     |53         |graph         |                                 |12  |10  |12   |5     |0        |
 ROW   |370     |54         |graphprototype|                                 |0   |0   |24   |5     |0        |
+ROW   |379     |55         |graph         |                                 |0   |0   |12   |5     |0        |
+ROW   |380     |55         |graphprototype|                                 |12  |0   |12   |5     |0        |
+ROW   |381     |55         |graph         |                                 |0   |5   |12   |5     |0        |
+ROW   |382     |55         |graph         |                                 |12  |5   |12   |5     |0        |
+ROW   |383     |55         |graphprototype|                                 |0   |10  |24   |5     |0        |
+ROW   |384     |55         |graphprototype|                                 |0   |15  |24   |5     |0        |
+ROW   |385     |55         |graphprototype|                                 |0   |20  |24   |5     |0        |
+ROW   |386     |55         |graphprototype|                                 |0   |25  |24   |5     |0        |
+ROW   |387     |56         |graph         |                                 |0   |0   |12   |5     |0        |
+ROW   |388     |56         |graph         |                                 |12  |0   |12   |5     |0        |
+ROW   |389     |56         |graph         |                                 |0   |5   |12   |5     |0        |
+ROW   |390     |56         |graph         |                                 |12  |5   |12   |5     |0        |
+ROW   |391     |56         |graph         |                                 |0   |10  |12   |5     |0        |
+ROW   |392     |56         |graph         |                                 |12  |10  |12   |5     |0        |
+ROW   |393     |56         |graph         |                                 |0   |15  |12   |5     |0        |
+ROW   |394     |56         |graph         |                                 |12  |15  |12   |5     |0        |
+ROW   |395     |56         |graphprototype|                                 |0   |20  |12   |5     |0        |
+ROW   |396     |7          |graph         |                                 |0   |0   |12   |5     |0        |
+ROW   |397     |7          |graph         |                                 |12  |0   |12   |5     |0        |
+ROW   |398     |7          |graph         |                                 |0   |5   |12   |5     |0        |
+ROW   |399     |7          |graph         |                                 |12  |5   |12   |5     |0        |
 
 TABLE |widget_field
 FIELDS|widget_fieldid|widgetid|type|name                |value_int|value_str                             |value_groupid|value_hostid|value_itemid|value_graphid|value_sysmapid|
@@ -472,34 +472,6 @@ ROW   |179           |34      |0   |source_type         |0        |             
 ROW   |180           |34      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1126         |NULL          |
 ROW   |181           |35      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |182           |35      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1127         |NULL          |
-ROW   |183           |36      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |184           |36      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1091         |NULL          |
-ROW   |185           |37      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |186           |37      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1095         |NULL          |
-ROW   |187           |38      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |188           |38      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1092         |NULL          |
-ROW   |189           |39      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |190           |39      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1094         |NULL          |
-ROW   |191           |40      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |192           |40      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1099         |NULL          |
-ROW   |193           |41      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |194           |41      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1100         |NULL          |
-ROW   |195           |42      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |196           |42      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1101         |NULL          |
-ROW   |197           |43      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |198           |43      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1102         |NULL          |
-ROW   |199           |44      |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |200           |44      |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |201           |44      |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |202           |44      |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1090         |NULL          |
-ROW   |203           |45      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |204           |45      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1093         |NULL          |
-ROW   |205           |46      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |206           |46      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1098         |NULL          |
-ROW   |207           |47      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |208           |47      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1096         |NULL          |
-ROW   |209           |48      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |210           |48      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1097         |NULL          |
 ROW   |211           |49      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |212           |49      |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1029         |NULL          |
 ROW   |213           |50      |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
@@ -712,32 +684,6 @@ ROW   |465           |144     |0   |source_type         |0        |             
 ROW   |466           |144     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1138         |NULL          |
 ROW   |467           |145     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |468           |145     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1141         |NULL          |
-ROW   |469           |146     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |470           |146     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |881          |NULL          |
-ROW   |471           |147     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |472           |147     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |473           |147     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |474           |147     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |869          |NULL          |
-ROW   |475           |148     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |476           |148     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |877          |NULL          |
-ROW   |477           |149     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |478           |149     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |879          |NULL          |
-ROW   |479           |150     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |480           |150     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |481           |150     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |482           |150     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |873          |NULL          |
-ROW   |483           |151     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |484           |151     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |485           |151     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |486           |151     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |867          |NULL          |
-ROW   |487           |152     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |488           |152     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |489           |152     |0   |source_type         |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |490           |152     |5   |itemid              |0        |                                      |NULL         |NULL        |29033       |NULL         |NULL          |
-ROW   |491           |153     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |492           |153     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |493           |153     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
-ROW   |494           |153     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |865          |NULL          |
 ROW   |495           |154     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |496           |154     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |497           |154     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
@@ -994,4 +940,58 @@ ROW   |1091          |370     |0   |columns             |1        |             
 ROW   |1092          |370     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |1093          |370     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
 ROW   |1094          |370     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |741          |NULL          |
+ROW   |1121          |379     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1122          |379     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |881          |NULL          |
+ROW   |1123          |380     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1124          |380     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1125          |380     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1126          |380     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |869          |NULL          |
+ROW   |1127          |381     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1128          |381     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |877          |NULL          |
+ROW   |1129          |382     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1130          |382     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |879          |NULL          |
+ROW   |1131          |383     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1132          |383     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1133          |383     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1134          |383     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |873          |NULL          |
+ROW   |1135          |384     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1136          |384     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1137          |384     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1138          |384     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |867          |NULL          |
+ROW   |1139          |385     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1140          |385     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1141          |385     |0   |source_type         |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1142          |385     |5   |itemid              |0        |                                      |NULL         |NULL        |29033       |NULL         |NULL          |
+ROW   |1143          |386     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1144          |386     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1145          |386     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1146          |386     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |865          |NULL          |
+ROW   |1147          |387     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1148          |387     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1091         |NULL          |
+ROW   |1149          |388     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1150          |388     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1095         |NULL          |
+ROW   |1151          |389     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1152          |389     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1092         |NULL          |
+ROW   |1153          |390     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1154          |390     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1094         |NULL          |
+ROW   |1155          |391     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1156          |391     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1099         |NULL          |
+ROW   |1157          |392     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1158          |392     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1100         |NULL          |
+ROW   |1159          |393     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1160          |393     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1101         |NULL          |
+ROW   |1161          |394     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1162          |394     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1102         |NULL          |
+ROW   |1163          |395     |0   |columns             |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1164          |395     |0   |rows                |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1165          |395     |0   |source_type         |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1166          |395     |7   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1090         |NULL          |
+ROW   |1167          |396     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1168          |396     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1093         |NULL          |
+ROW   |1169          |397     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1170          |397     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1098         |NULL          |
+ROW   |1171          |398     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1172          |398     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1096         |NULL          |
+ROW   |1173          |399     |0   |source_type         |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |1174          |399     |6   |graphid             |0        |                                      |NULL         |NULL        |NULL        |1097         |NULL          |
 
