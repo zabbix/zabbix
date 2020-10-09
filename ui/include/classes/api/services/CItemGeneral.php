@@ -738,7 +738,7 @@ abstract class CItemGeneral extends CApiService {
 				if ($this instanceof CItemPrototype) {
 					unset($new_item['ruleid']);
 				}
-				$upd_items[] = $new_item;
+				$upd_items[$new_item['itemid']] = $new_item;
 			}
 			else {
 				$ins_items[] = $new_item;
