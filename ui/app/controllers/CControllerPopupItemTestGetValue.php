@@ -46,12 +46,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
+			'script'				=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
 			'privatekey'			=> 'string',
 			'publickey'				=> 'string',
 			'query_fields'			=> 'array',
+			'parameters'			=> 'array',
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'snmp_oid'				=> 'string',
@@ -162,6 +164,10 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		if (array_key_exists('query_fields', $data)) {
 			$data['query_fields'] = $this->transformQueryFields($data['query_fields']);
+		}
+
+		if (array_key_exists('parameters', $data)) {
+			$data['parameters'] = $this->transformParametersFields($data['parameters']);
 		}
 
 		// Only non-empty fields need to be sent to server.
