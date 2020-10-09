@@ -1916,6 +1916,12 @@ Changes for 4.0.26rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
+..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
+.......PS. [ZBX-17178] fixed multi-line value truncation in snmp lld (asestakovs)
+.......PS. [ZBX-18462] fixed inconsistent auto-registration behaviour for hosts without metadata on Oracle DB compared to other databases when using Zabbix proxy (viktors)
+.......PS. [ZBX-18364] fixed inconsistency with autoregistration behaviour for hosts without metadata on Oracle compared to other databases (viktors)
 .......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
 ........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
 ..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
