@@ -766,9 +766,17 @@ insert_javascript_for_visibilitybox();
 				}
 			})
 			.bind('tableupdate.dynamicRows', function(event, options) {
-				jQuery('#overrideRow').toggle(jQuery(options.row, jQuery(this)).length > 1);
+				var show_formula = (jQuery('#overrides-evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
+					multiple_rows = (jQuery(options.row, jQuery(this)).length > 1);
 
-				if (jQuery('#overrides-evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+				jQuery('#overrideRow').toggle(multiple_rows);
+
+				if (show_formula) {
+					if (!multiple_rows) {
+						jQuery('#overrides-evaltype').val(<?= CONDITION_EVAL_TYPE_AND_OR ?>);
+					}
+				}
+				else {
 					that.updateExpression();
 				}
 			})
