@@ -1,9 +1,9 @@
 
-# Template DB MySQL by ODBC
+# MySQL by ODBC
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template is developed for monitoring DBMS MySQL and its forks.
 
 
@@ -16,7 +16,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
 
 1. Create MySQL user for monitoring (`<password>` at your discretion):
 
@@ -102,7 +102,7 @@ There are no template links in this template.
 |MySQL |MySQL: Command Update per second |<p>The Com_update counter variable indicates the number of times the update statement has been executed.</p> |DEPENDENT |mysql.com_update.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Com_update')].Value.first()`</p><p>- CHANGE_PER_SECOND |
 |MySQL |MySQL: Queries per second |<p>The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.</p> |DEPENDENT |mysql.queries.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Queries')].Value.first()`</p><p>- CHANGE_PER_SECOND |
 |MySQL |MySQL: Questions per second |<p>The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.</p> |DEPENDENT |mysql.questions.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Questions')].Value.first()`</p><p>- CHANGE_PER_SECOND |
-|MySQL |MySQL: Size of database {#DATABASE} |<p>-</p> |ODBC |db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH),0) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="{#DATABASE}"` |
+|MySQL |MySQL: Size of database {#DATABASE} |<p>-</p> |ODBC |db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`Text is too long. Please see the template.` |
 |MySQL |MySQL: Replication Seconds Behind Master {#MASTER_HOST} |<p>The number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p> |DEPENDENT |mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.Master_Host=='{#MASTER_HOST}')]['Seconds_Behind_Master'].first()`</p><p>- MATCHES_REGEX: `\d+`</p><p>⛔️ON_FAIL: `CUSTOM_ERROR -> Replication is not performed.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MySQL |MySQL: Replication Slave IO Running {#MASTER_HOST} |<p>Whether the I/O thread for reading the master's binary log is running. </p><p>Normally, you want this to be Yes unless you have not yet started replication or have </p><p>explicitly stopped it with STOP SLAVE.</p> |DEPENDENT |mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.Master_Host=='{#MASTER_HOST}')]['Slave_IO_Running'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MySQL |MySQL: Replication Slave SQL Running {#MASTER_HOST} |<p>Whether the SQL thread for executing events in the relay log is running. </p><p>As with the I/O thread, this should normally be Yes.</p> |DEPENDENT |mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.Master_Host=='{#MASTER_HOST}')]['Slave_SQL_Running'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |

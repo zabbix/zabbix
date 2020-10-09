@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,14 +18,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/testMetrics.php';
 
-class AgentTests {
-	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('general');
+class CFormActions extends CTag {
 
-		$suite->addTestSuite('testMetrics');
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	private const ZBX_STYLE_CLASS = 'form-actions';
 
-		return $suite;
+	/**
+	 * @param CButtonInterface|null $main_button
+	 * @param CButtonInterface[]    $other_buttons
+	 */
+	public function __construct(CButtonInterface $main_button = null, array $other_buttons = []) {
+		parent::__construct('div', true);
+
+		foreach ($other_buttons as $other_button) {
+			$other_button->addClass(ZBX_STYLE_BTN_ALT);
+		}
+
+		if ($main_button !== null) {
+			array_unshift($other_buttons, $main_button);
+		}
+
+		$this
+			->addClass(self::ZBX_STYLE_CLASS)
+			->addItem($other_buttons);
 	}
 }

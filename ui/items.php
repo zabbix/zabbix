@@ -156,7 +156,11 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_HTTPAGENT,
+										_('Timeout')
+									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
@@ -1053,7 +1057,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'posts' => getRequest('posts'),
 					'headers' => getRequest('headers', []),
 					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => getRequest('timeout')
 				];
 
 				if ($item['headers']) {
@@ -1196,6 +1201,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 					if ($type != ITEM_TYPE_JMX) {
 						unset($update_item['jmx_endpoint']);
+					}
+
+					if ($type != ITEM_TYPE_HTTPAGENT) {
+						unset($update_item['timeout']);
 					}
 				}
 				unset($update_item);
@@ -1557,7 +1566,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
-		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
+		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
 	];
 
 	foreach ($data['preprocessing'] as &$step) {

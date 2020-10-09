@@ -447,7 +447,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 #ifdef HAVE_NETSNMP
 		if (1 == snmp_cache_reload_requested)
 		{
-			zbx_clear_cache_snmp();
+			zbx_clear_cache_snmp(process_type, process_num);
 			snmp_cache_reload_requested = 0;
 		}
 #endif
