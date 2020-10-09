@@ -283,10 +283,6 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 		$('#type')
 			.change(function() {
-				jQuery('#timeout_row')
-					.find('label')
-					.toggleClass('form-label-asterisk', $(this).val() == <?= ITEM_TYPE_SCRIPT ?>);
-
 				var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
 					interface_ids_by_types = <?= json_encode($interface_ids_by_types) ?>;
 
