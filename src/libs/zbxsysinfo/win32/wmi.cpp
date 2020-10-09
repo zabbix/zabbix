@@ -233,15 +233,14 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 			return ret;
 		}
 
-		if (0 == uReturn)
+		if (FAILED(hres))
 		{
-			if (FAILED(hres))
-				ret = SYSINFO_RET_FAIL;
-			else if (hres == WBEM_S_FALSE)
-				ret = SYSINFO_RET_OK;
-
-			return ret;
+			*error = zbx_strdup(*error, "Retreiving WMI query result failed.");
+			return SYSINFO_RET_FAIL;
 		}
+
+		if (0 == uReturn && hres == WBEM_S_FALSE)
+			return SYSINFO_RET_OK;
 
 		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
@@ -873,14 +872,8 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
 {
 	struct zbx_json	j;
 	int		inst_i, prop_i, ret = SYSINFO_RET_OK;
-	size_t	json_sz;
 
-	if (0 == wmi_values->values_num)
-		json_sz = 1;
-	else
-		json_sz = wmi_values->values_num * wmi_values->values[0]->values_num * 50;
-
-	zbx_json_initarray(&j, json_sz);
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	for (inst_i = 0; inst_i < wmi_values->values_num && SYSINFO_RET_OK == ret; inst_i++)
 	{
