@@ -225,26 +225,26 @@ INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (200000, 200000, 29155, 1, 1, 'FF5555', 0, 2, 0);
 
 -- Add more screens
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200000, 'Test screen (graph)'                          , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200001, 'Test screen (clock)'                          , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200002, 'Test screen (data overview, left align)'      , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200003, 'Test screen (history of actions)'             , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200004, 'Test screen (history of events)'              , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200005, 'Test screen (hosts info, horizontal align)'   , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200006, 'Test screen (hosts info, vertical align)'     , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200007, 'Test screen (map)'                            , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200008, 'Test screen (plain text)'                     , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200010, 'Test screen (server info)'                    , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200011, 'Test screen (simple graph)'                   , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200012, 'Test screen (status of hostgroup triggers)'   , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200013, 'Test screen (status of host triggers)'        , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200014, 'Test screen (system status)'                  , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200015, 'Test screen (triggers info, horizontal align)', 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200016, 'Test screen (triggers overview, left align)'  , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200017, 'Test screen (triggers overview, top align)'   , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200018, 'Test screen (url)'                            , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200019, 'Test screen (data overview, top align)'       , 1, 1, NULL, 1, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200020, 'Test screen (triggers info, vertical align)'  , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200000, 'Test screen (graph)'                          , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200001, 'Test screen (clock)'                          , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200002, 'Test screen (data overview, left align)'      , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200003, 'Test screen (history of actions)'             , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200004, 'Test screen (history of events)'              , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200005, 'Test screen (hosts info, horizontal align)'   , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200006, 'Test screen (hosts info, vertical align)'     , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200007, 'Test screen (map)'                            , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200008, 'Test screen (plain text)'                     , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200010, 'Test screen (server info)'                    , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200011, 'Test screen (simple graph)'                   , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200012, 'Test screen (status of hostgroup triggers)'   , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200013, 'Test screen (status of host triggers)'        , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200014, 'Test screen (system status)'                  , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200015, 'Test screen (triggers info, horizontal align)', 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200016, 'Test screen (triggers overview, left align)'  , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200017, 'Test screen (triggers overview, top align)'   , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200018, 'Test screen (url)'                            , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200019, 'Test screen (data overview, top align)'       , 1, 1, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200020, 'Test screen (triggers info, vertical align)'  , 1, 1, 1, 0);
 
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200000,200000,0,200000,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200001,200001,7,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
@@ -2286,7 +2286,7 @@ INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (102, 'Dashboa
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (103, 102, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (902, 103, 0, 'style', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (903, 103, 2, 'groupids', 0, 50011);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200021, 'Screen to check trigger url', 1, 3, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200021, 'Screen to check trigger url', 1, 3, 1, 0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200021, 200021, 9, 50011, 500, 100, 0, 0, 1, 1, 0, 0, 0, 1, '', 0, 0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200022, 200021, 16, 50011, 500, 100, 0, 1, 1, 1, 25, 0, 0, 0, '', 0, 0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200023, 200021, 14, 50011, 500, 100, 0, 2, 1, 1, 25, 0, 0, 0, '', 0, 0);
