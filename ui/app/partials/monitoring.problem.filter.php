@@ -387,17 +387,26 @@ if (array_key_exists('render_html', $data)) {
 				show: () => {
 					// Dynamically disable hidden input elements to allow correct detection of unsaved changes.
 					var	filter_show = ($('input[name="show"]:checked', container).val() != <?= TRIGGERS_OPTION_ALL ?>),
+						filter_custom_time = $('[name="filter_custom_time"]', container).val(),
 						disabled = (!filter_show || !$('[name="age_state"]:checked', container).length);
 
 					$('[name="age"]', container).attr('disabled', disabled).closest('li').toggle(filter_show);
 					$('[name="age_state"]', container).attr('disabled', !filter_show);
 
-					if (filter_show) {
-						this._data.filter_custom_time = 0;
+					if (!filter_show && filter_custom_time == 1) {
+						$('[name="show"]')
+							.prop('checked', false)
+							.attr('disabled', 'disabled')
+							.filter('[value="<?= TRIGGERS_OPTION_ALL ?>"]')
+							.prop('checked', true)
+							.removeAttr('disabled');
+					}
+					else {
+						$('[name="show"]').removeAttr('disabled');
 					}
 
 					if (this._parent) {
-						this._parent.updateTimeselector(this, filter_show);
+						this._parent.updateTimeselector(this, filter_show || (filter_custom_time == 1));
 					}
 				},
 				age_state: (ev) => {
