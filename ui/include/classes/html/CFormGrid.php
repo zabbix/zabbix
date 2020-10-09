@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,30 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_SNMP_H
-#define ZABBIX_CHECKS_SNMP_H
 
-#include "common.h"
-#include "log.h"
-#include "dbcache.h"
-#include "sysinfo.h"
+class CFormGrid extends CTag {
 
-extern char	*CONFIG_SOURCE_IP;
-extern int	CONFIG_TIMEOUT;
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	private const ZBX_STYLE_CLASS = 'form-grid';
 
-#ifdef HAVE_NETSNMP
+	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
+	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
 
-#define ZBX_SNMP_STR_HEX	1
-#define ZBX_SNMP_STR_STRING	2
-#define ZBX_SNMP_STR_OID	3
-#define ZBX_SNMP_STR_BITS	4
-#define ZBX_SNMP_STR_ASCII	5
-#define ZBX_SNMP_STR_UNDEFINED	255
+	public function __construct() {
+		parent::__construct('div', true);
 
-void	zbx_init_snmp(void);
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type);
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type);
-void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
-#endif
-
-#endif
+		$this->addClass(self::ZBX_STYLE_CLASS);
+	}
+}

@@ -76,7 +76,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', 0));
+			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
@@ -213,15 +213,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 		}
 
-		// Check if if there is an interface and its details (SNMP) have macros and add them to list of macros.
-		if (array_key_exists('interface', $inputs) && array_key_exists('details', $inputs['interface'])) {
-			foreach ($inputs['interface']['details'] as $field) {
-				if (strstr($field, '{') !== false) {
-					$texts_support_user_macros[] = $field;
-				}
-			}
-		}
-
 		// Unset duplicate macros.
 		foreach ($supported_macros as &$item_macros_type) {
 			$item_macros_type = array_unique($item_macros_type);
@@ -242,6 +233,28 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		]);
 
 		$show_warning = false;
+
+		if (array_key_exists('interface', $inputs)) {
+			if (array_key_exists('address', $inputs['interface'])
+					&& strstr($inputs['interface']['address'], ZBX_SECRET_MASK) !== false) {
+				$inputs['interface']['address'] = '';
+				$show_warning = true;
+			}
+
+			if (array_key_exists('port', $inputs['interface']) && $inputs['interface']['port'] === ZBX_SECRET_MASK) {
+				$inputs['interface']['port'] = '';
+				$show_warning = true;
+			}
+
+			if (array_key_exists('details', $inputs['interface'])) {
+				foreach ($inputs['interface']['details'] as $field => $value) {
+					if (strstr($value, ZBX_SECRET_MASK) !== false) {
+						$inputs['interface']['details'][$field] = '';
+						$show_warning = true;
+					}
+				}
+			}
+		}
 
 		// Set resolved macros to previously specified values.
 		foreach (array_keys($usermacros['macros']) as $macro_name) {
@@ -318,6 +331,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interface_port_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['port']
 			),
+			'show_snmp_form' => ($this->item_type == ITEM_TYPE_SNMP),
 			'show_warning' => $show_warning,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

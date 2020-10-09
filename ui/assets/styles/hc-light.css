@@ -614,6 +614,42 @@ footer {
 .selected.expanded .icon-home::before {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -121px -510px; }
 
+.form-grid {
+  display: grid;
+  row-gap: 10px;
+  column-gap: 10px;
+  grid-template-columns: auto 1fr; }
+  .form-grid > label {
+    line-height: 24px;
+    text-align: right;
+    word-wrap: break-word; }
+  .form-grid .form-actions,
+  .form-grid .form-field,
+  .form-grid .field-fluid {
+    grid-column: 2 / -1;
+    text-align: left;
+    line-height: 24px; }
+  .form-grid .form-field.offset-1 {
+    grid-column-start: 2 !important; }
+  .form-grid .form-field.offset-2 {
+    grid-column-start: 3 !important; }
+  .form-grid .form-field.offset-3 {
+    grid-column-start: 4 !important; }
+  .form-grid.form-grid-3-1 {
+    grid-template-columns: auto 3fr auto auto; }
+  .form-grid.form-grid-1-1 {
+    grid-template-columns: repeat(2, auto 1fr); }
+  .form-grid.form-grid-3-1 .form-field:not(.field-fluid), .form-grid.form-grid-1-1 .form-field:not(.field-fluid) {
+    grid-column-start: initial;
+    grid-column-end: span 1; }
+
+.form-grid .table-forms-separator {
+  line-height: 1.4; }
+  .form-grid .table-forms-separator td {
+    padding: 5px 5px 5px 0; }
+.form-grid .form-actions button:not(:first-of-type) {
+  margin-left: 10px; }
+
 .form-search {
   position: relative;
   height: 24px; }
@@ -3595,12 +3631,6 @@ z-select[disabled] button, z-select[readonly] button,
       min-width: 450px; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
       min-width: 650px; }
-  .overlay-dialogue .hintbox-scrollable {
-    overflow: auto;
-    width: 100%;
-    max-height: calc(100vh - 190px);
-    max-width: 45vw;
-    white-space: nowrap; }
   .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;
@@ -4699,15 +4729,15 @@ span.is-loading {
 
 .msg-details ul::-webkit-scrollbar, z-select button::-webkit-scrollbar,
 .z-select button::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
-.z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+.z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
 .msg-details ul::-webkit-scrollbar-track, z-select button::-webkit-scrollbar-track,
 .z-select button::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
-.z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+.z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #999999; }
 .msg-details ul::-webkit-scrollbar-thumb, z-select button::-webkit-scrollbar-thumb,
 .z-select button::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
-.z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+.z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #f9f9f9;
   border: 1px solid #adadad; }
 
@@ -5527,15 +5557,6 @@ svg {
 
 .inline-sr-only {
   font-size: 0; }
-
-.item-test-popup-value-row,
-.preproc-test-popup-value-row {
-  display: flex; }
-  .item-test-popup-value-row label,
-  .preproc-test-popup-value-row label {
-    padding: 0 10px;
-    margin-left: auto;
-    line-height: 24px; }
 
 table.preprocessing-test-results td {
   vertical-align: top !important; }
