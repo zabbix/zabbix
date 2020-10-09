@@ -556,7 +556,12 @@ if (array_key_exists('render_html', $data)) {
 
 		if (this._parent) {
 			this._parent.on(TABFILTER_EVENT_UPDATE, (ev) => {
-				let form = this.getForm();
+				let form = this.getForm(),
+					tabfilter = ev.detail.target;
+
+				if (tabfilter._active_item !== this) {
+					return;
+				}
 
 				if ($(form).find('[name="filter_custom_time"]').val() == 1) {
 					$('[name="show"][value="<?= TRIGGERS_OPTION_ALL ?>"]', form).prop('checked', true);
