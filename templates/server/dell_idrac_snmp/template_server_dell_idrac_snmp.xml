@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:57Z</date>
+   <version>5.0</version>
+   <date>2020-06-04T23:48:14Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -9,17 +9,17 @@
    </groups>
    <templates>
       <template>
-         <template>Dell iDRAC SNMP</template>
-         <name>Dell iDRAC SNMP</name>
+         <template>Template Server Dell iDRAC SNMP</template>
+         <name>Template Server Dell iDRAC SNMP</name>
          <description>Template Server iDRAC&#13;
 &#13;
 MIBs used:&#13;
 IDRAC-MIB-SMIv2&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
          </templates>
          <groups>
@@ -179,7 +179,7 @@ This attribute defines the overall rollup status of all components in the system
                      <dependencies>
                         <dependency>
                            <name>System is in unrecoverable state!</name>
-                           <expression>{Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
+                           <expression>{Template Server Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -192,11 +192,11 @@ This attribute defines the overall rollup status of all components in the system
                      <dependencies>
                         <dependency>
                            <name>System is in unrecoverable state!</name>
-                           <expression>{Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
+                           <expression>{Template Server Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
                         </dependency>
                         <dependency>
                            <name>System status is in critical state</name>
-                           <expression>{Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Template Server Dell iDRAC SNMP:system.status[globalSystemStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -281,7 +281,7 @@ Possible values:&#13;
                            <dependencies>
                               <dependency>
                                  <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -294,11 +294,11 @@ Possible values:&#13;
                            <dependencies>
                               <dependency>
                                  <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                               <dependency>
                                  <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -312,7 +312,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -386,14 +385,13 @@ coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</des
                            <dependencies>
                               <dependency>
                                  <name>{#FAN_DESCR}: Fan is in critical state</name>
-                                 <expression>{Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalUpper"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableUpper"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalLower"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableLower"},eq)}=1 or {Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalUpper"},eq)}=1 or {Template Server Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableUpper"},eq)}=1 or {Template Server Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalLower"},eq)}=1 or {Template Server Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableLower"},eq)}=1 or {Template Server Dell iDRAC SNMP:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Array Controller Discovery</name>
@@ -460,7 +458,7 @@ Possible values:&#13;
                            <dependencies>
                               <dependency>
                                  <name>{#CNTLR_NAME}: Disk array controller is in unrecoverable state!</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -473,18 +471,17 @@ Possible values:&#13;
                            <dependencies>
                               <dependency>
                                  <name>{#CNTLR_NAME}: Disk array controller is in critical state</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1</expression>
                               </dependency>
                               <dependency>
                                  <name>{#CNTLR_NAME}: Disk array controller is in unrecoverable state!</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Physical Disk Discovery</name>
@@ -625,7 +622,7 @@ Indicates whether the physical disk has received a predictive failure alert.</de
                            <dependencies>
                               <dependency>
                                  <name>{#DISK_NAME}: Physical disk failed</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -672,14 +669,13 @@ Possible values:&#13;
                            <dependencies>
                               <dependency>
                                  <name>{#DISK_NAME}: Physical disk failed</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMP:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -724,14 +720,13 @@ Possible values:&#13;
                            <dependencies>
                               <dependency>
                                  <name>{#PSU_DESCR}: Power supply is in critical state</name>
-                                 <expression>{Dell iDRAC SNMP:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Dell iDRAC SNMP:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"nonRecoverable"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMP:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"nonRecoverable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Ambient Discovery</name>
@@ -806,27 +801,26 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
+                     <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                     <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"Ambient"}&#13;
+                     <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"Ambient"}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
+                     <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
@@ -834,12 +828,12 @@ or&#13;
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
+                           <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
-                           <recovery_expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
+                           <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -918,27 +912,26 @@ or&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
+                     <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                     <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"CPU"}&#13;
+                     <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"CPU"}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
+                     <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
                      <name>{#SENSOR_LOCALE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
@@ -946,12 +939,12 @@ or&#13;
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                           <expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
+                           <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}&#13;
 or&#13;
-{Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
-                           <recovery_expression>{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+{Template Server Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}</expression>
+                           <recovery_expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1100,7 +1093,7 @@ The data on the virtual disk might no longer be fault tolerant.</description>
                            <dependencies>
                               <dependency>
                                  <name>Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed</name>
-                                 <expression>{Dell iDRAC SNMP:system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS:"failed"},eq)}=1</expression>
+                                 <expression>{Template Server Dell iDRAC SNMP:system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS:"failed"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1129,7 +1122,6 @@ Possible values:&#13;
                      </valuemap>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

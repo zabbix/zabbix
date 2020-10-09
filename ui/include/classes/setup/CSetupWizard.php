@@ -85,15 +85,6 @@ class CSetupWizard extends CForm {
 		CSessionHelper::set($name, $value);
 	}
 
-	/**
-	 * Unset given keys from session storage.
-	 *
-	 * @param array $keys  List of keys to unset.
-	 */
-	protected function unsetConfig(array $keys): void {
-		CSessionHelper::unset($keys);
-	}
-
 	private function getStep(): int {
 		return $this->getConfig('step', 0);
 	}
@@ -278,6 +269,7 @@ class CSetupWizard extends CForm {
 
 	private function stage2(): array {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
+		$db_creds_storage = (int) $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG);
 
 		$table = (new CFormList())
 			->addItem([
@@ -315,49 +307,44 @@ class CSetupWizard extends CForm {
 			ZBX_STYLE_DISPLAY_NONE
 		);
 
-		$db_creds_storage = (int) $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG);
-
-		$table->addRow(_('Store credentials in'),
+		$table->addRow(_('Store credentials in'), [
 			(new CRadioButtonList('creds_storage', $db_creds_storage))
-				->addValue(_('Plain text'), DB_STORE_CREDS_CONFIG)
-				->addValue(_('HashiCorp Vault'), DB_STORE_CREDS_VAULT)
+				->addValue(_('Plain text'), DB_STORE_CREDS_CONFIG, null, 'submit()')
+				->addValue(_('HashiCorp Vault'), DB_STORE_CREDS_VAULT, null, 'submit()')
 				->setModern(true)
-		);
+		]);
 
-		$table->addRow(_('Vault API endpoint'),
-			(new CTextBox('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT)))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-			'vault_url_row',
-			($db_creds_storage == DB_STORE_CREDS_VAULT) ? ZBX_STYLE_DISPLAY_NONE : null
-		);
-
-		$table->addRow(_('Vault secret path'),
-			(new CTextBox('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH')))
-				->setAttribute('placeholder', _('path/to/secret'))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'vault_db_path_row',
-			($db_creds_storage == DB_STORE_CREDS_VAULT) ? ZBX_STYLE_DISPLAY_NONE : null
-		);
-
-		$table->addRow(_('Vault authentication token'),
-			(new CTextBox('vault_token', $this->getConfig('DB_VAULT_TOKEN')))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('maxlength', 2048),
-			'vault_token_row',
-			($db_creds_storage == DB_STORE_CREDS_VAULT) ? ZBX_STYLE_DISPLAY_NONE : null
-		);
-
-		$table->addRow(_('User'),
-			(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'db_user',
-			($db_creds_storage == DB_STORE_CREDS_CONFIG) ? ZBX_STYLE_DISPLAY_NONE : null
-		);
-
-		$table->addRow(_('Password'),
-			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'db_password',
-			($db_creds_storage == DB_STORE_CREDS_CONFIG) ? ZBX_STYLE_DISPLAY_NONE : null
-		);
+		if ($db_creds_storage == DB_STORE_CREDS_VAULT) {
+			$table
+				->addRow(_('Vault API endpoint'),
+					(new CTextBox('vault_url', $this->getConfig('DB_VAULT_URL', self::VAULT_URL_DEFAULT)))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+				->addRow(_('Vault secret path'),
+					(new CTextBox('vault_db_path', $this->getConfig('DB_VAULT_DB_PATH')))
+						->setAttribute('placeholder', _('path/to/secret'))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				->addRow(_('Vault authentication token'),
+					(new CTextBox('vault_token', $this->getConfig('DB_VAULT_TOKEN')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAttribute('maxlength', 2048)
+				)
+				->addVar('user', '')
+				->addVar('password', '');
+		}
+		else {
+			$table
+				->addRow(_('User'),
+					(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				->addRow(_('Password'),
+					(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				)
+				->addVar('vault_url', '')
+				->addVar('vault_db_path', '')
+				->addVar('vault_token', '');
+		}
 
 		$table->addRow(_('Database TLS encryption'), [
 				(new CCheckBox('tls_encryption'))->setChecked($this->getConfig('DB_ENCRYPTION', true)),
@@ -828,7 +815,9 @@ class CSetupWizard extends CForm {
 				case DB_STORE_CREDS_CONFIG:
 					$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
 					$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
-					$this->unsetConfig(['DB_VAULT_URL', 'DB_VAULT_DB_PATH', 'DB_VAULT_TOKEN']);
+					$this->setConfig('DB_VAULT_URL', '');
+					$this->setConfig('DB_VAULT_DB_PATH', '');
+					$this->setConfig('DB_VAULT_TOKEN', '');
 					break;
 
 				case DB_STORE_CREDS_VAULT:
@@ -843,7 +832,8 @@ class CSetupWizard extends CForm {
 					$this->setConfig('DB_VAULT_URL', $vault_url);
 					$this->setConfig('DB_VAULT_DB_PATH', $vault_db_path);
 					$this->setConfig('DB_VAULT_TOKEN', $vault_token);
-					$this->unsetConfig(['DB_USER', 'DB_PASSWORD']);
+					$this->setConfig('DB_USER', '');
+					$this->setConfig('DB_PASSWORD', '');
 					break;
 			}
 

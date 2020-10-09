@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:48Z</date>
+   <version>5.0</version>
+   <date>2020-08-13T11:04:30Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Oracle by ODBC</template>
-         <name>Oracle by ODBC</name>
+         <template>Template DB Oracle by ODBC</template>
+         <name>Template DB Oracle by ODBC</name>
          <description>1. Create an Oracle user for monitoring.&#13;
 &#13;
 2. Set the user name and password in host macros ({$ORACLE.USER} and {$ORACLE.PASSWORD}).&#13;
@@ -22,7 +22,7 @@
 The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.&#13;
 &#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -159,25 +159,27 @@ FROM v$pdbs;</params>
                <params>SELECT 'SYS::' || METRIC_NAME AS METRIC, ROUND(VALUE,3) as VALUE
  FROM V$SYSMETRIC WHERE GROUP_ID = 2
 UNION
-  SELECT 'SYSPARAM::' || INITCAP(NAME) AS METRIC, to_number(VALUE)
-  FROM V$SYSTEM_PARAMETER WHERE NAME IN ('sessions', 'processes', 'db_files')
+ SELECT 'SYSPARAM::' || INITCAP(NAME) AS METRIC, to_number(VALUE)
+ FROM V$SYSTEM_PARAMETER WHERE NAME IN ('sessions', 'processes', 'db_files')
 UNION
- SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
+ SELECT 'SESSION::' || INITCAP(STATUS)|| ' ' || INITCAP(TYPE) AS METRIC, COUNT(*) AS VALUE
+ FROM V$SESSION GROUP BY STATUS, TYPE
 UNION
-SELECT 'SESSION::Lock rate' ,(cnt_block / cnt_all)* 100 pct
-FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM v$session)
-UNION
+ SELECT 'SESSION::Total', COUNT(*) AS VALUE
+  FROM V$SESSION
+ UNION
   SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
 UNION
- SELECT 'SESSION::Total', COUNT(*) AS VALUE FROM V$SESSION
+ SELECT 'SESSION::Lock rate' ,(cnt_block / cnt_all)* 100 pct
+ FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM v$session)
 UNION
-SELECT 'SESSION::Concurrency rate', NVL(ROUND(SUM(duty_act.cnt*100 / num_cores.val)), 0)
-FROM
-( SELECT DECODE(session_state, 'ON CPU', 'CPU', wait_class) wait_class, ROUND(COUNT(*)/(60 * 15), 1) cnt
-FROM v$active_session_history sh
-WHERE sh.sample_time &gt;= SYSDATE - 15 / 1440 AND DECODE(session_state, 'ON CPU', 'CPU', wait_class) IN('Concurrency')
-GROUP BY DECODE(session_state, 'ON CPU', 'CPU', wait_class)) duty_act,
-( SELECT SUM(value) val FROM v$osstat WHERE stat_name = 'NUM_CPU_CORES') num_cores
+ SELECT 'SESSION::Concurrency rate', NVL(ROUND(SUM(duty_act.cnt*100 / num_cores.val)), 0)
+ FROM
+ ( SELECT DECODE(session_state, 'ON CPU', 'CPU', wait_class) wait_class, ROUND(COUNT(*)/(60 * 15), 1) cnt
+ FROM v$active_session_history sh
+ WHERE sh.sample_time &gt;= SYSDATE - 15 / 1440 AND DECODE(session_state, 'ON CPU', 'CPU', wait_class) IN('Concurrency')
+ GROUP BY DECODE(session_state, 'ON CPU', 'CPU', wait_class)) duty_act,
+ ( SELECT SUM(value) val FROM v$osstat WHERE stat_name = 'NUM_CPU_CORES') num_cores
 UNION
  SELECT 'PGA::' || INITCAP(NAME), VALUE FROM V$PGASTAT
 UNION
@@ -198,21 +200,21 @@ UNION
  SELECT 'DATAFILE::Count', COUNT(*) FROM v$datafile
 UNION
  SELECT 'SGA::' || INITCAP(pool), SUM(bytes) FROM V$SGASTAT
- WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
+  WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
 UNION
  SELECT 'SGA::Shared Pool', SUM(bytes) FROM V$SGASTAT
- WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory', 'sql area')
+  WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory', 'sql area')
 UNION
  SELECT 'SGA::' || INITCAP(name), bytes FROM V$SGASTAT
- WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
+  WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
 UNION
  SELECT 'SGA::Buffer_Cache', SUM(bytes) FROM V$SGASTAT
- WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers')
+  WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers')
 UNION
  SELECT 'REDO::Available', count(*) from v$log t where t.status in ('INACTIVE', 'UNUSED')
 UNION
- SELECT 'USER::Expire password', ROUND(DECODE(SIGN(NVL(u.expiry_date, SYSDATE + 999) - SYSDATE),-1, 0, NVL(u.expiry_date, SYSDATE + 999) - SYSDATE)) exp_passwd_days_before
-FROM dba_users u WHERE username = UPPER('{$ORACLE.USER}');</params>
+SELECT 'USER::Expire password', ROUND(DECODE(SIGN(NVL(u.expiry_date, SYSDATE + 999) - SYSDATE),-1, 0, NVL(u.expiry_date, SYSDATE + 999) - SYSDATE)) exp_passwd_days_before
+ FROM dba_users u WHERE username = UPPER('{$ORACLE.USER}');</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
                <description>The item gets system metric values.</description>
@@ -1844,7 +1846,7 @@ SELECT
                      <dependencies>
                         <dependency>
                            <name>Oracle: Port {$ORACLE.PORT} is unavailable</name>
-                           <expression>{Oracle by ODBC:net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}].max(#3)}=0  and {Oracle by ODBC:proc.num[,,,"tnslsnr LISTENER"].max(#3)}&gt;0</expression>
+                           <expression>{Template DB Oracle by ODBC:net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}].max(#3)}=0  and {Template DB Oracle by ODBC:proc.num[,,,"tnslsnr LISTENER"].max(#3)}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -2151,7 +2153,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                            <dependencies>
                               <dependency>
                                  <name>ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</name>
-                                 <expression>{Oracle by ODBC:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
+                                 <expression>{Template DB Oracle by ODBC:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2172,7 +2174,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Oracle by ODBC</host>
+                              <host>Template DB Oracle by ODBC</host>
                               <key>oracle.asm_free_size["{#DG_NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2180,7 +2182,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Oracle by ODBC</host>
+                              <host>Template DB Oracle by ODBC</host>
                               <key>oracle.asm_total_size["{#DG_NAME}"]</key>
                            </item>
                         </graph_item>
@@ -2316,7 +2318,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                            <dependencies>
                               <dependency>
                                  <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
-                                 <expression>{Oracle by ODBC:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
+                                 <expression>{Template DB Oracle by ODBC:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2364,7 +2366,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Oracle by ODBC:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Oracle by ODBC:oracle.db_log_mode["{#DBNAME}"].last()} = 1</expression>
+                     <expression>{Template DB Oracle by ODBC:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by ODBC:oracle.db_log_mode["{#DBNAME}"].last()} = 1</expression>
                      <name>Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog</name>
                      <priority>WARNING</priority>
                      <description>Force Logging mode  - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all transactions to the REDO.</description>
@@ -2581,7 +2583,7 @@ contents  FROM DBA_TABLESPACES;</params>
                            <dependencies>
                               <dependency>
                                  <name>Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</name>
-                                 <expression>{Oracle by ODBC:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
+                                 <expression>{Template DB Oracle by ODBC:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2618,7 +2620,7 @@ contents  FROM DBA_TABLESPACES;</params>
                            <dependencies>
                               <dependency>
                                  <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</name>
-                                 <expression>{Oracle by ODBC:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                                 <expression>{Template DB Oracle by ODBC:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -2638,7 +2640,7 @@ contents  FROM DBA_TABLESPACES;</params>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Oracle by ODBC</host>
+                              <host>Template DB Oracle by ODBC</host>
                               <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
@@ -2646,7 +2648,7 @@ contents  FROM DBA_TABLESPACES;</params>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Oracle by ODBC</host>
+                              <host>Template DB Oracle by ODBC</host>
                               <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
@@ -2776,31 +2778,31 @@ contents  FROM DBA_TABLESPACES;</params>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Oracle by ODBC:net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}].max(#3)}=0  and {Oracle by ODBC:proc.num[,,,"tnslsnr LISTENER"].max(#3)}&gt;0</expression>
+         <expression>{Template DB Oracle by ODBC:net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}].max(#3)}=0  and {Template DB Oracle by ODBC:proc.num[,,,"tnslsnr LISTENER"].max(#3)}&gt;0</expression>
          <name>Oracle: Port {$ORACLE.PORT} is unavailable</name>
          <priority>DISASTER</priority>
          <description>The TCP port of the Oracle Server service is currently unavailable.</description>
       </trigger>
       <trigger>
-         <expression>{Oracle by ODBC:oracle.processes_count.min(5m)} * 100 / {Oracle by ODBC:oracle.processes_limit.last()} &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by ODBC:oracle.processes_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.processes_limit.last()} &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
          <name>Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.</description>
       </trigger>
       <trigger>
-         <expression>{Oracle by ODBC:oracle.session_count.min(5m)} * 100 / {Oracle by ODBC:oracle.session_limit.last()} &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by ODBC:oracle.session_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.session_limit.last()} &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
          <name>Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.</description>
       </trigger>
       <trigger>
-         <expression>{Oracle by ODBC:oracle.db_files_count.min(5m)} * 100 / {Oracle by ODBC:oracle.db_files_limit.last()} &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by ODBC:oracle.db_files_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.db_files_limit.last()} &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
          <name>Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.</description>
       </trigger>
       <trigger>
-         <expression>{Oracle by ODBC:oracle.total_pga_used.min(5m)} * 100 / {Oracle by ODBC:oracle.pga_target.last()} &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
+         <expression>{Template DB Oracle by ODBC:oracle.total_pga_used.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.pga_target.last()} &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
          <name>Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)</name>
          <priority>WARNING</priority>
          <description>Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</description>
@@ -2813,7 +2815,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.db_files_count</key>
                </item>
             </graph_item>
@@ -2821,7 +2823,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.db_files_limit</key>
                </item>
             </graph_item>
@@ -2833,7 +2835,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.total_pga_used</key>
                </item>
             </graph_item>
@@ -2841,7 +2843,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.pga_target</key>
                </item>
             </graph_item>
@@ -2849,7 +2851,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.total_pga_allocated</key>
                </item>
             </graph_item>
@@ -2861,7 +2863,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.physical_writes_rate</key>
                </item>
             </graph_item>
@@ -2869,7 +2871,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.physical_reads_rate</key>
                </item>
             </graph_item>
@@ -2881,7 +2883,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.physical_write_bytes_rate</key>
                </item>
             </graph_item>
@@ -2889,7 +2891,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.physical_read_bytes_rate</key>
                </item>
             </graph_item>
@@ -2901,7 +2903,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.processes_count</key>
                </item>
             </graph_item>
@@ -2909,7 +2911,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.processes_limit</key>
                </item>
             </graph_item>
@@ -2921,7 +2923,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.session_count</key>
                </item>
             </graph_item>
@@ -2929,7 +2931,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.session_active_background</key>
                </item>
             </graph_item>
@@ -2937,7 +2939,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.session_inactive_user</key>
                </item>
             </graph_item>
@@ -2945,7 +2947,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.session_active_user</key>
                </item>
             </graph_item>
@@ -2953,7 +2955,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.session_limit</key>
                </item>
             </graph_item>
@@ -2966,7 +2968,7 @@ contents  FROM DBA_TABLESPACES;</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.sga_java_pool</key>
                </item>
             </graph_item>
@@ -2974,7 +2976,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.sga_large_pool</key>
                </item>
             </graph_item>
@@ -2982,7 +2984,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.sga_shared_pool</key>
                </item>
             </graph_item>
@@ -2990,7 +2992,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.sga_log_buffer</key>
                </item>
             </graph_item>
@@ -2998,7 +3000,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.sga_fixed</key>
                </item>
             </graph_item>
@@ -3006,7 +3008,7 @@ contents  FROM DBA_TABLESPACES;</params>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Oracle by ODBC</host>
+                  <host>Template DB Oracle by ODBC</host>
                   <key>oracle.sga_buffer_cache</key>
                </item>
             </graph_item>

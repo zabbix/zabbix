@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:59Z</date>
+   <version>5.0</version>
+   <date>2020-06-04T23:48:15Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>HP iLO SNMP</template>
-         <name>HP iLO SNMP</name>
+         <template>Template Server HP iLO SNMP</template>
+         <name>Template Server HP iLO SNMP</name>
          <description>Template Server HP iLO&#13;
 &#13;
 MIBs used:&#13;
@@ -18,10 +18,10 @@ CPQSINFO-MIB&#13;
 CPQHLTH-MIB&#13;
 CPQIDA-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
          </templates>
          <groups>
@@ -172,7 +172,7 @@ The overall condition. This object represents the overall status of the server i
                      <dependencies>
                         <dependency>
                            <name>System status is in critical state</name>
-                           <expression>{HP iLO SNMP:system.status[cpqHeMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Template Server HP iLO SNMP:system.status[cpqHeMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -241,7 +241,7 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                            <dependencies>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!</name>
-                                 <expression>{HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {Template Server HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -282,7 +282,7 @@ Note that for some controller models, a cache module board that physically attac
                            <dependencies>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</name>
-                                 <expression>{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -295,18 +295,17 @@ Note that for some controller models, a cache module board that physically attac
                            <dependencies>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</name>
-                                 <expression>{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1</expression>
                               </dependency>
                               <dependency>
                                  <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</name>
-                                 <expression>{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {Template Server HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {Template Server HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {Template Server HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Array Controller Discovery</name>
@@ -369,14 +368,13 @@ and any associated logical drives,physical drives, and array accelerators.</desc
                            <dependencies>
                               <dependency>
                                  <name>{#CNTLR_LOCATION}: Disk array controller is in critical state</name>
-                                 <expression>{HP iLO SNMP:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -426,14 +424,13 @@ failed(4)  A non-redundant fan is not operating properly.</description>
                            <dependencies>
                               <dependency>
                                  <name>Fan {#SNMPINDEX}: Fan is in critical state</name>
-                                 <expression>{HP iLO SNMP:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Physical Disk Discovery</name>
@@ -572,7 +569,7 @@ replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  er
                            <dependencies>
                               <dependency>
                                  <name>{#DISK_LOCATION}: Physical disk failed</name>
-                                 <expression>{HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -617,14 +614,13 @@ predictiveFailure(4)  Indicates that the drive has a predictive failure error an
                            <dependencies>
                               <dependency>
                                  <name>{#DISK_LOCATION}: Physical disk failed</name>
-                                 <expression>{HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -673,14 +669,13 @@ failed(4)  A power supply component detects a condition that could  permanently 
                            <dependencies>
                               <dependency>
                                  <name>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</name>
-                                 <expression>{HP iLO SNMP:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -746,8 +741,8 @@ Temperature readings of testpoint: {#SNMPINDEX}</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"{#SNMPINDEX}"}</name>
-                                 <expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPINDEX}"}</expression>
-                                 <recovery_expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPINDEX}"}-3</recovery_expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPINDEX}"}</expression>
+                                 <recovery_expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPINDEX}"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -771,7 +766,6 @@ Temperature readings of testpoint: {#SNMPINDEX}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery Ambient</name>
@@ -823,8 +817,8 @@ Temperature readings of testpoint: Ambient</description>
                            <dependencies>
                               <dependency>
                                  <name>Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                                 <expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                                 <recovery_expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -848,7 +842,6 @@ Temperature readings of testpoint: Ambient</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery CPU</name>
@@ -895,8 +888,8 @@ Temperature readings of testpoint: CPU-{#SNMPINDEX}</description>
                            <dependencies>
                               <dependency>
                                  <name>CPU-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                                 <expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
-                                 <recovery_expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                                 <recovery_expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -920,7 +913,6 @@ Temperature readings of testpoint: CPU-{#SNMPINDEX}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery I/O</name>
@@ -967,8 +959,8 @@ Temperature readings of testpoint: I/O-{#SNMPINDEX}</description>
                            <dependencies>
                               <dependency>
                                  <name>I/O-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"I/O"}</name>
-                                 <expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].avg(5m)}&gt;{$TEMP_CRIT:"I/O"}</expression>
-                                 <recovery_expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].max(5m)}&lt;{$TEMP_CRIT:"I/O"}-3</recovery_expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].avg(5m)}&gt;{$TEMP_CRIT:"I/O"}</expression>
+                                 <recovery_expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].max(5m)}&lt;{$TEMP_CRIT:"I/O"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -992,7 +984,6 @@ Temperature readings of testpoint: I/O-{#SNMPINDEX}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery System</name>
@@ -1039,8 +1030,8 @@ Temperature readings of testpoint: System-{#SNMPINDEX}</description>
                            <dependencies>
                               <dependency>
                                  <name>System-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
-                                 <expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
-                                 <recovery_expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+                                 <recovery_expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1064,7 +1055,6 @@ Temperature readings of testpoint: System-{#SNMPINDEX}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery Memory</name>
@@ -1111,8 +1101,8 @@ Temperature readings of testpoint: Memory-{#SNMPINDEX}</description>
                            <dependencies>
                               <dependency>
                                  <name>Memory-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Memory"}</name>
-                                 <expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Memory"}</expression>
-                                 <recovery_expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Memory"}-3</recovery_expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Memory"}</expression>
+                                 <recovery_expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Memory"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1136,7 +1126,6 @@ Temperature readings of testpoint: Memory-{#SNMPINDEX}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery PSU</name>
@@ -1183,8 +1172,8 @@ Temperature readings of testpoint: PSU-{#SNMPINDEX}</description>
                            <dependencies>
                               <dependency>
                                  <name>PSU-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"PSU"}</name>
-                                 <expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"PSU"}</expression>
-                                 <recovery_expression>{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"PSU"}-3</recovery_expression>
+                                 <expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"PSU"}</expression>
+                                 <recovery_expression>{Template Server HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"PSU"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1208,7 +1197,6 @@ Temperature readings of testpoint: PSU-{#SNMPINDEX}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Virtual Disk Discovery</name>
@@ -1296,14 +1284,13 @@ differ from the advertised size of a drive.</description>
                            <dependencies>
                               <dependency>
                                  <name>Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</name>
-                                 <expression>{HP iLO SNMP:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Server HP iLO SNMP:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

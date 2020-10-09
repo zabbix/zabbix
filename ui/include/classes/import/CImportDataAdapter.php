@@ -547,26 +547,6 @@ class CImportDataAdapter {
 		}
 		unset($graph_prototype);
 
-		foreach ($discovery_rule['host_prototypes'] as &$host_prototype) {
-			// Optionally remove interfaces array also if no custom interfaces are set.
-			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_INHERIT) {
-				unset($host_prototype['interfaces']);
-			}
-
-			if (array_key_exists('interfaces', $host_prototype)) {
-				foreach ($host_prototype['interfaces'] as &$interface) {
-					$interface = CArrayHelper::renameKeys($interface, ['default' => 'main']);
-
-					// Import creates empty arrays. Remove them, since they are not required.
-					if ($interface['type'] != INTERFACE_TYPE_SNMP) {
-						unset($interface['details']);
-					}
-				}
-				unset($interface);
-			}
-		}
-		unset($host_prototype);
-
 		return $discovery_rule;
 	}
 

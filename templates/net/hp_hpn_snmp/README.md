@@ -1,9 +1,9 @@
 
-# HP Enterprise Switch SNMP
+# Template Net HP Enterprise Switch SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 This template was tested on:
 
@@ -36,9 +36,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|EtherLike-MIB SNMP |
-|Generic SNMP |
-|Interfaces SNMP |
+|Template Module EtherLike-MIB SNMP |
+|Template Module Generic SNMP |
+|Template Module Interfaces SNMP |
 
 ## Discovery rules
 

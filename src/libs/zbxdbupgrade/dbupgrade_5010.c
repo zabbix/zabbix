@@ -296,30 +296,24 @@ static int	DBpatch_5010032(void)
 
 static int	DBpatch_5010033(void)
 {
-	const ZBX_FIELD	field = {"custom_interfaces", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("hosts", &field);
-}
-
-static int	DBpatch_5010034(void)
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("dashboard", &field);
 }
 
-static int	DBpatch_5010035(void)
+static int	DBpatch_5010034(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("dashboard", &field);
 }
 
-static int	DBpatch_5010036(void)
+static int	DBpatch_5010035(void)
 {
 	return DBcreate_index("dashboard", "dashboard_1", "userid", 0);
 }
 
-static int	DBpatch_5010037(void)
+static int	DBpatch_5010036(void)
 {
 #ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
 	if (SUCCEED == DBindex_exists("dashboard", "c_dashboard_1"))
@@ -328,12 +322,12 @@ static int	DBpatch_5010037(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5010038(void)
+static int	DBpatch_5010037(void)
 {
 	return DBcreate_index("dashboard", "dashboard_2", "templateid", 0);
 }
 
-static int	DBpatch_5010039(void)
+static int	DBpatch_5010038(void)
 {
 	const ZBX_FIELD	field = {"templateid", 0, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -1331,7 +1325,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 	return ret;
 }
 
-static int	DBpatch_5010040(void)
+static int	DBpatch_5010039(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1394,22 +1388,22 @@ static int	DBpatch_5010040(void)
 #undef POS_TAKEN
 #undef SKIP_EMPTY
 
-static int	DBpatch_5010041(void)
+static int	DBpatch_5010040(void)
 {
 	return DBdrop_foreign_key("screens", 1);
 }
 
-static int	DBpatch_5010042(void)
+static int	DBpatch_5010041(void)
 {
 	return DBdrop_field("screens", "templateid");
 }
 
-static int	DBpatch_5010043(void)
+static int	DBpatch_5010042(void)
 {
 	return DBcreate_index("screens", "screens_1", "userid", 0);
 }
 
-static int	DBpatch_5010044(void)
+static int	DBpatch_5010043(void)
 {
 #ifdef HAVE_MYSQL	/* fix automatic index name on MySQL */
 	if (SUCCEED == DBindex_exists("screens", "c_screens_3"))
@@ -1470,6 +1464,5 @@ DBPATCH_ADD(5010040, 0, 1)
 DBPATCH_ADD(5010041, 0, 1)
 DBPATCH_ADD(5010042, 0, 1)
 DBPATCH_ADD(5010043, 0, 1)
-DBPATCH_ADD(5010044, 0, 1)
 
 DBPATCH_END()

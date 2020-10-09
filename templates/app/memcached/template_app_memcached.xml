@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:52Z</date>
+   <version>5.0</version>
+   <date>2020-04-02T13:36:12Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,13 +9,13 @@
    </groups>
    <templates>
       <template>
-         <template>Memcached</template>
-         <name>Memcached</name>
+         <template>Template App Memcached</template>
+         <name>Template App Memcached</name>
          <description>Get Memcached metrics from plugin for the New Zabbix Agent (zabbix-agent2).&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -339,7 +339,7 @@ When sending GETs in batch mode and the connection contains too many requests (l
                      <dependencies>
                         <dependency>
                            <name>Memcached: Service is down</name>
-                           <expression>{Memcached:memcached.ping["{$MEMCACHED.CONN.URI}"].last()}=0</expression>
+                           <expression>{Template App Memcached:memcached.ping["{$MEMCACHED.CONN.URI}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -765,12 +765,12 @@ A high number of evictions coupled with a low hit rate means your application is
    </templates>
    <triggers>
       <trigger>
-         <expression>{Memcached:memcached.stats.bytes.min(5m)}/{Memcached:memcached.config.limit_maxbytes.last()}*100&gt;{$MEMCACHED.MEM.PUSED.MAX.WARN}</expression>
+         <expression>{Template App Memcached:memcached.stats.bytes.min(5m)}/{Template App Memcached:memcached.config.limit_maxbytes.last()}*100&gt;{$MEMCACHED.MEM.PUSED.MAX.WARN}</expression>
          <name>Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Memcached:memcached.connections.current.min(5m)}/{Memcached:memcached.connections.max.last()}*100&gt;{$MEMCACHED.CONN.PRC.MAX.WARN}</expression>
+         <expression>{Template App Memcached:memcached.connections.current.min(5m)}/{Template App Memcached:memcached.connections.max.last()}*100&gt;{$MEMCACHED.CONN.PRC.MAX.WARN}</expression>
          <name>Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)</name>
          <priority>WARNING</priority>
          <description>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</description>
@@ -783,7 +783,7 @@ A high number of evictions coupled with a low hit rate means your application is
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.commands.flush.rate</key>
                </item>
             </graph_item>
@@ -791,7 +791,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.commands.set.rate</key>
                </item>
             </graph_item>
@@ -799,7 +799,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.commands.get.rate</key>
                </item>
             </graph_item>
@@ -812,7 +812,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.connections.max</key>
                </item>
             </graph_item>
@@ -821,7 +821,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.connections.current</key>
                </item>
             </graph_item>
@@ -830,7 +830,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>GRADIENT_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.connections.structures</key>
                </item>
             </graph_item>
@@ -843,7 +843,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.connections.rate</key>
                </item>
             </graph_item>
@@ -852,7 +852,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.connections.throttled.rate</key>
                </item>
             </graph_item>
@@ -861,7 +861,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>BOLD_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.connections.queued.rate</key>
                </item>
             </graph_item>
@@ -873,7 +873,7 @@ A high number of evictions coupled with a low hit rate means your application is
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.stats.hits.rate</key>
                </item>
             </graph_item>
@@ -881,7 +881,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.stats.misses.rate</key>
                </item>
             </graph_item>
@@ -894,7 +894,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.stats.bytes_read.rate</key>
                </item>
             </graph_item>
@@ -903,7 +903,7 @@ A high number of evictions coupled with a low hit rate means your application is
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.stats.bytes_written.rate</key>
                </item>
             </graph_item>
@@ -915,7 +915,7 @@ A high number of evictions coupled with a low hit rate means your application is
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Memcached</host>
+                  <host>Template App Memcached</host>
                   <key>memcached.uptime</key>
                </item>
             </graph_item>

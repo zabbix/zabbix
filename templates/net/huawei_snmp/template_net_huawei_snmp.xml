@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:32:07Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:21Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,24 +9,24 @@
    </groups>
    <templates>
       <template>
-         <template>Huawei VRP SNMP</template>
-         <name>Huawei VRP SNMP</name>
+         <template>Template Net Huawei VRP SNMP</template>
+         <name>Template Net Huawei VRP SNMP</name>
          <description>Template Net Huawei VRP&#13;
 &#13;
 MIBs used:&#13;
 HUAWEI-ENTITY-EXTENT-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>EtherLike-MIB SNMP</name>
+               <name>Template Module EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -87,7 +87,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Entity Discovery</name>
@@ -129,7 +128,6 @@ Template tooling version used: 0.38</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>MPU Discovery</name>
@@ -176,8 +174,8 @@ The temperature for the {#SNMPVALUE}.</description>
                            <dependencies>
                               <dependency>
                                  <name>{#ENT_NAME}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Huawei VRP SNMP:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Huawei VRP SNMP:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Net Huawei VRP SNMP:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Huawei VRP SNMP:sensor.temp.value[hwEntityTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -337,7 +335,6 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#ENT_NAME}: CPU utilization</name>
@@ -348,7 +345,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Huawei VRP SNMP</host>
+                              <host>Template Net Huawei VRP SNMP</host>
                               <key>system.cpu.util[hwEntityCpuUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -363,7 +360,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Huawei VRP SNMP</host>
+                              <host>Template Net Huawei VRP SNMP</host>
                               <key>vm.memory.util[hwEntityMemUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>

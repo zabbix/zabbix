@@ -1,9 +1,9 @@
 
-# Dell Force S-Series SNMP
+# Template Net Dell Force S-Series SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 ## Setup
 
@@ -31,9 +31,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|EtherLike-MIB SNMP |
-|Generic SNMP |
-|Interfaces SNMP |
+|Template Module EtherLike-MIB SNMP |
+|Template Module Generic SNMP |
+|Template Module Interfaces SNMP |
 
 ## Discovery rules
 

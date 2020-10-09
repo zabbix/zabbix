@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:38Z</date>
+   <version>5.0</version>
+   <date>2020-05-08T07:25:12Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,11 +9,11 @@
    </groups>
    <templates>
       <template>
-         <template>ClickHouse by HTTP</template>
-         <name>ClickHouse by HTTP</name>
+         <template>Template DB ClickHouse by HTTP</template>
+         <name>Template DB ClickHouse by HTTP</name>
          <description>Get node metrics from ClickHouse HTTP interface using HTTP agent.&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -1311,7 +1311,7 @@ or due to startup without ZooKeeper configured."</description>
                      <dependencies>
                         <dependency>
                            <name>ClickHouse: Service is down</name>
-                           <expression>{ClickHouse by HTTP:clickhouse.ping.last()}=0 or {ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0</expression>
+                           <expression>{Template DB ClickHouse by HTTP:clickhouse.ping.last()}=0 or {Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1707,7 +1707,6 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>clickhouse.dictionaries</key>
                </master_item>
@@ -2044,10 +2043,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{ClickHouse by HTTP:clickhouse.replica.active_replicas["{#DB}.{#TABLE}"].max(5m)} &lt; {ClickHouse by HTTP:clickhouse.replica.total_replicas["{#DB}.{#TABLE}"].last()}</expression>
+                     <expression>{Template DB ClickHouse by HTTP:clickhouse.replica.active_replicas["{#DB}.{#TABLE}"].max(5m)} &lt; {Template DB ClickHouse by HTTP:clickhouse.replica.total_replicas["{#DB}.{#TABLE}"].last()}</expression>
                      <name>ClickHouse: {#DB}.{#TABLE}: Number of active replicas less than number of total replicas</name>
                      <priority>WARNING</priority>
                   </trigger_prototype>
@@ -2059,7 +2057,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>ClickHouse by HTTP</host>
+                              <host>Template DB ClickHouse by HTTP</host>
                               <key>clickhouse.replica.log_max_index["{#DB}.{#TABLE}"]</key>
                            </item>
                         </graph_item>
@@ -2067,7 +2065,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>ClickHouse by HTTP</host>
+                              <host>Template DB ClickHouse by HTTP</host>
                               <key>clickhouse.replica.log_pointer["{#DB}.{#TABLE}"]</key>
                            </item>
                         </graph_item>
@@ -2079,7 +2077,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>ClickHouse by HTTP</host>
+                              <host>Template DB ClickHouse by HTTP</host>
                               <key>clickhouse.replica.merges_in_queue["{#DB}.{#TABLE}"]</key>
                            </item>
                         </graph_item>
@@ -2087,7 +2085,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>ClickHouse by HTTP</host>
+                              <host>Template DB ClickHouse by HTTP</host>
                               <key>clickhouse.replica.inserts_in_queue["{#DB}.{#TABLE}"]</key>
                            </item>
                         </graph_item>
@@ -2095,7 +2093,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>ClickHouse by HTTP</host>
+                              <host>Template DB ClickHouse by HTTP</host>
                               <key>clickhouse.replica.queue_size["{#DB}.{#TABLE}"]</key>
                            </item>
                         </graph_item>
@@ -2103,7 +2101,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>ClickHouse by HTTP</host>
+                              <host>Template DB ClickHouse by HTTP</host>
                               <key>clickhouse.replica.future_parts["{#DB}.{#TABLE}"]</key>
                            </item>
                         </graph_item>
@@ -2111,7 +2109,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>ClickHouse by HTTP</host>
+                              <host>Template DB ClickHouse by HTTP</host>
                               <key>clickhouse.replica.parts_to_check["{#DB}.{#TABLE}"]</key>
                            </item>
                         </graph_item>
@@ -2246,7 +2244,6 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>clickhouse.tables</key>
                </master_item>
@@ -2346,14 +2343,14 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
    </templates>
    <triggers>
       <trigger>
-         <expression>{ClickHouse by HTTP:clickhouse.ping.last()}=0 or {ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0</expression>
+         <expression>{Template DB ClickHouse by HTTP:clickhouse.ping.last()}=0 or {Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0</expression>
          <name>ClickHouse: Service is down</name>
          <priority>AVERAGE</priority>
          <manual_close>YES</manual_close>
          <dependencies>
             <dependency>
                <name>ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</name>
-               <expression>{ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0</expression>
+               <expression>{Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0</expression>
             </dependency>
          </dependencies>
       </trigger>
@@ -2366,7 +2363,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.query.current</key>
                </item>
             </graph_item>
@@ -2375,7 +2372,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.merge.current</key>
                </item>
             </graph_item>
@@ -2388,7 +2385,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.connections.tcp</key>
                </item>
             </graph_item>
@@ -2397,7 +2394,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.connections.http</key>
                </item>
             </graph_item>
@@ -2406,7 +2403,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.connections.mysql</key>
                </item>
             </graph_item>
@@ -2415,7 +2412,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>A54F10</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.connections.interserver</key>
                </item>
             </graph_item>
@@ -2424,7 +2421,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>FC6EA3</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.connections.distribute</key>
                </item>
             </graph_item>
@@ -2436,7 +2433,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.distributed.files.retry.rate</key>
                </item>
             </graph_item>
@@ -2444,7 +2441,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.distributed.files.fail.rate</key>
                </item>
             </graph_item>
@@ -2454,7 +2451,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <color>F63100</color>
                <yaxisside>RIGHT</yaxisside>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.distributed.files</key>
                </item>
             </graph_item>
@@ -2467,7 +2464,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.inserted_bytes.rate</key>
                </item>
             </graph_item>
@@ -2476,7 +2473,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.merge_bytes.rate</key>
                </item>
             </graph_item>
@@ -2489,7 +2486,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.inserted_rows.rate</key>
                </item>
             </graph_item>
@@ -2498,7 +2495,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.merge_rows.rate</key>
                </item>
             </graph_item>
@@ -2510,7 +2507,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.memory.tracking.merges</key>
                </item>
             </graph_item>
@@ -2518,7 +2515,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.memory.tracking.schedule.pool</key>
                </item>
             </graph_item>
@@ -2526,7 +2523,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.memory.tracking.background.moves</key>
                </item>
             </graph_item>
@@ -2534,7 +2531,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.memory.tracking.background</key>
                </item>
             </graph_item>
@@ -2542,7 +2539,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.memory.tracking</key>
                </item>
             </graph_item>
@@ -2555,7 +2552,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.jemalloc.allocated</key>
                </item>
             </graph_item>
@@ -2564,7 +2561,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.jemalloc.resident</key>
                </item>
             </graph_item>
@@ -2573,7 +2570,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>GRADIENT_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.jemalloc.mapped</key>
                </item>
             </graph_item>
@@ -2586,7 +2583,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.query.rate</key>
                </item>
             </graph_item>
@@ -2595,7 +2592,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.select_query.rate</key>
                </item>
             </graph_item>
@@ -2604,7 +2601,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>F63100</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.insert_query.rate</key>
                </item>
             </graph_item>
@@ -2617,7 +2614,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.read</key>
                </item>
             </graph_item>
@@ -2626,7 +2623,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <drawtype>BOLD_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.write</key>
                </item>
             </graph_item>
@@ -2638,7 +2635,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.uptime</key>
                </item>
             </graph_item>
@@ -2650,7 +2647,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.zookeper.exeptions.rate</key>
                </item>
             </graph_item>
@@ -2658,7 +2655,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.zookeper.hw_exeptions.rate</key>
                </item>
             </graph_item>
@@ -2666,7 +2663,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.zookeper.user_exeptions.rate</key>
                </item>
             </graph_item>
@@ -2676,7 +2673,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                <color>A54F10</color>
                <yaxisside>RIGHT</yaxisside>
                <item>
-                  <host>ClickHouse by HTTP</host>
+                  <host>Template DB ClickHouse by HTTP</host>
                   <key>clickhouse.zookeper.watch</key>
                </item>
             </graph_item>

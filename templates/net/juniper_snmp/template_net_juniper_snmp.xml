@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:46Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:10Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Juniper SNMP</template>
-         <name>Juniper SNMP</name>
+         <template>Template Net Juniper SNMP</template>
+         <name>Template Net Juniper SNMP</name>
          <description>Template Net Juniper&#13;
 &#13;
 MIBs used:&#13;
@@ -18,16 +18,16 @@ JUNIPER-ALARM-MIB&#13;
 JUNIPER-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>EtherLike-MIB SNMP</name>
+               <name>Template Module EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -263,7 +263,6 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
@@ -274,7 +273,7 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Juniper SNMP</host>
+                              <host>Template Net Juniper SNMP</host>
                               <key>system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -289,7 +288,7 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Juniper SNMP</host>
+                              <host>Template Net Juniper SNMP</host>
                               <key>vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -333,7 +332,6 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -373,7 +371,6 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature discovery</name>
@@ -421,8 +418,8 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Juniper SNMP:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Juniper SNMP:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Net Juniper SNMP:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Juniper SNMP:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -446,7 +443,6 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

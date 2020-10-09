@@ -226,7 +226,7 @@ class testPageDashboardList extends CWebTest {
 	private function getTagText($table, $column, $color) {
 		$row = $table->findRow('Name', $column, true);
 
-		return $row->query('xpath://span[@class="status-'.$color.'"]')->one()->getText();
+		return $row->query('xpath://span[@class="tag '.$color.'-bg"]')->one()->getText();
 	}
 
 	/**

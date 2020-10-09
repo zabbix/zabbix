@@ -1,9 +1,9 @@
 
-# Ubiquiti AirOS SNMP
+# Template Net Ubiquiti AirOS SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 ## Setup
 
@@ -24,8 +24,8 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Generic SNMP |
-|Interfaces Simple SNMP |
+|Template Module Generic SNMP |
+|Template Module Interfaces Simple SNMP |
 
 ## Discovery rules
 

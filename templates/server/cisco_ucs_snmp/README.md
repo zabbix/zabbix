@@ -1,9 +1,9 @@
 
-# Cisco UCS SNMP
+# Template Server Cisco UCS SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 for Cisco UCS via Integrated Management Controller
 
 This template was tested on:
@@ -54,7 +54,7 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Generic SNMP |
+|Template Module Generic SNMP |
 
 ## Discovery rules
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:32:01Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:17Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Alcatel Timetra TiMOS SNMP</template>
-         <name>Alcatel Timetra TiMOS SNMP</name>
+         <template>Template Net Alcatel Timetra TiMOS SNMP</template>
+         <name>Template Net Alcatel Timetra TiMOS SNMP</name>
          <description>Template Net Alcatel Timetra TiMOS&#13;
 &#13;
 MIBs used:&#13;
@@ -18,16 +18,16 @@ TIMETRA-CHASSIS-MIB&#13;
 TIMETRA-SYSTEM-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>EtherLike-MIB SNMP</name>
+               <name>Template Module EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -277,7 +277,6 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -325,7 +324,6 @@ Current status of the Fan tray.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -399,7 +397,6 @@ A value of 'deviceStateFailed' represents a condition where at least one monitor
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -445,8 +442,8 @@ The current temperature reading in degrees celsius from this hardware component'
                            <dependencies>
                               <dependency>
                                  <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Alcatel Timetra TiMOS SNMP:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Alcatel Timetra TiMOS SNMP:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Net Alcatel Timetra TiMOS SNMP:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Alcatel Timetra TiMOS SNMP:sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -470,7 +467,6 @@ The current temperature reading in degrees celsius from this hardware component'
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -515,7 +511,7 @@ The current temperature reading in degrees celsius from this hardware component'
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Alcatel Timetra TiMOS SNMP</host>
+                  <host>Template Net Alcatel Timetra TiMOS SNMP</host>
                   <key>system.cpu.util[sgiCpuUsage.0]</key>
                </item>
             </graph_item>
@@ -529,7 +525,7 @@ The current temperature reading in degrees celsius from this hardware component'
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Alcatel Timetra TiMOS SNMP</host>
+                  <host>Template Net Alcatel Timetra TiMOS SNMP</host>
                   <key>vm.memory.total[snmp]</key>
                </item>
             </graph_item>
@@ -538,7 +534,7 @@ The current temperature reading in degrees celsius from this hardware component'
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Alcatel Timetra TiMOS SNMP</host>
+                  <host>Template Net Alcatel Timetra TiMOS SNMP</host>
                   <key>vm.memory.available[sgiKbMemoryAvailable.0]</key>
                </item>
             </graph_item>
@@ -553,7 +549,7 @@ The current temperature reading in degrees celsius from this hardware component'
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Alcatel Timetra TiMOS SNMP</host>
+                  <host>Template Net Alcatel Timetra TiMOS SNMP</host>
                   <key>vm.memory.util[vm.memory.util.0]</key>
                </item>
             </graph_item>

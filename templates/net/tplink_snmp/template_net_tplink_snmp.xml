@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:52Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:13Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>TP-LINK SNMP</template>
-         <name>TP-LINK SNMP</name>
+         <template>Template Net TP-LINK SNMP</template>
+         <name>Template Net TP-LINK SNMP</name>
          <description>Template Net TP-LINK JetStream&#13;
 &#13;
 MIBs used:&#13;
@@ -27,13 +27,13 @@ Known Issues:&#13;
   Version: prior to version V2_170323&#13;
   Device: T2600G-28TS 2.0&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces Simple SNMP</name>
+               <name>Template Module Interfaces Simple SNMP</name>
             </template>
          </templates>
          <groups>
@@ -203,7 +203,6 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: CPU utilization</name>
@@ -214,7 +213,7 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>TP-LINK SNMP</host>
+                              <host>Template Net TP-LINK SNMP</host>
                               <key>system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -256,7 +255,6 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: Memory utilization</name>
@@ -267,7 +265,7 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>TP-LINK SNMP</host>
+                              <host>Template Net TP-LINK SNMP</host>
                               <key>vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>

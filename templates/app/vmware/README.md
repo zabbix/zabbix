@@ -1,9 +1,9 @@
 
-# VMware macros
+# Template VM VMware macros
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.2  
 
 ## Setup
 
@@ -42,11 +42,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# VMware
+# Template VM VMware
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.2  
 The template to monitor VMware vCenter and ESX hypervisor.
 The "Template VM VMware Hypervisor" and "Template VM VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
 For additional information please check https://www.zabbix.com/documentation/current/manual/vm_monitoring
@@ -75,7 +75,7 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|VMware macros |
+|Template VM VMware macros |
 
 ## Discovery rules
 
@@ -110,11 +110,11 @@ Please report any issues with the template at https://support.zabbix.com
 
 You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
-# VMware Guest
+# Template VM VMware Guest
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.2  
 
 ## Setup
 
@@ -129,7 +129,7 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|VMware macros |
+|Template VM VMware macros |
 
 ## Discovery rules
 
@@ -185,11 +185,11 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# VMware Hypervisor
+# Template VM VMware Hypervisor
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.2  
 
 ## Setup
 
@@ -204,7 +204,7 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|VMware macros |
+|Template VM VMware macros |
 
 ## Discovery rules
 

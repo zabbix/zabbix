@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:56:27Z</date>
+   <version>5.0</version>
+   <date>2020-07-14T07:09:05Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,14 +9,14 @@
    </groups>
    <templates>
       <template>
-         <template>VMware</template>
-         <name>VMware</name>
+         <template>Template VM VMware</template>
+         <name>Template VM VMware</name>
          <description>You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>VMware macros</name>
+               <name>Template VM VMware macros</name>
             </template>
          </templates>
          <groups>
@@ -227,7 +227,7 @@ Template tooling version used: 0.38</description>
                      </group_prototypes>
                      <templates>
                         <template>
-                           <name>VMware Hypervisor</name>
+                           <name>Template VM VMware Hypervisor</name>
                         </template>
                      </templates>
                   </host_prototype>
@@ -268,7 +268,7 @@ Template tooling version used: 0.38</description>
                      </group_prototypes>
                      <templates>
                         <template>
-                           <name>VMware Guest</name>
+                           <name>Template VM VMware Guest</name>
                         </template>
                      </templates>
                   </host_prototype>
@@ -277,12 +277,12 @@ Template tooling version used: 0.38</description>
          </discovery_rules>
       </template>
       <template>
-         <template>VMware Guest</template>
-         <name>VMware Guest</name>
+         <template>Template VM VMware Guest</template>
+         <name>Template VM VMware Guest</name>
          <description>Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>VMware macros</name>
+               <name>Template VM VMware macros</name>
             </template>
          </templates>
          <groups>
@@ -860,12 +860,12 @@ Template tooling version used: 0.38</description>
          </discovery_rules>
       </template>
       <template>
-         <template>VMware Hypervisor</template>
-         <name>VMware Hypervisor</name>
+         <template>Template VM VMware Hypervisor</template>
+         <name>Template VM VMware Hypervisor</name>
          <description>Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>VMware macros</name>
+               <name>Template VM VMware macros</name>
             </template>
          </templates>
          <groups>
@@ -1186,7 +1186,7 @@ Template tooling version used: 0.38</description>
                      <dependencies>
                         <dependency>
                            <name>VMware: The {HOST.HOST} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1198,15 +1198,15 @@ Template tooling version used: 0.38</description>
                      <dependencies>
                         <dependency>
                            <name>VMware: The {HOST.HOST} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                         <dependency>
                            <name>VMware: The {HOST.HOST} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                         <dependency>
                            <name>VMware: The {HOST.HOST} health is Yellow</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2</expression>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1243,7 +1243,7 @@ Template tooling version used: 0.38</description>
                      <dependencies>
                         <dependency>
                            <name>VMware: The {HOST.HOST} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1384,8 +1384,8 @@ Template tooling version used: 0.38</description>
          </discovery_rules>
       </template>
       <template>
-         <template>VMware macros</template>
-         <name>VMware macros</name>
+         <template>Template VM VMware macros</template>
+         <name>Template VM VMware macros</name>
          <description>Template tooling version used: 0.38</description>
          <groups>
             <group>

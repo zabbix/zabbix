@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Apache Tomcat JMX</template>
-            <name>Apache Tomcat JMX</name>
+            <template>Template App Apache Tomcat JMX</template>
+            <name>Template App Apache Tomcat JMX</name>
             <description/>
             <groups>
                 <group>
@@ -2026,7 +2026,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads].last()} * 0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads].last()} * 0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% http-8080 worker threads busy on {HOST.NAME}</name>
@@ -2042,7 +2042,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads].last()} * 0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads].last()} * 0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% http-8443 worker threads busy on {HOST.NAME}</name>
@@ -2058,7 +2058,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads].last()}  *0.7)</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy].last()} &gt; ({Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads].last()}  *0.7)</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>70% jk-8009 worker threads busy on {HOST.NAME}</name>
@@ -2074,7 +2074,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Apache Tomcat JMX:jmx[&quot;Catalina:type=ProtocolHandler,port=8080&quot;,compression].str(off)} = 1</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ProtocolHandler,port=8080&quot;,compression].str(off)} = 1</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>gzip compression is off for connector http-8080 on {HOST.NAME}</name>
@@ -2090,7 +2090,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Apache Tomcat JMX:jmx[&quot;Catalina:type=ProtocolHandler,port=8443&quot;,compression].str(off)} = 1</expression>
+            <expression>{Template App Apache Tomcat JMX:jmx[&quot;Catalina:type=ProtocolHandler,port=8443&quot;,compression].str(off)} = 1</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>gzip compression is off for connector http-8443 on {HOST.NAME}</name>
@@ -2133,7 +2133,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,maxThreads]</key>
                     </item>
                 </graph_item>
@@ -2145,7 +2145,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadsBusy]</key>
                     </item>
                 </graph_item>
@@ -2157,7 +2157,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTP}\&quot;&quot;,currentThreadCount]</key>
                     </item>
                 </graph_item>
@@ -2189,7 +2189,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,maxThreads]</key>
                     </item>
                 </graph_item>
@@ -2201,7 +2201,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadsBusy]</key>
                     </item>
                 </graph_item>
@@ -2213,7 +2213,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_HTTPS}\&quot;&quot;,currentThreadCount]</key>
                     </item>
                 </graph_item>
@@ -2245,7 +2245,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,maxThreads]</key>
                     </item>
                 </graph_item>
@@ -2257,7 +2257,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadsBusy]</key>
                     </item>
                 </graph_item>
@@ -2269,7 +2269,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=ThreadPool,name=\&quot;{$PROTOCOL_HANDLER_AJP}\&quot;&quot;,currentThreadCount]</key>
                     </item>
                 </graph_item>
@@ -2301,7 +2301,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,rejectedSessions]</key>
                     </item>
                 </graph_item>
@@ -2313,7 +2313,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,activeSessions]</key>
                     </item>
                 </graph_item>
@@ -2325,7 +2325,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Apache Tomcat JMX</host>
+                        <host>Template App Apache Tomcat JMX</host>
                         <key>jmx[&quot;Catalina:type=Manager,context=/,host=localhost&quot;,maxActiveSessions]</key>
                     </item>
                 </graph_item>

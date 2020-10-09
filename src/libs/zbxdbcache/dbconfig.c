@@ -2987,7 +2987,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 				trends_sec = config->config->hk.trends;
 
 			numitem->trends = (0 != trends_sec);
-			numitem->trends_sec = trends_sec;
 
 			DCstrpool_replace(found, &numitem->units, row[26]);
 		}
@@ -3055,7 +3054,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* dependent items */
 
-		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]))
+		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]) && 0 == host->proxy_hostid)
 		{
 			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
 					sizeof(ZBX_DC_DEPENDENTITEM), &found);
@@ -7014,7 +7013,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
 
 			dst_item->trends = numitem->trends;
-			dst_item->trends_sec = numitem->trends_sec;
 			dst_item->units = zbx_strdup(NULL, numitem->units);
 			break;
 		case ITEM_VALUE_TYPE_LOG:

@@ -591,7 +591,7 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 
 	$function_macro_parser = new CFunctionMacroParser();
 	$user_macro_parser = new CUserMacroParser();
-	$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
+	$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
 	$lld_macro_parser = new CLLDMacroParser();
 	$lld_macro_function_parser = new CLLDMacroFunctionParser();
 

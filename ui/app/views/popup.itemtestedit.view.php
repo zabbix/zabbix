@@ -79,237 +79,122 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 		(new CCol(
 			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))
 				->removeId()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 	]);
 }
 
-$form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_3_1);
+$form_list_left = new CFormList();
+$form_list_right = new CFormList();
 
 if ($data['is_item_testable']) {
-	$form_grid->addItem([
-		new CLabel(_('Get value from host'), 'get_value'),
-		(new CFormField(
+	$form_list_left
+		->addRow(
+			new CLabel(_('Get value from host'), 'get_value'),
 			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
-
-		(new CLabel(_('Host address'), 'interface_address'))
-			->setAsteriskMark($data['interface_address_enabled'])
-			->addClass('js-host-address-row'),
-		(new CFormField(
+		)
+		->addRow(
+			new CLabel(_('Host address'), 'host_address'),
 			$data['interface_address_enabled']
-				? (new CTextBox('interface[address]', $data['inputs']['interface']['address'], false,
-						CControllerPopupItemTest::INPUT_MAX_LENGTH
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				: (new CTextBox('interface[address]', '', false, CControllerPopupItemTest::INPUT_MAX_LENGTH))
+				? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setEnabled(false)
-		))->addClass('js-host-address-row'),
+				: (new CTextBox('interface[address]'))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setEnabled(false),
+			'host_address_row'
+		)
+		->addRow(
+			new CLabel(_('Proxy'), 'proxy_hostid'),
+			$data['proxies_enabled']
+				? (new CComboBox('proxy_hostid',
+						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
+						[0 => _('(no proxy)')] + $data['proxies']))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				: (new CTextBox(null, _('(no proxy)'), true))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setId('proxy_hostid'), // Automated tests need this.
+			'proxy_hostid_row'
+		)
+		->addRow(null, null, 'empty_row_1');
 
-		(new CLabel(_('Port'), 'interface_port'))->addClass('js-host-address-row'),
-		(new CFormField(
+	$form_list_right
+		->addRow((new CDiv())->addStyle('height: 24px'))
+		->addRow(
+			new CLabel(_('Port'), 'port'),
 			$data['interface_port_enabled']
 				? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				: (new CTextBox('interface[port]'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setEnabled(false)
-		))->addClass('js-host-address-row')
-	]);
-
-	if ($data['show_snmp_form']) {
-		$form_grid->addItem([
-			(new CLabel(_('SNMP version'), 'interface[details][version]'))
-				->addClass('js-popup-row-snmp-version'),
-			(new CFormField(
-				new CComboBox('interface[details][version]', $data['inputs']['interface']['details']['version'], null,
-					[SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]
-				)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmp-version'),
-
-			(new CLabel(_('SNMP community'), 'interface[details][community]'))
-				->setAsteriskMark()
-				->addClass('js-popup-row-snmp-community'),
-			(new CFormField(
-				(new CTextBox('interface[details][community]', $data['inputs']['interface']['details']['community'],
-					false, CControllerPopupItemTest::INPUT_MAX_LENGTH
-				))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmp-community'),
-
-			(new CLabel(_('Context name'), 'interface[details][contextname]'))
-				->addClass('js-popup-row-snmpv3-contextname'),
-			(new CFormField(
-				(new CTextBox('interface[details][contextname]', $data['inputs']['interface']['details']['contextname'],
-					false, CControllerPopupItemTest::INPUT_MAX_LENGTH
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmpv3-contextname'),
-
-			(new CLabel(_('Security name'), 'interface[details][securityname]'))
-				->addClass('js-popup-row-snmpv3-securityname'),
-			(new CFormField(
-				(new CTextBox('interface[details][securityname]',
-					$data['inputs']['interface']['details']['securityname'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmpv3-securityname'),
-
-			(new CLabel(_('Security level'), 'interface[details][securitylevel]'))
-				->addClass('js-popup-row-snmpv3-securitylevel'),
-			(new CFormField(
-				new CComboBox('interface[details][securitylevel]',
-					$data['inputs']['interface']['details']['securitylevel'], null, [
-						ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-					]
-				)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmpv3-securitylevel'),
-
-			(new CLabel(_('Authentication protocol'), 'interface[details][authprotocol]'))
-				->addClass('js-popup-row-snmpv3-authprotocol'),
-			(new CFormField(
-				(new CRadioButtonList('interface[details][authprotocol]',
-					(int) $data['inputs']['interface']['details']['authprotocol']
-				))
-					->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
-					->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
-					->setModern(true)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmpv3-authprotocol'),
-
-			(new CLabel(_('Authentication passphrase'), 'interface[details][authpassphrase]'))
-				->addClass('js-popup-row-snmpv3-authpassphrase'),
-			(new CFormField(
-				(new CTextBox('interface[details][authpassphrase]',
-					$data['inputs']['interface']['details']['authpassphrase'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmpv3-authpassphrase'),
-
-			(new CLabel(_('Privacy protocol'), 'interface[details][privprotocol]'))
-				->addClass('js-popup-row-snmpv3-privprotocol'),
-			(new CFormField(
-				(new CRadioButtonList('interface[details][privprotocol]',
-					(int) $data['inputs']['interface']['details']['privprotocol']
-				))
-					->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
-					->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
-					->setModern(true)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmpv3-privprotocol'),
-
-			(new CLabel(_('Privacy passphrase'), 'interface[details][privpassphrase]'))
-				->addClass('js-popup-row-snmpv3-privpassphrase'),
-			(new CFormField(
-				(new CTextBox('interface[details][privpassphrase]',
-					$data['inputs']['interface']['details']['privpassphrase'], false,
-					CControllerPopupItemTest::INPUT_MAX_LENGTH
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))
-				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-				->addClass('js-popup-row-snmpv3-privpassphrase')
-		]);
-	}
-
-	$form_grid->addItem([
-		(new CLabel(_('Proxy'), 'proxy_hostid'))->addClass('js-proxy-hostid-row'),
-		(new CFormField(
-			$data['proxies_enabled']
-				? (new CComboBox('proxy_hostid',
-					array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
-					[0 => _('(no proxy)')] + $data['proxies']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				: (new CTextBox(null, _('(no proxy)'), true))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setId('proxy_hostid')
-		))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-			->addClass('js-proxy-hostid-row'),
-
-		(new CFormField(
+					->setEnabled(false),
+			'host_port_row'
+		)
+		->addRow(null, null, 'empty_row_2')
+		->addRow(
+			null,
 			(new CSimpleButton(_('Get value')))
-				->setId('get_value_btn')
 				->addClass(ZBX_STYLE_BTN_ALT)
-		))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_3)
-			->addClass('js-get-value-row')
-			->addStyle('text-align: right;')
-	]);
+				->setId('get_value_btn')
+				->addStyle('float: right'),
+			'get_value_row'
+		);
 }
 
-$form_grid->addItem([
-	new CLabel(_('Value'), 'value'),
-	new CFormField(
+$form_list_left
+	->addRow(
+		new CLabel(_('Value'), 'value'),
 		(new CMultilineInput('value', '', [
 			'disabled' => false,
 			'readonly' => false
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	),
-
-	new CLabel(_('Time'), 'time'),
-	new CFormField(
-		(new CTextBox(null, 'now', true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setId('time')
-	),
-
-	new CLabel(_('Previous value'), 'prev_item_value'),
-	new CFormField(
-		(new CMultilineInput('prev_value', '', [
-			'disabled' => !$data['show_prev']
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	),
-
-	new CLabel(_('Prev. time'), 'prev_time'),
-	new CFormField(
-		(new CTextBox('prev_time', $data['prev_time']))
-			->setEnabled($data['show_prev'])
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	),
-
-	new CLabel(_('End of line sequence'), 'eol'),
-	(new CFormField(
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'preproc-test-popup-value-row'
+	)
+	->addRow(
+		new CLabel(_('Previous value'), 'prev_item_value'),
+			(new CMultilineInput('prev_value', '', [
+				'disabled' => !$data['show_prev']
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'preproc-test-popup-prev-value-row'
+	)
+	->addRow(
+		new CLabel(_('End of line sequence'), 'eol'),
 		(new CRadioButtonList('eol', $data['eol']))
 			->addValue(_('LF'), ZBX_EOL_LF)
 			->addValue(_('CRLF'), ZBX_EOL_CRLF)
 			->setModern(true)
-	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-]);
+	);
+
+$form_list_right
+	->addRow(
+		new CLabel(_('Time'), 'time'),
+		(new CTextBox(null, 'now', true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setId('time')
+	)
+	->addRow(
+		new CLabel(_('Prev. time'), 'prev_time'),
+		(new CTextBox('prev_time', $data['prev_time']))
+			->setEnabled($data['show_prev'])
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	);
+
+$form_list = new CFormList();
 
 if ($macros_table) {
-	$form_grid->addItem([
-		new CLabel(_('Macros')),
-		(new CFormField(
-			(new CDiv($macros_table))
-				->addStyle('width: 675px;')
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-	]);
+	$form_list->addRow(
+		_('Macros'),
+		(new CDiv($macros_table))
+			->addStyle('width: 675px;')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	);
 }
 
 if (count($data['steps']) > 0) {
 	// Create results table.
 	$result_table = (new CTable())
 		->setId('preprocessing-steps')
-		->addClass('table-forms preprocessing-test-results')
+		->addClass('preprocessing-test-results')
 		->addStyle('width: 100%;')
 		->setHeader([
 			'',
@@ -340,25 +225,28 @@ if (count($data['steps']) > 0) {
 		]);
 	}
 
-	$form_grid->addItem([
-		new CLabel(_('Preprocessing steps')),
-		(new CFormField(
-			(new CDiv($result_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('width: 675px;')
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-	]);
+	$form_list->addRow(
+		_('Preprocessing steps'),
+		(new CDiv($result_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('width: 675px;')
+	);
 }
 
 if ($data['show_final_result']) {
-	$form_grid->addItem([
-		(new CLabel(_('Result')))->addClass('js-final-result'),
-		(new CFormField())->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-	]);
+	$form_list->addRow(_('Result'), false, 'final-result');
 }
 
+$container = (new CDiv())
+	->addClass(ZBX_STYLE_ROW)
+	->addItem([
+		(new CDiv($form_list_left))->addClass(ZBX_STYLE_CELL),
+		(new CDiv($form_list_right))->addClass(ZBX_STYLE_CELL)
+	]);
+
 $form
-	->addItem($form_grid)
+	->addItem($container)
+	->addItem($form_list)
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $templates = [
@@ -381,7 +269,7 @@ $templates = [
 			(new CDiv(
 				(new CSpan('#{result}'))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint('#{result}', 'hintbox-wrap')
+					->setHint('#{result}', 'hintbox-scrollable', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;')
 			))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
@@ -395,7 +283,7 @@ $templates = [
 				(new CDiv(
 					(new CSpan('#{failed}'))
 						->addClass(ZBX_STYLE_LINK_ACTION)
-						->setHint('#{failed}', 'hintbox-wrap')
+						->setHint('#{failed}', '', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px; ')
 				))
 					->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
@@ -407,7 +295,7 @@ $templates = [
 ];
 
 $warning_message = [[
-	'message' => _('Item contains user-defined macros with secret values. Values of these macros should be entered manually.')
+	'message' => _('Item contains user defined macros with type "Secret text". Values of these macros should be entered manually.')
 ]];
 $warning_box = $data['show_warning']
 	? makeMessageBox(false, $warning_message, null, true, false)

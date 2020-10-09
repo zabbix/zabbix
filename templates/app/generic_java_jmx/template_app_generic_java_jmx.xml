@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:46Z</date>
+   <version>5.0</version>
+   <date>2020-07-14T06:56:18Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Generic Java JMX</template>
-         <name>Generic Java JMX</name>
+         <template>Template App Generic Java JMX</template>
+         <name>Template App Generic Java JMX</name>
          <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
@@ -1124,67 +1124,67 @@
    </templates>
    <triggers>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"].last()}&gt;{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"].last()}</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"].last()}&gt;{Template App Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"].last()}</expression>
          <name>GarbageCollector: Concurrent Mark Sweep in fire fighting mode</name>
          <priority>AVERAGE</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"].last()}&gt;{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"].last()}</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"].last()}&gt;{Template App Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"].last()}</expression>
          <name>GarbageCollector: Mark Sweep Compact in fire fighting mode</name>
          <priority>AVERAGE</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"].last()}&gt;{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"].last()}</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"].last()}&gt;{Template App Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"].last()}</expression>
          <name>GarbageCollector: PS Mark Sweep in fire fighting mode</name>
          <priority>AVERAGE</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.used"].min({$JMX.HEAP.MEM.USAGE.TIME})}&gt;({Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.max"].last()}*{$JMX.HEAP.MEM.USAGE.MAX}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.used"].min({$JMX.HEAP.MEM.USAGE.TIME})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.max"].last()}*{$JMX.HEAP.MEM.USAGE.MAX}/100)</expression>
          <name>Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"].min({$JMX.NONHEAP.MEM.USAGE.TIME})}&gt;({Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"].last()}*{$JMX.NONHEAP.MEM.USAGE.MAX}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"].min({$JMX.NONHEAP.MEM.USAGE.TIME})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"].last()}*{$JMX.NONHEAP.MEM.USAGE.MAX}/100)</expression>
          <name>Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Old Gen"})}&gt;({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Old Gen"}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Old Gen"})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Old Gen"}/100)</expression>
          <name>MemoryPool: CMS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Old Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Old Gen"}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Perm Gen"})}&gt;({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Perm Gen"}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Perm Gen"})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Perm Gen"}/100)</expression>
          <name>MemoryPool: CMS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Perm Gen"}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"].min({$JMX.MP.USAGE.TIME:"Code Cache"})}&gt;({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Code Cache"}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"].min({$JMX.MP.USAGE.TIME:"Code Cache"})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Code Cache"}/100)</expression>
          <name>MemoryPool: Code Cache memory usage more than {$JMX.MP.USAGE.MAX:"Code Cache"}% for {$JMX.MP.USAGE.TIME:"Code Cache"}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Perm Gen"})}&gt;({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Perm Gen"}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Perm Gen"})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Perm Gen"}/100)</expression>
          <name>MemoryPool: Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"Perm Gen"}% for {$JMX.MP.USAGE.TIME:"Perm Gen"}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Old Gen"})}&gt;({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Old Gen"}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Old Gen"})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Old Gen"}/100)</expression>
          <name>MemoryPool: PS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Old Gen"}% for {$JMX.MP.USAGE.TIME:"PS Old Gen"}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Perm Gen"})}&gt;({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Perm Gen"}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Perm Gen"})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Perm Gen"}/100)</expression>
          <name>MemoryPool: PS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"PS Perm Gen"}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Tenured Gen"})}&gt;({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Tenured Gen"}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Tenured Gen"})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Tenured Gen"}/100)</expression>
          <name>MemoryPool: Tenured Gen memory usage more than {$JMX.MP.USAGE.MAX:"Tenured Gen"}% for {$JMX.MP.USAGE.TIME:"Tenured Gen"}</name>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Generic Java JMX:jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"].min({$JMX.FILE.DESCRIPTORS.TIME})}&gt;({Generic Java JMX:jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"].last()}*{$JMX.FILE.DESCRIPTORS.MAX}/100)</expression>
+         <expression>{Template App Generic Java JMX:jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"].min({$JMX.FILE.DESCRIPTORS.TIME})}&gt;({Template App Generic Java JMX:jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"].last()}*{$JMX.FILE.DESCRIPTORS.MAX}/100)</expression>
          <name>OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum</name>
          <priority>WARNING</priority>
       </trigger>
@@ -1196,7 +1196,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=ClassLoading","TotalLoadedClassCount"]</key>
                </item>
             </graph_item>
@@ -1204,7 +1204,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=ClassLoading","UnloadedClassCount"]</key>
                </item>
             </graph_item>
@@ -1212,7 +1212,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=ClassLoading","LoadedClassCount"]</key>
                </item>
             </graph_item>
@@ -1224,7 +1224,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"]</key>
                </item>
             </graph_item>
@@ -1232,7 +1232,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"]</key>
                </item>
             </graph_item>
@@ -1240,7 +1240,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"]</key>
                </item>
             </graph_item>
@@ -1248,7 +1248,7 @@
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"]</key>
                </item>
             </graph_item>
@@ -1256,7 +1256,7 @@
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"]</key>
                </item>
             </graph_item>
@@ -1264,7 +1264,7 @@
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"]</key>
                </item>
             </graph_item>
@@ -1276,7 +1276,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"]</key>
                </item>
             </graph_item>
@@ -1284,7 +1284,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.committed"]</key>
                </item>
             </graph_item>
@@ -1292,7 +1292,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"]</key>
                </item>
             </graph_item>
@@ -1304,7 +1304,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"]</key>
                </item>
             </graph_item>
@@ -1312,7 +1312,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.committed"]</key>
                </item>
             </graph_item>
@@ -1320,7 +1320,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"]</key>
                </item>
             </graph_item>
@@ -1332,7 +1332,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"]</key>
                </item>
             </graph_item>
@@ -1340,7 +1340,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.committed"]</key>
                </item>
             </graph_item>
@@ -1348,7 +1348,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"]</key>
                </item>
             </graph_item>
@@ -1360,7 +1360,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"]</key>
                </item>
             </graph_item>
@@ -1368,7 +1368,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.committed"]</key>
                </item>
             </graph_item>
@@ -1376,7 +1376,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"]</key>
                </item>
             </graph_item>
@@ -1388,7 +1388,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"]</key>
                </item>
             </graph_item>
@@ -1396,7 +1396,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.committed"]</key>
                </item>
             </graph_item>
@@ -1404,7 +1404,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"]</key>
                </item>
             </graph_item>
@@ -1416,7 +1416,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"]</key>
                </item>
             </graph_item>
@@ -1424,7 +1424,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.committed"]</key>
                </item>
             </graph_item>
@@ -1432,7 +1432,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"]</key>
                </item>
             </graph_item>
@@ -1444,7 +1444,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"]</key>
                </item>
             </graph_item>
@@ -1452,7 +1452,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.committed"]</key>
                </item>
             </graph_item>
@@ -1460,7 +1460,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"]</key>
                </item>
             </graph_item>
@@ -1472,7 +1472,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"]</key>
                </item>
             </graph_item>
@@ -1480,7 +1480,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]</key>
                </item>
             </graph_item>
@@ -1492,7 +1492,7 @@
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=Threading","PeakThreadCount"]</key>
                </item>
             </graph_item>
@@ -1500,7 +1500,7 @@
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=Threading","DaemonThreadCount"]</key>
                </item>
             </graph_item>
@@ -1508,7 +1508,7 @@
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Generic Java JMX</host>
+                  <host>Template App Generic Java JMX</host>
                   <key>jmx["java.lang:type=Threading","ThreadCount"]</key>
                </item>
             </graph_item>

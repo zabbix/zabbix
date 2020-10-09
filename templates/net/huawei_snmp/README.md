@@ -1,9 +1,9 @@
 
-# Huawei VRP SNMP
+# Template Net Huawei VRP SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 Reference: https://www.slideshare.net/Huanetwork/huawei-s5700-naming-conventions-and-port-numbering-conventions
 Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?contentId=KB1000090234
 
@@ -30,9 +30,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|EtherLike-MIB SNMP |
-|Generic SNMP |
-|Interfaces SNMP |
+|Template Module EtherLike-MIB SNMP |
+|Template Module Generic SNMP |
+|Template Module Interfaces SNMP |
 
 ## Discovery rules
 

@@ -319,15 +319,15 @@ class CHostInterface extends CApiService {
 				}
 			}
 
-			if ($interface['ip'] === '' && $interface['dns'] === '') {
+			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS cannot be empty for host interface.'));
 			}
 
-			if ($interface['useip'] == INTERFACE_USE_IP && $interface['ip'] === '') {
+			if ($interface['useip'] == INTERFACE_USE_IP && zbx_empty($interface['ip'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS "%1$s" cannot have empty IP address.', $interface['dns']));
 			}
 
-			if ($interface['useip'] == INTERFACE_USE_DNS && $interface['dns'] === '') {
+			if ($interface['useip'] == INTERFACE_USE_DNS && zbx_empty($interface['dns'])) {
 				if ($dbHosts && !empty($dbHosts[$interface['hostid']]['host'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',

@@ -1,9 +1,9 @@
 
-# Zabbix agent
+# Template Module Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 ## Setup
 
@@ -46,11 +46,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Zabbix agent active
+# Template Module Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 ## Setup
 

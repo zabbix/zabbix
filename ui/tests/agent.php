@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -17,33 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package ceph
+require_once dirname(__FILE__).'/agent/AgentTests.php';
 
-import (
-	"encoding/json"
-)
+class All {
+	public static function suite() {
+		$suite = new PHPUnit_Framework_TestSuite('Project');
 
-type cephHealth struct {
-	Status string `json:"status"`
-}
+		$suite->addTest(AgentTests::suite());
 
-const (
-	pingFailed = 0
-	pingOk     = 1
-)
-
-// pingHandler returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(data map[command][]byte) (interface{}, error) {
-	var health cephHealth
-
-	err := json.Unmarshal(data[cmdHealth], &health)
-	if err != nil {
-		return pingFailed, nil
+		return $suite;
 	}
-
-	if len(health.Status) > 0 {
-		return pingOk, nil
-	}
-
-	return pingFailed, nil
 }

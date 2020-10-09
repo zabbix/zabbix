@@ -148,9 +148,13 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 }
 // Interfaces for discovered hosts.
 else {
+	$existingInterfaceTypes = [];
+	foreach ($data['interfaces'] as $interface) {
+		$existingInterfaceTypes[$interface['type']] = true;
+	}
 	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode($data['interfaces']).');');
 	zbx_add_post_js('hostInterfaceManager.render();');
-	zbx_add_post_js('HostInterfaceManager.makeReadonly();');
+	zbx_add_post_js('HostInterfaceManager.disableEdit();');
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 

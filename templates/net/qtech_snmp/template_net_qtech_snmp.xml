@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:32:07Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:21Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,24 +9,24 @@
    </groups>
    <templates>
       <template>
-         <template>QTech QSW SNMP</template>
-         <name>QTech QSW SNMP</name>
+         <template>Template Net QTech QSW SNMP</template>
+         <name>Template Net QTech QSW SNMP</name>
          <description>Template Net QTech QSW&#13;
 &#13;
 MIBs used:&#13;
 QTECH-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>EtherLike-MIB SNMP</name>
+               <name>Template Module EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -82,8 +82,8 @@ Temperature readings of testpoint: __RESOURCE__</description>
                      <dependencies>
                         <dependency>
                            <name>Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{QTech QSW SNMP:sensor.temp.value[switchTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{QTech QSW SNMP:sensor.temp.value[switchTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net QTech QSW SNMP:sensor.temp.value[switchTemperature.0].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net QTech QSW SNMP:sensor.temp.value[switchTemperature.0].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -363,7 +363,6 @@ Used memory in Bytes</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -400,7 +399,6 @@ Used memory in Bytes</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -445,7 +443,7 @@ Used memory in Bytes</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>QTech QSW SNMP</host>
+                  <host>Template Net QTech QSW SNMP</host>
                   <key>system.cpu.util[switchCpuUsage.0]</key>
                </item>
             </graph_item>
@@ -460,7 +458,7 @@ Used memory in Bytes</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>QTech QSW SNMP</host>
+                  <host>Template Net QTech QSW SNMP</host>
                   <key>vm.memory.util[vm.memory.util.0]</key>
                </item>
             </graph_item>

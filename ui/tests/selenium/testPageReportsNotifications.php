@@ -168,8 +168,6 @@ class testPageReportsNotifications extends CLegacyWebTest {
 	public function testPageReportsNotifications_CheckFilters($data) {
 		$this->zbxTestLogin('report4.php');
 		$this->page->waitUntilReady();
-		// without sleep test fail because the "zabbix-sidebar-logo" element receive the click
-		sleep(1);
 
 		// Select period
 		if (array_key_exists('period', $data)) {

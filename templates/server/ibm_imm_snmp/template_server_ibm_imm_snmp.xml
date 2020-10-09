@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:49Z</date>
+   <version>5.0</version>
+   <date>2020-06-04T23:48:13Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>IBM IMM SNMP</template>
-         <name>IBM IMM SNMP</name>
+         <template>Template Server IBM IMM SNMP</template>
+         <name>Template Server IBM IMM SNMP</name>
          <description>Template Server IBM IMM&#13;
 &#13;
 MIBs used:&#13;
@@ -34,10 +34,10 @@ Known Issues:&#13;
   Version: IMM1&#13;
   Device: IMM1 servers (M2,M3 generations)&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
          </templates>
          <groups>
@@ -157,7 +157,7 @@ Indicates status of system health for the system in which the IMM resides. Value
                      <dependencies>
                         <dependency>
                            <name>System is in unrecoverable state!</name>
-                           <expression>{IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
+                           <expression>{Template Server IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -170,11 +170,11 @@ Indicates status of system health for the system in which the IMM resides. Value
                      <dependencies>
                         <dependency>
                            <name>System is in unrecoverable state!</name>
-                           <expression>{IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
+                           <expression>{Template Server IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
                         </dependency>
                         <dependency>
                            <name>System status is in critical state</name>
-                           <expression>{IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Template Server IBM IMM SNMP:system.status[systemHealthStat.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -240,7 +240,6 @@ A description of the fan component status.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Physical Disk Discovery</name>
@@ -291,7 +290,6 @@ disk module FRU name.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -328,7 +326,6 @@ A description of the power module status.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -375,8 +372,8 @@ Temperature readings of testpoint: {#SNMPVALUE}</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{IBM IMM SNMP:sensor.temp.value[tempReading.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{IBM IMM SNMP:sensor.temp.value[tempReading.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Server IBM IMM SNMP:sensor.temp.value[tempReading.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Server IBM IMM SNMP:sensor.temp.value[tempReading.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -400,7 +397,6 @@ Temperature readings of testpoint: {#SNMPVALUE}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery Ambient</name>
@@ -447,8 +443,8 @@ Temperature readings of testpoint: Ambient</description>
                            <dependencies>
                               <dependency>
                                  <name>Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                                 <expression>{IBM IMM SNMP:sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{IBM IMM SNMP:sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                                 <expression>{Template Server IBM IMM SNMP:sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                                 <recovery_expression>{Template Server IBM IMM SNMP:sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -472,7 +468,6 @@ Temperature readings of testpoint: Ambient</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery CPU</name>
@@ -519,8 +514,8 @@ Temperature readings of testpoint: CPU</description>
                            <dependencies>
                               <dependency>
                                  <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                                 <expression>{IBM IMM SNMP:sensor.temp.value[tempReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
-                                 <recovery_expression>{IBM IMM SNMP:sensor.temp.value[tempReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                                 <expression>{Template Server IBM IMM SNMP:sensor.temp.value[tempReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                                 <recovery_expression>{Template Server IBM IMM SNMP:sensor.temp.value[tempReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -544,7 +539,6 @@ Temperature readings of testpoint: CPU</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

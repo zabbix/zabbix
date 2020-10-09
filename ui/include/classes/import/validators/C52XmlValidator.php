@@ -336,11 +336,6 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC
 	];
 
-	private $CUSTOM_INTERFACES = [
-		CXmlConstantValue::CUSTOM_INTERFACES_NO => CXmlConstantName::NO,
-		CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES
-	];
-
 	private $DASHBOARD_WIDGET_TYPE = [
 		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_CLOCK => CXmlConstantName::DASHBOARD_WIDGET_TYPE_CLOCK,
 		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC => CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC,
@@ -413,7 +408,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'dns' =>					['type' => XML_STRING, 'default' => ''],
 							'port' =>					['type' => XML_STRING, 'default' => '10050'],
 							'details' =>				['type' => XML_ARRAY, 'rules' => [
-								'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
+								'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3,]],
 								'community' =>				['type' => XML_STRING, 'default' => ''],
 								'contextname' =>			['type' => XML_STRING, 'default' => ''],
 								'securityname' =>			['type' => XML_STRING, 'default' => ''],
@@ -782,29 +777,6 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 										'tag' =>					['type' => XML_ARRAY, 'rules' => [
 											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'custom_interfaces' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
-									'interfaces' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
-										'interface' =>				['type' => XML_ARRAY, 'rules' => [
-											'default' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
-											'useip' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
-											'dns' =>					['type' => XML_STRING, 'default' => ''],
-											'port' =>					['type' => XML_STRING, 'default' => '10050'],
-											'details' =>				['type' => XML_ARRAY, 'rules' => [
-												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-												'community' =>				['type' => XML_STRING, 'default' => ''],
-												'contextname' =>			['type' => XML_STRING, 'default' => ''],
-												'securityname' =>			['type' => XML_STRING, 'default' => ''],
-												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-											]]
 										]]
 									]]
 								]]
@@ -1418,29 +1390,6 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 										'tag' =>					['type' => XML_ARRAY, 'rules' => [
 											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'custom_interfaces' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CUSTOM_INTERFACES_NO, 'in' => $this->CUSTOM_INTERFACES],
-									'interfaces' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
-										'interface' =>				['type' => XML_ARRAY, 'rules' => [
-											'default' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
-											'useip' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
-											'dns' =>					['type' => XML_STRING, 'default' => ''],
-											'port' =>					['type' => XML_STRING, 'default' => '10050'],
-											'details' =>				['type' => XML_ARRAY, 'rules' => [
-												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
-												'community' =>				['type' => XML_STRING, 'default' => ''],
-												'contextname' =>			['type' => XML_STRING, 'default' => ''],
-												'securityname' =>			['type' => XML_STRING, 'default' => ''],
-												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-												'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-												'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-												'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
-												'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-											]]
 										]]
 									]]
 								]]

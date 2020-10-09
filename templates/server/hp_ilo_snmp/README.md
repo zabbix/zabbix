@@ -1,9 +1,9 @@
 
-# HP iLO SNMP
+# Template Server HP iLO SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 for HP iLO adapters that support SNMP get. Or via operating system, using SNMP HP subagent
 
 This template was tested on:
@@ -56,7 +56,7 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Generic SNMP |
+|Template Module Generic SNMP |
 
 ## Discovery rules
 

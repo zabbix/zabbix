@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:46Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:11Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,23 +9,23 @@
    </groups>
    <templates>
       <template>
-         <template>Dell Force S-Series SNMP</template>
-         <name>Dell Force S-Series SNMP</name>
+         <template>Template Net Dell Force S-Series SNMP</template>
+         <name>Template Net Dell Force S-Series SNMP</name>
          <description>Template Dell Force S-Series&#13;
 &#13;
 MIBs used:&#13;
 F10-S-SERIES-CHASSIS-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>EtherLike-MIB SNMP</name>
+               <name>Template Module EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -96,14 +96,13 @@ The status of the fan tray {#SNMPVALUE}.</description>
                            <dependencies>
                               <dependency>
                                  <name>Fan {#SNMPVALUE}: Fan is in critical state</name>
-                                 <expression>{Dell Force S-Series SNMP:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Net Dell Force S-Series SNMP:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>CPU and Memory and Flash Discovery</name>
@@ -162,7 +161,6 @@ Total memory usage in percentage.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -173,7 +171,7 @@ Total memory usage in percentage.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Dell Force S-Series SNMP</host>
+                              <host>Template Net Dell Force S-Series SNMP</host>
                               <key>system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -188,7 +186,7 @@ Total memory usage in percentage.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Dell Force S-Series SNMP</host>
+                              <host>Template Net Dell Force S-Series SNMP</host>
                               <key>vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -239,14 +237,13 @@ The status of the power supply {#SNMPVALUE}</description>
                            <dependencies>
                               <dependency>
                                  <name>PSU {#SNMPVALUE}: Power supply is in critical state</name>
-                                 <expression>{Dell Force S-Series SNMP:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Net Dell Force S-Series SNMP:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Stack Unit Discovery</name>
@@ -282,8 +279,8 @@ The temperature of the unit.</description>
                            <dependencies>
                               <dependency>
                                  <name>Device {#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Net Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -418,7 +415,6 @@ Current code version of this unit.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

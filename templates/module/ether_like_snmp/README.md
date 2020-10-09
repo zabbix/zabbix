@@ -1,9 +1,9 @@
 
-# EtherLike-MIB SNMP
+# Template Module EtherLike-MIB SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 ## Setup
 

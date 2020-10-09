@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:45Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:10Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>HP Comware HH3C SNMP</template>
-         <name>HP Comware HH3C SNMP</name>
+         <template>Template Net HP Comware HH3C SNMP</template>
+         <name>Template Net HP Comware HH3C SNMP</name>
          <description>Template Net HP Comware (HH3C)&#13;
 &#13;
 MIBs used:&#13;
@@ -23,16 +23,16 @@ Known Issues:&#13;
   Version: 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP&#13;
   Device: HP 1910-48&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>EtherLike-MIB SNMP</name>
+               <name>Template Module EtherLike-MIB SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -218,7 +218,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -268,7 +267,6 @@ fanError(41) means that the fan stops working.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Module Discovery</name>
@@ -346,7 +344,6 @@ percent of memory are used.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#MODULE_NAME}: CPU utilization</name>
@@ -357,7 +354,7 @@ percent of memory are used.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>HP Comware HH3C SNMP</host>
+                              <host>Template Net HP Comware HH3C SNMP</host>
                               <key>system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -372,7 +369,7 @@ percent of memory are used.</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>HP Comware HH3C SNMP</host>
+                              <host>Template Net HP Comware HH3C SNMP</host>
                               <key>vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -429,7 +426,6 @@ rpsError(61) means the Redundant Power Supply is in the state of fault.</descrip
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -486,8 +482,8 @@ The temperature for the {#SNMPVALUE}.</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Net HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -511,7 +507,6 @@ The temperature for the {#SNMPVALUE}.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

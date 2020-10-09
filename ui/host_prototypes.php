@@ -50,9 +50,6 @@ $fields = [
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'tags' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, null, null,		null],
-	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null, DB_ID,		null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
@@ -73,8 +70,6 @@ $fields = [
 ];
 check_fields($fields);
 
-$hostid = getRequest('hostid', 0);
-
 // permissions
 if (getRequest('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get([
@@ -88,9 +83,9 @@ if (getRequest('parent_discoveryid')) {
 		access_deny();
 	}
 
-	if ($hostid != 0) {
+	if (getRequest('hostid')) {
 		$hostPrototype = API::HostPrototype()->get([
-			'hostids' => [$hostid],
+			'hostids' => getRequest('hostid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
@@ -98,7 +93,6 @@ if (getRequest('parent_discoveryid')) {
 			'selectParentHost' => ['hostid'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
-			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);
@@ -139,7 +133,7 @@ if (getRequest('unlink')) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	DBstart();
-	$result = API::HostPrototype()->delete([$hostid]);
+	$result = API::HostPrototype()->delete([getRequest('hostid')]);
 	$result = DBend($result);
 
 	if ($result) {
@@ -189,8 +183,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'groupPrototypes' => [],
 		'tags' => $tags,
 		'macros' => $macros,
-		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', [])),
-		'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'))
+		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', []))
 	];
 
 	if (hasRequest('inventory_mode')) {
@@ -213,41 +206,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
-	if ($newHostPrototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
-		$interfaces = getRequest('interfaces', []);
-
-		foreach ($interfaces as $key => $interface) {
-			// Proccess SNMP interface fields.
-			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-				if (!array_key_exists('details', $interface)) {
-					$interface['details'] = [];
-				}
-
-				$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
-					? SNMP_BULK_ENABLED
-					: SNMP_BULK_DISABLED;
-			}
-
-			unset($interfaces[$key]['isNew'], $interfaces[$key]['items'], $interfaces[$key]['interfaceid']);
-			$interfaces[$key]['main'] = 0;
-		}
-
-		$main_interfaces = getRequest('mainInterfaces', []);
-
-		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
-			if (array_key_exists($type, $main_interfaces) && array_key_exists($main_interfaces[$type], $interfaces)) {
-				$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
-			}
-		}
-	}
-	else {
-		$interfaces = [];
-	}
-
-	$newHostPrototype['interfaces'] = $interfaces;
-
-	if ($hostid != 0) {
-		$newHostPrototype['hostid'] = $hostid;
+	if (getRequest('hostid')) {
+		$newHostPrototype['hostid'] = getRequest('hostid');
 
 		if (!$hostPrototype['templateid']) {
 			// add group prototypes based on existing host groups
@@ -309,9 +269,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 	}
 }
-elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscover') {
+elseif (getRequest('hostid', '') && getRequest('action', '') === 'hostprototype.updatediscover') {
 	$result = API::HostPrototype()->update([
-		'hostid' => $hostid,
+		'hostid' => getRequest('hostid'),
 		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover'))
 	]);
 
@@ -367,14 +327,11 @@ if (hasRequest('action') && hasRequest('group_hostid') && !$result) {
  * Display
  */
 if (hasRequest('form')) {
-	// During clone "hostid" could've been reset.
-	$hostid = getRequest('hostid', 0);
-
 	$data = [
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => [
-			'hostid' => $hostid,
-			'templateid' => ($hostid == 0) ? 0 : $hostPrototype['templateid'],
+			'hostid' => getRequest('hostid', 0),
+			'templateid' => getRequest('hostid') ? $hostPrototype['templateid'] : 0,
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
@@ -385,13 +342,10 @@ if (hasRequest('form')) {
 				CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE)
 			),
 			'groupPrototypes' => getRequest('group_prototypes', []),
-			'macros' => $macros,
-			'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces')),
-			'interfaces' => getRequest('interfaces', []),
-			'main_interfaces' => getRequest('mainInterfaces', []),
+			'macros' => $macros
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
-		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
+		'readonly' => (getRequest('hostid') && $hostPrototype['templateid']),
 		'groups' => [],
 		'tags' => $tags,
 		// Parent discovery rules.
@@ -453,6 +407,7 @@ if (hasRequest('form')) {
 
 	if (!hasRequest('form_refresh')) {
 		if ($data['host_prototype']['hostid'] != 0) {
+
 			// When opening existing host prototype, display all values from database.
 			$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
@@ -481,15 +436,6 @@ if (hasRequest('form')) {
 			// Set default values for new host prototype.
 			$data['host_prototype']['status'] = HOST_STATUS_MONITORED;
 		}
-	}
-	else {
-		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
-			if (array_key_exists($type, $data['host_prototype']['main_interfaces'])) {
-				$interfaceid = $data['host_prototype']['main_interfaces'][$type];
-				$data['host_prototype']['interfaces'][$interfaceid]['main'] = '1';
-			}
-		}
-		$data['host_prototype']['interfaces'] = array_values($data['host_prototype']['interfaces']);
 	}
 
 	$data['templates'] = makeHostPrototypeTemplatesHtml($data['host_prototype']['hostid'],

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:32:05Z</date>
+   <version>5.0</version>
+   <date>2020-08-29T09:23:37Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>MSSQL by ODBC</template>
-         <name>MSSQL by ODBC</name>
+         <template>Template DB MSSQL by ODBC</template>
+         <name>Template DB MSSQL by ODBC</name>
          <description>1. Create an MSSQL user for monitoring.&#13;
   View Server State and View Any Definition permissions should be granted to the user.&#13;
   For more information please see the MSSQL documentation.&#13;
@@ -24,7 +24,7 @@ The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -47,40 +47,49 @@ Template tooling version used: 0.38</description>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT object_name,counter_name,instance_name,cntr_value
-FROM sys.dm_os_performance_counters
-UNION
-SELECT '{$MSSQL.INSTANCE}' as object_name,'Version' as counter_name,@@version as instance_name,0 as cntr_value
-UNION
-SELECT '{$MSSQL.INSTANCE}' as object_name,'Uptime' as counter_name,'' as instance_name,DATEDIFF(second,sqlserver_start_time,GETDATE()) as cntr_value
+               <params>SELECT object_name, counter_name, instance_name, cntr_value
+FROM sys.dm_os_performance_counters 
+UNION 
+SELECT '{$MSSQL.INSTANCE}' as object_name, 'Version' as counter_name, @@version as instance_name, 0 as cntr_value
+UNION 
+SELECT '{$MSSQL.INSTANCE}' as object_name, 'Uptime' as counter_name, '' as instance_name, 
+DATEDIFF(second, sqlserver_start_time, GETDATE()) as cntr_value
 FROM sys.dm_os_sys_info
 UNION
-SELECT '{$MSSQL.INSTANCE}:Databases' as object_name,'State' as counter_name,name as instance_name,state as cntr_value
+SELECT '{$MSSQL.INSTANCE}:Databases' as object_name, 'State' as counter_name, name as instance_name, state as cntr_value
 FROM sys.databases
 UNION
-SELECT a.object_name,'BufferCacheHitRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters a
-JOIN (SELECT cntr_value,OBJECT_NAME
-FROM sys.dm_os_performance_counters
-WHERE counter_name='Buffer cache hit ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager') b
-ON a.OBJECT_NAME=b.OBJECT_NAME
-WHERE a.counter_name='Buffer cache hit ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager'
+SELECT a.object_name, 'BufferCacheHitRatio' as counter_name, '' as instance_name, 
+cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters  a
+JOIN  (SELECT cntr_value,OBJECT_NAME 
+  FROM sys.dm_os_performance_counters  
+    WHERE counter_name = 'Buffer cache hit ratio base'
+        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+WHERE a.counter_name = 'Buffer cache hit ratio'
+AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager'
 UNION
-SELECT a.object_name,'WorktablesFromCacheRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters a
-JOIN (SELECT cntr_value,OBJECT_NAME
-FROM sys.dm_os_performance_counters
-WHERE counter_name='Worktables From Cache Base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods') b
-ON a.OBJECT_NAME=b.OBJECT_NAME
-WHERE a.counter_name='Worktables From Cache Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods'
+SELECT a.object_name, 'WorktablesFromCacheRatio' as counter_name, '' as instance_name, 
+cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters  a
+JOIN  (SELECT cntr_value,OBJECT_NAME 
+  FROM sys.dm_os_performance_counters  
+    WHERE counter_name = 'Worktables From Cache Base'
+        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+WHERE a.counter_name = 'Worktables From Cache Ratio'
+AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods'
 UNION
-SELECT a.object_name,'CacheHitRatio' as counter_name,'_Total' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters a
-JOIN (SELECT cntr_value,OBJECT_NAME
-FROM sys.dm_os_performance_counters
-WHERE counter_name='Cache Hit Ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total') b
-ON a.OBJECT_NAME=b.OBJECT_NAME
-WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total'</params>
+SELECT a.object_name, 'CacheHitRatio' as counter_name, '_Total' as instance_name, 
+cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters  a
+JOIN  (SELECT cntr_value,OBJECT_NAME 
+  FROM sys.dm_os_performance_counters  
+    WHERE counter_name = 'Cache Hit Ratio base'
+        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
+        AND instance_name = '_Total') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+WHERE a.counter_name = 'Cache Hit Ratio'
+  AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
+  AND instance_name = '_Total'</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
                <description>The item gets server global status information.</description>
@@ -317,7 +326,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <dependencies>
                         <dependency>
                            <name>MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)</name>
-                           <expression>{MSSQL by ODBC:mssql.buffer_cache_hit_ratio.max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</expression>
+                           <expression>{Template DB MSSQL by ODBC:mssql.buffer_cache_hit_ratio.max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1788,7 +1797,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <dependencies>
                         <dependency>
                            <name>MSSQL: Service is unavailable</name>
-                           <expression>{MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0</expression>
+                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -2645,7 +2654,7 @@ FROM sys.databases</params>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_files_size["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -2653,7 +2662,7 @@ FROM sys.databases</params>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_files_used_size["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -2665,7 +2674,7 @@ FROM sys.databases</params>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_growths["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -2673,7 +2682,7 @@ FROM sys.databases</params>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_shrinks["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -2681,7 +2690,7 @@ FROM sys.databases</params>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_truncations["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -2693,7 +2702,7 @@ FROM sys.databases</params>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.data_files_size["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -3110,7 +3119,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.mirroring.state["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -3118,7 +3127,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>MSSQL by ODBC</host>
+                              <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.mirroring.witness_state["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
@@ -3576,7 +3585,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2</expression>
+                     <expression>{Template DB MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {Template DB MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2</expression>
                      <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is disconnected</name>
                      <priority>WARNING</priority>
                      <description>The response of an availability replica to the DISCONNECTED state depends on its role: &#13;
@@ -3732,13 +3741,13 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
    </templates>
    <triggers>
       <trigger>
-         <expression>{MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 &gt; 10 * {MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}</expression>
+         <expression>{Template DB MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 &gt; 10 * {Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}</expression>
          <name>MSSQL: Too frequently pointers using</name>
          <priority>WARNING</priority>
          <description>Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.</description>
       </trigger>
       <trigger>
-         <expression>{MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {MSSQL by ODBC:mssql.page_reads_sec.rate.last()}</expression>
+         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()}</expression>
          <name>MSSQL: Too many physical reads occurring</name>
          <priority>WARNING</priority>
          <description>If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.</description>
@@ -3751,7 +3760,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.forwarded_records_sec.rate</key>
                </item>
             </graph_item>
@@ -3759,7 +3768,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.full_scans_sec.rate</key>
                </item>
             </graph_item>
@@ -3767,7 +3776,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.index_searches_sec.rate</key>
                </item>
             </graph_item>
@@ -3775,7 +3784,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.page_splits_sec.rate</key>
                </item>
             </graph_item>
@@ -3783,7 +3792,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.workfiles_created_sec.rate</key>
                </item>
             </graph_item>
@@ -3791,7 +3800,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.worktables_created_sec.rate</key>
                </item>
             </graph_item>
@@ -3803,7 +3812,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.autoparam_attempts_sec.rate</key>
                </item>
             </graph_item>
@@ -3811,7 +3820,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.failed_autoparams_sec.rate</key>
                </item>
             </graph_item>
@@ -3819,7 +3828,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.safe_autoparams_sec.rate</key>
                </item>
             </graph_item>
@@ -3827,7 +3836,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.unsafe_autoparams_sec.rate</key>
                </item>
             </graph_item>
@@ -3839,7 +3848,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.cache_object_counts</key>
                </item>
             </graph_item>
@@ -3847,7 +3856,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.cache_objects_in_use</key>
                </item>
             </graph_item>
@@ -3859,7 +3868,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.sql_compilations_sec.rate</key>
                </item>
             </graph_item>
@@ -3867,7 +3876,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.sql_compilations_sec.rate</key>
                </item>
             </graph_item>
@@ -3879,7 +3888,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.database_pages</key>
                </item>
             </graph_item>
@@ -3887,7 +3896,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.target_pages</key>
                </item>
             </graph_item>
@@ -3899,7 +3908,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.errors_sec.rate</key>
                </item>
             </graph_item>
@@ -3907,7 +3916,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.offline_errors_sec.rate</key>
                </item>
             </graph_item>
@@ -3915,7 +3924,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.info_errors_sec.rate</key>
                </item>
             </graph_item>
@@ -3923,7 +3932,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.kill_connection_errors_sec.rate</key>
                </item>
             </graph_item>
@@ -3931,7 +3940,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.user_errors_sec.rate</key>
                </item>
             </graph_item>
@@ -3943,7 +3952,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.lock_requests_sec.rate</key>
                </item>
             </graph_item>
@@ -3951,7 +3960,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.lock_timeouts_sec.rate</key>
                </item>
             </graph_item>
@@ -3959,7 +3968,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.number_deadlocks_sec.rate</key>
                </item>
             </graph_item>
@@ -3967,7 +3976,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.lock_waits_sec.rate</key>
                </item>
             </graph_item>
@@ -3975,7 +3984,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.average_wait_time</key>
                </item>
             </graph_item>
@@ -3987,7 +3996,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.logins_sec.rate</key>
                </item>
             </graph_item>
@@ -3995,7 +4004,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.logouts_sec.rate</key>
                </item>
             </graph_item>
@@ -4007,7 +4016,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.cache_hit_ratio</key>
                </item>
             </graph_item>
@@ -4015,7 +4024,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.buffer_cache_hit_ratio</key>
                </item>
             </graph_item>
@@ -4027,7 +4036,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.memory_grants_outstanding</key>
                </item>
             </graph_item>
@@ -4035,7 +4044,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.memory_grants_pending</key>
                </item>
             </graph_item>
@@ -4047,7 +4056,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.page_life_expectancy</key>
                </item>
             </graph_item>
@@ -4059,7 +4068,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.page_lookups_sec.rate</key>
                </item>
             </graph_item>
@@ -4067,7 +4076,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.page_reads_sec.rate</key>
                </item>
             </graph_item>
@@ -4075,7 +4084,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.page_writes_sec.rate</key>
                </item>
             </graph_item>
@@ -4083,7 +4092,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.readahead_pages_sec.rate</key>
                </item>
             </graph_item>
@@ -4091,7 +4100,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.checkpoint_pages_sec.rate</key>
                </item>
             </graph_item>
@@ -4099,7 +4108,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.free_list_stalls_sec.rate</key>
                </item>
             </graph_item>
@@ -4107,7 +4116,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.lazy_writes_sec.rate</key>
                </item>
             </graph_item>
@@ -4119,7 +4128,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.processes_blocked</key>
                </item>
             </graph_item>
@@ -4131,7 +4140,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.target_server_memory</key>
                </item>
             </graph_item>
@@ -4139,7 +4148,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.total_server_memory</key>
                </item>
             </graph_item>
@@ -4147,7 +4156,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.granted_workspace_memory</key>
                </item>
             </graph_item>
@@ -4155,7 +4164,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.maximum_workspace_memory</key>
                </item>
             </graph_item>
@@ -4167,7 +4176,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.transactions_sec.rate</key>
                </item>
             </graph_item>
@@ -4175,7 +4184,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.batch_requests_sec.rate</key>
                </item>
             </graph_item>
@@ -4187,7 +4196,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.latch_waits_sec.rate</key>
                </item>
             </graph_item>
@@ -4195,7 +4204,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.lock_waits_sec.rate</key>
                </item>
             </graph_item>
@@ -4207,7 +4216,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.average_latch_wait_time</key>
                </item>
             </graph_item>
@@ -4215,7 +4224,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.total_latch_wait_time</key>
                </item>
             </graph_item>
@@ -4223,7 +4232,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.average_wait_time</key>
                </item>
             </graph_item>
@@ -4231,7 +4240,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>MSSQL by ODBC</host>
+                  <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.lock_wait_time</key>
                </item>
             </graph_item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:51Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:29:12Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -12,14 +12,14 @@
    </groups>
    <templates>
       <template>
-         <template>Brocade_Foundry Performance SNMP</template>
-         <name>Brocade_Foundry Performance SNMP</name>
+         <template>Template Module Brocade_Foundry Performance SNMP</template>
+         <name>Template Module Brocade_Foundry Performance SNMP</name>
          <description>Template Module Brocade_Foundry Performance&#13;
 &#13;
 MIBs used:&#13;
 FOUNDRY-SN-AGENT-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -98,23 +98,23 @@ For NI platforms, refer to snAgentBrdMemoryUtil100thPercent</description>
          </macros>
       </template>
       <template>
-         <template>Brocade_Foundry Nonstackable SNMP</template>
-         <name>Brocade_Foundry Nonstackable SNMP</name>
+         <template>Template Net Brocade_Foundry Nonstackable SNMP</template>
+         <name>Template Net Brocade_Foundry Nonstackable SNMP</name>
          <description>Template Net Brocade_Foundry Nonstackable&#13;
 &#13;
 MIBs used:&#13;
 FOUNDRY-SN-AGENT-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Brocade_Foundry Performance SNMP</name>
+               <name>Template Module Brocade_Foundry Performance SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -246,14 +246,13 @@ The version of the running software in the form'major.minor.maintenance[letters]
                            <dependencies>
                               <dependency>
                                  <name>Fan {#FAN_INDEX}: Fan is in critical state</name>
-                                 <expression>{Brocade_Foundry Nonstackable SNMP:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -297,14 +296,13 @@ The version of the running software in the form'major.minor.maintenance[letters]
                            <dependencies>
                               <dependency>
                                  <name>PSU {#PSU_INDEX}: Power supply is in critical state</name>
-                                 <expression>{Brocade_Foundry Nonstackable SNMP:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery Chassis</name>
@@ -349,8 +347,8 @@ For those non-applicable management module, it returns no-such-name.</descriptio
                            <dependencies>
                               <dependency>
                                  <name>Chassis #{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Chassis"}</name>
-                                 <expression>{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Chassis"}</expression>
-                                 <recovery_expression>{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Chassis"}-3</recovery_expression>
+                                 <expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Chassis"}</expression>
+                                 <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Chassis"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -374,7 +372,6 @@ For those non-applicable management module, it returns no-such-name.</descriptio
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -417,8 +414,8 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMP:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -442,7 +439,6 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -477,8 +473,8 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
          </macros>
       </template>
       <template>
-         <template>Brocade_Foundry Stackable SNMP</template>
-         <name>Brocade_Foundry Stackable SNMP</name>
+         <template>Template Net Brocade_Foundry Stackable SNMP</template>
+         <name>Template Net Brocade_Foundry Stackable SNMP</name>
          <description>Template Brocade_Foundry Stackable&#13;
 &#13;
 MIBs used:&#13;
@@ -491,16 +487,16 @@ Known Issues:&#13;
   Version: Version 08.0.40b and above&#13;
   Device: ICX 7750 in stack&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Brocade_Foundry Performance SNMP</name>
+               <name>Template Module Brocade_Foundry Performance SNMP</name>
             </template>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>Interfaces SNMP</name>
+               <name>Template Module Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -599,7 +595,6 @@ The serial number of the chassis for each unit. If the serial number is unknown 
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -643,14 +638,13 @@ The serial number of the chassis for each unit. If the serial number is unknown 
                            <dependencies>
                               <dependency>
                                  <name>Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state</name>
-                                 <expression>{Brocade_Foundry Stackable SNMP:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Net Brocade_Foundry Stackable SNMP:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -694,14 +688,13 @@ The serial number of the chassis for each unit. If the serial number is unknown 
                            <dependencies>
                               <dependency>
                                  <name>Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state</name>
-                                 <expression>{Brocade_Foundry Stackable SNMP:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Template Net Brocade_Foundry Stackable SNMP:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Stack Discovery</name>
@@ -735,7 +728,6 @@ A description of the configured/active system type for each unit.</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -778,8 +770,8 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Net Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Brocade_Foundry Stackable SNMP:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -803,7 +795,6 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -848,7 +839,7 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Brocade_Foundry Performance SNMP</host>
+                  <host>Template Module Brocade_Foundry Performance SNMP</host>
                   <key>system.cpu.util[snAgGblCpuUtil1MinAvg.0]</key>
                </item>
             </graph_item>
@@ -863,7 +854,7 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Brocade_Foundry Performance SNMP</host>
+                  <host>Template Module Brocade_Foundry Performance SNMP</host>
                   <key>vm.memory.util[snAgGblDynMemUtil.0]</key>
                </item>
             </graph_item>

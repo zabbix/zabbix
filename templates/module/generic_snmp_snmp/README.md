@@ -1,9 +1,9 @@
 
-# Generic SNMP
+# Template Module Generic SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 ## Setup
 
@@ -23,7 +23,7 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|ICMP Ping |
+|Template Module ICMP Ping |
 
 ## Discovery rules
 

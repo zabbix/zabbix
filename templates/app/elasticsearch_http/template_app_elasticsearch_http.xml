@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:32:06Z</date>
+   <version>5.0</version>
+   <date>2020-04-21T07:09:29Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Elasticsearch Cluster by HTTP</template>
-         <name>Elasticsearch Cluster by HTTP</name>
+         <template>Template App Elasticsearch Cluster by HTTP</template>
+         <name>Template App Elasticsearch Cluster by HTTP</name>
          <description>The template to monitor Elasticsearch by Zabbix that work without any external scripts.&#13;
 It works with both standalone and cluster instances.&#13;
 The metrics are collected in one pass remotely using an HTTP agent. &#13;
@@ -21,7 +21,7 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -661,7 +661,7 @@ This is the actual amount of free disk space the selected Elasticsearch nodes ca
                      <dependencies>
                         <dependency>
                            <name>ES: Service is down</name>
-                           <expression>{Elasticsearch Cluster by HTTP:net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"].last()}=0</expression>
+                           <expression>{Template App Elasticsearch Cluster by HTTP:net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1595,7 +1595,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <dependencies>
                               <dependency>
                                  <name>ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)</name>
-                                 <expression>{Elasticsearch Cluster by HTTP:es.node.jvm.mem.heap_used_percent[{#ES.NODE}].min(1h)}&gt;{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}</expression>
+                                 <expression>{Template App Elasticsearch Cluster by HTTP:es.node.jvm.mem.heap_used_percent[{#ES.NODE}].min(1h)}&gt;{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -1971,7 +1971,6 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>ES {#ES.NODE}: Latency</name>
@@ -1979,7 +1978,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.indices.search.query_latency[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -1987,7 +1986,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.indices.indexing.index_latency[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -1995,7 +1994,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.indices.search.fetch_latency[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2003,7 +2002,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.indices.flush.latency[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2015,7 +2014,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.indices.search.fetch_current[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2023,7 +2022,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.indices.search.query_current[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2035,7 +2034,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.refresh.active[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2043,7 +2042,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.refresh.queue[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2051,7 +2050,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2059,7 +2058,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2071,7 +2070,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.search.active[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2079,7 +2078,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.search.queue[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2087,7 +2086,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.search.completed.rate[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2095,7 +2094,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.search.rejected.rate[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2107,7 +2106,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.write.active[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2115,7 +2114,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.write.queue[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2123,7 +2122,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.write.completed.rate[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2131,7 +2130,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Elasticsearch Cluster by HTTP</host>
+                              <host>Template App Elasticsearch Cluster by HTTP</host>
                               <key>es.node.thread_pool.write.rejected.rate[{#ES.NODE}]</key>
                            </item>
                         </graph_item>
@@ -2215,7 +2214,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
    </templates>
    <triggers>
       <trigger>
-         <expression>({Elasticsearch Cluster by HTTP:es.nodes.fs.total_in_bytes.last()}-{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()})/({Elasticsearch Cluster by HTTP:es.cluster.number_of_data_nodes.last()}-1)&gt;{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()}</expression>
+         <expression>({Template App Elasticsearch Cluster by HTTP:es.nodes.fs.total_in_bytes.last()}-{Template App Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()})/({Template App Elasticsearch Cluster by HTTP:es.cluster.number_of_data_nodes.last()}-1)&gt;{Template App Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()}</expression>
          <name>ES: Cluster does not have enough space for resharding</name>
          <priority>HIGH</priority>
          <description>There is not enough disk space for index resharding.</description>
@@ -2228,7 +2227,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Elasticsearch Cluster by HTTP</host>
+                  <host>Template App Elasticsearch Cluster by HTTP</host>
                   <key>es.cluster.inactive_shards_percent_as_number</key>
                </item>
             </graph_item>
@@ -2236,7 +2235,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Elasticsearch Cluster by HTTP</host>
+                  <host>Template App Elasticsearch Cluster by HTTP</host>
                   <key>es.cluster.relocating_shards</key>
                </item>
             </graph_item>
@@ -2244,7 +2243,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Elasticsearch Cluster by HTTP</host>
+                  <host>Template App Elasticsearch Cluster by HTTP</host>
                   <key>es.cluster.initializing_shards</key>
                </item>
             </graph_item>
@@ -2252,7 +2251,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Elasticsearch Cluster by HTTP</host>
+                  <host>Template App Elasticsearch Cluster by HTTP</host>
                   <key>es.cluster.unassigned_shards</key>
                </item>
             </graph_item>
@@ -2260,7 +2259,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Elasticsearch Cluster by HTTP</host>
+                  <host>Template App Elasticsearch Cluster by HTTP</host>
                   <key>es.cluster.delayed_unassigned_shards</key>
                </item>
             </graph_item>
@@ -2268,7 +2267,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Elasticsearch Cluster by HTTP</host>
+                  <host>Template App Elasticsearch Cluster by HTTP</host>
                   <key>es.cluster.number_of_pending_tasks</key>
                </item>
             </graph_item>
@@ -2276,7 +2275,7 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Elasticsearch Cluster by HTTP</host>
+                  <host>Template App Elasticsearch Cluster by HTTP</host>
                   <key>es.cluster.task_max_waiting_in_queue</key>
                </item>
             </graph_item>

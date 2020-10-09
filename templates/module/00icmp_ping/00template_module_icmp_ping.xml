@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:37Z</date>
+   <version>4.4</version>
+   <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -9,11 +9,11 @@
    </groups>
    <templates>
       <template>
-         <template>ICMP Ping</template>
-         <name>ICMP Ping</name>
+         <template>Template Module ICMP Ping</template>
+         <name>Template Module ICMP Ping</name>
          <description>Template Module ICMP Ping&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.34</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -68,7 +68,7 @@ Template tooling version used: 0.38</description>
                      <dependencies>
                         <dependency>
                            <name>Unavailable by ICMP ping</name>
-                           <expression>{ICMP Ping:icmpping.max(#3)}=0</expression>
+                           <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -95,11 +95,11 @@ Template tooling version used: 0.38</description>
                      <dependencies>
                         <dependency>
                            <name>High ICMP ping loss</name>
-                           <expression>{ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
+                           <expression>{Template Module ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
                         </dependency>
                         <dependency>
                            <name>Unavailable by ICMP ping</name>
-                           <expression>{ICMP Ping:icmpping.max(#3)}=0</expression>
+                           <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>

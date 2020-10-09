@@ -420,7 +420,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'create_enabled' => true,
 					'hostgroup' => 'Hypervisors',
 					'group_prototype' => 'Clone group prototype {#CLONE_GROUP_PROTO}',
-					'template' => 'Mac OS X',
+					'template' => 'Template OS Mac OS X',
 					'inventory' => 'Manual',
 					'check_form' => true
 				]

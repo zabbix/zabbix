@@ -265,7 +265,6 @@
 			delete cached_values.interfaceid;
 			delete cached_values.address;
 			delete cached_values.port;
-			delete cached_values.interface_details;
 		}
 
 		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {

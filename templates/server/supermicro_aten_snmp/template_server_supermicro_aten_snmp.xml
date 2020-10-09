@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:31:38Z</date>
+   <version>5.0</version>
+   <date>2020-06-04T23:48:10Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -9,17 +9,17 @@
    </groups>
    <templates>
       <template>
-         <template>Supermicro Aten SNMP</template>
-         <name>Supermicro Aten SNMP</name>
+         <template>Template Server Supermicro Aten SNMP</template>
+         <name>Template Server Supermicro Aten SNMP</name>
          <description>Template Server Supermicro Aten&#13;
 &#13;
 MIBs used:&#13;
 ATEN-IPMI-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
          </templates>
          <groups>
@@ -75,7 +75,6 @@ This string should include the name of the manufacturer, the product name and th
                      </applications>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -128,8 +127,8 @@ This string should include the name of the manufacturer, the product name and th
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                                 <expression>{Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                                 <recovery_expression>{Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                                 <expression>{Template Server Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Server Supermicro Aten SNMP:sensor.temp.value[sensorReading.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -153,7 +152,6 @@ This string should include the name of the manufacturer, the product name and th
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

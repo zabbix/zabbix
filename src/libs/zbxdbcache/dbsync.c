@@ -1460,9 +1460,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (numitem->trends != (0 != trends_sec))
 			return FAIL;
 
-		if (numitem->trends_sec != trends_sec)
-			return FAIL;
-
 		if (FAIL == dbsync_compare_str(dbrow[26], numitem->units))
 			return FAIL;
 	}
@@ -3595,11 +3592,11 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 			" where pp.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and (h.proxy_hostid is null"
-					" or i.type in (%d,%d,%d,%d))"
+					" or i.type in (%d,%d,%d))"
 				" and h.status in (%d,%d)"
 				" and i.flags<>%d"
 			" order by pp.itemid",
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
+			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
@@ -3623,14 +3620,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		unsigned char	type;
 
 		ZBX_STR2UCHAR(type, dbrow[8]);
-
-		/* Sync preproccessing for all dependent items as they can depend on item processed by Zabbx server, */
-		/* avoid syncing preprocessing for internal items monitored by Zabbix proxy                          */
-		if (type != ITEM_TYPE_DEPENDENT && SUCCEED != DBis_null(dbrow[10]) &&
-				SUCCEED != is_item_processed_by_server(type, dbrow[9]))
-		{
+		if (SUCCEED != DBis_null(dbrow[10]) && SUCCEED != is_item_processed_by_server(type, dbrow[9]))
 			continue;
-		}
 
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));

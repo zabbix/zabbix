@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.2</version>
-   <date>2020-10-06T01:32:02Z</date>
+   <version>5.0</version>
+   <date>2020-06-05T01:30:23Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Windows SNMP</template>
-         <name>Windows SNMP</name>
+         <template>Template OS Windows SNMP</template>
+         <name>Template OS Windows SNMP</name>
          <description>Official Windows SNMP template. Requires Zabbix server 4.0.14, 4.2.8, 4.4.0 or newer (JSONPath function avg() used with types autoconversion).&#13;
 &#13;
 &#13;
@@ -29,16 +29,16 @@ https://social.technet.microsoft.com/Forums/windowsserver/en-US/07b62ff0-94f6-40
   Version: *&#13;
   Device: *&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
-               <name>Generic SNMP</name>
+               <name>Template Module Generic SNMP</name>
             </template>
             <template>
-               <name>HOST-RESOURCES-MIB SNMP</name>
+               <name>Template Module HOST-RESOURCES-MIB SNMP</name>
             </template>
             <template>
-               <name>Interfaces Windows SNMP</name>
+               <name>Template Module Interfaces Windows SNMP</name>
             </template>
          </templates>
          <groups>

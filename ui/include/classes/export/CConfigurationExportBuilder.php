@@ -793,9 +793,7 @@ class CConfigurationExportBuilder {
 				'macros' => $this->formatMacros($hostPrototype['macros']),
 				'tags' => $this->formatTags($hostPrototype['tags']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
-				'inventory_mode' => $hostPrototype['inventory_mode'],
-				'custom_interfaces' => $hostPrototype['custom_interfaces'],
-				'interfaces' => $this->formatHostPrototypeInterfaces($hostPrototype['interfaces'])
+				'inventory_mode' => $hostPrototype['inventory_mode']
 			];
 		}
 
@@ -929,36 +927,6 @@ class CConfigurationExportBuilder {
 				'details' => $interface['details'],
 				'interface_ref' => $interface['interface_ref']
 			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format host prototype interfaces.
-	 *
-	 * @param array $interfaces
-	 *
-	 * @return array
-	 */
-	protected function formatHostPrototypeInterfaces(array $interfaces): array {
-		$result = [];
-
-		CArrayHelper::sort($interfaces, ['type', 'ip', 'dns', 'port']);
-
-		foreach ($interfaces as $num => $interface) {
-			$result[$num] = [
-				'default' => $interface['main'],
-				'type' => $interface['type'],
-				'useip' => $interface['useip'],
-				'ip' => $interface['ip'],
-				'dns' => $interface['dns'],
-				'port' => $interface['port']
-			];
-
-			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-				$result[$num]['details'] = $interface['details'];
-			}
 		}
 
 		return $result;

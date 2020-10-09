@@ -1,9 +1,9 @@
 
-# Windows SNMP
+# Template OS Windows SNMP
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.0  
 
 ## Setup
 
@@ -18,9 +18,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Generic SNMP |
-|HOST-RESOURCES-MIB SNMP |
-|Interfaces Windows SNMP |
+|Template Module Generic SNMP |
+|Template Module HOST-RESOURCES-MIB SNMP |
+|Template Module Interfaces Windows SNMP |
 
 ## Discovery rules
 
