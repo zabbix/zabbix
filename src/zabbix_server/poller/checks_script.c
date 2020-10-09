@@ -37,7 +37,13 @@ void	scriptitem_es_engine_destroy(void)
 int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
-	int		script_bin_sz, ret = NOTSUPPORTED;
+	int		script_bin_sz, timeout_seconds, ret = NOTSUPPORTED;
+
+	if (FAIL == is_time_suffix(item->timeout, &timeout_seconds, strlen(item->timeout)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid timeout: %s", item->timeout));
+		return ret;
+	}
 
 	if (SUCCEED != zbx_es_is_env_initialized(&es_engine) && SUCCEED != zbx_es_init_env(&es_engine, &error))
 	{
@@ -51,7 +57,7 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 		goto err;
 	}
 
-	zbx_es_set_timeout(&es_engine, atoi(item->timeout));
+	zbx_es_set_timeout(&es_engine, timeout_seconds);
 
 	if (SUCCEED != zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, item->script_params, &output,
 			&error))
