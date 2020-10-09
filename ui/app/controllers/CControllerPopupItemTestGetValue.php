@@ -152,6 +152,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_ap' => 'params',
 			'params_es' => 'params',
 			'params_f' => 'params',
+			'script' => 'params',
 			'http_username' => 'username',
 			'http_password' => 'password',
 			'http_authtype' => 'authtype',
