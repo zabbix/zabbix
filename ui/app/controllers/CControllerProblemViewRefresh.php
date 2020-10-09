@@ -1,5 +1,4 @@
-<?php declare(strict_types = 1);
-
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -20,49 +19,34 @@
 **/
 
 
-/**
- * Controller for the "Host->Monitoring" asynchronous refresh page.
- */
-class CControllerHostViewRefresh extends CControllerHostView {
+class CControllerProblemViewRefresh extends CControllerProblemView {
 
-	protected function doAction(): void {
-		$filter = static::FILTER_FIELDS_DEFAULT;
+	protected function doAction() {
+		$data = [];
 
 		if ($this->getInput('filter_counters', 0)) {
 			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 			$filters = $this->hasInput('counter_index')
 				? [$profile->getTabFilter($this->getInput('counter_index'))]
 				: $profile->getTabsWithDefaults();
-			$filter_counters = [];
+			$data['filter_counters'] = [];
 
 			foreach ($filters as $index => $tabfilter) {
-				$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+				if (!$tabfilter['filter_custom_time']) {
+					$tabfilter = [
+						'from' => $profile->from,
+						'to' => $profile->to
+					] + $tabfilter;
+				}
+
+				$data['filter_counters'][$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
-
-			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['filter_counters' => $filter_counters])
-				]))->disableView()
-			);
 		}
-		else {
-			$this->getInputs($filter, array_keys($filter));
-			$filter = $this->cleanInput($filter);
-			$prepared_data = $this->getData($filter);
 
-			$view_url = (new CUrl())
-				->setArgument('action', 'host.view')
-				->removeArgument('page');
-
-			$data = [
-				'filter' => $filter,
-				'view_curl' => $view_url,
-				'sort' => $filter['sort'],
-				'sortorder' => $filter['sortorder']
-			] + $prepared_data;
-
-			$response = new CControllerResponseData($data);
-			$this->setResponse($response);
+		if (($messages = getMessages()) !== null) {
+			$data['messages'] = $messages->toString();
 		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }

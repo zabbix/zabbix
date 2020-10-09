@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0beta2');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010035);
+define('ZABBIX_DB_VERSION',		5010037);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -1695,6 +1695,7 @@ define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
+define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');

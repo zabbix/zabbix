@@ -298,14 +298,33 @@ static int	DBpatch_5010033(void)
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_5010034(void)
+static int DBpatch_5010034(void)
+{
+	const ZBX_FIELD	old_field = {"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("profiles", &field, &old_field);
+}
+
+static int DBpatch_5010035(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.hostsmon.filter.%%' or idx like 'web.problem.filter%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5010036(void)
 {
 	const ZBX_FIELD	field = {"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("triggers", &field);
 }
 
-static int	DBpatch_5010035(void)
+static int	DBpatch_5010037(void)
 {
 	const ZBX_TABLE	table =
 			{"trigger_queue", "", 0,
@@ -321,6 +340,7 @@ static int	DBpatch_5010035(void)
 
 	return DBcreate_table(&table);
 }
+
 #endif
 
 DBPATCH_START(5010)
@@ -363,5 +383,7 @@ DBPATCH_ADD(5010032, 0, 1)
 DBPATCH_ADD(5010033, 0, 1)
 DBPATCH_ADD(5010034, 0, 1)
 DBPATCH_ADD(5010035, 0, 1)
+DBPATCH_ADD(5010036, 0, 1)
+DBPATCH_ADD(5010037, 0, 1)
 
 DBPATCH_END()

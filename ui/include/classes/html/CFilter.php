@@ -98,7 +98,7 @@ class CFilter extends CDiv {
 
 		$this
 			->setAttribute('data-accessible', 1)
-			->addClass('filter-space')
+			->addClass(ZBX_STYLE_FILTER_SPACE)
 			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))
