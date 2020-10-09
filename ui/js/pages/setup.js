@@ -31,6 +31,7 @@ function updateElementsAvailability() {
 		|| (db_type === ZBX_DB_POSTGRESQL && !host.startsWith('/'))));
 	const encryption_customizable = (encryption_supported && encryption_allowed && encryption_enabled
 		&& document.querySelector('#verify_certificate').checked);
+	const vault_enabled = (document.querySelector('#creds_storage_0:checked, #creds_storage_1:checked').value == 1);
 	const rows = {
 			'#db_schema_row': (db_type === ZBX_DB_POSTGRESQL),
 			'#db_encryption_row': encryption_supported,
@@ -39,7 +40,12 @@ function updateElementsAvailability() {
 			'#db_certfile_row': encryption_customizable,
 			'#db_cafile_row': encryption_customizable,
 			'#db_verify_host_row': encryption_customizable,
-			'#db_cipher_row': (encryption_customizable && (db_type === ZBX_DB_MYSQL))
+			'#db_cipher_row': (encryption_customizable && (db_type === ZBX_DB_MYSQL)),
+			'#vault_url_row': vault_enabled,
+			'#vault_db_path_row': vault_enabled,
+			'#vault_token_row': vault_enabled,
+			'#db_user': !vault_enabled,
+			'#db_password': !vault_enabled
 		};
 
 	for (let selector in rows) {
@@ -111,7 +117,7 @@ function updateElementsAvailability() {
 document.addEventListener('DOMContentLoaded', () => {
 	// Stage 2, database configuration.
 	if (document.querySelector('[name=type]')) {
-		document.querySelectorAll('#type, #server, #tls_encryption, #verify_certificate').forEach(
+		document.querySelectorAll('#type, #server, #tls_encryption, #verify_certificate, #creds_storage').forEach(
 			(elem) => elem.addEventListener('change', updateElementsAvailability)
 		);
 

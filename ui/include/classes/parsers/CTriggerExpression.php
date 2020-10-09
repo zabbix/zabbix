@@ -212,7 +212,7 @@ class CTriggerExpression {
 		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
 		$this->notOperatorParser = new CSetParser(['not']);
-		$this->macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$this->macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 		if ($this->options['collapsed_expression']) {
 			$this->functionid_parser = new CFunctionIdParser();
 		}
@@ -873,7 +873,7 @@ class CTriggerExpression {
 
 			if ($allow_macros) {
 				$user_macro_parser = new CUserMacroParser();
-				$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+				$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 				$lld_macro_parser = new CLLDMacroParser();
 				$lld_macro_function_parser = new CLLDMacroFunctionParser;
 

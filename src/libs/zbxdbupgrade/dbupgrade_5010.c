@@ -293,12 +293,19 @@ static int	DBpatch_5010032(void)
 
 static int	DBpatch_5010033(void)
 {
+	const ZBX_FIELD	field = {"custom_interfaces", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_5010034(void)
+{
 	const ZBX_FIELD	field = {"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("triggers", &field);
 }
 
-static int	DBpatch_5010034(void)
+static int	DBpatch_5010035(void)
 {
 	const ZBX_TABLE	table =
 			{"trigger_queue", "", 0,
@@ -314,7 +321,6 @@ static int	DBpatch_5010034(void)
 
 	return DBcreate_table(&table);
 }
-
 #endif
 
 DBPATCH_START(5010)
@@ -356,5 +362,6 @@ DBPATCH_ADD(5010031, 0, 1)
 DBPATCH_ADD(5010032, 0, 1)
 DBPATCH_ADD(5010033, 0, 1)
 DBPATCH_ADD(5010034, 0, 1)
+DBPATCH_ADD(5010035, 0, 1)
 
 DBPATCH_END()

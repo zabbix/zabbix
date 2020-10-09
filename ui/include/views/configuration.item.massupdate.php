@@ -523,7 +523,7 @@ $form->addItem($tabs);
 $widget->addItem($form);
 
 $interface_ids_by_types = [];
-if ($data['displayInterfaces']) {
+if ($data['display_interfaces']) {
 	foreach ($data['hosts']['interfaces'] as $interface) {
 		$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
 	}
