@@ -27,10 +27,10 @@ $table = (new CTableInfo())
 	->setHeadingColumn(0);
 
 $headings[] = _('Hosts');
-foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
-	$headings[] = (new CColHeader($name))
+foreach ($data['items_by_key'] as $key => $hostid_to_itemid) {
+	$headings[] = (new CColHeader($data['item_names_by_key'][$key]))
 		->addClass('vertical_rotation')
-		->setTitle($name);
+		->setTitle($data['item_names_by_key'][$key]);
 }
 
 $table->setHeader($headings);
@@ -39,7 +39,7 @@ foreach ($data['db_hosts'] as $hostid => $host) {
 	$name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 	$row = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 
-	foreach ($data['items_by_name'] as $hostid_to_itemid) {
+	foreach ($data['items_by_key'] as $hostid_to_itemid) {
 		if (!array_key_exists($host['hostid'], $hostid_to_itemid)) {
 			$row[] = new CCol();
 		}
