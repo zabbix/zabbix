@@ -32,7 +32,7 @@ class testGraphPrototype extends CAPITest {
 				],
 				[
 					[
-						'graphid' => '1300'
+						'graphid' => '9000'
 					]
 				],
 				null

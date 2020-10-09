@@ -43,6 +43,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => ['host', 'user'],
 			'method' => 'resolveTexts'
 		],
+		'hostInterfaceDetailsSecurityname' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsAuthPassphrase' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsPrivPassphrase' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsContextName' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsCommunity' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
 		'hostInterfacePort' => [
 			'types' => ['user'],
 			'method' => 'resolveTexts'

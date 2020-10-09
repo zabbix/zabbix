@@ -891,6 +891,7 @@ class CConfigurationExport {
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
 			'inherited' => false,
 			'preservekeys' => true
 		]);

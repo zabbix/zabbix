@@ -44,7 +44,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	protected $hostName = 'Template inheritance test host';
 
 	public function testTemplateInheritance_linkHost(){
-		$sql = "select hostid from hosts where host='Template Module Zabbix agent';";
+		$sql = "select hostid from hosts where host='Zabbix agent';";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
@@ -58,9 +58,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		COverlayDialogElement::find()->one()->setDataContext('Templates');
-		$this->zbxTestClickLinkTextWait('Template Module Zabbix agent');
+		$this->zbxTestClickLinkTextWait('Zabbix agent');
 
-		$this->zbxTestTextPresent('Template Module Zabbix agent');
+		$this->zbxTestTextPresent('Zabbix agent');
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');

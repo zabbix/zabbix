@@ -95,6 +95,12 @@ $item_form_list
 				->setModern(true)
 		))->setId('post_type_container')
 	)
+	->addRow(
+		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))
+			->setLabel(_('Timeout'))
+			->setChecked(array_key_exists('timeout', $data['visible'])),
+		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
 	// Append "Request body" field (optional) for item prototype type "ITEM_TYPE_HTTPAGENT".
 	->addRow(
 		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))
@@ -540,8 +546,10 @@ $form->addItem($tabs);
 $widget->addItem($form);
 
 $interface_ids_by_types = [];
-foreach ($data['hosts']['interfaces'] as $interface) {
-	$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+if ($data['display_interfaces']) {
+	foreach ($data['hosts']['interfaces'] as $interface) {
+		$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+	}
 }
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

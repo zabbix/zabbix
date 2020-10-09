@@ -161,8 +161,10 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT Timeout field to form list.
 	->addRow(
-		new CLabel(_('Timeout'), 'timeout'),
-		(new CTextBox('timeout', $data['timeout'], $data['limited']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
+		(new CTextBox('timeout', $data['timeout'], $data['limited']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
 		'timeout_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
