@@ -61,7 +61,7 @@ int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	ret = SUCCEED;
-	SET_TEXT_RESULT(result, output);
+	SET_TEXT_RESULT(result, NULL != output ? output : zbx_strdup(NULL, ""));
 err:
 	if (SUCCEED == zbx_es_fatal_error(&es_engine))
 	{
