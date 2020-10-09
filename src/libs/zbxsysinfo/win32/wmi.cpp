@@ -239,8 +239,12 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 			return SYSINFO_RET_FAIL;
 		}
 
-		if (0 == uReturn && hres == WBEM_S_FALSE)
-			return SYSINFO_RET_OK;
+		if (0 == uReturn) {
+			if (WBEM_S_FALSE == hres)
+				return SYSINFO_RET_OK;
+			else
+				return SYSINFO_RET_FAIL;
+		}
 
 		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
