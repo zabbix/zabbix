@@ -20,6 +20,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 .filter-container.tabfilter-container {
 	padding: 0;
 	border: 0 none;
+	margin: 0;
 
 	.form-buttons {
 		[name="filter_new"],
@@ -33,6 +34,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		border: 1px solid $ui-border-color;
 		padding: 10px 0;
 		margin-top: -1px;
+		margin-bottom: 6px;
 	}
 
 	/* Top navigation labels */
@@ -56,6 +58,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 			ul {
 				white-space: nowrap;
+				margin-left: 3px;
+				margin-right: 3px;
 			}
 		}
 
@@ -141,7 +145,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		&.selected {
 			background-color: darken($tab-label-selected-bg-color, 5%);
-			border: 1px solid $tab-label-selected-border-color;
+			// border: 1px solid $tab-label-selected-border-color;
 
 			.tabfilter-item-link {
 				color: $tab-label-selected-color;

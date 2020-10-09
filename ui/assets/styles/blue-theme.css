@@ -471,6 +471,7 @@ footer {
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
+  margin: 0;
   /* All tab filters content container */
   /* Top navigation labels */
   /* tab filter label li element */
@@ -482,7 +483,8 @@ footer {
   .filter-container.tabfilter-container .tabfilter-content-container {
     border: 1px solid #dfe4e7;
     padding: 10px 0;
-    margin-top: -1px; }
+    margin-top: -1px;
+    margin-bottom: 6px; }
   .filter-container.tabfilter-container nav > ul {
     display: flex;
     flex: 1;
@@ -497,7 +499,9 @@ footer {
       margin: 0;
       height: 31px; }
       .filter-container.tabfilter-container nav > ul > li:nth-child(2) ul {
-        white-space: nowrap; }
+        white-space: nowrap;
+        margin-left: 3px;
+        margin-right: 3px; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(1), .filter-container.tabfilter-container nav > ul > li:nth-child(3) {
       white-space: nowrap; }
   .filter-container.tabfilter-container nav li {
@@ -548,8 +552,7 @@ footer {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .icon-edit {
         background: url("../img/icon-sprite.svg?20200407") no-repeat -44px -619px; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: #02659f;
-      border: 1px solid #0275b8; }
+      background-color: #02659f; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link {
         color: #ffffff; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
