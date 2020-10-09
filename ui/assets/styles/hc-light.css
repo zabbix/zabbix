@@ -515,7 +515,7 @@ footer {
     display: inline-block;
     background-color: #555555;
     border-radius: 2px;
-    border-top: 1px solid transparent;
+    border: 1px solid transparent;
     color: #ffffff;
     margin-right: 2px; }
     .filter-container.tabfilter-container .tabfilter-item-label:hover {
