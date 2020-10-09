@@ -550,7 +550,7 @@ footer {
         .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded.focused::after {
           background: #e8f5ff; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .icon-edit {
-        background: url("../img/icon-sprite.svg?20200407") no-repeat -44px -619px; }
+        background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -619px; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
       background-color: #02659f; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link {
