@@ -25,19 +25,28 @@
 class CEncryptedCookieSession extends CCookieSession {
 
 	/**
-	 * Prepare data and check sign.
+	 * @inheritDoc
 	 *
-	 * @param string $data
-	 *
-	 * @return boolean
+	 * @return string|null
 	 */
-	protected function checkSign(string $data): bool {
-		$data = unserialize($data);
-		$session_sign = $data['sign'];
-		unset($data['sign']);
-		$sign = CEncryptHelper::sign(serialize($data));
+	public function extractSessionId(): ?string {
+		if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
+			CEncryptHelper::updateKey(CEncryptHelper::generateKey());
+		}
 
-		return $session_sign && $sign && CEncryptHelper::checkSign($session_sign, $sign);
+		$session_data = $this->parseData();
+
+		if ($session_data === '' || !$this->checkSign($session_data)) {
+			return null;
+		}
+
+		$session_data = unserialize($session_data);
+
+		if (!array_key_exists('sessionid', $session_data)) {
+			return null;
+		}
+
+		return $session_data['sessionid'];
 	}
 
 	/**
@@ -60,39 +69,18 @@ class CEncryptedCookieSession extends CCookieSession {
 	}
 
 	/**
-	 * @inheritDoc
+	 * Prepare data and check sign.
+	 *
+	 * @param string $data
 	 *
 	 * @return boolean
 	 */
-	protected function session_start(): bool {
-		if (!$this->checkSessionKey()) {
-			CEncryptHelper::updateKey(CEncryptHelper::generateKey());
-		}
+	protected function checkSign(string $data): bool {
+		$data = unserialize($data);
+		$session_sign = $data['sign'];
+		unset($data['sign']);
+		$sign = CEncryptHelper::sign(serialize($data));
 
-		$session_data = $this->parseData();
-
-		if (mb_strlen($session_data) === 0 || !$this->checkSign($session_data)) {
-			return session_start();
-		}
-
-		$sessionid = $this->extractSessionId($session_data);
-		session_id($sessionid ?: CEncryptHelper::generateKey());
-
-		return session_start();
-	}
-
-	/**
-	 * Check exist secret session key.
-	 *
-	 * @throws \Exception
-	 *
-	 * @return boolean
-	 */
-	private function checkSessionKey(): bool {
-		if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
-			return false;
-		}
-
-		return true;
+		return $session_sign && $sign && CEncryptHelper::checkSign($session_sign, $sign);
 	}
 }

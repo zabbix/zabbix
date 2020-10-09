@@ -154,9 +154,10 @@ class ZBase {
 	/**
 	 * Initializes the application.
 	 *
-	 * @param string $mode  Application initialization mode.
+	 * @param string $mode Application initialization mode.
 	 *
 	 * @throws DBException
+	 * @throws Exception
 	 */
 	public function run($mode) {
 		$this->init();
@@ -168,15 +169,9 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
-
 				$this->loadConfigFile();
 				$this->initDB();
-
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
-
-				// Start sesion only after DB initialized.
-				new CEncryptedCookieSession();
-
 				$this->authenticateUser();
 
 				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
@@ -207,9 +202,6 @@ class ZBase {
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
-
-				CUser::$auth = CEncryptHelper::generateKey();
-
 				$this->initDB();
 				$this->initLocales('en_gb');
 				break;
@@ -219,12 +211,9 @@ class ZBase {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
-
-					new CEncryptedCookieSession();
-
 					$this->authenticateUser();
-					$this->initComponents();
 					$this->initLocales(CWebUser::$data['lang']);
+					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {
 					if ($e->getCode() == CConfigFile::CONFIG_VAULT_ERROR) {
@@ -459,13 +448,26 @@ class ZBase {
 
 	/**
 	 * Authenticate user.
+	 *
+	 * @throws Exception
 	 */
 	protected function authenticateUser(): void {
-		if (!CWebUser::checkAuthentication(CSessionHelper::getId())) {
+		$session = new CEncryptedCookieSession();
+
+		if (!CWebUser::checkAuthentication($session->extractSessionId())) {
 			CWebUser::setDefault();
 		}
 
-		// enable debug mode in the API
+		if (!$session->session_start(CWebUser::$data['sessionid'])) {
+			throw new Exception(_('Session initialization error.'));
+		}
+
+		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+
+		// Set the authentication token for the API.
+		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
 	}
 

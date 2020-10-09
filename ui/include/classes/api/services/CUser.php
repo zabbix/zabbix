@@ -1172,10 +1172,12 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$sessionid = self::$userData['sessionid'];
+
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
-				'sessionid' => self::$auth,
+				'sessionid' => $sessionid,
 				'status' => ZBX_SESSION_ACTIVE
 			],
 			'limit' => 1
@@ -1191,7 +1193,7 @@ class CUser extends CApiService {
 		]);
 		DB::update('sessions', [
 			'values' => ['status' => ZBX_SESSION_PASSIVE],
-			'where' => ['sessionid' => self::$auth]
+			'where' => ['sessionid' => $sessionid]
 		]);
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
@@ -1367,10 +1369,10 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::$auth = $session['sessionid'];
+		$sessionid = $session['sessionid'];
 
 		// access DB only once per page load
-		if (self::$userData !== null && self::$userData['sessionid'] === self::$auth) {
+		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
 			return self::$userData;
 		}
 
@@ -1378,7 +1380,7 @@ class CUser extends CApiService {
 
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess', 'status'],
-			'sessionids' => self::$auth
+			'sessionids' => $sessionid
 		]);
 
 		// If session not created.
@@ -1409,7 +1411,7 @@ class CUser extends CApiService {
 
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
-		$db_user['sessionid'] = self::$auth;
+		$db_user['sessionid'] = $sessionid;
 		$db_user['debug_mode'] = $usrgrps['debug_mode'];
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
@@ -1435,7 +1437,7 @@ class CUser extends CApiService {
 			]);
 			DB::update('sessions', [
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
-				'where' => ['sessionid' => self::$auth]
+				'where' => ['sessionid' => $sessionid]
 			]);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
@@ -1444,7 +1446,7 @@ class CUser extends CApiService {
 		if ($session['extend'] && $time != $db_session['lastaccess']) {
 			DB::update('sessions', [
 				'values' => ['lastaccess' => $time],
-				'where' => ['sessionid' => self::$auth]
+				'where' => ['sessionid' => $sessionid]
 			]);
 		}
 
@@ -1559,11 +1561,7 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private function createSession(array $db_user): array {
-		$db_user['sessionid'] = self::$auth;
-
-		DB::delete('sessions', [
-			'sessionid' => $db_user['sessionid']
-		]);
+		$db_user['sessionid'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],

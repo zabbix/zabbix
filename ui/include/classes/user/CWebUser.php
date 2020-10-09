@@ -84,15 +84,13 @@ class CWebUser {
 	 * Log-out the current user.
 	 */
 	public static function logout(): void {
-		self::$data['sessionid'] = CSessionHelper::getId();
-
 		if (API::User()->logout([])) {
 			self::$data = null;
 			session_destroy();
 		}
 	}
 
-	public static function checkAuthentication(string $sessionid): bool {
+	public static function checkAuthentication(?string $sessionid): bool {
 		try {
 			self::$data = API::User()->checkAuthentication([
 				'sessionid' => $sessionid,

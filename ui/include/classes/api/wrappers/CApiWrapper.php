@@ -32,6 +32,13 @@ class CApiWrapper {
 	public $api;
 
 	/**
+	 * Authentication token.
+	 *
+	 * @var string
+	 */
+	public $auth;
+
+	/**
 	 * Current API client.
 	 *
 	 * @var CApiClient
@@ -96,6 +103,6 @@ class CApiWrapper {
 	 * @return CApiClientResponse
 	 */
 	protected function callClientMethod($method, $params) {
-		return $this->client->callMethod($this->api, $method, $params, CApiService::$auth);
+		return $this->client->callMethod($this->api, $method, $params, $this->auth);
 	}
 }

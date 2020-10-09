@@ -22,7 +22,7 @@
 /**
  * Session wrapper uses cookie for session store.
  */
-class CCookieSession implements \SessionHandlerInterface {
+class CCookieSession implements SessionHandlerInterface {
 
 	/**
 	 * Cookie name.
@@ -43,48 +43,7 @@ class CCookieSession implements \SessionHandlerInterface {
 			session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'],
 				[$this, 'write'], [$this, 'destroy'], [$this, 'gc']
 			);
-
-			if (!$this->session_start()) {
-				throw new \Exception(_('Session initialization error.'));
-			}
-
-			CSessionHelper::set('sessionid', CSessionHelper::getId());
 		}
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @return boolean
-	 */
-	public function close() {
-		echo ob_get_clean();
-
-		return true;
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @param string $session_id
-	 *
-	 * @return boolean
-	 */
-	public function destroy($session_id) {
-		CCookieHelper::unset(self::COOKIE_NAME);
-
-		return true;
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @param integer $maxlifetime
-	 *
-	 * @return integer
-	 */
-	public function gc($maxlifetime) {
-		return true;
 	}
 
 	/**
@@ -99,6 +58,17 @@ class CCookieSession implements \SessionHandlerInterface {
 		ob_start();
 
 		return session_status() === PHP_SESSION_ACTIVE;
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @return boolean
+	 */
+	public function close() {
+		echo ob_get_clean();
+
+		return true;
 	}
 
 	/**
@@ -131,19 +101,38 @@ class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	/**
-	 * Run session_start.
+	 * @inheritDoc
+	 *
+	 * @param string $session_id
 	 *
 	 * @return boolean
 	 */
-	protected function session_start(): bool {
-		$session_data = $this->parseData();
+	public function destroy($session_id) {
+		CCookieHelper::unset(self::COOKIE_NAME);
 
-		if (mb_strlen($session_data) === 0) {
-			return session_start();
-		}
+		return true;
+	}
 
-		$sessionid = $this->extractSessionId($session_data);
-		session_id($sessionid ?: CEncryptHelper::generateKey());
+	/**
+	 * @inheritDoc
+	 *
+	 * @param integer $maxlifetime
+	 *
+	 * @return integer
+	 */
+	public function gc($maxlifetime) {
+		return true;
+	}
+
+	/**
+	 * Run session_start.
+	 *
+	 * @param string $sessionid
+	 *
+	 * @return boolean
+	 */
+	public function session_start(string $sessionid): bool {
+		session_id($sessionid);
 
 		return session_start();
 	}
@@ -151,31 +140,22 @@ class CCookieSession implements \SessionHandlerInterface {
 	/**
 	 * Extract session id from session data.
 	 *
-	 * @param string $session_data
-	 *
 	 * @return string|null
 	 */
-	protected function extractSessionId(string $session_data): ?string {
-		$session_data = unserialize($session_data);
+	public function extractSessionId(): ?string {
+		$session_data = $this->parseData();
 
-		if (array_key_exists('sessionid', $session_data)) {
-			return $session_data['sessionid'];
+		if ($session_data === '') {
+			return null;
 		}
 
-		return null;
-	}
+		$session_data = unserialize($session_data);
 
-	/**
-	 * Prepare session data.
-	 *
-	 * @param string $data
-	 *
-	 * @return string
-	 */
-	protected function prepareData(string $data): string {
-		$data = unserialize($data);
+		if (!array_key_exists('sessionid', $session_data)) {
+			return null;
+		}
 
-		return base64_encode(serialize($data));
+		return $session_data['sessionid'];
 	}
 
 	/**
@@ -189,5 +169,18 @@ class CCookieSession implements \SessionHandlerInterface {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Prepare session data.
+	 *
+	 * @param string $data
+	 *
+	 * @return string
+	 */
+	protected function prepareData(string $data): string {
+		$data = unserialize($data);
+
+		return base64_encode(serialize($data));
 	}
 }
