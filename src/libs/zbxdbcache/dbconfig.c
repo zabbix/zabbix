@@ -4969,11 +4969,17 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
 	zbx_dc_preproc_op_t	*p1 = *(zbx_dc_preproc_op_t **)d1;
 	zbx_dc_preproc_op_t	*p2 = *(zbx_dc_preproc_op_t **)d2;
 	if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == p1->type)
+	{
 		return -1;
+	}
 	else if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == p2->type)
+	{
 		return 1;
+	}
 	else
+	{
 		ZBX_RETURN_IF_NOT_EQUAL(p1->step, p2->step);
+	}
 
 	return 0;
 }
