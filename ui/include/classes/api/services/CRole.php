@@ -124,6 +124,12 @@ class CRole extends CApiService {
 			return $options['countOutput'] ? 0 : [];
 		}
 
+		$output = $options['output'];
+
+		if ($options['selectRules'] !== null && is_array($options['output']) && !in_array('type', $options['output'])) {
+			$options['output'][] = 'type';
+		}
+
 		// roleids
 		if ($options['roleids'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('r.roleid', $options['roleids']);
@@ -154,7 +160,7 @@ class CRole extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['roleid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['roleid', 'type'], $output);
 
 			if (!$options['preservekeys']) {
 				$result = array_values($result);
@@ -579,24 +585,12 @@ class CRole extends CApiService {
 
 		// adding role rules
 		if ($options['selectRules'] !== null && $options['selectRules'] !== API_OUTPUT_COUNT) {
-			$requested_rules = [
-				CRoleHelper::SECTION_UI => [],
-				CRoleHelper::UI_DEFAULT_ACCESS => '1',
-				CRoleHelper::SECTION_MODULES => [],
-				CRoleHelper::MODULES_DEFAULT_ACCESS => '1',
-				CRoleHelper::API_ACCESS => '1',
-				CRoleHelper::API_MODE => '0',
-				'api.methods' => [],
-				CRoleHelper::SECTION_ACTIONS => [],
-				CRoleHelper::ACTIONS_DEFAULT_ACCESS => '1'
-			];
-
-			if ($options['selectRules'] !== API_OUTPUT_EXTEND) {
-				foreach ($requested_rules as $key => $value) {
-					if (!in_array($key, $options['selectRules'])) {
-						unset($requested_rules[$key]);
-					}
-				}
+			if ($options['selectRules'] === API_OUTPUT_EXTEND) {
+				$options['selectRules'] = [CRoleHelper::SECTION_UI, CRoleHelper::UI_DEFAULT_ACCESS,
+					CRoleHelper::SECTION_MODULES, CRoleHelper::MODULES_DEFAULT_ACCESS, CRoleHelper::API_ACCESS,
+					CRoleHelper::API_MODE, 'api.methods', CRoleHelper::SECTION_ACTIONS,
+					CRoleHelper::ACTIONS_DEFAULT_ACCESS
+				];
 			}
 
 			$db_rules = DBselect(
@@ -605,23 +599,57 @@ class CRole extends CApiService {
 				' WHERE '.dbConditionInt('roleid', $roleids)
 			);
 
+			$all_enabled_modules = [];
+			if (!in_array(CRoleHelper::SECTION_MODULES, $options['selectRules'])) {
+				foreach (CRoleHelper::getAllModules() as $moduleid) {
+					$all_enabled_modules[] = ['moduleid' => $moduleid , 'status' => 1];
+				}
+			}
+
 			foreach ($result as $roleid => $role) {
-				$result[$roleid]['rules'] = [];
+				$rules = [];
+
+				foreach ($options['selectRules'] as $param) {
+					switch ($param) {
+						case CRoleHelper::SECTION_UI:
+							$rules[$param] = array_fill_keys(CRoleHelper::getAllUiElements((int) $role['type']), '1');
+							break;
+						case CRoleHelper::UI_DEFAULT_ACCESS:
+						case CRoleHelper::MODULES_DEFAULT_ACCESS:
+						case CRoleHelper::API_ACCESS:
+						case CRoleHelper::ACTIONS_DEFAULT_ACCESS:
+							$rules[$param] = '1';
+							break;
+						case CRoleHelper::SECTION_MODULES:
+							$rules[$param] = $all_enabled_modules;
+							break;
+						case CRoleHelper::API_MODE:
+							$rules[$param] = '0';
+							break;
+						case 'api.methods':
+							$rules[$param] = [];
+							break;
+						case CRoleHelper::SECTION_ACTIONS:
+							$rules[$param] = array_fill_keys(CRoleHelper::getAllActions((int) $role['type']), '1');
+					}
+				}
+
+				$result[$roleid]['rules'] = $rules;
 			}
 
 			while ($db_rule = DBfetch($db_rules)) {
 				$value = $db_rule[self::RULE_VALUE_TYPES[$db_rule['type']]];
 
-				if (array_key_exists($db_rule['name'], $requested_rules)) {
+				if (array_key_exists($db_rule['name'], $options['selectRules'])) {
 					$result[$db_rule['roleid']]['rules'][$db_rule['name']] = $value;
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::SECTION_UI) !== false
 						&& $db_rule['name'] !== CRoleHelper::UI_DEFAULT_ACCESS
-						&& array_key_exists(CRoleHelper::SECTION_UI, $requested_rules)) {
+						&& array_key_exists(CRoleHelper::SECTION_UI, $options['selectRules'])) {
 					$result[$db_rule['roleid']]['rules'][CRoleHelper::SECTION_UI][$db_rule['name']] = $value;
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::MODULES_MODULE) !== false
-						&& array_key_exists(CRoleHelper::SECTION_MODULES, $requested_rules)) {
+						&& array_key_exists(CRoleHelper::SECTION_MODULES, $options['selectRules'])) {
 					$id = (int) substr($db_rule['name'], strrpos($db_rule['name'], '.') + 1);
 
 					if (strpos($db_rule['name'], CRoleHelper::MODULES_MODULE_STATUS) !== false) {
@@ -632,12 +660,12 @@ class CRole extends CApiService {
 					}
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::API_METHOD) !== false
-						&& array_key_exists('api.methods', $requested_rules)) {
+						&& array_key_exists('api.methods', $options['selectRules'])) {
 					$result[$db_rule['roleid']]['rules']['api.methods'][] = $value;
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::SECTION_ACTIONS) !== false
 						&& $db_rule['name'] !== CRoleHelper::ACTIONS_DEFAULT_ACCESS
-						&& array_key_exists(CRoleHelper::SECTION_ACTIONS, $requested_rules)) {
+						&& array_key_exists(CRoleHelper::SECTION_ACTIONS, $options['selectRules'])) {
 					$result[$db_rule['roleid']]['rules'][CRoleHelper::SECTION_ACTIONS][] = [$db_rule['name'] => $value];
 				}
 			}
