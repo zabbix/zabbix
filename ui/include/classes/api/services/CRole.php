@@ -204,7 +204,7 @@ class CRole extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
-			'type' =>			['type' => API_INT32,  'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'rules' =>			['type' => API_OBJECTS, 'fields' => [
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::RULE_VALUE_TYPE_INT32, self::RULE_VALUE_TYPE_STR, self::RULE_VALUE_TYPE_MODULE])],
 				'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'name'), 'default' => DB::getDefault('role_rule', 'name')],
@@ -332,7 +332,7 @@ class CRole extends CApiService {
 			$this->checkDuplicates($names);
 		}
 
-		$this->checkRules($roles);
+		$this->checkRules($roles, __FUNCTION__);
 	}
 
 	/**
