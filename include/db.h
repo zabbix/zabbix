@@ -85,6 +85,7 @@ struct	_DC_TRIGGER;
 #else
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
+#define TRIGGER_EVENT_NAME_LEN		2048
 #define TAG_NAME_LEN			255
 #define TAG_VALUE_LEN			255
 
@@ -312,6 +313,7 @@ typedef struct
 	char		*comments;
 	char		*correlation_tag;
 	char		*opdata;
+	char		*event_name;
 	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;
