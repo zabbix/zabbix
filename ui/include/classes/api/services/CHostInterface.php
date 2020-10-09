@@ -614,8 +614,13 @@ class CHostInterface extends CApiService {
 	}
 
 	protected function validateMassRemove(array $data) {
-		// check permissions
+		// Check permissions.
 		$this->checkHostPermissions($data['hostids']);
+
+		// Check interfaces.
+		$this->checkValidator($data['hostids'], new CHostNormalValidator([
+			'message' => _('Cannot delete interface for discovered host "%1$s".')
+		]));
 
 		// check interfaces
 		foreach ($data['interfaces'] as $interface) {
@@ -640,7 +645,7 @@ class CHostInterface extends CApiService {
 				'filter' => $filter
 			]);
 			if ($interfacesToRemove) {
-				$this->checkMainInterfacesOnDelete(zbx_objectValues($interfacesToRemove, 'interfaceid'));
+				$this->checkMainInterfacesOnDelete(array_column($interfacesToRemove, 'interfaceid'));
 			}
 		}
 	}
