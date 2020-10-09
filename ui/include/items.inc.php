@@ -998,14 +998,14 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 /**
  * @param array $db_hosts
  * @param array $db_items
- * @param array $items_by_name
+ * @param array $items_by_key
  * @param int   $show_suppressed
  *
  * @return array
  */
-function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$items_by_name, int $show_suppressed): array {
+function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$items_by_key, int $show_suppressed): array {
 	$visible_items = [];
-	foreach ($items_by_name as $hostid_to_itemids) {
+	foreach ($items_by_key as $hostid_to_itemids) {
 		foreach ($hostid_to_itemids as $itemid) {
 			$visible_items[$itemid] = $db_items[$itemid];
 		}
@@ -1030,7 +1030,7 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	foreach ($items_by_name as $hostid_to_itemids) {
+	foreach ($items_by_key as $hostid_to_itemids) {
 		foreach ($db_hosts as $host) {
 			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
 				continue;
@@ -1121,7 +1121,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		]);
 	}
 
-	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
+	$db_items = CMacrosResolverHelper::resolveItemKeys($db_items);
 
 	CArrayHelper::sort($db_items, [
 		['field' => 'name_expanded', 'order' => ZBX_SORT_UP],
@@ -1188,18 +1188,20 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
  */
 function getDataOverviewLeft(?array $groupids, ?array $hostids, string $application = ''): array {
 	list($db_items, $hostids) = getDataOverviewItems($groupids, $hostids, $application);
-	$items_by_name = [];
+	$items_by_key = [];
+	$item_names_by_key = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
-			$items_by_name[$db_item['name_expanded']] = [];
+		if (!array_key_exists($db_item['key_expanded'], $items_by_key)) {
+			$items_by_key[$db_item['key_expanded']] = [];
+			$item_names_by_key[$db_item['key_expanded']] = $itemid;
 		}
-		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
+		$items_by_key[$db_item['key_expanded']][$db_item['hostid']] = $itemid;
 	}
 
-	$hidden_items_cnt = count(array_splice($items_by_name, ZBX_MAX_TABLE_COLUMNS));
+	$hidden_items_cnt = count(array_splice($items_by_key, ZBX_MAX_TABLE_COLUMNS));
 
 	$itemids = [];
-	foreach ($items_by_name as $hostid_to_itemid) {
+	foreach ($items_by_key as $hostid_to_itemid) {
 		foreach ($hostid_to_itemid as $itemid) {
 			$itemids[] = $itemid;
 		}
@@ -1212,7 +1214,13 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 
 	$has_hidden_data = ($hidden_items_cnt || ($db_hosts_ctn > count($db_hosts)));
 
-	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
+	$item_names_by_key = $has_hidden_data ? array_intersect_key($item_names_by_key, $items_by_key) : $item_names_by_key;
+	$item_names_by_key = array_map(function($itemid) use ($db_items) {return $db_items[$itemid];}, $item_names_by_key);
+	$item_names_by_key = array_map(function($item) {
+		return $item['name'];
+	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
+
+	return [$db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data];
 }
 
 /**
@@ -1229,20 +1237,28 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$db_hosts = array_intersect_key($db_hosts, array_flip($hostids));
 
 	list($db_items, $hostids) = getDataOverviewItems(null, $hostids, $application);
-	$items_by_name = [];
+	$items_by_key = [];
+	$item_names_by_key = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
-			$items_by_name[$db_item['name_expanded']] = [];
+		if (!array_key_exists($db_item['key_expanded'], $items_by_key)) {
+			$item_names_by_key[$db_item['key_expanded']] = $itemid;
+			$items_by_key[$db_item['key_expanded']] = [];
 		}
-		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
+		$items_by_key[$db_item['key_expanded']][$db_item['hostid']] = $itemid;
 	}
 
-	$items_by_name_ctn = count($items_by_name);
-	$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
+	$items_by_key_ctn = count($items_by_key);
+	$items_by_key = array_slice($items_by_key, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name)));
+	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_key_ctn > count($items_by_key)));
 
-	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
+	$item_names_by_key = $has_hidden_data ? array_intersect_key($item_names_by_key, $items_by_key) : $item_names_by_key;
+	$item_names_by_key = array_map(function($itemid) use ($db_items) {return $db_items[$itemid];}, $item_names_by_key);
+	$item_names_by_key = array_map(function($item) {
+		return $item['name'];
+	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
+
+	return [$db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data];
 }
 
 /**

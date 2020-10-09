@@ -160,7 +160,8 @@ if ($data['view_style'] == STYLE_TOP) {
 	$table = new CPartial('dataoverview.table.top', [
 		'visible_items' => $data['visible_items'],
 		'db_hosts' => $data['db_hosts'],
-		'items_by_name' => $data['items_by_name'],
+		'items_by_key' => $data['items_by_key'],
+		'item_names_by_key' => $data['item_names_by_key'],
 		'has_hidden_data' => $data['has_hidden_data']
 	]);
 }
@@ -168,7 +169,8 @@ else {
 	$table = new CPartial('dataoverview.table.left', [
 		'visible_items' => $data['visible_items'],
 		'db_hosts' => $data['db_hosts'],
-		'items_by_name' => $data['items_by_name'],
+		'items_by_key' => $data['items_by_key'],
+		'item_names_by_key' => $data['item_names_by_key'],
 		'has_hidden_data' => $data['has_hidden_data']
 	]);
 }

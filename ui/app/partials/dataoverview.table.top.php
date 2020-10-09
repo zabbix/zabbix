@@ -35,8 +35,8 @@ foreach ($data['db_hosts'] as $host) {
 
 $table->setHeader($headings);
 
-foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
-	$row = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
+foreach ($data['items_by_key'] as $key => $hostid_to_itemid) {
+	$row = [(new CColHeader($data['item_names_by_key'][$key]))->addClass(ZBX_STYLE_NOWRAP)];
 
 	foreach ($data['db_hosts'] as $hostid => $host) {
 		if (!array_key_exists($host['hostid'], $hostid_to_itemid)) {
