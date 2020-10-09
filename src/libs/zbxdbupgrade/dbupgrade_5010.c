@@ -302,6 +302,7 @@ static int	DBpatch_5010033(void)
 }
 
 static int	DBpatch_5010034(void)
+{
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("dashboard", &field);
