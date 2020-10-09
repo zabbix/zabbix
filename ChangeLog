@@ -142,6 +142,9 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.5rc1
 
 New features:
+.........T [ZBXNEXT-6232] added LTE monitoring in Template Net Mikrotik SNMP (mchudinov)
+.........T [ZBXNEXT-6189] added "Template Tel Asterisk by HTTP" (mchudinov)
+.........T [ZBXNEXT-6020] added template "Template App Ceph by Zabbix Agent2" (ychukina)
 .........T [ZBXNEXT-6180] added Squid template (tuskov)
 ...G...... [ZBXNEXT-6142] added Ceph monitoring plugin (vadimipatov)
 A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history cache contents (miks, wiper)
@@ -150,6 +153,19 @@ A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history c
 .........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
 
 Bug fixes:
+........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
+..F....... [ZBX-18443] fixed undefined index in item prototype form when creating dependent item using wizard (Ivo)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
+..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
+.......PS. [ZBX-17178] fixed multi-line value truncation in snmp lld (asestakovs)
+..F....... [ZBX-18378] fixed map context menu not opening for images with URLs (vmurzins)
+.......PS. [ZBX-18462] fixed inconsistent auto-registration behaviour for hosts without metadata on Oracle DB compared to other databases when using Zabbix proxy (viktors)
+........S. [ZBX-18118] sorted event tag macro selection (arimdjonoks)
+..F....... [ZBX-18456] fixed encryption field sent in form for non-supported encryption database (rlataria)
+.......PS. [ZBX-18407] fixed dependent items not working if it's master item is calculated and host is monitored by Zabbix proxy (vso)
+.......PS. [ZBX-18364] fixed inconsistency with autoregistration behaviour for hosts without metadata on Oracle compared to other databases (viktors)
+........S. [ZBX-18210] fixed preprocessor crashing on Solaris due to incorrect byteorder (arimdjonoks)
+.........T [ZBX-18383] fixed the value of the {$HAPROXY.FRONT_SUTIL.MAX.WARN} macro in Template App HAProxy by HTTP (mchudinov)
 .......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
 ...G...... [ZBX-18385] fixed segmentation violation in oracle plugin (vadimipatov)
 .......PS. [ZBX-18193] added logging for snmp_cache_reload (arimdjonoks)
