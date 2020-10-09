@@ -154,9 +154,8 @@ class ZBase {
 	/**
 	 * Initializes the application.
 	 *
-	 * @param string $mode Application initialization mode.
+	 * @param string $mode  Application initialization mode.
 	 *
-	 * @throws DBException
 	 * @throws Exception
 	 */
 	public function run($mode) {
@@ -454,7 +453,7 @@ class ZBase {
 	protected function authenticateUser(): void {
 		$session = new CEncryptedCookieSession();
 
-		if (!CWebUser::checkAuthentication($session->extractSessionId())) {
+		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
 			CWebUser::setDefault();
 		}
 

@@ -33,17 +33,14 @@ class CCookieSession implements SessionHandlerInterface {
 	 * Class consturctor. Set session handlers and start session.
 	 */
 	public function __construct() {
-		if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
+		// Set use standard cookie PHPSESSID to false.
+		ini_set('session.use_cookies', '0');
+		// Set serialize method to standard serialize / unserialize.
+		ini_set('session.serialize_handler', 'php_serialize');
 
-			// Set use standard cookie PHPSESSID to false.
-			ini_set('session.use_cookies', '0');
-			// Set serialize method to standard serialize / unserialize.
-			ini_set('session.serialize_handler', 'php_serialize');
-
-			session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'],
-				[$this, 'write'], [$this, 'destroy'], [$this, 'gc']
-			);
-		}
+		session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'],
+			[$this, 'write'], [$this, 'destroy'], [$this, 'gc']
+		);
 	}
 
 	/**
@@ -132,6 +129,10 @@ class CCookieSession implements SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function session_start(string $sessionid): bool {
+		if (headers_sent() || session_status() !== PHP_SESSION_NONE) {
+			return false;
+		}
+
 		session_id($sessionid);
 
 		return session_start();
@@ -179,8 +180,6 @@ class CCookieSession implements SessionHandlerInterface {
 	 * @return string
 	 */
 	protected function prepareData(string $data): string {
-		$data = unserialize($data);
-
-		return base64_encode(serialize($data));
+		return base64_encode($data);
 	}
 }

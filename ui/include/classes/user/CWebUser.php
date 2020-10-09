@@ -90,7 +90,7 @@ class CWebUser {
 		}
 	}
 
-	public static function checkAuthentication(?string $sessionid): bool {
+	public static function checkAuthentication(string $sessionid): bool {
 		try {
 			self::$data = API::User()->checkAuthentication([
 				'sessionid' => $sessionid,

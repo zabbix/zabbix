@@ -1174,6 +1174,10 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
+		if (!$sessionid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
+		}
+
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [

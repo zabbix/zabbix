@@ -77,6 +77,11 @@ class CEncryptedCookieSession extends CCookieSession {
 	 */
 	protected function checkSign(string $data): bool {
 		$data = unserialize($data);
+
+		if (!array_key_exists('sign', $data)) {
+			return false;
+		}
+
 		$session_sign = $data['sign'];
 		unset($data['sign']);
 		$sign = CEncryptHelper::sign(serialize($data));
