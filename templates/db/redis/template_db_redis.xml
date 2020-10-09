@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-10-08T00:00:00Z</date>
+    <date>2020-10-09T08:18:29Z</date>
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -3352,7 +3352,7 @@ return JSON.stringify(Object.keys(repl)
                     <widgets>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
-                            <width>18</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3372,8 +3372,8 @@ return JSON.stringify(Object.keys(repl)
                         </widget>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
-                            <x>18</x>
-                            <width>6</width>
+                            <x>12</x>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3394,7 +3394,7 @@ return JSON.stringify(Object.keys(repl)
                         <widget>
                             <type>GRAPH_CLASSIC</type>
                             <y>5</y>
-                            <width>18</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3414,9 +3414,9 @@ return JSON.stringify(Object.keys(repl)
                         </widget>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
-                            <x>18</x>
+                            <x>12</x>
                             <y>5</y>
-                            <width>6</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3437,7 +3437,7 @@ return JSON.stringify(Object.keys(repl)
                         <widget>
                             <type>GRAPH_CLASSIC</type>
                             <y>10</y>
-                            <width>18</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3457,9 +3457,9 @@ return JSON.stringify(Object.keys(repl)
                         </widget>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
-                            <x>18</x>
+                            <x>12</x>
                             <y>10</y>
-                            <width>6</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3480,7 +3480,7 @@ return JSON.stringify(Object.keys(repl)
                         <widget>
                             <type>GRAPH_CLASSIC</type>
                             <y>15</y>
-                            <width>18</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3500,9 +3500,9 @@ return JSON.stringify(Object.keys(repl)
                         </widget>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
-                            <x>18</x>
+                            <x>12</x>
                             <y>15</y>
-                            <width>6</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -3523,7 +3523,7 @@ return JSON.stringify(Object.keys(repl)
                         <widget>
                             <type>GRAPH_PROTOTYPE</type>
                             <y>20</y>
-                            <width>18</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>

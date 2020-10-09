@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.2</version>
-    <date>2020-10-08T10:32:13Z</date>
+    <date>2020-10-09T08:32:57Z</date>
     <groups>
         <group>
             <name>Templates/Modules</name>
@@ -1245,7 +1245,7 @@ Template tooling version used: 0.38</description>
                     <widgets>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
-                            <width>6</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -1265,8 +1265,8 @@ Template tooling version used: 0.38</description>
                         </widget>
                         <widget>
                             <type>GRAPH_PROTOTYPE</type>
-                            <x>6</x>
-                            <width>18</width>
+                            <x>12</x>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -1297,7 +1297,7 @@ Template tooling version used: 0.38</description>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
                             <y>5</y>
-                            <width>6</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
@@ -1317,9 +1317,9 @@ Template tooling version used: 0.38</description>
                         </widget>
                         <widget>
                             <type>GRAPH_CLASSIC</type>
-                            <x>6</x>
+                            <x>12</x>
                             <y>5</y>
-                            <width>18</width>
+                            <width>12</width>
                             <height>5</height>
                             <fields>
                                 <field>
