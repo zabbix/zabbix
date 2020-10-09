@@ -151,7 +151,9 @@ class CControllerMenuPopup extends CController {
 				]);
 			}
 
-			$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
+			$scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
+				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
+				: [];
 
 			foreach ($scripts as &$script) {
 				$script['name'] = trimPath($script['name']);
