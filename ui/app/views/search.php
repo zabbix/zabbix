@@ -123,8 +123,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_hostids[]', $hostid)
-				->setArgument('filter_set', '1')
+				->setArgument('filter_name', '')
+				->setArgument('hostids', [$hostid])
 		),
 		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
@@ -202,8 +202,8 @@ foreach ($data['groups'] as $groupid => $group) {
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_groupids[]', $groupid)
-				->setArgument('filter_set', '1')
+				->setArgument('filter_name', '')
+				->setArgument('groupids', [$groupid])
 		),
 		new CLink(_('Web'),
 			(new CUrl('zabbix.php'))

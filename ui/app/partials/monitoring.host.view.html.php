@@ -21,10 +21,6 @@
 
 $form = (new CForm())->setName('host_view');
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'host.view')
-	->getUrl();
-
 $table = (new CTableInfo());
 
 $view_url = $data['view_curl']->getUrl();
@@ -122,9 +118,9 @@ foreach ($data['hosts'] as $hostid => $host) {
 			new CLink(_('Problems'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_severities', $data['filter']['severities'])
-					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('filter_name', '')
+					->setArgument('severities', $data['filter']['severities'])
+					->setArgument('hostids', [$host['hostid']])
 			),
 			CViewHelper::showNum($total_problem_count)
 		],

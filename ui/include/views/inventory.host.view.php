@@ -147,8 +147,8 @@ $overviewFormList->addRow(_('Monitoring'),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_hostids[]', $data['host']['hostid'])
-				->setArgument('filter_set', '1')
+				->setArgument('filter_name', '')
+				->setArgument('hostids', [$data['host']['hostid']])
 		),
 		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
