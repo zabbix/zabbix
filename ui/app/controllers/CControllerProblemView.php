@@ -106,14 +106,20 @@ class CControllerProblemView extends CControllerProblem {
 			->setInput($this->cleanInput($this->getInputAll()));
 
 		foreach ($profile->getTabsWithDefaults() as $filter_tab) {
-			if ($filter_tab['show'] != TRIGGERS_OPTION_ALL) {
-				$filter_tab['filter_custom_time'] = 0;
+			if ($filter_tab['filter_custom_time']) {
+				$filter_tab['show'] = TRIGGERS_OPTION_ALL;
+				$filter_tab['filter_src']['show'] = TRIGGERS_OPTION_ALL;
 			}
 
 			$filter_tabs[] = $filter_tab + ['filter_view_data' => $this->getAdditionalData($filter_tab)];
 		}
 
 		$filter = $profile->getTabFilter($profile->selected);
+
+		if ($filter_tab['filter_custom_time']) {
+			$filter_tab['show'] = TRIGGERS_OPTION_ALL;
+		}
+
 		$refresh_curl = (new CUrl('zabbix.php'));
 		$filter['action'] = 'problem.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
