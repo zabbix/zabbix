@@ -39,7 +39,7 @@ class CPage {
 	/**
 	 * Page defaults.
 	 */
-	const DEFAULT_PAGE_WIDTH = 1280;
+	const DEFAULT_PAGE_WIDTH = 1440;
 	const DEFAULT_PAGE_HEIGHT = 1024;
 
 	/**
