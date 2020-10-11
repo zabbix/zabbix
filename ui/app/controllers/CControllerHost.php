@@ -72,7 +72,7 @@ abstract class CControllerHost extends CController {
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'inheritedTags' => true,
-			'groupids' => $groupids ? $groupids : null,
+			'groupids' => $groupids,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
 			'withProblemsSuppressed' => $filter['severities']
 				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
@@ -106,7 +106,7 @@ abstract class CControllerHost extends CController {
 	 * @param string $filter['evaltype']            Filter hosts by tags.
 	 * @param string $filter['tags']                Filter hosts by tag names and values.
 	 * @param string $filter['severities']          Filter problems on hosts by severities.
-	 * @param string $filter['show_suppressed']     Filter supressed problems.
+	 * @param string $filter['show_suppressed']     Filter suppressed problems.
 	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
 	 * @param int    $filter['page']                Page number.
 	 * @param string $filter['sort']                Sorting field.
@@ -115,15 +115,14 @@ abstract class CControllerHost extends CController {
 	 * @return array
 	 */
 	protected function getData(array $filter): array {
-		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids'], $filter_groups) : null;
-
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status'],
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'inheritedTags' => true,
-			'groupids' => $groupids ? $groupids : null,
+			'groupids' => $groupids,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
 			'withProblemsSuppressed' => $filter['severities']
 				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
@@ -153,7 +152,7 @@ abstract class CControllerHost extends CController {
 		// Split result array and create paging.
 		$paging = CPagerHelper::paginate($filter['page'], $hosts, $filter['sortorder'], $view_curl);
 
-		// Get additonal data to limited host amount.
+		// Get additional data to limited host amount.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type',
 				'available', 'snmp_available', 'jmx_available', 'ipmi_available', 'error', 'ipmi_error', 'snmp_error',

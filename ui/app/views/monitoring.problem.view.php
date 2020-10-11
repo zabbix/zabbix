@@ -96,38 +96,30 @@ if ($data['action'] === 'problem.view') {
 		->setControls(
 			(new CTag('nav', true,
 				(new CList())
-					->addItem(new CRedirectButton(_('Export to CSV'),
+					->addItem((new CRedirectButton(_('Export to CSV'),
 						(new CUrl())->setArgument('action', 'problem.view.csv')
-					))
+					))->setId('export_csv'))
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			))->setAttribute('aria-label', _('Content controls'))
 		);
 
 	if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-		$defaults = [
-			'tags' => [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]],
-			'inventory' => [['field' => 'type', 'value' => '']]
-		];
 		$filter = (new CTabFilter())
 			->setId('monitoring_problem_filter')
-			->setIdx($data['tabfilter_idx'])
-			->setSelected((int) $data['tab_selected'])
-			->setExpanded((bool) $data['tab_expanded'])
-			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults'] + $defaults));
+			->setOptions($data['tabfilter_options'])
+			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 		foreach ($data['filter_tabs'] as $tab) {
 			$tab['tab_view'] = $data['filter_view'];
 			$filter->addTemplatedTab($tab['filter_name'], $tab);
 		}
 
-		$filter->addTimeselector($data['timerange']);
 		// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
 		$data['filter_options'] = $filter->options;
 		$widget->addItem($filter);
-
-		$this->includeJsFile('monitoring.problem.view.js.php', $data);
 	}
 
+	$this->includeJsFile('monitoring.problem.view.js.php', $data);
 	$widget
 		->addItem($screen->get())
 		->show();
