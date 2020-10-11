@@ -303,24 +303,67 @@ static int	DBpatch_5010033(void)
 
 static int	DBpatch_5010034(void)
 {
+	const ZBX_FIELD	old_field = {"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("profiles", &field, &old_field);
+}
+
+static int	DBpatch_5010035(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.hostsmon.filter.%%' or idx like 'web.problem.filter%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5010036(void)
+{
+	const ZBX_FIELD	field = {"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_5010037(void)
+{
+	const ZBX_TABLE	table =
+			{"trigger_queue", "", 0,
+				{
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5010038(void)
+{
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("dashboard", &field);
 }
 
-static int	DBpatch_5010035(void)
+static int	DBpatch_5010039(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("dashboard", &field);
 }
 
-static int	DBpatch_5010036(void)
+static int	DBpatch_5010040(void)
 {
 	return DBcreate_index("dashboard", "dashboard_1", "userid", 0);
 }
 
-static int	DBpatch_5010037(void)
+static int	DBpatch_5010041(void)
 {
 #ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
 	if (SUCCEED == DBindex_exists("dashboard", "c_dashboard_1"))
@@ -329,12 +372,12 @@ static int	DBpatch_5010037(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5010038(void)
+static int	DBpatch_5010042(void)
 {
 	return DBcreate_index("dashboard", "dashboard_2", "templateid", 0);
 }
 
-static int	DBpatch_5010039(void)
+static int	DBpatch_5010043(void)
 {
 	const ZBX_FIELD	field = {"templateid", 0, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -1332,7 +1375,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 	return ret;
 }
 
-static int	DBpatch_5010040(void)
+static int	DBpatch_5010044(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1395,22 +1438,22 @@ static int	DBpatch_5010040(void)
 #undef POS_TAKEN
 #undef SKIP_EMPTY
 
-static int	DBpatch_5010041(void)
+static int	DBpatch_5010045(void)
 {
 	return DBdrop_foreign_key("screens", 1);
 }
 
-static int	DBpatch_5010042(void)
+static int	DBpatch_5010046(void)
 {
 	return DBdrop_field("screens", "templateid");
 }
 
-static int	DBpatch_5010043(void)
+static int	DBpatch_5010047(void)
 {
 	return DBcreate_index("screens", "screens_1", "userid", 0);
 }
 
-static int	DBpatch_5010044(void)
+static int	DBpatch_5010048(void)
 {
 #ifdef HAVE_MYSQL	/* fix automatic index name on MySQL */
 	if (SUCCEED == DBindex_exists("screens", "c_screens_3"))
@@ -1472,5 +1515,9 @@ DBPATCH_ADD(5010041, 0, 1)
 DBPATCH_ADD(5010042, 0, 1)
 DBPATCH_ADD(5010043, 0, 1)
 DBPATCH_ADD(5010044, 0, 1)
+DBPATCH_ADD(5010045, 0, 1)
+DBPATCH_ADD(5010046, 0, 1)
+DBPATCH_ADD(5010047, 0, 1)
+DBPATCH_ADD(5010048, 0, 1)
 
 DBPATCH_END()

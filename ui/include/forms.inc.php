@@ -1582,6 +1582,8 @@ function getTriggerMassupdateFormData() {
  * @param string      $data['recovery_expr_temp']               Trigger temporary recovery expression.
  * @param string      $data['recovery_mode']                    Trigger recovery mode.
  * @param string      $data['description']                      Trigger description.
+ * @param string      $data['event_name']                       Trigger event name.
+ * @param string      $data['opdata']                           Trigger operational data.
  * @param int         $data['type']                             Trigger problem event generation mode.
  * @param string      $data['priority']                         Trigger severity.
  * @param int         $data['status']                           Trigger status.
@@ -1594,6 +1596,10 @@ function getTriggerMassupdateFormData() {
  * @param string      $data['hostid']                           Host ID.
  * @param string      $data['expression_action']                Trigger expression action.
  * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
+ * @param string      $data['tags']                             Trigger tags.
+ * @param string      $data['correlation_mode']                 Trigger correlation mode.
+ * @param string      $data['correlation_tag']                  Trigger correlation tag.
+ * @param string      $data['manual_close']                     Trigger manual close.
  *
  * @return array
  */
@@ -1736,6 +1742,7 @@ function getTriggerFormData(array $data) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $trigger['description'];
+			$data['event_name'] = $trigger['event_name'];
 			$data['opdata'] = $trigger['opdata'];
 			$data['type'] = $trigger['type'];
 			$data['recovery_mode'] = $trigger['recovery_mode'];

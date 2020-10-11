@@ -533,8 +533,8 @@ else {
 			new CLink($trigger['description'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids', [$trigger['triggerid']])
-					->setArgument('filter_set', '1')
+					->setArgument('filter_name', '')
+					->setArgument('triggerids', [$trigger['triggerid']])
 			),
 			($availability['true'] < 0.00005)
 				? ''

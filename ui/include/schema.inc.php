@@ -3236,6 +3236,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'event_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => '',
+			],
 		],
 	],
 	'trigger_depends' => [
@@ -6461,8 +6467,7 @@ return [
 			],
 			'value_str' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'source' => [
@@ -8479,6 +8484,34 @@ return [
 				'ref_field' => 'lld_override_operationid',
 			],
 			'inventory_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'trigger_queue' => [
+		'key' => '',
+		'fields' => [
+			'objectid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ns' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

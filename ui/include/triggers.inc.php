@@ -348,7 +348,8 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name'
 		],
 		'selectDependencies' => ['triggerid'],
 		'selectTags' => ['tag', 'value'],
@@ -424,6 +425,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 			// The dependencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
+				'event_name' => $srcTrigger['event_name'],
 				'opdata' => $srcTrigger['opdata'],
 				'expression' => $srcTrigger['expression'],
 				'url' => $srcTrigger['url'],
@@ -1928,7 +1930,13 @@ function get_item_function_info($expr) {
 		'strlen' => $rules['string_as_uint'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],
-		'timeleft' => $rules['numeric_as_float']
+		'timeleft' => $rules['numeric_as_float'],
+		'trendavg' => $rules['numeric'],
+		'trendcount' => $rules['numeric'],
+		'trenddelta' => $rules['numeric'],
+		'trendmax' => $rules['numeric'],
+		'trendmin' => $rules['numeric'],
+		'trendsum' => $rules['numeric']
 	];
 
 	$expr_data = new CTriggerExpression();

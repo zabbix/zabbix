@@ -92,24 +92,20 @@ void	zbx_mock_str_to_token_type(const char *str, int *out)
 		*out = ZBX_TOKEN_OBJECTID;
 	else if (0 == strcmp(str, "ZBX_TOKEN_MACRO"))
 		*out = ZBX_TOKEN_MACRO;
-
 	else if (0 == strcmp(str, "ZBX_TOKEN_LLD_MACRO"))
 		*out = ZBX_TOKEN_LLD_MACRO;
-
 	else if (0 == strcmp(str, "ZBX_TOKEN_USER_MACRO"))
 		*out = ZBX_TOKEN_USER_MACRO;
-
 	else if (0 == strcmp(str, "ZBX_TOKEN_FUNC_MACRO"))
 		*out = ZBX_TOKEN_FUNC_MACRO;
-
 	else if (0 == strcmp(str, "ZBX_TOKEN_SIMPLE_MACRO"))
 		*out = ZBX_TOKEN_SIMPLE_MACRO;
-
 	else if (0 == strcmp(str, "ZBX_TOKEN_REFERENCE"))
 		*out = ZBX_TOKEN_REFERENCE;
-
 	else if (0 == strcmp(str, "ZBX_TOKEN_LLD_FUNC_MACRO"))
 		*out = ZBX_TOKEN_LLD_FUNC_MACRO;
+	else if (0 == strcmp(str, "ZBX_TOKEN_EXPRESSION_MACRO"))
+		*out = ZBX_TOKEN_EXPRESSION_MACRO;
 	else
 		fail_msg("Unknown token type \"%s\"", str);
 }

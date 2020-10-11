@@ -9,7 +9,8 @@ SERVER_tests = \
 	dc_item_poller_type_update \
 	dc_expand_user_macros_in_expression \
 	dc_expand_user_macros_in_func_params \
-	dc_expand_user_macros_in_calcitem
+	dc_expand_user_macros_in_calcitem \
+	dc_function_calculate_nextcheck
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -38,6 +39,7 @@ CACHE_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -189,5 +191,13 @@ dc_expand_user_macros_in_calcitem_LDADD = \
 	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
 	$(CACHE_LIBS) @SERVER_LIBS@ 
 dc_expand_user_macros_in_calcitem_LDFLAGS = @SERVER_LDFLAGS@
+
+dc_function_calculate_nextcheck_CFLAGS = \
+	-I@top_srcdir@/tests
+dc_function_calculate_nextcheck_SOURCES = \
+	dc_function_calculate_nextcheck.c
+dc_function_calculate_nextcheck_LDADD = \
+	$(CACHE_LIBS) @SERVER_LIBS@
+dc_function_calculate_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 endif

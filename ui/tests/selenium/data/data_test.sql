@@ -1442,9 +1442,9 @@ INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, 
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 7, 5);
 
 -- testPageDashboard Favorites
-INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'sysmapid',1);
-INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (2,1,'web.favorite.graphids',519,'graphid',1);
-INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (3,1,'web.favorite.screenids',16,'screenid',1);
+INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'','sysmapid',1);
+INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (2,1,'web.favorite.graphids',519,'','graphid',1);
+INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (3,1,'web.favorite.screenids',16,'','screenid',1);
 
 -- testFormAdministrationUserGroups
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
@@ -2092,7 +2092,7 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4)
 -- Dashboard for problem hosts widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (100, 'Dashboard for Problem hosts widget', 1, 1);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (1000, 100, 'problemhosts', '', 0, 0, 8, 8);
-INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (4, 1, 'web.dashbrd.dashboardid', 1, '', 1);
+INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashbrd.dashboardid', 1,'','', 1);
 
 -- testPageAvailabilityReport SLA reports
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '');

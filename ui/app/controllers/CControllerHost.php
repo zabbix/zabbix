@@ -25,8 +25,29 @@
  */
 abstract class CControllerHost extends CController {
 
+	// Filter idx prefix.
+	const FILTER_IDX = 'web.monitoring.hosts';
+
+	// Filter fields default values.
+	const FILTER_FIELDS_DEFAULT = [
+		'name' => '',
+		'groupids' => [],
+		'ip' => '',
+		'dns' => '',
+		'port' => '',
+		'status' => -1,
+		'evaltype' => TAG_EVAL_TYPE_AND_OR,
+		'tags' => [],
+		'severities' => [],
+		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
+		'maintenance_status' => HOST_MAINTENANCE_STATUS_ON,
+		'page' => null,
+		'sort' => 'name',
+		'sortorder' => ZBX_SORT_UP
+	];
+
 	/**
-	 * Prepares the host list based on the given filter and sorting options.
+	 * Get host list results count for passed filter.
 	 *
 	 * @param array  $filter                        Filter options.
 	 * @param string $filter['name']                Filter hosts by name.
@@ -40,51 +61,61 @@ abstract class CControllerHost extends CController {
 	 * @param string $filter['severities']          Filter problems on hosts by severities.
 	 * @param string $filter['show_suppressed']     Filter suppressed problems.
 	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 *
+	 * @return int
+	 */
+	protected function getCount(array $filter): int {
+		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
+
+		return (int) API::Host()->get([
+			'countOutput' => true,
+			'evaltype' => $filter['evaltype'],
+			'tags' => $filter['tags'],
+			'inheritedTags' => true,
+			'groupids' => $groupids ? $groupids : null,
+			'severities' => $filter['severities'] ? $filter['severities'] : null,
+			'withProblemsSuppressed' => $filter['severities']
+				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				: null,
+			'search' => [
+				'name' => ($filter['name'] === '') ? null : $filter['name'],
+				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
+				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+			],
+			'filter' => [
+				'status' => ($filter['status'] == -1) ? null : $filter['status'],
+				'port' => ($filter['port'] === '') ? null : $filter['port'],
+				'maintenance_status' => ($filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+					? null
+					: HOST_MAINTENANCE_STATUS_OFF
+			],
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		]);
+	}
+
+	/**
+	 * Prepares the host list based on the given filter and sorting options.
+	 *
+	 * @param array  $filter                        Filter options.
+	 * @param string $filter['name']                Filter hosts by name.
+	 * @param array  $filter['groupids']            Filter hosts by host groups.
+	 * @param string $filter['ip']                  Filter hosts by IP.
+	 * @param string $filter['dns']	                Filter hosts by DNS.
+	 * @param string $filter['port']                Filter hosts by port.
+	 * @param string $filter['status']              Filter hosts by status.
+	 * @param string $filter['evaltype']            Filter hosts by tags.
+	 * @param string $filter['tags']                Filter hosts by tag names and values.
+	 * @param string $filter['severities']          Filter problems on hosts by severities.
+	 * @param string $filter['show_suppressed']     Filter supressed problems.
+	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
 	 * @param int    $filter['page']                Page number.
-	 * @param string $sort						    Sorting field.
-	 * @param string $sortorder                     Sorting order.
+	 * @param string $filter['sort']                Sorting field.
+	 * @param string $filter['sortorder']           Sorting order.
 	 *
 	 * @return array
 	 */
-	protected function prepareData(array $filter, string $sort, string $sortorder): array {
-		$child_groups = [];
-
-		// Multiselect host groups.
-		$multiselect_hostgroup_data = [];
-
-		if ($filter['groupids']) {
-			$groups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter['groupids'],
-				'preservekeys' => true
-			]);
-
-			if ($groups) {
-				$subgroup_names = [];
-
-				foreach ($groups as $group) {
-					$subgroup_names[] = $group['name'].'/';
-
-					$multiselect_hostgroup_data[] = [
-						'id' => $group['groupid'],
-						'name' => $group['name']
-					];
-				}
-
-				$groups += API::HostGroup()->get([
-					'output' => ['groupid'],
-					'search' => ['name' => $subgroup_names],
-					'startSearch' => true,
-					'searchByAny' => true,
-					'preservekeys' => true
-				]);
-			}
-
-			$groupids = array_keys($groups);
-		}
-		else {
-			$groupids = null;
-		}
+	protected function getData(array $filter): array {
+		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids'], $filter_groups) : null;
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$hosts = API::Host()->get([
@@ -92,7 +123,7 @@ abstract class CControllerHost extends CController {
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
 			'inheritedTags' => true,
-			'groupids' => $groupids,
+			'groupids' => $groupids ? $groupids : null,
 			'severities' => $filter['severities'] ? $filter['severities'] : null,
 			'withProblemsSuppressed' => $filter['severities']
 				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
@@ -115,14 +146,14 @@ abstract class CControllerHost extends CController {
 		]);
 
 		// Sort for paging so we know which IDs go to which page.
-		CArrayHelper::sort($hosts, [['field' => $sort, 'order' => $sortorder]]);
+		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
 
-		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
+		$view_curl = (new CUrl())->setArgument('action', 'host.view');
 
 		// Split result array and create paging.
-		$paging = CPagerHelper::paginate($filter['page'], $hosts, $sortorder, $view_curl);
+		$paging = CPagerHelper::paginate($filter['page'], $hosts, $filter['sortorder'], $view_curl);
 
-		// Get additional data to limited host amount.
+		// Get additonal data to limited host amount.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type',
 				'available', 'snmp_available', 'jmx_available', 'ipmi_available', 'error', 'ipmi_error', 'snmp_error',
@@ -137,7 +168,7 @@ abstract class CControllerHost extends CController {
 			'preservekeys' => true
 		]);
 		// Re-sort the results again.
-		CArrayHelper::sort($hosts, [['field' => $sort, 'order' => $sortorder]]);
+		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
 
 		$maintenanceids = [];
 
@@ -234,11 +265,46 @@ abstract class CControllerHost extends CController {
 
 		return [
 			'paging' => $paging,
-			'view_curl' => $view_curl,
 			'hosts' => $hosts,
-			'maintenances' => $maintenances,
-			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
-			'filter' => $filter
+			'maintenances' => $maintenances
 		];
+	}
+
+	/**
+	 * Get additional data for filters. Selected groups for multiselect, etc.
+	 *
+	 * @param array $filter  Filter fields values array.
+	 *
+	 * @return array
+	 */
+	protected function getAdditionalData($filter): array {
+		$data = [];
+
+		if ($filter['groupids']) {
+			$groups= API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter['groupids']
+			]);
+			$data['groups_multiselect'] = CArrayHelper::renameObjectsKeys(array_values($groups), ['groupid' => 'id']);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Clean passed filter fields in input from default values required for HTML presentation. Convert field
+	 *
+	 * @param array $input  Filter fields values.
+	 *
+	 * @return array
+	 */
+	protected function cleanInput(array $input): array {
+		if (array_key_exists('tags', $input) && $input['tags']) {
+			$input['tags'] = array_filter($input['tags'], function($tag) {
+				return !($tag['tag'] === '' && $tag['value'] === '');
+			});
+		}
+
+		return $input;
 	}
 }

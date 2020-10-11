@@ -490,7 +490,9 @@ jQuery(function($) {
 		});
 	}
 
-	checkDisableTimeSelectorUI();
+	if (!$container.data('disable-initial-check')) {
+		checkDisableTimeSelectorUI();
+	}
 });
 
 /**
