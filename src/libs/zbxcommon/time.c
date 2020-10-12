@@ -19,13 +19,8 @@
 
 #include "common.h"
 
-#if defined(_WINDOWS)
-	#define localtime_r(x, y)	localtime_s(y, x)
-#endif
-
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
-
 
 static int	time_unit_seconds[ZBX_TIME_UNIT_COUNT] = {0, SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, 0, 0};
 
@@ -430,10 +425,4 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 	return str;
 }
 
-#ifdef _WINDOWS
-struct tm	*localtime_r(const time_t *timep, struct tm *result)
-{
-	localtime_s(result, timep);
-	return tm;
-}
 #endif
