@@ -400,6 +400,7 @@ if (array_key_exists('render_html', $data)) {
 							.filter('[value="<?= TRIGGERS_OPTION_ALL ?>"]')
 							.prop('checked', true)
 							.removeAttr('disabled');
+						this.setUrlArgument('show', <?= TRIGGERS_OPTION_ALL ?>);
 					}
 					else {
 						$('[name="show"]').removeAttr('disabled');
@@ -575,6 +576,7 @@ if (array_key_exists('render_html', $data)) {
 				if ($(form).find('[name="filter_custom_time"]').val() == 1) {
 					$('[name="show"][value="<?= TRIGGERS_OPTION_ALL ?>"]', form).prop('checked', true);
 					$('#show_' + this._data.uniqid, form).trigger('change');
+					this.setUrlArgument('show', <?= TRIGGERS_OPTION_ALL ?>);
 					this.updateUnsavedState();
 					this.setBrowserLocationToApplyUrl();
 				}

@@ -370,6 +370,23 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Set argument to URL used for data pooling (_apply_url) and URL used to track unsaved changes (_src_url).
+	 * Allow to change argument without affecting "unsaved" state of filter.
+	 *
+	 * @param {string} name   Argument name.
+	 * @param {string} value  Argument value.
+	 */
+	setUrlArgument(name, value) {
+		let apply_url = new URLSearchParams(this._apply_url),
+			src_url = new URLSearchParams(this._src_url);
+
+		apply_url.set(name, value);
+		src_url.set(name, value);
+		this._apply_url = apply_url.toString();
+		this._src_url = src_url.toString();
+	}
+
+	/**
 	 * Keep filter tab results request parameters.
 	 */
 	updateApplyUrl() {
