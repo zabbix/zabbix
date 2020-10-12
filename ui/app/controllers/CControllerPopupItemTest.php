@@ -834,7 +834,7 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 			}
 			elseif ($key === 'parameters') {
-				if ($value === '[]') {
+				if (!$value) {
 					unset($data[$key]);
 				}
 			}
@@ -909,9 +909,9 @@ abstract class CControllerPopupItemTest extends CController {
 	 * @param array $data[name]   Indexed array of names.
 	 * @param array $data[value]  Indexed array of values.
 	 *
-	 * @return string
+	 * @return array
 	 */
-	protected function transformParametersFields(array $data) {
+	protected function transformParametersFields(array $data): array {
 		$result = [];
 
 		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
@@ -922,7 +922,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 		}
 
-		return ($result);
+		return $result;
 	}
 
 	/**
