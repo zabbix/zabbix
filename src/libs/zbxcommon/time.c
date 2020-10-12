@@ -424,5 +424,3 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 
 	return str;
 }
-
-#endif
