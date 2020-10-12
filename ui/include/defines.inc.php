@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0beta2');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010037);
+define('ZABBIX_DB_VERSION',		5010048);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -251,6 +251,7 @@ define('AUDIT_RESOURCE_MODULE',				39);
 define('AUDIT_RESOURCE_SETTINGS',			40);
 define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
 define('AUDIT_RESOURCE_AUTHENTICATION',		42);
+define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1714,6 +1715,7 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
+define('ZBX_STYLE_HEADER_COMBOBOX', 'header-combobox');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');

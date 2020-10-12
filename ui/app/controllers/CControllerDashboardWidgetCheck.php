@@ -21,38 +21,28 @@
 
 class CControllerDashboardWidgetCheck extends CController {
 
-	public function __construct() {
-		parent::__construct();
-	}
+	private $context;
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'string|required',
-			'name' => 'string',
+			'templateid' => 'db dashboard.templateid',
+			'type' => 'required|string',
+			'name' => 'required|string',
 			'fields' => 'json',
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'));
+			$this->context = $this->hasInput('templateid')
+				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+				: CWidgetConfig::CONTEXT_DASHBOARD;
 
-			if ($errors = $form->validate(true)) {
-				foreach ($errors as $msg) {
-					error($msg);
-				}
-
-				$ret = false;
-			}
+			$ret = CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context);
 		}
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
@@ -63,6 +53,20 @@ class CControllerDashboardWidgetCheck extends CController {
 	}
 
 	protected function doAction() {
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
+		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'),
+			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
+		);
+
+		$data = [];
+
+		if ($errors = $form->validate(true)) {
+			foreach ($errors as $msg) {
+				error($msg);
+			}
+
+			$data['errors'] = getMessages()->toString();
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }

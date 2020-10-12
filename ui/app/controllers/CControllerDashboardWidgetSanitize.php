@@ -24,23 +24,35 @@
  *
  * This involves unset of unaccessible values specified in copied widget fields.
  */
-class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
+class CControllerDashboardWidgetSanitize extends CController {
+
+	private $context;
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'string|required',
+			'templateid' => 'db dashboard.templateid',
+			'type' => 'required|string',
 			'fields' => 'json'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
+		if ($ret) {
+			$this->context = $this->hasInput('templateid')
+				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+				: CWidgetConfig::CONTEXT_DASHBOARD;
 
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+			$ret = CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context);
+		}
+
+		if (!$ret) {
+			$messages = getMessages();
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'errors' => ($messages !== null) ? $messages->toString() : ''
+				])])
+			);
 		}
 
 		return $ret;
@@ -51,14 +63,21 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'));
-		$widget_fields = $this->unsetInaccessibleFields([['fields' => $form->fieldsToApi()]]);
+		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'),
+			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
+		);
+
+		$fields = $form->fieldsToApi();
+
+		if ($this->context === CWidgetConfig::CONTEXT_DASHBOARD) {
+			$fields = CDashboardHelper::unsetInaccessibleFields([['fields' => $fields]])[0]['fields'];
+		}
 
 		$output = [
 			'fields' => []
 		];
 
-		foreach ($widget_fields[0]['fields'] as $field) {
+		foreach ($fields as $field) {
 			if (array_key_exists($field['name'], $output['fields'])) {
 				if (!is_array($output['fields'][$field['name']])) {
 					$output['fields'][$field['name']] = [$output['fields'][$field['name']]];

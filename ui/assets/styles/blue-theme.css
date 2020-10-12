@@ -261,6 +261,8 @@ header {
     white-space: nowrap; }
     header .header-controls label {
       line-height: 24px; }
+  header .header-combobox {
+    max-width: 600px; }
   header a.link-action {
     box-sizing: border-box;
     display: block;
@@ -4713,7 +4715,9 @@ span.is-loading {
   overflow: hidden; }
   .overlay-dialogue.modal .overlay-dialogue-body.is-loading:before {
     top: 42px;
-    bottom: 42px; }
+    right: 1px;
+    bottom: 42px;
+    left: 1px; }
 
 .menu-popup-preloader {
   background: #ebeef0;

@@ -540,13 +540,6 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
-			'templateid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid',
-			],
 			'userid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
@@ -7717,7 +7710,7 @@ return [
 				'length' => 255,
 			],
 			'userid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'users',
@@ -7728,6 +7721,13 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1',
+			],
+			'templateid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
 			],
 		],
 	],

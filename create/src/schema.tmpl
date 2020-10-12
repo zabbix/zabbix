@@ -130,10 +130,9 @@ FIELD		|screenid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
 FIELD		|hsize		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|vsize		|t_integer	|'1'	|NOT NULL	|0
-FIELD		|templateid	|t_id		|	|NULL		|0			|1|hosts	|hostid
 FIELD		|userid		|t_id		|	|NULL		|0			|3|users	|		|RESTRICT
 FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
-INDEX		|1		|templateid
+INDEX		|1		|userid
 
 TABLE|screens_items|screenitemid|ZBX_TEMPLATE
 FIELD		|screenitemid	|t_id		|	|NOT NULL	|0
@@ -1671,8 +1670,11 @@ INDEX		|1			|httpstepid
 TABLE|dashboard|dashboardid|ZBX_DASHBOARD
 FIELD		|dashboardid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
-FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users	|		|RESTRICT
+FIELD		|userid		|t_id		|	|NULL		|0			|1|users	|	|RESTRICT
 FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|templateid	|t_id		|	|NULL		|0			|2|hosts	|hostid
+INDEX		|1		|userid
+INDEX		|2		|templateid
 
 TABLE|dashboard_user|dashboard_userid|ZBX_DASHBOARD
 FIELD		|dashboard_userid|t_id		|	|NOT NULL	|0
@@ -1857,4 +1859,4 @@ FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5010037	|5010037
+ROW		|5010048	|5010048

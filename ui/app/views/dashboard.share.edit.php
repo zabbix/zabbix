@@ -96,15 +96,13 @@ $form
 $output = [
 	'header' => _('Dashboard sharing'),
 	'body' => $form->toString(),
-	'script_inline' =>
-		'jQuery(document).ready(function($) {'.
-			'$("[name='.$form->getName().']").fillDashbrdSharingForm('.json_encode($data['dashboard']).');'.
-		'});',
+	'script_inline' => 'initializeDashboardShare('.json_encode($data['dashboard']).');',
 	'buttons' => [
 		[
 			'title' => _('Update'),
+			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return dashbrdConfirmSharing(overlay);'
+			'action' => 'dashboard_share.submit(overlay);'
 		]
 	]
 ];
