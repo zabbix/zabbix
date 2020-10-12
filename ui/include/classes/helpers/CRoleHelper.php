@@ -102,16 +102,6 @@ class CRoleHelper {
 	private static $roles = [];
 
 	/**
-	 * Array for storing all loaded role rules for specific section name and user type. The rules of specific section
-	 * name and user type can be accessed in following way: self::$section_rules[{section name}][{user type}].
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
-	private static $section_rules = [];
-
-	/**
 	 * Array for storing all API methods by user type.
 	 *
 	 * @var array
@@ -131,36 +121,11 @@ class CRoleHelper {
 	public static function checkAccess(string $rule_name, int $roleid): bool {
 		self::loadRoleRules($roleid);
 
-		$section_name = self::getRuleSection($rule_name);
-		$user_type = self::$roles[$roleid]['type'];
-		self::loadSectionRules($section_name, $user_type);
-
-		$rule_exists_in_section_rules = in_array($rule_name, self::$section_rules[$section_name][$user_type]);
-
-		$role_rules = self::$roles[$roleid]['rules'];
-		$role_rule_exists = array_key_exists($rule_name, $role_rules);
-		$role_rule_is_enabled = false;
-
-		if ($section_name === self::SECTION_API || $rule_name === $section_name.'.default_access') {
-			if ($rule_name === self::API_MODE) {
-				$role_rule_is_enabled = $role_rule_exists ? (bool) $role_rules[$rule_name] : false;
-			}
-			else {
-				$role_rule_is_enabled = (bool) $role_rules[$rule_name];
-			}
-		}
-		else {
-			$default_access_is_enabled = $section_name !== self::SECTION_API
-					&& $role_rules[$section_name.'.default_access'];
-			$role_rule_is_enabled = ($default_access_is_enabled && !$role_rule_exists)
-					|| (!$default_access_is_enabled && $role_rule_exists);
+		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name == 'api.methods') {
+			return false;
 		}
 
-		if ($rule_exists_in_section_rules && $role_rule_is_enabled) {
-			return true;
-		}
-
-		return false;
+		return self::$roles[$roleid]['rules'][$rule_name];
 	}
 
 	/**
@@ -176,7 +141,7 @@ class CRoleHelper {
 	public static function getRoleApiMethods(int $roleid): array {
 		self::loadRoleRules($roleid);
 
-		return self::$roles[$roleid]['rules']['api_methods'];
+		return self::$roles[$roleid]['rules']['api.methods'];
 	}
 
 	/**
@@ -195,7 +160,10 @@ class CRoleHelper {
 
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
-			'selectRules' => ['name', 'value'],
+			'selectRules' => [CRoleHelper::SECTION_UI, CRoleHelper::UI_DEFAULT_ACCESS,
+				CRoleHelper::SECTION_MODULES, CRoleHelper::MODULES_DEFAULT_ACCESS, CRoleHelper::API_ACCESS,
+				CRoleHelper::API_MODE, 'api.methods', CRoleHelper::SECTION_ACTIONS, CRoleHelper::ACTIONS_DEFAULT_ACCESS
+			],
 			'roleids' => $roleid
 		]);
 
@@ -205,67 +173,31 @@ class CRoleHelper {
 
 		$role = $roles[0];
 
-		$rules = ['api_methods' => []];
-		$modules = [];
+		$rules = [
+			CRoleHelper::UI_DEFAULT_ACCESS => (bool) $role['rules'][CRoleHelper::UI_DEFAULT_ACCESS],
+			CRoleHelper::MODULES_DEFAULT_ACCESS => (bool) $role['rules'][CRoleHelper::MODULES_DEFAULT_ACCESS],
+			CRoleHelper::API_ACCESS => (bool) $role['rules'][CRoleHelper::API_ACCESS],
+			CRoleHelper::API_MODE => (bool) $role['rules'][CRoleHelper::API_MODE],
+			'api.methods' => $role['rules']['api.methods'],
+			CRoleHelper::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS],
+		];
 
-		foreach ($role['rules'] as $rule) {
-			if (strncmp($rule['name'], self::MODULES_MODULE_STATUS, strlen(self::MODULES_MODULE_STATUS)) === 0) {
-				$modules[substr($rule['name'], strrpos($rule['name'], '.') + 1)]['status'] = $rule['value'];
-			}
-			elseif (strncmp($rule['name'], self::MODULES_MODULE, strlen(self::MODULES_MODULE)) === 0) {
-				$modules[substr($rule['name'], strrpos($rule['name'], '.') + 1)]['id'] = $rule['value'];
-			}
-			elseif (strncmp($rule['name'], self::API_METHOD, strlen(self::API_METHOD)) === 0) {
-				$rules['api_methods'][] = $rule['value'];
-			}
-			else {
-				$rules[$rule['name']] = $rule['value'];
-			}
+		foreach ($role['rules'][CRoleHelper::SECTION_UI] as $rule_name => $value) {
+			$rules[$rule_name] = (bool) $value;
 		}
 
-		foreach ($modules as $module) {
-			$rules[self::MODULES_MODULE.$module['id']] = $module['status'];
+		foreach ($role['rules'][CRoleHelper::SECTION_MODULES] as $module) {
+			$rules[self::MODULES_MODULE.$module['moduleid']] = (bool) $module['status'];
+		}
+
+		foreach ($role['rules'][CRoleHelper::SECTION_ACTIONS] as $rule_name => $value) {
+			$rules[$rule_name] = (bool) $value;
 		}
 
 		$role['type'] = (int) $role['type'];
 		$role['rules'] = $rules;
 
 		self::$roles[$roleid] = $role;
-	}
-
-	/**
-	 * Collects once all available rules for specific rule section and user type into $section_rules property.
-	 *
-	 * @static
-	 *
-	 * @throws Exception
-	 *
-	 * @param string  $section_name  Section name.
-	 * @param integer $user_type     User type.
-	 */
-	private static function loadSectionRules(string $section_name, int $user_type): void {
-		if (array_key_exists($section_name, self::$section_rules)
-				&& array_key_exists($user_type, self::$section_rules[$section_name])) {
-			return;
-		}
-
-		switch ($section_name) {
-			case self::SECTION_UI:
-				self::$section_rules[$section_name][$user_type] = self::getAllUiElements($user_type);
-				break;
-			case self::SECTION_MODULES:
-				self::$section_rules[$section_name][$user_type] = self::getAllModules($user_type);
-				break;
-			case self::SECTION_API:
-				$rules = [self::API_ACCESS, self::API_MODE];
-				self::$section_rules[$section_name][$user_type] = $rules;
-				break;
-			case self::SECTION_ACTIONS:
-				self::$section_rules[$section_name][$user_type] = self::getAllActions($user_type);
-				break;
-			default:
-				throw new Exception(_('Rule section was not found.'));
-		}
 	}
 
 	/**

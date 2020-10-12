@@ -645,11 +645,11 @@ class CRole extends CApiService {
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::SECTION_UI) !== false
 						&& $db_rule['name'] !== CRoleHelper::UI_DEFAULT_ACCESS
-						&& array_key_exists(CRoleHelper::SECTION_UI, $options['selectRules'])) {
+						&& in_array(CRoleHelper::SECTION_UI, $options['selectRules'])) {
 					$result[$db_rule['roleid']]['rules'][CRoleHelper::SECTION_UI][$db_rule['name']] = $value;
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::MODULES_MODULE) !== false
-						&& array_key_exists(CRoleHelper::SECTION_MODULES, $options['selectRules'])) {
+						&& in_array(CRoleHelper::SECTION_MODULES, $options['selectRules'])) {
 					$id = (int) substr($db_rule['name'], strrpos($db_rule['name'], '.') + 1);
 
 					if (strpos($db_rule['name'], CRoleHelper::MODULES_MODULE_STATUS) !== false) {
@@ -660,13 +660,13 @@ class CRole extends CApiService {
 					}
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::API_METHOD) !== false
-						&& array_key_exists('api.methods', $options['selectRules'])) {
+						&& in_array('api.methods', $options['selectRules'])) {
 					$result[$db_rule['roleid']]['rules']['api.methods'][] = $value;
 				}
 				elseif (strpos($db_rule['name'], CRoleHelper::SECTION_ACTIONS) !== false
 						&& $db_rule['name'] !== CRoleHelper::ACTIONS_DEFAULT_ACCESS
-						&& array_key_exists(CRoleHelper::SECTION_ACTIONS, $options['selectRules'])) {
-					$result[$db_rule['roleid']]['rules'][CRoleHelper::SECTION_ACTIONS][] = [$db_rule['name'] => $value];
+						&& in_array(CRoleHelper::SECTION_ACTIONS, $options['selectRules'])) {
+					$result[$db_rule['roleid']]['rules'][CRoleHelper::SECTION_ACTIONS][$db_rule['name']] = $value;
 				}
 			}
 		}
