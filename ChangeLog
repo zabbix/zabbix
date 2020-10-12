@@ -1,6 +1,7 @@
 Changes for 5.2.0beta2
 
 New features:
+A.F.I...ST [ZBXNEXT-6001] converted templated screens to dashboards (averza, kalimulin, rlataria)
 ADF.I..PS. [ZBXNEXT-6140] implemented new set of trigger functions for long term analytics (asitals, dimir, gcalenko, viktors, vmaksimovs, wiper)
 ..F....... [ZBXNEXT-710] added support of saving defined filters on monitoring problems and monitoring hosts pages (gcalenko, miks)
 .........T [ZBXNEXT-6232] added LTE monitoring to Mikrotik SNMP template (mchudinov)
