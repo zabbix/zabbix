@@ -471,6 +471,7 @@ footer {
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
+  background-color: none;
   margin: 0;
   /* All tab filters content container */
   /* Top navigation labels */
@@ -482,8 +483,8 @@ footer {
     margin-right: 20px; }
   .filter-container.tabfilter-container .tabfilter-content-container {
     border: 1px solid #dfe4e7;
+    background-color: #ffffff;
     padding: 10px 0;
-    margin-top: -1px;
     margin-bottom: 6px; }
   .filter-container.tabfilter-container nav > ul {
     display: flex;
@@ -504,14 +505,16 @@ footer {
         margin-right: 3px; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(1), .filter-container.tabfilter-container nav > ul > li:nth-child(3) {
       white-space: nowrap; }
-  .filter-container.tabfilter-container nav li {
-    display: inline-block;
-    vertical-align: top;
-    height: 24px;
-    line-height: 24px; }
-    .filter-container.tabfilter-container nav li button {
-      vertical-align: middle;
-      margin-top: 0; }
+  .filter-container.tabfilter-container nav {
+    margin-bottom: -1px; }
+    .filter-container.tabfilter-container nav li {
+      display: inline-block;
+      vertical-align: top;
+      height: 24px;
+      line-height: 22px; }
+      .filter-container.tabfilter-container nav li button {
+        vertical-align: middle;
+        margin-top: 0; }
   .filter-container.tabfilter-container .tabfilter-item-label {
     display: inline-block;
     background-color: #0275b8;
@@ -538,7 +541,7 @@ footer {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded::after {
         display: block;
         width: 100%;
-        height: 6px;
+        height: 8px;
         background-color: #ffffff;
         border-left: 1px solid #dfe4e7;
         border-right: 1px solid #dfe4e7;
@@ -568,8 +571,8 @@ footer {
   .filter-container.tabfilter-container .tabfilter-item-link {
     display: inline-block;
     color: #ffffff;
-    border-bottom: 0 none;
-    line-height: 24px;
+    border: 1px transparent;
+    line-height: 22px;
     vertical-align: middle;
     padding: 0 11px; }
   .filter-container.tabfilter-container .icon-edit {
