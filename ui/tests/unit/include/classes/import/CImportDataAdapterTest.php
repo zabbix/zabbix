@@ -39,7 +39,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($adapter->getTriggers(), []);
 		$this->assertEquals($adapter->getGraphs(), []);
 		$this->assertEquals($adapter->getDiscoveryRules(), []);
-		$this->assertEquals($adapter->getTemplateScreens(), []);
 		$this->assertEquals($adapter->getScreens(), []);
 		$this->assertEquals($adapter->getImages(), []);
 		$this->assertEquals($adapter->getMaps(), []);
@@ -1601,44 +1600,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'preprocessing' => [],
 					'overrides' => [],
 					'master_item' => []
-				]
-			]
-		]);
-	}
-
-	public function testGetTemplateScreens() {
-		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
-
-		$this->assertEquals($adapter->getTemplateScreens(), [
-			'export-template' => [
-				'screen' => [
-					'name' => 'screen',
-					'hsize' => '1',
-					'vsize' => '1',
-					'screenitems' => [
-						[
-							'resourcetype' => '0',
-							'width' => '500',
-							'height' => '100',
-							'x' => '0',
-							'y' => '0',
-							'colspan' => '1',
-							'rowspan' => '1',
-							'elements' => '0',
-							'valign' => '0',
-							'halign' => '0',
-							'style' => '0',
-							'url' => '',
-							'dynamic' => '0',
-							'sort_triggers' => '0',
-							'resource' => [
-								'name' => 'graph',
-								'host' => 'export-template'
-							],
-							'max_columns' => '',
-							'application' => ''
-						]
-					]
 				]
 			]
 		]);
