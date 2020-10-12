@@ -810,10 +810,17 @@ insert_javascript_for_visibilitybox();
 		this.$form.trimValues(['input[type="text"]']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
+		var form_data = this.$form.serializeJSON();
+		if (form_data.overrides_evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>
+				&& Object.keys(form_data.overrides_filters).length <= 1) {
+			form_data.overrides_evaltype = '<?= CONDITION_EVAL_TYPE_AND_OR ?>';
+			delete form_data.overrides_formula;
+		}
+
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: this.$form.serialize(),
+			data: form_data,
 			dataType: 'json',
 			type: 'post'
 		})
