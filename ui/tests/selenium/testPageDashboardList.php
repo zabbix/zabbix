@@ -213,7 +213,7 @@ class testPageDashboardList extends CWebTest {
 		$this->assertRowCount(0);
 
 		// Check database.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE templateid IS NULL'));
 	}
 
 	/**
