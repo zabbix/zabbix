@@ -103,7 +103,6 @@ class CTabFilter extends CBaseComponent {
 			src_item;
 
 		filter_src.uniqid = filter_data.uniqid + '__clone';
-		filter_src.filter_view_data = filter_data.filter_view_data;
 		filter_src.filter_configurable = filter_data.filter_configurable;
 		target.setAttribute('data-target', target.getAttribute('data-target') + '__clone');
 		src_item = this.create(target, filter_src);
