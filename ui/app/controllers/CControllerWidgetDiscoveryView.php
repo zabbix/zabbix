@@ -70,7 +70,8 @@ class CControllerWidgetDiscoveryView extends CControllerWidget {
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_discovery' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DISCOVERY)
 		]));
 	}
 }

@@ -165,14 +165,18 @@ class CControllerMenuPopup extends CController {
 			$menu_data = [
 				'type' => 'host',
 				'hostid' => $data['hostid'],
-				'hasGoTo' => (bool) $has_goto
+				'hasGoTo' => (bool) $has_goto,
+				'allowed_ui_inventory' => CWebUser::checkAccess(CRoleHelper::UI_INVENTORY_HOSTS),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
+				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 
 			if ($has_goto) {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
 				$menu_data['showScreens'] = (bool) $db_host['screens'];
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
-				$menu_data['showConfig'] = (CWebUser::getType() > USER_TYPE_ZABBIX_USER);
 				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
@@ -574,7 +578,13 @@ class CControllerMenuPopup extends CController {
 				'triggerid' => $data['triggerid'],
 				'items' => $items,
 				'showEvents' => $show_events,
-				'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'allowed_ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 			];
 
 			if ($db_trigger['url'] !== '') {

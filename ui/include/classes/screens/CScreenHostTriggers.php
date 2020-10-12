@@ -251,19 +251,34 @@ class CScreenHostTriggers extends CScreenBase {
 					->setArgument('filter_set', '1')
 			);
 
+			$allowed = [
+				'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			];
+
 			// Create acknowledge link.
 			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+			$problem_update_link = $allowed['ack']
+				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+				);;
 
 			$table->addRow([
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-							'triggerid' => $trigger['triggerid']], $problem['eventid']
+						->setHint(make_popup_eventlist(
+							['comments' => $problem['comments'], 'url' => $problem['url'],
+								'triggerid' => $trigger['triggerid']],
+							$problem['eventid'],
+							$allowed
 						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,

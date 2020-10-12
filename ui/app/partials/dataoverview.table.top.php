@@ -45,7 +45,7 @@ foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
 		else {
 			$itemid = $hostid_to_itemid[$host['hostid']];
 			$item = $data['visible_items'][$itemid];
-			$row[] = getItemDataOverviewCell($item, $item['trigger']);
+			$row[] = getItemDataOverviewCell($item, $item['trigger'], $data['allowed_ui_overview']);
 		}
 	}
 

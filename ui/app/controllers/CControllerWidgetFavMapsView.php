@@ -62,7 +62,8 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 			'maps' => $maps,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_maps' => $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS)
 		]));
 	}
 }

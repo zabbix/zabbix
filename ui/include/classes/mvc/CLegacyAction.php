@@ -53,11 +53,11 @@ class CLegacyAction extends CAction {
 		$action = $this->getAction();
 
 		if ($user_type < USER_TYPE_ZABBIX_USER) {
-			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart5.php', 'chart6.php', 'chart7.php', 'history.php',
-				'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php', 'imgstore.php',
-				'jsrpc.php', 'map.import.php', 'map.php', 'overview.php', 'toptriggers.php', 'tr_events.php',
-				'screenconf.php', 'screenedit.php', 'screen.import.php', 'screens.php', 'slideconf.php', 'slides.php',
-				'srv_status.php', 'sysmap.php', 'sysmaps.php', 'report2.php'
+			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart4.php', 'chart5.php', 'chart6.php', 'chart7.php',
+				'history.php', 'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php',
+				'imgstore.php', 'jsrpc.php', 'map.import.php', 'map.php', 'overview.php', 'toptriggers.php',
+				'tr_events.php', 'screenconf.php', 'screenedit.php', 'screen.import.php', 'screens.php',
+				'slideconf.php', 'slides.php', 'srv_status.php', 'sysmap.php', 'sysmaps.php', 'report2.php'
 			];
 		}
 
@@ -88,11 +88,9 @@ class CLegacyAction extends CAction {
 
 			$rule_actions = [
 				CRoleHelper::UI_MONITORING_PROBLEMS => ['tr_events.php'],
-				CRoleHelper::UI_MONITORING_HOSTS => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
-					'host_screen.php', 'httpdetails.php'
-				],
+				CRoleHelper::UI_MONITORING_HOSTS => ['host_screen.php', 'httpdetails.php'],
 				CRoleHelper::UI_MONITORING_OVERVIEW => ['overview.php'],
-				CRoleHelper::UI_MONITORING_LATEST_DATA => ['chart.php', 'history.php'],
+				CRoleHelper::UI_MONITORING_LATEST_DATA => ['history.php'],
 				CRoleHelper::UI_MONITORING_SCREENS => ['screen.import.php', 'screens.php', 'slideconf.php',
 					'slides.php'
 				],
@@ -102,7 +100,7 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_MONITORING_SERVICES => ['chart5.php', 'srv_status.php'],
 				CRoleHelper::UI_INVENTORY_OVERVIEW => ['hostinventoriesoverview.php'],
 				CRoleHelper::UI_INVENTORY_HOSTS => ['hostinventories.php'],
-				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => ['chart4.php', 'report2.php'],
+				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => ['report2.php'],
 				CRoleHelper::UI_REPORTS_TOP_TRIGGERS => ['toptriggers.php']
 			];
 		}
