@@ -273,50 +273,50 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
  *           day+ used as period base (now/?).                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trends_parse_nextcheck(time_t from, const char *p, time_t *nextcheck, char **error)
+int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *nextcheck, char **error)
 {
 	struct tm	tm;
 	zbx_time_unit_t	base;
 
-	if (SUCCEED != trends_parse_base(p, &base, error))
+	if (SUCCEED != trends_parse_base(period_shift, &base, error))
 		return FAIL;
 
 	/* parse period shift */
 
-	if (0 != strncmp(p, "now", ZBX_CONST_STRLEN("now")))
+	if (0 != strncmp(period_shift, "now", ZBX_CONST_STRLEN("now")))
 	{
 		*error = zbx_strdup(*error, "period shift must begin with \"now\"");
 		return FAIL;
 	}
 
-	p += ZBX_CONST_STRLEN("now");
+	period_shift += ZBX_CONST_STRLEN("now");
 
 	localtime_r(&from, &tm);
 
-	while ('\0' != *p)
+	while ('\0' != *period_shift)
 	{
 		zbx_time_unit_t	unit;
 
-		if ('/' == *p)
+		if ('/' == *period_shift)
 		{
-			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
+			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++period_shift)))
 			{
-				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", period_shift);
 				return FAIL;
 			}
 
 			zbx_tm_round_down(&tm, unit);
 
 			/* unit is single character */
-			p++;
+			period_shift++;
 		}
-		else if ('+' == *p || '-' == *p)
+		else if ('+' == *period_shift || '-' == *period_shift)
 		{
 			int	num;
-			char	op = *(p++);
+			char	op = *(period_shift++);
 			size_t	len;
 
-			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
+			if (FAIL == zbx_tm_parse_period(period_shift, &len, &num, &unit, error))
 				return FAIL;
 
 			/* nextcheck calculation is based on the largest rounding unit, */
@@ -329,11 +329,11 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *p, time_t *nextcheck, ch
 					zbx_tm_sub(&tm, num, unit);
 			}
 
-			p += len;
+			period_shift += len;
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", period_shift);
 			return FAIL;
 		}
 	}
