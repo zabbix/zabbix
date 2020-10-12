@@ -364,8 +364,9 @@ class CTabFilter extends CBaseComponent {
 						}).then(() => {
 							this._options.selected = item._index;
 						});
-						this.scrollIntoView(item);
 					}
+
+					this.scrollIntoView(item);
 				}
 
 				if (item !== this._active_item) {
