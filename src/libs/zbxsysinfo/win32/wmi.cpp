@@ -233,18 +233,11 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 			return ret;
 		}
 
-		if (FAILED(hres))
-		{
-			*error = zbx_strdup(*error, "Retreiving WMI query result failed.");
-			return SYSINFO_RET_FAIL;
-		}
+		if (WBEM_S_FALSE == hres && 0 == uReturn)
+			return SYSINFO_RET_OK;
 
-		if (0 == uReturn) {
-			if (WBEM_S_FALSE == hres)
-				return SYSINFO_RET_OK;
-			else
-				return SYSINFO_RET_FAIL;
-		}
+		if (FAILED(hres) || 0 == uReturn)
+			return ret;
 
 		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
