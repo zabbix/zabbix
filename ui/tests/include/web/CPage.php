@@ -178,7 +178,7 @@ class CPage {
 		}
 
 		if (self::$cookie !== null) {
-			$cookie = json_decode(base64_decode(self::$cookie['value']), true);
+			$cookie = json_decode(base64_decode(urldecode(self::$cookie['value'])), true);
 		}
 
 		if (self::$cookie === null || $sessionid !== $cookie['sessionid']) {
