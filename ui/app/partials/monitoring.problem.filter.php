@@ -403,7 +403,7 @@ if (array_key_exists('render_html', $data)) {
 						this.setUrlArgument('show', <?= TRIGGERS_OPTION_ALL ?>);
 					}
 					else {
-						$('[name="show"]').removeAttr('disabled');
+						$('[name="show"]', container).removeAttr('disabled');
 					}
 
 					if (this._parent) {
