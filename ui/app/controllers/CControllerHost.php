@@ -300,7 +300,10 @@ abstract class CControllerHost extends CController {
 			$input['tags'] = array_filter($input['tags'], function($tag) {
 				return !($tag['tag'] === '' && $tag['value'] === '');
 			});
+			$input['tags'] = array_values($input['tags']);
 		}
+
+		$input += ['severities' => []];
 
 		return $input;
 	}

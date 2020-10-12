@@ -160,12 +160,14 @@ abstract class CControllerProblem extends CController {
 			$input['tags'] = array_filter($input['tags'], function($tag) {
 				return !($tag['tag'] === '' && $tag['value'] === '');
 			});
+			$input['tags'] = array_values($input['tags']);
 		}
 
 		if (array_key_exists('inventory', $input) && $input['inventory']) {
 			$input['inventory'] = array_filter($input['inventory'], function($inventory) {
 				return $inventory['value'] !== '';
 			});
+			$input['inventory'] = array_values($input['inventory']);
 		}
 
 		return $input;
