@@ -78,6 +78,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		button {
 			vertical-align: middle;
+			// Remove global defined margin-top for buttons.
+			margin-top: 0;
 		}
 	}
 

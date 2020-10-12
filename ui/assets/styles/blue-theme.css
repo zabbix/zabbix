@@ -510,7 +510,8 @@ footer {
     height: 24px;
     line-height: 24px; }
     .filter-container.tabfilter-container nav li button {
-      vertical-align: middle; }
+      vertical-align: middle;
+      margin-top: 0; }
   .filter-container.tabfilter-container .tabfilter-item-label {
     display: inline-block;
     background-color: #0275b8;
