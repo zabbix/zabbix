@@ -1217,7 +1217,7 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	$item_names_by_key = $has_hidden_data ? array_intersect_key($item_names_by_key, $items_by_key) : $item_names_by_key;
 	$item_names_by_key = array_map(function($itemid) use ($db_items) {return $db_items[$itemid];}, $item_names_by_key);
 	$item_names_by_key = array_map(function($item) {
-		return $item['name'];
+		return $item['name_expanded'];
 	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
 
 	return [$db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data];
@@ -1255,7 +1255,7 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$item_names_by_key = $has_hidden_data ? array_intersect_key($item_names_by_key, $items_by_key) : $item_names_by_key;
 	$item_names_by_key = array_map(function($itemid) use ($db_items) {return $db_items[$itemid];}, $item_names_by_key);
 	$item_names_by_key = array_map(function($item) {
-		return $item['name'];
+		return $item['name_expanded'];
 	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
 
 	return [$db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data];
