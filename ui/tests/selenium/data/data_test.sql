@@ -2474,7 +2474,7 @@ INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALU
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (1012, 105, 'graph', '', 16, 0, 8, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90035, 1010, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90036, 1010, 4, 'itemid', 0, 99104);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90037, 111, 0, 'source_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90037, 1011, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90038, 1011, 4, 'itemid', 0, 99103);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90039, 1011, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90040, 1012, 0, 'source_type', 1);
