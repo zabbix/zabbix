@@ -394,7 +394,7 @@ if (array_key_exists('render_html', $data)) {
 					$('[name="age_state"]', container).attr('disabled', !filter_show);
 
 					if (!filter_show && filter_custom_time == 1) {
-						$('[name="show"]')
+						$('[name="show"]', container)
 							.prop('checked', false)
 							.attr('disabled', 'disabled')
 							.filter('[value="<?= TRIGGERS_OPTION_ALL ?>"]')
