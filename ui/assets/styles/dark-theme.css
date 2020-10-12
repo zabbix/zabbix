@@ -484,7 +484,7 @@ footer {
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
-  background-color: none;
+  background-color: transparent;
   margin: 0;
   /* All tab filters content container */
   /* Top navigation labels */
@@ -511,7 +511,7 @@ footer {
       flex-grow: 1;
       overflow: hidden;
       margin: 0;
-      height: 31px; }
+      height: 30px; }
       .filter-container.tabfilter-container nav > ul > li:nth-child(2) ul {
         white-space: nowrap;
         margin-left: 3px;
@@ -522,7 +522,6 @@ footer {
     margin-bottom: -1px; }
     .filter-container.tabfilter-container nav li {
       display: inline-block;
-      vertical-align: top;
       height: 24px;
       line-height: 22px; }
       .filter-container.tabfilter-container nav li button {
@@ -587,10 +586,10 @@ footer {
     border: 1px transparent;
     line-height: 22px;
     vertical-align: middle;
-    padding: 0 11px; }
+    padding: 0 8px; }
   .filter-container.tabfilter-container .icon-edit {
     width: 24px;
-    height: 24px;
+    height: 22px;
     background: url("../img/icon-sprite.svg?20200407") no-repeat -354px -619px;
     cursor: pointer;
     margin: 0;
@@ -624,7 +623,7 @@ footer {
 .icon-home::before {
   display: block;
   width: 22px;
-  height: 24px;
+  height: 22px;
   content: '';
   background: url("../img/icon-sprite.svg?20200407") no-repeat -433px -510px; }
 

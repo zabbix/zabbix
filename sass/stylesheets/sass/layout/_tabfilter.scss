@@ -20,7 +20,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 .filter-container.tabfilter-container {
 	padding: 0;
 	border: 0 none;
-	background-color: none;
+	background-color: transparent;
 	margin: 0;
 
 	.form-buttons {
@@ -55,7 +55,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			flex-grow: 1;
 			overflow: hidden;
 			margin: 0;
-			height: 31px;
+			height: 30px;
 
 			ul {
 				white-space: nowrap;
@@ -76,7 +76,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		li {
 			display: inline-block;
-			vertical-align: top;
 			height: 24px;
 			line-height: 22px;
 
@@ -184,14 +183,14 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		border: 1px transparent;
 		line-height: 22px;
 		vertical-align: middle;
-		padding: 0 11px;
+		padding: 0 8px;
 	}
 
 	.icon-edit {
 		//@extend .btn-widget-edit;
 		@extend %btn-widget-defaults;
 		width: 24px;
-		height: 24px;
+		height: 22px;
 		background: url($sprite-path) no-repeat -354px -619px;
 
 		cursor: pointer;
@@ -240,7 +239,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 .icon-home::before {
 	display: block;
 	width: 22px;
-	height: 24px;
+	height: 22px;
 	content: '';
 	// white icon
 	background: url($sprite-path) no-repeat -433px -510px;
