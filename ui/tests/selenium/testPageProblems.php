@@ -141,6 +141,7 @@ class testPageProblems extends CLegacyWebTest {
 		// Remove first tag option
 		$this->zbxTestClickXpath('//button[@name="tags[0][remove]"]');
 		$this->query('name:filter_apply')->one()->click();
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 	}
@@ -230,6 +231,7 @@ class testPageProblems extends CLegacyWebTest {
 		// Check Show tags 2
 		$this->zbxTestClickXpath('//label[@for="show_tags_20"]');
 		$this->query('name:filter_apply')->one()->click();
+		$this->zbxTestWaitForPageToLoad();
 		// Check tags in result
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
