@@ -133,6 +133,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Search and check result
 		$this->query('name:filter_apply')->one()->click();
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementText('//tbody/tr[1]/td[10]/a', 'Test trigger with tag');
 		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 2 of 2 found');
@@ -192,6 +193,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Apply filter and check result
 		$this->query('name:filter_apply')->one()->click();
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');
@@ -240,6 +242,7 @@ class testPageProblems extends CLegacyWebTest {
 		// Check Show tags 3
 		$this->zbxTestClickXpath('//label[@for="show_tags_30"]');
 		$this->query('name:filter_apply')->one()->click();
+		$this->zbxTestWaitForPageToLoad();
 		// Check tags in result
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
