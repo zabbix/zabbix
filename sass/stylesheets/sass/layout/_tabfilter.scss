@@ -44,17 +44,19 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		flex: 1;
 		justify-content: space-between;
 		background-color: $body-bg-color;
+		// Sortable container have padding-top 3px for focused state be visible, therefore filter content shift compensated with negative margin of same size.
+		margin-top: -3px;
 	}
 
 	nav > ul > li {
-		margin: 0 2px 5px 0;
+		margin: 0 3px 5px 0;
 		padding-top: 3px;
 
 		// Container with sortable tab items. Occupy space left with overflow and scrolling of content (javascript)
 		&:nth-child(2) {
 			flex-grow: 1;
 			overflow: hidden;
-			margin: 0;
+			margin: 0 3px 0 -3px;
 			height: 30px;
 
 			ul {
@@ -76,8 +78,9 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		li {
 			display: inline-block;
-			height: 24px;
+			height: 22px;
 			line-height: 22px;
+			vertical-align: middle;
 
 			button {
 				vertical-align: middle;
@@ -99,7 +102,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		border-radius: 2px;
 		border: 1px solid transparent;
 		color: $tab-label-color;
-		margin-right: 2px;
+		margin-right: 3px;
 
 		&.unsaved .tabfilter-item-link {
 			font-style: italic;
@@ -114,38 +117,40 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 
 		&.selected.expanded {
+			position: relative;
 			background-color: $tab-label-expanded-bg-color;
 			border: 1px solid $tab-label-expanded-border-color;
-			border-radius: 0;
 			border-bottom: 0 none;
 
 			.tabfilter-item-link {
 				color: $tab-label-expanded-color;
 			}
 
-			&::after {
+			&::before {
+				position: absolute;
+				bottom: -7px;
+				left: -1px;
 				display: block;
 				width: 100%;
-				height: 8px;
+				height: 9px;
 				background-color: $tab-label-expanded-bg-color;
 				border-left: 1px solid $tab-label-expanded-border-color;
 				border-right: 1px solid $tab-label-expanded-border-color;
-				margin-left: -1px;
-				margin-top: -1px;
 				content: '';
 			}
 
+			&:hover,
 			&.focused {
 				background: $tab-label-focus-bg-color;
 				box-shadow: none;
 
-				&::after {
+				&::before {
 					background: $tab-label-focus-bg-color;
 				}
 			}
 
 			.icon-edit {
-				background: url($sprite-path) no-repeat -42px -619px;
+				background: url($sprite-path) no-repeat -42px -621px;
 			}
 		}
 
@@ -160,10 +165,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			.tabfilter-item-link[data-counter]::after {
 				display: none;
 			}
-		}
-
-		&.focused {
-			box-shadow: 0 0 0 2px rgba($tab-label-bg-color, .35);
 		}
 
 		&.disabled {
@@ -191,7 +192,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		@extend %btn-widget-defaults;
 		width: 24px;
 		height: 22px;
-		background: url($sprite-path) no-repeat -354px -619px;
+		background: url($sprite-path) no-repeat -354px -621px;
 
 		cursor: pointer;
 		margin: 0;

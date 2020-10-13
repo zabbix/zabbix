@@ -490,14 +490,15 @@ footer {
     display: flex;
     flex: 1;
     justify-content: space-between;
-    background-color: #111111; }
+    background-color: #111111;
+    margin-top: -3px; }
   .filter-container.tabfilter-container nav > ul > li {
-    margin: 0 2px 5px 0;
+    margin: 0 3px 5px 0;
     padding-top: 3px; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(2) {
       flex-grow: 1;
       overflow: hidden;
-      margin: 0;
+      margin: 0 3px 0 -3px;
       height: 30px; }
       .filter-container.tabfilter-container nav > ul > li:nth-child(2) ul {
         white-space: nowrap;
@@ -509,8 +510,9 @@ footer {
     margin-bottom: -1px; }
     .filter-container.tabfilter-container nav li {
       display: inline-block;
-      height: 24px;
-      line-height: 22px; }
+      height: 22px;
+      line-height: 22px;
+      vertical-align: middle; }
       .filter-container.tabfilter-container nav li button {
         vertical-align: middle;
         margin-top: 0; }
@@ -520,7 +522,7 @@ footer {
     border-radius: 2px;
     border: 1px solid transparent;
     color: #333333;
-    margin-right: 2px; }
+    margin-right: 3px; }
     .filter-container.tabfilter-container .tabfilter-item-label:hover {
       color: #333333;
       background-color: lightgray; }
@@ -531,37 +533,36 @@ footer {
       .filter-container.tabfilter-container .tabfilter-item-label.unsaved .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded {
+      position: relative;
       background-color: #000000;
       border: 1px solid #444444;
-      border-radius: 0;
       border-bottom: 0 none; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .tabfilter-item-link {
         color: #ffffff; }
-      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded::after {
+      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded::before {
+        position: absolute;
+        bottom: -7px;
+        left: -1px;
         display: block;
         width: 100%;
-        height: 8px;
+        height: 9px;
         background-color: #000000;
         border-left: 1px solid #444444;
         border-right: 1px solid #444444;
-        margin-left: -1px;
-        margin-top: -1px;
         content: ''; }
-      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded.focused {
+      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover, .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded.focused {
         background: #414141;
         box-shadow: none; }
-        .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded.focused::after {
+        .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover::before, .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded.focused::before {
           background: #414141; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .icon-edit {
-        background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -619px; }
+        background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -621px; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
       background-color: lightgray; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link {
         color: #333333; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
-    .filter-container.tabfilter-container .tabfilter-item-label.focused {
-      box-shadow: 0 0 0 2px rgba(224, 224, 224, 0.35); }
     .filter-container.tabfilter-container .tabfilter-item-label.disabled {
       box-shadow: none;
       pointer-events: none; }
@@ -577,7 +578,7 @@ footer {
   .filter-container.tabfilter-container .icon-edit {
     width: 24px;
     height: 22px;
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -354px -619px;
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -354px -621px;
     cursor: pointer;
     margin: 0;
     vertical-align: middle;
