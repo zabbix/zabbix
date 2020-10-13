@@ -238,7 +238,7 @@ func (p *Plugin) Collect() (err error) {
 	for pid, stat := range stats {
 		p.getProcCpuUtil(pid, stat)
 		if stat.err != nil {
-			p.Debugf("cannot get process %d CPU utilisation statistics: %s", pid, stat.err)
+			p.Debugf("cannot get process %d CPU utilization statistics: %s", pid, stat.err)
 		}
 	}
 
@@ -372,7 +372,7 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	if stats, ok := p.queries[query]; ok {
 		stats.accessed = now
 		if stats.err != nil {
-			p.Debugf("CPU utilisation gathering error %s", err)
+			p.Debugf("CPU utilization gathering error %s", err)
 			return nil, stats.err
 		}
 		if stats.tail == stats.head {
@@ -410,9 +410,9 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	}
 	if err == nil {
 		p.queries[query] = stats
-		p.Debugf("registered new CPU utilisation query: %s, %s, %s", name, user, cmdline)
+		p.Debugf("registered new CPU utilization query: %s, %s, %s", name, user, cmdline)
 	} else {
-		p.Debugf("cannot register CPU utilisation query: %s", err)
+		p.Debugf("cannot register CPU utilization query: %s", err)
 	}
 	return
 }
@@ -696,7 +696,7 @@ func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
 
 func init() {
 	plugin.RegisterMetrics(&impl, "Proc",
-		"proc.cpu.util", "Process CPU utilisation percentage.",
-		"proc.mem", "Process memory utilisation values.",
+		"proc.cpu.util", "Process CPU utilization percentage.",
+		"proc.mem", "Process memory utilization values.",
 	)
 }
