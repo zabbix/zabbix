@@ -32,7 +32,8 @@ typedef enum
 	ZBX_DIAGINFO_VALUECACHE,
 	ZBX_DIAGINFO_PREPROCESSING,
 	ZBX_DIAGINFO_LLD,
-	ZBX_DIAGINFO_ALERTING
+	ZBX_DIAGINFO_ALERTING,
+	ZBX_DIAGINFO_LOCKS
 }
 zbx_diaginfo_section_t;
 
@@ -41,6 +42,7 @@ zbx_diaginfo_section_t;
 #define ZBX_DIAG_PREPROCESSING	"preprocessing"
 #define ZBX_DIAG_LLD		"lld"
 #define ZBX_DIAG_ALERTING	"alerting"
+#define ZBX_DIAG_LOCKS		"locks"
 
 int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
 void	zbx_diag_log_info(unsigned int flags);

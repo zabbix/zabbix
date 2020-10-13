@@ -170,6 +170,24 @@ int	zbx_locks_create(char **error)
 	return SUCCEED;
 }
 
+zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name)
+{
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	return &shared_lock->mutexes[mutex_name];
+#else
+	return mutex_name;
+#endif
+}
+
+zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name)
+{
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	return &shared_lock->rwlocks[rwlock_name];
+#else
+	return rwlock_name + ZBX_MUTEX_COUNT;
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_rwlock_create                                                *
