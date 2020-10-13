@@ -811,10 +811,9 @@ insert_javascript_for_visibilitybox();
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		var form_data = this.$form.serializeJSON();
-		if (form_data.overrides_evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>
-				&& Object.keys(form_data.overrides_filters).length <= 1) {
-			form_data.overrides_evaltype = '<?= CONDITION_EVAL_TYPE_AND_OR ?>';
+		if (Object.keys(form_data.overrides_filters).length <= 1) {
 			delete form_data.overrides_formula;
+			delete form_data.overrides_evaltype;
 		}
 
 		overlay.setLoading();
