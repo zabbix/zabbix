@@ -914,7 +914,11 @@ void	zbx_diag_log_info(unsigned int flags)
 			else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
 				diag_log_alerting(&jp_section);
 			else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "== locks diagnostic information ==");
 				diag_log_top_view(&jp_section, ZBX_DIAG_LOCKS, NULL);
+				zabbix_log(LOG_LEVEL_INFORMATION, "==");
+			}
 		}
 	}
 	else
