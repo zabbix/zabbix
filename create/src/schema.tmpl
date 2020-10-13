@@ -1856,7 +1856,14 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 
+TABLE|item_parameter|item_parameterid|ZBX_TEMPLATE
+FIELD		|item_parameterid|t_id		|	|NOT NULL	|0
+FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|items
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
+INDEX		|1		|itemid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5010048	|5010048
+ROW		|5010051	|5010051

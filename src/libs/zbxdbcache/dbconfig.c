@@ -222,6 +222,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_CALCULATED:
 		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_SCRIPT:
 			if (0 == CONFIG_POLLER_FORKS)
 				break;
 
@@ -2828,6 +2829,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_MASTERITEM	*master;
 	ZBX_DC_PREPROCITEM	*preprocitem;
 	ZBX_DC_HTTPITEM		*httpitem;
+	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
 
 	time_t			now;
@@ -3284,6 +3286,31 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			zbx_hashset_remove_direct(&config->httpitems, httpitem);
 		}
 
+		/* Script items */
+
+		if (ITEM_TYPE_SCRIPT == item->type)
+		{
+			scriptitem = (ZBX_DC_SCRIPTITEM *)DCfind_id(&config->scriptitems, itemid,
+					sizeof(ZBX_DC_SCRIPTITEM), &found);
+
+			DCstrpool_replace(found, &scriptitem->timeout, row[30]);
+			DCstrpool_replace(found, &scriptitem->script, row[11]);
+
+			if (0 == found)
+			{
+				zbx_vector_ptr_create_ext(&scriptitem->params, __config_mem_malloc_func,
+						__config_mem_realloc_func, __config_mem_free_func);
+			}
+		}
+		else if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid)))
+		{
+			zbx_strpool_release(scriptitem->timeout);
+			zbx_strpool_release(scriptitem->script);
+
+			zbx_vector_ptr_destroy(&scriptitem->params);
+			zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
+		}
+
 		/* it is crucial to update type specific (config->snmpitems, config->ipmiitems, etc.) hashsets before */
 		/* attempting to requeue an item because type specific properties are used to arrange items in queues */
 
@@ -3522,6 +3549,19 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			zbx_strpool_release(httpitem->trapper_hosts);
 
 			zbx_hashset_remove_direct(&config->httpitems, httpitem);
+		}
+
+		/* Script items */
+
+		if (ITEM_TYPE_SCRIPT == item->type)
+		{
+			scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid);
+
+			zbx_strpool_release(scriptitem->timeout);
+			zbx_strpool_release(scriptitem->script);
+
+			zbx_vector_ptr_destroy(&scriptitem->params);
+			zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
 		}
 
 		/* items */
@@ -5213,6 +5253,24 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_compare_itemscript_param                                      *
+ *                                                                            *
+ * Purpose: compare two item script parameters                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_compare_itemscript_param(const void *d1, const void *d2)
+{
+	zbx_dc_scriptitem_param_t	*p1 = *(zbx_dc_scriptitem_param_t **)d1;
+	zbx_dc_scriptitem_param_t	*p2 = *(zbx_dc_scriptitem_param_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->name, p2->name);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->value, p2->value);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_compare_item_preproc_by_step                                  *
  *                                                                            *
  * Purpose: compare two item preprocessing operations by step                 *
@@ -5343,6 +5401,110 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 		}
 		else
 			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
+	}
+
+	zbx_vector_ptr_destroy(&items);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_itemscript_param                                          *
+ *                                                                            *
+ * Purpose: Updates item script parameters in configuration cache             *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - item_script_paramid                                          *
+ *           1 - itemid                                                       *
+ *           2 - name                                                         *
+ *           3 - value                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
+{
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
+	zbx_uint64_t			item_script_paramid, itemid;
+	int				found, ret, i, index;
+	ZBX_DC_SCRIPTITEM		*scriptitem;
+	zbx_dc_scriptitem_param_t	*scriptitem_params;
+	zbx_vector_ptr_t		items;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&items);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(itemid, row[1]);
+		ZBX_STR2UINT64(item_script_paramid, row[0]);
+
+		scriptitem = (ZBX_DC_SCRIPTITEM *) zbx_hashset_search(&config->scriptitems, &itemid);
+		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
+				item_script_paramid, sizeof(zbx_dc_scriptitem_param_t), &found);
+
+		DCstrpool_replace(found, &scriptitem_params->name, row[2]);
+		DCstrpool_replace(found, &scriptitem_params->value, row[3]);
+
+		if (0 == found)
+		{
+			scriptitem_params->itemid = itemid;
+			zbx_vector_ptr_append(&scriptitem->params, scriptitem_params);
+		}
+
+		zbx_vector_ptr_append(&items, scriptitem);
+	}
+
+	/* remove deleted item script parameters */
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (scriptitem_params =
+				(zbx_dc_scriptitem_param_t *)zbx_hashset_search(&config->itemscript_params, &rowid)))
+		{
+			continue;
+		}
+
+		if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems,
+				&scriptitem_params->itemid)))
+		{
+			if (FAIL != (index = zbx_vector_ptr_search(&scriptitem->params, scriptitem_params,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			{
+				zbx_vector_ptr_remove_noorder(&scriptitem->params, index);
+				zbx_vector_ptr_append(&items, scriptitem);
+			}
+		}
+
+		zbx_strpool_release(scriptitem_params->name);
+		zbx_strpool_release(scriptitem_params->value);
+		zbx_hashset_remove_direct(&config->itemscript_params, scriptitem_params);
+	}
+
+	/* sort item script parameters */
+
+	zbx_vector_ptr_sort(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < items.values_num; i++)
+	{
+		scriptitem = (ZBX_DC_SCRIPTITEM *)items.values[i];
+
+		if (0 == scriptitem->params.values_num)
+		{
+			zbx_vector_ptr_destroy(&scriptitem->params);
+			zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
+		}
+		else
+			zbx_vector_ptr_sort(&scriptitem->params, dc_compare_itemscript_param);
 	}
 
 	zbx_vector_ptr_destroy(&items);
@@ -5614,15 +5776,15 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
 			action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, host_tag_sec, host_tag_sec2,
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
-			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, total, total2,
-			update_sec, maintenance_sec, maintenance_sec2;
+			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
+			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, triggers_sync, tdep_sync, func_sync, expr_sync,
 			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, host_tag_sync,
 			correlation_sync, corr_condition_sync, corr_operation_sync, hgroups_sync, itempp_sync,
-			maintenance_sync, maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
-			maintenance_host_sync, hgroup_host_sync;
+			itemscrp_sync, maintenance_sync, maintenance_period_sync, maintenance_tag_sync,
+			maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
 
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -5680,6 +5842,7 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	zbx_dbsync_init(&hgroups_sync, mode);
 	zbx_dbsync_init(&hgroup_host_sync, mode);
 	zbx_dbsync_init(&itempp_sync, mode);
+	zbx_dbsync_init(&itemscrp_sync, mode);
 
 	zbx_dbsync_init(&maintenance_sync, mode);
 	zbx_dbsync_init(&maintenance_period_sync, mode);
@@ -5847,6 +6010,11 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 		goto out;
 	itempp_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_item_script_param(&itemscrp_sync))
+		goto out;
+	itemscrp_sec = zbx_time() - sec;
+
 	START_SYNC;
 
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
@@ -5865,6 +6033,11 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	sec = zbx_time();
 	DCsync_item_preproc(&itempp_sync, sec);
 	itempp_sec2 = zbx_time() - sec;
+
+	/* relies on items, must be after DCsync_items() */
+	sec = zbx_time();
+	DCsync_itemscript_param(&itemscrp_sync);
+	itemscrp_sec2 = zbx_time() - sec;
 
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
@@ -6127,6 +6300,10 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, itempp_sec, itempp_sec2, itempp_sync.add_num, itempp_sync.update_num,
 				itempp_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item script param: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, itemscrp_sec, itemscrp_sec2, itemscrp_sync.add_num,
+				itemscrp_sync.update_num, itemscrp_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, maintenance_sec, maintenance_sec2, maintenance_sync.add_num,
@@ -6208,6 +6385,8 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 				config->calcitems.num_data, config->calcitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __func__,
 				config->httpitems.num_data, config->httpitems.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() scriptitems  : %d (%d slots)", __func__,
+				config->scriptitems.num_data, config->scriptitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __func__,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __func__,
@@ -6300,6 +6479,7 @@ out:
 	zbx_dbsync_clear(&corr_operation_sync);
 	zbx_dbsync_clear(&hgroups_sync);
 	zbx_dbsync_clear(&itempp_sync);
+	zbx_dbsync_clear(&itemscrp_sync);
 	zbx_dbsync_clear(&maintenance_sync);
 	zbx_dbsync_clear(&maintenance_period_sync);
 	zbx_dbsync_clear(&maintenance_tag_sync);
@@ -6682,6 +6862,8 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
 	CREATE_HASHSET(config->httpitems, 0);
+	CREATE_HASHSET(config->scriptitems, 0);
+	CREATE_HASHSET(config->itemscript_params, 0);
 	CREATE_HASHSET(config->template_items, 0);
 	CREATE_HASHSET(config->prototype_items, 0);
 	CREATE_HASHSET(config->functions, 100);
@@ -7256,6 +7438,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_CALCITEM		*calcitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
 	const ZBX_DC_HTTPITEM		*httpitem;
+	const ZBX_DC_SCRIPTITEM		*scriptitem;
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
@@ -7450,6 +7633,38 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->username = NULL;
 			dst_item->password = NULL;
 			break;
+		case ITEM_TYPE_SCRIPT:
+			if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems,
+					&src_item->itemid)))
+			{
+				int		i;
+				struct zbx_json	json;
+
+				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+				strscpy(dst_item->timeout_orig, scriptitem->timeout);
+				dst_item->params = zbx_strdup(NULL, scriptitem->script);
+
+				for (i = 0; i < scriptitem->params.values_num; i++)
+				{
+					zbx_dc_scriptitem_param_t	*params =
+							(zbx_dc_scriptitem_param_t*)(scriptitem->params.values[i]);
+
+					zbx_json_addstring(&json, params->name, params->value, ZBX_JSON_TYPE_STRING);
+				}
+
+				dst_item->script_params = zbx_strdup(NULL, json.buffer);
+				zbx_json_free(&json);
+			}
+			else
+			{
+				*dst_item->timeout_orig = '\0';
+				dst_item->params = zbx_strdup(NULL, "");
+				dst_item->script_params = zbx_strdup(NULL, "");
+			}
+
+			dst_item->timeout = NULL;
+			break;
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
 			{
@@ -7530,6 +7745,9 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 				zbx_free(items[i].headers);
 				zbx_free(items[i].posts);
 				break;
+			case ITEM_TYPE_SCRIPT:
+				zbx_free(items[i].script_params);
+				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
