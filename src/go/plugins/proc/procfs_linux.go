@@ -30,7 +30,6 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-	"unicode"
 )
 
 const (
@@ -225,27 +224,23 @@ func byteFromProcFileData(data []byte, valueName string) (float64, bool, error) 
 	str := string(data)
 	split := strings.Split(str, "\n")
 
-	var valueString, valueType string
 	for _, line := range split {
 		i := strings.Index(line, ":")
-		if i < 0 || len(line) < 3 || valueName != line[:i] {
+		if i < 0 || valueName != line[:i] || len(line) <= i {
 			continue
 		}
 
-		valueType = line[len(line)-2:]
-		valueString = strings.TrimFunc(line[i+1:], func(r rune) bool {
-			if unicode.IsLetter(r) || r == ' ' || r == '\t' {
-				return true
-			}
-			return false
-		})
+		line = line[i+1:]
+		if len(line) < 3 {
+			continue
+		}
 
-		v, err := strconv.Atoi(valueString)
+		v, err := strconv.Atoi(strings.TrimSpace(line[:len(line)-2]))
 		if err != nil {
 			return 0, false, err
 		}
 
-		switch valueType {
+		switch line[len(line)-2:] {
 		case "kB":
 			v *= kB
 		case "mB":

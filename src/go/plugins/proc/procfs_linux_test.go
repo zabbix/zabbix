@@ -54,6 +54,7 @@ func Test_byteFromProcFileData(t *testing.T) {
 		{"-incorrect_value", args{testData, "fail"}, 0, false, true},
 		{"-incorrect_value_type", args{testData, "fail_type"}, 0, false, true},
 		{"-not_found", args{testData, "FooBar"}, 0, false, false},
+		{"-no_data", args{nil, ""}, 0, false, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
