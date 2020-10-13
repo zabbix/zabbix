@@ -42,7 +42,7 @@ if (isset($this->data['maintenanceid'])) {
  */
 $maintenanceFormList = (new CFormList('maintenanceFormList'))
 	->addRow(
-		(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
+		(new CLabel(_('Name'), 'mname'))->setAsteriskMark($data['allowed_edit']),
 		(new CTextBox('mname', $this->data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -58,14 +58,14 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->setEnabled($data['allowed_edit'])
 	)
 	// Show date and time in shorter format without seconds.
-	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark($data['allowed_edit']),
 		(new CDateSelector('active_since', $data['active_since']))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
 			->setEnabled($data['allowed_edit'])
 	)
-	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark($data['allowed_edit']),
 		(new CDateSelector('active_till', $data['active_till']))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
@@ -134,7 +134,7 @@ $periodsDiv->addItem(
 );
 
 $maintenancePeriodFormList->addRow(
-	(new CLabel(_('Periods'), $periodsDiv->getId()))->setAsteriskMark(), $periodsDiv
+	(new CLabel(_('Periods'), $periodsDiv->getId()))->setAsteriskMark($data['allowed_edit']), $periodsDiv
 );
 
 /*
@@ -215,10 +215,15 @@ $tag_table->addRow(
 	))->setColSpan(3)
 );
 
-$hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
-	->addRow('',
+$hostsAndGroupsFormList = new CFormList('hostsAndGroupsFormList');
+
+if ($data['allowed_edit']) {
+	$hostsAndGroupsFormList->addRow('',
 		(new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark()
-	)
+	);
+}
+
+$hostsAndGroupsFormList
 	->addRow(new CLabel(_('Host groups'), 'groupids__ms'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
