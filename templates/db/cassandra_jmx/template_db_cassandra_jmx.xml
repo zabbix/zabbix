@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-05T08:50:10Z</date>
+   <date>2020-10-13T09:39:30Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -79,7 +79,7 @@ Template tooling version used: 0.38</description>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <name>Version has changed (new version: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
-                     <description>__RESOURCE__ version has changed. Ack to close.</description>
+                     <description>Cassandra version has changed. Ack to close.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>

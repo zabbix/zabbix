@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.0 and higher
+For Zabbix version: 5.0 and higher  
 Official JMX Template from Apache Cassandra DBSM.
 
 
@@ -156,7 +156,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |There are down nodes in cluster |<p>-</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"].last()}>0` |AVERAGE | |
-|Version has changed (new version: {ITEM.VALUE}) |<p>__RESOURCE__ version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"].diff()}=1 and {TEMPLATE_NAME:jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"].strlen()}>0` |INFO |<p>Manual close: YES</p> |
+|Version has changed (new version: {ITEM.VALUE}) |<p>Cassandra version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"].diff()}=1 and {TEMPLATE_NAME:jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Failed to fetch info data (or no data for 15m) |<p>Zabbix has not received data for items for the last 15 minutes</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"].nodata(15m)}=1` |WARNING | |
 |Too many storage exceptions |<p>-</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"].min(5m)}>0` |WARNING | |
 |Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m) |<p>-</p> |`{TEMPLATE_NAME:jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"].min(15m)}>{$CASSANDRA.PENDING_TASKS.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)</p> |
