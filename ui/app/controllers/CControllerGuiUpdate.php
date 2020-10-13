@@ -23,9 +23,11 @@ class CControllerGuiUpdate extends CController {
 
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
+		$timezones = array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones());
+
 		$fields = [
 			'default_lang' =>				'db config.default_lang|in '.implode(',', array_keys(getLocales())),
-			'default_timezone' =>			'required|in '.ZBX_DEFAULT_TIMEZONE.','.implode(',', DateTimeZone::listIdentifiers()).'|db config.default_timezone',
+			'default_timezone' =>			'required|in '.ZBX_DEFAULT_TIMEZONE.','.implode(',', $timezones).'|db config.default_timezone',
 			'default_theme' =>				'required|db config.default_theme|in '.implode(',', $themes),
 			'search_limit' =>				'required|db config.search_limit|ge 1|le 999999',
 			'max_overview_table_size' =>	'required|db config.max_overview_table_size|ge 5|le 999999',

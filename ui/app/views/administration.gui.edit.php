@@ -24,6 +24,7 @@
  */
 
 $this->includeJsFile('administration.gui.edit.js.php');
+$this->addJsFile('multiselect.js');
 
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
@@ -62,8 +63,6 @@ elseif ($all_locales_available == 0) {
 	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 
-$timezones = DateTimeZone::listIdentifiers();
-
 $gui_tab = (new CFormList())
 	->addRow(_('Default language'),
 		($language_error !== '')
@@ -71,9 +70,9 @@ $gui_tab = (new CFormList())
 			: $lang_combobox
 	)
 	->addRow(_('Default time zone'),
-		new CComboBox('default_timezone', $data['default_timezone'], null,
-			[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
-		)
+		(new CSelect('default_timezone'))
+			->addOptions(CSelect::createOptionsFromArray($data['timezones']))
+			->setValue($data['default_timezone'])
 	)
 	->addRow(_('Default theme'),
 		new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes())

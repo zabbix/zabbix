@@ -619,6 +619,18 @@ switch ($data['popup_type']) {
 		}
 		unset($data['table_records']);
 		break;
+
+	case 'timezones':
+		foreach ($data['table_records'] as $key => $value) {
+//			$action = 'javascript: addValue('.zbx_jsvalue('default_timezone').', '.
+//					zbx_jsvalue($key).', '.$options['parentid'].');';
+//			$action = 'javascript: addValue(null, "test", '.$options['parentid'].');';
+			$action = '';
+
+			$table->addRow((new CLink($value, 'javascript:void(0);'))->onClick($action.$js_action_onclick));
+		}
+		unset($data['table_records']);
+		break;
 }
 
 // Add submit button at footer.

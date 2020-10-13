@@ -136,7 +136,8 @@ elseif (CWebUser::$data) {
 
 $default_timezone = getRequest('default_timezone', $default_timezone);
 
-if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !in_array($default_timezone, DateTimeZone::listIdentifiers())) {
+if ($default_timezone !== ZBX_DEFAULT_TIMEZONE
+		&& !array_key_exists($default_timezone, (new CDateTimeZoneHelper())->getAllDateTimeZones())) {
 	$default_timezone = ZBX_DEFAULT_TIMEZONE;
 }
 

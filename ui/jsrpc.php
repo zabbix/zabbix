@@ -508,7 +508,6 @@ switch ($data['method']) {
 					$result = CArrayHelper::renameObjectsKeys($drules, ['druleid' => 'id']);
 				}
 				break;
-
 		}
 		break;
 

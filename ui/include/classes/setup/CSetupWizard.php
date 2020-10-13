@@ -454,13 +454,14 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stage4(): array {
-		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[ZBX_DEFAULT_TIMEZONE] = CDateTimeZoneHelper::getSystemDateTimeZone();
+		$timezones += (new CDateTimeZoneHelper())->getAllDateTimeZones();
 
 		$table = (new CFormList())
 			->addRow(_('Default time zone'),
-				new CComboBox('default_timezone', $this->getConfig('default_timezone'), null,
-					[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
-				)
+				(new CSelect('default_timezone'))
+					->setValue($this->getConfig('default_timezone', ZBX_DEFAULT_TIMEZONE))
+					->addOptions(CSelect::createOptionsFromArray($timezones))
 			)
 			->addRow(_('Default theme'),
 				new CComboBox('default_theme', $this->getConfig('default_theme'), 'submit()', APP::getThemes())
