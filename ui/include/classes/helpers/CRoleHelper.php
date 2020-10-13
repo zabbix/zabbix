@@ -160,9 +160,8 @@ class CRoleHelper {
 
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
-			'selectRules' => [CRoleHelper::SECTION_UI, CRoleHelper::UI_DEFAULT_ACCESS,
-				CRoleHelper::SECTION_MODULES, CRoleHelper::MODULES_DEFAULT_ACCESS, CRoleHelper::API_ACCESS,
-				CRoleHelper::API_MODE, 'api.methods', CRoleHelper::SECTION_ACTIONS, CRoleHelper::ACTIONS_DEFAULT_ACCESS
+			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
+				'api.methods', 'actions', 'actions.default_access'
 			],
 			'roleids' => $roleid
 		]);
@@ -253,28 +252,6 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_USER_ROLES, self::UI_ADMINISTRATION_USERS, self::UI_ADMINISTRATION_MEDIA_TYPES,
 				self::UI_ADMINISTRATION_SCRIPTS, self::UI_ADMINISTRATION_QUEUE
 			]);
-		}
-
-		return $rules;
-	}
-
-	/**
-	 * Gets all available modules rules.
-	 *
-	 * @static
-	 *
-	 * @return array  Returns the array of rule names.
-	 */
-	public static function getAllModules(): array {
-		$rules = [];
-
-		$modules = API::Module()->get([
-			'output' => ['moduleid'],
-			'filter' => ['status' => MODULE_STATUS_ENABLED]
-		]);
-
-		foreach ($modules as $module) {
-			$rules[] = self::MODULES_MODULE.$module['moduleid'];
 		}
 
 		return $rules;
