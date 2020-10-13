@@ -360,7 +360,7 @@ abstract class CItemGeneral extends CApiService {
 					],
 					'parameters' => ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 						'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
-						'value' =>		['type' => API_STRING_UTF8, 'flags' => $update ? 0x00 : API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
+						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
 					]]
 				]];
 
@@ -1823,10 +1823,6 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($item['type'] == ITEM_TYPE_SCRIPT && array_key_exists('parameters', $item)) {
 				foreach ($item['parameters'] as $parameter) {
-					if (!array_key_exists('value', $parameter)) {
-						$parameter['value'] = '';
-					}
-
 					if (array_key_exists($parameter['name'], $db_item_parameters)) {
 						if ($db_item_parameters[$parameter['name']]['value'] !== $parameter['value']) {
 							$upd_item_parameters[] = [
