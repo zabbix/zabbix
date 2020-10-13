@@ -170,6 +170,17 @@ int	zbx_locks_create(char **error)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mutex_addr_get                                               *
+ *                                                                            *
+ * Purpose: acquire address of the mutex                                      *
+ *                                                                            *
+ * Parameters: mutex_name - name of the mutex to return address for           *
+ *                                                                            *
+ * Return value: address of the mutex                                         *
+ *                                                                            *
+ ******************************************************************************/
 zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name)
 {
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
@@ -179,6 +190,17 @@ zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name)
 #endif
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mutex_addr_get                                               *
+ *                                                                            *
+ * Purpose: acquire address of the rwlock                                     *
+ *                                                                            *
+ * Parameters: rwlock_name - name of the rwlock to return address for         *
+ *                                                                            *
+ * Return value: address of the rwlock                                        *
+ *                                                                            *
+ ******************************************************************************/
 zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name)
 {
 #ifdef HAVE_PTHREAD_PROCESS_SHARED

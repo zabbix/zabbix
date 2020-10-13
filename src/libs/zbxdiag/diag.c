@@ -485,6 +485,15 @@ static void	zbx_json_addhex(struct zbx_json *j, const char *name, zbx_uint64_t v
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_STRING);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_locks_info                                              *
+ *                                                                            *
+ * Purpose: add requested locks diagnostic information to json data           *
+ *                                                                            *
+ * Parameters: json  - [IN/OUT] the json to update                            *
+ *                                                                            *
+ ******************************************************************************/
 void	diag_add_locks_info(struct zbx_json *json)
 {
 	int		i;
