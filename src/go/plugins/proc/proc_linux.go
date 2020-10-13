@@ -434,8 +434,12 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 	case 2:
 		if username := params[1]; username != "" {
 			usr, err = user.Lookup(username)
+			if err == user.UnknownUserError(username) {
+				p.Debugf("Failed to obtain user '%s': %s", username, err.Error())
+				return 0, nil
+			}
 			if err != nil {
-				return nil, fmt.Errorf("Cannot obtain user '%s': %s", username, err.Error())
+				return nil, fmt.Errorf("Failed to obtain user '%s': %s", username, err.Error())
 			}
 		}
 		fallthrough
@@ -452,24 +456,17 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 		return nil, errors.New("Invalid third parameter.")
 	}
 
-	meminfo, err := readAll("/proc/meminfo")
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read meminfo file: %s", err.Error())
-	}
-
 	var mem float64
-	var found bool
-	mem, found, err = byteFromProcFileData(meminfo, "MemTotal")
-	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain amount of total memory: %s", err.Error())
-	}
+	if memtype == "pmem" {
+		mem, err = getMemory()
+		if err != nil {
+			p.Debugf("cannot obtain memory: %s", err.Error())
+			return 0, nil
+		}
 
-	if !found {
-		return nil, fmt.Errorf("Cannot obtain amount of total memory")
-	}
-
-	if mem == 0 {
-		return nil, errors.New("Total memory reported is 0.")
+		if mem == 0 {
+			return nil, errors.New("Total memory reported is 0.")
+		}
 	}
 
 	var typeStr string
@@ -486,8 +483,8 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 	}
 
 	var count int
-	var memSize float64
-	var value float64
+	var memSize, value float64
+	var found bool
 
 	for _, file := range files {
 		if !file.IsDir() {
@@ -520,7 +517,7 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 				continue
 			}
 
-			value = (float64(vmRSS) / float64(mem)) * 100.00
+			value = vmRSS / mem * 100.00
 		case "size":
 			vmData, found, err := byteFromProcFileData(data, "VmData")
 			if err != nil {
@@ -576,21 +573,17 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 	}
 
 	if count == 0 {
-		return nil, fmt.Errorf("Cannot get amount of '%s' memory.", typeStr)
-	}
-
-	if memtype != "pmem" {
-		if mode == "avg" {
-			return int(memSize / float64(count)), nil
-		}
-
-		return int(memSize), nil
+		p.Debugf("no memory found for '%s'.", typeStr)
+		return 0, nil
 	}
 
 	if mode == "avg" {
 		return memSize / float64(count), nil
 	}
 
+	if memtype != "pmem" {
+		return int(memSize), nil
+	}
 	return memSize, nil
 }
 
@@ -608,32 +601,12 @@ func getMin(a, b float64) float64 {
 	return b
 }
 
-func checkProcessName(cmd, stats, name string) bool {
-	if name == "" {
-		return true
-	}
-
-	if stats == name {
-		return true
-	}
-
-	if cmd == name {
-		return true
-	}
-
-	return false
+func checkProcessName(cmdName, stats, name string) bool {
+	return name == "" || stats == name || cmdName == name
 }
 
 func checkUserInfo(uid int64, usr *user.User) bool {
-	if usr == nil {
-		return true
-	}
-
-	if strconv.FormatInt(uid, 10) == usr.Uid {
-		return true
-	}
-
-	return false
+	return usr == nil || strconv.FormatInt(uid, 10) == usr.Uid
 }
 
 func checkProccom(cmd, cmdline string) (bool, error) {
@@ -645,6 +618,7 @@ func checkProccom(cmd, cmdline string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	return rx.MatchString(cmd), nil
 }
 
@@ -680,7 +654,7 @@ func getTypeString(t string) (string, error) {
 }
 
 func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
-	_, cmd, err := p.getProcessCmdline(pid, procInfoCmdline)
+	arg0, cmd, err := p.getProcessCmdline(pid, procInfoName|procInfoCmdline)
 	if err != nil {
 		p.Logger.Debugf("failed to get proccess cmdline for pid '%s': %s", pid, err.Error())
 		return false
@@ -692,7 +666,7 @@ func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
 		return false
 	}
 
-	if !checkProcessName(cmd, stats, name) {
+	if !checkProcessName(arg0, stats, name) {
 		return false
 	}
 

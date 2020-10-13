@@ -26,12 +26,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math"
 	"os"
 	"strconv"
 	"strings"
 	"syscall"
 	"unicode"
+)
+
+const (
+	kB = 1024
+	mB = kB * 1024
+	gB = mB * 1024
+	tB = gB * 1024
 )
 
 func read2k(filename string) (data []byte, err error) {
@@ -196,27 +202,36 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 	return processes, nil
 }
 
-func byteFromProcFileData(data []byte, valueName string) (value float64, found bool, err error) {
+func getMemory() (mem float64, err error) {
+	meminfo, err := readAll("/proc/meminfo")
+	if err != nil {
+		return mem, fmt.Errorf("cannot read meminfo file: %s", err.Error())
+	}
+
+	var found bool
+	mem, found, err = byteFromProcFileData(meminfo, "MemTotal")
+	if err != nil {
+		return mem, fmt.Errorf("cannot get the amount of total memory: %s", err.Error())
+	}
+
+	if !found {
+		return mem, fmt.Errorf("cannot get the amount of total memory")
+	}
+
+	return
+}
+
+func byteFromProcFileData(data []byte, valueName string) (float64, bool, error) {
 	str := string(data)
 	split := strings.Split(str, "\n")
 
 	var valueString, valueType string
 	for _, line := range split {
 		i := strings.Index(line, ":")
-		if i < 0 {
+		if i < 0 || len(line) < 3 || valueName != line[:i] {
 			continue
 		}
 
-		//should never happen but escapes panics
-		if len(line) <= i || len(line) < 3 {
-			continue
-		}
-
-		if valueName != line[:i] {
-			continue
-		}
-
-		found = true
 		valueType = line[len(line)-2:]
 		valueString = strings.TrimFunc(line[i+1:], func(r rune) bool {
 			if unicode.IsLetter(r) || r == ' ' || r == '\t' {
@@ -224,30 +239,26 @@ func byteFromProcFileData(data []byte, valueName string) (value float64, found b
 			}
 			return false
 		})
+
+		v, err := strconv.Atoi(valueString)
+		if err != nil {
+			return 0, false, err
+		}
+
+		switch valueType {
+		case "kB":
+			v *= kB
+		case "mB":
+			v *= mB
+		case "GB":
+			v *= gB
+		case "TB":
+			v *= tB
+		default:
+			return 0, false, errors.New("cannot resolve value type")
+		}
+		return float64(v), true, nil
 	}
 
-	if !found {
-		return
-	}
-
-	i, err := strconv.Atoi(valueString)
-	if err != nil {
-		return
-	}
-
-	value = float64(i)
-	switch valueType {
-	case "kB":
-		value = value * 1024
-	case "mB":
-		value = value * math.Pow(1024, 2)
-	case "GB":
-		value = value * math.Pow(1024, 3)
-	case "TB":
-		value = value * math.Pow(1024, 4)
-	default:
-		return 0, false, errors.New("cannot resolve value type")
-	}
-
-	return
+	return 0, false, nil
 }

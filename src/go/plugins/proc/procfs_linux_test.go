@@ -31,6 +31,7 @@ VmHWM:	     456 mB
 VmRSS:	     456 GB
 VmData:	     376 TB
 fail:		 abs TB
+fail_type:	 200 FB
 `)
 
 func Test_byteFromProcFileData(t *testing.T) {
@@ -49,9 +50,10 @@ func Test_byteFromProcFileData(t *testing.T) {
 		{"+mB", args{testData, "VmHWM"}, 456 * 1024 * 1024, true, false},
 		{"+GB", args{testData, "VmRSS"}, 456 * 1024 * 1024 * 1024, true, false},
 		{"+TB", args{testData, "VmData"}, 376 * 1024 * 1024 * 1024 * 1024, true, false},
-		{"+TB", args{testData, "VmData"}, 376 * 1024 * 1024 * 1024 * 1024, true, false},
 		{"-malformed_line", args{testData, "b"}, 0, false, false},
-		{"-incorrect_value", args{testData, "fail"}, 0, true, true},
+		{"-incorrect_value", args{testData, "fail"}, 0, false, true},
+		{"-incorrect_value_type", args{testData, "fail_type"}, 0, false, true},
+		{"-not_found", args{testData, "FooBar"}, 0, false, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
