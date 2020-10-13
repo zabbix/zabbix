@@ -1,1 +1,1 @@
-.D.....PS. [ZBXNEXT-6245] added locks section to diaginfo (vso)
+.D.....PS. [ZBXNEXT-6245] added locks section to diaginfo runtime command to log adresses of the mutexes and read write locks (vso)
