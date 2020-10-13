@@ -533,8 +533,8 @@ else {
 			new CLink($trigger['description'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids', [$trigger['triggerid']])
-					->setArgument('filter_set', '1')
+					->setArgument('filter_name', '')
+					->setArgument('triggerids', [$trigger['triggerid']])
 			),
 			($availability['true'] < 0.00005)
 				? ''
@@ -551,8 +551,7 @@ else {
 		'domid' => 'avail_report',
 		'loadSBox' => 0,
 		'loadImage' => 0,
-		'dynamic' => 0,
-		'mainObject' => 1
+		'dynamic' => 0
 	];
 	zbx_add_post_js(
 		'timeControl.addObject("avail_report", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');'

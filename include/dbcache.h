@@ -249,6 +249,7 @@ typedef struct _DC_TRIGGER
 	char			*new_error;
 	char			*correlation_tag;
 	char			*opdata;
+	char			*event_name;
 	zbx_timespec_t		timespec;
 	int			lastchange;
 	unsigned char		topoindex;
@@ -902,11 +903,6 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids);
 
-void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
-void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
-void	zbx_dc_clear_timer_queue(void);
-
 /* data session support */
 
 typedef struct
@@ -995,5 +991,29 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
+
+typedef struct
+{
+	zbx_uint64_t		objectid;
+	zbx_uint64_t		triggerid;
+	zbx_function_type_t	type;
+	zbx_time_unit_t		trend_base;
+	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
+	int			revision;	/* function revision */
+	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
+	zbx_timespec_t		exec_ts;	/* real time when the timer must be executed */
+	const char		*parameter;	/* function parameters (for trend functions) */
+}
+zbx_trigger_timer_t;
+
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now);
+void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit);
+void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers);
+void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+		const zbx_vector_ptr_t *timers);
+void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
+
+int	zbx_db_trigger_queue_locked(void);
+void	zbx_db_trigger_queue_unlock(void);
 
 #endif

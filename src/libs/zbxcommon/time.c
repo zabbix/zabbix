@@ -19,7 +19,10 @@
 
 #include "common.h"
 
+static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
+
+static int	time_unit_seconds[ZBX_TIME_UNIT_COUNT] = {0, SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, 0, 0};
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
 {
@@ -82,6 +85,41 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_add_seconds                                                   *
+ *                                                                            *
+ * Purpose: add seconds to the time and adjust result by dst                  *
+ *                                                                            *
+ * Parameter: tm      - [IN/OUT] the time structure                           *
+ *            seconds - [IN] the seconds to add (can be negative)             *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_add_seconds(struct tm *tm, int seconds)
+{
+	time_t		time_new;
+	struct tm	tm_new = *tm;
+
+	if (-1 == (time_new = mktime(&tm_new)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	time_new += seconds;
+	localtime_r(&time_new, &tm_new);
+
+	if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
+	{
+		if (0 == tm_new.tm_isdst)
+			tm_add(&tm_new, 1, ZBX_TIME_UNIT_HOUR);
+		else
+			tm_sub(&tm_new, 1, ZBX_TIME_UNIT_HOUR);
+	}
+
+	*tm = tm_new;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_add                                                           *
  *                                                                            *
  * Purpose: add time duration without adjusting DST clocks                    *
@@ -93,7 +131,7 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
  ******************************************************************************/
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	int		shift;
+	int	shift;
 
 	switch (base)
 	{
@@ -149,27 +187,29 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	time_t		time_new;
-	struct	tm	tm_new;
+	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
+		tm_add(tm, multiplier, base);
 
-	tm_add(tm, multiplier, base);
+	tm_add_seconds(tm, multiplier * time_unit_seconds[base]);
 
-	/* adjust clock if DST changes were in effect */
+	return;
+}
 
-	tm_new = *tm;
+/******************************************************************************
+ *                                                                            *
+ * Function: neg_to_pos_wrap                                                  *
+ *                                                                            *
+ * Purpose: convert negative number to postive by wrapping around the base    *
+ *                                                                            *
+ * Parameter: value - [IN/OUT] the value to convert                           *
+ *            base  - [IN] the wrap base                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	neg_to_pos_wrap(int *value, int base)
+{
+	int	reminder = *value % base;
 
-	if (-1 != (time_new = mktime(&tm_new)))
-	{
-		tm_new = *localtime(&time_new);
-		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
-		{
-			*tm = tm_new;
-			if (0 == tm->tm_isdst)
-				tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
-			else
-				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
-		}
-	}
+	*value = (0 == reminder ? 0 : base + reminder);
 }
 
 /******************************************************************************
@@ -193,8 +233,10 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 			tm->tm_hour -= multiplier;
 			if (0 > tm->tm_hour)
 			{
-				shift = -tm->tm_hour / 24 + 1;
-				tm->tm_hour = 24 + tm->tm_hour % 24;
+				shift = -tm->tm_hour / 24;
+				neg_to_pos_wrap(&tm->tm_hour, 24);
+				if (0 != tm->tm_hour)
+					shift++;
 				tm_sub(tm, shift, ZBX_TIME_UNIT_DAY);
 			}
 			return;
@@ -212,8 +254,8 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 				tm_sub(tm, 1, ZBX_TIME_UNIT_MONTH);
 			}
 			tm->tm_wday -= multiplier;
-			if (0 < tm->tm_wday)
-				tm->tm_wday = 7 + tm->tm_wday % 7;
+			if (0 > tm->tm_wday)
+				neg_to_pos_wrap(&tm->tm_wday, 7);
 			return;
 		case ZBX_TIME_UNIT_WEEK:
 			tm_sub(tm, multiplier * 7, ZBX_TIME_UNIT_DAY);
@@ -222,8 +264,10 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 			tm->tm_mon -= multiplier;
 			if (0 > tm->tm_mon)
 			{
-				shift = -tm->tm_mon / 12 + 1;
-				tm->tm_mon = 12 + tm->tm_mon % 12;
+				shift = -tm->tm_mon / 12;
+				neg_to_pos_wrap(&tm->tm_mon, 12);
+				if (0 != tm->tm_mon)
+					shift++;
 				tm_sub(tm, shift, ZBX_TIME_UNIT_YEAR);
 			}
 			return;
@@ -248,27 +292,135 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	time_t		time_new;
-	struct	tm	tm_new;
+	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
+		tm_sub(tm, multiplier, base);
 
-	tm_sub(tm, multiplier, base);
+	tm_add_seconds(tm, -multiplier * time_unit_seconds[base]);
 
-	/* adjust clock if DST changes were in effect */
+	return;
+}
 
-	tm_new = *tm;
-
-	if (-1 != (time_new = mktime(&tm_new)))
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tm_round_up                                                  *
+ *                                                                            *
+ * Purpose: rounds time by the specified unit upwards                         *
+ *                                                                            *
+ * Parameter: tm         - [IN/OUT] the time structure                        *
+ *            base       - [IN] the time unit                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
+{
+	if (0 != tm->tm_sec)
 	{
-		tm_new = *localtime(&time_new);
-
-		if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
-		{
-			*tm = tm_new;
-			if (0 == tm->tm_isdst)
-				tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
-			else
-				tm_sub(tm, 1, ZBX_TIME_UNIT_HOUR);
-
-		}
+		tm->tm_sec = 0;
+		tm->tm_min++;
 	}
+
+	if (0 != tm->tm_min)
+	{
+		tm->tm_min = 0;
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
+	}
+
+	if (ZBX_TIME_UNIT_HOUR == base)
+		return;
+
+	if (0 != tm->tm_hour)
+	{
+		tm->tm_hour = 0;
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+	}
+
+	if (ZBX_TIME_UNIT_DAY == base)
+		return;
+
+	if (ZBX_TIME_UNIT_WEEK == base)
+	{
+		if (1 != tm->tm_wday)
+		{
+			zbx_tm_add(tm, (0 == tm->tm_wday ? 1 : 8 - tm->tm_wday), ZBX_TIME_UNIT_DAY);
+			tm->tm_wday = 1;
+		}
+		return;
+	}
+
+	if (1 != tm->tm_mday)
+	{
+		tm->tm_mday = 1;
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_MONTH);
+	}
+
+	if (ZBX_TIME_UNIT_MONTH == base)
+		return;
+
+	if (0 != tm->tm_mon)
+	{
+		tm->tm_mon = 0;
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_YEAR);
+	}
+
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tm_round_down                                                *
+ *                                                                            *
+ * Purpose: rounds time by the specified unit downwards                       *
+ *                                                                            *
+ * Parameter: tm         - [IN/OUT] the time structure                        *
+ *            base       - [IN] the time unit                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base)
+{
+	switch (base)
+	{
+		case ZBX_TIME_UNIT_WEEK:
+			if (1 != tm->tm_wday)
+			{
+				zbx_tm_sub(tm, (0 == tm->tm_wday ? 6 : tm->tm_wday - 1), ZBX_TIME_UNIT_DAY);
+				tm->tm_wday = 1;
+			}
+
+			tm->tm_hour = 0;
+			tm->tm_min = 0;
+			tm->tm_sec = 0;
+			break;
+		case ZBX_TIME_UNIT_YEAR:
+			tm->tm_mon = 0;
+			ZBX_FALLTHROUGH;
+		case ZBX_TIME_UNIT_MONTH:
+			tm->tm_mday = 1;
+			ZBX_FALLTHROUGH;
+		case ZBX_TIME_UNIT_DAY:
+			tm->tm_hour = 0;
+			ZBX_FALLTHROUGH;
+		case ZBX_TIME_UNIT_HOUR:
+			tm->tm_min = 0;
+			tm->tm_sec = 0;
+			break;
+		default:
+			break;
+	}
+
+	tm_add_seconds(tm, 0);
+
+	return;
+}
+
+const char	*zbx_timespec_str(const zbx_timespec_t *ts)
+{
+	static ZBX_THREAD_LOCAL char	str[32];
+
+	time_t		ts_time = ts->sec;
+	struct tm	tm;
+
+	localtime_r(&ts_time, &tm);
+	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d %09d", tm.tm_year + 1900, tm.tm_mon + 1,
+			tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns);
+
+	return str;
 }

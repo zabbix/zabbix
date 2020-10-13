@@ -39,7 +39,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($adapter->getTriggers(), []);
 		$this->assertEquals($adapter->getGraphs(), []);
 		$this->assertEquals($adapter->getDiscoveryRules(), []);
-		$this->assertEquals($adapter->getTemplateScreens(), []);
 		$this->assertEquals($adapter->getScreens(), []);
 		$this->assertEquals($adapter->getImages(), []);
 		$this->assertEquals($adapter->getMaps(), []);
@@ -681,6 +680,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -698,6 +698,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -721,6 +722,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -738,6 +740,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -1129,6 +1132,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'tags' => [],
 							'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 							'correlation_tag' => '',
+							'event_name' => '',
 							'opdata' => '',
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 							'dependencies' => []
@@ -1523,6 +1527,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'recovery_expression' => '',
 							'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 							'correlation_tag' => '',
+							'event_name' => '',
 							'opdata' => '',
 							'tags' => [],
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -1613,44 +1618,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'preprocessing' => [],
 					'overrides' => [],
 					'master_item' => []
-				]
-			]
-		]);
-	}
-
-	public function testGetTemplateScreens() {
-		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
-
-		$this->assertEquals($adapter->getTemplateScreens(), [
-			'export-template' => [
-				'screen' => [
-					'name' => 'screen',
-					'hsize' => '1',
-					'vsize' => '1',
-					'screenitems' => [
-						[
-							'resourcetype' => '0',
-							'width' => '500',
-							'height' => '100',
-							'x' => '0',
-							'y' => '0',
-							'colspan' => '1',
-							'rowspan' => '1',
-							'elements' => '0',
-							'valign' => '0',
-							'halign' => '0',
-							'style' => '0',
-							'url' => '',
-							'dynamic' => '0',
-							'sort_triggers' => '0',
-							'resource' => [
-								'name' => 'graph',
-								'host' => 'export-template'
-							],
-							'max_columns' => '',
-							'application' => ''
-						]
-					]
 				]
 			]
 		]);
@@ -2326,6 +2293,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'recovery_expression' => '',
 					'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 					'correlation_tag' => '',
+					'event_name' => '',
 					'opdata' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -2343,6 +2311,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 					'recovery_expression' => '',
 					'correlation_tag' => '',
+					'event_name' => '',
 					'opdata' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,

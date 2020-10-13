@@ -23,6 +23,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/header";
 @import "layout/footer";
 @import "layout/sidebar";
+@import "layout/tabfilter";
 @import "layout/form-grid";
 
 @import "components/form-search";
@@ -5603,7 +5604,9 @@ span {
 
 		&:before {
 			top: 42px;
+			right: 1px;
 			bottom: 42px;
+			left: 1px;
 		}
 	}
 }

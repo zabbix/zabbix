@@ -3557,17 +3557,22 @@ int	is_discovery_macro(const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_time_function                                                 *
+ * Function: zbx_get_function_type                                            *
  *                                                                            *
- * Return value:  SUCCEED - given function is time-based                      *
- *                FAIL - otherwise                                            *
+ * Purpose: Returns function type based on its name                           *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Return value:  Function type.                                              *
  *                                                                            *
  ******************************************************************************/
-int	is_time_function(const char *func)
+zbx_function_type_t	zbx_get_function_type(const char *func)
 {
-	return str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ',');
+	if (0 == strncmp(func, "trend", 5))
+		return ZBX_FUNCTION_TYPE_TRENDS;
+
+	if (SUCCEED == str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ','))
+		return ZBX_FUNCTION_TYPE_TIMER;
+
+	return ZBX_FUNCTION_TYPE_HISTORY;
 }
 
 /******************************************************************************

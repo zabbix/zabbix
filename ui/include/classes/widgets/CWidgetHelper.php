@@ -36,16 +36,16 @@ class CWidgetHelper {
 	/**
 	 * Create CFormList for widget configuration form with default fields in it.
 	 *
-	 * @param string $dialogue_name
-	 * @param string $type
-	 * @param int $view_mode (ZBX_WIDGET_VIEW_MODE_NORMAL|ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
-	 * @param array $known_widget_types
-	 * @param CWidgetFieldComboBox $field_rf_rate
+	 * @param string  $name
+	 * @param string  $type
+	 * @param int     $view_mode  ZBX_WIDGET_VIEW_MODE_NORMAL | ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+	 * @param array   $known_widget_types
+	 * @param CWidgetFieldComboBox|null  $field_rf_rate
 	 *
 	 * @return CFormList
 	 */
-	public static function createFormList($dialogue_name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
-		return (new CFormList())
+	public static function createFormList($name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
+		$form_list = (new CFormList())
 			->addItem((new CListItem([
 					(new CDiv(new CLabel(_('Type'), 'type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 					(new CDiv(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types)))
@@ -59,11 +59,16 @@ class CWidgetHelper {
 				]))->addClass('table-forms-row-with-second-field')
 			)
 			->addRow(_('Name'),
-				(new CTextBox('name', $dialogue_name))
+				(new CTextBox('name', $name))
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			)
-			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
+			);
+
+		if ($field_rf_rate !== null) {
+			$form_list->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
+		}
+
+		return $form_list;
 	}
 
 	/**
@@ -277,7 +282,6 @@ class CWidgetHelper {
 		return self::getMultiselectField($field, $captions, $form_name, 'items', [
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid',
-			'real_hosts' => true,
 			'webitems' => true
 		] + $field->getFilterParameters());
 	}
@@ -294,7 +298,6 @@ class CWidgetHelper {
 			'srctbl' => 'graphs',
 			'srcfld1' => 'graphid',
 			'srcfld2' => 'name',
-			'real_hosts' => true,
 			'with_graphs' => true
 		] + $field->getFilterParameters());
 	}
@@ -309,8 +312,7 @@ class CWidgetHelper {
 	public static function getItemPrototype($field, $captions, $form_name) {
 		return self::getMultiselectField($field, $captions, $form_name, 'item_prototypes', [
 			'srctbl' => 'item_prototypes',
-			'srcfld1' => 'itemid',
-			'real_hosts' => true
+			'srcfld1' => 'itemid'
 		] + $field->getFilterParameters());
 	}
 
@@ -326,7 +328,6 @@ class CWidgetHelper {
 			'srctbl' => 'graph_prototypes',
 			'srcfld1' => 'graphid',
 			'srcfld2' => 'name',
-			'real_hosts' => true,
 			'with_graph_prototypes' => true
 		] + $field->getFilterParameters());
 	}

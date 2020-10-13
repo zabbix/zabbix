@@ -139,8 +139,15 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 			elseif (in_array($param_name, ['shift'])) {
 				$param_type_element = _('Time');
 			}
+			elseif (in_array($param_name, ['period_shift'])) {
+				$param_type_element = _('Period');
+			}
 
 			$param_field = (new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+			if ($param_name === 'period_shift') {
+				$param_field->setAttribute('placeholder', 'now/h');
+			}
 
 			$expression_form_list->addRow($label, [
 				$param_field,

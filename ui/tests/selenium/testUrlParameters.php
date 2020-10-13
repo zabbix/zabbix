@@ -281,7 +281,7 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'screenedit.php?screenid=16',
+						'url' => 'screenedit.php?screenid=1',
 						'text_present' => 'Screens: Zabbix server'
 					],
 					[
@@ -647,7 +647,7 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=abc',
+						'url' => 'zabbix.php?action=problem.view&triggerids%5B%5D=abc',
 						'text_not_present' => 'Problems',
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
@@ -655,7 +655,7 @@ class testUrlParameters extends CLegacyWebTest {
 							]
 					],
 					[
-						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=',
+						'url' => 'zabbix.php?action=problem.view&triggerids%5B%5D=',
 						'text_not_present' => 'Problems',
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
@@ -663,7 +663,7 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=problem.view&filter_triggerids[]=-1',
+						'url' => 'zabbix.php?action=problem.view&triggerids%5B%5D=-1',
 						'text_not_present' => 'Problems',
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',

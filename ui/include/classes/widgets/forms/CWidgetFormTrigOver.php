@@ -24,8 +24,8 @@
  */
 class CWidgetFormTrigOver extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_TRIG_OVER);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_TRIG_OVER);
 
 		// Output information option.
 		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [
