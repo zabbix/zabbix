@@ -1576,20 +1576,20 @@ static int	DBpatch_5010058(void)
 	const char	*values[] = {
 			"1,1,0,'ui.default_access',1,'',NULL",
 			"2,1,0,'modules.default_access',1,'',NULL",
-			"3,1,0,'api',1,'',NULL",
+			"3,1,0,'api.access',1,'',NULL",
 			"4,1,0,'actions.default_access',1,'',NULL",
 			"5,2,0,'ui.default_access',1,'',NULL",
 			"6,2,0,'modules.default_access',1,'',NULL",
-			"7,2,0,'api',1,'',NULL",
+			"7,2,0,'api.access',1,'',NULL",
 			"8,2,0,'actions.default_access',1,'',NULL",
 			"9,3,0,'ui.default_access',1,'',NULL",
 			"10,3,0,'modules.default_access',1,'',NULL",
-			"11,3,0,'api',1,'',NULL",
+			"11,3,0,'api.access',1,'',NULL",
 			"12,3,0,'actions.default_access',1,'',NULL",
 			"13,4,0,'ui.default_access',1,'',NULL",
 			"14,4,0,'modules.default_access',1,'',NULL",
-			"15,4,0,'api',1,'',NULL",
-			"16,4,0,'actions.default_access',1,'',NULL",
+			"15,4,0,'api.access',0,'',NULL",
+			"16,4,0,'actions.default_access',0,'',NULL",
 			NULL
 		};
 
@@ -1639,7 +1639,6 @@ static int      DBpatch_5010062(void)
 	return DBadd_foreign_key("users", 1, &field);
 }
 
-
 static int	DBpatch_5010063(void)
 {
 	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -1661,7 +1660,7 @@ static int	DBpatch_5010065(void)
 	/* 1 - USER TYPE / USER ROLE */
 	/* 2 - ADMIN TYPE / ADMIN ROLE */
 	/* 3 - SUPER ADMIN TYPE / SUPER ADMIN ROLE */
-	const char      *values[] = {
+	const char	*values[] = {
 			"1",
 			"2",
 			"3",
@@ -1672,8 +1671,11 @@ static int	DBpatch_5010065(void)
 	{
 		for (i = 0; NULL != values[i]; i++)
 		{
-			if (ZBX_DB_OK > DBexecute("update profiles set value_id=%s,type=1,value_int=0 where idx='web.user.filter_type' and value_int=%s", values[i], values[i]))
+			if (ZBX_DB_OK > DBexecute("update profiles set value_id=%s,type=1,value_int=0 "
+					"where idx='web.user.filter_type' and value_int=%s", values[i], values[i]))
+			{
 				return FAIL;
+			}
 		}
 
 		/* -1 - ANY PROFILE */
