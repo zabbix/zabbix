@@ -74,8 +74,9 @@ function getMainMenu(): CMenu {
 				->setAliases(['report.services', 'chart5.php'])
 			: null
 	];
+	$submenu_monitoring = array_filter($submenu_monitoring);
 
-	if (array_filter($submenu_monitoring)) {
+	if ($submenu_monitoring) {
 		$menu->add(
 			(new CMenuItem(_('Monitoring')))
 				->setId('view')
@@ -93,8 +94,9 @@ function getMainMenu(): CMenu {
 			? (new CMenuItem(_('Hosts')))->setUrl(new CUrl('hostinventories.php'), 'hostinventories.php')
 			: null
 	];
+	$submenu_inventory = array_filter($submenu_inventory);
 
-	if (array_filter($submenu_inventory)) {
+	if ($submenu_inventory) {
 		$menu->add(
 			(new CMenuItem(_('Inventory')))
 				->setId('cm')
@@ -125,8 +127,9 @@ function getMainMenu(): CMenu {
 			? (new CMenuItem(_('Notifications')))->setUrl(new CUrl('report4.php'), 'report4.php')
 			: null
 	];
+	$submenu_reports = array_filter($submenu_reports);
 
-	if (array_filter($submenu_reports)) {
+	if ($submenu_reports) {
 		$menu->add(
 			(new CMenuItem(_('Reports')))
 				->setId('reports')
@@ -171,8 +174,9 @@ function getMainMenu(): CMenu {
 			? (new CMenuItem(_('Services')))->setUrl(new CUrl('services.php'), 'services.php')
 			: null
 	];
+	$submenu_configuration = array_filter($submenu_configuration);
 
-	if (array_filter($submenu_configuration)) {
+	if ($submenu_configuration) {
 		$menu->add(
 			(new CMenuItem(_('Configuration')))
 				->setId('config')
@@ -232,8 +236,9 @@ function getMainMenu(): CMenu {
 			? (new CMenuItem(_('Queue')))->setUrl(new CUrl('queue.php'), 'queue.php')
 			: null
 	];
+	$submenu_administration = array_filter($submenu_administration);
 
-	if (array_filter($submenu_administration)) {
+	if ($submenu_administration) {
 		$menu->add(
 			(new CMenuItem(_('Administration')))
 				->setId('admin')
