@@ -30,6 +30,10 @@ function getMenuPopupHistory(options) {
 	var items = [],
 		url = new Curl('history.php', false);
 
+	if (!options.allowed_ui_latest_data) {
+		return [];
+	}
+
 	url.setArgument('itemids[]', options.itemid);
 
 	// latest graphs

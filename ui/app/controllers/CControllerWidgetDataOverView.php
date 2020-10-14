@@ -62,8 +62,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'has_hidden_data' => $has_hidden_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'allowed_ui_overview' => $this->checkAccess(CRoleHelper::UI_MONITORING_OVERVIEW)
+			]
 		]));
 	}
 }

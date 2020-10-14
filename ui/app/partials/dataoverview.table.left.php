@@ -46,7 +46,7 @@ foreach ($data['db_hosts'] as $hostid => $host) {
 		else {
 			$itemid = $hostid_to_itemid[$host['hostid']];
 			$item = $data['visible_items'][$itemid];
-			$row[] = getItemDataOverviewCell($item, $item['trigger'], $data['allowed_ui_overview']);
+			$row[] = getItemDataOverviewCell($item, $item['trigger']);
 		}
 	}
 

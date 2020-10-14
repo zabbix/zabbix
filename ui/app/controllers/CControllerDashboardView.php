@@ -234,6 +234,10 @@ class CControllerDashboardView extends CController {
 			}
 		}
 
+		if ($dashboard !== null) {
+			$dashboard['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		}
+
 		return [$dashboard, $error];
 	}
 

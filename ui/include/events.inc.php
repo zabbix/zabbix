@@ -134,17 +134,18 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 
 /**
  *
- * @param array  $event                   An array of event data.
- * @param string $event['eventid']        Event ID.
- * @param string $event['objectid']       Object ID.
- * @param string $event['correlationid']  OK Event correlation ID.
- * @param string $event['userid']         User ID who generated the OK event.
- * @param string $event['name']           Event name.
- * @param string $event['acknowledged']   State of acknowledgement.
- * @param CCOl   $event['opdata']         Operational data with expanded macros.
- * @param string $event['comments']       Trigger description with expanded macros.
- * @param array  $allowed                 An array of user role rules.
- * @param bool   $allowed['ack']          Whether user is allowed to make acknowledge actions.
+ * @param array  $event                      An array of event data.
+ * @param string $event['eventid']           Event ID.
+ * @param string $event['objectid']          Object ID.
+ * @param string $event['correlationid']     OK Event correlation ID.
+ * @param string $event['userid']            User ID who generated the OK event.
+ * @param string $event['name']              Event name.
+ * @param string $event['acknowledged']      State of acknowledgement.
+ * @param CCOl   $event['opdata']            Operational data with expanded macros.
+ * @param string $event['comments']          Trigger description with expanded macros.
+ * @param array  $allowed                    An array of user role rules.
+ * @param bool   $allowed['ack']             Whether user is allowed to make acknowledge actions.
+ * @param bool   $allowed['ui_correlation']  Whether user is allowed to visit event correlation page.
  *
  * @return CTableInfo
  */
@@ -188,7 +189,7 @@ function make_event_details(array $event, array $allowed) {
 			]);
 
 			if ($correlations) {
-				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+				if ($allowed['ui_correlation']) {
 					$correlation_name = (new CLink($correlations[0]['name'],
 						(new CUrl('correlation.php'))
 							->setArgument('correlationid', $correlations[0]['correlationid'])

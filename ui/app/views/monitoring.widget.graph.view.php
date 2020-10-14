@@ -33,7 +33,7 @@ if ($data['graph']['unavailable_object']) {
 }
 else {
 	$flickerfree_item = (new CDiv(
-		(new CLink(null, $data['item_graph_url']))
+		(($data['item_graph_url'] !== null) ? new CLink(null, $data['item_graph_url']) : new CSpan(null))
 			->setId($data['graph']['containerid'])
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
 	))

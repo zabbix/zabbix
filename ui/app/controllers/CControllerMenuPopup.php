@@ -66,7 +66,8 @@ class CControllerMenuPopup extends CController {
 			return [
 				'type' => 'history',
 				'itemid' => $data['itemid'],
-				'hasLatestGraphs' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+				'hasLatestGraphs' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 			];
 		}
 

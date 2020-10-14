@@ -1295,11 +1295,10 @@ function getInterfaceSelect(array $interfaces): CSelect {
 /**
  * @param array $item
  * @param array $trigger
- * @param bool  $allowed_ui_overview
  *
  * @return CCol
  */
-function getItemDataOverviewCell(array $item, ?array $trigger = null, bool $allowed_ui_overview = false): CCol {
+function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;
@@ -1318,13 +1317,9 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null, bool $allo
 
 	$col = (new CCol([$value, $ack]))
 		->addClass($css)
-		->addClass(ZBX_STYLE_NOWRAP);
-
-	if ($allowed_ui_overview) {
-		$col
-			->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
-			->addClass(ZBX_STYLE_CURSOR_POINTER);
-	}
+		->addClass(ZBX_STYLE_NOWRAP)
+		->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
+		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 	return $col;
 }

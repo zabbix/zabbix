@@ -157,7 +157,8 @@ $allowed = [
 	'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
 			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
 ];
 
 /*

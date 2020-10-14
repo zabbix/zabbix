@@ -238,14 +238,6 @@ class CScreenHostTriggers extends CScreenBase {
 				}
 			}
 
-			// Clock.
-			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
-					->setArgument('triggerids', [$trigger['triggerid']])
-			);
-
 			$allowed = [
 				'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
@@ -253,6 +245,16 @@ class CScreenHostTriggers extends CScreenBase {
 						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
 						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
 			];
+
+			// Clock.
+			$clock = $allowed['ui_problems']
+				? new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('triggerids', [$trigger['triggerid']])
+				)
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 
 			// Create acknowledge link.
 			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
@@ -263,7 +265,7 @@ class CScreenHostTriggers extends CScreenBase {
 					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
 				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
 					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-				);;
+				);
 
 			$table->addRow([
 				$host_name,
