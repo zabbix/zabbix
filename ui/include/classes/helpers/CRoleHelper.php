@@ -121,7 +121,7 @@ class CRoleHelper {
 	public static function checkAccess(string $rule_name, int $roleid): bool {
 		self::loadRoleRules($roleid);
 
-		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name == 'api.methods') {
+		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api.methods') {
 			return false;
 		}
 
@@ -173,24 +173,24 @@ class CRoleHelper {
 		$role = $roles[0];
 
 		$rules = [
-			CRoleHelper::UI_DEFAULT_ACCESS => (bool) $role['rules'][CRoleHelper::UI_DEFAULT_ACCESS],
-			CRoleHelper::MODULES_DEFAULT_ACCESS => (bool) $role['rules'][CRoleHelper::MODULES_DEFAULT_ACCESS],
-			CRoleHelper::API_ACCESS => (bool) $role['rules'][CRoleHelper::API_ACCESS],
-			CRoleHelper::API_MODE => (bool) $role['rules'][CRoleHelper::API_MODE],
+			self::UI_DEFAULT_ACCESS => (bool) $role['rules'][self::UI_DEFAULT_ACCESS],
+			self::MODULES_DEFAULT_ACCESS => (bool) $role['rules'][self::MODULES_DEFAULT_ACCESS],
+			self::API_ACCESS => (bool) $role['rules'][self::API_ACCESS],
+			self::API_MODE => (bool) $role['rules'][self::API_MODE],
 			'api.methods' => $role['rules']['api.methods'],
-			CRoleHelper::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS],
+			self::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][self::ACTIONS_DEFAULT_ACCESS],
 		];
 
-		foreach ($role['rules'][CRoleHelper::SECTION_UI] as $rule) {
-			$rules[CRoleHelper::SECTION_UI.'.'.$rule['name']] = (bool) $rule['status'];
+		foreach ($role['rules'][self::SECTION_UI] as $rule) {
+			$rules[self::SECTION_UI.'.'.$rule['name']] = (bool) $rule['status'];
 		}
 
-		foreach ($role['rules'][CRoleHelper::SECTION_MODULES] as $module) {
+		foreach ($role['rules'][self::SECTION_MODULES] as $module) {
 			$rules[self::MODULES_MODULE.$module['moduleid']] = (bool) $module['status'];
 		}
 
-		foreach ($role['rules'][CRoleHelper::SECTION_ACTIONS] as $rule) {
-			$rules[CRoleHelper::SECTION_ACTIONS.'.'.$rule['name']] = (bool) $rule['status'];
+		foreach ($role['rules'][self::SECTION_ACTIONS] as $rule) {
+			$rules[self::SECTION_ACTIONS.'.'.$rule['name']] = (bool) $rule['status'];
 		}
 
 		$role['type'] = (int) $role['type'];
