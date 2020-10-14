@@ -61,7 +61,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if total == 0 && mode != "total" {
-		return nil, errors.New("Cannot be calculated because swap file size is 0")
+		return nil, errors.New("Cannot be calculated because swap file size is 0.")
 	}
 
 	switch mode {
