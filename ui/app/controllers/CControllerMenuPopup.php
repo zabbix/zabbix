@@ -363,7 +363,8 @@ class CControllerMenuPopup extends CController {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$menu_data = [
 							'type' => 'map_element_submap',
-							'sysmapid' => $selement['elements'][0]['sysmapid']
+							'sysmapid' => $selement['elements'][0]['sysmapid'],
+							'allowed_ui_maps' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_MAPS)
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];
@@ -379,7 +380,8 @@ class CControllerMenuPopup extends CController {
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$menu_data = [
 							'type' => 'map_element_group',
-							'groupid' => $selement['elements'][0]['groupid']
+							'groupid' => $selement['elements'][0]['groupid'],
+							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
@@ -416,7 +418,8 @@ class CControllerMenuPopup extends CController {
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$menu_data = [
 							'type' => 'map_element_trigger',
-							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid')
+							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid'),
+							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');

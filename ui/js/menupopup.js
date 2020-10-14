@@ -284,6 +284,10 @@ function getMenuPopupMapElementSubmap(options) {
 			', "' + options.widget_uniqueid + '");', false);
 	}
 	else {
+		if (!options.allowed_ui_maps) {
+			return [];
+		}
+
 		submap_url = new Curl('zabbix.php', false);
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
@@ -325,6 +329,10 @@ function getMenuPopupMapElementSubmap(options) {
  * @return array
  */
 function getMenuPopupMapElementGroup(options) {
+	if (!options.allowed_ui_problems) {
+		return [];
+	}
+
 	var sections = [],
 		problems_url = new Curl('zabbix.php', false);
 
@@ -373,6 +381,10 @@ function getMenuPopupMapElementGroup(options) {
  * @return array
  */
 function getMenuPopupMapElementTrigger(options) {
+	if (!options.allowed_ui_problems) {
+		return [];
+	}
+
 	var sections = [],
 		problems_url = new Curl('zabbix.php', false);
 
