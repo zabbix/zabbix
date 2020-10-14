@@ -1522,7 +1522,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 					->onClick('javascript: document.location = "index.php?request='.$url.'";');
 			}
 
-			$data['buttons'][] = (new CButton('back', _('Go to').' '.CMenuHelper::getFirstLabel()))
+			$data['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
 				->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"');
 		}
 		// if the user is not logged in - offer to login
