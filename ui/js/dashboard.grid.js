@@ -2482,7 +2482,7 @@
 	}
 
 	/**
-	 * Find first empty position in gived size.
+	 * Find first empty position in given size.
 	 *
 	 * @param {object} $obj               Dashboard object.
 	 * @param {object} data               Dashboard 'dashboardGrid' object.
@@ -2615,7 +2615,7 @@
 	};
 
 	/**
-	 * Get jQuery obejct of the new widget placeholder.
+	 * Get jQuery object of the new widget placeholder.
 	 *
 	 * @returns {jQuery}
 	 */

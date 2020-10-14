@@ -50,45 +50,21 @@ $item_form_list = (new CFormList('item-form-list'))
 
 // Append hosts to item form list.
 if ($data['displayInterfaces']) {
-	$interfaces_combo_box = new CComboBox('interfaceid', $data['interfaceid']);
-	$interfaces_combo_box->addItem(new CComboItem(0, '', false, false));
-
-	// Set up interface groups sorted by priority.
-	$interface_types = zbx_objectValues($data['hosts']['interfaces'], 'type');
-	$interface_groups = [];
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		if (in_array($interface_type, $interface_types)) {
-			$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
-		}
-	}
-
-	// add interfaces to groups
-	foreach ($data['hosts']['interfaces'] as $interface) {
-		$option = new CComboItem(
-			$interface['interfaceid'],
-			$interface['useip']
-				? $interface['ip'].' : '.$interface['port']
-				: $interface['dns'].' : '.$interface['port'],
-			($interface['interfaceid'] == $data['interfaceid'])
-		);
-		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interface_groups[$interface['type']]->addItem($option);
-	}
-	foreach ($interface_groups as $interface_group) {
-		$interfaces_combo_box->addItem($interface_group);
-	}
-
-	$span = (new CSpan(_('No interface found')))
-		->addClass(ZBX_STYLE_RED)
-		->setId('interface_not_defined')
-		->setAttribute('style', 'display: none;');
-
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setChecked(isset($data['visible']['interfaceid']))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
-		(new CDiv([$interfaces_combo_box, $span]))->setId('interfaceDiv'),
+		(new CDiv([
+			getInterfaceSelect($data['hosts']['interfaces'])
+				->setId('interface-select')
+				->setValue($data['interfaceid'])
+				->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE),
+			(new CSpan(_('No interface found')))
+				->addClass(ZBX_STYLE_RED)
+				->setId('interface_not_defined')
+				->setAttribute('style', 'display: none;')
+		]))->setId('interfaceDiv'),
 		'interface_row'
 	);
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
@@ -539,6 +515,13 @@ if (!hasRequest('massupdate')) {
 $form->addItem($tabs);
 
 $widget->addItem($form);
+
+$interface_ids_by_types = [];
+if ($data['displayInterfaces']) {
+	foreach ($data['hosts']['interfaces'] as $interface) {
+		$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+	}
+}
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';
 

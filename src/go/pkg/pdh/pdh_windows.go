@@ -280,9 +280,3 @@ func MakePath(elements *CounterPathElements) (path string, err error) {
 	cpe.InstanceIndex = uint32(elements.InstanceIndex)
 	return win32.PdhMakeCounterPath(&cpe)
 }
-
-func init() {
-	if err := LocateObjectsAndDefaultCounters(true); err != nil {
-		panic(err.Error())
-	}
-}

@@ -151,7 +151,7 @@ class testDashboardGraphWidget extends CWebTest {
 				$form->selectTab($tab);
 				$this->fillOverrides(CTestArrayHelper::get($data, 'Overrides'));
 
-				// Remove all overide options.
+				// Remove all override options.
 				if (CTestArrayHelper::get($data, 'remove_override_options', false)) {
 					$form->query('xpath://button[@class="subfilter-disable-btn"]')->all()->click();
 				}
@@ -419,7 +419,7 @@ class testDashboardGraphWidget extends CWebTest {
 			$data[] = $item;
 		}
 
-		// Add aditional test cases to data provider.
+		// Add additional test cases to data provider.
 		return array_merge($data, [
 			// Empty host and/or item field.
 			[
@@ -1442,7 +1442,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'check_form' => true
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'main_fields' => [
@@ -1729,7 +1729,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'check_form' => true
 				]
 			],
-			// All posible fields.
+			// All possible fields.
 			[
 				[
 					'main_fields' => [
@@ -2129,7 +2129,7 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'main_fields' => [
-						'Name' => 'Add new graph widget and cancle dashboard update'
+						'Name' => 'Add new graph widget and cancel dashboard update'
 					],
 					'Data set' => [
 						'host' => 'Zabbix*, new widget',

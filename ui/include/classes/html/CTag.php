@@ -328,7 +328,7 @@ class CTag extends CObject {
 	 *
 	 * @param bool $is_required  Define aria-required attribute for element.
 	 *
-	 * @return CTag
+	 * @return $this
 	 */
 	public function setAriaRequired($is_required = true) {
 		if ($is_required) {
