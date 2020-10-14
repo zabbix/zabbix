@@ -23,168 +23,222 @@
  * @return CMenu
  */
 function getMainMenu(): CMenu {
-	$menu = new CMenu([
-		(new CMenuItem(_('Monitoring')))
-			->setId('view')
-			->setIcon('icon-monitoring')
-			->setSubMenu(new Cmenu([
-				(new CMenuItem(_('Dashboard')))
-					->setAction('dashboard.view')
-					->setAliases(['dashboard.list']),
-				(new CMenuItem(_('Problems')))
-					->setAction('problem.view')
-					->setAliases(['tr_events.php']),
-				(new CMenuItem(_('Hosts')))
-					->setAction('host.view')
-					->setAliases(['web.view', 'charts.view', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
-						'httpdetails.php', 'host.dashboard.view'
-					]),
-				(new CMenuItem(_('Overview')))
-					->setUrl(new CUrl('overview.php'), 'overview.php'),
-				(new CMenuItem(_('Latest data')))
-					->setAction('latest.view')
-					->setAliases(['history.php', 'chart.php']),
-				(new CMenuItem(_('Screens')))
-					->setUrl(new CUrl('screens.php'), 'screens.php')
-					->setAliases(['screenconf.php', 'screenedit.php', 'screen.import.php',
-						'slides.php', 'slideconf.php'
-					]),
-				(new CMenuItem(_('Maps')))
-					->setAction('map.view')
-					->setAliases(['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php']),
-				(new CMenuItem(_('Services')))
-					->setUrl(new CUrl('srv_status.php'), 'srv_status.php')
-					->setAliases(['report.services', 'chart5.php'])
-			])),
-		(new CMenuItem(_('Inventory')))
-			->setId('cm')
-			->setIcon('icon-inventory')
-			->setSubMenu(new CMenu([
-				(new CMenuItem(_('Overview')))
-					->setUrl(new CUrl('hostinventoriesoverview.php'), 'hostinventoriesoverview.php'),
-				(new CMenuItem(_('Hosts')))
-					->setUrl(new CUrl('hostinventories.php'), 'hostinventories.php')
-			])),
-		(new CMenuItem(_('Reports')))
-			->setId('reports')
-			->setIcon('icon-reports')
-			->setSubMenu(new CMenu([
-				(new CMenuItem(_('Availability report')))
-					->setUrl(new CUrl('report2.php'), 'report2.php')
-					->setAliases(['chart4.php']),
-				(new CMenuItem(_('Triggers top 100')))
-					->setUrl(new CUrl('toptriggers.php'), 'toptriggers.php')
-			]))
-	]);
+	$menu = new CMenu();
 
-	if (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN) {
-		$menu
-			->find(_('Monitoring'))
-			->getSubMenu()
-				->insertAfter(_('Maps'),
-					(new CMenuItem(_('Discovery')))
-						->setAction('discovery.view')
-				);
+	$submenu_monitoring = [
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+			? (new CMenuItem(_('Dashboard')))
+				->setAction('dashboard.view')
+				->setAliases(['dashboard.list'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+			? (new CMenuItem(_('Problems')))
+				->setAction('problem.view')
+				->setAliases(['tr_events.php'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
+			? (new CMenuItem(_('Hosts')))
+				->setAction('host.view')
+				->setAliases([
+					'web.view', 'charts.view', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
+					'httpdetails.php', 'host.dashboard.view'
+				])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_OVERVIEW)
+			? (new CMenuItem(_('Overview')))->setUrl(new CUrl('overview.php'), 'overview.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+			? (new CMenuItem(_('Latest data')))
+				->setAction('latest.view')
+				->setAliases(['history.php', 'chart.php'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SCREENS)
+			? (new CMenuItem(_('Screens')))
+				->setUrl(new CUrl('screens.php'), 'screens.php')
+				->setAliases([
+					'screenconf.php?!templateid=*', 'screenedit.php?!templateid=*',
+					'screen.import.php', 'slides.php', 'slideconf.php'
+				])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_MAPS)
+			? (new CMenuItem(_('Maps')))
+				->setAction('map.view')
+				->setAliases(['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DISCOVERY)
+			? (new CMenuItem(_('Discovery')))->setAction('discovery.view')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
+			? (new CMenuItem(_('Services')))
+				->setUrl(new CUrl('srv_status.php'), 'srv_status.php')
+				->setAliases(['report.services', 'chart5.php'])
+			: null
+	];
 
-		$menu
-			->find(_('Reports'))
-			->getSubMenu()
-				->add((new CMenuItem(_('Notifications')))
-					->setUrl(new CUrl('report4.php'), 'report4.php')
-				);
+	if (array_filter($submenu_monitoring)) {
+		$menu->add(
+			(new CMenuItem(_('Monitoring')))
+				->setId('view')
+				->setIcon('icon-monitoring')
+				->setSubMenu(new CMenu($submenu_monitoring))
+		);
+	}
 
+	$submenu_inventory = [
+		CWebUser::checkAccess(CRoleHelper::UI_INVENTORY_OVERVIEW)
+			? (new CMenuItem(_('Overview')))
+				->setUrl(new CUrl('hostinventoriesoverview.php'), 'hostinventoriesoverview.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_INVENTORY_HOSTS)
+			? (new CMenuItem(_('Hosts')))->setUrl(new CUrl('hostinventories.php'), 'hostinventories.php')
+			: null
+	];
+
+	if (array_filter($submenu_inventory)) {
+		$menu->add(
+			(new CMenuItem(_('Inventory')))
+				->setId('cm')
+				->setIcon('icon-inventory')
+				->setSubMenu(new CMenu($submenu_inventory))
+		);
+	}
+
+	$submenu_reports = [
+		CWebUser::checkAccess(CRoleHelper::UI_REPORTS_SYSTEM_INFO)
+			? (new CMenuItem(_('System information')))->setAction('report.status')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
+			? (new CMenuItem(_('Availability report')))
+				->setUrl(new CUrl('report2.php'), 'report2.php')
+				->setAliases(['chart4.php'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_REPORTS_TOP_TRIGGERS)
+			? (new CMenuItem(_('Triggers top 100')))->setUrl(new CUrl('toptriggers.php'), 'toptriggers.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AUDIT)
+			? (new CMenuItem(_('Audit')))->setAction('auditlog.list')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_REPORTS_ACTION_LOG)
+			? (new CMenuItem(_('Action log')))->setUrl(new CUrl('auditacts.php'), 'auditacts.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_REPORTS_NOTIFICATIONS)
+			? (new CMenuItem(_('Notifications')))->setUrl(new CUrl('report4.php'), 'report4.php')
+			: null
+	];
+
+	if (array_filter($submenu_reports)) {
+		$menu->add(
+			(new CMenuItem(_('Reports')))
+				->setId('reports')
+				->setIcon('icon-reports')
+				->setSubMenu(new CMenu($submenu_reports))
+		);
+	}
+
+	$submenu_configuration = [
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)
+			? (new CMenuItem(_('Host groups')))->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			? (new CMenuItem(_('Templates')))
+				->setUrl(new CUrl('templates.php'), 'templates.php')
+				->setAliases(
+					['conf.import.php?rules_preset=template', 'template.dashboard.list', 'template.dashboard.edit']
+				)
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			? (new CMenuItem(_('Hosts')))
+				->setUrl(new CUrl('hosts.php'), 'hosts.php')
+				->setAliases([
+					'items.php', 'triggers.php', 'graphs.php', 'application.list', 'application.edit',
+					'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
+					'host_prototypes.php', 'httpconf.php', 'conf.import.php?rules_preset=host'
+				])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
+			? (new CMenuItem(_('Maintenance')))->setUrl(new CUrl('maintenance.php'), 'maintenance.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)
+			? (new CMenuItem(_('Actions')))->setUrl(new CUrl('actionconf.php'), 'actionconf.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
+			? (new CMenuItem(_('Event correlation')))->setUrl(new CUrl('correlation.php'), 'correlation.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
+			? (new CMenuItem(_('Discovery')))->setUrl(new CUrl('discoveryconf.php'), 'discoveryconf.php')
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
+			? (new CMenuItem(_('Services')))->setUrl(new CUrl('services.php'), 'services.php')
+			: null
+	];
+
+	if (array_filter($submenu_configuration)) {
 		$menu->add(
 			(new CMenuItem(_('Configuration')))
 				->setId('config')
 				->setIcon('icon-configuration')
-				->setSubMenu(new CMenu([
-					(new CMenuItem(_('Host groups')))
-						->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php'),
-					(new CMenuItem(_('Templates')))
-						->setUrl(new CUrl('templates.php'), 'templates.php')
-						->setAliases(['conf.import.php?rules_preset=template', 'template.dashboard.list',
-							'template.dashboard.edit'
-						]),
-					(new CMenuItem(_('Hosts')))
-						->setUrl(new CUrl('hosts.php'), 'hosts.php')
-						->setAliases(['items.php', 'triggers.php', 'graphs.php', 'application.list', 'application.edit',
-							'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
-							'host_prototypes.php', 'httpconf.php', 'conf.import.php?rules_preset=host'
-						]),
-					(new CMenuItem(_('Maintenance')))
-						->setUrl(new CUrl('maintenance.php'), 'maintenance.php'),
-					(new CMenuItem(_('Actions')))
-						->setUrl(new CUrl('actionconf.php'), 'actionconf.php'),
-					(new CMenuItem(_('Discovery')))
-						->setUrl(new CUrl('discoveryconf.php'), 'discoveryconf.php'),
-					(new CMenuItem(_('Services')))
-						->setUrl(new CUrl('services.php'), 'services.php')
-				]))
+				->setSubMenu(new CMenu($submenu_configuration))
 		);
 	}
 
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$menu
-			->find(_('Reports'))
-			->getSubMenu()
-				->insertBefore(_('Availability report'),
-					(new CMenuItem(_('System information')))
-						->setAction('report.status')
-				)
-				->insertAfter(_('Triggers top 100'),
-					(new CMenuItem(_('Audit')))
-						->setAction('auditlog.list')
-				)
-				->insertAfter(_('Audit'),
-					(new CMenuItem(_('Action log')))
-						->setUrl(new CUrl('auditacts.php'), 'auditacts.php')
-				);
+	$submenu_administration = [
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+			? (new CMenuItem(_('General')))
+				->setAction('gui.edit')
+				->setAliases([
+					'autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
+					'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
+					'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
+					'miscconfig.edit', 'module.list', 'module.edit', 'module.scan',
+					'conf.import.php?rules_preset=valuemap'
+				])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+			? (new CMenuItem(_('Proxies')))
+				->setAction('proxy.list')
+				->setAliases(['proxy.edit'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION)
+			? (new CMenuItem(_('Authentication')))
+				->setAction('authentication.edit')
+				->setAliases(['authentication.update'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)
+			? (new CMenuItem(_('User groups')))
+				->setAction('usergroup.list')
+				->setAliases(['usergroup.edit'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_ROLES)
+			? (new CMenuItem(_('User roles')))
+				->setAction('userrole.list')
+				->setAliases(['userrole.edit'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)
+			? (new CMenuItem(_('Users')))
+				->setAction('user.list')
+				->setAliases(['user.edit'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)
+			? (new CMenuItem(_('Media types')))
+				->setAction('mediatype.list')
+				->setAliases(['mediatype.edit', 'conf.import.php?rules_preset=mediatype'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)
+			? (new CMenuItem(_('Scripts')))
+				->setAction('script.list')
+				->setAliases(['script.edit'])
+			: null,
+		CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
+			? (new CMenuItem(_('Queue')))->setUrl(new CUrl('queue.php'), 'queue.php')
+			: null
+	];
 
-		$menu
-			->find(_('Configuration'))
-			->getSubMenu()
-				->insertAfter(_('Actions'),
-					(new CMenuItem(_('Event correlation')))
-						->setUrl(new CUrl('correlation.php'), 'correlation.php')
-				);
-
+	if (array_filter($submenu_administration)) {
 		$menu->add(
 			(new CMenuItem(_('Administration')))
 				->setId('admin')
 				->setIcon('icon-administration')
-				->setSubMenu(new CMenu([
-					(new CMenuItem(_('General')))
-						->setAction('gui.edit')
-						->setAliases(['autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
-							'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
-							'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
-							'miscconfig.edit', 'module.list', 'module.edit', 'module.scan',
-							'conf.import.php?rules_preset=valuemap'
-						]),
-					(new CMenuItem(_('Proxies')))
-						->setAction('proxy.list')
-						->setAliases(['proxy.edit']),
-					(new CMenuItem(_('Authentication')))
-						->setAction('authentication.edit')
-						->setAliases(['authentication.update']),
-					(new CMenuItem(_('User groups')))
-						->setAction('usergroup.list')
-						->setAliases(['usergroup.edit']),
-					(new CMenuItem(_('User roles')))
-						->setAction('userrole.list')
-						->setAliases(['userrole.edit']),
-					(new CMenuItem(_('Users')))
-						->setAction('user.list')
-						->setAliases(['user.edit']),
-					(new CMenuItem(_('Media types')))
-						->setAction('mediatype.list')
-						->setAliases(['mediatype.edit', 'conf.import.php?rules_preset=mediatype']),
-					(new CMenuItem(_('Scripts')))
-						->setAction('script.list')
-						->setAliases(['script.edit']),
-					(new CMenuItem(_('Queue')))
-						->setUrl(new CUrl('queue.php'), 'queue.php')
-				]))
+				->setSubMenu(new CMenu($submenu_administration))
 		);
 	}
 

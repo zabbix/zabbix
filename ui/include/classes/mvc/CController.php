@@ -61,40 +61,7 @@ abstract class CController {
 	private $validateSID = true;
 
 	public function __construct() {
-		$this->composeMenu();
 		$this->init();
-	}
-
-	/**
-	 * Composes main menu in accordance with the access rules of current user's role.
-	 */
-	protected function composeMenu() {
-		$menu = APP::Component()->get('menu.main');
-		$user_type = $this->getUserType();
-
-		if ($user_type === 0) {
-			return;
-		}
-
-		foreach (CRoleHelper::getUiSectionsLabels($user_type) as $section_name => $section_label) {
-			$section_submenu = $menu
-				->find($section_label)
-				->getSubMenu();
-			$section_rules_labels = CRoleHelper::getUiSectionRulesLabels($section_name, $user_type);
-			$section_rules_count = count($section_rules_labels);
-			$no_access_rules_count = 0;
-
-			foreach ($section_rules_labels as $rule_name => $rule_label) {
-				if (!CWebUser::checkAccess($rule_name)) {
-					$section_submenu->remove($rule_label);
-					$no_access_rules_count++;
-				}
-			}
-
-			if ($section_rules_count === $no_access_rules_count) {
-				$menu->remove($section_label);
-			}
-		}
 	}
 
 	/**
