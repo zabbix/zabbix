@@ -85,7 +85,7 @@ Ignored if housekeeper is being currently executed.
 .RS 4
 .TP 4
 \fBdiaginfo\fR[=\fIsection\fR]
-Log internal diagnostic information of the specified section. Section can be \fIhistorycache\fR, \fIpreprocessing\fR.
+Log internal diagnostic information of the specified section. Section can be \fIhistorycache\fR, \fIpreprocessing\fR, \fIlocks\fR.
 By default diagnostic information of all sections is logged.
 .RE
 .RS 4
