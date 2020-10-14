@@ -1557,13 +1557,13 @@ static int	DBpatch_5010057(void)
 			NULL
 		};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
 	{
-		for (i = 0; NULL != values[i]; i++)
-		{
-			if (ZBX_DB_OK > DBexecute("insert into role (%s) values (%s)", columns, values[i]))
-				return FAIL;
-		}
+		if (ZBX_DB_OK > DBexecute("insert into role (%s) values (%s)", columns, values[i]))
+			return FAIL;
 	}
 
 	return SUCCEED;
@@ -1593,13 +1593,13 @@ static int	DBpatch_5010058(void)
 			NULL
 		};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
 	{
-		for (i = 0; NULL != values[i]; i++)
-		{
-			if (ZBX_DB_OK > DBexecute("insert into role_rule (%s) values (%s)", columns, values[i]))
-				return FAIL;
-		}
+		if (ZBX_DB_OK > DBexecute("insert into role_rule (%s) values (%s)", columns, values[i]))
+			return FAIL;
 	}
 
 	return SUCCEED;
@@ -1616,14 +1616,15 @@ static int	DBpatch_5010060(void)
 {
 	int	i;
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 1; i <= 3; i++)
 	{
-		for (i = 1; i <= 3; i++)
-		{
-			if (ZBX_DB_OK > DBexecute("update users set roleid=%d where type=%d", i, i))
+		if (ZBX_DB_OK > DBexecute("update users set roleid=%d where type=%d", i, i))
 			return FAIL;
-		}
 	}
+
 	return SUCCEED;
 }
 
@@ -1667,21 +1668,21 @@ static int	DBpatch_5010065(void)
 			NULL
 		};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
-	{
-		for (i = 0; NULL != values[i]; i++)
-		{
-			if (ZBX_DB_OK > DBexecute("update profiles set value_id=%s,type=1,value_int=0 "
-					"where idx='web.user.filter_type' and value_int=%s", values[i], values[i]))
-			{
-				return FAIL;
-			}
-		}
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-		/* -1 - ANY PROFILE */
-		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.user.filter_type' and value_int=-1"))
+	for (i = 0; NULL != values[i]; i++)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set value_id=%s,type=1,value_int=0 "
+				"where idx='web.user.filter_type' and value_int=%s", values[i], values[i]))
+		{
 			return FAIL;
+		}
 	}
+
+	/* -1 - ANY PROFILE */
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.user.filter_type' and value_int=-1"))
+		return FAIL;
 
 	return SUCCEED;
 }
