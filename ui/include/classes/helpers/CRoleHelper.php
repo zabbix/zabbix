@@ -181,16 +181,16 @@ class CRoleHelper {
 			CRoleHelper::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS],
 		];
 
-		foreach ($role['rules'][CRoleHelper::SECTION_UI] as $rule_name => $value) {
-			$rules[$rule_name] = (bool) $value;
+		foreach ($role['rules'][CRoleHelper::SECTION_UI] as $rule) {
+			$rules[CRoleHelper::SECTION_UI.'.'.$rule['name']] = (bool) $rule['status'];
 		}
 
 		foreach ($role['rules'][CRoleHelper::SECTION_MODULES] as $module) {
 			$rules[self::MODULES_MODULE.$module['moduleid']] = (bool) $module['status'];
 		}
 
-		foreach ($role['rules'][CRoleHelper::SECTION_ACTIONS] as $rule_name => $value) {
-			$rules[$rule_name] = (bool) $value;
+		foreach ($role['rules'][CRoleHelper::SECTION_ACTIONS] as $rule) {
+			$rules[CRoleHelper::SECTION_ACTIONS.'.'.$rule['name']] = (bool) $rule['status'];
 		}
 
 		$role['type'] = (int) $role['type'];
