@@ -285,14 +285,13 @@ class CRole extends CApiService {
 		return ['roleids' => array_column($roles, 'roleid')];
 	}
 
-
 	/**
 	 * @param array $roles
 	 * @param array $db_roles
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function validateUpdate(array &$roles, array &$db_roles = []) {
+	private function validateUpdate(array &$roles, ?array &$db_roles) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
@@ -402,7 +401,7 @@ class CRole extends CApiService {
 
 			if (array_key_exists('ui', $role['rules'])) {
 				foreach ($role['rules']['ui'] as $ui_element) {
-					if (!in_array('ui'.$ui_element['name'], CRoleHelper::getAllUiElements($role['type']))) {
+					if (!in_array('ui.'.$ui_element['name'], CRoleHelper::getAllUiElements((int) $role['type']))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('UI element "%1$s" is not available.', $ui_element['name'])
 						);
@@ -418,7 +417,7 @@ class CRole extends CApiService {
 
 			if (array_key_exists('api.methods', $role['rules'])) {
 				foreach ($role['rules']['api.methods'] as $api_method) {
-					if (!in_array($api_method, CRoleHelper::getApiMethods($role['type']))) {
+					if (!in_array($api_method, CRoleHelper::getApiMethods((int) $role['type']))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('API method "%1$s" is not available.', $api_method)
 						);
@@ -428,7 +427,7 @@ class CRole extends CApiService {
 
 			if (array_key_exists('actions', $role['rules'])) {
 				foreach ($role['rules']['actions'] as $action) {
-					if (!in_array('actions.'.$action['name'], CRoleHelper::getAllActions($role['type']))) {
+					if (!in_array('actions.'.$action['name'], CRoleHelper::getAllActions((int) $role['type']))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Action "%1$s" is not available.', $action['name'])
 						);
@@ -465,33 +464,76 @@ class CRole extends CApiService {
 	 */
 	private function updateRules(array $roles, string $method): void {
 		$roles_rules = [];
-		$def_values = [];
+		$field_defaults = [];
 		foreach (self::RULE_VALUE_TYPES as $field_name) {
 			$default = DB::getDefault('role_rule', $field_name);
-			$def_values[$field_name] = ($default !== null) ? $default : 0;
+			$field_defaults[$field_name] = ($default !== null) ? $default : 0;
 		}
 
+		$roleids = [];
 		foreach ($roles as $role) {
-			if (array_key_exists('rules', $role)) {
-				CArrayHelper::sort($role['rules'], ['type', 'name']);
-				$roles_rules[$role['roleid']] = $role['rules'];
-			}
-		}
+			$roleids[] = $role['roleid'];
 
-		foreach ($roles_rules as &$rules) {
-			foreach ($rules as &$rule) {
-				$rule[self::RULE_VALUE_TYPES[$rule['type']]] = $rule['value'];
-				unset($rule['value']);
-				$rule += $def_values;
+			if (array_key_exists('rules', $role)) {
+				$rules = [];
+
+				foreach ($role['rules'] as $key => $value) {
+					switch ($key) {
+						case 'ui':
+						case 'actions':
+							foreach ($value as $element) {
+								$rule = [
+									'type' => self::RULE_VALUE_TYPE_INT32,
+									'name' => $key.'.'.$element['name']
+								];
+								if (array_key_exists('status', $element)) {
+									$rule[self::RULE_VALUE_TYPES[self::RULE_VALUE_TYPE_INT32]] = $element['status'];
+								}
+								$rules[] = $rule + $field_defaults;
+							}
+							break;
+						case 'modules':
+							foreach ($value as $index => $element) {
+								$rules[] = [
+									'type' => self::RULE_VALUE_TYPE_MODULE,
+									'name' => 'modules.module.moduleid.'.$index,
+									self::RULE_VALUE_TYPES[self::RULE_VALUE_TYPE_MODULE] => $element['moduleid']
+								] + $field_defaults;
+								if (array_key_exists('status', $element)) {
+									$rules[] = [
+										'type' => self::RULE_VALUE_TYPE_STR,
+										'name' => 'modules.module.status.'.$index,
+										self::RULE_VALUE_TYPES[self::RULE_VALUE_TYPE_STR] => $element['status']
+									] + $field_defaults;
+								}
+							}
+							break;
+						case 'api.methods':
+							foreach ($value as $index => $element) {
+								$rules[] = [
+									'type' => self::RULE_VALUE_TYPE_STR,
+									'name' => 'api.method.'.$index,
+									self::RULE_VALUE_TYPES[self::RULE_VALUE_TYPE_STR] => $element
+								] + $field_defaults;
+							}
+							break;
+						default:
+							$rules[] = [
+								'type' => self::RULE_VALUE_TYPE_INT32,
+								'name' => $key,
+								self::RULE_VALUE_TYPES[self::RULE_VALUE_TYPE_INT32] => $value
+							] + $field_defaults;
+					}
+				}
+
+				$roles_rules[$role['roleid']] = $rules;
 			}
-			unset($rule);
 		}
-		unset($rules);
 
 		$db_rules = ($method === 'update')
 			? DB::select('role_rule', [
 				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
-				'filter' => ['roleid' => array_keys(array_flip(array_column($roles, 'roleid')))],
+				'filter' => ['roleid' => $roleids],
 				'sortfield' => ['roleid', 'type', 'name']
 			])
 			: [];
