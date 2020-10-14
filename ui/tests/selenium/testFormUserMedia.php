@@ -146,7 +146,7 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => 'Invalid email address "Mr Person person@zabbix.com".'
 				]
 			],
-			// Email address without the recepient specified - just the domain.
+			// Email address without the recipient specified - just the domain.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -551,7 +551,7 @@ class testFormUserMedia extends CWebTest {
 	private function setMediaValues($data) {
 		$media_form = $this->query('id:media_form')->waitUntilVisible()->asForm()->one();
 		$media_form->fill($data['fields']);
-		// Check that there is posibility to add only multiple emails to media.
+		// Check that there is possibility to add only multiple emails to media.
 		$clickable = ($data['fields']['Type'] === 'Email');
 		$this->assertEquals($clickable, $media_form->query('id:email_send_to_add')->one()->isClickable());
 		$this->assertEquals($clickable, $media_form->query('button:Remove')->one()->isClickable());

@@ -4305,19 +4305,27 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
 		$source = $reader->read($source);
 
-		$importConverterFactory = new CImportConverterFactory();
+		$import_validator_factory = new CImportValidatorFactory(CImportReaderFactory::XML);
+		$import_converter_factory = new CImportConverterFactory();
 
-		$source = (new CXmlValidator)->validate($source, 'xml');
+		$validator = new CXmlValidator($import_validator_factory, CImportReaderFactory::XML);
+
+		$source = $validator
+			->setStrict(true)
+			->validate($source, '/');
 
 		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4'] as $version) {
 			if ($source['zabbix_export']['version'] !== $version) {
 				continue;
 			}
 
-			$source = $importConverterFactory
+			$source = $import_converter_factory
 				->getObject($version)
 				->convert($source);
-			$source = (new CXmlValidator)->validate($source, 'xml');
+
+			$source = $validator
+				->setStrict(false)
+				->validate($source, '/');
 		}
 
 		$schema = (new CImportValidatorFactory('xml'))->getObject(ZABBIX_EXPORT_VERSION)->getSchema();

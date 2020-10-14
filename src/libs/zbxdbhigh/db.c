@@ -429,6 +429,22 @@ int	DBexecute_once(const char *fmt, ...)
 	return rc;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBis_null                                                        *
+ *                                                                            *
+ * Purpose: check if numeric field value is null                              *
+ *                                                                            *
+ * Parameters: field - [IN] field value to be checked                         *
+ *                                                                            *
+ * Return value: SUCCEED - field value is null                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: ATTENTION! This function should only be used with numeric fields *
+ *           since on Oracle empty string is returned instead of NULL and it  *
+ *           is not possible to differentiate empty string from NULL string   *
+ *                                                                            *
+ ******************************************************************************/
 int	DBis_null(const char *field)
 {
 	return zbx_db_is_null(field);
@@ -1572,7 +1588,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata,a.listen_ip,a.listen_dns,"
-					"a.listen_port,a.flags"
+					"a.listen_port,a.flags,a.autoreg_hostid"
 				" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
@@ -1594,7 +1610,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
 				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
 
-				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[3]) ||
+				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[8]) ||
 						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
 						autoreg_host->flag != atoi(row[7]))
 				{

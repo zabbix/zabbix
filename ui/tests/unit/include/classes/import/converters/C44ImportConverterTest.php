@@ -178,7 +178,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 					'hosts' => [
 						[
 							'interfaces' => [
-								'interface' => [
+								1 => [
 									'interface_ref' => 'if2',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',
@@ -198,7 +198,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 										'privpassphrase' => 'test'
 									]
 								],
-								'interface1' => [
+								2 => [
 									'interface_ref' => 'if3',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',
@@ -218,7 +218,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 										'privpassphrase' => 'test'
 									]
 								],
-								'interface2' => [
+								3 => [
 									'interface_ref' => 'if4',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',
@@ -232,7 +232,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 										'community' => 'test'
 									]
 								],
-								'interface3' => [
+								4 => [
 									'interface_ref' => 'if5',
 									'ip' => '127.0.0.1',
 									'type' => 'SNMP',

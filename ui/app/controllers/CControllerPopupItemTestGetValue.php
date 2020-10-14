@@ -146,7 +146,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		// Get post data for particular item type.
 		$data = $this->getItemTestProperties($this->getInputAll());
 
-		// Apply efective macros values to properties.
+		// Apply effective macros values to properties.
 		$data = $this->resolveItemPropertyMacros($data);
 
 		if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {

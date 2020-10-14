@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-09-21T10:39:13Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template App PHP-FPM by HTTP</template>
+         <name>Template App PHP-FPM by HTTP</name>
+         <description>Get PHP-FPM metrics using Zabbix agent running on Linux.&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>PHP-FPM</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>PHP-FPM: Accepted connections per second</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.conn_accepted.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of accepted requests per second.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['accepted conn']</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Get ping page</name>
+               <type>HTTP_AGENT</type>
+               <key>php-fpm.get_ping</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.PING.PAGE}</url>
+               <retrieve_mode>BOTH</retrieve_mode>
+            </item>
+            <item>
+               <name>PHP-FPM: Get status page</name>
+               <type>HTTP_AGENT</type>
+               <key>php-fpm.get_status</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.STATUS.PAGE}?json</url>
+            </item>
+            <item>
+               <name>PHP-FPM: Listen queue</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.listen_queue</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The current number of connections that have been initiated, but not yet accepted.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['listen queue']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Listen queue, len</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.listen_queue_len</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Size of the socket queue of pending connections.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['listen queue len']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Listen queue, max</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.listen_queue_max</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The maximum number of requests in the queue of pending connections since this FPM pool has started.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['max listen queue']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Queue usage</name>
+               <type>CALCULATED</type>
+               <key>php-fpm.listen_queue_usage</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <params>last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+last(php-fpm.listen_queue_len)=0)*100</params>
+               <description>Queue utilization</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)}  &gt; {$PHP_FPM.QUEUE.WARN.MAX}</expression>
+                     <name>PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)</name>
+                     <priority>WARNING</priority>
+                     <description>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>PHP-FPM: Max children reached</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.max_children</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of times that pm.max_children has been reached since the php-fpm pool started</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['max children reached']</params>
+                  </step>
+                  <step>
+                     <type>SIMPLE_CHANGE</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Pool name</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.name</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The name of current pool.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.pool</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Ping</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.ping</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>REGEX</type>
+                     <params>{$PHP_FPM.PING.REPLY}$
+1</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_ping</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0 or {nodata(3m)}=1</expression>
+                     <name>PHP-FPM: Service is down</name>
+                     <priority>HIGH</priority>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>PHP-FPM: Process manager</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.process_manager</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The method used by the process manager to control the number of child processes for this pool.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['process manager']</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1</expression>
+                     <name>PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>PHP-FPM manager changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>PHP-FPM: Processes, active</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.processes_active</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The total number of active processes.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['active processes']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Processes, idle</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.processes_idle</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The total number of idle processes.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['idle processes']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Processes, max active</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.processes_max_active</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The highest value that 'active processes' has reached since the php-fpm server started.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['max active processes']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Processes, total</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.processes_total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The total number of server processes currently running.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['total processes']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Slow requests</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.slow_requests</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of requests that exceeded your request_slowlog_timeout value.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['slow requests']</params>
+                  </step>
+                  <step>
+                     <type>SIMPLE_CHANGE</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(#3)}&gt;0</expression>
+                     <name>PHP-FPM: Detected slow requests</name>
+                     <priority>WARNING</priority>
+                     <description>PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>PHP-FPM: Start time</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.start_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>unixtime</units>
+               <description>The time when this pool was started.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['start time']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>PHP-FPM: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>s</units>
+               <description>How long has this pool been running.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.['start since']</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_status</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>PHP-FPM: Failed to fetch info data (or no data for 30m)</name>
+                     <priority>INFO</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>PHP-FPM: Service is down</name>
+                           <expression>{Template App PHP-FPM by HTTP:php-fpm.ping.last()}=0 or {Template App PHP-FPM by HTTP:php-fpm.ping.nodata(3m)}=1</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>PHP-FPM: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>PHP-FPM: Version</name>
+               <type>DEPENDENT</type>
+               <key>php-fpm.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.</description>
+               <applications>
+                  <application>
+                     <name>PHP-FPM</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>REGEX</type>
+                     <params>^[.\s\S]*X-Powered-By: PHP/([.\d]{1,})
+\1</params>
+                     <error_handler>DISCARD_VALUE</error_handler>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>php-fpm.get_ping</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>PHP-FPM: Version has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>PHP-FPM version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <macros>
+            <macro>
+               <macro>{$PHP_FPM.HOST}</macro>
+               <value>localhost</value>
+               <description>Hostname or IP of PHP-FPM status host or container.</description>
+            </macro>
+            <macro>
+               <macro>{$PHP_FPM.PING.PAGE}</macro>
+               <value>ping</value>
+               <description>The path of PHP-FPM ping page.</description>
+            </macro>
+            <macro>
+               <macro>{$PHP_FPM.PING.REPLY}</macro>
+               <value>pong</value>
+               <description>Expected reply to the ping.</description>
+            </macro>
+            <macro>
+               <macro>{$PHP_FPM.PORT}</macro>
+               <value>80</value>
+               <description>The port of PHP-FPM status host or container.</description>
+            </macro>
+            <macro>
+               <macro>{$PHP_FPM.QUEUE.WARN.MAX}</macro>
+               <value>80</value>
+               <description>The maximum PHP-FPM queue usage percent for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$PHP_FPM.SCHEME}</macro>
+               <value>http</value>
+               <description>Request scheme which may be http or https</description>
+            </macro>
+            <macro>
+               <macro>{$PHP_FPM.STATUS.PAGE}</macro>
+               <value>status</value>
+               <description>The path of PHP-FPM status page.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>PHP-FPM: Process</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App PHP-FPM by HTTP</host>
+                  <key>php-fpm.processes_max_active</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App PHP-FPM by HTTP</host>
+                  <key>php-fpm.processes_idle</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template App PHP-FPM by HTTP</host>
+                  <key>php-fpm.processes_total</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template App PHP-FPM by HTTP</host>
+                  <key>php-fpm.processes_active</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>PHP-FPM: Queue</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App PHP-FPM by HTTP</host>
+                  <key>php-fpm.listen_queue_len</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App PHP-FPM by HTTP</host>
+                  <key>php-fpm.listen_queue</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template App PHP-FPM by HTTP</host>
+                  <key>php-fpm.listen_queue_max</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

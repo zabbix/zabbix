@@ -172,6 +172,7 @@ typedef struct
 	char			*units;
 	char			*delay;
 	int			history_sec;
+	int			trends_sec;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
