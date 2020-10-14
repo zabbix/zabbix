@@ -21,10 +21,6 @@
 
 $form = (new CForm())->setName('host_view');
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'host.view')
-	->getUrl();
-
 $table = (new CTableInfo());
 
 $view_url = $data['view_curl']->getUrl();
@@ -39,7 +35,7 @@ $table->setHeader([
 	(new CColHeader(_('Latest data'))),
 	(new CColHeader(_('Problems'))),
 	(new CColHeader(_('Graphs'))),
-	(new CColHeader(_('Screens'))),
+	(new CColHeader(_('Dashboards'))),
 	(new CColHeader(_('Web')))
 ]);
 
@@ -122,28 +118,33 @@ foreach ($data['hosts'] as $hostid => $host) {
 			new CLink(_('Problems'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_severities', $data['filter']['severities'])
-					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('filter_name', '')
+					->setArgument('severities', $data['filter']['severities'])
+					->setArgument('hostids', [$host['hostid']])
 			),
 			CViewHelper::showNum($total_problem_count)
 		],
 		$host['graphs']
 			? [
-				new CLink(_('Graphs'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'charts.view')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', (array) $host['hostid'])
+				new CLink(_('Graphs'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'charts.view')
+						->setArgument('filter_set', '1')
+						->setArgument('filter_hostids', (array) $host['hostid'])
 				),
 				CViewHelper::showNum($host['graphs'])
 			]
 			: (new CSpan(_('Graphs')))->addClass(ZBX_STYLE_DISABLED),
-		$host['screens']
+		$host['dashboards']
 			? [
-				new CLink(_('Screens'), (new CUrl('host_screen.php'))->setArgument('hostid', $host['hostid'])),
-				CViewHelper::showNum($host['screens'])
+				new CLink(_('Dashboards'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'host.dashboard.view')
+						->setArgument('hostid', $host['hostid'])
+				),
+				CViewHelper::showNum($host['dashboards'])
 			]
-			: (new CSpan(_('Screens')))->addClass(ZBX_STYLE_DISABLED),
+			: (new CSpan(_('Dashboards')))->addClass(ZBX_STYLE_DISABLED),
 		$host['httpTests']
 			? [
 				new CLink(_('Web'),

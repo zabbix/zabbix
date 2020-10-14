@@ -35,9 +35,10 @@ class CControllerDashboardShareEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$errors = json_encode(['errors' => [getMessages()->toString()]]);
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => $errors]))->disableView()
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
 			);
 		}
 
@@ -54,7 +55,7 @@ class CControllerDashboardShareEdit extends CController {
 			'output' => ['dashboardid', 'private'],
 			'selectUsers' => ['userid', 'permission'],
 			'selectUserGroups' => ['usrgrpid', 'permission'],
-			'dashboardids' => $this->getInput('dashboardid'),
+			'dashboardids' => [$this->getInput('dashboardid')],
 			'editable' => true
 		]);
 
@@ -106,7 +107,7 @@ class CControllerDashboardShareEdit extends CController {
 		$result = [];
 		foreach ($db_users as $db_user) {
 			$result[] = [
-				'id'   => $db_user['userid'],
+				'id' => $db_user['userid'],
 				'name' => getUserFullname($db_user),
 				'permission' => $users[$db_user['userid']]['permission']
 			];

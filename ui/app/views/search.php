@@ -33,7 +33,7 @@ $table = (new CTableInfo())
 		_('Latest data'),
 		_('Problems'),
 		_('Graphs'),
-		_('Screens'),
+		_('Dashboards'),
 		_('Web'),
 		_('Applications'),
 		_('Items'),
@@ -123,17 +123,23 @@ foreach ($data['hosts'] as $hostid => $host) {
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_hostids[]', $hostid)
-				->setArgument('filter_set', '1')
+				->setArgument('filter_name', '')
+				->setArgument('hostids', [$hostid])
 		),
-		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+		new CLink(_('Graphs'),
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
 				->setArgument('view_as', HISTORY_GRAPH)
 				->setArgument('filter_hostids[]', $hostid)
 				->setArgument('filter_set', '1')
 		),
-		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
-		new CLink(_('Web'), (new CUrl('zabbix.php'))
+		new CLink(_('Dashboards'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.dashboard.view')
+				->setArgument('hostid', $hostid)
+		),
+		new CLink(_('Web'),
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'web.view')
 				->setArgument('filter_hostids[]', $hostid)
 				->setArgument('filter_set', '1')
@@ -202,8 +208,8 @@ foreach ($data['groups'] as $groupid => $group) {
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_groupids[]', $groupid)
-				->setArgument('filter_set', '1')
+				->setArgument('filter_name', '')
+				->setArgument('groupids', [$groupid])
 		),
 		new CLink(_('Web'),
 			(new CUrl('zabbix.php'))
@@ -225,8 +231,8 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	]));
 
 if ($data['admin']) {
-	$table = (new CTableInfo())->setHeader([
-		_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'), _('Screens'), _('Discovery'), _('Web')
+	$table = (new CTableInfo())->setHeader([_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'),
+		_('Dashboards'), _('Discovery'), _('Web')
 	]);
 
 	foreach ($data['templates'] as $templateid => $template) {
@@ -235,7 +241,7 @@ if ($data['admin']) {
 		$item_count = CViewHelper::showNum($template['items']);
 		$trigger_count = CViewHelper::showNum($template['triggers']);
 		$graph_count = CViewHelper::showNum($template['graphs']);
-		$screen_count = CViewHelper::showNum($template['screens']);
+		$dashboard_count = CViewHelper::showNum($template['dashboards']);
 		$discovery_count = CViewHelper::showNum($template['discoveries']);
 		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
@@ -275,9 +281,16 @@ if ($data['admin']) {
 			), $graph_count]
 			: [_('Graphs'), $graph_count];
 
-		$screens_link = $template['editable']
-			? [new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), $screen_count]
-			: [_('Screens'), $screen_count];
+		$dashboards_link = $template['editable']
+			? [
+				new CLink(_('Dashboards'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'template.dashboard.list')
+						->setArgument('templateid', $templateid)
+				),
+				$dashboard_count
+			]
+			: [_('Dashboards'), $dashboard_count];
 
 		$discovery_link = $template['editable']
 			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
@@ -300,7 +313,7 @@ if ($data['admin']) {
 			$template_cell[] = ')';
 		}
 
-		$table->addRow([$template_cell, $applications_link, $items_link, $triggers_link, $graphs_link, $screens_link,
+		$table->addRow([$template_cell, $applications_link, $items_link, $triggers_link, $graphs_link, $dashboards_link,
 			$discovery_link, $httptests_link
 		]);
 	}

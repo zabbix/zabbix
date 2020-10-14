@@ -23,11 +23,11 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageScreens extends CLegacyWebTest {
 
 	public static function allScreens() {
-		return CDBHelper::getDataProvider('SELECT screenid,name FROM screens WHERE templateid IS NULL ORDER BY screenid');
+		return CDBHelper::getDataProvider('SELECT screenid,name FROM screens ORDER BY screenid');
 	}
 
 	public function testPageScreens_CheckLayout() {
-		$screens = CDBHelper::getAll('SELECT name FROM screens WHERE templateid IS NULL');
+		$screens = CDBHelper::getAll('SELECT name FROM screens');
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');

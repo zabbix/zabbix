@@ -27,62 +27,19 @@ require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
-// create form
-$maintenanceForm = (new CForm())
+$maintenance_form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $this->data['form']);
-if (isset($this->data['maintenanceid'])) {
-	$maintenanceForm->addVar('maintenanceid', $this->data['maintenanceid']);
+	->addVar('form', $data['form']);
+
+if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
+	$maintenance_form->addVar('maintenanceid', $data['maintenanceid']);
 }
 
 /*
- * Maintenance tab
+ * Maintenance period.
  */
-$maintenanceFormList = (new CFormList('maintenanceFormList'))
-	->addRow(
-		(new CLabel(_('Name'), 'mname'))->setAsteriskMark($data['allowed_edit']),
-		(new CTextBox('mname', $this->data['mname']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
-			->setEnabled($data['allowed_edit'])
-	)
-	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type')),
-		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
-			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
-			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
-			->setModern(true)
-			->setEnabled($data['allowed_edit'])
-	)
-	// Show date and time in shorter format without seconds.
-	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark($data['allowed_edit']),
-		(new CDateSelector('active_since', $data['active_since']))
-			->setDateFormat(ZBX_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-			->setAriaRequired()
-			->setEnabled($data['allowed_edit'])
-	)
-	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark($data['allowed_edit']),
-		(new CDateSelector('active_till', $data['active_till']))
-			->setDateFormat(ZBX_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
-			->setAriaRequired()
-			->setEnabled($data['allowed_edit'])
-	);
-
-$maintenanceFormList->addRow(_('Description'),
-	(new CTextArea('description', $this->data['description']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setEnabled($data['allowed_edit'])
-);
-
-/*
- * Maintenance period tab
- */
-$maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
 $maintenance_period_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')])
@@ -121,21 +78,52 @@ foreach (array_values($data['timeperiods']) as $index => $timeperiod) {
 	]);
 }
 
-$periodsDiv = (new CDiv($maintenance_period_table))
+$periods_container = (new CDiv($maintenance_period_table))
 	->setId('maintenance_periods')
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	->addItem(
+		(new CSimpleButton(_('Add')))
+			->setAttribute('data-action', 'add')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->setEnabled($data['allowed_edit'])
+	);
 
-$periodsDiv->addItem(
-	(new CSimpleButton(_('Add')))
-		->setAttribute('data-action', 'add')
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->setEnabled($data['allowed_edit'])
-);
-
-$maintenancePeriodFormList->addRow(
-	(new CLabel(_('Periods'), $periodsDiv->getId()))->setAsteriskMark($data['allowed_edit']), $periodsDiv
-);
+$table = (new CFormList('maintenanceFormList'))
+	->addRow(
+		(new CLabel(_('Name'), 'mname'))->setAsteriskMark($data['allowed_edit']),
+		(new CTextBox('mname', $data['mname']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
+			->setEnabled($data['allowed_edit'])
+	)
+	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type')),
+		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
+			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
+			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
+			->setModern(true)
+			->setEnabled($data['allowed_edit'])
+	)
+	// Show date and time in shorter format without seconds.
+	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark($data['allowed_edit']),
+		(new CDateSelector('active_since', $data['active_since']))
+			->setDateFormat(ZBX_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
+			->setAriaRequired()
+			->setEnabled($data['allowed_edit'])
+	)
+	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark($data['allowed_edit']),
+		(new CDateSelector('active_till', $data['active_till']))
+			->setDateFormat(ZBX_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
+			->setAriaRequired()
+			->setEnabled($data['allowed_edit'])
+	)
+	->addRow(
+		(new CLabel(_('Periods'), $periods_container->getId()))->setAsteriskMark($data['allowed_edit']), $periods_container
+	);
 
 /*
  * Hosts and groups tab.
@@ -206,6 +194,7 @@ foreach ($tags as $tag) {
 
 	$i++;
 }
+
 $tag_table->addRow(
 	(new CCol(
 		(new CButton('tags_add', _('Add')))
@@ -215,15 +204,7 @@ $tag_table->addRow(
 	))->setColSpan(3)
 );
 
-$hostsAndGroupsFormList = new CFormList('hostsAndGroupsFormList');
-
-if ($data['allowed_edit']) {
-	$hostsAndGroupsFormList->addRow('',
-		(new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark()
-	);
-}
-
-$hostsAndGroupsFormList
+$table
 	->addRow(new CLabel(_('Host groups'), 'groupids__ms'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
@@ -234,7 +215,7 @@ $hostsAndGroupsFormList
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $maintenanceForm->getName(),
+					'dstfrm' => $maintenance_form->getName(),
 					'dstfld1' => 'groupids_',
 					'editable' => true
 				]
@@ -251,31 +232,38 @@ $hostsAndGroupsFormList
 				'parameters' => [
 					'srctbl' => 'hosts',
 					'srcfld1' => 'hostid',
-					'dstfrm' => $maintenanceForm->getName(),
+					'dstfrm' => $maintenance_form->getName(),
 					'dstfld1' => 'hostids_',
 					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
+	);
+
+if ($data['allowed_edit']) {
+	$table->addRow('',
+		(new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark()
+	);
+}
+
+$table
 	->addRow(_('Tags'),
 		(new CDiv($tag_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	)
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setEnabled($data['allowed_edit'])
 	);
 
 // Append tabs to form.
-$maintenanceTab = (new CTabView())
-	->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList)
-	->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList, TAB_INDICATOR_PERIODS)
-	->addTab('hostTab', _('Hosts and groups'), $hostsAndGroupsFormList);
-if (!$this->data['form_refresh']) {
-	$maintenanceTab->setSelected(0);
-}
+$maintenance_tab = (new CTabView())->addTab('maintenanceTab', _('Maintenance'), $table);
 
 // append buttons to form
-if (isset($this->data['maintenanceid'])) {
-	$maintenanceTab->setFooter(makeFormFooter(
+if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
+	$maintenance_tab->setFooter(makeFormFooter(
 		(new CSubmit('update', _('Update')))->setEnabled($data['allowed_edit']),
 		[
 			(new CSubmit('clone', _('Clone')))->setEnabled($data['allowed_edit']),
@@ -286,14 +274,14 @@ if (isset($this->data['maintenanceid'])) {
 	));
 }
 else {
-	$maintenanceTab->setFooter(makeFormFooter(
+	$maintenance_tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel()]
 	));
 }
 
-$maintenanceForm->addItem($maintenanceTab);
+$maintenance_form->addItem($maintenance_tab);
 
-$widget->addItem($maintenanceForm);
+$widget->addItem($maintenance_form);
 
 $widget->show();

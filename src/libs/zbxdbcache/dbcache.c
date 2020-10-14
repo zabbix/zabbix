@@ -36,6 +36,7 @@
 #include "export.h"
 #include "zbxjson.h"
 #include "zbxhistory.h"
+#include "daemon.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -70,6 +71,7 @@ extern int		CONFIG_DOUBLE_PRECISION;
 /* the maximum number of items in one synchronization batch */
 #define ZBX_HC_SYNC_MAX		1000
 #define ZBX_HC_TIMER_MAX	(ZBX_HC_SYNC_MAX / 2)
+#define ZBX_HC_TIMER_SOFT_MAX	(ZBX_HC_TIMER_MAX - 10)
 
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -110,6 +112,8 @@ typedef struct
 	int			trends_last_cleanup_hour;
 	int			history_num_total;
 	int			history_progress_ts;
+
+	unsigned char		db_trigger_queue_lock;
 }
 ZBX_DC_CACHE;
 
@@ -420,37 +424,55 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
  *                                                                            *
  * Function: dc_remove_updated_trends                                         *
  *                                                                            *
- * Purpose: helper function for DCflush trends                                *
+ * Purpose: Update trends disable_until for items without trends data past or *
+ *          equal the specified clock                                         *
+ *                                                                            *
+ * Comments: A helper function for DCflush trends                             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const char *table_name,
 		int value_type, zbx_uint64_t *itemids, int *itemids_num, int clock)
 {
-	int		i;
+	int		i, j, clocks_num, now, age;
 	ZBX_DC_TREND	*trend;
 	zbx_uint64_t	itemid;
 	size_t		sql_offset;
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		clocks[] = {SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, SEC_PER_YEAR, INT_MAX};
 
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct itemid"
-			" from %s"
-			" where clock>=%d and",
-			table_name, clock);
+	now = time(NULL);
+	age = now - clock;
+	for (clocks_num = 0; age > clocks[clocks_num]; clocks_num++)
+		clocks[clocks_num] = now - clocks[clocks_num];
+	clocks[clocks_num] = clock;
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	/* remove itemids with trends data past or equal the clock */
+	for (j = 0; j <= clocks_num && 0 < *itemids_num; j++)
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_remove(itemids, itemids_num, &itemid, 1);
-	}
-	DBfree_result(result);
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct itemid"
+				" from %s"
+				" where clock>=%d and",
+				table_name, clocks[j]);
 
+		if (0 < j)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " clock<%d and", clocks[j - 1]);
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+			uint64_array_remove(itemids, itemids_num, &itemid, 1);
+		}
+		DBfree_result(result);
+	}
+
+	/* update trends disable_until for the leftover itemids */
 	while (0 != *itemids_num)
 	{
 		itemid = itemids[--*itemids_num];
@@ -1521,15 +1543,15 @@ static void	DCsync_trends(void)
  *                                                                            *
  * Parameters: history           - [IN] array of history data                 *
  *             history_num       - [IN] number of history structures          *
- *             timer_triggerids  - [IN] the timer triggerids to process       *
+ *             timers            - [IN] the trigger timers                    *
  *             trigger_diff      - [OUT] trigger updates                      *
  *             timers_num        - [OUT] processed timer triggers             *
  *                                                                            *
  ******************************************************************************/
-static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
-		const zbx_vector_uint64_t *timer_triggerids, zbx_vector_ptr_t *trigger_diff)
+static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num, const zbx_vector_ptr_t *timers,
+		zbx_vector_ptr_t *trigger_diff)
 {
-	int			i, item_num = 0;
+	int			i, item_num = 0, timers_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
@@ -1556,10 +1578,18 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 		}
 	}
 
-	if (0 == item_num && 0 == timer_triggerids->values_num)
+	for (i = 0; i < timers->values_num; i++)
+	{
+		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];
+
+		if (0 != timer->lock)
+			timers_num++;
+	}
+
+	if (0 == item_num && 0 == timers_num)
 		goto out;
 
-	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num + timer_triggerids->values_num),
+	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num + timers_num),
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&trigger_order);
@@ -1573,13 +1603,8 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 		zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
 	}
 
-	if (0 != timer_triggerids->values_num)
-	{
-		zbx_timespec_t	ts;
-
-		zbx_timespec(&ts);
-		zbx_dc_get_timer_triggers_by_triggerids(&trigger_info, &trigger_order, timer_triggerids, &ts);
-	}
+	if (0 != timers_num)
+		zbx_dc_get_triggers_by_timers(&trigger_info, &trigger_order, timers);
 
 	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	evaluate_expressions(&trigger_order);
@@ -1917,7 +1942,7 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 					item->host.host, item->key_orig, h->value.str);
 
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state, NULL,
-					NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, h->value.err);
+					NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, h->value.err);
 
 			if (0 != strcmp(item->error, h->value.err))
 				item_error = h->value.err;
@@ -1930,7 +1955,7 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
-					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
+					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
 
 			item_error = "";
 		}
@@ -2511,13 +2536,33 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		}
 
 		if (0 == item->history)
-			h->flags |= ZBX_DC_FLAG_NOHISTORY;
-
-		if ((ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type) ||
-				0 == item->trends)
 		{
-			h->flags |= ZBX_DC_FLAG_NOTRENDS;
+			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 		}
+		else if (now - h->ts.sec > item->history_sec)
+		{
+			h->flags |= ZBX_DC_FLAG_NOHISTORY;
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside history "
+					"storage period", item->host.host, item->key_orig,
+					zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
+		}
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
+		{
+			if (0 == item->trends)
+			{
+				h->flags |= ZBX_DC_FLAG_NOTRENDS;
+			}
+			else if (now - h->ts.sec > item->trends_sec)
+			{
+				h->flags |= ZBX_DC_FLAG_NOTRENDS;
+				zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside "
+						"trends storage period", item->host.host, item->key_orig,
+						zbx_date2str(h->ts.sec, NULL), zbx_time2str(h->ts.sec, NULL));
+			}
+		}
+		else
+			h->flags |= ZBX_DC_FLAG_NOTRENDS;
 
 		normalize_item_value(item, h);
 
@@ -2886,8 +2931,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
 					history_text_num, history_log_num, txn_error, compression_age;
 	time_t				sync_start;
-	zbx_vector_uint64_t		triggerids, timer_triggerids;
-	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
+	zbx_vector_uint64_t		triggerids ;
+	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
 
@@ -2932,8 +2977,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, ZBX_HC_SYNC_MAX);
 
-	zbx_vector_uint64_create(&timer_triggerids);
-	zbx_vector_uint64_reserve(&timer_triggerids, ZBX_HC_TIMER_MAX);
+	zbx_vector_ptr_create(&trigger_timers);
+	zbx_vector_ptr_reserve(&trigger_timers, ZBX_HC_TIMER_MAX);
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
@@ -3019,23 +3064,33 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		if (FAIL != ret)
 		{
-			zbx_dc_get_timer_triggerids(&timer_triggerids, time(NULL), ZBX_HC_TIMER_MAX);
-			timers_num = timer_triggerids.values_num;
+			/* don't process trigger timers when server is shutting down */
+			if (ZBX_IS_RUNNING())
+			{
+				zbx_dc_get_trigger_timers(&trigger_timers, time(NULL), ZBX_HC_TIMER_SOFT_MAX,
+						ZBX_HC_TIMER_MAX);
+			}
 
-			if (ZBX_HC_TIMER_MAX == timers_num)
+			timers_num = trigger_timers.values_num;
+
+			if (ZBX_HC_TIMER_SOFT_MAX <= timers_num)
 				*more = ZBX_SYNC_MORE;
 
 			if (0 != history_num || 0 != timers_num)
 			{
-				/* timer triggers do not intersect with item triggers because item triggers */
-				/* where already locked and skipped when retrieving timer triggers          */
-				zbx_vector_uint64_append_array(&triggerids, timer_triggerids.values,
-						timer_triggerids.values_num);
+				for (i = 0; i < trigger_timers.values_num; i++)
+				{
+					zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)trigger_timers.values[i];
+
+					if (0 != timer->lock)
+						zbx_vector_uint64_append(&triggerids, timer->triggerid);
+				}
+
 				do
 				{
 					DBbegin();
 
-					recalculate_triggers(history, history_num, &timer_triggerids, &trigger_diff);
+					recalculate_triggers(history, history_num, &trigger_timers, &trigger_diff);
 
 					/* process trigger events generated by recalculate_triggers() */
 					zbx_process_events(&trigger_diff, &triggerids);
@@ -3054,8 +3109,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
-
-			zbx_vector_uint64_clear(&timer_triggerids);
 		}
 
 		if (0 != triggerids.values_num)
@@ -3063,6 +3116,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			*triggers_num += triggerids.values_num;
 			DCconfig_unlock_triggers(&triggerids);
 			zbx_vector_uint64_clear(&triggerids);
+		}
+
+		if (0 != trigger_timers.values_num)
+		{
+			zbx_dc_reschedule_trigger_timers(&trigger_timers, time(NULL));
+			zbx_vector_ptr_clear(&trigger_timers);
 		}
 
 		if (0 != proxy_subscribtions.values_num)
@@ -3147,7 +3206,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 	zbx_vector_uint64_pair_destroy(&proxy_subscribtions);
 
-	zbx_vector_uint64_destroy(&timer_triggerids);
+	zbx_vector_ptr_destroy(&trigger_timers);
 	zbx_vector_uint64_destroy(&triggerids);
 }
 
@@ -3187,9 +3246,6 @@ static void	sync_history_cache_full(void)
 	{
 		/* unlock all triggers before full sync so no items are locked by triggers */
 		DCconfig_unlock_all_triggers();
-
-		/* clear timer trigger queue to avoid processing time triggers at exit */
-		zbx_dc_clear_timer_queue();
 	}
 
 	tmp_history_queue = cache->history_queue;
@@ -4355,6 +4411,8 @@ int	init_database_cache(char **error)
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
 
+	cache->db_trigger_queue_lock = 1;
+
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 out:
@@ -4603,3 +4661,28 @@ void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
 
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_queue_locked                                      *
+ *                                                                            *
+ * Purpose: checks if database trigger queue table is locked                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_trigger_queue_locked(void)
+{
+	return 0 == cache->db_trigger_queue_lock ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_queue_unlock                                      *
+ *                                                                            *
+ * Purpose: unlocks database trigger queue table                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_queue_unlock(void)
+{
+	cache->db_trigger_queue_lock = 0;
+}
+

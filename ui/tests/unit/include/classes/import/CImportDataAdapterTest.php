@@ -39,7 +39,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($adapter->getTriggers(), []);
 		$this->assertEquals($adapter->getGraphs(), []);
 		$this->assertEquals($adapter->getDiscoveryRules(), []);
-		$this->assertEquals($adapter->getTemplateScreens(), []);
 		$this->assertEquals($adapter->getScreens(), []);
 		$this->assertEquals($adapter->getImages(), []);
 		$this->assertEquals($adapter->getMaps(), []);
@@ -397,6 +396,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'item',
 					'trapper_hosts' => '',
@@ -445,6 +445,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'item-jmx',
 					'trapper_hosts' => '',
@@ -497,6 +498,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'item2',
 					'trapper_hosts' => '',
@@ -546,6 +548,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'item',
 					'trapper_hosts' => '',
@@ -593,6 +596,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'item-jmx',
 					'trapper_hosts' => '',
@@ -644,6 +648,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'item2',
 					'trapper_hosts' => '',
@@ -675,6 +680,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -692,6 +698,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -715,6 +722,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -732,6 +740,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'tags' => [],
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 				'correlation_tag' => '',
+				'event_name' => '',
 				'opdata' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
@@ -858,6 +867,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'empty-lld-rule',
 					'trapper_hosts' => '',
@@ -908,6 +918,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'empty-lld-rule-jmx',
 					'trapper_hosts' => '',
@@ -994,6 +1005,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'verify_host' => '0',
 							'allow_traps' => '0',
 							'query_fields' => [],
+							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item',
 							'trapper_hosts' => '',
@@ -1043,6 +1055,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'verify_host' => '0',
 							'allow_traps' => '0',
 							'query_fields' => [],
+							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item-jmx',
 							'trapper_hosts' => '',
@@ -1097,6 +1110,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'verify_host' => '0',
 							'allow_traps' => '0',
 							'query_fields' => [],
+							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item2',
 							'trapper_hosts' => '',
@@ -1118,6 +1132,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'tags' => [],
 							'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 							'correlation_tag' => '',
+							'event_name' => '',
 							'opdata' => '',
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 							'dependencies' => []
@@ -1179,7 +1194,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'inventory_mode' => '0',
 							'templates' => [],
 							'macros' => [],
-							'tags' => []
+							'tags' => [],
+							'custom_interfaces' => '0'
 						]
 					],
 					'jmx_endpoint' => '',
@@ -1200,6 +1216,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'lld-rule',
 					'trapper_hosts' => '',
@@ -1251,6 +1268,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'empty-lld-rule',
 					'trapper_hosts' => '',
@@ -1300,6 +1318,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'lld-rule-jmx',
 					'trapper_hosts' => '',
@@ -1386,6 +1405,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'verify_host' => '0',
 							'allow_traps' => '0',
 							'query_fields' => [],
+							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item',
 							'trapper_hosts' => ''
@@ -1434,6 +1454,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'verify_host' => '0',
 							'allow_traps' => '0',
 							'query_fields' => [],
+							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item-jmx',
 							'trapper_hosts' => ''
@@ -1486,6 +1507,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'verify_host' => '0',
 							'allow_traps' => '0',
 							'query_fields' => [],
+							'parameters' => [],
 							'headers' => [],
 							'key_' => 'lld-item2',
 							'trapper_hosts' => ''
@@ -1505,6 +1527,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'recovery_expression' => '',
 							'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 							'correlation_tag' => '',
+							'event_name' => '',
 							'opdata' => '',
 							'tags' => [],
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -1566,7 +1589,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'discover' => '0',
 							'templates' => [],
 							'macros' => [],
-							'tags' => []
+							'tags' => [],
+							'custom_interfaces' => '0'
 						]
 					],
 					'jmx_endpoint' => '',
@@ -1586,6 +1610,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'allow_traps' => '0',
 					'query_fields' => [],
+					'parameters' => [],
 					'headers' => [],
 					'key_' => 'lld-rule',
 					'trapper_hosts' => '',
@@ -1593,44 +1618,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'preprocessing' => [],
 					'overrides' => [],
 					'master_item' => []
-				]
-			]
-		]);
-	}
-
-	public function testGetTemplateScreens() {
-		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
-
-		$this->assertEquals($adapter->getTemplateScreens(), [
-			'export-template' => [
-				'screen' => [
-					'name' => 'screen',
-					'hsize' => '1',
-					'vsize' => '1',
-					'screenitems' => [
-						[
-							'resourcetype' => '0',
-							'width' => '500',
-							'height' => '100',
-							'x' => '0',
-							'y' => '0',
-							'colspan' => '1',
-							'rowspan' => '1',
-							'elements' => '0',
-							'valign' => '0',
-							'halign' => '0',
-							'style' => '0',
-							'url' => '',
-							'dynamic' => '0',
-							'sort_triggers' => '0',
-							'resource' => [
-								'name' => 'graph',
-								'host' => 'export-template'
-							],
-							'max_columns' => '',
-							'application' => ''
-						]
-					]
 				]
 			]
 		]);
@@ -2138,6 +2125,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'timeout' => '3s',
 						'url' => '',
 						'query_fields' => [],
+						'parameters' => [],
 						'posts' => '',
 						'status_codes' => '200',
 						'follow_redirects' => '1',
@@ -2193,6 +2181,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'timeout' => '3s',
 						'url' => '',
 						'query_fields' => [],
+						'parameters' => [],
 						'posts' => '',
 						'status_codes' => '200',
 						'follow_redirects' => '1',
@@ -2246,6 +2235,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'timeout' => '3s',
 						'url' => '',
 						'query_fields' => [],
+						'parameters' => [],
 						'posts' => '',
 						'status_codes' => '200',
 						'follow_redirects' => '1',
@@ -2303,6 +2293,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'recovery_expression' => '',
 					'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,
 					'correlation_tag' => '',
+					'event_name' => '',
 					'opdata' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -2320,6 +2311,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 					'recovery_expression' => '',
 					'correlation_tag' => '',
+					'event_name' => '',
 					'opdata' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -2636,6 +2628,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'privatekey' => '',
 						'publickey' => '',
 						'query_fields' => [],
+						'parameters' => [],
 						'snmp_oid' => '',
 						'ssl_cert_file' => '',
 						'ssl_key_file' => '',
@@ -2689,6 +2682,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'privatekey' => '',
 						'publickey' => '',
 						'query_fields' => [],
+						'parameters' => [],
 						'snmp_oid' => '',
 						'ssl_cert_file' => '',
 						'ssl_key_file' => '',
@@ -2955,6 +2949,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3002,6 +2997,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3049,6 +3045,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3096,6 +3093,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3143,6 +3141,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3190,6 +3189,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3249,6 +3249,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'timeout' => '3s',
 							'url' => '',
 							'query_fields' => [],
+							'parameters' => [],
 							'posts' => '',
 							'status_codes' => '200',
 							'follow_redirects' => '1',
@@ -3292,6 +3293,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3347,6 +3349,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'timeout' => '3s',
 							'url' => '',
 							'query_fields' => [],
+							'parameters' => [],
 							'posts' => '',
 							'status_codes' => '200',
 							'follow_redirects' => '1',
@@ -3390,6 +3393,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3445,6 +3449,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'timeout' => '3s',
 							'url' => '',
 							'query_fields' => [],
+							'parameters' => [],
 							'posts' => '',
 							'status_codes' => '200',
 							'follow_redirects' => '1',
@@ -3488,6 +3493,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3735,6 +3741,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3783,6 +3790,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3831,6 +3839,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3879,6 +3888,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3927,6 +3937,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -3975,6 +3986,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -4036,6 +4048,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'timeout' => '3s',
 							'url' => '',
 							'query_fields' => [],
+							'parameters' => [],
 							'posts' => '',
 							'status_codes' => '200',
 							'follow_redirects' => '1',
@@ -4079,6 +4092,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -4136,6 +4150,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'timeout' => '3s',
 							'url' => '',
 							'query_fields' => [],
+							'parameters' => [],
 							'posts' => '',
 							'status_codes' => '200',
 							'follow_redirects' => '1',
@@ -4179,6 +4194,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -4236,6 +4252,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'timeout' => '3s',
 							'url' => '',
 							'query_fields' => [],
+							'parameters' => [],
 							'posts' => '',
 							'status_codes' => '200',
 							'follow_redirects' => '1',
@@ -4279,6 +4296,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'timeout' => '3s',
 					'url' => '',
 					'query_fields' => [],
+					'parameters' => [],
 					'posts' => '',
 					'status_codes' => '200',
 					'follow_redirects' => '1',
@@ -4307,19 +4325,27 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
 		$source = $reader->read($source);
 
-		$importConverterFactory = new CImportConverterFactory();
+		$import_validator_factory = new CImportValidatorFactory(CImportReaderFactory::XML);
+		$import_converter_factory = new CImportConverterFactory();
 
-		$source = (new CXmlValidator)->validate($source, 'xml');
+		$validator = new CXmlValidator($import_validator_factory, CImportReaderFactory::XML);
+
+		$source = $validator
+			->setStrict(true)
+			->validate($source, '/');
 
 		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4'] as $version) {
 			if ($source['zabbix_export']['version'] !== $version) {
 				continue;
 			}
 
-			$source = $importConverterFactory
+			$source = $import_converter_factory
 				->getObject($version)
 				->convert($source);
-			$source = (new CXmlValidator)->validate($source, 'xml');
+
+			$source = $validator
+				->setStrict(false)
+				->validate($source, '/');
 		}
 
 		$schema = (new CImportValidatorFactory('xml'))->getObject(ZABBIX_EXPORT_VERSION)->getSchema();

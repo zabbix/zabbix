@@ -219,6 +219,48 @@ Curl.prototype = {
 		return this.args;
 	},
 
+	/**
+	 * Get query parameters as javascript object, support indexed names up to 3 levels only.
+	 */
+	getArgumentsObject: function() {
+		let result = {},
+			parts;
+
+		for (const name in this.args) {
+			parts = name.replace(/\]/g, '').split('[');
+
+			switch (parts.length) {
+				case 1:
+					result[name] = this.args[name];
+					break;
+
+				case 2:
+					// name[0]
+					if (!(parts[0] in result)) {
+						result[parts[0]] = [];
+					}
+
+					result[parts[0]][parts[1]] = this.args[name];
+					break;
+
+				case 3:
+					// name[0][property]
+					if (!(parts[0] in result)) {
+						result[parts[0]] = [];
+					}
+
+					if (!(parts[1] in result[parts[0]])) {
+						result[parts[0]][parts[1]] = {}
+					}
+
+					result[parts[0]][parts[1]][parts[2]] = this.args[name];
+					break;
+			}
+		}
+
+		return result;
+	},
+
 	getUrl: function() {
 		this.formatQuery();
 

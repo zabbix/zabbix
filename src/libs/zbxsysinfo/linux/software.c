@@ -218,11 +218,11 @@ int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
-				ZBX_EXIT_CODE_CHECKS_DISABLED) &&
+				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
 		{
 			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
-					ZBX_EXIT_CODE_CHECKS_DISABLED))
+					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
 			}

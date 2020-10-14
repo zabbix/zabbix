@@ -152,7 +152,7 @@ $table = (new CTableInfo())
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
-		_('Screens'),
+		_('Dashboards'),
 		_('Discovery'),
 		_('Web'),
 		_('Linked templates'),
@@ -268,8 +268,11 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['graphs'])
 		],
 		[
-			new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']),
-			CViewHelper::showNum($template['screens'])
+			new CLink(_('Dashboards'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'template.dashboard.list')
+					->setArgument('templateid', $template['templateid'])),
+			CViewHelper::showNum($template['dashboards'])
 		],
 		[
 			new CLink(_('Discovery'),

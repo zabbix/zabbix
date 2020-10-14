@@ -47,6 +47,15 @@ catch (ConfigFileException $e) {
 			]))->getOutput();
 
 			exit;
+
+		case CConfigFile::CONFIG_VAULT_ERROR:
+			echo (new CView('general.warning', [
+				'header' => _('Vault connection failed.'),
+				'messages' => [$e->getMessage()],
+				'theme' => ZBX_DEFAULT_THEME
+			]))->getOutput();
+
+			exit;
 	}
 }
 catch (Exception $e) {

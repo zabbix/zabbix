@@ -38,7 +38,7 @@ class testPageApplications extends CLegacyWebTest {
 			[
 				[
 					'filter' => [
-						'Hosts' => 'Template App Apache Tomcat JMX'
+						'Hosts' => 'Apache Tomcat JMX'
 					]
 				]
 			],

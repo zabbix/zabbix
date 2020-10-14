@@ -85,6 +85,19 @@ int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *fi
 			}
 		}
 	}
+	else
+	{
+		if (SUCCEED == zbx_json_value_by_name(jp, "stats", value, sizeof(value), NULL) &&
+				0 == strcmp(value, "extend"))
+		{
+			*field_mask |= field_map->value;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "Unknown statistic field value: %s", value);
+			goto out;
+		}
+	}
 
 	/* parse requested top views */
 	if (SUCCEED == zbx_json_brackets_by_name(jp, "top", &jp_stats))
@@ -235,7 +248,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEMORY},
+					{"", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEMORY},
 					{"items", ZBX_DIAG_HISTORYCACHE_ITEMS},
 					{"values", ZBX_DIAG_HISTORYCACHE_VALUES},
 					{"memory", ZBX_DIAG_HISTORYCACHE_MEMORY},
@@ -386,7 +399,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_PREPROC_VALUES | ZBX_DIAG_PREPROC_VALUES_PREPROC},
+					{"", ZBX_DIAG_PREPROC_VALUES | ZBX_DIAG_PREPROC_VALUES_PREPROC},
 					{"values", ZBX_DIAG_PREPROC_VALUES},
 					{"preproc.values", ZBX_DIAG_PREPROC_VALUES_PREPROC},
 					{NULL, 0}
@@ -526,9 +539,7 @@ static void	diag_add_section_request(struct zbx_json *j, const char *section, ..
 	const char	*field;
 
 	zbx_json_addobject(j, section);
-	zbx_json_addarray(j, "stats");
-	zbx_json_addstring(j, NULL, "all", ZBX_JSON_TYPE_STRING);
-	zbx_json_close(j);
+	zbx_json_addstring(j, "stats", "extend", ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addobject(j, "top");
 
@@ -644,14 +655,14 @@ static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, c
 		{
 			const char	*pnext;
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "  buckets:");
+			zabbix_log(LOG_LEVEL_INFORMATION, "    buckets:");
 
 			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp_buckets, pnext));)
 			{
 				if (SUCCEED == zbx_json_brackets_open(pnext, &jp_bucket))
 				{
 					diag_get_simple_values(&jp_bucket, &msg);
-					zabbix_log(LOG_LEVEL_INFORMATION, "    %s", msg);
+					zabbix_log(LOG_LEVEL_INFORMATION, "      %s", msg);
 					zbx_free(msg);
 				}
 			}
@@ -828,7 +839,11 @@ void	zbx_diag_log_info(unsigned int flags)
 	zbx_json_init(&j, 1024);
 
 	diag_prepare_default_request(&j, flags);
-	zbx_json_open(j.buffer, &jp);
+	if (FAIL == zbx_json_open(j.buffer, &jp))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
 
 	if (SUCCEED == zbx_diag_get_info(&jp, &info))
 	{
@@ -836,7 +851,11 @@ void	zbx_diag_log_info(unsigned int flags)
 		struct zbx_json_parse	jp_section;
 		const char		*pnext = NULL;
 
-		zbx_json_open(info, &jp);
+		if (FAIL == zbx_json_open(info, &jp))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+		}
 
 		while (NULL != (pnext = zbx_json_pair_next(&jp, pnext, section, sizeof(section))))
 		{
@@ -860,7 +879,7 @@ void	zbx_diag_log_info(unsigned int flags)
 	}
 	else
 		zabbix_log(LOG_LEVEL_INFORMATION, "cannot obtain diagnostic information: %s", info);
-
+out:
 	zbx_free(info);
 	zbx_json_free(&j);
 }

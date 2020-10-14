@@ -94,6 +94,7 @@ abstract class CItemGeneral extends CApiService {
 			'url'					=> ['template' => 1],
 			'timeout'				=> ['template' => 1],
 			'query_fields'			=> ['template' => 1],
+			'parameters'			=> ['template' => 1],
 			'posts'					=> ['template' => 1],
 			'status_codes'			=> ['template' => 1],
 			'follow_redirects'		=> ['template' => 1],
@@ -275,6 +276,10 @@ abstract class CItemGeneral extends CApiService {
 
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
+					if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
+						$rules['template'] = 1;
+					}
+
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
 
@@ -339,10 +344,45 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
+				if ($update) {
+					if ($dbItems[$item['itemid']]['type'] == $fullItem['type']) {
+						$flags = API_NOT_EMPTY;
+					}
+					else {
+						$flags = API_REQUIRED | API_NOT_EMPTY;
+					}
+				}
+				else {
+					$flags = API_REQUIRED | API_NOT_EMPTY;
+				}
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'params' => ['type' => API_STRING_UTF8, 'flags' => $flags, 'length' => DB::getFieldLength('items', 'params')],
+					'timeout' => [
+						'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
+							? $flags | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+							: $flags | API_ALLOW_USER_MACRO,
+						'in' => '1:'.SEC_PER_MIN
+					],
+					'parameters' => ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+						'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
+						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
+					]]
+				]];
+
+				$data = array_intersect_key($item, $api_input_rules['fields']);
+
+				if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($inum + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+
 			$host = $dbHosts[$fullItem['hostid']];
 
 			// Validate update interval.
 			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+					&& ($fullItem['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($fullItem['key_'], 'mqtt.get', 8) !== 0)
 					&& !validateDelay($update_interval_parser, 'delay', $fullItem['delay'], $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
@@ -590,7 +630,9 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('type', $item) &&
-				($item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_TRAPPER)) {
+				($item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_TRAPPER
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && array_key_exists('key_', $item)
+						&& strncmp($item['key_'], 'mqtt.get', 8) === 0))) {
 			$item['delay'] = 0;
 		}
 
@@ -703,7 +745,7 @@ abstract class CItemGeneral extends CApiService {
 				if ($this instanceof CItemPrototype) {
 					unset($new_item['ruleid']);
 				}
-				$upd_items[] = $new_item;
+				$upd_items[$new_item['itemid']] = $new_item;
 			}
 			else {
 				$ins_items[] = $new_item;
@@ -1711,6 +1753,123 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Create item parameters.
+	 *
+	 * @param array $items                             Array of items.
+	 * @param array $items[]['parameters']             Item parameters.
+	 * @param array $items[]['parameters'][]['name']   Parameter name.
+	 * @param array $items[]['parameters'][]['value']  Parameter value.
+	 * @param array $itemids                           Array of item IDs that were created before.
+	 */
+	protected function createItemParameters(array $items, array $itemids): void {
+		$item_parameters = [];
+
+		foreach ($items as $key => $item) {
+			$items[$key]['itemid'] = $itemids[$key];
+
+			if (!array_key_exists('parameters', $item) || !$item['parameters']) {
+				continue;
+			}
+
+			foreach ($item['parameters'] as $parameter) {
+				$item_parameters[] = [
+					'itemid' => $items[$key]['itemid'],
+					'name' => $parameter['name'],
+					'value' => $parameter['value']
+				];
+			}
+		}
+
+		if ($item_parameters) {
+			DB::insertBatch('item_parameter', $item_parameters);
+		}
+	}
+
+	/**
+	 * Update item parameters.
+	 *
+	 * @param array      $items                             Array of items.
+	 * @param int|string $items[]['itemid']                 Item ID.
+	 * @param int|string $items[]['type']                   Item type.
+	 * @param array      $items[]['parameters']             Item parameters.
+	 * @param array      $items[]['parameters'][]['name']   Parameter name.
+	 * @param array      $items[]['parameters'][]['value']  Parameter value.
+	 */
+	protected function updateItemParameters(array $items): void {
+		$db_item_parameters_by_itemid = [];
+
+		foreach ($items as $item) {
+			if ($item['type'] != ITEM_TYPE_SCRIPT || array_key_exists('parameters', $item)) {
+				$db_item_parameters_by_itemid[$item['itemid']] = [];
+			}
+		}
+
+		if (!$db_item_parameters_by_itemid) {
+			return;
+		}
+
+		$options = [
+			'output' => ['item_parameterid', 'itemid', 'name', 'value'],
+			'filter' => ['itemid' => array_keys($db_item_parameters_by_itemid)]
+		];
+		$result = DBselect(DB::makeSql('item_parameter', $options));
+
+		while ($row = DBfetch($result)) {
+			$db_item_parameters_by_itemid[$row['itemid']][$row['name']] = [
+				'item_parameterid' => $row['item_parameterid'],
+				'value' => $row['value']
+			];
+		}
+
+		$ins_item_parameters = [];
+		$upd_item_parameters = [];
+		$del_item_parameterids = [];
+
+		foreach ($db_item_parameters_by_itemid as $itemid => $db_item_parameters) {
+			$item = $items[$itemid];
+
+			if ($item['type'] == ITEM_TYPE_SCRIPT && array_key_exists('parameters', $item)) {
+				foreach ($item['parameters'] as $parameter) {
+					if (array_key_exists($parameter['name'], $db_item_parameters)) {
+						if ($db_item_parameters[$parameter['name']]['value'] !== $parameter['value']) {
+							$upd_item_parameters[] = [
+								'values' => ['value' => $parameter['value']],
+								'where' => [
+									'item_parameterid' => $db_item_parameters[$parameter['name']]['item_parameterid']
+								]
+							];
+						}
+						unset($db_item_parameters[$parameter['name']]);
+					}
+					else {
+						$ins_item_parameters[] = [
+							'itemid' => $itemid,
+							'name' => $parameter['name'],
+							'value' => $parameter['value']
+						];
+					}
+				}
+			}
+
+			$del_item_parameterids = array_merge($del_item_parameterids,
+				array_column($db_item_parameters, 'item_parameterid')
+			);
+		}
+
+		if ($del_item_parameterids) {
+			DB::delete('item_parameter', ['item_parameterid' => $del_item_parameterids]);
+		}
+
+		if ($upd_item_parameters) {
+			DB::update('item_parameter', $upd_item_parameters);
+		}
+
+		if ($ins_item_parameters) {
+			DB::insertBatch('item_parameter', $ins_item_parameters);
+		}
+	}
+
+	/**
 	 * Check if any item from list already exists.
 	 * If items have item ids it will check for existing item with different itemid.
 	 *
@@ -1791,6 +1950,26 @@ abstract class CItemGeneral extends CApiService {
 				if (array_key_exists($itemid, $result)) {
 					$result[$itemid]['preprocessing'][] = $step;
 				}
+			}
+		}
+
+		if (!$options['countOutput'] && $this->outputIsRequested('parameters', $options['output'])) {
+			$item_parameters = DBselect(
+				'SELECT ip.itemid,ip.name,ip.value'.
+				' FROM item_parameter ip'.
+				' WHERE '.dbConditionInt('ip.itemid', array_keys($result))
+			);
+
+			foreach ($result as &$item) {
+				$item['parameters'] = [];
+			}
+			unset($item);
+
+			while ($row = DBfetch($item_parameters)) {
+				$result[$row['itemid']]['parameters'][] = [
+					'name' =>  $row['name'],
+					'value' =>  $row['value']
+				];
 			}
 		}
 
@@ -2310,5 +2489,76 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Remove NCLOB value type fields from resulting query SELECT part if DISTINCT will be used.
+	 *
+	 * @param string $table_name     Table name.
+	 * @param string $table_alias    Table alias value.
+	 * @param array  $options        Array of query options.
+	 * @param array  $sql_parts      Array of query parts already initialized from $options.
+	 *
+	 * @return array    The resulting SQL parts array.
+	 */
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
+		if (!$options['countOutput'] && self::dbDistinct($sql_parts)) {
+			$schema = $this->getTableSchema();
+			$nclob_fields = [];
+
+			foreach ($schema['fields'] as $field_name => $field) {
+				if ($field['type'] == DB::FIELD_TYPE_NCLOB
+						&& $this->outputIsRequested($field_name, $options['output'])) {
+					$nclob_fields[] = $field_name;
+				}
+			}
+
+			if ($nclob_fields) {
+				$output = ($options['output'] === API_OUTPUT_EXTEND)
+					? array_keys($schema['fields'])
+					: $options['output'];
+
+				$options['output'] = array_diff($output, $nclob_fields);
+			}
+		}
+
+		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+	}
+
+	/**
+	 * Add NCLOB type fields if there was DISTINCT in query.
+	 *
+	 * @param array $options    Array of query options.
+	 * @param array $result     Query results.
+	 *
+	 * @return array    The result array with added NCLOB fields.
+	 */
+	protected function addNclobFieldValues(array $options, array $result): array {
+		$schema = $this->getTableSchema();
+		$nclob_fields = [];
+
+		foreach ($schema['fields'] as $field_name => $field) {
+			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
+				$nclob_fields[] = $field_name;
+			}
+		}
+
+		if (!$nclob_fields) {
+			return $result;
+		}
+
+		$pk = $schema['key'];
+		$options = [
+			'output' => $nclob_fields,
+			'filter' => [$pk => array_keys($result)]
+		];
+
+		$db_items = DBselect(DB::makeSql($this->tableName, $options));
+
+		while ($db_item = DBfetch($db_items)) {
+			$result[$db_item[$pk]] += $db_item;
+		}
+
+		return $result;
 	}
 }

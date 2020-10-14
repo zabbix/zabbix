@@ -37,7 +37,7 @@ function getMainMenu(): CMenu {
 				(new CMenuItem(_('Hosts')))
 					->setAction('host.view')
 					->setAliases(['web.view', 'charts.view', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
-						'httpdetails.php', 'host_screen.php'
+						'httpdetails.php', 'host.dashboard.view'
 					]),
 				(new CMenuItem(_('Overview')))
 					->setUrl(new CUrl('overview.php'), 'overview.php'),
@@ -46,7 +46,7 @@ function getMainMenu(): CMenu {
 					->setAliases(['history.php', 'chart.php']),
 				(new CMenuItem(_('Screens')))
 					->setUrl(new CUrl('screens.php'), 'screens.php')
-					->setAliases(['screenconf.php?!templateid=*', 'screenedit.php?!templateid=*', 'screen.import.php',
+					->setAliases(['screenconf.php', 'screenedit.php', 'screen.import.php',
 						'slides.php', 'slideconf.php'
 					]),
 				(new CMenuItem(_('Maps')))
@@ -102,8 +102,8 @@ function getMainMenu(): CMenu {
 						->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php'),
 					(new CMenuItem(_('Templates')))
 						->setUrl(new CUrl('templates.php'), 'templates.php')
-						->setAliases(['conf.import.php?rules_preset=template', 'screenconf.php?templateid=*',
-							'screenedit.php?templateid=*'
+						->setAliases(['conf.import.php?rules_preset=template', 'template.dashboard.list',
+							'template.dashboard.edit'
 						]),
 					(new CMenuItem(_('Hosts')))
 						->setUrl(new CUrl('hosts.php'), 'hosts.php')

@@ -75,7 +75,7 @@ class CRouter {
 		'dashboard.list'				=> ['CControllerDashboardList',						'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.properties.check'	=> ['CControllerDashboardPropertiesCheck',			'layout.json',			null],
 		'dashboard.properties.edit'		=> ['CControllerDashboardPropertiesEdit',			'layout.json',			'dashboard.properties.edit'],
-		'dashboard.share.edit'			=> ['CControllerDashboardShareEdit',				'layout.json',			'dashboard.sharing.edit'],
+		'dashboard.share.edit'			=> ['CControllerDashboardShareEdit',				'layout.json',			'dashboard.share.edit'],
 		'dashboard.share.update'		=> ['CControllerDashboardShareUpdate',				'layout.json',			null],
 		'dashboard.update'				=> ['CControllerDashboardUpdate',					'layout.json',			null],
 		'dashboard.view'				=> ['CControllerDashboardView',						'layout.htmlpage',		'monitoring.dashboard.view'],
@@ -95,6 +95,7 @@ class CRouter {
 		'favourite.delete'				=> ['CControllerFavouriteDelete',					'layout.javascript',	null],
 		'gui.edit'						=> ['CControllerGuiEdit',							'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'					=> ['CControllerGuiUpdate',							null,					null],
+		'host.dashboard.view'			=> ['CControllerHostDashboardView',					'layout.htmlpage',		'monitoring.host.dashboard.view'],
 		'host.view'						=> ['CControllerHostView',							'layout.htmlpage',		'monitoring.host.view'],
 		'host.view.refresh'				=> ['CControllerHostViewRefresh',					'layout.json',			'monitoring.host.view.refresh'],
 		'hostmacros.list'				=> ['CControllerHostMacrosList',					'layout.json',			'hostmacros.list'],
@@ -155,12 +156,17 @@ class CRouter {
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
 		'popup.scriptexec'				=> ['CControllerPopupScriptExec',					'layout.json',			'popup.scriptexec'],
 		'popup.services'				=> ['CControllerPopupServices',						'layout.json',			'popup.services'],
+		'popup.tabfilter.delete'		=> ['CControllerPopupTabFilterDelete',				'layout.json',			null],
+		'popup.tabfilter.edit'			=> ['CControllerPopupTabFilterEdit',				'layout.json',			'popup.tabfilter.edit'],
+		'popup.tabfilter.update'		=> ['CControllerPopupTabFilterUpdate',				'layout.json',			null],
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',					'layout.json',			'popup.triggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
 		'problem.view'					=> ['CControllerProblemView',						'layout.htmlpage',		'monitoring.problem.view'],
+		'problem.view.refresh'			=> ['CControllerProblemViewRefresh',				'layout.json',			null],
 		'problem.view.csv'				=> ['CControllerProblemView',						'layout.csv',			'monitoring.problem.view'],
 		'profile.update'				=> ['CControllerProfileUpdate',						'layout.json',			null],
+		'tabfilter.profile.update'		=> ['CControllerTabFilterProfileUpdate',			'layout.json',			null],
 		'proxy.create'					=> ['CControllerProxyCreate',						null,					null],
 		'proxy.delete'					=> ['CControllerProxyDelete',						null,					null],
 		'proxy.edit'					=> ['CControllerProxyEdit',							'layout.htmlpage',		'administration.proxy.edit'],
@@ -183,6 +189,10 @@ class CRouter {
 		'script.update'					=> ['CControllerScriptUpdate',						null,					null],
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search'],
 		'system.warning'				=> ['CControllerSystemWarning',						'layout.warning',		'system.warning'],
+		'template.dashboard.delete'		=> ['CControllerTemplateDashboardDelete',			null,					null],
+		'template.dashboard.edit'		=> ['CControllerTemplateDashboardEdit',				'layout.htmlpage',		'configuration.dashboard.edit'],
+		'template.dashboard.list'		=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
+		'template.dashboard.update'		=> ['CControllerTemplateDashboardUpdate',			'layout.json',			null],
 		'timeselector.update'			=> ['CControllerTimeSelectorUpdate',				'layout.json',			null],
 		'trigdisplay.edit'				=> ['CControllerTrigDisplayEdit',					'layout.htmlpage',		'administration.trigdisplay.edit'],
 		'trigdisplay.update'			=> ['CControllerTrigDisplayUpdate',					null,					null],
@@ -263,7 +273,6 @@ class CRouter {
 		'history.php'					=> ['CLegacyAction', null, null],
 		'host_discovery.php'			=> ['CLegacyAction', null, null],
 		'host_prototypes.php'			=> ['CLegacyAction', null, null],
-		'host_screen.php'				=> ['CLegacyAction', null, null],
 		'hostgroups.php'				=> ['CLegacyAction', null, null],
 		'hostinventories.php'			=> ['CLegacyAction', null, null],
 		'hostinventoriesoverview.php'	=> ['CLegacyAction', null, null],
@@ -304,7 +313,7 @@ class CRouter {
 	];
 
 	/**
-	 * Add new actions (potentially overwritting the existing ones).
+	 * Add new actions (potentially overwriting the existing ones).
 	 *
 	 * @param array  $actions                           List of actions.
 	 * @param string $actions['action_name']            Definition of the 'action_name' action.

@@ -24,11 +24,11 @@
  */
 class CWidgetFormPlainText extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_PLAIN_TEXT);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_PLAIN_TEXT);
 
 		// Items selector.
-		$field_items = (new CWidgetFieldMsItem('itemids', _('Items')))
+		$field_items = (new CWidgetFieldMsItem('itemids', _('Items'), $templateid))
 			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 		if (array_key_exists('itemids', $this->data)) {
@@ -73,13 +73,15 @@ class CWidgetFormPlainText extends CWidgetForm {
 
 		$this->fields[$field_show_as_html->getName()] = $field_show_as_html;
 
-		// Use dynamic items.
-		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic items')))->setDefault(WIDGET_SIMPLE_ITEM);
+		// Dynamic item.
+		if ($templateid === null) {
+			$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic items')))->setDefault(WIDGET_SIMPLE_ITEM);
 
-		if (array_key_exists('dynamic', $this->data)) {
-			$dynamic_item->setValue($this->data['dynamic']);
+			if (array_key_exists('dynamic', $this->data)) {
+				$dynamic_item->setValue($this->data['dynamic']);
+			}
+
+			$this->fields[$dynamic_item->getName()] = $dynamic_item;
 		}
-
-		$this->fields[$dynamic_item->getName()] = $dynamic_item;
 	}
 }

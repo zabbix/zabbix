@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
+			'type' => 'required|in history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -43,39 +43,6 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkPermissions() {
 		return true;
-	}
-
-	/**
-	 * Prepare data for dashboard context menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['dashboardid']
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataDashboard(array $data) {
-		$db_dashboards = API::Dashboard()->get([
-			'output' => [],
-			'dashboardids' => $data['dashboardid'],
-		]);
-
-		if ($db_dashboards) {
-			$db_dashboard = $db_dashboards[0];
-
-			return [
-				'type' => 'dashboard',
-				'dashboardid' => $data['dashboardid'],
-				'editable' => (bool) API::Dashboard()->get([
-					'output' => [],
-					'dashboardids' => $data['dashboardid'],
-					'editable' => true
-				])
-			];
-		}
-
-		error(_('No permissions to referred object or it does not exist!'));
-
-		return null;
 	}
 
 	/**
@@ -130,7 +97,6 @@ class CControllerMenuPopup extends CController {
 			? API::Host()->get([
 				'output' => ['hostid', 'status'],
 				'selectGraphs' => API_OUTPUT_COUNT,
-				'selectScreens' => API_OUTPUT_COUNT,
 				'selectHttpTests' => API_OUTPUT_COUNT,
 				'hostids' => $data['hostid']
 			])
@@ -175,7 +141,7 @@ class CControllerMenuPopup extends CController {
 
 			if ($has_goto) {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
-				$menu_data['showScreens'] = (bool) $db_host['screens'];
+				$menu_data['showDashboards'] = (bool) getHostDashboards($data['hostid']);
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
 				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
@@ -341,6 +307,8 @@ class CControllerMenuPopup extends CController {
 		}
 
 		CArrayHelper::sort($selement['urls'], ['name']);
+		$selement['urls'] = array_values($selement['urls']);
+
 		// Prepare urls for processing in menupopup.js.
 		$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
 
@@ -693,10 +661,6 @@ class CControllerMenuPopup extends CController {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
 		switch ($this->getInput('type')) {
-			case 'dashboard':
-				$menu_data = self::getMenuDataDashboard($data);
-				break;
-
 			case 'history':
 				$menu_data = self::getMenuDataHistory($data);
 				break;

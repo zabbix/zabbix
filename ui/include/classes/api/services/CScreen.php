@@ -54,7 +54,7 @@ class CScreen extends CApiService {
 		$sql_parts = [
 			'select'	=> ['screens' => 's.screenid'],
 			'from'		=> ['screens' => 'screens s'],
-			'where'		=> ['template' => 's.templateid IS NULL'],
+			'where'		=> [],
 			'order'		=> [],
 			'group'		=> [],
 			'limit'		=> null
@@ -371,7 +371,6 @@ class CScreen extends CApiService {
 		}
 
 		if ($result) {
-			$result = $this->unsetExtraFields($result, ['templateid'], []);
 			$result = $this->addRelatedObjects($options, $result);
 		}
 
@@ -434,14 +433,6 @@ class CScreen extends CApiService {
 			}
 
 			$this->validateScreenSize($screen);
-
-			// "templateid", is not allowed
-			if (array_key_exists('templateid', $screen)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot set "templateid" for screen "%1$s".', $screen['name'])
-				);
-			}
 
 			unset($screen['screenid']);
 		}
@@ -661,9 +652,7 @@ class CScreen extends CApiService {
 		$this->validateCreate($screens);
 
 		foreach ($screens as &$screen) {
-			if (!array_key_exists('templateid', $screen)) {
-				$screen['userid'] = array_key_exists('userid', $screen) ? $screen['userid'] : self::$userData['userid'];
-			}
+			$screen['userid'] = array_key_exists('userid', $screen) ? $screen['userid'] : self::$userData['userid'];
 		}
 		unset($screen);
 
@@ -754,14 +743,6 @@ class CScreen extends CApiService {
 		$screens = $this->extendFromObjects(zbx_toHash($screens, 'screenid'), $db_screens, ['name']);
 
 		foreach ($screens as $screen) {
-			// "templateid" is not allowed
-			if (array_key_exists('templateid', $screen)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot update "templateid" for screen "%1$s".', $screen['name'])
-				);
-			}
-
 			if (array_key_exists('name', $screen)) {
 				// Validate "name" field.
 				if (array_key_exists('name', $screen)) {

@@ -40,6 +40,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.charts.filter.active':
 				case 'web.correlation.filter.active':
 				case 'web.dashbrd.filter.active':
+				case 'web.dashbrd.hostid':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
 				case 'web.graphs.filter.active':
@@ -79,7 +80,6 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
-				case CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY:
 					$ret = true;
 					break;
 

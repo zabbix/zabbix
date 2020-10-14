@@ -232,14 +232,14 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
 /**
  * Creates a hintbox suitable for Problem hosts widget.
  *
- * @param array  $hosts                                                   Array of problematic hosts.
- * @param array  $data                                                    Array of host data, filter settings and
- *                                                                        severity configuration.
- * @param array  $data['filter']['severities']                            Array of severities.
- * @param string $data['hosts_data'][<hostid>]['host']                    Host name.
- * @param int    $data['hosts_data'][<hostid>]['severities'][<severity>]  Severity count.
- * @param CUrl|null   $url                                                     URL that leads to problems view having hostid
- *                                                                        in its filter.
+ * @param array      $hosts                                                   Array of problematic hosts.
+ * @param array      $data                                                    Array of host data, filter settings and
+ *                                                                            severity configuration.
+ * @param array      $data['filter']['severities']                            Array of severities.
+ * @param string     $data['hosts_data'][<hostid>]['host']                    Host name.
+ * @param int        $data['hosts_data'][<hostid>]['severities'][<severity>]  Severity count.
+ * @param CUrl|null  $url                                                     URL that leads to problems view having
+ *                                                                            hostid in its filter.
  *
  * @return CTableInfo
  */
@@ -275,7 +275,7 @@ function makeProblemHostsHintBox(array $hosts, array $data, ?CUrl $url) {
 	foreach ($hosts as $hostid => $host) {
 		$host_data = $data['hosts_data'][$hostid];
 		if ($url !== null) {
-			$url->setArgument('filter_hostids', [$hostid]);
+			$url->setArgument('hostids', [$hostid]);
 			$host_name = new CLink($host_data['host'], $url->getUrl());
 		}
 		else {

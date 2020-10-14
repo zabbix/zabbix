@@ -160,11 +160,6 @@ class CScreenHostTriggers extends CScreenBase {
 	 * @param string  $filter['sortorder']  Sort order.
 	 */
 	protected function getProblemsListTable(array $filter) {
-		// If no hostids and groupids defined show recent problems.
-		if ($filter['hostids'] === null && $filter['groupids'] === null) {
-			$filter['show'] = TRIGGERS_OPTION_RECENT_PROBLEM;
-		}
-
 		$filter = $filter + [
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'show_timeline' => 0,
@@ -247,8 +242,8 @@ class CScreenHostTriggers extends CScreenBase {
 			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids[]', $trigger['triggerid'])
-					->setArgument('filter_set', '1')
+					->setArgument('filter_name', '')
+					->setArgument('triggerids', [$trigger['triggerid']])
 			);
 
 			$allowed = [

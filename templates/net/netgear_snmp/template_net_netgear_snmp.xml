@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:29:22Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:08Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,21 +9,21 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Netgear Fastpath SNMP</template>
-         <name>Template Net Netgear Fastpath SNMP</name>
+         <template>Netgear Fastpath SNMP</template>
+         <name>Netgear Fastpath SNMP</name>
          <description>Template Net Netgear Fastpath&#13;
 &#13;
 MIBs used:&#13;
 FASTPATH-SWITCHING-MIB&#13;
 FASTPATH-BOXSERVICES-PRIVATE-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMP</name>
+               <name>Interfaces SNMP</name>
             </template>
          </templates>
          <groups>
@@ -266,6 +266,7 @@ The status of fan</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -304,6 +305,7 @@ The status of power supply</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -359,24 +361,25 @@ The temperature value reported by sensor</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+                     <expression>{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
+{Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>#{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
+                     <expression>{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}&#13;
 or&#13;
-{Template Net Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+{Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>#{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
@@ -384,10 +387,10 @@ or&#13;
                      <dependencies>
                         <dependency>
                            <name>#{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
+                           <expression>{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;
 or&#13;
-{Template Net Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
-                           <recovery_expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+{Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}</expression>
+                           <recovery_expression>{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -444,7 +447,7 @@ or&#13;
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Netgear Fastpath SNMP</host>
+                  <host>Netgear Fastpath SNMP</host>
                   <key>system.cpu.util[agentSwitchCpuProcessTotalUtilization.0]</key>
                </item>
             </graph_item>
@@ -458,7 +461,7 @@ or&#13;
                <drawtype>BOLD_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Netgear Fastpath SNMP</host>
+                  <host>Netgear Fastpath SNMP</host>
                   <key>vm.memory.total[agentSwitchCpuProcessMemAvailable.0]</key>
                </item>
             </graph_item>
@@ -467,7 +470,7 @@ or&#13;
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template Net Netgear Fastpath SNMP</host>
+                  <host>Netgear Fastpath SNMP</host>
                   <key>vm.memory.available[agentSwitchCpuProcessMemFree.0]</key>
                </item>
             </graph_item>
@@ -482,7 +485,7 @@ or&#13;
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Netgear Fastpath SNMP</host>
+                  <host>Netgear Fastpath SNMP</host>
                   <key>vm.memory.util[memoryUsedPercentage.0]</key>
                </item>
             </graph_item>

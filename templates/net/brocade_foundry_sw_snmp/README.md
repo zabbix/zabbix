@@ -1,9 +1,9 @@
 
-# Template Module Brocade_Foundry Performance SNMP
+# Brocade_Foundry Performance SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -45,11 +45,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Net Brocade_Foundry Nonstackable SNMP
+# Brocade_Foundry Nonstackable SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 For devices(old Foundry devices, MLXe and so on) that doesn't support Stackable SNMP Tables: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table -
 FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.
 For example:
@@ -87,9 +87,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Brocade_Foundry Performance SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|Brocade_Foundry Performance SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -132,11 +132,11 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Net Brocade_Foundry Stackable SNMP
+# Brocade_Foundry Stackable SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 For devices(most of the IronWare Brocade devices) that support Stackable SNMP Tables in FOUNDRY-SN-AGENT-MIB: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table - so objects from all Stack members are provided.
 
 This template was tested on:
@@ -172,9 +172,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Brocade_Foundry Performance SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|Brocade_Foundry Performance SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 

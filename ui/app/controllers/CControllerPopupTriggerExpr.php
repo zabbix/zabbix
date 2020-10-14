@@ -22,6 +22,7 @@
 class CControllerPopupTriggerExpr extends CController {
 	private $metrics = [];
 	private $param1SecCount = [];
+	private $param1Period = [];
 	private $param1Sec = [];
 	private $param1Str = [];
 	private $param2SecCount = [];
@@ -64,6 +65,19 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Time shift'),
 				'T' => T_ZBX_INT,
 				'A' => false
+			]
+		];
+
+		$this->param1Period = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'period_shift' => [
+				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
 			]
 		];
 
@@ -414,6 +428,42 @@ class CControllerPopupTriggerExpr extends CController {
 			'timeleft' => [
 				'description' => _('timeleft() - Time to reach threshold estimated based on period T'),
 				'params' => $this->paramTimeleft,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'trendavg' => [
+				'description' => _('trendavg() - Average value of a period T with exact period shift'),
+				'params' => $this->param1Period,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'trendcount' => [
+				'description' => _('trendcount() - Number of successfully retrieved values V (which fulfill operator O) for period T with exact period shift'),
+				'params' => $this->param1Period,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'trenddelta' => [
+				'description' => _('trenddelta() - Difference between MAX and MIN value of a period T with exact period shift'),
+				'params' => $this->param1Period,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'trendmax' => [
+				'description' => _('trendmax() - Maximum value for period T with exact period shift'),
+				'params' => $this->param1Period,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'trendmin' => [
+				'description' => _('trendmin() - Minimum value for period T with exact period shift'),
+				'params' => $this->param1Period,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			],
+			'trendsum' => [
+				'description' => _('trendsum() - Sum of values of a period T with exact period shift'),
+				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			]

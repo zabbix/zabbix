@@ -83,7 +83,7 @@ class CConfigurationExport {
 			'item' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
+				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps'
@@ -94,12 +94,12 @@ class CConfigurationExport {
 				'flags', 'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
 				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps'
+				'verify_host', 'allow_traps', 'parameters'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
+				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
 				'verify_host', 'allow_traps', 'discover'
@@ -280,6 +280,7 @@ class CConfigurationExport {
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
+			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'templateids' => $templateids,
 			'preservekeys' => true
@@ -289,7 +290,7 @@ class CConfigurationExport {
 			// merge host groups with all groups
 			$this->data['groups'] += zbx_toHash($template['groups'], 'groupid');
 
-			$template['screens'] = [];
+			$template['dashboards'] = [];
 			$template['applications'] = [];
 			$template['discoveryRules'] = [];
 			$template['items'] = [];
@@ -298,7 +299,7 @@ class CConfigurationExport {
 		unset($template);
 
 		if ($templates) {
-			$templates = $this->gatherTemplateScreens($templates);
+			$templates = $this->gatherTemplateDashboards($templates);
 			$templates = $this->gatherApplications($templates);
 			$templates = $this->gatherItems($templates);
 			$templates = $this->gatherDiscoveryRules($templates);
@@ -353,28 +354,86 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get template screens from database.
+	 * Get template dashboards from database.
 	 *
 	 * @param array $templates
 	 *
 	 * @return array
 	 */
-	protected function gatherTemplateScreens(array $templates) {
-		$screens = API::TemplateScreen()->get([
+	protected function gatherTemplateDashboards(array $templates) {
+		$dashboards = API::TemplateDashboard()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'selectWidgets' => API_OUTPUT_EXTEND,
 			'templateids' => array_keys($templates),
-			'noInheritance' => true,
 			'preservekeys' => true
 		]);
 
-		$this->prepareScreenExport($screens);
+		foreach ($dashboards as $dashboard) {
+			$dashboard['widgets'] = $this->prepareDashboardWidgets($dashboard['widgets']);
 
-		foreach ($screens as $screen) {
-			$templates[$screen['templateid']]['screens'][] = $screen;
+			$templates[$dashboard['templateid']]['dashboards'][] = $dashboard;
 		}
 
 		return $templates;
+	}
+
+	/**
+	 * Get dashboard widgets related objects from database.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return array
+	 */
+	protected function prepareDashboardWidgets(array $widgets): array {
+		$hostids = [];
+		$itemids = [];
+		$graphids = [];
+
+		// Collect ids.
+		foreach ($widgets as $widget) {
+			foreach ($widget['fields'] as $field) {
+				switch ($field['type']) {
+					case ZBX_WIDGET_FIELD_TYPE_HOST:
+						$hostids[$field['value']] = true;
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_ITEM:
+					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+						$itemids[$field['value']] = true;
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+						$graphids[$field['value']] = true;
+						break;
+				}
+			}
+		}
+
+		$hosts = $this->getHostsReferences(array_keys($hostids));
+		$items = $this->getItemsReferences(array_keys($itemids));
+		$graphs = $this->getGraphsReferences(array_keys($graphids));
+
+		// Replace ids.
+		foreach ($widgets as &$widget) {
+			foreach ($widget['fields'] as &$field) {
+				switch ($field['type']) {
+					case ZBX_WIDGET_FIELD_TYPE_HOST:
+						$field['value'] = $hosts[$field['value']];
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_ITEM:
+					case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+						$field['value'] = $items[$field['value']];
+						break;
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+					case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+						$field['value'] = $graphs[$field['value']];
+						break;
+				}
+			}
+			unset($field);
+		}
+		unset($widget);
+
+		return $widgets;
 	}
 
 	/**
@@ -805,7 +864,7 @@ class CConfigurationExport {
 		$triggers = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
 				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover'
+				'discover', 'event_name'
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
@@ -832,6 +891,7 @@ class CConfigurationExport {
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -1072,7 +1132,8 @@ class CConfigurationExport {
 
 		$triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+				'event_name'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],

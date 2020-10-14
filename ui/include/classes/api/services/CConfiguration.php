@@ -147,7 +147,7 @@ class CConfiguration extends CApiService {
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templateScreens' =>	['type' => API_OBJECT, 'fields' => [
+				'templateDashboards' =>	['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
@@ -181,27 +181,35 @@ class CConfiguration extends CApiService {
 			}
 		}
 
-		$importReader = CImportReaderFactory::getReader($params['format']);
-		$data = $importReader->read($params['source']);
+		$import_reader = CImportReaderFactory::getReader($params['format']);
+		$data = $import_reader->read($params['source']);
 
-		$importValidatorFactory = new CImportValidatorFactory($params['format']);
-		$importConverterFactory = new CImportConverterFactory();
+		$import_validator_factory = new CImportValidatorFactory($params['format']);
+		$import_converter_factory = new CImportConverterFactory();
 
-		$data = (new CXmlValidator)->validate($data, $params['format']);
+		$validator = new CXmlValidator($import_validator_factory, $params['format']);
+
+		$data = $validator
+			->setStrict(true)
+			->validate($data, '/');
 
 		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0'] as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
 
-			$data = $importConverterFactory
+			$data = $import_converter_factory
 				->getObject($version)
 				->convert($data);
-			$data = (new CXmlValidator)->validate($data, $params['format']);
+
+			$data = $validator
+				// Must not use XML_INDEXED_ARRAY key validaiton for the converted data.
+				->setStrict(false)
+				->validate($data, '/');
 		}
 
 		// Get schema for converters.
-		$schema = $importValidatorFactory
+		$schema = $import_validator_factory
 			->getObject(ZABBIX_EXPORT_VERSION)
 			->getSchema();
 
@@ -220,12 +228,12 @@ class CConfiguration extends CApiService {
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
 
-		$configurationImport = new CConfigurationImport(
+		$configuration_import = new CConfigurationImport(
 			$params['rules'],
 			new CImportReferencer(),
 			new CImportedObjectContainer()
 		);
 
-		return $configurationImport->import($adapter);
+		return $configuration_import->import($adapter);
 	}
 }

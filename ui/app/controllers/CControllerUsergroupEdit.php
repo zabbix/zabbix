@@ -156,7 +156,7 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
-	 * Returs all needed host groups formatted for multiselector.
+	 * Returns all needed host groups formatted for multiselector.
 	 *
 	 * @param array $groupids
 	 *
@@ -178,7 +178,7 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
-	 * Returs all needed user formatted for multiselector.
+	 * Returns all needed user formatted for multiselector.
 	 *
 	 * @return array
 	 */

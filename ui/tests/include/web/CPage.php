@@ -39,7 +39,7 @@ class CPage {
 	/**
 	 * Page defaults.
 	 */
-	const DEFAULT_PAGE_WIDTH = 1280;
+	const DEFAULT_PAGE_WIDTH = 1440;
 	const DEFAULT_PAGE_HEIGHT = 1024;
 
 	/**
@@ -177,22 +177,20 @@ class CPage {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
-		$cookie_sessionid = '';
 		if (self::$cookie !== null) {
-			$cookie = unserialize(base64_decode(self::$cookie['value']));
-			$cookie_sessionid = $cookie['sessionid'];
+			$cookie = json_decode(base64_decode(urldecode(self::$cookie['value'])), true);
 		}
 
-		if (self::$cookie === null || $sessionid !== $cookie_sessionid) {
+		if (self::$cookie === null || $sessionid !== $cookie['sessionid']) {
 			$data = ['sessionid' => $sessionid];
 
 			$config = CDBHelper::getRow('select session_key from config where configid=1');
-			$data['sign'] = openssl_encrypt(serialize($data), 'aes-256-ecb', $config['session_key']);
+			$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
 
 			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
 				'name' => 'zbx_session',
-				'value' => base64_encode(serialize($data)),
+				'value' => base64_encode(json_encode($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
