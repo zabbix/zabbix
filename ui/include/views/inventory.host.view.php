@@ -137,19 +137,21 @@ $overviewFormList->addRow(_('Monitoring'),
 			->setArgument('filter_hostids[]', $data['host']['hostid'])
 			->setArgument('filter_set', '1')
 		),
-		new CLink(_('Latest data'),
-			(new CUrl('zabbix.php'))
+		$data['allowed_ui_latest_data']
+			? new CLink(_('Latest data'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
 				->setArgument('filter_show_details', '1')
 				->setArgument('filter_set', '1')
-		),
-		new CLink(_('Problems'),
-			(new CUrl('zabbix.php'))
+			)
+			: _('Latest data'),
+		$data['allowed_ui_problems']
+			? new CLink(_('Problems'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
 				->setArgument('filter_name', '')
 				->setArgument('hostids', [$data['host']['hostid']])
-		),
+			)
+			: _('Problems'),
 		new CLink(_('Graphs'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
@@ -158,20 +160,23 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 				->setArgument('filter_hostids', [$data['host']['hostid']])
 		),
-		new CLink(_('Dashboards'),
-			(new CUrl('zabbix.php'))
+		$data['allowed_ui_dashboard']
+			? new CLink(_('Dashboards'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'host.dashboard.view')
 				->setArgument('hostid', $data['host']['hostid'])
-		)
+			)
+			: _('Dashboards')
 	])
 );
 
 // configuration
 if ($data['rwHost']) {
-	$hostLink = new CLink(_('Host'), (new CUrl('hosts.php'))
-		->setArgument('form', 'update')
-		->setArgument('hostid', $data['host']['hostid'])
-	);
+	$hostLink = $data['allowed_ui_conf_hosts']
+		? new CLink(_('Host'), (new CUrl('hosts.php'))
+			->setArgument('form', 'update')
+			->setArgument('hostid', $data['host']['hostid'])
+		)
+		: _('Host');
 	$applicationsLink = new CLink(_('Applications'),
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'application.list')
