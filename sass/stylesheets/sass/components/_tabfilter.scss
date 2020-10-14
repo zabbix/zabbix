@@ -1,7 +1,3 @@
-.float-left {
-	float: left;
-}
-
 $tab-label-color: $btn-font-color;
 $tab-label-bg-color: $btn-bg-color;
 $tab-label-focus-bg-color: $btn-form-hover-color;
@@ -15,7 +11,6 @@ $tab-label-hover-color: $btn-font-color;
 $tab-label-hover-bg-color: $btn-bg-color;
 $tab-label-counter-color: $form-font-color;
 $tab-label-counter-bg-color: $form-disabled-bg-color;
-
 
 .filter-container.tabfilter-container {
 	padding: 0;
@@ -56,7 +51,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		&:nth-child(2) {
 			flex-grow: 1;
 			overflow: hidden;
-			margin: 0 3px 0 -3px;
+			padding-bottom: 2px;
+			margin: 0 3px -2px -3px;
 			height: 30px;
 
 			ul {
@@ -90,7 +86,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 	}
 
-	/* tab filter label li element */
+	// Tab filter label li element.
 	.tabfilter-item-label {
 		&:hover {
 			color: $tab-label-hover-color;
@@ -120,29 +116,18 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			position: relative;
 			background-color: $tab-label-expanded-bg-color;
 			border: 1px solid $tab-label-expanded-border-color;
-			border-bottom: 0 none;
+			border-bottom: 0;
+			padding-bottom: 8px;
+			margin-top: -1px;
+			vertical-align: baseline;
 
 			.tabfilter-item-link {
 				color: $tab-label-expanded-color;
 			}
 
-			&::before {
-				position: absolute;
-				bottom: -7px;
-				left: -1px;
-				display: block;
-				width: 100%;
-				height: 9px;
-				background-color: $tab-label-expanded-bg-color;
-				border-left: 1px solid $tab-label-expanded-border-color;
-				border-right: 1px solid $tab-label-expanded-border-color;
-				content: '';
-			}
-
 			&:hover,
 			&.focused {
 				background: $tab-label-focus-bg-color;
-				box-shadow: none;
 
 				&::before {
 					background: $tab-label-focus-bg-color;
@@ -156,7 +141,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		&.selected {
 			background-color: darken($tab-label-selected-bg-color, 5%);
-			// border: 1px solid $tab-label-selected-border-color;
 
 			.tabfilter-item-link {
 				color: $tab-label-selected-color;
@@ -165,6 +149,10 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			.tabfilter-item-link[data-counter]::after {
 				display: none;
 			}
+		}
+
+		&.focused {
+			box-shadow: 0 0 0 2px rgba($blue, .35);
 		}
 
 		&.disabled {
@@ -177,7 +165,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 	}
 
-	/* tab filter label li clickable a element */
+	// Tab filter label li clickable a element.
 	.tabfilter-item-link {
 		display: inline-block;
 		color: $tab-label-color;
@@ -188,7 +176,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	}
 
 	.icon-edit {
-		//@extend .btn-widget-edit;
 		@extend %btn-widget-defaults;
 		width: 24px;
 		height: 22px;
@@ -201,7 +188,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		opacity: 0;
 	}
 
-	/* tab filter contents container */
+	// Tab filter contents container.
 	.tabfilter-tabs-container {
 		.filter-container.time-selection-container {
 			border: 0 none;
@@ -240,24 +227,12 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 .icon-home::before {
 	display: block;
 	width: 22px;
-	height: 22px;
+	height: 24px;
 	content: '';
 	// white icon
-	background: url($sprite-path) no-repeat -433px -510px;
+	background: url($sprite-path) no-repeat -432px -510px;
 }
 .selected.expanded .icon-home::before {
 	// grey icon
-	background: url($sprite-path) no-repeat -121px -510px;
-}
-
-@if $theme-name == 'hc-dark' {
-	.selected.expanded .icon-home::before {
-		// white icon
-		background: url($sprite-path) no-repeat -433px -510px;
-	}
-
-	.icon-home::before {
-		// black icon
-		background: url($sprite-path) no-repeat -281px -510px;
-	}
+	background: url($sprite-path) no-repeat -120px -510px;
 }
