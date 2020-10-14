@@ -128,7 +128,6 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
-		require_once 'include/menu.inc.php';
 		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
@@ -642,8 +641,8 @@ class ZBase {
 	 */
 	private function initComponents() {
 		$this->component_registry->register('router', new CRouter());
-		$this->component_registry->register('menu.main', getMainMenu());
-		$this->component_registry->register('menu.user', getUserMenu());
+		$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
+		$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
 	}
 
 	/**

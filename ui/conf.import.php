@@ -182,7 +182,7 @@ switch (getRequest('rules_preset')) {
 		break;
 
 	default:
-		$data['backurl'] = ZBX_DEFAULT_URL;
+		$data['backurl'] = CMenuHelper::getFirstUrl();
 
 		break;
 }
