@@ -458,10 +458,11 @@ class CSetupWizard extends CForm {
 		$timezones += (new CDateTimeZoneHelper())->getAllDateTimeZones();
 
 		$table = (new CFormList())
-			->addRow(_('Default time zone'),
+			->addRow(new CLabel(_('Default time zone'), 'default-timezone-select'),
 				(new CSelect('default_timezone'))
 					->setValue($this->getConfig('default_timezone', ZBX_DEFAULT_TIMEZONE))
 					->addOptions(CSelect::createOptionsFromArray($timezones))
+					->setFocusableElementId('default-timezone-select')
 			)
 			->addRow(_('Default theme'),
 				new CComboBox('default_theme', $this->getConfig('default_theme'), 'submit()', APP::getThemes())

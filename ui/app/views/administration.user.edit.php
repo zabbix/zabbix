@@ -186,13 +186,14 @@ else {
 
 	$timezone_combobox
 		->addOptions(CSelect::createOptionsFromArray($data['timezones']))
-		->setValue($data['timezone']);
+		->setValue($data['timezone'])
+		->setFocusableElementId('timezone-select');
 	$theme_combobox->addItems(APP::getThemes());
 }
 
 $user_form_list
 	->addRow(_('Language'), $lang_combobox)
-	->addRow(_('Time zone'), $timezone_combobox)
+	->addRow(new CLabel(_('Time zone'), 'timezone-select'), $timezone_combobox)
 	->addRow(_('Theme'), $theme_combobox);
 
 // Append auto-login & auto-logout to form list.

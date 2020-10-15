@@ -69,10 +69,11 @@ $gui_tab = (new CFormList())
 			? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
 			: $lang_combobox
 	)
-	->addRow(_('Default time zone'),
+	->addRow(new CLabel(_('Default time zone'), 'default-timezone-select'),
 		(new CSelect('default_timezone'))
 			->addOptions(CSelect::createOptionsFromArray($data['timezones']))
 			->setValue($data['default_timezone'])
+			->setFocusableElementId('default-timezone-select')
 	)
 	->addRow(_('Default theme'),
 		new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes())
