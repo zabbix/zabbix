@@ -1640,7 +1640,7 @@ static int	DBpatch_5010062(void)
 	return DBdrop_field("users", "type");
 }
 
-static int      DBpatch_5010063(void)
+static int	DBpatch_5010063(void)
 {
 	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
