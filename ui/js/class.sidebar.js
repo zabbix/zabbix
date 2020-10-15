@@ -120,7 +120,7 @@ class CSidebar extends CBaseComponent {
 			this._is_opened = false;
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-				ZABBIX.MenuMain.collapseAll();
+				ZABBIX.MenuMain.collapseExpanded();
 				this._sidebar_scrollable.scrollTop = 0;
 			}
 
@@ -209,6 +209,9 @@ class CSidebar extends CBaseComponent {
 					if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
 						setTimeout(() => this.close());
 					}
+					else {
+						ZABBIX.MenuMain.expandSelected();
+					}
 
 					this.fire(SIDEBAR_EVENT_BLUR);
 				}
@@ -260,7 +263,7 @@ class CSidebar extends CBaseComponent {
 
 			viewmodechange: (e) => {
 				if (e.target.classList.contains('button-compact')) {
-					ZABBIX.MenuMain.collapseAll();
+					ZABBIX.MenuMain.collapseExpanded();
 					clearTimeout(this._expand_timer);
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
 				}

@@ -50,6 +50,10 @@ class CMenuItem extends CBaseComponent {
 		this._toggle.blur();
 	}
 
+	isExpanded() {
+		return this._is_expanded;
+	}
+
 	isSelected() {
 		return this._is_selected;
 	}
