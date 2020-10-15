@@ -667,10 +667,11 @@ function getTopLevelTemplates($applicationid, array $parent_templates) {
  *
  * @param string $applicationid
  * @param array  $parent_templates  The list of the templates, prepared by getApplicationParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeApplicationTemplatePrefix($applicationid, array $parent_templates) {
+function makeApplicationTemplatePrefix($applicationid, array $parent_templates, bool $provide_links) {
 	if (!array_key_exists($applicationid, $parent_templates['links'])) {
 		return null;
 	}
@@ -681,7 +682,7 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 	$list = [];
 
 	foreach ($templates as $template) {
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = (new CLink(CHtml::encode($template['name']),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'application.list')
