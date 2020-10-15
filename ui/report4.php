@@ -290,9 +290,10 @@ else {
 	$widget->addItem($table);
 
 	if ($media_type == 0) {
+		$allowed_ui_media_types = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 		$links = [];
 		foreach ($media_types as $id => $name) {
-			$links[] = (CWebUser::getType() < USER_TYPE_SUPER_ADMIN)
+			$links[] = !$allowed_ui_media_types
 				? $name
 				: new CLink($name, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
 			$links[] = SPACE.'/'.SPACE;
