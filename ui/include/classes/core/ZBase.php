@@ -646,13 +646,13 @@ class ZBase {
 	}
 
 	/**
-	 * Initialize module manager and load all enabled modules.
+	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
 	private function initModuleManager() {
 		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
 
 		$db_modules = API::getApiService('module')->get([
-			'output' => ['id', 'relative_path', 'config'],
+			'output' => ['moduleid', 'id', 'relative_path', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'sortfield' => 'relative_path'
 		], false);
@@ -660,6 +660,10 @@ class ZBase {
 		$modules_missing = [];
 
 		foreach ($db_modules as $db_module) {
+			if (!CWebUser::checkAccess(CRoleHelper::MODULES_MODULE.$db_module['moduleid'])) {
+				continue;
+			}
+
 			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['id'],
 				$db_module['config']
 			);
