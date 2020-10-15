@@ -28,7 +28,8 @@ class CAction extends CApiService {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'validateoperationsintegrity' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
 	protected $tableName = 'actions';

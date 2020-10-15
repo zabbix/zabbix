@@ -1329,7 +1329,8 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 	if (NULL == recipient_userid || *userid == *recipient_userid)
 		goto out;
 
-	result = DBselect("select type from users where userid=" ZBX_FS_UI64, *recipient_userid);
+	result = DBselect("select r.type from users u,role r where u.roleid=r.roleid and"
+			" userid=" ZBX_FS_UI64, *recipient_userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		user_type = atoi(row[0]);
