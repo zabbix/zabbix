@@ -752,9 +752,9 @@ class CRole extends CApiService {
 					$module_rules = array_key_exists('modules', $rules[$roleid]) ? $rules[$roleid]['modules'] : [];
 					$modules = [];
 					foreach ($module_rules as $key => $value) {
-						$index = substr($key, strrpos($key, '.') + 1);
+						$index = mb_substr($key, mb_strrpos($key, '.') + 1);
 
-						if (strpos($key, 'modules.module.moduleid') === 0) {
+						if (mb_strpos($key, 'module.moduleid') === 0) {
 							$modules[$index]['moduleid'] = $value;
 						}
 						else {
