@@ -936,6 +936,8 @@ footer {
         white-space: nowrap;
         margin-left: 3px;
         margin-right: 3px; }
+    .filter-container.tabfilter-container nav > ul > li:nth-child(3) > ul > li {
+      vertical-align: top; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(1), .filter-container.tabfilter-container nav > ul > li:nth-child(3) {
       white-space: nowrap; }
   .filter-container.tabfilter-container nav {

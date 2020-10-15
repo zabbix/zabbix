@@ -47,7 +47,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		margin: 0 3px 5px 0;
 		padding-top: 3px;
 
-		// Container with sortable tab items. Occupy space left with overflow and scrolling of content (javascript)
+		// Container with sortable tab items. Occupy space left with overflow and scrolling of content (javascript).
 		&:nth-child(2) {
 			flex-grow: 1;
 			overflow: hidden;
@@ -59,6 +59,12 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 				white-space: nowrap;
 				margin-left: 3px;
 				margin-right: 3px;
+			}
+		}
+
+		&:nth-child(3) {
+			> ul > li {
+				vertical-align: top;
 			}
 		}
 
