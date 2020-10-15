@@ -95,6 +95,8 @@ int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex);
 void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex);
 void	zbx_mutex_destroy(zbx_mutex_t *mutex);
+zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name);
+zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name);
 
 #ifdef _WINDOWS
 zbx_mutex_name_t	zbx_mutex_create_per_process_name(const zbx_mutex_name_t prefix);

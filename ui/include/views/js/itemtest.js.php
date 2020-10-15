@@ -225,6 +225,15 @@
 					password: form_data['password'],
 				};
 				break;
+
+			case <?= ITEM_TYPE_SCRIPT ?>:
+				properties = {
+					key: form_data['key'].trim(),
+					parameters: form_data['parameters'],
+					script: form_data['script'],
+					timeout: form_data['timeout']
+				};
+				break;
 		}
 
 		// Common properties.

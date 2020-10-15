@@ -1464,6 +1464,34 @@ static int	DBpatch_5010048(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5010049(void)
+{
+	const ZBX_TABLE	table =
+			{"item_parameter", "item_parameterid", 0,
+				{
+					{"item_parameterid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5010050(void)
+{
+	return DBcreate_index("item_parameter", "item_parameter_1", "itemid", 0);
+}
+
+static int	DBpatch_5010051(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_parameter", 1, &field);
+}
 #endif
 
 DBPATCH_START(5010)
@@ -1519,5 +1547,8 @@ DBPATCH_ADD(5010045, 0, 1)
 DBPATCH_ADD(5010046, 0, 1)
 DBPATCH_ADD(5010047, 0, 1)
 DBPATCH_ADD(5010048, 0, 1)
+DBPATCH_ADD(5010049, 0, 1)
+DBPATCH_ADD(5010050, 0, 1)
+DBPATCH_ADD(5010051, 0, 1)
 
 DBPATCH_END()

@@ -1180,7 +1180,7 @@ jQuery(function($) {
 	}
 
 	function isSearchFieldVisible($obj) {
-		return !$obj.hasClass('.search-disabled');
+		return !$obj.hasClass('search-disabled');
 	}
 
 	function getLimit($obj) {

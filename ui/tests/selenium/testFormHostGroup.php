@@ -110,6 +110,9 @@ class testFormHostGroup extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
+	/**
+	 * @depends testFormHostGroup_Update
+	 */
 	public function testFormHostGroup_Delete() {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->zbxTestClickLinkTextWait($this->hostGroup.' 2');

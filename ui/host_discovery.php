@@ -69,7 +69,7 @@ $fields = [
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -94,7 +94,7 @@ $fields = [
 								],
 	$paramsFieldName =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update}))'.
 									' && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.
-										ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'
+										ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED.','.ITEM_TYPE_SCRIPT, 'type'
 									),
 									getParamFieldLabelByType(getRequest('type', 0))
 								],
@@ -120,7 +120,7 @@ $fields = [
 	],
 	'timeout' => 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
 									'(isset({add}) || isset({update})) && isset({type})'.
-										' && {type} == '.ITEM_TYPE_HTTPAGENT,
+										' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
 									_('Timeout')
 								],
 	'url' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -129,6 +129,7 @@ $fields = [
 									_('URL')
 								],
 	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'parameters' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>		[T_ZBX_INT, O_OPT, null,
@@ -220,7 +221,7 @@ $fields = [
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 									]),
 									null
 								],
@@ -545,6 +546,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$newItem = prepareItemHttpAgentFormData($http_item) + $newItem;
 		}
 
+		if ($newItem['type'] == ITEM_TYPE_SCRIPT) {
+			$script_item = [
+				'parameters' => getRequest('parameters', []),
+				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+			];
+
+			$newItem = prepareScriptItemFormData($script_item) + $newItem;
+		}
+
 		if ($newItem['type'] == ITEM_TYPE_JMX) {
 			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
 		}
@@ -601,8 +611,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if (hasRequest('update')) {
 			DBstart();
 
-			// unset unchanged values
-			$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
+			// Unset equal values if item script type and parameters have not changed.
+			$compare = function($arr, $arr2) {
+				return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
+					array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
+				);
+			};
+			if ($newItem['type'] == ITEM_TYPE_SCRIPT && $newItem['type'] == $item['type']
+					&& $compare($item['parameters'], $newItem['parameters'])) {
+				unset($newItem['parameters']);
+			}
+
+			if ($newItem['type'] == $item['type']) {
+				$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
+			}
 
 			// don't update the filter if it hasn't changed
 			$conditionsChanged = false;

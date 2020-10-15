@@ -44,7 +44,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP
+		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 	];
 
 	/**
@@ -91,7 +91,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected $items_support_proxy = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_SNMP
+		ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 	];
 
 	/**
@@ -183,7 +183,19 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
+		'parameters' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
 		'params_f' => [],
+		'script' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'timeout' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
 		'ipmi_sensor' => [
 			'support_user_macros' => false,
 			'support_lld_macros' => true
@@ -655,6 +667,15 @@ abstract class CControllerPopupItemTest extends CController {
 					$data['interface']['dns'],  $data['interface']['port']
 				);
 				break;
+
+			case ITEM_TYPE_SCRIPT:
+				$data += [
+					'key' => $input['key'],
+					'parameters' => array_key_exists('parameters', $input) ? $input['parameters'] : [],
+					'script' => array_key_exists('script', $input) ? $input['script'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null
+				];
+				break;
 		}
 
 		return $data;
@@ -788,9 +809,7 @@ abstract class CControllerPopupItemTest extends CController {
 							$data['interface']['details']['privpassphrase']
 						);
 					}
-					elseif (
-						$data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-					) {
+					elseif ($data['interface']['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
 						unset($data['interface']['details']['privprotocol'],
 							$data['interface']['details']['privpassphrase']
 						);
@@ -811,6 +830,11 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 			elseif ($key === 'query_fields') {
 				if ($value === '[]') {
+					unset($data[$key]);
+				}
+			}
+			elseif ($key === 'parameters') {
+				if (!$value) {
 					unset($data[$key]);
 				}
 			}
@@ -875,6 +899,30 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return json_encode($result);
+	}
+
+	/**
+	 * Transform front-end familiar array of parameters fields to the form server is capable to handle. Server expects
+	 * one object where parameter names are keys and parameter values are values. Note that parameter names are unique.
+	 *
+	 * @param array $data
+	 * @param array $data[name]   Indexed array of names.
+	 * @param array $data[value]  Indexed array of values.
+	 *
+	 * @return array
+	 */
+	protected function transformParametersFields(array $data): array {
+		$result = [];
+
+		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
+			foreach (array_keys($data['name']) as $num) {
+				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
+					$result += [$data['name'][$num] => $data['value'][$num]];
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -1039,7 +1087,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 
 			// Get strings to resolve and types of supported macros.
-			if ($field === 'query_fields' || $field === 'headers') {
+			if ($field === 'query_fields' || $field === 'headers' || $field === 'parameters') {
 				if (!array_key_exists($field, $inputs) || !$inputs[$field]) {
 					continue;
 				}

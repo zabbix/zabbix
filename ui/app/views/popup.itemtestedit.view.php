@@ -51,7 +51,7 @@ foreach ($data['inputs'] as $name => $value) {
 	elseif ($name === 'proxy_hostid') {
 		continue;
 	}
-	elseif ($name === 'query_fields' || $name === 'headers') {
+	elseif ($name === 'query_fields' || $name === 'headers' || $name === 'parameters') {
 		foreach (['name', 'value'] as $key) {
 			if (array_key_exists($key, $value)) {
 				$form->addVar($name.'['.$key.']', $value[$key]);

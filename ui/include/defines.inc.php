@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0rc1');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010048);
+define('ZABBIX_DB_VERSION',		5010051);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -490,6 +490,7 @@ define('ITEM_TYPE_SNMPTRAP',		17);
 define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
 define('ITEM_TYPE_SNMP',			20);
+define('ITEM_TYPE_SCRIPT',			21);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);

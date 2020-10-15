@@ -1,5 +1,3 @@
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,20 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
+#ifndef ZABBIX_CHECKS_SCRIPT_H
+#define ZABBIX_CHECKS_SCRIPT_H
 
-func getMetrics() []string {
-	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
-		"proc.mem", "Memory used by process in bytes.",
-		"proc.num", "The number of processes.",
-		"system.hw.chassis", "Chassis information.",
-		"system.hw.devices", "Listing of PCI or USB devices.",
-		"system.sw.packages", "Listing of installed packages.",
-		"system.users.num", "Number of users logged in.",
-		"vfs.dir.count", "Directory entry count.",
-		"vfs.dir.size", "Directory size (in bytes).",
-		"vm.memory.size", "Memory size in bytes or in percentage from total.",
-	}
-}
+#include "common.h"
+#include "dbcache.h"
+
+void	scriptitem_es_engine_init(void);
+void	scriptitem_es_engine_destroy(void);
+int	get_value_script(DC_ITEM *item, AGENT_RESULT *result);
+
+#endif
