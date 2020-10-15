@@ -253,15 +253,11 @@ class CLocalApiClient extends CApiClient {
 				' AND ('.
 					'name LIKE "'.CRoleHelper::SECTION_API.'%"'.
 					(($action !== '') ? ' OR name='.zbx_dbstr($action) : '').
-				')'.
-			' ORDER by name'
+				')'
 		);
 
 		$api_access_mode = false;
-		$api_method_masks = [
-			CRoleHelper::API_WILDCARD, CRoleHelper::API_WILDCARD_ALIAS, CRoleHelper::API_ANY_SERVICE.$method,
-			$api.CRoleHelper::API_ANY_METHOD
-		];
+		$api_methods = [];
 
 		while ($db_rule = DBfetch($db_rules)) {
 			$rule_value = $db_rule[CRole::RULE_VALUE_TYPES[$db_rule['type']]];
@@ -274,11 +270,25 @@ class CLocalApiClient extends CApiClient {
 			if ($db_rule['name'] === CRoleHelper::API_MODE) {
 				$api_access_mode = (bool) $rule_value;
 			}
-			elseif ($rule_value === $api.'.'.$method || in_array($rule_value, $api_method_masks)) {
+			else {
+				$api_methods[] = $rule_value;
+			}
+		}
+
+		if (!$api_methods) {
+			return true;
+		}
+
+		$api_method_masks = [
+			CRoleHelper::API_WILDCARD, CRoleHelper::API_WILDCARD_ALIAS, CRoleHelper::API_ANY_SERVICE.$method,
+			$api.CRoleHelper::API_ANY_METHOD
+		];
+		foreach ($api_methods as $api_method) {
+			if ($api_method === $api.'.'.$method || in_array($api_method, $api_method_masks)) {
 				return $api_access_mode;
 			}
 		}
 
-		return true;
+		return !$api_access_mode;
 	}
 }
