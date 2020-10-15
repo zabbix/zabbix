@@ -26,11 +26,13 @@
 $widget = (new CWidget())
 	->setTitle(_('Maintenance periods'))
 	->setControls(
-		(new CTag('nav', true, (new CRedirectButton(_('Create maintenance period'), (new CUrl('maintenance.php'))
-			->removeArgument('maintenanceid')
-			->setArgument('form', 'create')
-			->getUrl()
-		))->setEnabled($data['allowed_edit'])))->setAttribute('aria-label', _('Content controls'))
+		(new CTag('nav', true,
+			(new CRedirectButton(_('Create maintenance period'), (new CUrl('maintenance.php'))
+				->removeArgument('maintenanceid')
+				->setArgument('form', 'create')
+				->getUrl()
+			))->setEnabled($data['allowed_edit']))
+		)->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter(new CUrl('maintenance.php')))
 		->setProfile($data['profileIdx'])

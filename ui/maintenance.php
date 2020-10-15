@@ -99,7 +99,7 @@ if (hasRequest('action') && (!hasRequest('maintenanceids') || !is_array(getReque
 $allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 
 if (!$allowed_edit && hasRequest('form') && getRequest('form') !== 'update') {
-	access_deny();
+	access_deny(ACCESS_DENY_PAGE);
 }
 
 /*
@@ -111,7 +111,7 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (!$allowed_edit) {
-		access_deny();
+		access_deny(ACCESS_DENY_PAGE);
 	}
 
 	if (hasRequest('update')) {
@@ -199,7 +199,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdelete') {
 	if (!$allowed_edit) {
-		access_deny();
+		access_deny(ACCESS_DENY_PAGE);
 	}
 
 	$maintenanceids = getRequest('maintenanceid', []);
