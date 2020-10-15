@@ -1102,7 +1102,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$this->checkNoParameters($trigger, $read_only_fields_tmpl, $error_cannot_update_tmpl, $description);
 			}
 
-			if (array_key_exists('event_name', $trigger) && $db_triggers['event_name'] !== $trigger['event_name']
+			if (array_key_exists('event_name', $trigger) && $_db_trigger['event_name'] !== $trigger['event_name']
 					&& !$eventname_validator->validate($trigger['event_name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', 'event_name', $eventname_validator->getError())
