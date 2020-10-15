@@ -1607,7 +1607,7 @@ static int	DBpatch_5010058(void)
 
 static int	DBpatch_5010059(void)
 {
-	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("users", &field);
 }
@@ -1630,31 +1630,38 @@ static int	DBpatch_5010060(void)
 
 static int	DBpatch_5010061(void)
 {
+	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("users", &field);
+}
+
+static int	DBpatch_5010062(void)
+{
 	return DBdrop_field("users", "type");
 }
 
-static int      DBpatch_5010062(void)
+static int      DBpatch_5010063(void)
 {
 	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("users", 1, &field);
 }
 
-static int	DBpatch_5010063(void)
+static int	DBpatch_5010064(void)
 {
 	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("role_rule", 1, &field);
 }
 
-static int	DBpatch_5010064(void)
+static int	DBpatch_5010065(void)
 {
 	const ZBX_FIELD field = {"value_moduleid", NULL, "module", "moduleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("role_rule", 2, &field);
 }
 
-static int	DBpatch_5010065(void)
+static int	DBpatch_5010066(void)
 {
 	int	i;
 
@@ -1759,5 +1766,6 @@ DBPATCH_ADD(5010062, 0, 1)
 DBPATCH_ADD(5010063, 0, 1)
 DBPATCH_ADD(5010064, 0, 1)
 DBPATCH_ADD(5010065, 0, 1)
+DBPATCH_ADD(5010066, 0, 1)
 
 DBPATCH_END()
