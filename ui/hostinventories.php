@@ -77,7 +77,6 @@ if ($hostId > 0) {
 		'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
 		'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 		'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-		'allowed_ui_dashboard' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD),
 		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 	];
 

@@ -164,7 +164,7 @@ $overviewFormList->addRow(_('Monitoring'),
 					->setArgument('filter_hostids', [$data['host']['hostid']])
 			)
 			: _('Graphs'),
-		$data['allowed_ui_dashboard']
+		$data['allowed_ui_hosts']
 			? new CLink(_('Dashboards'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'host.dashboard.view')
 				->setArgument('hostid', $data['host']['hostid'])
