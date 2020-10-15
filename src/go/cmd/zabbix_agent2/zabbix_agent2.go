@@ -349,6 +349,10 @@ func main() {
 		}
 		agent.FirstHostname = hostnames[0]
 
+		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+			fatalExit("cannot process configuration", err)
+		}
+
 		if argTest {
 			checkMetric(m, testFlag)
 		} else {

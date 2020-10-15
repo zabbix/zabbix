@@ -19,20 +19,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixsync
+package swap
 
-func getMetrics() []string {
-	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
-		"proc.mem", "Memory used by process in bytes.",
-		"proc.num", "The number of processes.",
-		"system.hw.chassis", "Chassis information.",
-		"system.hw.devices", "Listing of PCI or USB devices.",
-		"system.sw.packages", "Listing of installed packages.",
-		"system.users.num", "Number of users logged in.",
-		"vfs.dir.count", "Directory entry count.",
-		"vfs.dir.size", "Directory size (in bytes).",
-		"vm.memory.size", "Memory size in bytes or in percentage from total.",
+import "syscall"
+
+func getSwap() (uint64, uint64, error) {
+	info := &syscall.Sysinfo_t{}
+	if err := syscall.Sysinfo(info); err != nil {
+		return 0, 0, err
 	}
+
+	return info.Totalswap, info.Freeswap, nil
 }

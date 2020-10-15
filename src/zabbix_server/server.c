@@ -110,7 +110,7 @@ const char	*help_message[] = {
 	"      " ZBX_SECRETS_RELOAD "             Reload secrets from Vault",
 	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
 	"                                 section (historycache, preprocessing, alerting,",
-	"                                 lld, valuecache) or everything if section is",
+	"                                 lld, valuecache, locks) or everything if section is",
 	"                                 not specified",
 	"",
 	"      Log level control targets:",
@@ -985,7 +985,7 @@ static void	zbx_main_sigusr_handler(int flags)
 		{
 			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
 					(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
-					(1 << ZBX_DIAGINFO_ALERTING);
+					(1 << ZBX_DIAGINFO_ALERTING) | (1 << ZBX_DIAGINFO_LOCKS);
 		}
 		else
 			zbx_diaginfo_scope = 1 << scope;

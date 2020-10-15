@@ -1483,7 +1483,7 @@ static int	DBpatch_5010049(void)
 
 static int	DBpatch_5010050(void)
 {
-	return DBcreate_index("item_parameter", "item_parameter_1", "itemid", 1);
+	return DBcreate_index("item_parameter", "item_parameter_1", "itemid", 0);
 }
 
 static int	DBpatch_5010051(void)
