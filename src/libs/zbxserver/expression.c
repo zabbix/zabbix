@@ -657,7 +657,8 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_
 
 	if (NULL != userid)
 	{
-		result = DBselect("select type from users where userid=" ZBX_FS_UI64, *userid);
+		result = DBselect("select r.type from users u,role r where u.roleid=r.roleid and"
+				"userid=" ZBX_FS_UI64, *userid);
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 			user_type = atoi(row[0]);
@@ -770,7 +771,8 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64
 
 	if (NULL != userid)
 	{
-		result = DBselect("select type from users where userid=" ZBX_FS_UI64, *userid);
+		result = DBselect("select r.type from users u,role r where u.roleid=r.roleid and"
+				"userid=" ZBX_FS_UI64, *userid);
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 			user_type = atoi(row[0]);
