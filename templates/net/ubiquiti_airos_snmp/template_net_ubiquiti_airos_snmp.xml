@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:30:19Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:41Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Ubiquiti AirOS SNMP</template>
-         <name>Template Net Ubiquiti AirOS SNMP</name>
+         <template>Ubiquiti AirOS SNMP</template>
+         <name>Ubiquiti AirOS SNMP</name>
          <description>Template Net Ubiquiti AirOS&#13;
 &#13;
 MIBs used:&#13;
@@ -35,13 +35,13 @@ Known Issues:&#13;
   Version: all above&#13;
   Device: NanoStation, UAP-LR&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
             <template>
-               <name>Template Module Interfaces Simple SNMP</name>
+               <name>Interfaces Simple SNMP</name>
             </template>
          </templates>
          <groups>
@@ -272,7 +272,7 @@ Total memory in Bytes</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Ubiquiti AirOS SNMP</host>
+                  <host>Ubiquiti AirOS SNMP</host>
                   <key>system.cpu.util[loadValue.2]</key>
                </item>
             </graph_item>
@@ -287,7 +287,7 @@ Total memory in Bytes</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template Net Ubiquiti AirOS SNMP</host>
+                  <host>Ubiquiti AirOS SNMP</host>
                   <key>vm.memory.util[memoryUsedPercentage]</key>
                </item>
             </graph_item>

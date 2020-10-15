@@ -150,12 +150,15 @@
 
 						const $dropdown_btn = jQuery('#macros_' + macro_num + '_type_btn');
 
+						const dropdown_btn_classes = {
+							'<?= ZBX_MACRO_TYPE_TEXT ?>': '<?= ZBX_STYLE_ICON_TEXT ?>',
+							'<?= ZBX_MACRO_TYPE_SECRET ?>': '<?= ZBX_STYLE_ICON_INVISIBLE ?>',
+							'<?= ZBX_MACRO_TYPE_VAULT ?>': '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
+						};
+
 						$dropdown_btn
 							.removeClass()
-							.addClass(['btn-alt', 'btn-dropdown-toggle', (macro_type == <?= ZBX_MACRO_TYPE_SECRET ?>)
-								? '<?= ZBX_STYLE_ICON_SECRET_TEXT ?>'
-								: '<?= ZBX_STYLE_ICON_TEXT ?>'
-							].join(' '));
+							.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[macro_type]].join(' '));
 
 						jQuery('input[type=hidden]', $dropdown_btn.parent())
 							.val(macro_type)
@@ -277,6 +280,12 @@
 			linked_templates = <?= json_encode($data['macros_tab']['linked_templates']) ?>,
 			add_templates = <?= json_encode($data['macros_tab']['add_templates']) ?>,
 			macros_initialized = false;
+
+		$('#host, #template_name')
+			.on('input keydown paste', function() {
+				$('#visiblename').attr('placeholder', $(this).val());
+			})
+			.trigger('input');
 
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
 			var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;

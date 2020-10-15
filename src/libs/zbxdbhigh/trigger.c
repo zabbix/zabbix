@@ -122,13 +122,13 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 				trigger->expression_orig, trigger->recovery_expression_orig,
 				trigger->priority, trigger->type, &trigger->tags,
 				trigger->correlation_mode, trigger->correlation_tag, trigger->value, trigger->opdata,
-				NULL);
+				trigger->event_name, NULL);
 	}
 
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 	{
 		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, new_state, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL,
+				&trigger->timespec, new_state, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL,
 				new_error);
 	}
 

@@ -26,9 +26,13 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$form->addItem(CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $fields['rf_rate']
-));
+$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
+
+$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
+);
+
+$form->addItem($form_list);
 
 return [
 	'form' => $form

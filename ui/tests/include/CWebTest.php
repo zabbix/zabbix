@@ -472,6 +472,11 @@ class CWebTest extends CTest {
 				$this->fail($message."\n".'Cannot save current screenshot.');
 			}
 
+			if ($compare['ref'] !== null
+					&& file_put_contents(PHPUNIT_SCREENSHOT_DIR.'src_'.$name, $compare['ref']) === false) {
+				$this->fail($message."\n".'Cannot save reference screenshot.');
+			}
+
 			if ($compare['diff'] !== null) {
 				if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'diff_'.$name, $compare['diff']) === false) {
 					$this->fail($message."\n".'Cannot save screenshot diff.');

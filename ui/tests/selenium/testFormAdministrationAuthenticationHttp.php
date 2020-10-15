@@ -538,7 +538,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 			// Check user data in DB after login.
 			$session_cookie = $this->webDriver->manage()->getCookieNamed(ZBX_SESSION_NAME);
-			$session_cookie = unserialize(base64_decode($session_cookie['value']));
+			$session_cookie = json_decode(base64_decode(urldecode($session_cookie['value'])), true);
 			$session = $session_cookie['sessionid'];
 
 			$user_data = CDBHelper::getRow(

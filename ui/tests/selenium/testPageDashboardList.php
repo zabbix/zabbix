@@ -156,7 +156,7 @@ class testPageDashboardList extends CWebTest {
 	}
 
 	/**
-	 * Check that My and Sharing tags displays corectly in Dashboard Lists for Admin.
+	 * Check that My and Sharing tags displays correctly in Dashboard Lists for Admin.
 	 */
 	public function testPageDashboardList_CheckOwners() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
@@ -213,7 +213,7 @@ class testPageDashboardList extends CWebTest {
 		$this->assertRowCount(0);
 
 		// Check database.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE templateid IS NULL'));
 	}
 
 	/**
@@ -226,7 +226,7 @@ class testPageDashboardList extends CWebTest {
 	private function getTagText($table, $column, $color) {
 		$row = $table->findRow('Name', $column, true);
 
-		return $row->query('xpath://span[@class="tag '.$color.'-bg"]')->one()->getText();
+		return $row->query('xpath://span[@class="status-'.$color.'"]')->one()->getText();
 	}
 
 	/**

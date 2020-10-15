@@ -355,12 +355,11 @@ function makeSystemStatus(array $filter, array $data) {
 
 	$url_group = (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
-		->setArgument('filter_set', 1)
-		->setArgument('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM)
-		->setArgument('filter_groupids', null)
-		->setArgument('filter_hostids', array_key_exists('hostids', $filter) ? $filter['hostids'] : null)
-		->setArgument('filter_name', array_key_exists('problem', $filter) ? $filter['problem'] : null)
-		->setArgument('filter_show_suppressed',
+		->setArgument('filter_name', '')
+		->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
+		->setArgument('hostids', array_key_exists('hostids', $filter) ? $filter['hostids'] : [])
+		->setArgument('name', array_key_exists('problem', $filter) ? $filter['problem'] : null)
+		->setArgument('show_suppressed',
 			(array_key_exists('show_suppressed', $filter) && $filter['show_suppressed'] == 1)
 				? 1
 				: null
@@ -371,7 +370,7 @@ function makeSystemStatus(array $filter, array $data) {
 			continue;
 		}
 
-		$url_group->setArgument('filter_groupids', [$group['groupid']]);
+		$url_group->setArgument('groupids', [$group['groupid']]);
 		$row = [new CLink($group['name'], $url_group->getUrl())];
 
 		foreach ($group['stats'] as $severity => $stat) {
@@ -486,7 +485,7 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
 			continue;
 		}
 
-		$groupurl->setArgument('filter_groupids', [$group['groupid']]);
+		$groupurl->setArgument('groupids', [$group['groupid']]);
 		$row = [new CLink($group['name'], $groupurl->getUrl())];
 
 		foreach ($group['stats'] as $severity => $stat) {

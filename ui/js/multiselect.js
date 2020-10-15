@@ -19,19 +19,7 @@
 
 
 jQuery(function($) {
-	var ZBX_STYLE_CLASS = 'multiselect-control',
-		KEY = {
-			ARROW_DOWN: 40,
-			ARROW_LEFT: 37,
-			ARROW_RIGHT: 39,
-			ARROW_UP: 38,
-			BACKSPACE: 8,
-			DELETE: 46,
-			ENTER: 13,
-			ESCAPE: 27,
-			TAB: 9
-		};
-
+	var ZBX_STYLE_CLASS = 'multiselect-control';
 	const MS_ACTION_POPUP = 0;
 	const MS_ACTION_AUTOSUGGEST = 1;
 
@@ -492,11 +480,11 @@ jQuery(function($) {
 			})
 				.on('keyup', function(e) {
 					switch (e.which) {
-						case KEY.ARROW_DOWN:
-						case KEY.ARROW_LEFT:
-						case KEY.ARROW_RIGHT:
-						case KEY.ARROW_UP:
-						case KEY.ESCAPE:
+						case KEY_ARROW_DOWN:
+						case KEY_ARROW_LEFT:
+						case KEY_ARROW_RIGHT:
+						case KEY_ARROW_UP:
+						case KEY_ESCAPE:
 							return false;
 					}
 
@@ -570,13 +558,13 @@ jQuery(function($) {
 				})
 				.on('keydown', function(e) {
 					switch (e.which) {
-						case KEY.TAB:
-						case KEY.ESCAPE:
+						case KEY_TAB:
+						case KEY_ESCAPE:
 							hideAvailable($obj);
 							cleanSearchInput($obj);
 							break;
 
-						case KEY.ENTER:
+						case KEY_ENTER:
 							if ($input.val() !== '') {
 								var $selected = $('li.suggest-hover', ms.values.available_div);
 
@@ -589,7 +577,7 @@ jQuery(function($) {
 							}
 							break;
 
-						case KEY.ARROW_LEFT:
+						case KEY_ARROW_LEFT:
 							if ($input.val() === '') {
 								var $collection = $('.selected li', $obj);
 
@@ -605,7 +593,7 @@ jQuery(function($) {
 							}
 							break;
 
-						case KEY.ARROW_RIGHT:
+						case KEY_ARROW_RIGHT:
 							if ($input.val() === '') {
 								var $collection = $('.selected li', $obj);
 
@@ -621,13 +609,13 @@ jQuery(function($) {
 							}
 							break;
 
-						case KEY.ARROW_UP:
-						case KEY.ARROW_DOWN:
+						case KEY_ARROW_UP:
+						case KEY_ARROW_DOWN:
 							var $collection = $('li', ms.values.available_div.filter(':visible')),
 								$selected = $collection.filter('.suggest-hover').removeClass('suggest-hover');
 
 							if ($selected.length) {
-								$selected = (e.which == KEY.ARROW_UP)
+								$selected = (e.which == KEY_ARROW_UP)
 									? ($selected.is(':first-child') ? $collection.last() : $selected.prev())
 									: ($selected.is(':last-child') ? $collection.first() : $selected.next());
 
@@ -639,8 +627,8 @@ jQuery(function($) {
 
 							return false;
 
-						case KEY.BACKSPACE:
-						case KEY.DELETE:
+						case KEY_BACKSPACE:
+						case KEY_DELETE:
 							if ($input.val() === '') {
 								var $selected = $('.selected li.selected', $obj);
 
@@ -651,7 +639,7 @@ jQuery(function($) {
 									if (typeof item.disabled === 'undefined' || !item.disabled) {
 										var aria_text = sprintf(t('Removed, %1$s'), $selected.data('label'));
 
-										$selected = (e.which == KEY.BACKSPACE)
+										$selected = (e.which == KEY_BACKSPACE)
 											? ($selected.is(':first-child') ? $selected.next() : $selected.prev())
 											: ($selected.is(':last-child') ? $selected.prev() : $selected.next());
 
@@ -679,7 +667,7 @@ jQuery(function($) {
 										$aria_live.text(t('Can not be removed'));
 									}
 								}
-								else if (e.which == KEY.BACKSPACE) {
+								else if (e.which == KEY_BACKSPACE) {
 									/*
 									 * Pressing Backspace on empty input field should select last element in
 									 * multiselect. For next Backspace press to be able to remove it.
@@ -1192,7 +1180,7 @@ jQuery(function($) {
 	}
 
 	function isSearchFieldVisible($obj) {
-		return !$obj.hasClass('.search-disabled');
+		return !$obj.hasClass('search-disabled');
 	}
 
 	function getLimit($obj) {

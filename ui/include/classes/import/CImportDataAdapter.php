@@ -401,25 +401,33 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get template screens from the imported data.
+	 * Get template dashboards from the imported data.
 	 *
 	 * @return array
 	 */
-	public function getTemplateScreens() {
-		$screens = [];
+	public function getTemplateDashboards() {
+		$dashboards = [];
 
 		if (array_key_exists('templates', $this->data)) {
 			foreach ($this->data['templates'] as $template) {
-				if (array_key_exists('screens', $template)) {
-					foreach ($template['screens'] as $screen) {
-						$screens[$template['template']][$screen['name']] =
-							CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
+				if (array_key_exists('dashboards', $template)) {
+					foreach ($template['dashboards'] as $dashboard) {
+						// Rename hide_header to view_mode in widgets.
+						if (array_key_exists('widgets', $dashboard)) {
+							$dashboard['widgets'] = array_map(function (array $widget): array {
+								$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
+
+								return $widget;
+							}, $dashboard['widgets']);
+						}
+
+						$dashboards[$template['template']][$dashboard['name']] = $dashboard;
 					}
 				}
 			}
 		}
 
-		return $screens;
+		return $dashboards;
 	}
 
 	/**
@@ -538,6 +546,26 @@ class CImportDataAdapter {
 			$graph_prototype = $this->renameGraphFields($graph_prototype);
 		}
 		unset($graph_prototype);
+
+		foreach ($discovery_rule['host_prototypes'] as &$host_prototype) {
+			// Optionally remove interfaces array also if no custom interfaces are set.
+			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_INHERIT) {
+				unset($host_prototype['interfaces']);
+			}
+
+			if (array_key_exists('interfaces', $host_prototype)) {
+				foreach ($host_prototype['interfaces'] as &$interface) {
+					$interface = CArrayHelper::renameKeys($interface, ['default' => 'main']);
+
+					// Import creates empty arrays. Remove them, since they are not required.
+					if ($interface['type'] != INTERFACE_TYPE_SNMP) {
+						unset($interface['details']);
+					}
+				}
+				unset($interface);
+			}
+		}
+		unset($host_prototype);
 
 		return $discovery_rule;
 	}

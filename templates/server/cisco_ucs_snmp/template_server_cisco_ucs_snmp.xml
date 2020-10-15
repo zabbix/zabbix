@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-04T23:48:11Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:43Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Server Cisco UCS SNMP</template>
-         <name>Template Server Cisco UCS SNMP</name>
+         <template>Cisco UCS SNMP</template>
+         <name>Cisco UCS SNMP</name>
          <description>Template Server Cisco UCS&#13;
 &#13;
 MIBs used:&#13;
@@ -19,10 +19,10 @@ CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB&#13;
 CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB&#13;
 CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module Generic SNMP</name>
+               <name>Generic SNMP</name>
             </template>
          </templates>
          <groups>
@@ -98,13 +98,14 @@ Template tooling version used: 0.36</description>
                            <dependencies>
                               <dependency>
                                  <name>{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!</name>
-                                 <expression>{Template Server Cisco UCS SNMP:system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Array Controller Discovery</name>
@@ -162,7 +163,7 @@ Template tooling version used: 0.36</description>
                            <dependencies>
                               <dependency>
                                  <name>{#DISKARRAY_LOCATION}: Disk array controller is in critical state</name>
-                                 <expression>{Template Server Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -175,17 +176,18 @@ Template tooling version used: 0.36</description>
                            <dependencies>
                               <dependency>
                                  <name>{#DISKARRAY_LOCATION}: Disk array controller is in critical state</name>
-                                 <expression>{Template Server Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                               </dependency>
                               <dependency>
                                  <name>{#DISKARRAY_LOCATION}: Disk array controller is in warning state</name>
-                                 <expression>{Template Server Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_WARN_STATUS:"degraded"},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_WARN_STATUS:"degraded"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -229,13 +231,14 @@ Cisco UCS equipment:Fan:operState managed object property</description>
                            <dependencies>
                               <dependency>
                                  <name>{#FAN_LOCATION}: Fan is in critical state</name>
-                                 <expression>{Template Server Cisco UCS SNMP:sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"inoperable"},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Physical Disk Discovery</name>
@@ -336,13 +339,14 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                            <dependencies>
                               <dependency>
                                  <name>{#DISK_LOCATION}: Physical disk failed</name>
-                                 <expression>{Template Server Cisco UCS SNMP:system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -386,13 +390,14 @@ Cisco UCS equipment:Psu:operState managed object property</description>
                            <dependencies>
                               <dependency>
                                  <name>{#PSU_LOCATION}: Power supply is in critical state</name>
-                                 <expression>{Template Server Cisco UCS SNMP:sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"inoperable"},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature CPU Discovery</name>
@@ -428,8 +433,8 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_LOCATION}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                                 <expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                                 <expression>{Cisco UCS SNMP:sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                                 <recovery_expression>{Cisco UCS SNMP:sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -453,6 +458,7 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -488,8 +494,8 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                                 <expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                                 <recovery_expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -539,8 +545,8 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                                 <expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                                 <recovery_expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -590,8 +596,8 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                                 <expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                                 <recovery_expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -641,8 +647,8 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                            <dependencies>
                               <dependency>
                                  <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                                 <expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                                 <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                                 <expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                                 <recovery_expression>{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -666,6 +672,7 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Unit Discovery</name>
@@ -764,13 +771,14 @@ Cisco UCS compute:RackUnit:operState managed object property</description>
                            <dependencies>
                               <dependency>
                                  <name>{#UNIT_LOCATION}: System status is in critical state</name>
-                                 <expression>{Template Server Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"computeFailed"},eq)}=1 or {Template Server Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"configFailure"},eq)}=1 or {Template Server Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"unconfigFailure"},eq)}=1 or {Template Server Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"inoperable"},eq)}=1</expression>
+                                 <expression>{Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"computeFailed"},eq)}=1 or {Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"configFailure"},eq)}=1 or {Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"unconfigFailure"},eq)}=1 or {Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Virtual Disk Discovery</name>
@@ -852,6 +860,7 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

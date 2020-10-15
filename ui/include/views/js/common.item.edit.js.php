@@ -149,10 +149,15 @@ $ui_rows = [
 		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
 		'request_method', 'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row',
 		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row', 'trapper_hosts', 'allow_traps'
+	],
+	ITEM_TYPE_SCRIPT => [
+		'parameters_row', 'script_row', 'timeout_row'
 	]
 ];
-foreach ($ui_rows[ITEM_TYPE_HTTPAGENT] as $row) {
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_HTTPAGENT, $row);
+foreach ($ui_rows as $type => $rows) {
+	foreach ($rows as $row) {
+		zbx_subarray_push($this->data['typeVisibility'], $type, $row);
+	}
 }
 
 foreach ($this->data['types'] as $type => $label) {
@@ -274,13 +279,15 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 		$("#key").on('keyup change', updateItemFormElements);
 
+		$('#parameters_table').dynamicRows({template: '#parameters_table_row'});
+
 		$('#type')
 			.change(function() {
-				// update the interface select with each item type change
-				var itemInterfaceTypes = <?= json_encode(itemTypeInterface()) ?>;
+				var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
+					interface_ids_by_types = <?= json_encode($interface_ids_by_types) ?>;
 
 				updateItemFormElements();
-				organizeInterfaces(itemInterfaceTypes[parseInt($(this).val())] || null);
+				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt($(this).val()));
 
 				setAuthTypeLabel();
 			})

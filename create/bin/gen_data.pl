@@ -179,7 +179,7 @@ sub process_row
 					foreach (@sections)
 					{
 						# split after 'end of line' character and move what is left to the next line
-						if (/(.*' \|\| chr\(13\) \|\| chr\(10\) \|\| ')(.*)/)
+						if (/(.*' \|\| (?:chr\(13\) \|\| )?chr\(10\) \|\| ')(.*)/)
 						{
 							if ($first_part == 1)
 							{

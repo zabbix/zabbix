@@ -74,7 +74,7 @@ $fields = [
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
 											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
-											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 										]),
 										'isset({add}) || isset({update})'
 									],
@@ -113,7 +113,7 @@ $fields = [
 	$paramsFieldName =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
 											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.
-												ITEM_TYPE_CALCULATED, 'type'
+												ITEM_TYPE_CALCULATED.','.ITEM_TYPE_SCRIPT, 'type'
 											),
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
@@ -156,13 +156,18 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
+										_('Timeout')
+									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
 	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'parameters' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
@@ -254,7 +259,7 @@ $fields = [
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
 											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
 											ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP,
-											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+											ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 										]),
 										null
 									],
@@ -693,6 +698,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
+			if ($item['type'] == ITEM_TYPE_SCRIPT) {
+				$script_item = [
+					'parameters' => getRequest('parameters', []),
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+				];
+
+				$item = prepareScriptItemFormData($script_item) + $item;
+			}
+
 			$result = (bool) API::Item()->create($item);
 		}
 		else {
@@ -703,7 +717,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'templateid', 'flags', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
 					'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-					'verify_peer', 'verify_host', 'allow_traps'
+					'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -838,6 +852,29 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['master_itemid'] = getRequest('master_itemid');
 			}
 
+			if (getRequest('type') == ITEM_TYPE_SCRIPT) {
+				$script_item = [
+					'parameters' => getRequest('parameters', []),
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+				];
+
+				$item = prepareScriptItemFormData($script_item) + $item;
+				if ($db_item['type'] == getRequest('type')) {
+					$compare = function($arr, $arr2) {
+						return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
+							array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
+						);
+					};
+
+					if ($compare($db_item['parameters'], $item['parameters'])) {
+						unset($item['parameters']);
+					}
+					if ($db_item['timeout'] === $item['timeout']) {
+						unset($item['timeout']);
+					}
+				}
+			}
+
 			if ($item) {
 				$item['itemid'] = getRequest('itemid');
 
@@ -865,8 +902,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+		'request' => [
+			'itemid' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -1020,7 +1059,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 			if ($items) {
 				$item = [
-					'interfaceid' => getRequest('interfaceid'),
+					'interfaceid' => getRequest('interfaceid', 0),
 					'description' => getRequest('description'),
 					'delay' => $delay,
 					'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
@@ -1051,7 +1090,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'posts' => getRequest('posts'),
 					'headers' => getRequest('headers', []),
 					'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'preprocessing' => []
+					'preprocessing' => [],
+					'timeout' => getRequest('timeout')
 				];
 
 				if ($item['headers']) {
@@ -1194,6 +1234,10 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 					if ($type != ITEM_TYPE_JMX) {
 						unset($update_item['jmx_endpoint']);
+					}
+
+					if ($type != ITEM_TYPE_HTTPAGENT && $type != ITEM_TYPE_SCRIPT) {
+						unset($update_item['timeout']);
 					}
 				}
 				unset($update_item);
@@ -1351,10 +1395,18 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('group_itemid')
-	]);
+	$tasks = [];
+
+	foreach (getRequest('group_itemid') as $itemid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'itemid' => $itemid
+			]
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));
@@ -1381,13 +1433,13 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	if (hasRequest('itemid')) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid',
-				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint',
-				'master_itemid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects',
-				'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
+				'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',
+				'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+				'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file',
+				'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -1547,7 +1599,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
-		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
+		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
 	];
 
 	foreach ($data['preprocessing'] as &$step) {
@@ -1673,7 +1726,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 	// item types
 	$data['itemTypes'] = item_type2str();
-	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
+	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST], $data['itemTypes'][ITEM_TYPE_SCRIPT]);
 
 	// valuemap
 	$data['valuemaps'] = API::ValueMap()->get([

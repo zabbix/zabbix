@@ -21,14 +21,28 @@
 
 class CControllerDashboardWidgetConfigure extends CController {
 
+	private $context;
+
 	protected function checkInput() {
 		$fields = [
-			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
+			'templateid' => 'db dashboard.templateid',
+			'type' => 'required|string',
 			'fields' => 'json',
-			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])
+			'view_mode' => 'required|in '.implode(',', [
+				ZBX_WIDGET_VIEW_MODE_NORMAL,
+				ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+			])
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$this->context = $this->hasInput('templateid')
+				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+				: CWidgetConfig::CONTEXT_DASHBOARD;
+
+			$ret = CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context);
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -43,7 +57,9 @@ class CControllerDashboardWidgetConfigure extends CController {
 
 	protected function doAction() {
 		$type = $this->getInput('type');
-		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'),
+			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
+		);
 		// Transforms corrupted data to default values.
 		$form->validate();
 

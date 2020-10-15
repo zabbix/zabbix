@@ -1,0 +1,127 @@
+{
+  "stats": {
+    "total_bytes": 12872318976,
+    "total_avail_bytes": 6900023296,
+    "total_used_bytes": 2751070208,
+    "total_used_raw_bytes": 5972295680,
+    "total_used_raw_ratio": 0.4639642536640167,
+    "num_osds": 3,
+    "num_per_pool_osds": 3,
+    "num_per_pool_omap_osds": 3
+  },
+  "stats_by_class": {
+    "hdd": {
+      "total_bytes": 12872318976,
+      "total_avail_bytes": 6900023296,
+      "total_used_bytes": 2751070208,
+      "total_used_raw_bytes": 5972295680,
+      "total_used_raw_ratio": 0.4639642536640167
+    }
+  },
+  "pools": [
+    {
+      "name": "device_health_metrics",
+      "id": 1,
+      "stats": {
+        "stored": 0,
+        "stored_data": 0,
+        "stored_omap": 0,
+        "objects": 0,
+        "kb_used": 0,
+        "bytes_used": 0,
+        "data_bytes_used": 0,
+        "omap_bytes_used": 0,
+        "percent_used": 0,
+        "max_avail": 1390298112,
+        "quota_objects": 0,
+        "quota_bytes": 0,
+        "dirty": 0,
+        "rd": 0,
+        "rd_bytes": 0,
+        "wr": 0,
+        "wr_bytes": 0,
+        "compress_bytes_used": 0,
+        "compress_under_bytes": 0,
+        "stored_raw": 0
+      }
+    },
+    {
+      "name": "test_zabbix",
+      "id": 4,
+      "stats": {
+        "stored": 22206,
+        "stored_data": 22206,
+        "stored_omap": 0,
+        "objects": 4,
+        "kb_used": 768,
+        "bytes_used": 786432,
+        "data_bytes_used": 786432,
+        "omap_bytes_used": 0,
+        "percent_used": 0.00018851681670639664,
+        "max_avail": 1390298112,
+        "quota_objects": 0,
+        "quota_bytes": 0,
+        "dirty": 4,
+        "rd": 0,
+        "rd_bytes": 0,
+        "wr": 4,
+        "wr_bytes": 24576,
+        "compress_bytes_used": 0,
+        "compress_under_bytes": 0,
+        "stored_raw": 66618
+      }
+    },
+    {
+      "name": "zabbix",
+      "id": 5,
+      "stats": {
+        "stored": 0,
+        "stored_data": 0,
+        "stored_omap": 0,
+        "objects": 0,
+        "kb_used": 0,
+        "bytes_used": 0,
+        "data_bytes_used": 0,
+        "omap_bytes_used": 0,
+        "percent_used": 0,
+        "max_avail": 1390298112,
+        "quota_objects": 0,
+        "quota_bytes": 0,
+        "dirty": 0,
+        "rd": 0,
+        "rd_bytes": 0,
+        "wr": 0,
+        "wr_bytes": 0,
+        "compress_bytes_used": 0,
+        "compress_under_bytes": 0,
+        "stored_raw": 0
+      }
+    },
+    {
+      "name": "new_pool",
+      "id": 6,
+      "stats": {
+        "stored": 0,
+        "stored_data": 0,
+        "stored_omap": 0,
+        "objects": 0,
+        "kb_used": 0,
+        "bytes_used": 0,
+        "data_bytes_used": 0,
+        "omap_bytes_used": 0,
+        "percent_used": 0,
+        "max_avail": 695170880,
+        "quota_objects": 0,
+        "quota_bytes": 0,
+        "dirty": 0,
+        "rd": 0,
+        "rd_bytes": 0,
+        "wr": 0,
+        "wr_bytes": 0,
+        "compress_bytes_used": 0,
+        "compress_under_bytes": 0,
+        "stored_raw": 0
+      }
+    }
+  ]
+}

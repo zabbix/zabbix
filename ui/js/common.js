@@ -18,6 +18,21 @@
 **/
 
 
+const KEY_ARROW_DOWN = 40;
+const KEY_ARROW_LEFT = 37;
+const KEY_ARROW_RIGHT = 39;
+const KEY_ARROW_UP = 38;
+const KEY_BACKSPACE = 8;
+const KEY_DELETE = 46;
+const KEY_ENTER = 13;
+const KEY_ESCAPE = 27;
+const KEY_TAB = 9;
+const KEY_PAGE_UP = 33;
+const KEY_PAGE_DOWN = 34;
+const KEY_END = 35;
+const KEY_HOME = 36;
+const KEY_SPACE = 32;
+
 /**
  * jQuery based publish/subscribe handler.
  *
