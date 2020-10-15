@@ -132,11 +132,13 @@ if ($data['host']['description'] !== '') {
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		new CLink(_('Web'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'web.view')
-			->setArgument('filter_hostids[]', $data['host']['hostid'])
-			->setArgument('filter_set', '1')
-		),
+		$data['allowed_ui_hosts']
+			? new CLink(_('Web'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('filter_hostids[]', $data['host']['hostid'])
+				->setArgument('filter_set', '1')
+			)
+			: _('Web'),
 		$data['allowed_ui_latest_data']
 			? new CLink(_('Latest data'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
@@ -152,14 +154,16 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('hostids', [$data['host']['hostid']])
 			)
 			: _('Problems'),
-		new CLink(_('Graphs'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'charts.view')
-				->setArgument('filter_set', '1')
-				->setArgument('view_as', HISTORY_GRAPH)
-				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-				->setArgument('filter_hostids', [$data['host']['hostid']])
-		),
+		$data['allowed_ui_hosts']
+			? new CLink(_('Graphs'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'charts.view')
+					->setArgument('filter_set', '1')
+					->setArgument('view_as', HISTORY_GRAPH)
+					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+					->setArgument('filter_hostids', [$data['host']['hostid']])
+			)
+			: _('Graphs'),
 		$data['allowed_ui_dashboard']
 			? new CLink(_('Dashboards'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'host.dashboard.view')
@@ -170,13 +174,11 @@ $overviewFormList->addRow(_('Monitoring'),
 );
 
 // configuration
-if ($data['rwHost']) {
-	$hostLink = $data['allowed_ui_conf_hosts']
-		? new CLink(_('Host'), (new CUrl('hosts.php'))
-			->setArgument('form', 'update')
-			->setArgument('hostid', $data['host']['hostid'])
-		)
-		: _('Host');
+if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
+	$hostLink = new CLink(_('Host'), (new CUrl('hosts.php'))
+		->setArgument('form', 'update')
+		->setArgument('hostid', $data['host']['hostid'])
+	);
 	$applicationsLink = new CLink(_('Applications'),
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'application.list')
