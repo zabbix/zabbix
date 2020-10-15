@@ -186,3 +186,7 @@ $preloader-bg-color: $body-bg-color !default;
 $preloader-color: #ccd5d9 !default;
 $preloader-disabled-color: #fdfdfd !default;
 $preloader-accent-color: #0275b8 !default;
+
+// Dashboard list table.
+$dashboard-shared-bg-color: darken(desaturate($alt-yellow, 9%), 20%) !default;
+$dashboard-my-bg-color: darken(desaturate($alt-green, 10%), 20%) !default;

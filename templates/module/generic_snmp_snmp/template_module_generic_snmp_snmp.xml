@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-06-05T01:27:48Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:31:49Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -9,17 +9,17 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module Generic SNMP</template>
-         <name>Template Module Generic SNMP</name>
+         <template>Generic SNMP</template>
+         <name>Generic SNMP</name>
          <description>Template Module Generic&#13;
 &#13;
 MIBs used:&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
-               <name>Template Module ICMP Ping</name>
+               <name>ICMP Ping</name>
             </template>
          </templates>
          <groups>
@@ -212,7 +212,7 @@ The time (in hundredths of a second) since the network management portion of the
                      <dependencies>
                         <dependency>
                            <name>No SNMP data collection</name>
-                           <expression>{Template Module Generic SNMP:zabbix[host,snmp,available].max({$SNMP.TIMEOUT})}=0</expression>
+                           <expression>{Generic SNMP:zabbix[host,snmp,available].max({$SNMP.TIMEOUT})}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -241,7 +241,7 @@ The time (in hundredths of a second) since the network management portion of the
                      <dependencies>
                         <dependency>
                            <name>Unavailable by ICMP ping</name>
-                           <expression>{Template Module Generic SNMP:icmpping.max(#3)}=0</expression>
+                           <expression>{Generic SNMP:icmpping.max(#3)}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>

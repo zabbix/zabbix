@@ -1,0 +1,256 @@
+.float-left {
+	float: left;
+}
+
+$tab-label-color: $btn-font-color;
+$tab-label-bg-color: $btn-bg-color;
+$tab-label-focus-bg-color: $btn-form-hover-color;
+$tab-label-selected-color: $btn-font-color;
+$tab-label-selected-bg-color: $btn-bg-color;
+$tab-label-selected-border-color: $btn-bg-color;
+$tab-label-expanded-color: $font-color;
+$tab-label-expanded-bg-color: $ui-bg-color;
+$tab-label-expanded-border-color: $ui-border-color;
+$tab-label-hover-color: $btn-font-color;
+$tab-label-hover-bg-color: $btn-bg-color;
+$tab-label-counter-color: $form-font-color;
+$tab-label-counter-bg-color: $form-disabled-bg-color;
+
+
+.filter-container.tabfilter-container {
+	padding: 0;
+	border: 0 none;
+	margin: 0;
+
+	.form-buttons {
+		[name="filter_new"],
+		[name="filter_update"] {
+			margin-right: 20px;
+		}
+	}
+
+	/* All tab filters content container */
+	.tabfilter-content-container {
+		border: 1px solid $ui-border-color;
+		padding: 10px 0;
+		margin-top: -1px;
+		margin-bottom: 6px;
+	}
+
+	/* Top navigation labels */
+	nav > ul {
+		display: flex;
+		flex: 1;
+		justify-content: space-between;
+		background-color: $body-bg-color;
+	}
+
+	nav > ul > li {
+		margin: 0 2px 5px 0;
+		padding-top: 3px;
+
+		// Container with sortable tab items. Occupy space left with overflow and scrolling of content (javascript)
+		&:nth-child(2) {
+			flex-grow: 1;
+			overflow: hidden;
+			margin: 0;
+			height: 31px;
+
+			ul {
+				white-space: nowrap;
+				margin-left: 3px;
+				margin-right: 3px;
+			}
+		}
+
+		// Left and right navigation containers. Occupy as much space as needed to render it content.
+		&:nth-child(1),
+		&:nth-child(3) {
+			white-space: nowrap;
+		}
+	}
+
+	nav li {
+		display: inline-block;
+		vertical-align: top;
+		height: 24px;
+		line-height: 24px;
+
+		button {
+			vertical-align: middle;
+		}
+	}
+
+	/* tab filter label li element */
+	.tabfilter-item-label {
+		&:hover {
+			color: $tab-label-hover-color;
+			background-color: darken($tab-label-hover-bg-color, 5%);
+		}
+
+		display: inline-block;
+		background-color: $tab-label-bg-color;
+		border-radius: 2px;
+		border: 1px solid transparent;
+		color: $tab-label-color;
+		margin-right: 2px;
+
+		&.unsaved .tabfilter-item-link {
+			font-style: italic;
+
+			&::before {
+				content: '*';
+			}
+
+			&[data-counter]::after {
+				display: none;
+			}
+		}
+
+		&.selected.expanded {
+			background-color: $tab-label-expanded-bg-color;
+			border: 1px solid $tab-label-expanded-border-color;
+			border-radius: 0;
+			border-bottom: 0 none;
+
+			.tabfilter-item-link {
+				color: $tab-label-expanded-color;
+			}
+
+			&::after {
+				display: block;
+				width: 100%;
+				height: 6px;
+				background-color: $tab-label-expanded-bg-color;
+				border-left: 1px solid $tab-label-expanded-border-color;
+				border-right: 1px solid $tab-label-expanded-border-color;
+				margin-left: -1px;
+				margin-top: -1px;
+				content: '';
+			}
+
+			&.focused {
+				background: $tab-label-focus-bg-color;
+				box-shadow: none;
+
+				&::after {
+					background: $tab-label-focus-bg-color;
+				}
+			}
+
+			.icon-edit {
+				background: url($sprite-path) no-repeat -44px -619px;
+			}
+		}
+
+		&.selected {
+			background-color: darken($tab-label-selected-bg-color, 5%);
+			// border: 1px solid $tab-label-selected-border-color;
+
+			.tabfilter-item-link {
+				color: $tab-label-selected-color;
+			}
+
+			.tabfilter-item-link[data-counter]::after {
+				display: none;
+			}
+		}
+
+		&.focused {
+			box-shadow: 0 0 0 2px rgba($tab-label-bg-color, .35);
+		}
+
+		&.disabled {
+			box-shadow: none;
+			pointer-events: none;
+		}
+
+		.icon-home.tabfilter-item-link[data-counter]::after {
+			display: none;
+		}
+	}
+
+	/* tab filter label li clickable a element */
+	.tabfilter-item-link {
+		display: inline-block;
+		color: $tab-label-color;
+		border-bottom: 0 none;
+		line-height: 24px;
+		vertical-align: middle;
+		padding: 0 11px;
+	}
+
+	.icon-edit {
+		//@extend .btn-widget-edit;
+		@extend %btn-widget-defaults;
+		width: 24px;
+		height: 24px;
+		background: url($sprite-path) no-repeat -354px -619px;
+
+		cursor: pointer;
+		margin: 0;
+		vertical-align: middle;
+		display: inline-block;
+		opacity: 0;
+	}
+
+	/* tab filter contents container */
+	.tabfilter-tabs-container {
+		.filter-container.time-selection-container {
+			border: 0 none;
+		}
+	}
+}
+
+[data-counter]::after {
+	margin-left: .4em;
+	padding: 0.1em 0.4em;
+	font-size: $font-h3-size;
+	background-color: $tab-label-counter-bg-color;
+	border-radius: 2px;
+	color: $tab-label-counter-color;
+	content: attr(data-counter);
+}
+
+[data-counter=""]::after {
+	display: none;
+}
+
+.menu-popup {
+	.menu-popup-item[data-counter]::after {
+		display: block;
+		position: absolute;
+		top: 2px;
+		right: 15px;
+		line-height: 18px;
+	}
+
+	.menu-popup-item[data-counter] {
+		padding-right: 35px;
+	}
+}
+
+.icon-home::before {
+	display: block;
+	width: 22px;
+	height: 24px;
+	content: '';
+	// white icon
+	background: url($sprite-path) no-repeat -433px -510px;
+}
+.selected.expanded .icon-home::before {
+	// grey icon
+	background: url($sprite-path) no-repeat -121px -510px;
+}
+
+@if $theme-name == 'hc-dark' {
+	.selected.expanded .icon-home::before {
+		// white icon
+		background: url($sprite-path) no-repeat -433px -510px;
+	}
+
+	.icon-home::before {
+		// black icon
+		background: url($sprite-path) no-repeat -281px -510px;
+	}
+}

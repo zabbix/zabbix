@@ -133,8 +133,7 @@ $objData = [
 	'domid' => 'events',
 	'loadSBox' => 0,
 	'loadImage' => 0,
-	'dynamic' => 0,
-	'mainObject' => 1
+	'dynamic' => 0
 ];
 zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');

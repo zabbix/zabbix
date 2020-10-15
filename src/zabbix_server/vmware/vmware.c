@@ -104,8 +104,10 @@ static zbx_vmware_t	*vmware = NULL;
 
 #define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 
-#define ZBX_VPXD_STATS_MAXQUERYMETRICS	64
-#define ZBX_MAXQUERYMETRICS_UNLIMITED	1000
+#define ZBX_VPXD_STATS_MAXQUERYMETRICS				64
+#define ZBX_MAXQUERYMETRICS_UNLIMITED				1000
+#define ZBX_VCENTER_LESS_THAN_6_5_0_STATS_MAXQUERYMETRICS	64
+#define ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS	256
 
 ZBX_PTR_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
 ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
@@ -2712,9 +2714,9 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	id_esc = xml_escape_dyn(id);
 
-	if (ZBX_VMWARE_TYPE_VSPHERE == service->type &&
-			NULL != service->version && ZBX_VMWARE_DS_REFRESH_VERSION > atoi(service->version) &&
-			SUCCEED != vmware_service_refresh_datastore_info(easyhandle, id_esc, &error))
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type && NULL != service->version &&
+			ZBX_VMWARE_DS_REFRESH_VERSION > service->major_version && SUCCEED !=
+			vmware_service_refresh_datastore_info(easyhandle, id_esc, &error))
 	{
 		zbx_free(id_esc);
 		goto out;
@@ -4405,11 +4407,35 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_default_maxquerymetrics_for_vcenter                          *
+ *                                                                            *
+ * Purpose: get statically defined default value for maxquerymetrics for      *
+ *          vcenter when it could not be retrieved from soap, depending on    *
+ *          vcenter version (https://kb.vmware.com/s/article/2107096)         *
+ * Parameters: service   - [IN] the vmware service                            *
+ *                                                                            *
+ * Return value: maxquerymetrics                                              *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned int	get_default_maxquerymetrics_for_vcenter(const zbx_vmware_service_t *service)
+{
+	if ((6 == service->major_version && 5 <= service->minor_version) ||
+			6 < service->major_version)
+	{
+		return ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS;
+	}
+	else
+		return ZBX_VCENTER_LESS_THAN_6_5_0_STATS_MAXQUERYMETRICS;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_get_maxquerymetrics                               *
  *                                                                            *
  * Purpose: get vpxd.stats.maxquerymetrics parameter from vcenter only        *
  *                                                                            *
  * Parameters: easyhandle   - [IN] the CURL handle                            *
+ *             service      - [IN] the vmware service                         *
  *             max_qm       - [OUT] max count of Datastore metrics in one     *
  *                                  request                                   *
  *             error        - [OUT] the error message in the case of failure  *
@@ -4418,7 +4444,8 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, char **error)
+static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_service_t *service, int *max_qm,
+		char **error)
 {
 #	define ZBX_POST_MAXQUERYMETRICS								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -4439,7 +4466,7 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 		if (NULL == doc)	/* if not SOAP error */
 			goto out;
 
-		zabbix_log(LOG_LEVEL_WARNING, "Error of query maxQueryMetrics: %s.", *error);
+		zabbix_log(LOG_LEVEL_DEBUG, "Error of query maxQueryMetrics: %s.", *error);
 		zbx_free(*error);
 	}
 
@@ -4447,8 +4474,8 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 
 	if (NULL == (val = zbx_xml_read_doc_value(doc, ZBX_XPATH_MAXQUERYMETRICS())))
 	{
-		*max_qm = ZBX_VPXD_STATS_MAXQUERYMETRICS;
-		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics used default value %d", ZBX_VPXD_STATS_MAXQUERYMETRICS);
+		*max_qm = get_default_maxquerymetrics_for_vcenter(service);
+		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics defaults to %d", *max_qm);
 		goto out;
 	}
 
@@ -4463,7 +4490,8 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 	else if (SUCCEED != is_uint31(val, max_qm))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot convert maxQueryMetrics from %s.", val);
-		*max_qm = ZBX_VPXD_STATS_MAXQUERYMETRICS;
+		*max_qm = get_default_maxquerymetrics_for_vcenter(service);
+		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics defaults to %d", *max_qm);
 	}
 	else if (0 == *max_qm)
 	{
@@ -4523,7 +4551,9 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
-	char			*version = NULL, *fullname = NULL;
+#	define UNPARSED_SERVICE_MAJOR_VERSION_DELIM	"."
+
+	char			*version_without_major, *version = NULL, *fullname = NULL;
 	zbx_vector_ptr_t	counters;
 	int			ret = FAIL;
 
@@ -4537,13 +4567,24 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	zbx_vmware_lock();
 
-	service->version = vmware_shared_strdup(version);
 	service->fullname = vmware_shared_strdup(fullname);
 	vmware_counters_shared_copy(&service->counters, &counters);
+	service->version = vmware_shared_strdup(version);
+	service->major_version = atoi(version);
 
-	zbx_vmware_unlock();
+	/* version should have the "x.y.z" format, but there is also an "x.y Un" format in nature */
+	/* according to https://www.vmware.com/support/policies/version.html */
+	if (NULL == (version_without_major = strstr(version, UNPARSED_SERVICE_MAJOR_VERSION_DELIM)))
+	{
+		*error = zbx_dsprintf(*error, "Invalid version: %s.", version);
+		goto unlock;
+	}
+
+	service->minor_version = atoi(strlen(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + version_without_major);
 
 	ret = SUCCEED;
+unlock:
+	zbx_vmware_unlock();
 out:
 	zbx_free(version);
 	zbx_free(fullname);
@@ -4826,8 +4867,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (ZBX_VMWARE_TYPE_VCENTER != service->type)
 		data->max_query_metrics = ZBX_VPXD_STATS_MAXQUERYMETRICS;
-	else if (SUCCEED != vmware_service_get_maxquerymetrics(easyhandle, &data->max_query_metrics, &data->error))
+	else if (SUCCEED != vmware_service_get_maxquerymetrics(easyhandle, service, &data->max_query_metrics,
+			&data->error))
+	{
 		goto clean;
+	}
 
 	if (SUCCEED != vmware_service_logout(service, easyhandle, &data->error))
 	{

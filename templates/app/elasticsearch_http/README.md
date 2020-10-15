@@ -1,9 +1,9 @@
 
-# Template App Elasticsearch Cluster by HTTP
+# Elasticsearch Cluster by HTTP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor Elasticsearch by Zabbix that work without any external scripts.
 It works with both standalone and cluster instances.
 The metrics are collected in one pass remotely using an HTTP agent. 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
 If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
@@ -59,7 +59,7 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |ES_cluster |ES: Service status |<p>Checks if the service is running and accepting TCP connections.</p> |SIMPLE |net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |ES_cluster |ES: Service response time |<p>Checks performance of the TCP service.</p> |SIMPLE |net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"] |
-|ES_cluster |ES: Cluster health status |<p>Health status of the cluster, based on the state of its primary and replica shards. Statuses are:</p><p>green</p><p>All shards are assigned.</p><p>yellow</p><p>All primary shards are assigned, but one or more replica shards are unassigned. If a node in the cluster fails, some data could be unavailable until that node is repaired.</p><p>red</p><p>One or more primary shards are unassigned, so some data is unavailable. This can occur briefly during cluster startup as primary shards are assigned.</p> |DEPENDENT |es.cluster.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- JAVASCRIPT: `var state = ['green', 'yellow', 'red']; return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim()); `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|ES_cluster |ES: Cluster health status |<p>Health status of the cluster, based on the state of its primary and replica shards. Statuses are:</p><p>green</p><p>All shards are assigned.</p><p>yellow</p><p>All primary shards are assigned, but one or more replica shards are unassigned. If a node in the cluster fails, some data could be unavailable until that node is repaired.</p><p>red</p><p>One or more primary shards are unassigned, so some data is unavailable. This can occur briefly during cluster startup as primary shards are assigned.</p> |DEPENDENT |es.cluster.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |ES_cluster |ES: Number of nodes |<p>The number of nodes within the cluster.</p> |DEPENDENT |es.cluster.number_of_nodes<p>**Preprocessing**:</p><p>- JSONPATH: `$.number_of_nodes`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |ES_cluster |ES: Number of data nodes |<p>The number of nodes that are dedicated to data nodes.</p> |DEPENDENT |es.cluster.number_of_data_nodes<p>**Preprocessing**:</p><p>- JSONPATH: `$.number_of_data_nodes`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |ES_cluster |ES: Number of relocating shards |<p>The number of shards that are under relocation.</p> |DEPENDENT |es.cluster.relocating_shards<p>**Preprocessing**:</p><p>- JSONPATH: `$.relocating_shards`</p> |
@@ -140,7 +140,7 @@ There are no template links in this template.
 |ES: Cluster has the initializing shards |<p>The cluster has the initializing shards longer than 10 minutes.</p> |`{TEMPLATE_NAME:es.cluster.initializing_shards.min(10m)}>0` |AVERAGE | |
 |ES: Cluster has the unassigned shards |<p>The cluster has the unassigned shards longer than 10 minutes.</p> |`{TEMPLATE_NAME:es.cluster.unassigned_shards.min(10m)}>0` |AVERAGE | |
 |ES: Cluster has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:es.nodes.jvm.max_uptime[{#ES.NODE}].last()}<10m` |INFO |<p>Manual close: YES</p> |
-|ES: Cluster does not have enough space for resharding |<p>There is not enough disk space for index resharding.</p> |`({Template App Elasticsearch Cluster by HTTP:es.nodes.fs.total_in_bytes.last()}-{TEMPLATE_NAME:es.nodes.fs.available_in_bytes.last()})/({Template App Elasticsearch Cluster by HTTP:es.cluster.number_of_data_nodes.last()}-1)>{TEMPLATE_NAME:es.nodes.fs.available_in_bytes.last()}` |HIGH | |
+|ES: Cluster does not have enough space for resharding |<p>There is not enough disk space for index resharding.</p> |`({Elasticsearch Cluster by HTTP:es.nodes.fs.total_in_bytes.last()}-{TEMPLATE_NAME:es.nodes.fs.available_in_bytes.last()})/({Elasticsearch Cluster by HTTP:es.cluster.number_of_data_nodes.last()}-1)>{TEMPLATE_NAME:es.nodes.fs.available_in_bytes.last()}` |HIGH | |
 |ES: Cluster has only two master nodes |<p>The cluster has only two nodes with a master role and will be unavailable if one of them breaks.</p> |`{TEMPLATE_NAME:es.nodes.count.master.last()}=2` |DISASTER | |
 |ES {#ES.NODE}: Node {#ES.NODE} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:es.node.jvm.uptime[{#ES.NODE}].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h) |<p>This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation. </p><p>To address this problem, you can either increase your heap size (as long as it remains below the recommended </p><p>guidelines stated above), or scale out the cluster by adding more nodes.</p> |`{TEMPLATE_NAME:es.node.jvm.mem.heap_used_percent[{#ES.NODE}].min(1h)}>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)</p> |

@@ -142,7 +142,15 @@ out:
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
- * Parameters: host - [IN] require size 'HOST_HOST_LEN_MAX'                   *
+ * Parameters: sock          - [IN] open socket of server-agent connection    *
+ *             host          - [IN] host name                                 *
+ *             ip            - [IN] IP address of the host                    *
+ *             port          - [IN] port of the host                          *
+ *             host_metadata - [IN] host metadata                             *
+ *             flag          - [IN] flag describing interface type            *
+ *             interface     - [IN] interface value if flag is not default    *
+ *             hostid        - [OUT] host ID                                  *
+ *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
@@ -150,19 +158,19 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: NB! adds host to the database if it does not exist or if it      *
- *           exists but metadata has changed                                  *
+ *           exists but metadata, interface, interface type or port has       *
+ *           changed                                                          *
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
 		char *error)
 {
-	char		*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-	unsigned short	old_port_v;
-	int		tls_offset = 0;
+	char			*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
+	DB_RESULT		result;
+	DB_ROW			row;
+	unsigned short		old_port_v;
+	int			tls_offset = 0, ret = FAIL;
 	zbx_conn_flags_t	old_flag_v;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
@@ -273,7 +281,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		old_port_v = (unsigned short)(SUCCEED == DBis_null(old_port)) ? 0 : atoi(old_port);
 		old_flag_v = (zbx_conn_flags_t)(SUCCEED == DBis_null(old_flag)) ? ZBX_CONN_DEFAULT : atoi(old_flag);
 		/* metadata is available only on Zabbix server */
-		if (SUCCEED == DBis_null(old_metadata) || 0 != strcmp(old_metadata, host_metadata) ||
+		if (SUCCEED == DBis_null(old_flag) || 0 != strcmp(old_metadata, host_metadata) ||
 				(ZBX_CONN_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)) ||
 				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
 				(old_flag_v != flag))

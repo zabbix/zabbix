@@ -274,7 +274,7 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 
 	foreach ($hosts as $hostid => $host) {
 		$host_data = $data['hosts_data'][$hostid];
-		$url->setArgument('filter_hostids', [$hostid]);
+		$url->setArgument('hostids', [$hostid]);
 		$host_name = new CLink($host_data['host'], $url->getUrl());
 
 		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {

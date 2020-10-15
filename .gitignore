@@ -158,6 +158,7 @@ tests/libs/zbxdbcache/is_item_processed_by_server
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
+tests/libs/zbxdbcache/dc_function_calculate_nextcheck
 tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
@@ -191,6 +192,11 @@ tests/libs/zbxsysinfo/linux/SYSTEM_HW_CHASSIS
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
+tests/libs/zbxcommon/zbx_tm_add
+tests/libs/zbxcommon/zbx_tm_sub
+tests/libs/zbxcommon/zbx_tm_round_up
+tests/libs/zbxcommon/zbx_tm_round_down
+tests/libs/zbxtrends/zbx_trends_parse_range
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc

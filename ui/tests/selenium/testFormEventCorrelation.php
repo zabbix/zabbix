@@ -25,7 +25,6 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup correlation
  */
-
 class testFormEventCorrelation extends CLegacyWebTest {
 
 	public static function create() {
@@ -83,7 +82,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 		$this->zbxTestInputType('tag', $data['tag']);
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+		COverlayDialogElement::ensureNotPresent();
 
 		if (array_key_exists('description', $data)) {
 			$this->zbxTestInputType('description', $data['description']);
@@ -157,7 +156,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 			$this->zbxTestInputType('tag', $data['tag']);
 			$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+			COverlayDialogElement::ensureNotPresent();
 		}
 
 		$this->zbxTestClick('add');
@@ -194,7 +193,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 		$this->zbxTestInputType('tag', 'Test tag');
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->zbxTestTabSwitch('Operations');
 		$this->zbxTestCheckboxSelect('operation_0_type');
@@ -363,7 +362,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->zbxTestTabSwitch('Operations');
 		$this->zbxTestCheckboxSelect('operation_0_type');
@@ -659,7 +658,6 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			}
 
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
 			COverlayDialogElement::ensureNotPresent();
 		}
 
@@ -735,7 +733,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 		$this->zbxTestInputTypeOverwrite('tag', 'New update tag');
 		$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay_dialogue'));
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->zbxTestInputTypeOverwrite('description', 'New test description update');
 

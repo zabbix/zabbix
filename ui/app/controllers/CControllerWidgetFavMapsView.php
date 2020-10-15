@@ -58,7 +58,7 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		CArrayHelper::sort($maps, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAV_MAPS]),
+			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes($this->getContext())[WIDGET_FAV_MAPS]),
 			'maps' => $maps,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

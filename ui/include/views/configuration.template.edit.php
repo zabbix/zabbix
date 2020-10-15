@@ -290,24 +290,23 @@ if ($data['form'] === 'full_clone') {
 		}
 	}
 
-	// screens
-	$screens = API::TemplateScreen()->get([
-		'inherited' => false,
+	// Dashboards
+	$dashboards = API::TemplateDashboard()->get([
+		'output' => ['dashboardid', 'name'],
 		'templateids' => $data['templateid'],
-		'output' => ['screenid', 'name'],
 	]);
-	if (!empty($screens)) {
-		$screensList = [];
-		foreach ($screens as $screen) {
-			$screensList[$screen['screenid']] = $screen['name'];
+	if (!empty($dashboards)) {
+		$dashboardList = [];
+		foreach ($dashboards as $dashboard) {
+			$dashboardList[$dashboard['dashboardid']] = $dashboard['name'];
 		}
-		order_result($screensList);
+		order_result($dashboardList);
 
-		$listBox = (new CListBox('screens', null, 8))
+		$listBox = (new CListBox('dashboards', null, 8))
 			->setAttribute('disabled', 'disabled')
-			->addItems($screensList);
+			->addItems($dashboardList);
 
-		$templateList->addRow(_('Screens'), $listBox);
+		$templateList->addRow(_('Dashboards'), $listBox);
 	}
 
 	// web scenarios

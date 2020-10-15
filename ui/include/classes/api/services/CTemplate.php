@@ -92,7 +92,7 @@ class CTemplate extends CHostGeneral {
 			'selectGraphs'				=> null,
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
-			'selectScreens'				=> null,
+			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,
 			'selectTags'				=> null,
 			'countOutput'				=> false,
@@ -1284,38 +1284,36 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		// Adding screens
-		if ($options['selectScreens'] !== null) {
-			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
-				$screens = API::TemplateScreen()->get([
-					'output' => $this->outputExtend($options['selectScreens'], ['templateid']),
-					'templateids' => $templateids,
-					'nopermissions' => true
+		// Adding dashboards.
+		if ($options['selectDashboards'] !== null) {
+			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
+				$dashboards = API::TemplateDashboard()->get([
+					'output' => $this->outputExtend($options['selectDashboards'], ['templateid']),
+					'templateids' => $templateids
 				]);
 				if (!is_null($options['limitSelects'])) {
-					order_result($screens, 'name');
+					order_result($dashboards, 'name');
 				}
 
-				// preservekeys is not supported by templatescreen.get, so we're building a map using array keys
+				// Build relation map.
 				$relationMap = new CRelationMap();
-				foreach ($screens as $key => $screen) {
-					$relationMap->addRelation($screen['templateid'], $key);
+				foreach ($dashboards as $key => $dashboard) {
+					$relationMap->addRelation($dashboard['templateid'], $key);
 				}
 
-				$screens = $this->unsetExtraFields($screens, ['templateid'], $options['selectScreens']);
-				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
+				$dashboards = $this->unsetExtraFields($dashboards, ['templateid'], $options['selectDashboards']);
+				$result = $relationMap->mapMany($result, $dashboards, 'dashboards', $options['limitSelects']);
 			}
 			else {
-				$screens = API::TemplateScreen()->get([
+				$dashboards = API::TemplateDashboard()->get([
 					'templateids' => $templateids,
-					'nopermissions' => true,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
-				$screens = zbx_toHash($screens, 'templateid');
+				$dashboards = zbx_toHash($dashboards, 'templateid');
 				foreach ($result as $templateid => $template) {
-					$result[$templateid]['screens'] = array_key_exists($templateid, $screens)
-						? $screens[$templateid]['rowscount']
+					$result[$templateid]['dashboards'] = array_key_exists($templateid, $dashboards)
+						? $dashboards[$templateid]['rowscount']
 						: '0';
 				}
 			}

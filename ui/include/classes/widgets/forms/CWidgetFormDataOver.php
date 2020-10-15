@@ -24,8 +24,8 @@
  */
 class CWidgetFormDataOver extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_DATA_OVER);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_DATA_OVER);
 
 		// Host groups.
 		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));

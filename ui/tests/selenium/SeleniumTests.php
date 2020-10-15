@@ -102,11 +102,13 @@ require_once dirname(__FILE__).'/testFormHostPrototypeMacros.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemHttpAgent.php';
 require_once dirname(__FILE__).'/testFormItemPreprocessing.php';
-require_once dirname(__FILE__).'/testFormItemPreprocessingTest.php';
+// Uncomment after DEV-1718 is ready.
+//require_once dirname(__FILE__).'/testFormItemPreprocessingTest.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormItemPrototypePreprocessing.php';
-require_once dirname(__FILE__).'/testFormItemTestHost.php';
-require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
+// Uncomment after DEV-1718 is ready.
+//require_once dirname(__FILE__).'/testFormItemTestHost.php';
+//require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
@@ -152,7 +154,6 @@ require_once dirname(__FILE__).'/testTriggerDependencies.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
 require_once dirname(__FILE__).'/testUrlUserPermissions.php';
-require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
@@ -250,11 +251,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
 		$suite->addTestSuite('testFormItemPreprocessing');
-		$suite->addTestSuite('testFormItemPreprocessingTest');
+		// Uncomment after DEV-1718 is ready.
+//		$suite->addTestSuite('testFormItemPreprocessingTest');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormItemPrototypePreprocessing');
-		$suite->addTestSuite('testFormItemTestHost');
-		$suite->addTestSuite('testFormItemTestTemplate');
+		// Uncomment after DEV-1718 is ready.
+//		$suite->addTestSuite('testFormItemTestHost');
+//		$suite->addTestSuite('testFormItemTestTemplate');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
@@ -300,7 +303,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testUrlParameters');
 		$suite->addTestSuite('testUrlUserPermissions');
-		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
 		$suite->addTestSuite('testDashboardCopyWidgets');
