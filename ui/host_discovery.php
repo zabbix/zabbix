@@ -114,7 +114,11 @@ $fields = [
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
-	'timeout' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' => 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+									'(isset({add}) || isset({update})) && isset({type})'.
+										' && {type} == '.ITEM_TYPE_HTTPAGENT,
+									_('Timeout')
+								],
 	'url' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
 										' && {type} == '.ITEM_TYPE_HTTPAGENT,
@@ -375,8 +379,10 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+		'request' => [
+			'itemid' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -695,10 +701,18 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('g_hostdruleid')
-	]);
+	$tasks = [];
+
+	foreach (getRequest('g_hostdruleid') as $taskid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'itemid' => $taskid
+			]
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows($checkbox_hash);
@@ -775,7 +789,7 @@ if (hasRequest('form')) {
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
-		// Sort overides to be listed in step order.
+		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], [
 			['field' => 'step', 'order' => ZBX_SORT_UP]
 		]);

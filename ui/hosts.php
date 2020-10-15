@@ -750,7 +750,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				// Proccess SNMP interface fields.
+				// Process SNMP interface fields.
 				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 					if (!array_key_exists('details', $interface)) {
 						unset($interface[$key]);

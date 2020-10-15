@@ -22,41 +22,13 @@
 package swap
 
 import (
-	"errors"
-
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if key != "system.swap.size" {
-		return nil, plugin.UnsupportedMetricError
-	}
-
-	if len(params) > 2 {
-		return nil, errors.New("Too many parameters.")
-	}
-
-	var mode string
-	if len(params) == 2 && params[1] != "" {
-		mode = params[1]
-	}
-
-	if len(params) > 0 && params[0] != "" && params[0] != "all" {
-		return nil, errors.New("Invalid first parameter.")
-	}
-
+func getSwap() (uint64, uint64, error) {
 	m, err := win32.GlobalMemoryStatusEx()
 	if err != nil {
-		return
+		return 0, 0, nil
 	}
 
 	var total, avail uint64
@@ -66,28 +38,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if m.AvailPageFile > m.AvailPhys {
 		avail = m.AvailPageFile - m.AvailPhys
 	}
-	if avail > total {
-		avail = total
-	}
 
-	switch mode {
-	case "", "total":
-		return total, nil
-	case "free":
-		return avail, nil
-	case "used":
-		return total - avail, nil
-	case "pfree":
-		return float64(avail) / float64(total) * 100, nil
-	case "pused":
-		return float64(total-avail) / float64(total) * 100, nil
-	default:
-		return nil, errors.New("Invalid second parameter.")
-	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Swap",
-		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
-	)
+	return total, avail, nil
 }

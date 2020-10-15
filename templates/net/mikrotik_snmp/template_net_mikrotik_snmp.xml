@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-24T15:27:11Z</date>
+   <date>2020-10-08T15:20:34Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -26,7 +26,7 @@ Known Issues:&#13;
   Version: RouterOS 6.38.5&#13;
   Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -71,7 +71,7 @@ Template tooling version used: 0.37</description>
                <trends>0</trends>
                <value_type>CHAR</value_type>
                <description>MIB: MIKROTIK-MIB&#13;
-Current firmware version</description>
+Current firmware version.</description>
                <applications>
                   <application>
                      <name>Inventory</name>
@@ -126,7 +126,7 @@ Current firmware version</description>
                <trends>0</trends>
                <value_type>CHAR</value_type>
                <description>MIB: MIKROTIK-MIB&#13;
-RouterBOARD serial number</description>
+RouterBOARD serial number.</description>
                <inventory_link>SERIALNO_A</inventory_link>
                <applications>
                   <application>
@@ -159,7 +159,7 @@ RouterBOARD serial number</description>
                <trends>0</trends>
                <value_type>CHAR</value_type>
                <description>MIB: MIKROTIK-MIB&#13;
-Software version</description>
+Software version.</description>
                <inventory_link>OS</inventory_link>
                <applications>
                   <application>
@@ -329,7 +329,8 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrHlProcessorTemperature) Processor temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</description>
+mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).&#13;
+Might be missing in entry models (RB750, RB450G..).</description>
                      <applications>
                         <application>
                            <name>Temperature</name>
@@ -399,7 +400,9 @@ this is done to avoid unsupported items.</description>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)&#13;
+mtxrHlTemperature Device temperature in Celsius (degrees C).&#13;
+Might be missing in entry models (RB750, RB450G..).&#13;
+&#13;
 Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <applications>
                         <application>
@@ -452,6 +455,162 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
+               <name>LTE modem discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]</snmp_oid>
+               <key>mtxrLTEModem.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#IFTYPE}</macro>
+                        <value>^1$</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFNAME}</macro>
+                        <value>{$IFNAME.LTEMODEM.MATCHES}</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>MIKROTIK-MIB::mtxrLTEModemInterfaceIndex</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.16.1.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>dbm</units>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrLTEModemSignalRSRP Reference Signal Received Power.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(5m)} &lt; {$LTEMODEM.RSRP.MIN.WARN}</expression>
+                           <name>Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.16.1.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>db</units>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrLTEModemSignalRSRQ Reference Signal Received Quality.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(5m)} &lt; {$LTEMODEM.RSRQ.MIN.WARN}</expression>
+                           <name>Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.16.1.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>dbm</units>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrLTEModemSignalRSSI Received Signal Strength Indicator.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(5m)} &lt; {$LTEMODEM.RSSI.MIN.WARN}</expression>
+                           <name>Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): LTE modem SINR</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.14988.1.1.16.1.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>db</units>
+                     <description>MIB: MIKROTIK-MIB&#13;
+mtxrLTEModemSignalSINR Signal to Interference &amp; Noise Ratio.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(5m)} &lt; {$LTEMODEM.SINR.MIN.WARN}</expression>
+                           <name>Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Modem Signal. {#SNMPINDEX}</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Net Mikrotik SNMP</host>
+                              <key>lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template Net Mikrotik SNMP</host>
+                              <key>lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template Net Mikrotik SNMP</host>
+                              <key>lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template Net Mikrotik SNMP</host>
+                              <key>lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+            <discovery_rule>
                <name>AP channel discovery</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7]</snmp_oid>
@@ -481,7 +640,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <key>ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlApAuthClientCount) Number of authentication clients</description>
+mtxrWlApAuthClientCount Number of authentication clients.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -519,7 +678,7 @@ mtxrWlApBand</description>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrWlApSsid</description>
+mtxrWlApSsid Service Set Identifier.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -560,7 +719,7 @@ mtxrWlApNoiseFloor</description>
                      <key>ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlApClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</description>
+mtxrWlApClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -584,6 +743,11 @@ mtxrWlApNoiseFloor</description>
                         <value>^1$</value>
                         <formulaid>A</formulaid>
                      </condition>
+                     <condition>
+                        <macro>{#IFNAME}</macro>
+                        <value>{$IFNAME.WIFI.MATCHES}</value>
+                        <formulaid>B</formulaid>
+                     </condition>
                   </conditions>
                </filter>
                <description>MIKROTIK-MIB::mtxrWlCMChannel</description>
@@ -595,7 +759,7 @@ mtxrWlApNoiseFloor</description>
                      <key>ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlCMAuthClientCount) Number of authentication clients</description>
+mtxrWlCMAuthClientCount Number of authentication clients.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -631,7 +795,7 @@ mtxrWlCMChannel</description>
                      <key>ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlCMRegClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</description>
+mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -647,7 +811,7 @@ mtxrWlCMChannel</description>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
                      <description>MIB: MIKROTIK-MIB&#13;
-(mtxrWlCMState) Wireless interface state</description>
+mtxrWlCMState Wireless interface state.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -829,6 +993,36 @@ The amount of the storage represented by this entry that is allocated, in units 
             <macro>
                <macro>{$CPU.UTIL.CRIT}</macro>
                <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$IFNAME.LTEMODEM.MATCHES}</macro>
+               <value>^lte</value>
+               <description>This macro is used in LTE modem discovery. It can be overridden on the host.</description>
+            </macro>
+            <macro>
+               <macro>{$IFNAME.WIFI.MATCHES}</macro>
+               <value>WIFI</value>
+               <description>This macro is used in CAPsMAN AP channel discovery. It can be overridden on the host level.</description>
+            </macro>
+            <macro>
+               <macro>{$LTEMODEM.RSRP.MIN.WARN}</macro>
+               <value>-100</value>
+               <description>The LTE modem RSRP minimum value for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$LTEMODEM.RSRQ.MIN.WARN}</macro>
+               <value>-20</value>
+               <description>The LTE modem RSRQ minimum value for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$LTEMODEM.RSSI.MIN.WARN}</macro>
+               <value>-100</value>
+               <description>The LTE modem RSSI minimum value for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$LTEMODEM.SINR.MIN.WARN}</macro>
+               <value>0</value>
+               <description>The LTE modem SINR minimum value for warning trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MEMORY.UTIL.MAX}</macro>

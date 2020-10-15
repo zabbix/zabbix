@@ -293,6 +293,12 @@ header {
       padding-left: 0; }
     header ul button {
       line-height: 22px; }
+  header z-select > button {
+    line-height: normal; }
+  header z-select .list {
+    text-align: left; }
+    header z-select .list li:first-child {
+      padding: 5px; }
 
 footer {
   padding: 55px 10px 10px;
@@ -867,6 +873,95 @@ footer {
   max-width: 25%;
   margin: 5% auto 0;
   text-align: left; }
+
+z-select,
+.z-select {
+  display: inline-block; }
+  z-select button,
+  .z-select button {
+    position: relative;
+    height: 24px;
+    padding: 3px 18px 3px 4px;
+    overflow: hidden;
+    font-size: 1em;
+    text-align: left;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    white-space: pre;
+    cursor: default;
+    border-radius: 0; }
+    z-select button::after,
+    .z-select button::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      right: 5px;
+      width: 5px;
+      height: 5px;
+      border-right: 1.4px solid;
+      border-bottom: 1.4px solid;
+      transform: rotate(45deg); }
+    z-select button:active, z-select button:hover, z-select button:focus,
+    .z-select button:active,
+    .z-select button:hover,
+    .z-select button:focus {
+      color: #f2f2f2;
+      background-color: #383838;
+      border-color: #4f4f4f;
+      box-shadow: none; }
+  z-select .list,
+  .z-select .list {
+    display: none;
+    z-index: 20000;
+    max-height: 362px;
+    overflow-y: auto;
+    border: 1px solid;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5); }
+    z-select .list li,
+    .z-select .list li {
+      display: block;
+      height: inherit;
+      padding: 5px;
+      line-height: normal;
+      color: #f2f2f2;
+      text-overflow: ellipsis;
+      word-break: break-all;
+      white-space: pre-wrap;
+      user-select: none; }
+      z-select .list li.hover,
+      .z-select .list li.hover {
+        background-color: #454545; }
+      z-select .list li.red,
+      .z-select .list li.red {
+        color: #e45959; }
+      z-select .list li[disabled],
+      .z-select .list li[disabled] {
+        color: #525252; }
+      z-select .list li[optgroup]::before,
+      .z-select .list li[optgroup]::before {
+        content: attr(optgroup);
+        display: block;
+        font-weight: bold; }
+    z-select .list > li > ul,
+    .z-select .list > li > ul {
+      margin: 5px -5px -5px; }
+      z-select .list > li > ul li,
+      .z-select .list > li > ul li {
+        padding-left: 15px; }
+    z-select .list.fall-upwards,
+    .z-select .list.fall-upwards {
+      box-shadow: 0 -6px 10px 0 rgba(0, 0, 0, 0.5); }
+  z-select.is-expanded > ul,
+  .z-select.is-expanded > ul {
+    display: block;
+    position: fixed; }
+  z-select[disabled] button, z-select[readonly] button,
+  .z-select[disabled] button,
+  .z-select[readonly] button {
+    pointer-events: none; }
+  z-select[readonly] button,
+  .z-select[readonly] button {
+    color: #f2f2f2 !important; }
 
 .link-action {
   border-bottom: 1px dotted;
@@ -2009,14 +2104,18 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   padding: 0 5px;
   min-height: 24px; }
 
-.multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
+z-select button,
+.z-select button, z-select .list,
+.z-select .list, .multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   background-color: #383838;
   border: 1px solid #4f4f4f;
   box-sizing: border-box;
   color: #f2f2f2;
   outline: 0;
   transition: border-color .2s ease-out, box-shadow .2s ease-out; }
-  .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
+  z-select button:focus,
+  .z-select button:focus, z-select .list:focus,
+  .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
     border-color: #768d99; }
 
 button::-moz-focus-inner {
@@ -2442,7 +2541,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: .3;
     background-color: transparent; }
 
-.multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
+z-select[disabled] button, z-select[readonly] button,
+.z-select[disabled] button,
+.z-select[readonly] button, .multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
 .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .input-group button.btn-dropdown-toggle:disabled {
   color: #525252;
   background-color: #2b2b2b !important;
@@ -2570,6 +2671,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: flex;
     margin-bottom: 40px;
     justify-content: flex-start; }
+  .setup-container #tls_encryption_hint {
+    font-style: italic;
+    color: #737373; }
 
 .setup-left {
   float: left;
@@ -2594,11 +2698,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow-y: auto; }
   .setup-right-body .list-table {
     border: 0; }
-  .setup-right-body .table-forms-td-left {
-    text-align: left;
-    width: auto; }
-  .setup-right-body .table-forms-td-right {
-    width: 100%; }
   .setup-right-body h1 {
     margin: 25% 0 .4em; }
 
@@ -3381,12 +3480,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       min-width: 450px; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
       min-width: 650px; }
-  .overlay-dialogue .hintbox-scrollable {
-    overflow: auto;
-    width: 100%;
-    max-height: calc(100vh - 190px);
-    max-width: 45vw;
-    white-space: nowrap; }
   .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;
@@ -4486,11 +4579,17 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+.msg-details ul::-webkit-scrollbar, z-select button::-webkit-scrollbar,
+.z-select button::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
+.z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-.msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+.msg-details ul::-webkit-scrollbar-track, z-select button::-webkit-scrollbar-track,
+.z-select button::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
+.z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #1f1f1f; }
-.msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+.msg-details ul::-webkit-scrollbar-thumb, z-select button::-webkit-scrollbar-thumb,
+.z-select button::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
+.z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #383838;
   border: 1px solid #2b2b2b; }
 
@@ -5568,6 +5667,17 @@ table.preprocessing-test-results .rel-container {
   width: 105px; }
 #itemsTable .table-col-action {
   width: 55px; }
+
+z-select.z-select-host-interface .description:not(:empty),
+.z-select.z-select-host-interface .description:not(:empty) {
+  display: block;
+  margin-top: 5px;
+  color: #9d9d9d; }
+z-select.z-select-host-interface[disabled] .description:not(:empty),
+z-select.z-select-host-interface li[disabled] .description:not(:empty),
+.z-select.z-select-host-interface[disabled] .description:not(:empty),
+.z-select.z-select-host-interface li[disabled] .description:not(:empty) {
+  color: #525252; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }

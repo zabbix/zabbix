@@ -42,7 +42,7 @@ class CInputGroupElement extends CElement {
 	/**
 	 * Select the type of InputGroup element.
 	 *
-	 * @param	string	$new_type	vlaue field type to be selected
+	 * @param	string	$new_type	value field type to be selected
 	 *
 	 * @return $this
 	 */

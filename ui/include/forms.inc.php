@@ -835,7 +835,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	if ($data['parent_discoveryid'] != 0) {
 		$data['discover'] = hasRequest('form_refresh')
 			? getRequest('discover', DB::getDefault('items', 'discover'))
-			: ($item
+			: (($item && array_key_exists('discover', $item))
 				? $item['discover']
 				: DB::getDefault('items', 'discover')
 			);
