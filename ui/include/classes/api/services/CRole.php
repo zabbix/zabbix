@@ -478,6 +478,7 @@ class CRole extends CApiService {
 		}
 
 		$roles_rules = [];
+		$processed_sections = [];
 
 		foreach ($roles as $role) {
 			if (!array_key_exists('rules', $role)) {
@@ -506,6 +507,10 @@ class CRole extends CApiService {
 
 			// UI rules.
 			$default_access = $rules[CRoleHelper::UI_DEFAULT_ACCESS];
+			$processed_sections[$roleid][CRoleHelper::SECTION_UI] = (bool) array_intersect_key($role['rules'], [
+				CRoleHelper::UI_DEFAULT_ACCESS => '',
+				CRoleHelper::SECTION_UI => ''
+			]);
 
 			if (!$default_access) {
 				$roles_rules[$roleid][] = [
@@ -525,6 +530,10 @@ class CRole extends CApiService {
 
 			// API rules.
 			$api_access = $rules[CRoleHelper::API_ACCESS];
+			$processed_sections[$roleid][CRoleHelper::SECTION_API] = (bool) array_intersect_key($role['rules'], [
+				CRoleHelper::API_ACCESS => '',
+				CRoleHelper::SECTION_API => ''
+			]);
 
 			if ($api_access) {
 				$status = $rules[CRoleHelper::API_MODE];
@@ -554,6 +563,10 @@ class CRole extends CApiService {
 
 			// Module rules.
 			$default_access = $rules[CRoleHelper::MODULES_DEFAULT_ACCESS];
+			$processed_sections[$roleid][CRoleHelper::SECTION_MODULES] = (bool) array_intersect_key($role['rules'], [
+				CRoleHelper::MODULES_DEFAULT_ACCESS => '',
+				CRoleHelper::SECTION_MODULES => ''
+			]);
 
 			if (!$default_access) {
 				$roles_rules[$roleid][] = [
@@ -579,6 +592,10 @@ class CRole extends CApiService {
 
 			// Action rules.
 			$default_access = $rules[CRoleHelper::ACTIONS_DEFAULT_ACCESS];
+			$processed_sections[$roleid][CRoleHelper::SECTION_ACTIONS] = (bool) array_intersect_key($role['rules'], [
+				CRoleHelper::ACTIONS_DEFAULT_ACCESS => '',
+				CRoleHelper::SECTION_ACTIONS => ''
+			]);
 
 			if (!$default_access) {
 				$roles_rules[$roleid][] = [
@@ -603,8 +620,8 @@ class CRole extends CApiService {
 
 		foreach ($roles_rules as $roleid => $rules) {
 			if (!array_key_exists($roleid, $db_roles_rules)) {
-				foreach ($rules as $role) {
-					$insert[] = $role + ['roleid' => $roleid];
+				foreach ($rules as $rule) {
+					$insert[] = $rule + ['roleid' => $roleid];
 				}
 
 				continue;
@@ -620,6 +637,7 @@ class CRole extends CApiService {
 				}
 
 				$role_ruleid = $db_role_rules[$rule['name']]['role_ruleid'];
+				// TODO: add to update only when value is changes!
 				$update[] = [
 					'values' => $rule,
 					'where' => ['role_ruleid' => $role_ruleid]
@@ -628,8 +646,18 @@ class CRole extends CApiService {
 			}
 		}
 
-		foreach ($db_roles_rules as $db_role_rules) {
-			$delete = array_merge($delete, array_column($db_role_rules, 'role_ruleid'));
+		foreach ($db_roles_rules as $roleid => $db_role_rules) {
+			if (!array_key_exists($roleid, $processed_sections)) {
+				continue;
+			}
+
+			foreach ($db_role_rules as $db_rule) {
+				$section = substr($db_rule['name'], 0, strpos($db_rule['name'], '.'));
+
+				if ($processed_sections[$roleid][$section]) {
+					$delete[] = $db_rule['role_ruleid'];
+				}
+			}
 		}
 
 		if ($insert) {
