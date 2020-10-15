@@ -1603,7 +1603,8 @@ else {
 		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
 		'config' => [
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
-		]
+		],
+		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 	];
 
 	$hostView = new CView('configuration.host.list', $data);
