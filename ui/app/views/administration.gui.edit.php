@@ -74,6 +74,7 @@ $gui_tab = (new CFormList())
 			->addOptions(CSelect::createOptionsFromArray($data['timezones']))
 			->setValue($data['default_timezone'])
 			->setFocusableElementId('default-timezone-select')
+			->setId('default_timezone')
 	)
 	->addRow(_('Default theme'),
 		new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes())
