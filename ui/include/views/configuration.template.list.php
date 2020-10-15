@@ -227,11 +227,13 @@ foreach ($data['templates'] as $template) {
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			new CLink(_('Hosts'),
-				(new CUrl('hosts.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_templates', [$template['templateid']])
-			),
+			$data['allowed_ui_conf_hosts']
+				? new CLink(_('Hosts'),
+					(new CUrl('hosts.php'))
+						->setArgument('filter_set', '1')
+						->setArgument('filter_templates', [$template['templateid']])
+				)
+				: _('Hosts'),
 			CViewHelper::showNum(count(array_intersect_key($template['hosts'], $data['editable_hosts'])))
 		],
 		[
