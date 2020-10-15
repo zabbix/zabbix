@@ -1642,8 +1642,8 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
-int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
-		int refresh_unsupported, int *nextcheck, char **error);
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
+		int *nextcheck, char **error);
 
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);

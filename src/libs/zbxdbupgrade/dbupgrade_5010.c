@@ -1492,6 +1492,11 @@ static int	DBpatch_5010051(void)
 
 	return DBadd_foreign_key("item_parameter", 1, &field);
 }
+
+static int	DBpatch_5010052(void)
+{
+	return DBdrop_field("config", "refresh_unsupported");
+}
 #endif
 
 DBPATCH_START(5010)
@@ -1550,5 +1555,6 @@ DBPATCH_ADD(5010048, 0, 1)
 DBPATCH_ADD(5010049, 0, 1)
 DBPATCH_ADD(5010050, 0, 1)
 DBPATCH_ADD(5010051, 0, 1)
+DBPATCH_ADD(5010052, 0, 1)
 
 DBPATCH_END()

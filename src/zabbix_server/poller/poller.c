@@ -951,7 +951,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					items[i].state, results[i].msg);
 		}
 
-		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1, poller_type,
+		DCpoller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1, poller_type,
 				nextcheck);
 	}
 

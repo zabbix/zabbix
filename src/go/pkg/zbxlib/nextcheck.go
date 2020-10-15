@@ -24,8 +24,8 @@ package zbxlib
 
 #include "common.h"
 
-int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
-		int refresh_unsupported, int *nextcheck, char **error);
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
+		int *nextcheck, char **error);
 */
 import "C"
 
@@ -35,20 +35,14 @@ import (
 	"unsafe"
 )
 
-func GetNextcheck(itemid uint64, delay string, from time.Time, unsupported bool, refresh_unsupported int) (nextcheck time.Time, err error) {
+func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, err error) {
 	var cnextcheck C.int
 	var cerr *C.char
-	var state int
 	cdelay := C.CString(delay)
 
-	if unsupported {
-		state = ItemStateNotsupported
-	} else {
-		state = ItemStateNormal
-	}
 	now := from.Unix()
-	ret := C.zbx_get_agent_item_nextcheck(C.zbx_uint64_t(itemid), cdelay, C.uchar(state), C.int(now),
-		C.int(refresh_unsupported), &cnextcheck, &cerr)
+	ret := C.zbx_get_agent_item_nextcheck(C.zbx_uint64_t(itemid), cdelay, C.int(now),
+		&cnextcheck, &cerr)
 
 	if ret != Succeed {
 		err = errors.New(C.GoString(cerr))
