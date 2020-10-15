@@ -54,6 +54,10 @@ class CMenu extends CBaseComponent {
 		}
 	}
 
+	getItems() {
+		return this._items;
+	}
+
 	collapseExpanded() {
 		this._expanded_item !== null && this._expanded_item.collapseSubmenu();
 		this._expanded_item = null;
@@ -80,6 +84,10 @@ class CMenu extends CBaseComponent {
 		}
 
 		return this;
+	}
+
+	getExpanded() {
+		return this._expanded_item;
 	}
 
 	getSelected() {

@@ -86,11 +86,7 @@ class CSidebar extends CBaseComponent {
 		clearTimeout(this._opened_timer);
 
 		if (!this._is_opened) {
-			this._is_opened = true;
-
-			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
-				ZABBIX.MenuMain.expandSelected();
-			}
+			setTimeout(() => this._is_opened = true);
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
 				this.removeClass('focus-off');
@@ -246,6 +242,10 @@ class CSidebar extends CBaseComponent {
 				}, MENU_EXPAND_SELECTED_DELAY);
 			},
 
+			expandOver: (item) => {
+				!this._is_opened && ZABBIX.MenuMain.getExpanded() === null && item.expandSubmenu();
+			},
+
 			cancelExpandSelected: () => {
 				clearTimeout(this._expand_timer);
 			},
@@ -290,10 +290,18 @@ class CSidebar extends CBaseComponent {
 				if (view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 					this.on('mouseenter', this._events.mouseenter);
 					this.on('mouseleave', this._events.mouseleave);
+
+					for (const item of ZABBIX.MenuMain.getItems()) {
+						item.hasSubmenu() && item.on('mouseenter', () => this._events.expandOver(item));
+					}
 				}
 				else {
 					this.off('mouseenter', this._events.mouseenter);
 					this.off('mouseleave', this._events.mouseleave);
+
+					for (const item of ZABBIX.MenuMain.getItems()) {
+						item.hasSubmenu() && item.off('mouseenter', () => this._events.expandOver(item));
+					}
 				}
 
 				if (this._sidebar_toggle !== null) {

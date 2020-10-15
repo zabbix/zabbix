@@ -94,9 +94,7 @@ class CMenuItem extends CBaseComponent {
 		this._events = {
 
 			click: (e) => {
-				if (!this._is_expanded) {
-					this.expandSubmenu();
-				}
+				this.expandSubmenu();
 				e.preventDefault();
 			},
 
