@@ -43,7 +43,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -115,7 +117,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.01</params>
+                     <parameters>
+                        <parameter>0.01</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -150,7 +154,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1048576</params>
+                     <parameters>
+                        <parameter>1048576</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -205,7 +211,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -225,7 +231,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -246,7 +252,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -267,7 +275,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -287,7 +297,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -307,7 +317,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -327,7 +337,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -348,7 +358,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -369,7 +381,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -389,7 +403,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -409,7 +423,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -430,7 +444,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -451,7 +467,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -472,11 +490,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -497,7 +517,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -518,7 +540,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -539,11 +563,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -564,11 +590,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -589,11 +617,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -613,7 +643,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -633,7 +663,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -654,7 +684,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -675,7 +707,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -696,7 +730,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -717,7 +753,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -737,7 +775,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -757,7 +795,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -777,7 +815,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -798,7 +836,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -819,7 +859,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1048576</params>
+                     <parameters>
+                        <parameter>1048576</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -840,7 +882,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -874,7 +918,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -1009,7 +1053,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1048576</params>
+                     <parameters>
+                        <parameter>1048576</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -1029,7 +1075,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
             </item>
@@ -1050,7 +1096,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.01</params>
+                     <parameters>
+                        <parameter>0.01</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -1080,7 +1128,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>6h</params>
+                     <parameters>
+                        <parameter>6h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>

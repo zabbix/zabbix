@@ -63,12 +63,16 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>Firmware Version: ([0-9.]+),
-\1</params>
+                     <parameters>
+                        <parameter>Firmware Version: ([0-9.]+),</parameter>
+                        <parameter>\1</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -101,12 +105,16 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>(.+) - Firmware
-\1</params>
+                     <parameters>
+                        <parameter>(.+) - Firmware</parameter>
+                        <parameter>\1</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -346,7 +354,9 @@ The serial number of the FRU.  If not available, this value is a zero-length str
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>

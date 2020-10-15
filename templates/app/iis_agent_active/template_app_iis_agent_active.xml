@@ -44,7 +44,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -132,7 +134,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -151,7 +155,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -170,7 +176,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -202,7 +210,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -221,7 +231,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -240,7 +252,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -259,7 +273,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -278,7 +294,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -297,7 +315,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -316,7 +336,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -335,7 +357,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -367,7 +391,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -386,7 +412,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -405,7 +433,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -424,7 +454,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -443,7 +475,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -462,7 +496,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -481,7 +517,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -500,7 +538,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -542,7 +582,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -561,7 +603,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -580,7 +624,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -599,7 +645,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -618,7 +666,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -637,7 +687,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -656,7 +708,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -675,7 +729,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -696,7 +752,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -731,7 +789,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -784,7 +844,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <parameters>
+                              <parameter>10m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -832,7 +894,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <parameters>
+                              <parameter>10m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -858,7 +922,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <parameters>
+                              <parameter>10m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>

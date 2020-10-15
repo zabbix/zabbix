@@ -48,11 +48,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$[&quot;Total kBytes&quot;]</params>
+                            <parameters>
+                               <parameter>$[&quot;Total kBytes&quot;]</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -77,15 +81,19 @@ BytesPerSec is not used, as it counts average since last Apache server start.</d
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$[&quot;Total kBytes&quot;]</params>
+                            <parameters>
+                               <parameter>$[&quot;Total kBytes&quot;]</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -107,7 +115,9 @@ BytesPerSec is not used, as it counts average since last Apache server start.</d
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$[&quot;Total Accesses&quot;]</params>
+                            <parameters>
+                               <parameter>$[&quot;Total Accesses&quot;]</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -131,11 +141,13 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$[&quot;Total Accesses&quot;]</params>
+                            <parameters>
+                               <parameter>$[&quot;Total Accesses&quot;]</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -158,7 +170,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.ServerUptimeSeconds</params>
+                            <parameters>
+                               <parameter>$.ServerUptimeSeconds</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -191,11 +205,15 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.ServerVersion</params>
+                            <parameters>
+                               <parameter>$.ServerVersion</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -226,7 +244,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.cleanup</params>
+                            <parameters>
+                               <parameter>$.Workers.cleanup</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -248,7 +268,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.closing</params>
+                            <parameters>
+                               <parameter>$.Workers.closing</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -270,7 +292,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.dnslookup</params>
+                            <parameters>
+                               <parameter>$.Workers.dnslookup</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -292,7 +316,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.finishing</params>
+                            <parameters>
+                               <parameter>$.Workers.finishing</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -314,7 +340,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.keepalive</params>
+                            <parameters>
+                               <parameter>$.Workers.keepalive</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -336,7 +364,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.logging</params>
+                            <parameters>
+                               <parameter>$.Workers.logging</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -358,7 +388,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.reading</params>
+                            <parameters>
+                               <parameter>$.Workers.reading</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -380,7 +412,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.sending</params>
+                            <parameters>
+                               <parameter>$.Workers.sending</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -402,7 +436,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.slot</params>
+                            <parameters>
+                               <parameter>$.Workers.slot</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -424,7 +460,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.starting</params>
+                            <parameters>
+                               <parameter>$.Workers.starting</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -446,7 +484,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Workers.waiting</params>
+                            <parameters>
+                               <parameter>$.Workers.waiting</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -468,7 +508,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.BusyWorkers</params>
+                            <parameters>
+                               <parameter>$.BusyWorkers</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -490,7 +532,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.IdleWorkers</params>
+                            <parameters>
+                               <parameter>$.IdleWorkers</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -542,7 +586,9 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
+                            <parameters>
+                               <parameter>10m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -630,7 +676,8 @@ https://httpd.apache.org/docs/current/mod/mod_status.html</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>// Convert Apache status to JSON
+                            <parameters>
+                               <parameter>// Convert Apache status to JSON
 var lines = value.split('\n');
 var output = {},
     workers = {
@@ -670,7 +717,8 @@ output.Workers = {
 };
 
 // Return JSON string
-return JSON.stringify(output);</params>
+return JSON.stringify(output);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -720,7 +768,9 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.BytesPerReq</params>
+                                    <parameters>
+                                       <parameter>$.BytesPerReq</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -742,7 +792,9 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.ConnsAsyncClosing</params>
+                                    <parameters>
+                                       <parameter>$.ConnsAsyncClosing</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -764,7 +816,9 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.ConnsAsyncKeepAlive</params>
+                                    <parameters>
+                                       <parameter>$.ConnsAsyncKeepAlive</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -786,7 +840,9 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.ConnsAsyncWriting</params>
+                                    <parameters>
+                                       <parameter>$.ConnsAsyncWriting</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -808,7 +864,9 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.ConnsTotal</params>
+                                    <parameters>
+                                       <parameter>$.ConnsTotal</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -830,7 +888,9 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Processes</params>
+                                    <parameters>
+                                       <parameter>$.Processes</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -896,11 +956,15 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.ServerMPM</params>
+                            <parameters>
+                               <parameter>$.ServerMPM</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);</params>
+                            <parameters>
+                               <parameter>return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>

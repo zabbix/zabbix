@@ -37,7 +37,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -56,7 +58,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -75,7 +79,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -96,7 +102,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>30m</params>
+                     <parameters>
+                        <parameter>30m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -125,11 +133,15 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -149,7 +161,7 @@
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -170,11 +182,15 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -194,7 +210,7 @@
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -215,11 +231,15 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -239,7 +259,7 @@
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -260,11 +280,15 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -284,7 +308,7 @@
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -305,11 +329,15 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -329,7 +357,7 @@
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -350,11 +378,15 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -374,7 +406,7 @@
                <preprocessing>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -395,11 +427,15 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -433,7 +469,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -453,7 +491,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -473,7 +513,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -493,7 +535,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -513,7 +557,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -532,7 +578,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -552,7 +600,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -600,7 +650,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -648,7 +700,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -696,7 +750,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -744,7 +800,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -792,7 +850,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -840,7 +900,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -887,7 +949,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -921,7 +985,9 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>100</params>
+                     <parameters>
+                        <parameter>100</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -946,7 +1012,9 @@
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -975,7 +1043,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>30m</params>
+                     <parameters>
+                        <parameter>30m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -1004,7 +1074,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>30m</params>
+                     <parameters>
+                        <parameter>30m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -1023,7 +1095,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>

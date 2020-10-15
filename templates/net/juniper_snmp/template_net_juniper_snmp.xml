@@ -79,7 +79,9 @@ The name, model, or detailed description of the box,indicating which product the
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -103,7 +105,9 @@ The serial number of this subject, blank if unknown or unavailable.</description
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -171,12 +175,16 @@ front panel module.</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>kernel (JUNOS [0-9a-zA-Z\.\-]+)
-\1</params>
+                     <parameters>
+                        <parameter>kernel (JUNOS [0-9a-zA-Z\.\-]+)</parameter>
+                        <parameter>\1</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>

@@ -77,7 +77,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
+                            <parameters>
+                               <parameter>10m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -111,12 +113,14 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)
-\1</params>
+                            <parameters>
+                               <parameter>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -138,8 +142,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>Active connections: ([0-9]+)
-\1</params>
+                            <parameters>
+                               <parameter>Active connections: ([0-9]+)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -162,14 +168,16 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/)
+                            <parameters>
+                               <parameter>var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/)
 if (a) {
     return a[1]-a[2]
-}</params>
+}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -211,12 +219,14 @@ if (a) {
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)
-\2</params>
+                            <parameters>
+                               <parameter>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)</parameter>
+                               <parameter>\2</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -238,8 +248,10 @@ if (a) {
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+)
-\1</params>
+                            <parameters>
+                               <parameter>Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -261,8 +273,10 @@ if (a) {
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+)
-\3</params>
+                            <parameters>
+                               <parameter>Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+)</parameter>
+                               <parameter>\3</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -284,8 +298,10 @@ if (a) {
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+)
-\2</params>
+                            <parameters>
+                               <parameter>Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+)</parameter>
+                               <parameter>\2</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -307,8 +323,10 @@ if (a) {
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)
-\3</params>
+                            <parameters>
+                               <parameter>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)</parameter>
+                               <parameter>\3</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -331,12 +349,14 @@ if (a) {
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)
-\3</params>
+                            <parameters>
+                               <parameter>server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)</parameter>
+                               <parameter>\3</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -359,12 +379,16 @@ if (a) {
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>Server: nginx\/(.+(?&lt;!\r))
-\1</params>
+                            <parameters>
+                               <parameter>Server: nginx\/(.+(?&lt;!\r))</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>

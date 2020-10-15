@@ -88,7 +88,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -110,7 +112,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -300,7 +304,9 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.1</params>
+                           <parameters>
+                              <parameter>0.1</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>

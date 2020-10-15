@@ -46,11 +46,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.cmd_flush</params>
+                     <parameters>
+                        <parameter>$.cmd_flush</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -73,11 +75,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.cmd_get</params>
+                     <parameters>
+                        <parameter>$.cmd_get</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -100,11 +104,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.cmd_set</params>
+                     <parameters>
+                        <parameter>$.cmd_set</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -127,11 +133,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.limit_maxbytes</params>
+                     <parameters>
+                        <parameter>$.limit_maxbytes</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>30m</params>
+                     <parameters>
+                        <parameter>30m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -153,7 +163,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.curr_connections</params>
+                     <parameters>
+                        <parameter>$.curr_connections</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -175,11 +187,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.max_connections</params>
+                     <parameters>
+                        <parameter>$.max_connections</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>30m</params>
+                     <parameters>
+                        <parameter>30m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -202,11 +218,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.listen_disabled_num</params>
+                     <parameters>
+                        <parameter>$.listen_disabled_num</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -237,11 +255,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.total_connections</params>
+                     <parameters>
+                        <parameter>$.total_connections</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -263,7 +283,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.connection_structures</params>
+                     <parameters>
+                        <parameter>$.connection_structures</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -286,11 +308,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.conn_yields</params>
+                     <parameters>
+                        <parameter>$.conn_yields</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -323,7 +347,9 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.rusage_system</params>
+                     <parameters>
+                        <parameter>$.rusage_system</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -362,7 +388,9 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.rusage_user</params>
+                     <parameters>
+                        <parameter>$.rusage_user</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -384,7 +412,9 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -411,11 +441,15 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pid</params>
+                     <parameters>
+                        <parameter>$.pid</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -439,7 +473,9 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.bytes</params>
+                     <parameters>
+                        <parameter>$.bytes</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -463,11 +499,13 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.bytes_read</params>
+                     <parameters>
+                        <parameter>$.bytes_read</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -491,11 +529,13 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.bytes_written</params>
+                     <parameters>
+                        <parameter>$.bytes_written</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -517,7 +557,9 @@ When sending GETs in batch mode and the connection contains too many requests (l
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.curr_items</params>
+                     <parameters>
+                        <parameter>$.curr_items</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -541,11 +583,13 @@ A high number of evictions coupled with a low hit rate means your application is
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.evictions</params>
+                     <parameters>
+                        <parameter>$.evictions</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -567,11 +611,13 @@ A high number of evictions coupled with a low hit rate means your application is
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.get_hits</params>
+                     <parameters>
+                        <parameter>$.get_hits</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -593,11 +639,13 @@ A high number of evictions coupled with a low hit rate means your application is
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.get_misses</params>
+                     <parameters>
+                        <parameter>$.get_misses</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -619,7 +667,9 @@ A high number of evictions coupled with a low hit rate means your application is
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.threads</params>
+                     <parameters>
+                        <parameter>$.threads</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -641,11 +691,13 @@ A high number of evictions coupled with a low hit rate means your application is
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.total_items</params>
+                     <parameters>
+                        <parameter>$.total_items</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -680,7 +732,9 @@ A high number of evictions coupled with a low hit rate means your application is
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.uptime</params>
+                     <parameters>
+                        <parameter>$.uptime</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -713,11 +767,15 @@ A high number of evictions coupled with a low hit rate means your application is
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.version</params>
+                     <parameters>
+                        <parameter>$.version</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>

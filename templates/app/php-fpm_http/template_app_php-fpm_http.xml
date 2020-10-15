@@ -44,11 +44,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['accepted conn']</params>
+                     <parameters>
+                        <parameter>$.['accepted conn']</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -99,7 +101,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['listen queue']</params>
+                     <parameters>
+                        <parameter>$.['listen queue']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -121,7 +125,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['listen queue len']</params>
+                     <parameters>
+                        <parameter>$.['listen queue len']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -143,7 +149,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['max listen queue']</params>
+                     <parameters>
+                        <parameter>$.['max listen queue']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -188,11 +196,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['max children reached']</params>
+                     <parameters>
+                        <parameter>$.['max children reached']</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>SIMPLE_CHANGE</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -216,11 +226,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pool</params>
+                     <parameters>
+                        <parameter>$.pool</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>3h</params>
+                     <parameters>
+                        <parameter>3h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -244,8 +258,10 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>{$PHP_FPM.PING.REPLY}$
-1</params>
+                     <parameters>
+                        <parameter>{$PHP_FPM.PING.REPLY}$</parameter>
+                        <parameter>1</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -279,11 +295,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['process manager']</params>
+                     <parameters>
+                        <parameter>$.['process manager']</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>3h</params>
+                     <parameters>
+                        <parameter>3h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -314,7 +334,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['active processes']</params>
+                     <parameters>
+                        <parameter>$.['active processes']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -336,7 +358,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['idle processes']</params>
+                     <parameters>
+                        <parameter>$.['idle processes']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -358,7 +382,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['max active processes']</params>
+                     <parameters>
+                        <parameter>$.['max active processes']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -380,7 +406,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['total processes']</params>
+                     <parameters>
+                        <parameter>$.['total processes']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -402,11 +430,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['slow requests']</params>
+                     <parameters>
+                        <parameter>$.['slow requests']</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>SIMPLE_CHANGE</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -437,7 +467,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['start time']</params>
+                     <parameters>
+                        <parameter>$.['start time']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -460,7 +492,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['start since']</params>
+                     <parameters>
+                        <parameter>$.['start since']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -506,13 +540,17 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>^[.\s\S]*X-Powered-By: PHP/([.\d]{1,})
-\1</params>
+                     <parameters>
+                        <parameter>^[.\s\S]*X-Powered-By: PHP/([.\d]{1,})</parameter>
+                        <parameter>\1</parameter>
+                     </parameters>
                      <error_handler>DISCARD_VALUE</error_handler>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>3h</params>
+                     <parameters>
+                        <parameter>3h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>

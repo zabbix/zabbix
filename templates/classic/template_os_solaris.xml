@@ -137,7 +137,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -209,7 +209,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -507,11 +507,13 @@
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -528,11 +530,13 @@
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>

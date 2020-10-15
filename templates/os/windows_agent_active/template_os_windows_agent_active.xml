@@ -748,7 +748,9 @@ and are waiting to be executed.</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -800,7 +802,9 @@ and are waiting to be executed.</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -821,7 +825,9 @@ and are waiting to be executed.</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1022,7 +1028,9 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return (100 - value)</params>
+                            <parameters>
+                               <parameter>return (100 - value)</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1209,7 +1217,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1228,7 +1236,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1248,11 +1256,13 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1271,7 +1281,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1290,7 +1300,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1310,11 +1320,13 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1335,14 +1347,18 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.Name == &quot;{#IFNAME}&quot;)].Speed.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.Name == &quot;{#IFNAME}&quot;)].Speed.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>return (value=='9223372036854775807' ? 0 : value)
-</params>
+                                    <parameters>
+                                       <parameter>return (value=='9223372036854775807' ? 0 : value)
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1368,7 +1384,9 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.Name == &quot;{#IFNAME}&quot;)].NetConnectionStatus.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.Name == &quot;{#IFNAME}&quot;)].NetConnectionStatus.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1412,7 +1430,9 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.Name == &quot;{#IFNAME}&quot;)].AdapterTypeId.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.Name == &quot;{#IFNAME}&quot;)].AdapterTypeId.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1555,17 +1575,21 @@ and {Windows network by Zabbix agent active:net.if.out[&quot;{#IFNAME}&quot;,err
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>output = JSON.parse(value).map(function(net){
+                            <parameters>
+                               <parameter>output = JSON.parse(value).map(function(net){
     return {
         &quot;{#IFNAME}&quot;: net.Name,
         &quot;{#IFDESCR}&quot;: net.Description,
         &quot;{#IFALIAS}&quot; : net.NetConnectionID
     }})
-return JSON.stringify({&quot;data&quot;: output})</params>
+return JSON.stringify({&quot;data&quot;: output})</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -1803,8 +1827,10 @@ return JSON.stringify({&quot;data&quot;: output})</params>
                     <preprocessing>
                         <step>
                             <type>STR_REPLACE</type>
-                            <params>{#INSTANCE}
-{#DEVNAME}</params>
+                            <parameters>
+                               <parameter>{#INSTANCE}</parameter>
+                               <parameter>{#DEVNAME}</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>

@@ -108,7 +108,9 @@ A    the function set available in your router&#13;
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -141,7 +143,9 @@ A    the function set available in your router&#13;
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -191,7 +195,9 @@ A    the function set available in your router&#13;
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -213,7 +219,9 @@ A    the function set available in your router&#13;
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>

@@ -98,7 +98,9 @@ CPU utilization in %</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -134,7 +136,9 @@ networking software.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -156,7 +160,9 @@ networking software.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -179,7 +185,9 @@ networking software.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>

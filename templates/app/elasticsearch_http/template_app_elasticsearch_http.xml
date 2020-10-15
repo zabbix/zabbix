@@ -51,7 +51,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.delayed_unassigned_shards</params>
+                     <parameters>
+                        <parameter>$.delayed_unassigned_shards</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -114,11 +116,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.active_shards_percent_as_number</params>
+                     <parameters>
+                        <parameter>$.active_shards_percent_as_number</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>return (100 - value)</params>
+                     <parameters>
+                        <parameter>return (100 - value)</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -140,7 +146,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.initializing_shards</params>
+                     <parameters>
+                        <parameter>$.initializing_shards</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -170,11 +178,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.number_of_data_nodes</params>
+                     <parameters>
+                        <parameter>$.number_of_data_nodes</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -196,11 +208,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.number_of_nodes</params>
+                     <parameters>
+                        <parameter>$.number_of_nodes</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -236,7 +252,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.number_of_pending_tasks</params>
+                     <parameters>
+                        <parameter>$.number_of_pending_tasks</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -258,7 +276,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.relocating_shards</params>
+                     <parameters>
+                        <parameter>$.relocating_shards</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -289,18 +309,24 @@ One or more primary shards are unassigned, so some data is unavailable. This can
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.status</params>
+                     <parameters>
+                        <parameter>$.status</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var state = ['green', 'yellow', 'red'];
+                     <parameters>
+                        <parameter>var state = ['green', 'yellow', 'red'];
 
 return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-</params>
+</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -346,11 +372,15 @@ This can occur briefly during cluster startup as primary shards are assigned.</d
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.task_max_waiting_in_queue_millis</params>
+                     <parameters>
+                        <parameter>$.task_max_waiting_in_queue_millis</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -372,7 +402,9 @@ This can occur briefly during cluster startup as primary shards are assigned.</d
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.unassigned_shards</params>
+                     <parameters>
+                        <parameter>$.unassigned_shards</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -402,11 +434,15 @@ This can occur briefly during cluster startup as primary shards are assigned.</d
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.indices.count</params>
+                     <parameters>
+                        <parameter>$.indices.count</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -429,11 +465,15 @@ This number is based on the documents in Lucene segments and may include the doc
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.indices.docs.count</params>
+                     <parameters>
+                        <parameter>$.indices.docs.count</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -455,11 +495,15 @@ This number is based on the documents in Lucene segments and may include the doc
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.nodes.count.data</params>
+                     <parameters>
+                        <parameter>$.nodes.count.data</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -481,11 +525,15 @@ This number is based on the documents in Lucene segments and may include the doc
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.nodes.count.ingest</params>
+                     <parameters>
+                        <parameter>$.nodes.count.ingest</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -507,11 +555,15 @@ This number is based on the documents in Lucene segments and may include the doc
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.nodes.count.master</params>
+                     <parameters>
+                        <parameter>$.nodes.count.master</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -544,11 +596,15 @@ This is the actual amount of free disk space the selected Elasticsearch nodes ca
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.nodes.fs.available_in_bytes</params>
+                     <parameters>
+                        <parameter>$.nodes.fs.available_in_bytes</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -571,11 +627,15 @@ This is the actual amount of free disk space the selected Elasticsearch nodes ca
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.nodes.fs.total_in_bytes</params>
+                     <parameters>
+                        <parameter>$.nodes.fs.total_in_bytes</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -618,11 +678,15 @@ This is the actual amount of free disk space the selected Elasticsearch nodes ca
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.nodes.jvm.max_uptime_in_millis</params>
+                     <parameters>
+                        <parameter>$.nodes.jvm.max_uptime_in_millis</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.001</params>
+                     <parameters>
+                        <parameter>0.001</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -684,7 +748,9 @@ This is the actual amount of free disk space the selected Elasticsearch nodes ca
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -729,11 +795,15 @@ This is the actual amount of free disk space the Elasticsearch node can utilize.
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].fs.total.available_in_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].fs.total.available_in_bytes.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -756,11 +826,15 @@ This is the actual amount of free disk space the Elasticsearch node can utilize.
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].fs.total.total_in_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].fs.total.total_in_bytes.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -782,11 +856,15 @@ This is the actual amount of free disk space the Elasticsearch node can utilize.
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].http.current_open.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].http.current_open.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -810,11 +888,13 @@ This is the actual amount of free disk space the Elasticsearch node can utilize.
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].http.total_opened.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].http.total_opened.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -861,11 +941,15 @@ and eventually prevent you from being able to add new information to your index.
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.flush.total_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.flush.total_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -887,11 +971,15 @@ and eventually prevent you from being able to add new information to your index.
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.flush.total.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.flush.total.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -913,11 +1001,15 @@ and eventually prevent you from being able to add new information to your index.
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_current.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_current.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -964,11 +1056,15 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -990,11 +1086,15 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_total.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_total.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1018,15 +1118,19 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.indexing.throttle_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.indexing.throttle_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.001</params>
+                           <parameters>
+                              <parameter>0.001</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>SIMPLE_CHANGE</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1050,15 +1154,19 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.merges.total_throttled_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.merges.total_throttled_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.001</params>
+                           <parameters>
+                              <parameter>0.001</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>SIMPLE_CHANGE</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1082,15 +1190,19 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.recovery.throttle_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.recovery.throttle_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.001</params>
+                           <parameters>
+                              <parameter>0.001</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>SIMPLE_CHANGE</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1114,11 +1226,13 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.refresh.total.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.refresh.total.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1142,15 +1256,19 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.refresh.total_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.refresh.total_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.001</params>
+                           <parameters>
+                              <parameter>0.001</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>SIMPLE_CHANGE</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1172,7 +1290,9 @@ recommends starting with a bulk indexing size of 5 to 15 megabytes and increasin
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_current.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_current.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1220,11 +1340,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1248,15 +1372,19 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.001</params>
+                           <parameters>
+                              <parameter>0.001</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>SIMPLE_CHANGE</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1278,11 +1406,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_total.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_total.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1306,11 +1438,13 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_total.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_total.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1332,7 +1466,9 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.query_current.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.query_current.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1379,11 +1515,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.query_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.query_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1407,15 +1547,19 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.query_time_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.query_time_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.001</params>
+                           <parameters>
+                              <parameter>0.001</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>SIMPLE_CHANGE</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1437,11 +1581,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.query_total.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.query_total.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1465,11 +1613,13 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].indices.search.query_total.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].indices.search.query_total.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1492,11 +1642,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_committed_in_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_committed_in_bytes.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1519,11 +1673,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_max_in_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_max_in_bytes.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1546,11 +1704,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_used_in_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_used_in_bytes.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1574,11 +1736,15 @@ or requesting too many results.</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_used_percent.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_used_percent.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1626,11 +1792,15 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].jvm.uptime_in_millis.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].jvm.uptime_in_millis.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.001</params>
+                           <parameters>
+                              <parameter>0.001</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1661,7 +1831,9 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.active.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.active.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1685,11 +1857,13 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.completed.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.completed.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1711,7 +1885,9 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.queue.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.queue.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1735,11 +1911,13 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.rejected.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.rejected.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1769,7 +1947,9 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.active.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.active.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1793,11 +1973,13 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.completed.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.completed.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1819,7 +2001,9 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.queue.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.queue.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1843,11 +2027,13 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.rejected.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.search.rejected.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1877,7 +2063,9 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.active.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.active.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1901,11 +2089,13 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.completed.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.completed.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1927,7 +2117,9 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.queue.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.queue.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1951,11 +2143,13 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.rejected.first()</params>
+                           <parameters>
+                              <parameter>$..[?(@.name=='{#ES.NODE}')].thread_pool.write.rejected.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2147,11 +2341,15 @@ guidelines stated above), or scale out the cluster by adding more nodes.</descri
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.nodes.[*]</params>
+                     <parameters>
+                        <parameter>$.nodes.[*]</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>

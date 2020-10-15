@@ -71,7 +71,9 @@ The textual identification of the contact person for this managed node, together
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -96,7 +98,9 @@ networking software.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -120,7 +124,9 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -144,7 +150,9 @@ An administratively-assigned name for this managed node.By convention, this is t
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -176,7 +184,9 @@ The vendor's authoritative identification of the network management subsystem co
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -199,7 +209,9 @@ The time (in hundredths of a second) since the network management portion of the
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.01</params>
+                     <parameters>
+                        <parameter>0.01</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>

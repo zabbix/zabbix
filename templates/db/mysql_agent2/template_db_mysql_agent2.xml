@@ -57,11 +57,13 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Aborted_clients</params>
+                            <parameters>
+                               <parameter>$.Aborted_clients</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -84,11 +86,13 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Aborted_connects</params>
+                            <parameters>
+                               <parameter>$.Aborted_connects</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -171,11 +175,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Bytes_received</params>
+                            <parameters>
+                               <parameter>$.Bytes_received</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -199,11 +205,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Bytes_sent</params>
+                            <parameters>
+                               <parameter>$.Bytes_sent</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -226,11 +234,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Com_delete</params>
+                            <parameters>
+                               <parameter>$.Com_delete</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -253,11 +263,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Com_insert</params>
+                            <parameters>
+                               <parameter>$.Com_insert</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -280,11 +292,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Com_select</params>
+                            <parameters>
+                               <parameter>$.Com_select</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -307,11 +321,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Com_update</params>
+                            <parameters>
+                               <parameter>$.Com_update</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -334,11 +350,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Connections</params>
+                            <parameters>
+                               <parameter>$.Connections</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -361,11 +379,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Connection_errors_accept</params>
+                            <parameters>
+                               <parameter>$.Connection_errors_accept</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -388,11 +408,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Connection_errors_internal</params>
+                            <parameters>
+                               <parameter>$.Connection_errors_internal</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -415,11 +437,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Connection_errors_max_connections</params>
+                            <parameters>
+                               <parameter>$.Connection_errors_max_connections</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -450,11 +474,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Connection_errors_peer_address</params>
+                            <parameters>
+                               <parameter>$.Connection_errors_peer_address</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -477,11 +503,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Connection_errors_select</params>
+                            <parameters>
+                               <parameter>$.Connection_errors_select</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -504,11 +532,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Connection_errors_tcpwrap</params>
+                            <parameters>
+                               <parameter>$.Connection_errors_tcpwrap</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -531,11 +561,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Created_tmp_disk_tables</params>
+                            <parameters>
+                               <parameter>$.Created_tmp_disk_tables</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -566,11 +598,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Created_tmp_files</params>
+                            <parameters>
+                               <parameter>$.Created_tmp_files</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -601,11 +635,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Created_tmp_tables</params>
+                            <parameters>
+                               <parameter>$.Created_tmp_tables</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -648,7 +684,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_buffer_pool_pages_free</params>
+                            <parameters>
+                               <parameter>$.Innodb_buffer_pool_pages_free</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -670,11 +708,15 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_buffer_pool_pages_total</params>
+                            <parameters>
+                               <parameter>$.Innodb_buffer_pool_pages_total</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -696,7 +738,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_buffer_pool_reads</params>
+                            <parameters>
+                               <parameter>$.Innodb_buffer_pool_reads</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -719,11 +763,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_buffer_pool_reads</params>
+                            <parameters>
+                               <parameter>$.Innodb_buffer_pool_reads</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -745,7 +791,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_buffer_pool_read_requests</params>
+                            <parameters>
+                               <parameter>$.Innodb_buffer_pool_read_requests</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -768,11 +816,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_buffer_pool_read_requests</params>
+                            <parameters>
+                               <parameter>$.Innodb_buffer_pool_read_requests</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -796,15 +846,21 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_row_lock_time</params>
+                            <parameters>
+                               <parameter>$.Innodb_row_lock_time</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -828,15 +884,21 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_row_lock_time_max</params>
+                            <parameters>
+                               <parameter>$.Innodb_row_lock_time_max</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -858,7 +920,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Innodb_row_lock_waits</params>
+                            <parameters>
+                               <parameter>$.Innodb_row_lock_waits</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -880,11 +944,15 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Max_used_connections</params>
+                            <parameters>
+                               <parameter>$.Max_used_connections</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -906,7 +974,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
+                            <parameters>
+                               <parameter>10m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -933,11 +1003,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Queries</params>
+                            <parameters>
+                               <parameter>$.Queries</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -960,11 +1032,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Questions</params>
+                            <parameters>
+                               <parameter>$.Questions</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -987,11 +1061,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Slow_queries</params>
+                            <parameters>
+                               <parameter>$.Slow_queries</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1021,7 +1097,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Threads_cached</params>
+                            <parameters>
+                               <parameter>$.Threads_cached</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1043,7 +1121,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Threads_connected</params>
+                            <parameters>
+                               <parameter>$.Threads_connected</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1066,11 +1146,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Threads_created</params>
+                            <parameters>
+                               <parameter>$.Threads_created</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1092,7 +1174,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Threads_running</params>
+                            <parameters>
+                               <parameter>$.Threads_running</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1115,7 +1199,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Uptime</params>
+                            <parameters>
+                               <parameter>$.Uptime</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1157,7 +1243,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1202,7 +1290,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                             <preprocessing>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1216,7 +1306,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -1257,17 +1349,23 @@ from the master in a timely fashion.</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Seconds_Behind_Master</params>
+                                    <parameters>
+                                       <parameter>$.Seconds_Behind_Master</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>MATCHES_REGEX</type>
-                                    <params>\d+</params>
+                                    <parameters>
+                                       <parameter>\d+</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_ERROR</error_handler>
                                     <error_handler_params>Replication is not performed.</error_handler_params>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1300,11 +1398,15 @@ explicitly stopped it with STOP SLAVE.</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Slave_IO_Running</params>
+                                    <parameters>
+                                       <parameter>$.Slave_IO_Running</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1348,11 +1450,15 @@ As with the I/O thread, this should normally be Yes.</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Slave_SQL_Running</params>
+                                    <parameters>
+                                       <parameter>$.Slave_SQL_Running</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1383,7 +1489,9 @@ As with the I/O thread, this should normally be Yes.</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>

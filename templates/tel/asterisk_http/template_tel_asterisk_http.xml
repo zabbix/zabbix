@@ -47,7 +47,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.active_calls</params>
+                     <parameters>
+                        <parameter>$.active_calls</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -69,7 +71,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.active_channels</params>
+                     <parameters>
+                        <parameter>$.active_channels</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -91,7 +95,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.calls_processed</params>
+                     <parameters>
+                        <parameter>$.calls_processed</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -114,11 +120,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.calls_processed</params>
+                     <parameters>
+                        <parameter>$.calls_processed</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -141,7 +149,8 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var Ami = {
+                     <parameters>
+                        <parameter>var Ami = {
     params: {
         url: '{$AMI.URL}',
         trunk: '{$AMI.TRUNK_REGEXP}'
@@ -369,7 +378,8 @@ asterisk.queue.total = asterisk.queue.queues.length;
 response = Ami.request(url, 'Logoff');
 
 return JSON.stringify(asterisk);
-</params>
+</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$AMI.URL}</url>
@@ -404,7 +414,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.iax.offline</params>
+                     <parameters>
+                        <parameter>$.iax.offline</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -426,7 +438,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.iax.total</params>
+                     <parameters>
+                        <parameter>$.iax.total</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -448,7 +462,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.iax.unmonitored</params>
+                     <parameters>
+                        <parameter>$.iax.unmonitored</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -470,7 +486,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pjsip.total</params>
+                     <parameters>
+                        <parameter>$.pjsip.total</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -492,7 +510,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pjsip.unavailable</params>
+                     <parameters>
+                        <parameter>$.pjsip.unavailable</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -514,7 +534,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.sip.monitored_offline</params>
+                     <parameters>
+                        <parameter>$.sip.monitored_offline</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -536,7 +558,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.sip.monitored_online</params>
+                     <parameters>
+                        <parameter>$.sip.monitored_online</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -558,7 +582,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.sip.total</params>
+                     <parameters>
+                        <parameter>$.sip.total</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -580,7 +606,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.sip.unmonitored_offline</params>
+                     <parameters>
+                        <parameter>$.sip.unmonitored_offline</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -602,7 +630,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.sip.unmonitored_online</params>
+                     <parameters>
+                        <parameter>$.sip.unmonitored_online</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -624,7 +654,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.queue.total</params>
+                     <parameters>
+                        <parameter>$.queue.total</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -648,7 +680,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.uptime</params>
+                     <parameters>
+                        <parameter>$.uptime</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -694,7 +728,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.uptime_reload</params>
+                     <parameters>
+                        <parameter>$.uptime_reload</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -727,7 +763,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.version</params>
+                     <parameters>
+                        <parameter>$.version</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -788,7 +826,9 @@ return JSON.stringify(asterisk);
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -823,7 +863,9 @@ return JSON.stringify(asterisk);
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()</params>
+                           <parameters>
+                              <parameter>$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -859,11 +901,15 @@ OK</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].Status.first()</params>
+                           <parameters>
+                              <parameter>$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].Status.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -892,11 +938,15 @@ OK</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.iax.trunks</params>
+                     <parameters>
+                        <parameter>$.iax.trunks</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -921,7 +971,9 @@ OK</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pjsip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()</params>
+                           <parameters>
+                              <parameter>$.pjsip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -956,11 +1008,15 @@ In use</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pjsip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].DeviceState.first()</params>
+                           <parameters>
+                              <parameter>$.pjsip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].DeviceState.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -989,11 +1045,15 @@ In use</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pjsip.trunks</params>
+                     <parameters>
+                        <parameter>$.pjsip.trunks</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1018,7 +1078,9 @@ In use</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()</params>
+                           <parameters>
+                              <parameter>$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1040,7 +1102,9 @@ In use</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()</params>
+                           <parameters>
+                              <parameter>$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1070,7 +1134,9 @@ In use</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()</params>
+                           <parameters>
+                              <parameter>$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1091,11 +1157,15 @@ In use</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.queue.queues</params>
+                     <parameters>
+                        <parameter>$.queue.queues</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1120,7 +1190,9 @@ In use</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.sip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()</params>
+                           <parameters>
+                              <parameter>$.sip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].active_channels.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1156,11 +1228,15 @@ OK</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.sip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].Status.first()</params>
+                           <parameters>
+                              <parameter>$.sip.trunks[?(@.ObjectName=='{#OBJECTNAME}')].Status.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1189,11 +1265,15 @@ OK</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.sip.trunks</params>
+                     <parameters>
+                        <parameter>$.sip.trunks</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>

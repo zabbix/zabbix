@@ -706,7 +706,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -725,7 +725,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -848,7 +848,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -866,7 +866,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -884,7 +884,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -902,7 +902,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -920,7 +920,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -938,7 +938,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -956,7 +956,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>

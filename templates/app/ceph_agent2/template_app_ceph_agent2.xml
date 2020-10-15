@@ -57,11 +57,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.min_mon_release_name</params>
+                     <parameters>
+                        <parameter>$.min_mon_release_name</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -92,11 +96,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.num_mon</params>
+                     <parameters>
+                        <parameter>$.num_mon</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>30m</params>
+                     <parameters>
+                        <parameter>30m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -118,11 +126,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.num_osd</params>
+                     <parameters>
+                        <parameter>$.num_osd</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -144,11 +156,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.num_osd_in</params>
+                     <parameters>
+                        <parameter>$.num_osd_in</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -170,11 +186,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.num_osd_up</params>
+                     <parameters>
+                        <parameter>$.num_osd_up</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -196,11 +216,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.num_pg</params>
+                     <parameters>
+                        <parameter>$.num_pg</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -222,7 +246,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.num_pg_temp</params>
+                     <parameters>
+                        <parameter>$.num_pg_temp</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -244,7 +270,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.num_pools</params>
+                     <parameters>
+                        <parameter>$.num_pools</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -267,11 +295,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_backfillfull_ratio</params>
+                     <parameters>
+                        <parameter>$.osd_backfillfull_ratio</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -295,7 +327,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_fill.avg</params>
+                     <parameters>
+                        <parameter>$.osd_fill.avg</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -319,7 +353,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_fill.max</params>
+                     <parameters>
+                        <parameter>$.osd_fill.max</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -343,7 +379,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_fill.min</params>
+                     <parameters>
+                        <parameter>$.osd_fill.min</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -366,11 +404,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_full_ratio</params>
+                     <parameters>
+                        <parameter>$.osd_full_ratio</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -394,7 +436,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_latency_apply.avg</params>
+                     <parameters>
+                        <parameter>$.osd_latency_apply.avg</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -418,7 +462,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_latency_apply.max</params>
+                     <parameters>
+                        <parameter>$.osd_latency_apply.max</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -442,7 +488,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_latency_apply.min</params>
+                     <parameters>
+                        <parameter>$.osd_latency_apply.min</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -466,7 +514,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_latency_commit.avg</params>
+                     <parameters>
+                        <parameter>$.osd_latency_commit.avg</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -490,7 +540,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_latency_commit.max</params>
+                     <parameters>
+                        <parameter>$.osd_latency_commit.max</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -514,7 +566,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_latency_commit.min</params>
+                     <parameters>
+                        <parameter>$.osd_latency_commit.min</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -537,11 +591,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_nearfull_ratio</params>
+                     <parameters>
+                        <parameter>$.osd_nearfull_ratio</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -564,7 +622,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_pgs.avg</params>
+                     <parameters>
+                        <parameter>$.osd_pgs.avg</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -587,7 +647,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_pgs.max</params>
+                     <parameters>
+                        <parameter>$.osd_pgs.max</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -610,7 +672,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.osd_pgs.min</params>
+                     <parameters>
+                        <parameter>$.osd_pgs.min</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -659,11 +723,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.overall_status</params>
+                     <parameters>
+                        <parameter>$.overall_status</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -707,7 +775,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.active</params>
+                     <parameters>
+                        <parameter>$.pg_states.active</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -729,7 +799,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.backfill_toofull</params>
+                     <parameters>
+                        <parameter>$.pg_states.backfill_toofull</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -751,7 +823,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.backfill_wait</params>
+                     <parameters>
+                        <parameter>$.pg_states.backfill_wait</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -773,7 +847,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.backfilling</params>
+                     <parameters>
+                        <parameter>$.pg_states.backfilling</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -795,7 +871,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.clean</params>
+                     <parameters>
+                        <parameter>$.pg_states.clean</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -817,7 +895,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.degraded</params>
+                     <parameters>
+                        <parameter>$.pg_states.degraded</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -839,7 +919,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.inconsistent</params>
+                     <parameters>
+                        <parameter>$.pg_states.inconsistent</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -861,7 +943,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.peering</params>
+                     <parameters>
+                        <parameter>$.pg_states.peering</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -883,7 +967,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.recovering</params>
+                     <parameters>
+                        <parameter>$.pg_states.recovering</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -905,7 +991,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.recovery_wait</params>
+                     <parameters>
+                        <parameter>$.pg_states.recovery_wait</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -927,7 +1015,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.remapped</params>
+                     <parameters>
+                        <parameter>$.pg_states.remapped</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -949,7 +1039,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.scrubbing</params>
+                     <parameters>
+                        <parameter>$.pg_states.scrubbing</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -971,7 +1063,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.undersized</params>
+                     <parameters>
+                        <parameter>$.pg_states.undersized</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -993,7 +1087,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.pg_states.unknown</params>
+                     <parameters>
+                        <parameter>$.pg_states.unknown</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1015,7 +1111,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>30m</params>
+                     <parameters>
+                        <parameter>30m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -1044,11 +1142,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.rd_bytes</params>
+                     <parameters>
+                        <parameter>$.rd_bytes</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1072,7 +1172,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.rd_ops</params>
+                     <parameters>
+                        <parameter>$.rd_ops</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1107,7 +1209,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.total_avail_bytes</params>
+                     <parameters>
+                        <parameter>$.total_avail_bytes</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1130,7 +1234,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.total_bytes</params>
+                     <parameters>
+                        <parameter>$.total_bytes</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1152,7 +1258,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.total_objects</params>
+                     <parameters>
+                        <parameter>$.total_objects</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1175,7 +1283,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.total_used_bytes</params>
+                     <parameters>
+                        <parameter>$.total_used_bytes</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1199,11 +1309,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.wr_bytes</params>
+                     <parameters>
+                        <parameter>$.wr_bytes</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1227,11 +1339,13 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.wr_ops</params>
+                     <parameters>
+                        <parameter>$.wr_ops</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1262,7 +1376,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.osds.{#OSDNAME}.osd_fill</params>
+                           <parameters>
+                              <parameter>$.osds.{#OSDNAME}.osd_fill</parameter>
+                           </parameters>
                            <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
@@ -1302,11 +1418,15 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.osds.{#OSDNAME}.in</params>
+                           <parameters>
+                              <parameter>$.osds.{#OSDNAME}.in</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <parameters>
+                              <parameter>10m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1330,7 +1450,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.osds.{#OSDNAME}.osd_latency_apply</params>
+                           <parameters>
+                              <parameter>$.osds.{#OSDNAME}.osd_latency_apply</parameter>
+                           </parameters>
                            <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
@@ -1355,7 +1477,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.osds.{#OSDNAME}.osd_latency_commit</params>
+                           <parameters>
+                              <parameter>$.osds.{#OSDNAME}.osd_latency_commit</parameter>
+                           </parameters>
                            <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
@@ -1377,7 +1501,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.osds.{#OSDNAME}.num_pgs</params>
+                           <parameters>
+                              <parameter>$.osds.{#OSDNAME}.num_pgs</parameter>
+                           </parameters>
                            <error_handler>DISCARD_VALUE</error_handler>
                         </step>
                      </preprocessing>
@@ -1399,11 +1525,15 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.osds.{#OSDNAME}.up</params>
+                           <parameters>
+                              <parameter>$.osds.{#OSDNAME}.up</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <parameters>
+                              <parameter>10m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1466,7 +1596,9 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.bytes_used</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.bytes_used</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1489,7 +1621,9 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.max_avail</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.max_avail</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1511,7 +1645,9 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.objects</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.objects</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1534,7 +1670,9 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.percent_used</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.percent_used</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1558,11 +1696,13 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.rd_bytes</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.rd_bytes</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1586,11 +1726,13 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.rd_ops</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.rd_ops</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1613,7 +1755,9 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.stored_raw</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.stored_raw</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1637,11 +1781,13 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.wr_bytes</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.wr_bytes</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1665,11 +1811,13 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.wr_ops</params>
+                           <parameters>
+                              <parameter>$.pools.{#POOLNAME}.wr_ops</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>

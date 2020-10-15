@@ -76,12 +76,16 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_exporter_build_info
-version</params>
+                            <parameters>
+                               <parameter>node_exporter_build_info</parameter>
+                               <parameter>version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -103,8 +107,10 @@ version</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_filefd_allocated
-</params>
+                            <parameters>
+                               <parameter>node_filefd_allocated</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -127,12 +133,16 @@ version</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_filefd_maximum
-</params>
+                            <parameters>
+                               <parameter>node_filefd_maximum</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -191,8 +201,10 @@ version</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;^node_boot_time(?:_seconds)?$&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_boot_time(?:_seconds)?$&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -216,23 +228,29 @@ version</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_guest_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=~&quot;^(?:user|guest)$&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_guest_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=~&quot;^(?:user|guest)$&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -256,23 +274,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_guest_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=~&quot;^(?:nice|guest_nice)$&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_guest_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=~&quot;^(?:nice|guest_nice)$&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -296,23 +320,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;idle&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;idle&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -336,23 +366,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;irq&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;irq&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -374,12 +410,14 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;node_intr&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;node_intr&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -403,23 +441,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;iowait&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;iowait&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -441,8 +485,10 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_load1
-</params>
+                            <parameters>
+                               <parameter>node_load1</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -464,8 +510,10 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_load5
-</params>
+                            <parameters>
+                               <parameter>node_load5</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -487,8 +535,10 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_load15
-</params>
+                            <parameters>
+                               <parameter>node_load15</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -512,23 +562,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;nice&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;nice&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -549,13 +605,17 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;idle&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;idle&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//count the number of cores
+                            <parameters>
+                               <parameter>//count the number of cores
 return JSON.parse(value).length
-</params>
+</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -579,23 +639,29 @@ return JSON.parse(value).length
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;softirq&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;softirq&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -619,23 +685,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;steal&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;steal&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -657,12 +729,14 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;node_context_switches&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;node_context_switches&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -686,23 +760,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;system&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;system&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -726,23 +806,29 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;user&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_cpu(?:_seconds_total)?$&quot;,cpu=~&quot;.+&quot;,mode=&quot;user&quot;}</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//calculates average, all cpu utilization
+                            <parameters>
+                               <parameter>//calculates average, all cpu utilization
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0)/valueArr.length;</params>
+},0)/valueArr.length;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>100</params>
+                            <parameters>
+                               <parameter>100</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -766,8 +852,10 @@ return valueArr.reduce(function(acc,obj){
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//Calculate utilization
-return (100 - value)</params>
+                            <parameters>
+                               <parameter>//Calculate utilization
+return (100 - value)</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -808,16 +896,22 @@ and {Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0</expression
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>node_uname_info</params>
+                            <parameters>
+                               <parameter>node_uname_info</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>var info = JSON.parse(value)[0];
-   return info.labels.sysname+' version: '+info.labels.release+' '+info.labels.version</params>
+                            <parameters>
+                               <parameter>var info = JSON.parse(value)[0];
+   return info.labels.sysname+' version: '+info.labels.release+' '+info.labels.version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -841,8 +935,10 @@ and {Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0</expression
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;^node_time(?:_seconds)?$&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_time(?:_seconds)?$&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -876,12 +972,16 @@ and {Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0</expression
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_uname_info
-nodename</params>
+                            <parameters>
+                               <parameter>node_uname_info</parameter>
+                               <parameter>nodename</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -914,12 +1014,16 @@ nodename</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>node_uname_info
-machine</params>
+                            <parameters>
+                               <parameter>node_uname_info</parameter>
+                               <parameter>machine</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -943,7 +1047,9 @@ machine</params>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -983,8 +1089,10 @@ machine</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;node_memory_SwapFree&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;node_memory_SwapFree&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1023,8 +1131,10 @@ machine</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;node_memory_SwapTotal&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;node_memory_SwapTotal&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1048,13 +1158,17 @@ machine</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;^node_boot_time(?:_seconds)?$&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_boot_time(?:_seconds)?$&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//use boottime to calculate uptime
-return (Math.floor(Date.now()/1000)-Number(value));</params>
+                            <parameters>
+                               <parameter>//use boottime to calculate uptime
+return (Math.floor(Date.now()/1000)-Number(value));</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1087,8 +1201,10 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;node_memory_MemAvailable&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;node_memory_MemAvailable&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1112,8 +1228,10 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_PATTERN</type>
-                            <params>{__name__=~&quot;node_memory_MemTotal&quot;}
-</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;node_memory_MemTotal&quot;}</parameter>
+                               <parameter></parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1211,12 +1329,14 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_receive_drop_total{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_receive_drop_total{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1238,12 +1358,14 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_receive_errs_total{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_receive_errs_total{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1266,16 +1388,20 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_receive_bytes_total{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_receive_bytes_total{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1297,12 +1423,14 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_transmit_drop_total{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_transmit_drop_total{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1324,12 +1452,14 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_transmit_errs_total{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_transmit_errs_total{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1352,16 +1482,20 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_transmit_bytes_total{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_transmit_bytes_total{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1385,14 +1519,18 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_speed_bytes{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_speed_bytes{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1420,12 +1558,15 @@ Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net<
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_info{device=&quot;{#IFNAME}&quot;}
-operstate</params>
+                                    <parameters>
+                                       <parameter>node_network_info{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter>operstate</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>var newvalue;
+                                    <parameters>
+                                       <parameter>var newvalue;
 switch(value) {
   case &quot;up&quot;:
     newvalue = 1;
@@ -1448,7 +1589,8 @@ switch(value) {
   default:
     newvalue = &quot;Problem parsing interface operstate in JS&quot;;
 }
-return newvalue;</params>
+return newvalue;</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1491,8 +1633,10 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_network_protocol_type{device=&quot;{#IFNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_network_protocol_type{device=&quot;{#IFNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1676,7 +1820,9 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_network_info$&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_network_info$&quot;}</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -1718,12 +1864,14 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_disk_io_time_weighted_seconds_total{device=&quot;{#DEVNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_disk_io_time_weighted_seconds_total{device=&quot;{#DEVNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1762,12 +1910,14 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_disk_reads_completed_total{device=&quot;{#DEVNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_disk_reads_completed_total{device=&quot;{#DEVNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1790,12 +1940,14 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_disk_read_time_seconds_total{device=&quot;{#DEVNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_disk_read_time_seconds_total{device=&quot;{#DEVNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1819,16 +1971,20 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_disk_io_time_seconds_total{device=&quot;{#DEVNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_disk_io_time_seconds_total{device=&quot;{#DEVNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>100</params>
+                                    <parameters>
+                                       <parameter>100</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1867,12 +2023,14 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_disk_writes_completed_total{device=&quot;{#DEVNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_disk_writes_completed_total{device=&quot;{#DEVNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1895,12 +2053,14 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>node_disk_write_time_seconds_total{device=&quot;{#DEVNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>node_disk_write_time_seconds_total{device=&quot;{#DEVNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1999,7 +2159,9 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>node_disk_io_now{device=~&quot;.+&quot;}</params>
+                            <parameters>
+                               <parameter>node_disk_io_now{device=~&quot;.+&quot;}</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -2064,8 +2226,10 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>{__name__=~&quot;^node_filesystem_avail(?:_bytes)?$&quot;, mountpoint=&quot;{#FSNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>{__name__=~&quot;^node_filesystem_avail(?:_bytes)?$&quot;, mountpoint=&quot;{#FSNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2088,11 +2252,14 @@ and {Linux by Prom:net.if.out.errors[node_exporter&quot;{#IFNAME}&quot;].max(5m)
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_TO_JSON</type>
-                                    <params>{__name__=~&quot;node_filesystem_files.*&quot;,mountpoint=&quot;{#FSNAME}&quot;}</params>
+                                    <parameters>
+                                       <parameter>{__name__=~&quot;node_filesystem_files.*&quot;,mountpoint=&quot;{#FSNAME}&quot;}</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//count vfs.fs.inode.pfree
+                                    <parameters>
+                                       <parameter>//count vfs.fs.inode.pfree
 var inode_free;
 var inode_total;
 JSON.parse(value).forEach(function(metric) {
@@ -2102,7 +2269,8 @@ JSON.parse(value).forEach(function(metric) {
       inode_free = metric['value'];
   }
 });
-return (inode_free/inode_total)*100;</params>
+return (inode_free/inode_total)*100;</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2165,8 +2333,10 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                             <preprocessing>
                                 <step>
                                     <type>PROMETHEUS_PATTERN</type>
-                                    <params>{__name__=~&quot;^node_filesystem_size(?:_bytes)?$&quot;, mountpoint=&quot;{#FSNAME}&quot;}
-</params>
+                                    <parameters>
+                                       <parameter>{__name__=~&quot;^node_filesystem_size(?:_bytes)?$&quot;, mountpoint=&quot;{#FSNAME}&quot;}</parameter>
+                                       <parameter></parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2275,7 +2445,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>PROMETHEUS_TO_JSON</type>
-                            <params>{__name__=~&quot;^node_filesystem_size(?:_bytes)?$&quot;, mountpoint=~&quot;.+&quot;}</params>
+                            <parameters>
+                               <parameter>{__name__=~&quot;^node_filesystem_size(?:_bytes)?$&quot;, mountpoint=~&quot;.+&quot;}</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>

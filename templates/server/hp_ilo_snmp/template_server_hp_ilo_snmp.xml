@@ -100,7 +100,9 @@ The machine product name.The name of the machine used in this system.</descripti
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -124,7 +126,9 @@ The serial number of the physical system unit. The string will be empty if the s
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -538,7 +542,9 @@ or if the controller does not support SCSI drives.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1048576</params>
+                           <parameters>
+                              <parameter>1048576</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -1259,7 +1265,9 @@ differ from the advertised size of a drive.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1048576</params>
+                           <parameters>
+                              <parameter>1048576</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>

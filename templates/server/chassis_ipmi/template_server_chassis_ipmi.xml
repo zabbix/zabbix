@@ -99,11 +99,15 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.[?(@.id=='{#SENSOR_ID}')].state.text.first()</params>
+                           <parameters>
+                              <parameter>$.[?(@.id=='{#SENSOR_ID}')].state.text.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -187,11 +191,15 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.[?(@.id=='{#SENSOR_ID}')].value.first()</params>
+                           <parameters>
+                              <parameter>$.[?(@.id=='{#SENSOR_ID}')].value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>

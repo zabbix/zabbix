@@ -629,7 +629,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <request_method>POST</request_method>
@@ -648,7 +648,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <request_method>POST</request_method>
@@ -667,7 +667,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <request_method>POST</request_method>
@@ -686,7 +686,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <request_method>POST</request_method>
@@ -705,7 +705,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <request_method>POST</request_method>
@@ -724,7 +724,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <request_method>POST</request_method>
@@ -743,7 +743,7 @@
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <request_method>POST</request_method>

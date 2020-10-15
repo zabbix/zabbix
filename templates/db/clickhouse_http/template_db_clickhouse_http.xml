@@ -46,7 +46,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "DistributedSend")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "DistributedSend")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -68,7 +70,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "HTTPConnection")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "HTTPConnection")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -90,7 +94,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "InterserverConnection")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "InterserverConnection")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -112,7 +118,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "MySQLConnection")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "MySQLConnection")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -136,7 +144,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "TCPConnection")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "TCPConnection")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -158,7 +168,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.data</params>
+                     <parameters>
+                        <parameter>$.data</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -194,7 +206,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "DistributedFilesToInsert")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "DistributedFilesToInsert")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -227,13 +241,15 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "DistributedConnectionFailAtAll")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "DistributedConnectionFailAtAll")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -256,13 +272,15 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "DistributedConnectionFailTry")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "DistributedConnectionFailTry")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -285,13 +303,15 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "InsertQuery")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "InsertQuery")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -314,7 +334,9 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "DelayedInserts")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "DelayedInserts")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -347,13 +369,15 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "InsertedBytes")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "InsertedBytes")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -376,13 +400,15 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "InsertedRows")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "InsertedRows")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -405,7 +431,9 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "jemalloc.allocated")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "jemalloc.allocated")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -428,7 +456,9 @@ https://clickhouse.tech/docs/en/operations/table_engines/distributed/"</descript
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "jemalloc.mapped")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "jemalloc.mapped")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -453,7 +483,9 @@ and unused dirty pages."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "jemalloc.resident")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "jemalloc.resident")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -476,7 +508,9 @@ after that background merge process run."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "MaxPartCountForPartition")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "MaxPartCountForPartition")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -513,7 +547,9 @@ SELECT queries performance can significate degrade, so clickhouse try delay inse
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "MemoryTracking")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "MemoryTracking")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -538,7 +574,9 @@ SELECT queries performance can significate degrade, so clickhouse try delay inse
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "MemoryTrackingInBackgroundProcessingPool")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "MemoryTrackingInBackgroundProcessingPool")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -563,7 +601,9 @@ SELECT queries performance can significate degrade, so clickhouse try delay inse
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "MemoryTrackingInBackgroundMoveProcessingPool")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "MemoryTrackingInBackgroundMoveProcessingPool")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -590,7 +630,9 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "MemoryTrackingForMerges")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "MemoryTrackingForMerges")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -614,7 +656,9 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "MemoryTrackingInBackgroundSchedulePool")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "MemoryTrackingInBackgroundSchedulePool")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -638,13 +682,15 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "MergedUncompressedBytes")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "MergedUncompressedBytes")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -667,13 +713,15 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "MergedRows")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "MergedRows")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -695,7 +743,9 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "Merge")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "Merge")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -718,13 +768,15 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "NetworkErrors")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "NetworkErrors")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -755,14 +807,18 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>Ok\.
-1</params>
+                     <parameters>
+                        <parameter>Ok\.</parameter>
+                        <parameter>1</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/ping</url>
@@ -822,7 +878,9 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "Query")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "Query")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -845,13 +903,15 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.data.event == "Query")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.data.event == "Query")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -873,7 +933,9 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "Read")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "Read")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -897,13 +959,15 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "ReadCompressedBytes")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "ReadCompressedBytes")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -925,7 +989,9 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.data</params>
+                     <parameters>
+                        <parameter>$.data</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -962,7 +1028,9 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "ReplicasMaxAbsoluteDelay")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "ReplicasMaxAbsoluteDelay")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -996,7 +1064,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "ReadonlyReplica")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "ReadonlyReplica")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1017,7 +1087,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "ReplicasSumQueueSize")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "ReplicasSumQueueSize")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1039,7 +1111,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "Revision")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "Revision")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1062,13 +1136,15 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "SelectQuery")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "SelectQuery")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1091,7 +1167,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.data</params>
+                     <parameters>
+                        <parameter>$.data</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -1128,7 +1206,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.data</params>
+                     <parameters>
+                        <parameter>$.data</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -1165,7 +1245,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.data</params>
+                     <parameters>
+                        <parameter>$.data</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -1202,11 +1284,15 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.data</params>
+                     <parameters>
+                        <parameter>$.data</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -1251,7 +1337,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.data</params>
+                     <parameters>
+                        <parameter>$.data</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -1288,7 +1376,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "Uptime")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "Uptime")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1333,7 +1423,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/</url>
@@ -1378,7 +1470,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "Write")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "Write")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1401,13 +1495,15 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "ZooKeeperOtherExceptions")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "ZooKeeperOtherExceptions")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1430,13 +1526,15 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "ZooKeeperHardwareExceptions")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "ZooKeeperHardwareExceptions")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1458,7 +1556,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "ZooKeeperRequest")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "ZooKeeperRequest")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1480,7 +1580,9 @@ or due to startup without ZooKeeper configured."</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "ZooKeeperSession")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "ZooKeeperSession")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1512,13 +1614,15 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "ZooKeeperUserExceptions")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "ZooKeeperUserExceptions")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1542,17 +1646,21 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.event == "ZooKeeperWaitMicroseconds")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.event == "ZooKeeperWaitMicroseconds")].value.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.000001</params>
+                     <parameters>
+                        <parameter>0.000001</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1574,7 +1682,9 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.metric == "ZooKeeperWatch")].value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.metric == "ZooKeeperWatch")].value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1597,7 +1707,9 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -1650,7 +1762,9 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.name == "{#NAME}")].bytes_allocated.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.name == "{#NAME}")].bytes_allocated.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1672,7 +1786,9 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.name == "{#NAME}")].element_count.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.name == "{#NAME}")].element_count.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1695,11 +1811,15 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.name == "{#NAME}")].bytes_allocated.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.name == "{#NAME}")].bytes_allocated.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>100</params>
+                           <parameters>
+                              <parameter>100</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1756,7 +1876,9 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].active_replicas.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].active_replicas.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1778,7 +1900,9 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].future_parts.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].future_parts.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1800,7 +1924,9 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].inserts_in_queue.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].inserts_in_queue.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1826,7 +1952,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].is_readonly.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].is_readonly.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1859,7 +1987,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].is_session_expired.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].is_session_expired.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1890,7 +2020,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].replica_lag.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].replica_lag.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1919,7 +2051,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].log_max_index.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].log_max_index.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1941,7 +2075,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].log_pointer.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].log_pointer.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1963,7 +2099,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].merges_in_queue.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].merges_in_queue.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1985,7 +2123,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].parts_to_check.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].parts_to_check.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2007,7 +2147,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].queue_size.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].queue_size.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2036,7 +2178,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].total_replicas.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].total_replicas.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2171,7 +2315,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}")].bytes.sum()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}")].bytes.sum()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2194,7 +2340,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].bytes.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].bytes.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2216,7 +2364,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].parts.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].parts.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2238,7 +2388,9 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].rows.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].rows.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>

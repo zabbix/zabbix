@@ -45,7 +45,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.ack</params>
+                            <parameters>
+                               <parameter>$.message_stats.ack</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -70,7 +72,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.ack_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.ack_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -94,7 +98,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.confirm</params>
+                            <parameters>
+                               <parameter>$.message_stats.confirm</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -119,7 +125,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.confirm_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.confirm_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -143,7 +151,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.deliver_get</params>
+                            <parameters>
+                               <parameter>$.message_stats.deliver_get</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -168,7 +178,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.deliver_get_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.deliver_get_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -192,7 +204,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.publish</params>
+                            <parameters>
+                               <parameter>$.message_stats.publish</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -217,7 +231,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.publish_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.publish_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -241,7 +257,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.publish_in</params>
+                            <parameters>
+                               <parameter>$.message_stats.publish_in</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -266,7 +284,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.publish_in_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.publish_in_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -290,7 +310,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.publish_out</params>
+                            <parameters>
+                               <parameter>$.message_stats.publish_out</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -315,7 +337,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.publish_out_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.publish_out_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -339,7 +363,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.redeliver</params>
+                            <parameters>
+                               <parameter>$.message_stats.redeliver</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -364,7 +390,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.redeliver_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.redeliver_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -388,7 +416,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.return_unroutable</params>
+                            <parameters>
+                               <parameter>$.message_stats.return_unroutable</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -413,7 +443,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.message_stats.return_unroutable_details.rate</params>
+                            <parameters>
+                               <parameter>$.message_stats.return_unroutable_details.rate</parameter>
+                            </parameters>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -437,7 +469,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.object_totals.channels</params>
+                            <parameters>
+                               <parameter>$.object_totals.channels</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -459,7 +493,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.object_totals.connections</params>
+                            <parameters>
+                               <parameter>$.object_totals.connections</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -481,7 +517,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.object_totals.consumers</params>
+                            <parameters>
+                               <parameter>$.object_totals.consumers</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -503,7 +541,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.object_totals.exchanges</params>
+                            <parameters>
+                               <parameter>$.object_totals.exchanges</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -525,7 +565,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.object_totals.queues</params>
+                            <parameters>
+                               <parameter>$.object_totals.queues</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -547,7 +589,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.queue_totals.messages</params>
+                            <parameters>
+                               <parameter>$.queue_totals.messages</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -569,7 +613,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.queue_totals.messages_ready</params>
+                            <parameters>
+                               <parameter>$.queue_totals.messages_ready</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -591,7 +637,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.queue_totals.messages_unacknowledged</params>
+                            <parameters>
+                               <parameter>$.queue_totals.messages_unacknowledged</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -613,8 +661,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>\n\s?\n(.*)
-\1</params>
+                            <parameters>
+                               <parameter>\n\s?\n(.*)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -633,8 +683,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>\n\s?\n(.*)
-\1</params>
+                            <parameters>
+                               <parameter>\n\s?\n(.*)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -688,7 +740,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.ack_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.ack_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -712,7 +766,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.ack.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.ack.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -737,7 +793,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.confirm_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.confirm_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -761,7 +819,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.confirm.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.confirm.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -786,7 +846,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.deliver_get_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.deliver_get_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -810,7 +872,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.deliver_get.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.deliver_get.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -835,7 +899,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -859,7 +925,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -884,7 +952,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_in_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_in_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -908,7 +978,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_in.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_in.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -933,7 +1005,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_out_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_out_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -957,7 +1031,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_out.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.publish_out.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -982,7 +1058,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.redeliver_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.redeliver_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -1006,7 +1084,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.redeliver.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.redeliver.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -1031,7 +1111,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.return_unroutable_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.return_unroutable_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -1055,7 +1137,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.return_unroutable.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#EXCHANGE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot; &amp;&amp; @.type ==&quot;{#TYPE}&quot;)].message_stats.return_unroutable.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -1294,7 +1378,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
+                            <parameters>
+                               <parameter>10m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1382,7 +1468,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.disk_free</params>
+                            <parameters>
+                               <parameter>$.disk_free</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1407,11 +1495,13 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.disk_free_alarm</params>
+                            <parameters>
+                               <parameter>$.disk_free_alarm</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1443,7 +1533,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.disk_free_limit</params>
+                            <parameters>
+                               <parameter>$.disk_free_limit</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1465,7 +1557,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.fd_used</params>
+                            <parameters>
+                               <parameter>$.fd_used</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1490,11 +1584,13 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.mem_alarm</params>
+                            <parameters>
+                               <parameter>$.mem_alarm</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1526,7 +1622,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.mem_limit</params>
+                            <parameters>
+                               <parameter>$.mem_limit</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1549,7 +1647,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.mem_used</params>
+                            <parameters>
+                               <parameter>$.mem_used</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1573,11 +1673,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.management_version</params>
+                            <parameters>
+                               <parameter>$.management_version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1601,11 +1705,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.rabbitmq_version</params>
+                            <parameters>
+                               <parameter>$.rabbitmq_version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1636,11 +1744,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.partitions</params>
+                            <parameters>
+                               <parameter>$.partitions</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.parse(value).length;</params>
+                            <parameters>
+                               <parameter>return JSON.parse(value).length;</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1674,11 +1786,13 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.running</params>
+                            <parameters>
+                               <parameter>$.running</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1719,7 +1833,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.run_queue</params>
+                            <parameters>
+                               <parameter>$.run_queue</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1741,7 +1857,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.sockets_total</params>
+                            <parameters>
+                               <parameter>$.sockets_total</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1763,7 +1881,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.sockets_used</params>
+                            <parameters>
+                               <parameter>$.sockets_used</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1787,11 +1907,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.uptime</params>
+                            <parameters>
+                               <parameter>$.uptime</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1823,16 +1947,20 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>\n\s?\n(.*)
-\1</params>
+                            <parameters>
+                               <parameter>\n\s?\n(.*)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.status</params>
+                            <parameters>
+                               <parameter>$.status</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>0</error_handler_params>
                         </step>
@@ -1862,8 +1990,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>\n\s?\n(.*)
-\1</params>
+                            <parameters>
+                               <parameter>\n\s?\n(.*)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1901,8 +2031,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>\n\s?\n(.*)
-\1</params>
+                            <parameters>
+                               <parameter>\n\s?\n(.*)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1921,8 +2053,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>\n\s?\n(.*)
-\1</params>
+                            <parameters>
+                               <parameter>\n\s?\n(.*)</parameter>
+                               <parameter>\1</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1971,7 +2105,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].consumers.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].consumers.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1994,7 +2130,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].memory.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].memory.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2017,7 +2155,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.ack_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.ack_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2041,7 +2181,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.ack.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.ack.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2066,7 +2208,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2090,7 +2234,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2115,7 +2261,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver_get_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver_get_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2139,7 +2287,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver_get.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.deliver_get.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2164,7 +2314,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.publish_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.publish_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2188,7 +2340,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.publish.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.publish.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2213,7 +2367,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_details.rate.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2236,7 +2392,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.redeliver_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.redeliver_details.rate.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2260,7 +2418,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.redeliver.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].message_stats.redeliver.first()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
@@ -2284,7 +2444,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2315,7 +2477,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_ready_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_ready_details.rate.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2337,7 +2501,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_ready.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_ready.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2360,7 +2526,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_unacknowledged_details.rate.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_unacknowledged_details.rate.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2382,7 +2550,9 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_unacknowledged.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.name == &quot;{#QUEUE}&quot; &amp;&amp; @.vhost == &quot;{#VHOST}&quot;)].messages_unacknowledged.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>

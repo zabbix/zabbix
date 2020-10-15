@@ -631,7 +631,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -654,7 +656,9 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -686,12 +690,16 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>Version (.+), RELEASE
-\1</params>
+                     <parameters>
+                        <parameter>Version (.+), RELEASE</parameter>
+                        <parameter>\1</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -747,7 +755,9 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>

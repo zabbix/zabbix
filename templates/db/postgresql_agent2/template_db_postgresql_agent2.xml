@@ -43,7 +43,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.archived_count</params>
+                            <parameters>
+                               <parameter>$.archived_count</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -65,7 +67,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.count_files</params>
+                            <parameters>
+                               <parameter>$.count_files</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -89,7 +93,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.failed_count</params>
+                            <parameters>
+                               <parameter>$.failed_count</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -112,7 +118,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.size_files</params>
+                            <parameters>
+                               <parameter>$.size_files</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -160,11 +168,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.buffers_alloc</params>
+                            <parameters>
+                               <parameter>$.buffers_alloc</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -187,11 +197,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.buffers_backend</params>
+                            <parameters>
+                               <parameter>$.buffers_backend</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -214,11 +226,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.buffers_backend_fsync</params>
+                            <parameters>
+                               <parameter>$.buffers_backend_fsync</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -241,11 +255,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.buffers_checkpoint</params>
+                            <parameters>
+                               <parameter>$.buffers_checkpoint</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -268,11 +284,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.buffers_clean</params>
+                            <parameters>
+                               <parameter>$.buffers_clean</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -295,11 +313,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.checkpoints_req</params>
+                            <parameters>
+                               <parameter>$.checkpoints_req</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -322,11 +342,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.checkpoints_timed</params>
+                            <parameters>
+                               <parameter>$.checkpoints_timed</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -350,15 +372,19 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.checkpoint_write_time</params>
+                            <parameters>
+                               <parameter>$.checkpoint_write_time</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -381,11 +407,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.maxwritten_clean</params>
+                            <parameters>
+                               <parameter>$.maxwritten_clean</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -409,15 +437,19 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.sync_time</params>
+                            <parameters>
+                               <parameter>$.sync_time</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -464,7 +496,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.active</params>
+                            <parameters>
+                               <parameter>$.active</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -486,7 +520,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.disabled</params>
+                            <parameters>
+                               <parameter>$.disabled</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -508,7 +544,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.idle_in_transaction</params>
+                            <parameters>
+                               <parameter>$.idle_in_transaction</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -530,7 +568,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.idle</params>
+                            <parameters>
+                               <parameter>$.idle</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -552,7 +592,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.idle_in_transaction</params>
+                            <parameters>
+                               <parameter>$.idle_in_transaction</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -574,7 +616,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.idle_in_transaction_aborted</params>
+                            <parameters>
+                               <parameter>$.idle_in_transaction_aborted</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -597,7 +641,9 @@ https://www.postgresql.org/docs/current/sql-prepare-transaction.html</descriptio
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.prepared</params>
+                            <parameters>
+                               <parameter>$.prepared</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -619,7 +665,9 @@ https://www.postgresql.org/docs/current/sql-prepare-transaction.html</descriptio
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.total</params>
+                            <parameters>
+                               <parameter>$.total</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -642,7 +690,9 @@ https://www.postgresql.org/docs/current/sql-prepare-transaction.html</descriptio
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.total_pct</params>
+                            <parameters>
+                               <parameter>$.total_pct</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -672,7 +722,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.waiting</params>
+                            <parameters>
+                               <parameter>$.waiting</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -709,11 +761,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.blks_hit</params>
+                            <parameters>
+                               <parameter>$.blks_hit</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -736,11 +790,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.blks_read</params>
+                            <parameters>
+                               <parameter>$.blks_read</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -764,11 +820,15 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.blk_read_time</params>
+                            <parameters>
+                               <parameter>$.blk_read_time</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -792,11 +852,15 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.blk_read_time</params>
+                            <parameters>
+                               <parameter>$.blk_read_time</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -819,15 +883,19 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.checksum_failures</params>
+                            <parameters>
+                               <parameter>$.checksum_failures</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MATCHES_REGEX</type>
-                            <params>^\d*$</params>
+                            <parameters>
+                               <parameter>^\d*$</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                             <error_handler>CUSTOM_VALUE</error_handler>
                             <error_handler_params>ZBX_NOTSUPPORTED: Checksum failures metric is supported only in PostgreSQL 12 or higher.</error_handler_params>
                         </step>
@@ -852,11 +920,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.conflicts</params>
+                            <parameters>
+                               <parameter>$.conflicts</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -879,11 +949,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.deadlocks</params>
+                            <parameters>
+                               <parameter>$.deadlocks</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -900,7 +972,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.numbackends</params>
+                            <parameters>
+                               <parameter>$.numbackends</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -924,11 +998,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.temp_bytes</params>
+                            <parameters>
+                               <parameter>$.temp_bytes</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -951,11 +1027,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.temp_files</params>
+                            <parameters>
+                               <parameter>$.temp_files</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -978,11 +1056,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.tup_deleted</params>
+                            <parameters>
+                               <parameter>$.tup_deleted</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1005,11 +1085,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.tup_fetched</params>
+                            <parameters>
+                               <parameter>$.tup_fetched</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1032,11 +1114,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.tup_inserted</params>
+                            <parameters>
+                               <parameter>$.tup_inserted</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1059,11 +1143,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.tup_returned</params>
+                            <parameters>
+                               <parameter>$.tup_returned</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1086,11 +1172,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.tup_updated</params>
+                            <parameters>
+                               <parameter>$.tup_updated</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1113,11 +1201,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.xact_commit</params>
+                            <parameters>
+                               <parameter>$.xact_commit</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1140,11 +1230,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.xact_rollback</params>
+                            <parameters>
+                               <parameter>$.xact_rollback</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1224,7 +1316,9 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1332,7 +1426,9 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.write</params>
+                            <parameters>
+                               <parameter>$.write</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1369,11 +1465,13 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.write</params>
+                            <parameters>
+                               <parameter>$.write</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1449,11 +1547,13 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].blks_hit</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].blks_hit</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1476,11 +1576,13 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].blks_read</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].blks_read</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1504,15 +1606,19 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].blk_read_time</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].blk_read_time</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>0.001</params>
+                                    <parameters>
+                                       <parameter>0.001</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1536,15 +1642,19 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].blk_write_time</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].blk_write_time</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>0.001</params>
+                                    <parameters>
+                                       <parameter>0.001</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1567,15 +1677,19 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].checksum_failures</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].checksum_failures</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>MATCHES_REGEX</type>
-                                    <params>^\d*$</params>
+                                    <parameters>
+                                       <parameter>^\d*$</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>ZBX_NOTSUPPORTED: Checksum failures metric is supported only in PostgreSQL 12 or higher.</error_handler_params>
                                 </step>
@@ -1600,11 +1714,13 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].conflicts</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].conflicts</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1636,11 +1752,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].deadlocks</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].deadlocks</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1669,7 +1787,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].numbackends</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].numbackends</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1692,11 +1812,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].temp_bytes</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].temp_bytes</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1718,11 +1840,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].temp_files</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].temp_files</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1745,11 +1869,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].tup_deleted</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].tup_deleted</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1772,11 +1898,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].tup_fetched</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].tup_fetched</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1799,11 +1927,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].tup_inserted</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].tup_inserted</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1826,11 +1956,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].tup_returned</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].tup_returned</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1853,11 +1985,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].tup_updated</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].tup_updated</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1880,11 +2014,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].xact_commit</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].xact_commit</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1907,11 +2043,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].xact_rollback</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].xact_rollback</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1933,7 +2071,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].accessexclusive</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].accessexclusive</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1955,7 +2095,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].accessshare</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].accessshare</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1977,7 +2119,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].exclusive</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].exclusive</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1999,7 +2143,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].rowexclusive</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].rowexclusive</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2021,7 +2167,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].rowshare</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].rowshare</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2043,7 +2191,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].sharerowexclusive</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].sharerowexclusive</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2065,7 +2215,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].shareupdateexclusive</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].shareupdateexclusive</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2087,7 +2239,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].share</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].share</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2109,7 +2263,9 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$['{#DBNAME}'].total</params>
+                                    <parameters>
+                                       <parameter>$['{#DBNAME}'].total</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>

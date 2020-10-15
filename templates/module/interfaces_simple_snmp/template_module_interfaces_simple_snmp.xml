@@ -121,7 +121,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -142,7 +142,7 @@ For packet-oriented interfaces, the number of inbound packets that contained err
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -164,11 +164,13 @@ The total number of octets received on the interface,including framing character
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -193,7 +195,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -214,7 +216,7 @@ For packet-oriented interfaces, the number of outbound packets that contained er
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -236,11 +238,13 @@ The total number of octets transmitted out of the interface, including framing c
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -330,7 +334,9 @@ through updating the syntax of the IANAifType textual convention.</description>
                             <preprocessing>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>

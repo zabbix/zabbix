@@ -57,11 +57,13 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Aborted_clients']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Aborted_clients']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -84,11 +86,13 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Aborted_connects']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Aborted_connects']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -171,11 +175,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Bytes_received']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Bytes_received']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -199,11 +205,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Bytes_sent']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Bytes_sent']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -226,11 +234,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Com_delete']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Com_delete']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -253,11 +263,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Com_insert']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Com_insert']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -280,11 +292,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Com_select']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Com_select']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -307,11 +321,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Com_update']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Com_update']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -334,11 +350,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Connections']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Connections']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -361,11 +379,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Connection_errors_accept']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Connection_errors_accept']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -388,11 +408,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Connection_errors_internal']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Connection_errors_internal']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -415,11 +437,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Connection_errors_max_connections']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Connection_errors_max_connections']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -450,11 +474,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Connection_errors_peer_address']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Connection_errors_peer_address']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -477,11 +503,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Connection_errors_select']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Connection_errors_select']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -504,11 +532,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Connection_errors_tcpwrap']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Connection_errors_tcpwrap']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -531,11 +561,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Created_tmp_disk_tables']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Created_tmp_disk_tables']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -566,11 +598,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Created_tmp_files']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Created_tmp_files']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -601,11 +635,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Created_tmp_tables']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Created_tmp_tables']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -648,7 +684,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_buffer_pool_pages_free']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_buffer_pool_pages_free']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -670,11 +708,15 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_buffer_pool_pages_total']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_buffer_pool_pages_total']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -696,7 +738,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_buffer_pool_reads']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_buffer_pool_reads']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -719,11 +763,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_buffer_pool_reads']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_buffer_pool_reads']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -745,7 +791,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_buffer_pool_read_requests']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_buffer_pool_read_requests']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -768,11 +816,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_buffer_pool_read_requests']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_buffer_pool_read_requests']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -796,15 +846,21 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_row_lock_time']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_row_lock_time']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -828,15 +884,21 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_row_lock_time_max']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_row_lock_time_max']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>0.001</params>
+                            <parameters>
+                               <parameter>0.001</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -858,7 +920,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Innodb_row_lock_waits']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Innodb_row_lock_waits']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -880,11 +944,15 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Max_used_connections']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Max_used_connections']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -906,11 +974,15 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return value.indexOf('is alive') !== -1 ? 1 : 0;</params>
+                            <parameters>
+                               <parameter>return value.indexOf('is alive') !== -1 ? 1 : 0;</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
+                            <parameters>
+                               <parameter>10m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -937,11 +1009,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Queries']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Queries']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -964,11 +1038,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Questions']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Questions']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -991,11 +1067,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Slow_queries']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Slow_queries']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1025,7 +1103,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Threads_cached']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Threads_cached']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1047,7 +1127,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Threads_connected']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Threads_connected']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1070,11 +1152,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Threads_created']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Threads_created']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1096,7 +1180,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Threads_running']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Threads_running']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1119,7 +1205,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>XMLPATH</type>
-                            <params>/resultset/row[field/text()='Uptime']/field[@name='Value']/text()</params>
+                            <parameters>
+                               <parameter>/resultset/row[field/text()='Uptime']/field[@name='Value']/text()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1161,12 +1249,16 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
-                            <params>(Server version)\s+(.+)
-\2</params>
+                            <parameters>
+                               <parameter>(Server version)\s+(.+)</parameter>
+                               <parameter>\2</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1211,7 +1303,9 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                             <preprocessing>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1219,13 +1313,17 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(value.split(&quot;\n&quot;).map(function (name) {
+                            <parameters>
+                               <parameter>return JSON.stringify(value.split(&quot;\n&quot;).map(function (name) {
     return ({&quot;{#DBNAME}&quot;: name});
-}));</params>
+}));</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -1253,15 +1351,21 @@ from the master in a timely fashion.</description>
                             <preprocessing>
                                 <step>
                                     <type>XMLPATH</type>
-                                    <params>/resultset/row/field[@name='Seconds_Behind_Master']/text()</params>
+                                    <parameters>
+                                       <parameter>/resultset/row/field[@name='Seconds_Behind_Master']/text()</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>NOT_MATCHES_REGEX</type>
-                                    <params>null</params>
+                                    <parameters>
+                                       <parameter>null</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_ERROR</error_handler>
                                     <error_handler_params>Replication is not performed.</error_handler_params>
                                 </step>
@@ -1296,11 +1400,15 @@ explicitly stopped it with STOP SLAVE.</description>
                             <preprocessing>
                                 <step>
                                     <type>XMLPATH</type>
-                                    <params>/resultset/row/field[@name='Slave_IO_Running']/text()</params>
+                                    <parameters>
+                                       <parameter>/resultset/row/field[@name='Slave_IO_Running']/text()</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1344,11 +1452,15 @@ As with the I/O thread, this should normally be Yes.</description>
                             <preprocessing>
                                 <step>
                                     <type>XMLPATH</type>
-                                    <params>/resultset/row/field[@name='Slave_SQL_Running']/text()</params>
+                                    <parameters>
+                                       <parameter>/resultset/row/field[@name='Slave_SQL_Running']/text()</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1386,16 +1498,20 @@ As with the I/O thread, this should normally be Yes.</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>var matches = value.match(/Master_Host.*&gt;(.*)&lt;.*/);
+                            <parameters>
+                               <parameter>var matches = value.match(/Master_Host.*&gt;(.*)&lt;.*/);
 if (matches) {
     return JSON.stringify([{&quot;{#MASTERHOST}&quot;: matches[1]}]);
 }
 
-return '[]';</params>
+return '[]';</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>

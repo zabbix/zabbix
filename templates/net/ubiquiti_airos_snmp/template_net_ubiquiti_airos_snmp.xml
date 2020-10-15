@@ -105,7 +105,9 @@ Printable string used to identify the manufacturer's product version of the reso
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -139,7 +141,9 @@ A printable string used to identify the manufacturer's product name of the resou
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -160,7 +164,9 @@ Memory used by kernel buffers (Buffers in /proc/meminfo)</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -181,7 +187,9 @@ Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)</desc
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -201,7 +209,9 @@ Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)</desc
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -222,7 +232,9 @@ Total memory in Bytes</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>

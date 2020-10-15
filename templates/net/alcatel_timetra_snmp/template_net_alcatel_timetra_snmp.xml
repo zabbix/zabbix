@@ -100,12 +100,16 @@ The value of sgiCpuUsage indicates the current CPU utilization for the system.</
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>^(\w|-|\.|/)+ (\w|-|\.|/)+ (.+) Copyright
-\3</params>
+                     <parameters>
+                        <parameter>^(\w|-|\.|/)+ (\w|-|\.|/)+ (.+) Copyright</parameter>
+                        <parameter>\3</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -128,12 +132,16 @@ The value of sgiCpuUsage indicates the current CPU utilization for the system.</
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>^((\w|-|\.|/)+)
-\1</params>
+                     <parameters>
+                        <parameter>^((\w|-|\.|/)+)</parameter>
+                        <parameter>\1</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -164,7 +172,9 @@ The value of sgiKbMemoryAvailable indicates the amount of free memory, in kiloby
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -199,7 +209,9 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -263,7 +275,9 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>

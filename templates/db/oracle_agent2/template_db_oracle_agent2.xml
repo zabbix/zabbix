@@ -42,7 +42,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Active Parallel Sessions']</params>
+                     <parameters>
+                        <parameter>$.['Active Parallel Sessions']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -65,7 +67,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Active Serial Sessions']</params>
+                     <parameters>
+                        <parameter>$.['Active Serial Sessions']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -88,7 +92,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Average Active Sessions']</params>
+                     <parameters>
+                        <parameter>$.['Average Active Sessions']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -126,7 +132,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..archiver.first()</params>
+                     <parameters>
+                        <parameter>$..archiver.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -150,7 +158,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Buffer Cache Hit Ratio']</params>
+                     <parameters>
+                        <parameter>$.['Buffer Cache Hit Ratio']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -172,7 +182,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Global Cache Blocks Corrupted']</params>
+                     <parameters>
+                        <parameter>$.['Global Cache Blocks Corrupted']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -194,7 +206,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Global Cache Blocks Lost']</params>
+                     <parameters>
+                        <parameter>$.['Global Cache Blocks Lost']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -231,7 +245,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Cursor Cache Hit Ratio']</params>
+                     <parameters>
+                        <parameter>$.['Cursor Cache Hit Ratio']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -255,7 +271,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Database CPU Time Ratio']</params>
+                     <parameters>
+                        <parameter>$.['Database CPU Time Ratio']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -279,7 +297,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Database Wait Time Ratio']</params>
+                     <parameters>
+                        <parameter>$.['Database Wait Time Ratio']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -299,7 +319,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.datafile_num</params>
+                     <parameters>
+                        <parameter>$.datafile_num</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -318,7 +340,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.db_files</params>
+                     <parameters>
+                        <parameter>$.db_files</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -342,7 +366,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Disk Sort Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Disk Sort Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -379,7 +405,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Enqueue Timeouts Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Enqueue Timeouts Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -401,7 +429,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.number_of_files</params>
+                     <parameters>
+                        <parameter>$.number_of_files</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -423,7 +453,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.restore_point</params>
+                     <parameters>
+                        <parameter>$.restore_point</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -446,7 +478,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.space_limit</params>
+                     <parameters>
+                        <parameter>$.space_limit</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -469,7 +503,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.space_reclaimable</params>
+                     <parameters>
+                        <parameter>$.space_reclaimable</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -492,7 +528,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.space_used</params>
+                     <parameters>
+                        <parameter>$.space_used</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -515,7 +553,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.usable_pct</params>
+                     <parameters>
+                        <parameter>$.usable_pct</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -552,7 +592,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['GC CR Block Received Per Second']</params>
+                     <parameters>
+                        <parameter>$.['GC CR Block Received Per Second']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -576,7 +618,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..hostname.first()</params>
+                     <parameters>
+                        <parameter>$..hostname.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -609,7 +653,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.instance</params>
+                     <parameters>
+                        <parameter>$.instance</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -643,7 +689,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.status</params>
+                     <parameters>
+                        <parameter>$.status</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -681,7 +729,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.role</params>
+                     <parameters>
+                        <parameter>$.role</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -705,7 +755,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Library Cache Hit Ratio']</params>
+                     <parameters>
+                        <parameter>$.['Library Cache Hit Ratio']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -729,7 +781,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Logons Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Logons Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -753,7 +807,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Long Table Scans Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Long Table Scans Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -777,7 +833,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Memory Sorts Ratio']</params>
+                     <parameters>
+                        <parameter>$.['Memory Sorts Ratio']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -813,7 +871,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['global memory bound']</params>
+                     <parameters>
+                        <parameter>$.['global memory bound']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -836,7 +896,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['aggregate PGA target parameter']</params>
+                     <parameters>
+                        <parameter>$.['aggregate PGA target parameter']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -873,7 +935,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Physical Read Bytes Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Physical Read Bytes Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -897,7 +961,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Physical Reads Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Physical Reads Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -921,7 +987,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Physical Write Bytes Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Physical Write Bytes Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -945,7 +1013,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Physical Writes Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['Physical Writes Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -969,7 +1039,9 @@
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -993,7 +1065,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.proc_num</params>
+                     <parameters>
+                        <parameter>$.proc_num</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -1012,7 +1086,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.processes</params>
+                     <parameters>
+                        <parameter>$.processes</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1032,7 +1108,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.available</params>
+                     <parameters>
+                        <parameter>$.available</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -1060,7 +1138,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Rows Per Sort']</params>
+                     <parameters>
+                        <parameter>$.['Rows Per Sort']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1084,11 +1164,15 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['SQL Service Response Time']</params>
+                     <parameters>
+                        <parameter>$.['SQL Service Response Time']</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.01</params>
+                     <parameters>
+                        <parameter>0.01</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1111,7 +1195,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.active_background</params>
+                     <parameters>
+                        <parameter>$.active_background</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1136,7 +1222,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.active_user</params>
+                     <parameters>
+                        <parameter>$.active_user</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1162,7 +1250,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.concurrency_rate</params>
+                     <parameters>
+                        <parameter>$.concurrency_rate</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1193,7 +1283,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.total</params>
+                     <parameters>
+                        <parameter>$.total</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1216,7 +1308,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.inactive_user</params>
+                     <parameters>
+                        <parameter>$.inactive_user</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1240,7 +1334,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.sessions</params>
+                     <parameters>
+                        <parameter>$.sessions</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1264,7 +1360,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.lock_rate</params>
+                     <parameters>
+                        <parameter>$.lock_rate</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1295,7 +1393,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.long_time_locked</params>
+                     <parameters>
+                        <parameter>$.long_time_locked</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1339,7 +1439,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.buffer_cache</params>
+                     <parameters>
+                        <parameter>$.buffer_cache</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1362,7 +1464,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.fixed_sga</params>
+                     <parameters>
+                        <parameter>$.fixed_sga</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1385,7 +1489,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.java_pool</params>
+                     <parameters>
+                        <parameter>$.java_pool</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1408,7 +1514,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.large_pool</params>
+                     <parameters>
+                        <parameter>$.large_pool</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1431,7 +1539,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.log_buffer</params>
+                     <parameters>
+                        <parameter>$.log_buffer</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1454,7 +1564,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.shared_pool</params>
+                     <parameters>
+                        <parameter>$.shared_pool</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1491,7 +1603,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Shared Pool Free %']</params>
+                     <parameters>
+                        <parameter>$.['Shared Pool Free %']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1522,7 +1636,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Total Sorts Per User Call']</params>
+                     <parameters>
+                        <parameter>$.['Total Sorts Per User Call']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1573,7 +1689,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['Temp Space Used']</params>
+                     <parameters>
+                        <parameter>$.['Temp Space Used']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1596,7 +1714,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['total PGA allocated']</params>
+                     <parameters>
+                        <parameter>$.['total PGA allocated']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1619,7 +1739,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['total freeable PGA memory']</params>
+                     <parameters>
+                        <parameter>$.['total freeable PGA memory']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1642,7 +1764,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['total PGA inuse']</params>
+                     <parameters>
+                        <parameter>$.['total PGA inuse']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1679,7 +1803,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.uptime</params>
+                     <parameters>
+                        <parameter>$.uptime</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1718,7 +1844,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.['User Rollbacks Per Sec']</params>
+                     <parameters>
+                        <parameter>$.['User Rollbacks Per Sec']</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1740,7 +1868,9 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.exp_passwd_days_before</params>
+                     <parameters>
+                        <parameter>$.exp_passwd_days_before</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -1769,11 +1899,15 @@
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.version</params>
+                     <parameters>
+                        <parameter>$.version</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1815,7 +1949,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DEST_NAME}'].log_sequence.first()</params>
+                           <parameters>
+                              <parameter>$..['{#DEST_NAME}'].log_sequence.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1837,7 +1973,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DEST_NAME}'].log_sequence.first()</params>
+                           <parameters>
+                              <parameter>$..['{#DEST_NAME}'].log_sequence.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1862,7 +2000,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DEST_NAME}'].log_sequence.first()</params>
+                           <parameters>
+                              <parameter>$..['{#DEST_NAME}'].log_sequence.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1921,11 +2061,15 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#DBNAME}.force_logging.first()</params>
+                           <parameters>
+                              <parameter>$..{#DBNAME}.force_logging.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1950,11 +2094,15 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#DBNAME}.log_mode.first()</params>
+                           <parameters>
+                              <parameter>$..{#DBNAME}.log_mode.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1979,11 +2127,15 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#DBNAME}.open_mode.first()</params>
+                           <parameters>
+                              <parameter>$..{#DBNAME}.open_mode.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2029,11 +2181,15 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#DBNAME}.role.first()</params>
+                           <parameters>
+                              <parameter>$..{#DBNAME}.role.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2083,7 +2239,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DG_NAME}'].free_size_byte.first()</params>
+                           <parameters>
+                              <parameter>$..['{#DG_NAME}'].free_size_byte.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2106,7 +2264,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DG_NAME}'].size_byte.first()</params>
+                           <parameters>
+                              <parameter>$..['{#DG_NAME}'].size_byte.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2130,7 +2290,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..['{#DG_NAME}'].used_percent.first()</params>
+                           <parameters>
+                              <parameter>$..['{#DG_NAME}'].used_percent.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2223,11 +2385,15 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#DBNAME}.open_mode.first()</params>
+                           <parameters>
+                              <parameter>$..{#DBNAME}.open_mode.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2291,7 +2457,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..{#TABLESPACE}.used_bytes.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2314,7 +2482,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.free_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..{#TABLESPACE}.free_bytes.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2337,7 +2507,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.max_bytes.first()</params>
+                           <parameters>
+                              <parameter>$..{#TABLESPACE}.max_bytes.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2362,7 +2534,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.status.first()</params>
+                           <parameters>
+                              <parameter>$..{#TABLESPACE}.status.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2407,7 +2581,9 @@
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_pct.first()</params>
+                           <parameters>
+                              <parameter>$..{#TABLESPACE}.used_pct.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>

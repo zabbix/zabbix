@@ -163,7 +163,9 @@ Total CPU utlization (percentage) as of last sampling.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -196,7 +198,9 @@ Total CPU utlization (percentage) as of last sampling.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -219,7 +223,9 @@ Total CPU utlization (percentage) as of last sampling.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -250,7 +256,9 @@ Total CPU utlization (percentage) as of last sampling.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -276,7 +284,9 @@ This will also be reported in RMON2 probeSoftwareRev if this is the software ima
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -368,7 +378,9 @@ Total amount of free memory in Kbytes in the system.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -389,7 +401,9 @@ Total amount of DRAM in Kbytes in the system.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>

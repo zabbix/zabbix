@@ -37,7 +37,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.lld_queue</params>
+                            <parameters>
+                               <parameter>$.data.lld_queue</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -59,7 +61,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.preprocessing_queue</params>
+                            <parameters>
+                               <parameter>$.data.preprocessing_queue</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -82,7 +86,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process.alerter.busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process.alerter.busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -114,7 +120,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['alert manager'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['alert manager'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -146,7 +154,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['alert syncer'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['alert syncer'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -178,7 +188,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['configuration syncer'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['configuration syncer'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -211,7 +223,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process.discoverer.busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process.discoverer.busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -243,7 +257,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process.escalator.busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process.escalator.busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -275,7 +291,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['history syncer'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['history syncer'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -307,7 +325,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process.housekeeper.busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process.housekeeper.busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -339,7 +359,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['http poller'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['http poller'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -371,7 +393,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['icmp pinger'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['icmp pinger'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -403,7 +427,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['ipmi manager'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['ipmi manager'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -435,7 +461,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['ipmi poller'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['ipmi poller'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -467,7 +495,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['java poller'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['java poller'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -499,7 +529,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['lld manager'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['lld manager'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -531,7 +563,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['lld worker'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['lld worker'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -563,7 +597,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process.poller.busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process.poller.busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -595,7 +631,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['preprocessing manager'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['preprocessing manager'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -627,7 +665,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['preprocessing worker'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['preprocessing worker'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -659,7 +699,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['proxy poller'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['proxy poller'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -691,7 +733,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['self-monitoring'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['self-monitoring'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -723,7 +767,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['snmp trapper'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['snmp trapper'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -755,7 +801,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['task manager'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['task manager'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -787,7 +835,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process.timer.busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process.timer.busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -819,7 +869,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process.trapper.busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process.trapper.busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -851,7 +903,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['unreachable poller'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['unreachable poller'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -883,7 +937,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.process['vmware collector'].busy.avg</params>
+                            <parameters>
+                               <parameter>$.data.process['vmware collector'].busy.avg</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -915,7 +971,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.rcache.pused</params>
+                            <parameters>
+                               <parameter>$.data.rcache.pused</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -946,7 +1004,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.vcache.buffer.pused</params>
+                            <parameters>
+                               <parameter>$.data.vcache.buffer.pused</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -977,11 +1037,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.vcache.cache.hits</params>
+                            <parameters>
+                               <parameter>$.data.vcache.cache.hits</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1004,11 +1066,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.vcache.cache.misses</params>
+                            <parameters>
+                               <parameter>$.data.vcache.cache.misses</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1032,7 +1096,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.vcache.cache.mode</params>
+                            <parameters>
+                               <parameter>$.data.vcache.cache.mode</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1063,11 +1129,15 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.version</params>
+                            <parameters>
+                               <parameter>$.data.version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1099,7 +1169,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.vmware.pused</params>
+                            <parameters>
+                               <parameter>$.data.vmware.pused</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1130,7 +1202,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.history.pused</params>
+                            <parameters>
+                               <parameter>$.data.wcache.history.pused</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1161,7 +1235,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.index.pused</params>
+                            <parameters>
+                               <parameter>$.data.wcache.index.pused</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1192,7 +1268,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.trend.pused</params>
+                            <parameters>
+                               <parameter>$.data.wcache.trend.pused</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1222,11 +1300,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.values.all</params>
+                            <parameters>
+                               <parameter>$.data.wcache.values.all</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1248,11 +1328,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.values.float</params>
+                            <parameters>
+                               <parameter>$.data.wcache.values.float</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1274,11 +1356,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.values.log</params>
+                            <parameters>
+                               <parameter>$.data.wcache.values.log</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1300,11 +1384,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.values['not supported']</params>
+                            <parameters>
+                               <parameter>$.data.wcache.values['not supported']</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1326,11 +1412,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.values.str</params>
+                            <parameters>
+                               <parameter>$.data.wcache.values.str</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1352,11 +1440,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.values.text</params>
+                            <parameters>
+                               <parameter>$.data.wcache.values.text</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1378,11 +1468,13 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.data.wcache.values.uint</params>
+                            <parameters>
+                               <parameter>$.data.wcache.values.uint</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1403,7 +1495,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.queue</params>
+                            <parameters>
+                               <parameter>$.queue</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1428,7 +1522,9 @@
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.queue</params>
+                            <parameters>
+                               <parameter>$.queue</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>

@@ -45,11 +45,15 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.etcdcluster</params>
+                     <parameters>
+                        <parameter>$.etcdcluster</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -82,12 +86,14 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>process_cpu_seconds_total
-</params>
+                     <parameters>
+                        <parameter>process_cpu_seconds_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -111,8 +117,10 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_db_total_size_in_bytes
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_db_total_size_in_bytes</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -136,12 +144,14 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_delete_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_delete_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -165,12 +175,14 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_events_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_events_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -192,8 +204,10 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_pending_events_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_pending_events_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -248,18 +262,22 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>grpc_server_msg_received_total</params>
+                     <parameters>
+                        <parameter>grpc_server_msg_received_total</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var valueArr = JSON.parse(value);
+                     <parameters>
+                        <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -283,18 +301,22 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>grpc_server_msg_sent_total</params>
+                     <parameters>
+                        <parameter>grpc_server_msg_sent_total</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var valueArr = JSON.parse(value);
+                     <parameters>
+                        <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -318,18 +340,22 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>grpc_server_started_total</params>
+                     <parameters>
+                        <parameter>grpc_server_started_total</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var valueArr = JSON.parse(value);
+                     <parameters>
+                        <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -354,12 +380,16 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_server_has_leader
-</params>
+                     <parameters>
+                        <parameter>etcd_server_has_leader</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -393,17 +423,21 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.health</params>
+                     <parameters>
+                        <parameter>$.health</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <parameters/>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/health</url>
@@ -441,18 +475,22 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>etcd_http_failed_total{code=~"4.+"}</params>
+                     <parameters>
+                        <parameter>etcd_http_failed_total{code=~"4.+"}</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var valueArr = JSON.parse(value);
+                     <parameters>
+                        <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -476,18 +514,22 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>etcd_http_failed_total{code=~"5.+"}</params>
+                     <parameters>
+                        <parameter>etcd_http_failed_total{code=~"5.+"}</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var valueArr = JSON.parse(value);
+                     <parameters>
+                        <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -519,18 +561,22 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>etcd_http_received_total</params>
+                     <parameters>
+                        <parameter>etcd_http_received_total</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var valueArr = JSON.parse(value);
+                     <parameters>
+                        <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -555,14 +601,18 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_server_is_leader
-</params>
+                     <parameters>
+                        <parameter>etcd_server_is_leader</parameter>
+                        <parameter></parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -600,14 +650,16 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_db_compaction_keys_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_db_compaction_keys_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -630,12 +682,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_store_expires_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_store_expires_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -657,8 +711,10 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_keys_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_keys_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -680,8 +736,10 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_server_leader_changes_seen_total
-</params>
+                     <parameters>
+                        <parameter>etcd_server_leader_changes_seen_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -712,8 +770,10 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>process_max_fds
-</params>
+                     <parameters>
+                        <parameter>process_max_fds</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -737,12 +797,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_network_client_grpc_received_bytes_total
-</params>
+                     <parameters>
+                        <parameter>etcd_network_client_grpc_received_bytes_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -766,12 +828,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_network_client_grpc_sent_bytes_total
-</params>
+                     <parameters>
+                        <parameter>etcd_network_client_grpc_sent_bytes_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -794,8 +858,10 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>process_open_fds
-</params>
+                     <parameters>
+                        <parameter>process_open_fds</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -818,12 +884,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_server_proposals_applied_total
-</params>
+                     <parameters>
+                        <parameter>etcd_server_proposals_applied_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -846,12 +914,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_server_proposals_committed_total
-</params>
+                     <parameters>
+                        <parameter>etcd_server_proposals_committed_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -874,12 +944,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_server_proposals_failed_total
-</params>
+                     <parameters>
+                        <parameter>etcd_server_proposals_failed_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -910,8 +982,10 @@ longer downtime caused by a loss of quorum in the cluster."</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_server_proposals_pending
-</params>
+                     <parameters>
+                        <parameter>etcd_server_proposals_pending</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -943,12 +1017,14 @@ longer downtime caused by a loss of quorum in the cluster."</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_put_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_put_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -972,12 +1048,14 @@ longer downtime caused by a loss of quorum in the cluster."</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_range_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_range_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1001,19 +1079,23 @@ longer downtime caused by a loss of quorum in the cluster."</description>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>etcd_debugging_store_reads_total</params>
+                     <parameters>
+                        <parameter>etcd_debugging_store_reads_total</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>//calculates total reads
+                     <parameters>
+                        <parameter>//calculates total reads
 var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1037,8 +1119,10 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>process_resident_memory_bytes
-</params>
+                     <parameters>
+                        <parameter>process_resident_memory_bytes</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1062,11 +1146,15 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$.etcdserver</params>
+                     <parameters>
+                        <parameter>$.etcdserver</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1099,12 +1187,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>etcd_debugging_mvcc_range_total
-</params>
+                     <parameters>
+                        <parameter>etcd_debugging_mvcc_range_total</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1128,13 +1218,17 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>process_start_time_seconds
-</params>
+                     <parameters>
+                        <parameter>process_start_time_seconds</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>//use boottime to calculate uptime
-return (Math.floor(Date.now()/1000)-Number(value));</params>
+                     <parameters>
+                        <parameter>//use boottime to calculate uptime
+return (Math.floor(Date.now()/1000)-Number(value));</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1167,8 +1261,10 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_PATTERN</type>
-                     <params>process_virtual_memory_bytes
-</params>
+                     <parameters>
+                        <parameter>process_virtual_memory_bytes</parameter>
+                        <parameter></parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1192,18 +1288,22 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>etcd_debugging_store_writes_total</params>
+                     <parameters>
+                        <parameter>etcd_debugging_store_writes_total</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var valueArr = JSON.parse(value);
+                     <parameters>
+                        <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1226,7 +1326,9 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -1279,18 +1381,22 @@ return valueArr.reduce(function(acc,obj){
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_TO_JSON</type>
-                           <params>grpc_server_handled_total{grpc_method="{#GRPC.CODE}"}</params>
+                           <parameters>
+                              <parameter>grpc_server_handled_total{grpc_method="{#GRPC.CODE}"}</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>JAVASCRIPT</type>
-                           <params>var valueArr = JSON.parse(value);
+                           <parameters>
+                              <parameter>var valueArr = JSON.parse(value);
 return valueArr.reduce(function(acc,obj){
    return acc + parseFloat(obj['value'])
-},0);</params>
+},0);</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1312,11 +1418,14 @@ return valueArr.reduce(function(acc,obj){
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>grpc_server_handled_total</params>
+                     <parameters>
+                        <parameter>grpc_server_handled_total</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>var data = JSON.parse(value),
+                     <parameters>
+                        <parameter>var data = JSON.parse(value),
  lookup = {},
  result =[];
 for (var item, i = 0; item = data[i++];) {
@@ -1326,11 +1435,14 @@ for (var item, i = 0; item = data[i++];) {
   result.push({ "{#GRPC.CODE}": code});
 }
 }
-return JSON.stringify(result);</params>
+return JSON.stringify(result);</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <parameters>
+                        <parameter>1h</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <overrides>
@@ -1381,14 +1493,16 @@ return JSON.stringify(result);</params>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}
-</params>
+                           <parameters>
+                              <parameter>etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}</parameter>
+                              <parameter></parameter>
+                           </parameters>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1412,14 +1526,16 @@ return JSON.stringify(result);</params>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}
-</params>
+                           <parameters>
+                              <parameter>etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}</parameter>
+                              <parameter></parameter>
+                           </parameters>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1443,14 +1559,16 @@ return JSON.stringify(result);</params>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}
-</params>
+                           <parameters>
+                              <parameter>etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}</parameter>
+                              <parameter></parameter>
+                           </parameters>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1474,14 +1592,16 @@ return JSON.stringify(result);</params>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}
-</params>
+                           <parameters>
+                              <parameter>etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}</parameter>
+                              <parameter></parameter>
+                           </parameters>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1502,7 +1622,9 @@ return JSON.stringify(result);</params>
                <preprocessing>
                   <step>
                      <type>PROMETHEUS_TO_JSON</type>
-                     <params>etcd_network_peer_sent_bytes_total</params>
+                     <parameters>
+                        <parameter>etcd_network_peer_sent_bytes_total</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>

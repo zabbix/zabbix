@@ -156,7 +156,9 @@ The version of the running software in the form'major.minor.maintenance[letters]
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -189,7 +191,9 @@ The version of the running software in the form'major.minor.maintenance[letters]
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -334,7 +338,9 @@ For those non-applicable management module, it returns no-such-name.</descriptio
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.5</params>
+                           <parameters>
+                              <parameter>0.5</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -402,7 +408,9 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.5</params>
+                           <parameters>
+                              <parameter>0.5</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -542,7 +550,9 @@ The version of the running software in the form 'major.minor.maintenance[letters
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -585,7 +595,9 @@ The serial number of the chassis for each unit. If the serial number is unknown 
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -730,7 +742,9 @@ A description of the configured/active system type for each unit.</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -763,7 +777,9 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.5</params>
+                           <parameters>
+                              <parameter>0.5</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>

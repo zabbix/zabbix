@@ -46,11 +46,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Architecture</params>
+                            <parameters>
+                               <parameter>$.Architecture</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -73,11 +77,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CgroupDriver</params>
+                            <parameters>
+                               <parameter>$.CgroupDriver</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -111,7 +119,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.ContainersPaused</params>
+                            <parameters>
+                               <parameter>$.ContainersPaused</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -133,7 +143,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.ContainersRunning</params>
+                            <parameters>
+                               <parameter>$.ContainersRunning</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -155,7 +167,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.ContainersStopped</params>
+                            <parameters>
+                               <parameter>$.ContainersStopped</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -177,7 +191,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Containers</params>
+                            <parameters>
+                               <parameter>$.Containers</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -199,7 +215,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Containers[*].SizeRw.sum()</params>
+                            <parameters>
+                               <parameter>$.Containers[*].SizeRw.sum()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -224,15 +242,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CpuCfsPeriod</params>
+                            <parameters>
+                               <parameter>$.CpuCfsPeriod</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -257,15 +279,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CpuCfsQuota</params>
+                            <parameters>
+                               <parameter>$.CpuCfsQuota</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -290,15 +316,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CPUSet</params>
+                            <parameters>
+                               <parameter>$.CPUSet</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -323,15 +353,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CPUShares</params>
+                            <parameters>
+                               <parameter>$.CPUShares</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -367,15 +401,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Debug</params>
+                            <parameters>
+                               <parameter>$.Debug</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -398,11 +436,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.DefaultRuntime</params>
+                            <parameters>
+                               <parameter>$.DefaultRuntime</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -427,11 +469,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Driver</params>
+                            <parameters>
+                               <parameter>$.Driver</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -453,7 +499,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.NGoroutines</params>
+                            <parameters>
+                               <parameter>$.NGoroutines</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -487,7 +535,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.length()</params>
+                            <parameters>
+                               <parameter>$.length()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -509,7 +559,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Images</params>
+                            <parameters>
+                               <parameter>$.Images</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -531,7 +583,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Images[*].Size.sum()</params>
+                            <parameters>
+                               <parameter>$.Images[*].Size.sum()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -567,15 +621,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.IPv4Forwarding</params>
+                            <parameters>
+                               <parameter>$.IPv4Forwarding</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -599,15 +657,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.KernelMemory</params>
+                            <parameters>
+                               <parameter>$.KernelMemory</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -631,15 +693,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.KernelMemoryTCP</params>
+                            <parameters>
+                               <parameter>$.KernelMemoryTCP</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -662,11 +728,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.KernelVersion</params>
+                            <parameters>
+                               <parameter>$.KernelVersion</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -688,7 +758,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.LayersSize</params>
+                            <parameters>
+                               <parameter>$.LayersSize</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -712,15 +784,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.LiveRestoreEnabled</params>
+                            <parameters>
+                               <parameter>$.LiveRestoreEnabled</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -743,11 +819,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.LoggingDriver</params>
+                            <parameters>
+                               <parameter>$.LoggingDriver</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -769,7 +849,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.MemTotal</params>
+                            <parameters>
+                               <parameter>$.MemTotal</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -793,15 +875,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.MemoryLimit</params>
+                            <parameters>
+                               <parameter>$.MemoryLimit</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -824,7 +910,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Name</params>
+                            <parameters>
+                               <parameter>$.Name</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -860,7 +948,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.NCPU</params>
+                            <parameters>
+                               <parameter>$.NCPU</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -881,7 +971,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.NEventsListener</params>
+                            <parameters>
+                               <parameter>$.NEventsListener</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -903,7 +995,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.NFd</params>
+                            <parameters>
+                               <parameter>$.NFd</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -927,15 +1021,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.OomKillDisable</params>
+                            <parameters>
+                               <parameter>$.OomKillDisable</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -958,11 +1056,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.OperatingSystem</params>
+                            <parameters>
+                               <parameter>$.OperatingSystem</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -985,11 +1087,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.OSType</params>
+                            <parameters>
+                               <parameter>$.OSType</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1010,15 +1116,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.PidsLimit</params>
+                            <parameters>
+                               <parameter>$.PidsLimit</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1040,7 +1150,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
+                            <parameters>
+                               <parameter>10m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1068,11 +1180,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.DockerRootDir</params>
+                            <parameters>
+                               <parameter>$.DockerRootDir</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1095,11 +1211,15 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.ServerVersion</params>
+                            <parameters>
+                               <parameter>$.ServerVersion</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1132,15 +1252,19 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.SwapLimit</params>
+                            <parameters>
+                               <parameter>$.SwapLimit</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1162,7 +1286,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Volumes[*].UsageData.Size.sum()</params>
+                            <parameters>
+                               <parameter>$.Volumes[*].UsageData.Size.sum()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1212,11 +1338,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Created</params>
+                                    <parameters>
+                                       <parameter>$.Created</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1239,11 +1369,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.FinishedAt</params>
+                                    <parameters>
+                                       <parameter>$.State.FinishedAt</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1266,11 +1400,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.Names[0] == &quot;{#NAME}&quot;)].Image.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.Names[0] == &quot;{#NAME}&quot;)].Image.first()</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1291,7 +1429,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.RestartCount</params>
+                                    <parameters>
+                                       <parameter>$.RestartCount</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1314,11 +1454,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.StartedAt</params>
+                                    <parameters>
+                                       <parameter>$.State.StartedAt</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1342,11 +1486,13 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.Dead</params>
+                                    <parameters>
+                                       <parameter>$.State.Dead</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>BOOL_TO_DECIMAL</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1369,11 +1515,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.Error</params>
+                                    <parameters>
+                                       <parameter>$.State.Error</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1403,11 +1553,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.ExitCode</params>
+                                    <parameters>
+                                       <parameter>$.State.ExitCode</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1431,11 +1585,13 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.OOMKilled</params>
+                                    <parameters>
+                                       <parameter>$.State.OOMKilled</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>BOOL_TO_DECIMAL</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1459,11 +1615,13 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.Paused</params>
+                                    <parameters>
+                                       <parameter>$.State.Paused</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>BOOL_TO_DECIMAL</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1484,11 +1642,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.Pid</params>
+                                    <parameters>
+                                       <parameter>$.State.Pid</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1512,11 +1674,13 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.Restarting</params>
+                                    <parameters>
+                                       <parameter>$.State.Restarting</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>BOOL_TO_DECIMAL</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1540,11 +1704,13 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.Running</params>
+                                    <parameters>
+                                       <parameter>$.State.Running</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>BOOL_TO_DECIMAL</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1567,11 +1733,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.State.Status</params>
+                                    <parameters>
+                                       <parameter>$.State.Status</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <parameters>
+                                       <parameter>1h</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1607,15 +1777,19 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.cpu_stats.cpu_usage.usage_in_kernelmode</params>
+                                    <parameters>
+                                       <parameter>$.cpu_stats.cpu_usage.usage_in_kernelmode</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>1.0E-9</params>
+                                    <parameters>
+                                       <parameter>1.0E-9</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1637,7 +1811,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.cpu_stats.throttling_data.throttled_periods</params>
+                                    <parameters>
+                                       <parameter>$.cpu_stats.throttling_data.throttled_periods</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1661,11 +1837,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.cpu_stats.throttling_data.throttled_time</params>
+                                    <parameters>
+                                       <parameter>$.cpu_stats.throttling_data.throttled_time</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>1.0E-9</params>
+                                    <parameters>
+                                       <parameter>1.0E-9</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1687,7 +1867,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.cpu_stats.throttling_data.periods</params>
+                                    <parameters>
+                                       <parameter>$.cpu_stats.throttling_data.periods</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1710,15 +1892,19 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.cpu_stats.cpu_usage.total_usage</params>
+                                    <parameters>
+                                       <parameter>$.cpu_stats.cpu_usage.total_usage</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>1.0E-9</params>
+                                    <parameters>
+                                       <parameter>1.0E-9</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1741,15 +1927,19 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.cpu_stats.cpu_usage.usage_in_usermode</params>
+                                    <parameters>
+                                       <parameter>$.cpu_stats.cpu_usage.usage_in_usermode</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>1.0E-9</params>
+                                    <parameters>
+                                       <parameter>1.0E-9</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1771,7 +1961,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.memory_stats.commitbytes</params>
+                                    <parameters>
+                                       <parameter>$.memory_stats.commitbytes</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1793,7 +1985,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.memory_stats.commitpeakbytes</params>
+                                    <parameters>
+                                       <parameter>$.memory_stats.commitpeakbytes</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1815,7 +2009,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.memory_stats.max_usage</params>
+                                    <parameters>
+                                       <parameter>$.memory_stats.max_usage</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1837,7 +2033,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.memory_stats.privateworkingset</params>
+                                    <parameters>
+                                       <parameter>$.memory_stats.privateworkingset</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1859,7 +2057,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.memory_stats.usage</params>
+                                    <parameters>
+                                       <parameter>$.memory_stats.usage</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1880,7 +2080,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.cpu_stats.online_cpus</params>
+                                    <parameters>
+                                       <parameter>$.cpu_stats.online_cpus</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1916,13 +2118,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].rx_bytes.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].rx_bytes.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1944,13 +2148,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].rx_dropped.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].rx_dropped.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1972,13 +2178,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].rx_errors.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].rx_errors.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2000,13 +2208,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].rx_packets.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].rx_packets.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2029,13 +2239,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].tx_bytes.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].tx_bytes.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2057,13 +2269,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].tx_dropped.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].tx_dropped.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2085,13 +2299,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].tx_errors.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].tx_errors.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2113,13 +2329,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.networks[*].tx_packets.sum()</params>
+                                    <parameters>
+                                       <parameter>$.networks[*].tx_packets.sum()</parameter>
+                                    </parameters>
                                     <error_handler>CUSTOM_VALUE</error_handler>
                                     <error_handler_params>0</error_handler_params>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2310,11 +2528,15 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.Id == &quot;{#ID}&quot;)].Created.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.Id == &quot;{#ID}&quot;)].Created.first()</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2336,7 +2558,9 @@ false - Returns only running containers</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[?(@.Id == &quot;{#ID}&quot;)].Size.first()</params>
+                                    <parameters>
+                                       <parameter>$[?(@.Id == &quot;{#ID}&quot;)].Size.first()</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>

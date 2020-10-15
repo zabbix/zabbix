@@ -106,11 +106,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Auto-Param Attempts/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Auto-Param Attempts/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -150,7 +152,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time Base')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time Base')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -173,7 +177,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time (ms)')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time (ms)')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -221,7 +227,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Average Wait Time Base' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Average Wait Time Base' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -244,7 +252,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Average Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Average Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -268,11 +278,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Batch Requests/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Batch Requests/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -296,7 +308,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='BufferCacheHitRatio')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='BufferCacheHitRatio')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -340,7 +354,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='CacheHitRatio' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='CacheHitRatio' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -362,7 +378,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Object Counts' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Object Counts' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -384,7 +402,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Objects in use' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Objects in use' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -406,7 +426,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Pages' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Plan Cache' &amp;&amp; @.counter_name=='Cache Pages' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -429,11 +451,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Checkpoint pages/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Checkpoint pages/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -456,11 +480,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -482,7 +510,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Database pages')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Database pages')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -505,11 +535,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -532,11 +564,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Failed Auto-Params/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Failed Auto-Params/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -559,11 +593,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Forwarded Records/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Forwarded Records/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -587,11 +623,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Free list stalls/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Free list stalls/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -622,11 +660,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Full Scans/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Full Scans/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -649,11 +689,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Granted Workspace Memory (KB)')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Granted Workspace Memory (KB)')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -676,11 +720,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Index Searches/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Index Searches/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -703,11 +749,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Info Errors')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Info Errors')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -730,11 +778,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Kill Connection Errors')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Kill Connection Errors')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -758,11 +808,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Latch Waits/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Latch Waits/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -785,11 +837,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Lazy writes/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Lazy writes/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -821,11 +875,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Requests/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Requests/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -857,11 +913,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Timeouts/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Timeouts/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -893,11 +951,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -921,11 +981,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Waits/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Lock Waits/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -956,11 +1018,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -983,11 +1049,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1010,11 +1080,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Logins/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Logins/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1037,11 +1109,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Logouts/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Logouts/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1064,11 +1138,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Maximum Workspace Memory (KB)')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Maximum Workspace Memory (KB)')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1090,7 +1168,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Outstanding')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Outstanding')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1112,7 +1192,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Pending')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Pending')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1136,11 +1218,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Number of Deadlocks/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Locks' &amp;&amp; @.counter_name=='Number of Deadlocks/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1171,11 +1255,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='DB Offline Errors')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='DB Offline Errors')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1199,7 +1285,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page life expectancy')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page life expectancy')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1231,11 +1319,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page lookups/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page lookups/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1258,11 +1348,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page reads/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page reads/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1293,11 +1385,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Page Splits/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Page Splits/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1320,11 +1414,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page writes/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Page writes/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1404,7 +1500,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Processes blocked')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='Processes blocked')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1427,11 +1525,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Readahead pages/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Readahead pages/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1454,11 +1554,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Safe Auto-Params/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Safe Auto-Params/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1504,11 +1606,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='SQL Compilations/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='SQL Compilations/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1531,11 +1635,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='SQL Re-Compilations/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='SQL Re-Compilations/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1558,11 +1664,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Table Lock Escalations/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Table Lock Escalations/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1584,7 +1692,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Target pages')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Buffer Manager' &amp;&amp; @.counter_name=='Target pages')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1607,11 +1717,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Target Server Memory (KB)')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Target Server Memory (KB)')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1635,11 +1749,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Total Latch Wait Time (ms)')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Latches' &amp;&amp; @.counter_name=='Total Latch Wait Time (ms)')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1662,11 +1778,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Total Server Memory (KB)')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Memory Manager' &amp;&amp; @.counter_name=='Total Server Memory (KB)')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1688,7 +1808,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Transactions' &amp;&amp; @.counter_name=='Transactions')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Transactions' &amp;&amp; @.counter_name=='Transactions')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1711,11 +1833,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1738,11 +1862,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Unsafe Auto-Params/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Statistics' &amp;&amp; @.counter_name=='Unsafe Auto-Params/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1766,7 +1892,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}' &amp;&amp; @.counter_name=='Uptime')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}' &amp;&amp; @.counter_name=='Uptime')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1809,7 +1937,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='User Connections')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:General Statistics' &amp;&amp; @.counter_name=='User Connections')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1832,11 +1962,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='User Errors')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='User Errors')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1860,11 +1992,15 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}' &amp;&amp; @.counter_name=='Version')].instance_name.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}' &amp;&amp; @.counter_name=='Version')].instance_name.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1896,11 +2032,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Workfiles Created/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Workfiles Created/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1931,11 +2069,13 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Worktables Created/sec')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='Worktables Created/sec')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
-                     <params/>
+                     <parameters/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1967,7 +2107,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='WorktablesFromCacheRatio')].cntr_value.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' &amp;&amp; @.counter_name=='WorktablesFromCacheRatio')].cntr_value.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -2000,7 +2142,9 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -2068,11 +2212,15 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}')].primary_recovery_health.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}')].primary_recovery_health.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2104,11 +2252,15 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}')].primary_replica.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}')].primary_replica.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>3h</params>
+                           <parameters>
+                              <parameter>3h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2136,11 +2288,15 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}')].secondary_recovery_health.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}')].secondary_recovery_health.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2176,11 +2332,15 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}')].synchronization_health.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}')].synchronization_health.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2206,7 +2366,9 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2252,7 +2414,9 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Active Transactions' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Active Transactions' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2275,11 +2439,15 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2303,11 +2471,13 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Bytes Flushed/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Bytes Flushed/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2330,11 +2500,15 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2357,11 +2531,15 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2385,11 +2563,13 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flush Wait Time' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flush Wait Time' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2420,11 +2600,13 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flush Waits/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flush Waits/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2455,11 +2637,13 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flushes/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Flushes/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2481,7 +2665,9 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Growths' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Growths' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2503,7 +2689,9 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Shrinks' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Shrinks' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2525,7 +2713,9 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Truncations' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Log Truncations' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2549,7 +2739,9 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Percent Log Used' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Percent Log Used' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2590,11 +2782,15 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='State' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='State' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2625,11 +2821,13 @@ FROM sys.databases</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.object_name=='{$MSSQL.INSTANCE}:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2703,7 +2901,9 @@ FROM sys.databases</params>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2766,11 +2966,15 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].is_suspended.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].is_suspended.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2801,11 +3005,15 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].database_state.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].database_state.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2842,11 +3050,15 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].synchronization_health.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].synchronization_health.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2872,7 +3084,9 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2931,11 +3145,13 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.dbname=='{#DBNAME}')].mirroring_role_sequence.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.dbname=='{#DBNAME}')].mirroring_role_sequence.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>SIMPLE_CHANGE</type>
-                           <params/>
+                           <parameters/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2962,11 +3178,15 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.dbname=='{#DBNAME}')].mirroring_role.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.dbname=='{#DBNAME}')].mirroring_role.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2994,11 +3214,15 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.dbname=='{#DBNAME}')].mirroring_safety_level.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.dbname=='{#DBNAME}')].mirroring_safety_level.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3030,11 +3254,15 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.dbname=='{#DBNAME}')].mirroring_state.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.dbname=='{#DBNAME}')].mirroring_state.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3082,11 +3310,15 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.dbname=='{#DBNAME}')].mirroring_witness_state.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.dbname=='{#DBNAME}')].mirroring_witness_state.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3128,7 +3360,9 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -3189,15 +3423,21 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].log_send_queue_size.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].log_send_queue_size.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3228,15 +3468,21 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].redo_queue_size.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].redo_queue_size.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3256,7 +3502,9 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -3325,11 +3573,15 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].connected_state.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].connected_state.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3356,11 +3608,15 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].is_local.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].is_local.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3387,11 +3643,15 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].join_state.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].join_state.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3423,11 +3683,15 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].operational_state.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].operational_state.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3475,11 +3739,15 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].recovery_health.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].recovery_health.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3515,11 +3783,15 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].role.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].role.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3547,11 +3819,15 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].synchronization_health.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].synchronization_health.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -3586,7 +3862,9 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </discovery_rule>

@@ -73,7 +73,9 @@ This attribute defines the firmware version of a remote access card.</descriptio
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -107,7 +109,9 @@ This attribute defines the model name of the system.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -131,7 +135,9 @@ This attribute defines the service tag of the system.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -222,7 +228,9 @@ This attribute defines the name of the operating system that the hostis running.
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -594,7 +602,9 @@ The size of the physical disk in megabytes.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1048576</params>
+                           <parameters>
+                              <parameter>1048576</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -791,7 +801,9 @@ Possible values:&#13;
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.1</params>
+                           <parameters>
+                              <parameter>0.1</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -903,7 +915,9 @@ or&#13;
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.1</params>
+                           <parameters>
+                              <parameter>0.1</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -1032,7 +1046,9 @@ The size of the virtual disk in megabytes.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1048576</params>
+                           <parameters>
+                              <parameter>1048576</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>

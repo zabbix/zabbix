@@ -72,15 +72,19 @@
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[10]</params>
+                                    <parameters>
+                                       <parameter>$[10]</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>0.001</params>
+                                    <parameters>
+                                       <parameter>0.001</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -119,11 +123,13 @@
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[0]</params>
+                                    <parameters>
+                                       <parameter>$[0]</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -146,15 +152,19 @@
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[3]</params>
+                                    <parameters>
+                                       <parameter>$[3]</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>0.001</params>
+                                    <parameters>
+                                       <parameter>0.001</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -178,15 +188,19 @@
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[9]</params>
+                                    <parameters>
+                                       <parameter>$[9]</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>0.1</params>
+                                    <parameters>
+                                       <parameter>0.1</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -225,11 +239,13 @@
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[4]</params>
+                                    <parameters>
+                                       <parameter>$[4]</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -252,15 +268,19 @@
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$[7]</params>
+                                    <parameters>
+                                       <parameter>$[7]</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>0.001</params>
+                                    <parameters>
+                                       <parameter>0.001</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -283,7 +303,9 @@
                             <preprocessing>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>return JSON.stringify(value.trim().split(/ +/));</params>
+                                    <parameters>
+                                       <parameter>return JSON.stringify(value.trim().split(/ +/));</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -366,7 +388,9 @@
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -710,7 +734,7 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -763,7 +787,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -781,7 +807,7 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -802,8 +828,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//Calculate utilization
-return (100 - value)</params>
+                            <parameters>
+                               <parameter>//Calculate utilization
+return (100 - value)</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1249,7 +1277,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1275,7 +1305,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1329,7 +1361,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1351,7 +1385,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1403,7 +1439,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1424,7 +1462,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1460,7 +1500,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1481,7 +1523,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1537,7 +1581,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1687,7 +1733,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return (100-value);</params>
+                            <parameters>
+                               <parameter>return (100-value);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1782,7 +1830,7 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1800,7 +1848,7 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1819,11 +1867,13 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1841,7 +1891,7 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1859,7 +1909,7 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1878,11 +1928,13 @@ Template tooling version used: 0.38</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>8</params>
+                                    <parameters>
+                                       <parameter>8</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1906,7 +1958,8 @@ Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net<
                             <preprocessing>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>var newvalue;
+                                    <parameters>
+                                       <parameter>var newvalue;
 switch(value) {
   case &quot;up&quot;:
     newvalue = 1;
@@ -1929,7 +1982,8 @@ switch(value) {
   default:
     newvalue = &quot;Problem parsing interface operstate in JS&quot;;
 }
-return newvalue;</params>
+return newvalue;</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <trigger_prototypes>
@@ -1971,7 +2025,9 @@ Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net<
                             <preprocessing>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>

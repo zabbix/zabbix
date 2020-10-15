@@ -71,7 +71,7 @@ The number of read accesses from this device since boot.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -109,7 +109,7 @@ The number of write accesses from this device since boot.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -186,7 +186,7 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -248,9 +248,11 @@ Count the number of CPU cores by counting number of cores discovered in hrProces
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//count the number of cores
+                            <parameters>
+                               <parameter>//count the number of cores
 return JSON.parse(value).length;
-</params>
+</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -269,7 +271,7 @@ return JSON.parse(value).length;
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                 </item>
@@ -300,13 +302,15 @@ Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  sy
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -328,13 +332,15 @@ Time spent running a niced guest (virtual CPU for guest operating systems under 
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -356,13 +362,15 @@ The time the CPU has spent doing nothing.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -384,13 +392,15 @@ The amount of time the CPU has been servicing hardware interrupts.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -412,13 +422,15 @@ Amount of time the CPU has been waiting for I/O to complete.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -440,13 +452,15 @@ The time the CPU has spent running users' processes that have been niced.</descr
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -468,13 +482,15 @@ The amount of time the CPU has been servicing software interrupts.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -496,13 +512,15 @@ The amount of CPU 'stolen' from this virtual machine by the hypervisor for other
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -524,13 +542,15 @@ The time the CPU has spent running the kernel and its processes.</description>
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -552,13 +572,15 @@ The time the CPU has spent running users' processes that are not niced.</descrip
                             <preprocessing>
                                 <step>
                                     <type>CHANGE_PER_SECOND</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//to get utilization in %, divide by N, where N is number of cores.
+                                    <parameters>
+                                       <parameter>//to get utilization in %, divide by N, where N is number of cores.
 return value/{#CPU.COUNT}
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -579,9 +601,11 @@ return value/{#CPU.COUNT}
                             <preprocessing>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>//Calculate utilization
+                                    <parameters>
+                                       <parameter>//Calculate utilization
 return (100 - value)
-</params>
+</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -700,9 +724,11 @@ return (100 - value)
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>//count the number of CPU cores
+                            <parameters>
+                               <parameter>//count the number of CPU cores
 return JSON.stringify([{&quot;{#CPU.COUNT}&quot;: value, &quot;{#SNMPINDEX}&quot;: 0, &quot;{#SINGLETON}&quot;:&quot;&quot;}])
-</params>
+</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -791,7 +817,9 @@ If having problems collecting this item make sure access to UCD-SNMP-MIB is allo
                             <preprocessing>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>return (100-value);</params>
+                                    <parameters>
+                                       <parameter>return (100-value);</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <trigger_prototypes>
@@ -853,7 +881,9 @@ For example, the amount of main storage allocated to a buffer pool might be modi
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>{#ALLOC_UNITS}</params>
+                                    <parameters>
+                                       <parameter>{#ALLOC_UNITS}</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -874,7 +904,9 @@ The amount of the storage represented by this entry that is allocated, in units 
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>{#ALLOC_UNITS}</params>
+                                    <parameters>
+                                       <parameter>{#ALLOC_UNITS}</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -1021,7 +1053,9 @@ The amount of swap space currently unused or available.</description>
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1057,7 +1091,9 @@ The total amount of swap space configured for this host.</description>
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1092,7 +1128,9 @@ Memory used by kernel buffers (Buffers in /proc/meminfo)</description>
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1113,7 +1151,9 @@ Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)</desc
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1133,7 +1173,9 @@ Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo)</desc
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>
@@ -1154,7 +1196,9 @@ Total memory in Bytes</description>
                     <preprocessing>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </item>

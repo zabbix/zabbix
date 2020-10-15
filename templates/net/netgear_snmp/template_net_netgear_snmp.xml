@@ -70,8 +70,10 @@ CPU utilization in %</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>60 Secs \( ([0-9\.]+)%\).+300 Secs
-\1</params>
+                     <parameters>
+                        <parameter>60 Secs \( ([0-9\.]+)%\).+300 Secs</parameter>
+                        <parameter>\1</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -103,7 +105,9 @@ CPU utilization in %</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -127,7 +131,9 @@ Serial number of the switch</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -160,7 +166,9 @@ Operating System running on this unit</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>

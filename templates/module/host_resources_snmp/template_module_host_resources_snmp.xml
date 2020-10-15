@@ -47,7 +47,9 @@ Implementations may approximate this one minute smoothing period if necessary.</
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$..['{#CPU.UTIL}'].avg()</params>
+                            <parameters>
+                               <parameter>$..['{#CPU.UTIL}'].avg()</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -140,7 +142,9 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>{#ALLOC_UNITS}</params>
+                                    <parameters>
+                                       <parameter>{#ALLOC_UNITS}</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -161,7 +165,9 @@ The amount of the storage represented by this entry that is allocated, in units 
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>{#ALLOC_UNITS}</params>
+                                    <parameters>
+                                       <parameter>{#ALLOC_UNITS}</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -435,7 +441,9 @@ For example, the amount of main storage allocated to a buffer pool might be modi
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>{#ALLOC_UNITS}</params>
+                                    <parameters>
+                                       <parameter>{#ALLOC_UNITS}</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>
@@ -456,7 +464,9 @@ The amount of the storage represented by this entry that is allocated, in units 
                             <preprocessing>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>{#ALLOC_UNITS}</params>
+                                    <parameters>
+                                       <parameter>{#ALLOC_UNITS}</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                         </item_prototype>

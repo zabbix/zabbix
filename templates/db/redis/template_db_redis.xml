@@ -45,7 +45,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Clients.blocked_clients</params>
+                            <parameters>
+                               <parameter>$.Clients.blocked_clients</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -67,7 +69,9 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Clients.connected_clients</params>
+                            <parameters>
+                               <parameter>$.Clients.connected_clients</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -89,8 +93,10 @@ Template tooling version used: 0.38</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>var clients = JSON.parse(value).Clients
-return clients.client_recent_max_input_buffer || clients.client_biggest_input_buf</params>
+                            <parameters>
+                               <parameter>var clients = JSON.parse(value).Clients
+return clients.client_recent_max_input_buffer || clients.client_biggest_input_buf</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -112,8 +118,10 @@ return clients.client_recent_max_input_buffer || clients.client_biggest_input_bu
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>var clients = JSON.parse(value).Clients
-return clients.client_recent_max_output_buffer || clients.client_longest_output_list</params>
+                            <parameters>
+                               <parameter>var clients = JSON.parse(value).Clients
+return clients.client_recent_max_output_buffer || clients.client_longest_output_list</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -138,7 +146,9 @@ return clients.client_recent_max_output_buffer || clients.client_longest_output_
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Cluster.cluster_enabled</params>
+                            <parameters>
+                               <parameter>$.Cluster.cluster_enabled</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -161,11 +171,15 @@ Once the limit is reached Redis will close all the new connections sending an er
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.maxclients</params>
+                            <parameters>
+                               <parameter>$.maxclients</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>30m</params>
+                            <parameters>
+                               <parameter>30m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -186,7 +200,9 @@ Once the limit is reached Redis will close all the new connections sending an er
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1h</params>
+                            <parameters>
+                               <parameter>1h</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -216,7 +232,9 @@ Once the limit is reached Redis will close all the new connections sending an er
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CPU.used_cpu_sys</params>
+                            <parameters>
+                               <parameter>$.CPU.used_cpu_sys</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -240,7 +258,9 @@ Once the limit is reached Redis will close all the new connections sending an er
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CPU.used_cpu_sys_children</params>
+                            <parameters>
+                               <parameter>$.CPU.used_cpu_sys_children</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -264,7 +284,9 @@ Once the limit is reached Redis will close all the new connections sending an er
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CPU.used_cpu_user</params>
+                            <parameters>
+                               <parameter>$.CPU.used_cpu_user</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -288,7 +310,9 @@ Once the limit is reached Redis will close all the new connections sending an er
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.CPU.used_cpu_user_children</params>
+                            <parameters>
+                               <parameter>$.CPU.used_cpu_user_children</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -344,7 +368,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Memory.mem_fragmentation_ratio</params>
+                            <parameters>
+                               <parameter>$.Memory.mem_fragmentation_ratio</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -381,7 +407,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Memory.used_memory</params>
+                            <parameters>
+                               <parameter>$.Memory.used_memory</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -404,7 +432,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Memory.used_memory_lua</params>
+                            <parameters>
+                               <parameter>$.Memory.used_memory_lua</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -427,7 +457,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Memory.used_memory_peak</params>
+                            <parameters>
+                               <parameter>$.Memory.used_memory_peak</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -450,7 +482,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Memory.used_memory_rss</params>
+                            <parameters>
+                               <parameter>$.Memory.used_memory_rss</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -477,7 +511,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.aof_current_rewrite_time_sec</params>
+                            <parameters>
+                               <parameter>$.Persistence.aof_current_rewrite_time_sec</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -502,7 +538,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.aof_enabled</params>
+                            <parameters>
+                               <parameter>$.Persistence.aof_enabled</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -527,11 +565,13 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.aof_last_bgrewrite_status</params>
+                            <parameters>
+                               <parameter>$.Persistence.aof_last_bgrewrite_status</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -558,7 +598,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.aof_last_rewrite_time_sec</params>
+                            <parameters>
+                               <parameter>$.Persistence.aof_last_rewrite_time_sec</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -583,11 +625,13 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.aof_last_write_status</params>
+                            <parameters>
+                               <parameter>$.Persistence.aof_last_write_status</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -617,7 +661,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.aof_rewrite_in_progress</params>
+                            <parameters>
+                               <parameter>$.Persistence.aof_rewrite_in_progress</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -639,7 +685,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.aof_rewrite_scheduled</params>
+                            <parameters>
+                               <parameter>$.Persistence.aof_rewrite_scheduled</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -664,7 +712,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.loading</params>
+                            <parameters>
+                               <parameter>$.Persistence.loading</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -686,7 +736,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.rdb_bgsave_in_progress</params>
+                            <parameters>
+                               <parameter>$.Persistence.rdb_bgsave_in_progress</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -708,7 +760,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.rdb_changes_since_last_save</params>
+                            <parameters>
+                               <parameter>$.Persistence.rdb_changes_since_last_save</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -735,7 +789,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.rdb_current_bgsave_time_sec</params>
+                            <parameters>
+                               <parameter>$.Persistence.rdb_current_bgsave_time_sec</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -760,11 +816,13 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.rdb_last_bgsave_status</params>
+                            <parameters>
+                               <parameter>$.Persistence.rdb_last_bgsave_status</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>BOOL_TO_DECIMAL</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -799,7 +857,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.rdb_last_bgsave_time_sec</params>
+                            <parameters>
+                               <parameter>$.Persistence.rdb_last_bgsave_time_sec</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -821,7 +881,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Persistence.rdb_last_save_time</params>
+                            <parameters>
+                               <parameter>$.Persistence.rdb_last_save_time</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -843,7 +905,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>10m</params>
+                            <parameters>
+                               <parameter>10m</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -870,7 +934,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Replication.connected_slaves</params>
+                            <parameters>
+                               <parameter>$.Replication.connected_slaves</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -906,7 +972,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Replication.master_repl_offset</params>
+                            <parameters>
+                               <parameter>$.Replication.master_repl_offset</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -931,7 +999,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Replication.repl_backlog_active</params>
+                            <parameters>
+                               <parameter>$.Replication.repl_backlog_active</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -954,7 +1024,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Replication.repl_backlog_first_byte_offset</params>
+                            <parameters>
+                               <parameter>$.Replication.repl_backlog_first_byte_offset</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -976,7 +1048,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Replication.repl_backlog_histlen</params>
+                            <parameters>
+                               <parameter>$.Replication.repl_backlog_histlen</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -999,7 +1073,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Replication.repl_backlog_size</params>
+                            <parameters>
+                               <parameter>$.Replication.repl_backlog_size</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1023,11 +1099,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Replication.role</params>
+                            <parameters>
+                               <parameter>$.Replication.role</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1059,11 +1139,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Server.process_id</params>
+                            <parameters>
+                               <parameter>$.Server.process_id</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1087,11 +1171,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Server.redis_mode</params>
+                            <parameters>
+                               <parameter>$.Server.redis_mode</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1115,11 +1203,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Server.redis_version</params>
+                            <parameters>
+                               <parameter>$.Server.redis_version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1150,11 +1242,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Server.tcp_port</params>
+                            <parameters>
+                               <parameter>$.Server.tcp_port</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>1d</params>
+                            <parameters>
+                               <parameter>1d</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1177,7 +1273,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Server.uptime_in_seconds</params>
+                            <parameters>
+                               <parameter>$.Server.uptime_in_seconds</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1205,7 +1303,7 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <parameters/>
                         </step>
                     </preprocessing>
                     <triggers>
@@ -1231,7 +1329,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.evicted_keys</params>
+                            <parameters>
+                               <parameter>$.Stats.evicted_keys</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1253,7 +1353,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.expired_keys</params>
+                            <parameters>
+                               <parameter>$.Stats.expired_keys</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1277,11 +1379,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.instantaneous_input_kbps</params>
+                            <parameters>
+                               <parameter>$.Stats.instantaneous_input_kbps</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1303,7 +1409,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.instantaneous_ops_per_sec</params>
+                            <parameters>
+                               <parameter>$.Stats.instantaneous_ops_per_sec</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1327,11 +1435,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.instantaneous_output_kbps</params>
+                            <parameters>
+                               <parameter>$.Stats.instantaneous_output_kbps</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1024</params>
+                            <parameters>
+                               <parameter>1024</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1353,7 +1465,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.keyspace_hits</params>
+                            <parameters>
+                               <parameter>$.Stats.keyspace_hits</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1375,7 +1489,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.keyspace_misses</params>
+                            <parameters>
+                               <parameter>$.Stats.keyspace_misses</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1398,11 +1514,15 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.latest_fork_usec</params>
+                            <parameters>
+                               <parameter>$.Stats.latest_fork_usec</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>MULTIPLIER</type>
-                            <params>1.0E-5</params>
+                            <parameters>
+                               <parameter>1.0E-5</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1424,7 +1544,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.migrate_cached_sockets</params>
+                            <parameters>
+                               <parameter>$.Stats.migrate_cached_sockets</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1446,7 +1568,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.pubsub_channels</params>
+                            <parameters>
+                               <parameter>$.Stats.pubsub_channels</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1468,7 +1592,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.pubsub_patterns</params>
+                            <parameters>
+                               <parameter>$.Stats.pubsub_patterns</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1490,7 +1616,9 @@ https://redis.io/topics/memory-optimization</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.rejected_connections</params>
+                            <parameters>
+                               <parameter>$.Stats.rejected_connections</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1522,7 +1650,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.sync_full</params>
+                            <parameters>
+                               <parameter>$.Stats.sync_full</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1544,7 +1674,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.sync_partial_err</params>
+                            <parameters>
+                               <parameter>$.Stats.sync_partial_err</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1566,7 +1698,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.sync_partial_ok</params>
+                            <parameters>
+                               <parameter>$.Stats.sync_partial_ok</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1588,7 +1722,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.total_commands_processed</params>
+                            <parameters>
+                               <parameter>$.Stats.total_commands_processed</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1610,7 +1746,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.total_connections_received</params>
+                            <parameters>
+                               <parameter>$.Stats.total_connections_received</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1633,7 +1771,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.total_net_input_bytes</params>
+                            <parameters>
+                               <parameter>$.Stats.total_net_input_bytes</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1656,7 +1796,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Stats.total_net_output_bytes</params>
+                            <parameters>
+                               <parameter>$.Stats.total_net_output_bytes</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -1751,7 +1893,9 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(value &gt; 0 ? [{'{#SINGLETON}': ''}] : []);</params>
+                            <parameters>
+                               <parameter>return JSON.stringify(value &gt; 0 ? [{'{#SINGLETON}': ''}] : []);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -1794,11 +1938,15 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Keyspace[&quot;{#DB}&quot;].avg_ttl</params>
+                                    <parameters>
+                                       <parameter>$.Keyspace[&quot;{#DB}&quot;].avg_ttl</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>MULTIPLIER</type>
-                                    <params>0.001</params>
+                                    <parameters>
+                                       <parameter>0.001</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1820,7 +1968,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Keyspace[&quot;{#DB}&quot;].expires</params>
+                                    <parameters>
+                                       <parameter>$.Keyspace[&quot;{#DB}&quot;].expires</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1842,7 +1992,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Keyspace[&quot;{#DB}&quot;].keys</params>
+                                    <parameters>
+                                       <parameter>$.Keyspace[&quot;{#DB}&quot;].keys</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1880,8 +2032,10 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(Object.keys(JSON.parse(value).Keyspace)
-  .map(function (v){return {&quot;{#DB}&quot;: v}}));</params>
+                            <parameters>
+                               <parameter>return JSON.stringify(Object.keys(JSON.parse(value).Keyspace)
+  .map(function (v){return {&quot;{#DB}&quot;: v}}));</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -1907,7 +2061,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.active_defrag_running</params>
+                                    <parameters>
+                                       <parameter>$.Memory.active_defrag_running</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1929,7 +2085,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.lazyfree_pending_objects</params>
+                                    <parameters>
+                                       <parameter>$.Memory.lazyfree_pending_objects</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1952,7 +2110,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.maxmemory</params>
+                                    <parameters>
+                                       <parameter>$.Memory.maxmemory</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -1976,11 +2136,15 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.maxmemory_policy</params>
+                                    <parameters>
+                                       <parameter>$.Memory.maxmemory_policy</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2003,7 +2167,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.total_system_memory</params>
+                                    <parameters>
+                                       <parameter>$.Memory.total_system_memory</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2026,7 +2192,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.used_memory_dataset</params>
+                                    <parameters>
+                                       <parameter>$.Memory.used_memory_dataset</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2050,12 +2218,16 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.used_memory_dataset_perc</params>
+                                    <parameters>
+                                       <parameter>$.Memory.used_memory_dataset_perc</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>REGEX</type>
-                                    <params>(.+)%
-\1</params>
+                                    <parameters>
+                                       <parameter>(.+)%</parameter>
+                                       <parameter>\1</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2078,7 +2250,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.used_memory_overhead</params>
+                                    <parameters>
+                                       <parameter>$.Memory.used_memory_overhead</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2102,12 +2276,16 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.used_memory_peak_perc</params>
+                                    <parameters>
+                                       <parameter>$.Memory.used_memory_peak_perc</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>REGEX</type>
-                                    <params>(.+)%
-\1</params>
+                                    <parameters>
+                                       <parameter>(.+)%</parameter>
+                                       <parameter>\1</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2130,7 +2308,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.used_memory_startup</params>
+                                    <parameters>
+                                       <parameter>$.Memory.used_memory_startup</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2153,7 +2333,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_last_cow_size</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_last_cow_size</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2176,7 +2358,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.rdb_last_cow_size</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.rdb_last_cow_size</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2203,7 +2387,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.second_repl_offset</params>
+                                    <parameters>
+                                       <parameter>$.Replication.second_repl_offset</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2227,11 +2413,15 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Server.executable</params>
+                                    <parameters>
+                                       <parameter>$.Server.executable</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2253,7 +2443,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Stats.active_defrag_hits</params>
+                                    <parameters>
+                                       <parameter>$.Stats.active_defrag_hits</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2275,7 +2467,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Stats.active_defrag_key_hits</params>
+                                    <parameters>
+                                       <parameter>$.Stats.active_defrag_key_hits</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2297,7 +2491,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Stats.active_defrag_key_misses</params>
+                                    <parameters>
+                                       <parameter>$.Stats.active_defrag_key_misses</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2319,7 +2515,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Stats.active_defrag_misses</params>
+                                    <parameters>
+                                       <parameter>$.Stats.active_defrag_misses</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2341,7 +2539,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Stats.expired_stale_perc</params>
+                                    <parameters>
+                                       <parameter>$.Stats.expired_stale_perc</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2362,7 +2562,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Stats.expired_time_cap_reached_count</params>
+                                    <parameters>
+                                       <parameter>$.Stats.expired_time_cap_reached_count</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2384,7 +2586,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Stats.slave_expires_tracked_keys</params>
+                                    <parameters>
+                                       <parameter>$.Stats.slave_expires_tracked_keys</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2405,11 +2609,15 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Server.redis_version</params>
+                            <parameters>
+                               <parameter>$.Server.redis_version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(parseInt(value.split('.')[0]) &gt;= 4 ? [{'{#SINGLETON}': ''}] : []);</params>
+                            <parameters>
+                               <parameter>return JSON.stringify(parseInt(value.split('.')[0]) &gt;= 4 ? [{'{#SINGLETON}': ''}] : []);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -2434,7 +2642,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.allocator_active</params>
+                                    <parameters>
+                                       <parameter>$.Memory.allocator_active</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2455,7 +2665,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.allocator_allocated</params>
+                                    <parameters>
+                                       <parameter>$.Memory.allocator_allocated</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2477,7 +2689,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.allocator_frag_bytes</params>
+                                    <parameters>
+                                       <parameter>$.Memory.allocator_frag_bytes</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2499,7 +2713,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.allocator_frag_ratio</params>
+                                    <parameters>
+                                       <parameter>$.Memory.allocator_frag_ratio</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2520,7 +2736,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.allocator_resident</params>
+                                    <parameters>
+                                       <parameter>$.Memory.allocator_resident</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2542,7 +2760,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.allocator_rss_bytes</params>
+                                    <parameters>
+                                       <parameter>$.Memory.allocator_rss_bytes</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2564,7 +2784,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.allocator_rss_ratio</params>
+                                    <parameters>
+                                       <parameter>$.Memory.allocator_rss_ratio</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2586,7 +2808,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.mem_fragmentation_bytes</params>
+                                    <parameters>
+                                       <parameter>$.Memory.mem_fragmentation_bytes</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2608,7 +2832,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.mem_aof_buffer</params>
+                                    <parameters>
+                                       <parameter>$.Memory.mem_aof_buffer</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2629,7 +2855,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.mem_clients_normal</params>
+                                    <parameters>
+                                       <parameter>$.Memory.mem_clients_normal</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2650,7 +2878,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.mem_clients_slaves</params>
+                                    <parameters>
+                                       <parameter>$.Memory.mem_clients_slaves</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2671,7 +2901,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.mem_not_counted_for_evict</params>
+                                    <parameters>
+                                       <parameter>$.Memory.mem_not_counted_for_evict</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2692,7 +2924,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.number_of_cached_scripts</params>
+                                    <parameters>
+                                       <parameter>$.Memory.number_of_cached_scripts</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2713,7 +2947,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.mem_replication_backlog</params>
+                                    <parameters>
+                                       <parameter>$.Memory.mem_replication_backlog</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2736,7 +2972,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.rss_overhead_bytes</params>
+                                    <parameters>
+                                       <parameter>$.Memory.rss_overhead_bytes</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2758,7 +2996,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.rss_overhead_ratio</params>
+                                    <parameters>
+                                       <parameter>$.Memory.rss_overhead_ratio</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2779,7 +3019,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Memory.used_memory_scripts</params>
+                                    <parameters>
+                                       <parameter>$.Memory.used_memory_scripts</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2793,11 +3035,15 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JSONPATH</type>
-                            <params>$.Server.redis_version</params>
+                            <parameters>
+                               <parameter>$.Server.redis_version</parameter>
+                            </parameters>
                         </step>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(parseInt(value.split('.')[0]) &gt;= 5 ? [{'{#SINGLETON}': ''}] : []);</params>
+                            <parameters>
+                               <parameter>return JSON.stringify(parseInt(value.split('.')[0]) &gt;= 5 ? [{'{#SINGLETON}': ''}] : []);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -2824,7 +3070,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_base_size</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_base_size</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2847,7 +3095,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_buffer_length</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_buffer_length</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2870,7 +3120,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_current_size</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_current_size</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2892,7 +3144,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_delayed_fsync</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_delayed_fsync</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2914,7 +3168,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_pending_bio_fsync</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_pending_bio_fsync</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2939,7 +3195,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_pending_rewrite</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_pending_rewrite</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2962,7 +3220,9 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Persistence.aof_rewrite_buffer_length</params>
+                                    <parameters>
+                                       <parameter>$.Persistence.aof_rewrite_buffer_length</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2976,9 +3236,11 @@ https://redis.io/topics/clients</description>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(JSON.parse(value).Persistence.aof_enabled === '1'
+                            <parameters>
+                               <parameter>return JSON.stringify(JSON.parse(value).Persistence.aof_enabled === '1'
   ? [{'{#SINGLETON}': ''}]
-  : []);</params>
+  : []);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -3005,7 +3267,8 @@ https://redis.io/topics/clients</description>
                             <preprocessing>
                                 <step>
                                     <type>JAVASCRIPT</type>
-                                    <params>var repl = JSON.parse(value).Replication;
+                                    <parameters>
+                                       <parameter>var repl = JSON.parse(value).Replication;
 var res = Object.keys(repl)
     .filter(function (v) {return v.match(/slave\d+/)})
     .filter(function (v) {return (repl[v].ip === &quot;{#SLAVE_IP}&quot; &amp;&amp; repl[v].port === &quot;{#SLAVE_PORT}&quot;)})
@@ -3015,7 +3278,8 @@ if (res === undefined) {
     throw 'Slave {#SLAVE_IP}:{#SLAVE_PORT} is no longer available.';
 }
 
-return res;</params>
+return res;</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3044,12 +3308,14 @@ return res;</params>
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>var repl = JSON.parse(value).Replication;
+                            <parameters>
+                               <parameter>var repl = JSON.parse(value).Replication;
 return JSON.stringify(Object.keys(repl)
   .filter(function (v) {return v.match(/slave\d+/)})
   .map(function (v){
     return {&quot;{#SLAVE_IP}&quot;: repl[v].ip, &quot;{#SLAVE_PORT}&quot;: repl[v].port}
-  }));</params>
+  }));</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -3077,11 +3343,15 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.master_host</params>
+                                    <parameters>
+                                       <parameter>$.Replication.master_host</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3104,7 +3374,9 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.master_last_io_seconds_ago</params>
+                                    <parameters>
+                                       <parameter>$.Replication.master_last_io_seconds_ago</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3135,11 +3407,13 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.master_link_status</params>
+                                    <parameters>
+                                       <parameter>$.Replication.master_link_status</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>BOOL_TO_DECIMAL</type>
-                                    <params/>
+                                    <parameters/>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3161,11 +3435,15 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.master_port</params>
+                                    <parameters>
+                                       <parameter>$.Replication.master_port</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3187,7 +3465,9 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.master_sync_in_progress</params>
+                                    <parameters>
+                                       <parameter>$.Replication.master_sync_in_progress</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3209,7 +3489,9 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.slave_priority</params>
+                                    <parameters>
+                                       <parameter>$.Replication.slave_priority</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3231,11 +3513,15 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.slave_read_only</params>
+                                    <parameters>
+                                       <parameter>$.Replication.slave_read_only</parameter>
+                                    </parameters>
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <parameters>
+                                       <parameter>1d</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3258,7 +3544,9 @@ return JSON.stringify(Object.keys(repl)
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
-                                    <params>$.Replication.slave_repl_offset</params>
+                                    <parameters>
+                                       <parameter>$.Replication.slave_repl_offset</parameter>
+                                    </parameters>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3287,9 +3575,11 @@ return JSON.stringify(Object.keys(repl)
                     <preprocessing>
                         <step>
                             <type>JAVASCRIPT</type>
-                            <params>return JSON.stringify(JSON.parse(value).Replication.role === 'slave'
+                            <parameters>
+                               <parameter>return JSON.stringify(JSON.parse(value).Replication.role === 'slave'
   ? [{'{#SINGLETON}': ''}]
-  : []);</params>
+  : []);</parameter>
+                            </parameters>
                         </step>
                     </preprocessing>
                 </discovery_rule>

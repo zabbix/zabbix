@@ -301,7 +301,9 @@ Cisco UCS storage:LocalDisk:size managed object property. In MB.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1048576</params>
+                           <parameters>
+                              <parameter>1048576</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -700,7 +702,9 @@ Cisco UCS compute:RackUnit:model managed object property</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -723,7 +727,9 @@ Cisco UCS compute:RackUnit:serial managed object property</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <parameters>
+                              <parameter>1d</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -828,7 +834,9 @@ Cisco UCS storage:LocalLun:size managed object property in MB.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1048576</params>
+                           <parameters>
+                              <parameter>1048576</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>

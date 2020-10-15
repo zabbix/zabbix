@@ -80,7 +80,9 @@ Current firmware version.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -112,7 +114,9 @@ Current firmware version.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -136,7 +140,9 @@ RouterBOARD serial number.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -169,7 +175,9 @@ Software version.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -208,7 +216,9 @@ might be modified.</description>
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -229,7 +239,9 @@ The amount of the storage represented by this entry that is allocated, in units 
                <preprocessing>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>1024</params>
+                     <parameters>
+                        <parameter>1024</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -339,7 +351,9 @@ Might be missing in entry models (RB750, RB450G..).</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.1</params>
+                           <parameters>
+                              <parameter>0.1</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -412,7 +426,9 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>0.1</params>
+                           <parameters>
+                              <parameter>0.1</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -665,7 +681,9 @@ mtxrWlApBand</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -687,7 +705,9 @@ mtxrWlApSsid Service Set Identifier.</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -708,7 +728,9 @@ mtxrWlApNoiseFloor</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -784,7 +806,9 @@ mtxrWlCMChannel</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -820,7 +844,9 @@ mtxrWlCMState Wireless interface state.</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -898,7 +924,9 @@ might be modified.</description>
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -919,7 +947,9 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <preprocessing>
                         <step>
                            <type>MULTIPLIER</type>
-                           <params>1024</params>
+                           <parameters>
+                              <parameter>1024</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                   </item_prototype>

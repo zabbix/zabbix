@@ -314,7 +314,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
             </item>
@@ -334,7 +336,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Active Parallel Sessions')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Active Parallel Sessions')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -357,7 +361,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Active Serial Sessions')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Active Serial Sessions')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -380,7 +386,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Average Active Sessions')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Average Active Sessions')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -405,7 +413,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..ARCHIVER.first()</params>
+                     <parameters>
+                        <parameter>$..ARCHIVER.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -429,7 +439,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Buffer Cache Hit Ratio')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Buffer Cache Hit Ratio')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -451,7 +463,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Global Cache Blocks Corrupted')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Global Cache Blocks Corrupted')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -473,7 +487,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Global Cache Blocks Lost')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Global Cache Blocks Lost')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -497,7 +513,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Cursor Cache Hit Ratio')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Cursor Cache Hit Ratio')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -521,7 +539,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Database CPU Time Ratio')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Database CPU Time Ratio')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -545,7 +565,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Database Wait Time Ratio')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Database Wait Time Ratio')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -567,7 +589,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='DATAFILE::Count')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='DATAFILE::Count')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -589,7 +613,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYSPARAM::Db_Files')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYSPARAM::Db_Files')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -613,7 +639,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Disk Sort Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Disk Sort Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -637,7 +665,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Enqueue Timeouts Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Enqueue Timeouts Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -659,7 +689,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='FRA::Number Of Files')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Number Of Files')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -683,7 +715,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='FRA::Restore Point')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Restore Point')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -706,7 +740,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='FRA::Space Limit')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Space Limit')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -731,7 +767,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='FRA::Space Reclaimable')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Space Reclaimable')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -756,7 +794,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='FRA::Space Used')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Space Used')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -781,7 +821,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='FRA::Usable Pct')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Usable Pct')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -807,7 +849,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::GC CR Block Received Per Second')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::GC CR Block Received Per Second')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -831,7 +875,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..HOST_NAME.first()</params>
+                     <parameters>
+                        <parameter>$..HOST_NAME.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -864,7 +910,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..INSTANCE_NAME.first()</params>
+                     <parameters>
+                        <parameter>$..INSTANCE_NAME.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -898,7 +946,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..STATUS.first()</params>
+                     <parameters>
+                        <parameter>$..STATUS.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -923,7 +973,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..INSTANCE_ROLE.first()</params>
+                     <parameters>
+                        <parameter>$..INSTANCE_ROLE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -947,7 +999,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Library Cache Hit Ratio')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Library Cache Hit Ratio')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -971,7 +1025,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Logons Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Logons Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -995,7 +1051,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Long Table Scans Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Long Table Scans Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1019,7 +1077,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Memory Sorts Ratio')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Memory Sorts Ratio')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1042,7 +1102,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='PGA::Global Memory Bound')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Global Memory Bound')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1065,7 +1127,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='PGA::Aggregate Pga Target Parameter')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Aggregate Pga Target Parameter')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1089,7 +1153,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Physical Read Bytes Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Read Bytes Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1113,7 +1179,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Physical Reads Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Reads Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1137,7 +1205,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Physical Write Bytes Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Write Bytes Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1161,7 +1231,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Physical Writes Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Writes Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1182,7 +1254,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='PROC::Procnum')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PROC::Procnum')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1204,7 +1278,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYSPARAM::Processes')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYSPARAM::Processes')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1226,7 +1302,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='REDO::Available')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='REDO::Available')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1257,7 +1335,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Rows Per Sort')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Rows Per Sort')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1281,11 +1361,15 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::SQL Service Response Time')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::SQL Service Response Time')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
-                     <params>0.01</params>
+                     <parameters>
+                        <parameter>0.01</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1308,7 +1392,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SESSION::Active Background')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Active Background')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1333,7 +1419,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SESSION::Active User')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Active User')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1359,7 +1447,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SESSION::Concurrency rate')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Concurrency rate')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1390,7 +1480,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SESSION::Total')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Total')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1413,7 +1505,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SESSION::Inactive User')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Inactive User')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1437,7 +1531,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYSPARAM::Sessions')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYSPARAM::Sessions')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1461,7 +1557,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SESSION::Lock rate')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Lock rate')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1492,7 +1590,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SESSION::Long time locked')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Long time locked')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1523,7 +1623,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SGA::Buffer_Cache')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Buffer_Cache')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1548,7 +1650,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SGA::Fixed_Sga')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Fixed_Sga')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1573,7 +1677,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SGA::Java Pool')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Java Pool')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1598,7 +1704,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SGA::Large Pool')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Large Pool')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1623,7 +1731,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SGA::Log_Buffer')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Log_Buffer')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1648,7 +1758,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SGA::Shared Pool')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Shared Pool')].VALUE.first()</parameter>
+                     </parameters>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -1674,7 +1786,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Shared Pool Free %')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Shared Pool Free %')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1705,7 +1819,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Total Sorts Per User Call')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Total Sorts Per User Call')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1729,7 +1845,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::Temp Space Used')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Temp Space Used')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1752,7 +1870,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='PGA::Total Pga Allocated')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Total Pga Allocated')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1775,7 +1895,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='PGA::Total Freeable Pga Memory')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Total Freeable Pga Memory')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1798,7 +1920,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='PGA::Total Pga Inuse')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Total Pga Inuse')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1822,7 +1946,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..UPTIME.first()</params>
+                     <parameters>
+                        <parameter>$..UPTIME.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1867,7 +1993,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='USER::Expire password')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='USER::Expire password')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1899,7 +2027,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC=='SYS::User Rollbacks Per Sec')].VALUE.first()</params>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::User Rollbacks Per Sec')].VALUE.first()</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1923,11 +2053,15 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$..VERSION.first()</params>
+                     <parameters>
+                        <parameter>$..VERSION.first()</parameter>
+                     </parameters>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <master_item>
@@ -1957,7 +2091,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
                   </step>
                </preprocessing>
                <triggers>
@@ -1998,7 +2134,9 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].ERROR.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DEST_NAME=='{#DEST_NAME}')].ERROR.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2020,7 +2158,9 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].LOG_SEQUENCE.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DEST_NAME=='{#DEST_NAME}')].LOG_SEQUENCE.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2045,7 +2185,9 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].STATUS.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DEST_NAME=='{#DEST_NAME}')].STATUS.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2089,7 +2231,9 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DG_NAME=='{#DG_NAME}')].FREE_SIZE_BYTE.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DG_NAME=='{#DG_NAME}')].FREE_SIZE_BYTE.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2112,7 +2256,9 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DG_NAME=='{#DG_NAME}')].SIZE_BYTE.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DG_NAME=='{#DG_NAME}')].SIZE_BYTE.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2136,7 +2282,9 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DG_NAME=='{#DG_NAME}')].USED_PERCENT.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DG_NAME=='{#DG_NAME}')].USED_PERCENT.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2232,11 +2380,15 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DBNAME=='{#DBNAME}')].FORCE_LOGGING.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].FORCE_LOGGING.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2261,11 +2413,15 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DBNAME=='{#DBNAME}')].LOG_MODE.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].LOG_MODE.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2290,11 +2446,15 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2340,11 +2500,15 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DBNAME=='{#DBNAME}')].ROLE.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].ROLE.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2415,11 +2579,15 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()</parameter>
+                           </parameters>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>15m</params>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2488,7 +2656,9 @@ contents  FROM DBA_TABLESPACES;</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2511,7 +2681,9 @@ contents  FROM DBA_TABLESPACES;</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].FREE_BYTES.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].FREE_BYTES.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2534,7 +2706,9 @@ contents  FROM DBA_TABLESPACES;</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].MAX_BYTES.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].MAX_BYTES.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2559,7 +2733,9 @@ contents  FROM DBA_TABLESPACES;</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].STATUS.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].STATUS.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2604,7 +2780,9 @@ contents  FROM DBA_TABLESPACES;</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_PCT.first()</params>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_PCT.first()</parameter>
+                           </parameters>
                         </step>
                      </preprocessing>
                      <master_item>
