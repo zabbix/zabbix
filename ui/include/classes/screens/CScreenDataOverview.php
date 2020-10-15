@@ -51,6 +51,7 @@ class CScreenDataOverview extends CScreenBase {
 			$data['db_hosts'] = $db_hosts;
 			$data['items_by_key'] = $items_by_key;
 			$data['has_hidden_data'] = $has_hidden_data;
+			$data['item_names_by_key'] = $item_names_by_key;
 
 			$table = new CPartial('dataoverview.table.top', $data);
 		}
