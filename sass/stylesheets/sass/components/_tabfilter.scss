@@ -125,13 +125,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 				color: $tab-label-expanded-color;
 			}
 
-			&:hover,
-			&.focused {
+			&:hover {
 				background: $tab-label-focus-bg-color;
-
-				&::before {
-					background: $tab-label-focus-bg-color;
-				}
 			}
 
 			.icon-edit {
@@ -232,6 +227,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	// white icon
 	background: url($sprite-path) no-repeat -432px -510px;
 }
+
 .selected.expanded .icon-home::before {
 	// grey icon
 	background: url($sprite-path) no-repeat -120px -510px;

@@ -974,10 +974,8 @@ footer {
       vertical-align: baseline; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .tabfilter-item-link {
         color: #000000; }
-      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover, .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded.focused {
+      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover {
         background: #f4f4f4; }
-        .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover::before, .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded.focused::before {
-          background: #f4f4f4; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .icon-edit {
         background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -621px; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
