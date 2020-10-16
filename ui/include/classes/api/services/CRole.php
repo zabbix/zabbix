@@ -848,7 +848,7 @@ class CRole extends CApiService {
 					$role_rules['api.mode'] = $rules[$roleid]['api.mode'];
 				}
 				if (in_array('api', $options['selectRules'])) {
-					$role_rules['api'] = $rules[$roleid]['api'];
+					$role_rules['api'] = array_values($rules[$roleid]['api']);
 				}
 				if (in_array('actions', $options['selectRules'])) {
 					$role_rules['actions'] = [];
