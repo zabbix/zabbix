@@ -78,7 +78,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 		$ui[] = new CDiv(
 			(new CCheckBox(str_replace('.', '_', $rule_key), 1))
 				->setId($rule_key)
-				->setChecked(array_key_exists($rule_key, $data['rules']) && $data['rules'][$rule_key])
+				->setChecked(array_key_exists($rule_key, $data['rules'][CRoleHelper::SECTION_UI]) && $data['rules'][CRoleHelper::SECTION_UI][$rule_key])
 				->setReadonly($data['readonly'])
 				->setLabel($rule_label)
 				->setUncheckedValue(0)
@@ -222,7 +222,7 @@ foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = new CDiv(
 		(new CCheckBox(str_replace('.', '_', $action), 1))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules']) && $data['rules'][$action])
+			->setChecked(array_key_exists($action, $data['rules'][CRoleHelper::SECTION_ACTIONS]) && $data['rules'][CRoleHelper::SECTION_ACTIONS][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
