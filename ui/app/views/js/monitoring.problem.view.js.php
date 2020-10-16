@@ -48,6 +48,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 			url.setArgument('action', 'problem.view.csv');
 			$('#export_csv').attr('data-url', url.getUrl());
 			refreshResults();
+			refreshCounters();
 
 			if (active_filter !== filter._active_item) {
 				active_filter = filter._active_item;
