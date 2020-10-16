@@ -1,0 +1,406 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:17Z'
+  groups:
+    -
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      template: 'Intel SR1630 IPMI'
+      name: 'Intel SR1630 IPMI'
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      applications:
+        -
+          name: Fans
+        -
+          name: Temperature
+        -
+          name: Voltage
+      items:
+        -
+          name: 'Baseboard Temp'
+          type: IPMI
+          key: baseboard_temp
+          history: 1w
+          value_type: FLOAT
+          units: C
+          ipmi_sensor: 'Baseboard Temp'
+          applications:
+            -
+              name: Temperature
+          triggers:
+            -
+              expression: '{last()}<5 or {last()}>90'
+              name: 'Baseboard Temp Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<10 or {last()}>83'
+              name: 'Baseboard Temp Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'Baseboard Temp Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:baseboard_temp.last()}<5 or {Intel SR1630 IPMI:baseboard_temp.last()}>90'
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+        -
+          name: 'BB +1.05V PCH'
+          type: IPMI
+          key: bb_1.05v_pch
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +1.05V PCH'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<0.953 or {last()}>1.149'
+              name: 'BB +1.05V PCH Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<0.985 or {last()}>1.117'
+              name: 'BB +1.05V PCH Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +1.05V PCH Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:bb_1.05v_pch.last()}<0.953 or {Intel SR1630 IPMI:bb_1.05v_pch.last()}>1.149'
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+        -
+          name: 'BB +1.1V P1 Vccp'
+          type: IPMI
+          key: bb_1.1v_p1_vccp
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +1.1V P1 Vccp'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<0.683 or {last()}>1.543'
+              name: 'BB +1.1V P1 Vccp Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<0.708 or {last()}>1.501'
+              name: 'BB +1.1V P1 Vccp Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +1.1V P1 Vccp Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}<0.683 or {Intel SR1630 IPMI:bb_1.1v_p1_vccp.last()}>1.543'
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+        -
+          name: 'BB +1.5V P1 DDR3'
+          type: IPMI
+          key: bb_1.5v_p1_ddr3
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +1.5V P1 DDR3'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<1.362 or {last()}>1.635'
+              name: 'BB +1.5V P1 DDR3 Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<1.401 or {last()}>1.589'
+              name: 'BB +1.5V P1 DDR3 Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +1.5V P1 DDR3 Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}<1.362 or {Intel SR1630 IPMI:bb_1.5v_p1_ddr3.last()}>1.635'
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+        -
+          name: 'BB +3.3V'
+          type: IPMI
+          key: bb_3.3v
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +3.3V'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<2.982 or {last()}>3.625'
+              name: 'BB +3.3V Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<3.067 or {last()}>3.525'
+              name: 'BB +3.3V Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +3.3V Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:bb_3.3v.last()}<2.982 or {Intel SR1630 IPMI:bb_3.3v.last()}>3.625'
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+        -
+          name: 'BB +3.3V STBY'
+          type: IPMI
+          key: bb_3.3v_stby
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +3.3V STBY'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<2.982 or {last()}>3.625'
+              name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+            -
+              expression: '{last()}<3.067 or {last()}>3.525'
+              name: 'BB +3.3V STBY Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:bb_3.3v_stby.last()}<2.982 or {Intel SR1630 IPMI:bb_3.3v_stby.last()}>3.625'
+        -
+          name: 'BB +5.0V'
+          type: IPMI
+          key: bb_5.0v
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +5.0V'
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}<4.471 or {last()}>5.538'
+              name: 'BB +5.0V Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<4.630 or {last()}>5.380'
+              name: 'BB +5.0V Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +5.0V Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:bb_5.0v.last()}<4.471 or {Intel SR1630 IPMI:bb_5.0v.last()}>5.538'
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+        -
+          name: 'Front Panel Temp'
+          type: IPMI
+          key: front_panel_temp
+          history: 1w
+          value_type: FLOAT
+          units: C
+          ipmi_sensor: 'Front Panel Temp'
+          applications:
+            -
+              name: Temperature
+          triggers:
+            -
+              expression: '{last()}<0 or {last()}>48'
+              name: 'Front Panel Temp Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<5 or {last()}>44'
+              name: 'Front Panel Temp Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'Front Panel Temp Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:front_panel_temp.last()}<0 or {Intel SR1630 IPMI:front_panel_temp.last()}>48'
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+        -
+          name: Power
+          type: IPMI
+          key: power
+          history: 1w
+          ipmi_sensor: power
+          applications:
+            -
+              name: Voltage
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: Power
+              priority: WARNING
+        -
+          name: 'System Fan 2'
+          type: IPMI
+          key: system_fan_2
+          history: 1w
+          value_type: FLOAT
+          units: RPM
+          ipmi_sensor: 'System Fan 2'
+          applications:
+            -
+              name: Fans
+          triggers:
+            -
+              expression: '{last()}<324'
+              name: 'System Fan 2 Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<378'
+              name: 'System Fan 2 Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                -
+                  name: 'System Fan 2 Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:system_fan_2.last()}<324'
+        -
+          name: 'System Fan 3'
+          type: IPMI
+          key: system_fan_3
+          history: 1w
+          value_type: FLOAT
+          units: RPM
+          ipmi_sensor: 'System Fan 3'
+          applications:
+            -
+              name: Fans
+          triggers:
+            -
+              expression: '{last()}<324'
+              name: 'System Fan 3 Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+            -
+              expression: '{last()}<378'
+              name: 'System Fan 3 Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: Power
+                  expression: '{Intel SR1630 IPMI:power.last()}=0'
+                -
+                  name: 'System Fan 3 Critical [{ITEM.VALUE}]'
+                  expression: '{Intel SR1630 IPMI:system_fan_3.last()}<324'
+  graphs:
+    -
+      name: 'Fan speed and temperature'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: EE0000
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: front_panel_temp
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: EE00EE
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: baseboard_temp
+        -
+          sortorder: '2'
+          color: '000000'
+          yaxisside: RIGHT
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: system_fan_2
+        -
+          sortorder: '3'
+          drawtype: DASHED_LINE
+          color: '000000'
+          yaxisside: RIGHT
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: system_fan_3
+    -
+      name: Voltage
+      yaxismax: '5.5'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: '880000'
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: power
+        -
+          sortorder: '1'
+          color: '009900'
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: bb_1.05v_pch
+        -
+          sortorder: '2'
+          color: 00CCCC
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: bb_3.3v
+        -
+          sortorder: '3'
+          color: '000000'
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: bb_3.3v_stby
+        -
+          sortorder: '4'
+          color: 3333FF
+          item:
+            host: 'Intel SR1630 IPMI'
+            key: bb_5.0v

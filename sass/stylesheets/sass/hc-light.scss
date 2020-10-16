@@ -1269,3 +1269,13 @@ td.inactive-bg {
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
 }
+
+// Tabfilter
+
+.filter-container.tabfilter-container {
+	.tabfilter-item-label {
+		&.focused {
+			box-shadow: 0 0 0 2px $blue;
+		}
+	}
+}

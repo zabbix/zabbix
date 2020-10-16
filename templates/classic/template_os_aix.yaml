@@ -1,0 +1,798 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:15Z'
+  groups:
+    -
+      name: 'Templates/Operating systems'
+  templates:
+    -
+      template: AIX
+      name: AIX
+      templates:
+        -
+          name: 'Zabbix agent'
+      groups:
+        -
+          name: 'Templates/Operating systems'
+      applications:
+        -
+          name: CPU
+        -
+          name: Filesystems
+        -
+          name: General
+        -
+          name: 'Logical partitions'
+        -
+          name: Memory
+        -
+          name: 'Network interfaces'
+        -
+          name: OS
+        -
+          name: Performance
+        -
+          name: Processes
+        -
+          name: Security
+      items:
+        -
+          name: 'Number of running processes'
+          key: 'proc.num[,,run]'
+          history: 1w
+          description: 'Number of processes in running state.'
+          applications:
+            -
+              name: Processes
+          triggers:
+            -
+              expression: '{avg(5m)}>30'
+              name: 'Too many processes running on {HOST.NAME}'
+              priority: WARNING
+        -
+          name: 'Number of processes'
+          key: 'proc.num[]'
+          history: 1w
+          description: 'Total number of processes in any state.'
+          applications:
+            -
+              name: Processes
+          triggers:
+            -
+              expression: '{avg(5m)}>300'
+              name: 'Too many processes on {HOST.NAME}'
+              priority: WARNING
+        -
+          name: 'Interrupts per second'
+          key: system.cpu.intr
+          history: 1w
+          units: ips
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+        -
+          name: 'Processor load (1 min average per core)'
+          key: 'system.cpu.load[percpu,avg1]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+          triggers:
+            -
+              expression: '{avg(5m)}>5'
+              name: 'Processor load is too high on {HOST.NAME}'
+              priority: WARNING
+        -
+          name: 'Processor load (5 min average per core)'
+          key: 'system.cpu.load[percpu,avg5]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'Processor load (15 min average per core)'
+          key: 'system.cpu.load[percpu,avg15]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'Context switches per second'
+          key: system.cpu.switches
+          history: 1w
+          units: sps
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+        -
+          name: 'Host name'
+          key: system.hostname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'System host name.'
+          inventory_link: NAME
+          applications:
+            -
+              name: General
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{diff(0)}>0'
+              name: 'Hostname was changed on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'Host local time'
+          key: system.localtime
+          history: 1w
+          units: unixtime
+          applications:
+            -
+              name: General
+            -
+              name: OS
+        -
+          name: 'CPU available physical processors in the shared pool'
+          key: 'system.stat[cpu,app]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: CPU
+            -
+              name: 'Logical partitions'
+            -
+              name: Performance
+        -
+          name: 'CPU entitled capacity consumed'
+          key: 'system.stat[cpu,ec]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: CPU
+            -
+              name: 'Logical partitions'
+            -
+              name: Performance
+        -
+          name: 'CPU idle time'
+          key: 'system.stat[cpu,id]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'CPU logical processor utilization'
+          key: 'system.stat[cpu,lbusy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: CPU
+            -
+              name: 'Logical partitions'
+            -
+              name: Performance
+        -
+          name: 'CPU number of physical processors consumed'
+          key: 'system.stat[cpu,pc]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: CPU
+            -
+              name: 'Logical partitions'
+            -
+              name: Performance
+        -
+          name: 'CPU system time'
+          key: 'system.stat[cpu,sy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'CPU user time'
+          key: 'system.stat[cpu,us]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'CPU iowait time'
+          key: 'system.stat[cpu,wa]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+          triggers:
+            -
+              expression: '{avg(5m)}>20'
+              name: 'Disk I/O is overloaded on {HOST.NAME}'
+              priority: WARNING
+              description: 'OS spends significant time waiting for I/O (input/output) operations. It could be indicator of performance issues with storage system.'
+        -
+          name: 'Amount of data transferred'
+          key: 'system.stat[disk,bps]'
+          history: 1w
+          value_type: FLOAT
+          units: B
+          applications:
+            -
+              name: Filesystems
+            -
+              name: Performance
+        -
+          name: 'Number of transfers'
+          key: 'system.stat[disk,tps]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Filesystems
+            -
+              name: Performance
+        -
+          name: 'Processor units is entitled to receive'
+          key: 'system.stat[ent]'
+          delay: 1h
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: CPU
+            -
+              name: 'Logical partitions'
+        -
+          name: 'Kernel thread context switches'
+          key: 'system.stat[faults,cs]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'Device interrupts'
+          key: 'system.stat[faults,in]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'System calls'
+          key: 'system.stat[faults,sy]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'Length of the swap queue'
+          key: 'system.stat[kthr,b]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Memory
+            -
+              name: Performance
+        -
+          name: 'Length of the run queue'
+          key: 'system.stat[kthr,r]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: CPU
+            -
+              name: Performance
+        -
+          name: 'Active virtual pages'
+          key: 'system.stat[memory,avm]'
+          history: 1w
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Free real memory'
+          key: 'system.stat[memory,fre]'
+          history: 1w
+          applications:
+            -
+              name: Memory
+        -
+          name: 'File page-ins per second'
+          key: 'system.stat[page,fi]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Memory
+        -
+          name: 'File page-outs per second'
+          key: 'system.stat[page,fo]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Pages freed (page replacement)'
+          key: 'system.stat[page,fr]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Pages paged in from paging space'
+          key: 'system.stat[page,pi]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Pages paged out to paging space'
+          key: 'system.stat[page,po]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Pages scanned by page-replacement algorithm'
+          key: 'system.stat[page,sr]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Memory
+        -
+          name: 'System information'
+          key: system.uname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'The information as normally returned by ''uname -a''.'
+          inventory_link: OS
+          applications:
+            -
+              name: General
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{diff(0)}>0'
+              name: 'Host information was changed on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'System uptime'
+          key: system.uptime
+          delay: 10m
+          history: 1w
+          units: uptime
+          applications:
+            -
+              name: General
+            -
+              name: OS
+          triggers:
+            -
+              expression: '{change(0)}<0'
+              name: '{HOST.NAME} has just been restarted'
+              priority: INFO
+        -
+          name: 'Number of logged in users'
+          key: system.users.num
+          history: 1w
+          description: 'Number of users who are currently logged in.'
+          applications:
+            -
+              name: OS
+            -
+              name: Security
+        -
+          name: 'Checksum of /etc/passwd'
+          key: 'vfs.file.cksum[/etc/passwd]'
+          delay: 1h
+          history: 1w
+          applications:
+            -
+              name: Security
+          triggers:
+            -
+              expression: '{diff(0)}>0'
+              name: '/etc/passwd has been changed on {HOST.NAME}'
+              priority: WARNING
+        -
+          name: 'Available memory'
+          key: 'vm.memory.size[available]'
+          history: 1w
+          units: B
+          description: 'Available memory is defined as free+cached+buffers memory.'
+          applications:
+            -
+              name: Memory
+          triggers:
+            -
+              expression: '{last()}<20M'
+              name: 'Lack of available memory on server {HOST.NAME}'
+              priority: AVERAGE
+        -
+          name: 'Total memory'
+          key: 'vm.memory.size[total]'
+          delay: 1h
+          history: 1w
+          units: B
+          applications:
+            -
+              name: Memory
+      discovery_rules:
+        -
+          name: 'Network interface discovery'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#IFNAME}'
+                value: '@Network interfaces for discovery'
+                formulaid: A
+          description: 'Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".'
+          item_prototypes:
+            -
+              name: 'Incoming network traffic on {#IFNAME}'
+              key: 'net.if.in[{#IFNAME}]'
+              history: 1w
+              units: bps
+              applications:
+                -
+                  name: 'Network interfaces'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+            -
+              name: 'Outgoing network traffic on {#IFNAME}'
+              key: 'net.if.out[{#IFNAME}]'
+              history: 1w
+              units: bps
+              applications:
+                -
+                  name: 'Network interfaces'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+          graph_prototypes:
+            -
+              name: 'Network traffic on {#IFNAME}'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 00AA00
+                  item:
+                    host: AIX
+                    key: 'net.if.in[{#IFNAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 3333FF
+                  item:
+                    host: AIX
+                    key: 'net.if.out[{#IFNAME}]'
+        -
+          name: 'Mounted filesystem discovery'
+          key: vfs.fs.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#FSTYPE}'
+                value: '@File systems for discovery'
+                formulaid: A
+          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          item_prototypes:
+            -
+              name: 'Free inodes on {#FSNAME} (percentage)'
+              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              applications:
+                -
+                  name: Filesystems
+              trigger_prototypes:
+                -
+                  expression: '{last()}<20'
+                  name: 'Free inodes is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+            -
+              name: 'Free disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},free]'
+              history: 1w
+              units: B
+              applications:
+                -
+                  name: Filesystems
+            -
+              name: 'Free disk space on {#FSNAME} (percentage)'
+              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              applications:
+                -
+                  name: Filesystems
+              trigger_prototypes:
+                -
+                  expression: '{last()}<20'
+                  name: 'Free disk space is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+            -
+              name: 'Total disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},total]'
+              delay: 1h
+              history: 1w
+              units: B
+              applications:
+                -
+                  name: Filesystems
+            -
+              name: 'Used disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},used]'
+              history: 1w
+              units: B
+              applications:
+                -
+                  name: Filesystems
+          graph_prototypes:
+            -
+              name: 'Disk space usage {#FSNAME}'
+              width: '600'
+              height: '340'
+              show_work_period: 'NO'
+              show_triggers: 'NO'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: C80000
+                  type: GRAPH_SUM
+                  item:
+                    host: AIX
+                    key: 'vfs.fs.size[{#FSNAME},total]'
+                -
+                  sortorder: '1'
+                  color: 00C800
+                  item:
+                    host: AIX
+                    key: 'vfs.fs.size[{#FSNAME},free]'
+      dashboards:
+        -
+          name: 'System performance'
+          widgets:
+            -
+              type: GRAPH_CLASSIC
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'CPU load'
+                    host: AIX
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'CPU jumps'
+                    host: AIX
+            -
+              type: GRAPH_CLASSIC
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'CPU utilization'
+                    host: AIX
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Memory usage'
+                    host: AIX
+  graphs:
+    -
+      name: 'CPU jumps'
+      graph_items:
+        -
+          color: '009900'
+          item:
+            host: AIX
+            key: system.cpu.switches
+        -
+          sortorder: '1'
+          color: '000099'
+          item:
+            host: AIX
+            key: system.cpu.intr
+    -
+      name: 'CPU load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: '009900'
+          item:
+            host: AIX
+            key: 'system.cpu.load[percpu,avg1]'
+        -
+          sortorder: '1'
+          color: '000099'
+          item:
+            host: AIX
+            key: 'system.cpu.load[percpu,avg5]'
+        -
+          sortorder: '2'
+          color: '990000'
+          item:
+            host: AIX
+            key: 'system.cpu.load[percpu,avg15]'
+    -
+      name: 'CPU utilization'
+      show_triggers: 'NO'
+      type: STACKED
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          color: '009999'
+          item:
+            host: AIX
+            key: 'system.stat[cpu,ec]'
+        -
+          sortorder: '1'
+          color: '990099'
+          item:
+            host: AIX
+            key: 'system.stat[cpu,pc]'
+        -
+          sortorder: '2'
+          color: '999900'
+          item:
+            host: AIX
+            key: 'system.stat[cpu,wa]'
+        -
+          sortorder: '3'
+          color: '990000'
+          item:
+            host: AIX
+            key: 'system.stat[cpu,sy]'
+        -
+          sortorder: '4'
+          color: '000099'
+          item:
+            host: AIX
+            key: 'system.stat[cpu,us]'
+        -
+          sortorder: '5'
+          color: '009900'
+          item:
+            host: AIX
+            key: 'system.stat[cpu,id]'
+    -
+      name: 'Memory usage'
+      ymin_type_1: FIXED
+      ymax_type_1: ITEM
+      ymax_item_1:
+        host: AIX
+        key: 'vm.memory.size[total]'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 00C800
+          item:
+            host: AIX
+            key: 'vm.memory.size[available]'
