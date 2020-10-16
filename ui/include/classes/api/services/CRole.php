@@ -543,6 +543,7 @@ class CRole extends CApiService {
 				CRoleHelper::SECTION_UI => ''
 			]);
 			$roles_rules[$roleid][] = [
+				'type' => self::RULE_VALUE_TYPE_INT32,
 				'name' => CRoleHelper::UI_DEFAULT_ACCESS,
 				'value_int' => $default_access
 			];
@@ -550,6 +551,7 @@ class CRole extends CApiService {
 			foreach ($rules[CRoleHelper::SECTION_UI] as $rule) {
 				if ($rule['status'] != $default_access) {
 					$roles_rules[$roleid][] = [
+						'type' => self::RULE_VALUE_TYPE_INT32,
 						'name' => sprintf('%s.%s', CRoleHelper::SECTION_UI, $rule['name']),
 						'value_int' => $rule['status']
 					];
@@ -563,6 +565,7 @@ class CRole extends CApiService {
 				CRoleHelper::SECTION_API => ''
 			]);
 			$roles_rules[$roleid][] = [
+				'type' => self::RULE_VALUE_TYPE_INT32,
 				'name' => CRoleHelper::API_ACCESS,
 				'value_int' => $api_access
 			];
@@ -573,6 +576,7 @@ class CRole extends CApiService {
 				$index = 0;
 				foreach ($rules[CRoleHelper::SECTION_API] as $method) {
 					$roles_rules[$roleid][] = [
+						'type' => self::RULE_VALUE_TYPE_STR,
 						'name' => CRoleHelper::API_METHOD.$index,
 						'value_str' => $method
 					];
@@ -581,6 +585,7 @@ class CRole extends CApiService {
 
 				if ($index) {
 					$roles_rules[$roleid][] = [
+						'type' => self::RULE_VALUE_TYPE_INT32,
 						'name' => CRoleHelper::API_MODE,
 						'value_int' => $status
 					];
@@ -594,6 +599,7 @@ class CRole extends CApiService {
 				CRoleHelper::SECTION_MODULES => ''
 			]);
 			$roles_rules[$roleid][] = [
+				'type' => self::RULE_VALUE_TYPE_INT32,
 				'name' => CRoleHelper::MODULES_DEFAULT_ACCESS,
 				'value_int' => $default_access
 			];
@@ -602,12 +608,9 @@ class CRole extends CApiService {
 			foreach ($rules[CRoleHelper::SECTION_MODULES] as $module) {
 				if ($module['status'] != $default_access) {
 					$roles_rules[$roleid][] = [
+						'type' => self::RULE_VALUE_TYPE_MODULE,
 						'name' => CRoleHelper::MODULES_MODULE.$index,
-						'module_id' => $module['moduleid']
-					];
-					$roles_rules[$roleid][] = [
-						'name' => CRoleHelper::MODULES_MODULE_STATUS.$index,
-						'value_int' => $module['status']
+						'value_moduleid' => $module['moduleid']
 					];
 					$index++;
 				}
