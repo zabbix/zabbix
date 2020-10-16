@@ -485,6 +485,7 @@ class CRole extends CApiService {
 				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
 				'filter' => ['roleid' => array_keys($roles)]
 			]);
+			$role_uirules = array_fill_keys(array_keys($roles), false);
 
 			// Move rules in database to $delete if it is not accessible anymore by role type.
 			foreach ($db_rows as $db_row) {
@@ -495,6 +496,10 @@ class CRole extends CApiService {
 					&& strpos($db_row['value_str'], CRoleHelper::API_WILDCARD) !== false
 				);
 
+				if ($section === CRoleHelper::SECTION_UI && $db_row['value']) {
+					$role_uirules[$db_row['roleid']] = true;
+				}
+
 				if ($section === CRoleHelper::SECTION_API && !$is_api_wildcard) {
 					$rule_name = CRoleHelper::API_METHOD.$db_row['value_str'];
 				}
@@ -504,6 +509,26 @@ class CRole extends CApiService {
 				}
 				else {
 					$delete[] = $db_row['role_ruleid'];
+				}
+			}
+
+			if (array_search(false, $role_uirules) !== false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('At least one UI element must be checked.')
+				);
+			}
+		}
+		else {
+			foreach ($roles as $role) {
+				$role += [
+					CRoleHelper::UI_DEFAULT_ACCESS => 1,
+					CRoleHelper::SECTION_UI => []
+				];
+
+				if (!$role[CRoleHelper::UI_DEFAULT_ACCESS] && !$role[CRoleHelper::SECTION_UI]) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('At least one UI element must be checked.')
+					);
 				}
 			}
 		}
@@ -517,15 +542,11 @@ class CRole extends CApiService {
 			}
 
 			$default = [
-				CRoleHelper::SECTION_UI => [],
 				CRoleHelper::UI_DEFAULT_ACCESS => 1,
 				CRoleHelper::API_ACCESS => 1,
 				CRoleHelper::API_MODE => 1,
-				CRoleHelper::SECTION_API => [],
 				CRoleHelper::MODULES_DEFAULT_ACCESS => 1,
-				CRoleHelper::SECTION_MODULES => [],
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => 1,
-				CRoleHelper::SECTION_ACTIONS => []
 			];
 
 			if ($is_update) {
@@ -533,7 +554,12 @@ class CRole extends CApiService {
 				$default = array_intersect_key($db_role_rules, $default) + $default;
 			}
 
-			$rules = $role['rules'] + $default;
+			$rules = $role['rules'] + $default + [
+				CRoleHelper::SECTION_UI => [],
+				CRoleHelper::SECTION_API => [],
+				CRoleHelper::SECTION_MODULES => [],
+				CRoleHelper::SECTION_ACTIONS => []
+			];
 			$roleid = $role['roleid'];
 
 			// UI rules.
