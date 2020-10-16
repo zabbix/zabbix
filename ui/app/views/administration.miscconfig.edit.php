@@ -31,14 +31,6 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $from_list = (new CFormList())
-	->addRow((new CLabel(_('Refresh unsupported items'), 'refresh_unsupported'))->setAsteriskMark(),
-		(new CTextBox('refresh_unsupported', $data['refresh_unsupported'], false,
-			DB::getFieldLength('config', 'refresh_unsupported')
-		))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-	)
 	->addRow((new CLabel(_('Group for discovered hosts'), 'discovery_groupid'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'discovery_groupid',

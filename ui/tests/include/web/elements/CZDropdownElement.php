@@ -60,7 +60,7 @@ class CZDropdownElement extends CElement {
 		for ($i = 0; $i < 2; $i++) {
 			try {
 				$this->waitUntilClickable()->click();
-				$option = $this->query($xpath)->waitUntilVisible()->one();
+				$option = $this->query($xpath)->waitUntilClickable()->one();
 
 				break;
 			}

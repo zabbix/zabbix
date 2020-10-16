@@ -50,6 +50,10 @@ class CMenuItem extends CBaseComponent {
 		this._toggle.blur();
 	}
 
+	isExpanded() {
+		return this._is_expanded;
+	}
+
 	isSelected() {
 		return this._is_selected;
 	}
@@ -90,9 +94,7 @@ class CMenuItem extends CBaseComponent {
 		this._events = {
 
 			click: (e) => {
-				if (!this._is_expanded) {
-					this.expandSubmenu();
-				}
+				this.expandSubmenu();
 				e.preventDefault();
 			},
 

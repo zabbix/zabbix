@@ -25,7 +25,6 @@
 #include "mutexs.h"
 #include "sysinfo.h"
 
-#define UNSUPPORTED_REFRESH_PERIOD	600
 #define OBJECT_CACHE_REFRESH_INTERVAL	60
 #define NAMES_UPDATE_INTERVAL		60
 
@@ -39,7 +38,6 @@ typedef struct
 {
 	zbx_perf_counter_data_t	*pPerfCounterList;
 	PDH_HQUERY		pdh_query;
-	time_t			nextcheck;		/* refresh time of not supported counters */
 	time_t			lastrefresh_objects;	/* last refresh time of object cache */
 	time_t			lastupdate_names;	/* last update time of object names */
 }
@@ -451,7 +449,6 @@ int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
 		goto out;
 	}
 
-	ppsd.nextcheck = time(NULL) + UNSUPPORTED_REFRESH_PERIOD;
 	ppsd.lastrefresh_objects = 0;
 	ppsd.lastupdate_names = 0;
 
@@ -523,18 +520,13 @@ void	collect_perfstat(void)
 	now = time(NULL);
 
 	/* refresh unsupported counters */
-	if (ppsd.nextcheck <= now)
+	for (cptr = ppsd.pPerfCounterList; NULL != cptr; cptr = cptr->next)
 	{
-		for (cptr = ppsd.pPerfCounterList; NULL != cptr; cptr = cptr->next)
- 		{
-			if (PERF_COUNTER_NOTSUPPORTED != cptr->status)
-				continue;
+		if (PERF_COUNTER_NOTSUPPORTED != cptr->status)
+			continue;
 
-			zbx_PdhAddCounter(__func__, cptr, ppsd.pdh_query, cptr->counterpath,
-					cptr->lang, &cptr->handle);
-		}
-
-		ppsd.nextcheck = now + UNSUPPORTED_REFRESH_PERIOD;
+		zbx_PdhAddCounter(__func__, cptr, ppsd.pdh_query, cptr->counterpath,
+				cptr->lang, &cptr->handle);
 	}
 
 	/* query for new data */

@@ -327,76 +327,50 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_KEY_CHANGED		0x04
 #define ZBX_ITEM_TYPE_CHANGED		0x08
 #define ZBX_ITEM_DELAY_CHANGED		0x10
-#define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
-		int flags, int now, char **error)
+static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int flags, int now, char **error)
 {
-	zbx_uint64_t	seed;
+	zbx_uint64_t		seed;
+	int			simple_interval;
+	zbx_custom_interval_t	*custom_intervals;
+	int			disable_until;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
-			((ITEM_STATE_NORMAL == new_state && 0 == (flags & ZBX_ITEM_DELAY_CHANGED)) ||
-			(ITEM_STATE_NOTSUPPORTED == new_state && 0 == (flags & (0 == item->schedulable ?
-					ZBX_ITEM_DELAY_CHANGED : ZBX_REFRESH_UNSUPPORTED_CHANGED)))))
+			0 == (flags & ZBX_ITEM_DELAY_CHANGED))
 	{
 		return SUCCEED;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
-	/* for new items, supported items and items that are notsupported due to invalid update interval try to parse */
-	/* interval first and then decide whether it should become/remain supported/notsupported */
-	if (0 == item->nextcheck || ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
+	if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, error))
 	{
-		int			simple_interval;
-		zbx_custom_interval_t	*custom_intervals;
+		/* Polling items with invalid update intervals repeatedly does not make sense because they */
+		/* can only be healed by editing configuration (either update interval or macros involved) */
+		/* and such changes will be detected during configuration synchronization. DCsync_items()  */
+		/* detects item configuration changes affecting check scheduling and passes them in flags. */
 
-		if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, error))
-		{
-			/* Polling items with invalid update intervals repeatedly does not make sense because they */
-			/* can only be healed by editing configuration (either update interval or macros involved) */
-			/* and such changes will be detected during configuration synchronization. DCsync_items()  */
-			/* detects item configuration changes affecting check scheduling and passes them in flags. */
-
-			item->nextcheck = ZBX_JAN_2038;
-			item->schedulable = 0;
-			return FAIL;
-		}
-
-		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
-		{
-			int	disable_until;
-
-			if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
-					DCget_disable_until(item, host)))
-			{
-				item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
-						custom_intervals, disable_until);
-			}
-			else
-			{
-				/* supported items and items that could not have been scheduled previously, but had */
-				/* their update interval fixed, should be scheduled using their update intervals */
-				item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
-						custom_intervals, now);
-			}
-		}
-		else
-		{
-			/* use refresh_unsupported interval for new items that have a valid update interval of their */
-			/* own, but were synced from the database in ITEM_STATE_NOTSUPPORTED state */
-			item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported,
-					NULL, now);
-		}
-
-		zbx_custom_interval_free(custom_intervals);
+		item->nextcheck = ZBX_JAN_2038;
+		item->schedulable = 0;
+		return FAIL;
 	}
-	else	/* for items notsupported for other reasons use refresh_unsupported interval */
+
+	if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
+			DCget_disable_until(item, host)))
 	{
-		item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL,
-				now);
+		item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
+				custom_intervals, disable_until);
 	}
+	else
+	{
+		/* supported items and items that could not have been scheduled previously, but had */
+		/* their update interval fixed, should be scheduled using their update intervals */
+		item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
+				custom_intervals, now);
+	}
+
+	zbx_custom_interval_free(custom_intervals);
 
 	item->schedulable = 1;
 
@@ -987,7 +961,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
 	const ZBX_TABLE	*config_table;
 
-	const char	*selected_fields[] = {"refresh_unsupported", "discovery_groupid", "snmptrap_logging",
+	const char	*selected_fields[] = {"discovery_groupid", "snmptrap_logging",
 					"severity_name_0", "severity_name_1", "severity_name_2", "severity_name_3",
 					"severity_name_4", "severity_name_5", "hk_events_mode", "hk_events_trigger",
 					"hk_events_internal", "hk_events_discovery", "hk_events_autoreg",
@@ -999,7 +973,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"instanceid", "default_timezone"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
-	int		j, found = 1, refresh_unsupported, ret;
+	int		j, found = 1, ret;
 	char		**db_row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
@@ -1034,49 +1008,30 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	/* store the config data */
 
-	if (SUCCEED != is_time_suffix(row[0], &refresh_unsupported, ZBX_LENGTH_UNLIMITED))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid unsupported item refresh interval, restoring default");
-
-		config_table = DBget_table("config");
-
-		if (SUCCEED != is_time_suffix(DBget_field(config_table, "refresh_unsupported")->default_value,
-				&refresh_unsupported, ZBX_LENGTH_UNLIMITED))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			refresh_unsupported = 0;
-		}
-	}
-
-	if (0 == found || config->config->refresh_unsupported != refresh_unsupported)
-		*flags |= ZBX_REFRESH_UNSUPPORTED_CHANGED;
-
-	config->config->refresh_unsupported = refresh_unsupported;
-
-	if (NULL != row[1])
-		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
+	if (NULL != row[0])
+		ZBX_STR2UINT64(config->config->discovery_groupid, row[0]);
 	else
 		config->config->discovery_groupid = ZBX_DISCOVERY_GROUPID_UNDEFINED;
 
-	ZBX_STR2UCHAR(config->config->snmptrap_logging, row[2]);
-	config->config->default_inventory_mode = atoi(row[26]);
-	DCstrpool_replace(found, (const char **)&config->config->db.extension, row[27]);
-	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[28]);
-	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[29]);
-	ZBX_STR2UCHAR(config->config->db.history_compression_availability, row[30]);
+	ZBX_STR2UCHAR(config->config->snmptrap_logging, row[1]);
+	config->config->default_inventory_mode = atoi(row[25]);
+	DCstrpool_replace(found, (const char **)&config->config->db.extension, row[26]);
+	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[27]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[28]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_availability, row[29]);
 
-	if (SUCCEED != is_time_suffix(row[31], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != is_time_suffix(row[30], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[31]);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[30]);
 		config->config->db.history_compress_older = 0;
 	}
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
-		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
+		DCstrpool_replace(found, &config->config->severity_name[j], row[2 + j]);
 
 	/* instance id cannot be changed - update it only at first sync to avoid read locks later */
 	if (0 == found)
-		DCstrpool_replace(found, &config->config->instanceid, row[32]);
+		DCstrpool_replace(found, &config->config->instanceid, row[31]);
 
 #if TRIGGER_SEVERITY_COUNT != 6
 #	error "row indexes below are based on assumption of six trigger severity levels"
@@ -1084,44 +1039,44 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	/* read housekeeper configuration */
 
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.events_mode = atoi(row[9])) &&
-			(SUCCEED != set_hk_opt(&config->config->hk.events_trigger, 1, SEC_PER_DAY, row[10]) ||
-			SUCCEED != set_hk_opt(&config->config->hk.events_internal, 1, SEC_PER_DAY, row[11]) ||
-			SUCCEED != set_hk_opt(&config->config->hk.events_discovery, 1, SEC_PER_DAY, row[12]) ||
-			SUCCEED != set_hk_opt(&config->config->hk.events_autoreg, 1, SEC_PER_DAY, row[13])))
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.events_mode = atoi(row[8])) &&
+			(SUCCEED != set_hk_opt(&config->config->hk.events_trigger, 1, SEC_PER_DAY, row[9]) ||
+			SUCCEED != set_hk_opt(&config->config->hk.events_internal, 1, SEC_PER_DAY, row[10]) ||
+			SUCCEED != set_hk_opt(&config->config->hk.events_discovery, 1, SEC_PER_DAY, row[11]) ||
+			SUCCEED != set_hk_opt(&config->config->hk.events_autoreg, 1, SEC_PER_DAY, row[12])))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trigger, internal, network discovery and auto-registration data"
 				" housekeeping will be disabled due to invalid settings");
 		config->config->hk.events_mode = ZBX_HK_OPTION_DISABLED;
 	}
 
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.services_mode = atoi(row[14])) &&
-			SUCCEED != set_hk_opt(&config->config->hk.services, 1, SEC_PER_DAY, row[15]))
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.services_mode = atoi(row[13])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.services, 1, SEC_PER_DAY, row[14]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "IT services data housekeeping will be disabled due to invalid"
 				" settings");
 		config->config->hk.services_mode = ZBX_HK_OPTION_DISABLED;
 	}
 
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.audit_mode = atoi(row[16])) &&
-			SUCCEED != set_hk_opt(&config->config->hk.audit, 1, SEC_PER_DAY, row[17]))
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.audit_mode = atoi(row[15])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.audit, 1, SEC_PER_DAY, row[16]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "audit data housekeeping will be disabled due to invalid"
 				" settings");
 		config->config->hk.audit_mode = ZBX_HK_OPTION_DISABLED;
 	}
 
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.sessions_mode = atoi(row[18])) &&
-			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[19]))
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.sessions_mode = atoi(row[17])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[18]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "user sessions data housekeeping will be disabled due to invalid"
 				" settings");
 		config->config->hk.sessions_mode = ZBX_HK_OPTION_DISABLED;
 	}
 
-	config->config->hk.history_mode = atoi(row[20]);
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.history_global = atoi(row[21])) &&
-			SUCCEED != set_hk_opt(&config->config->hk.history, 0, ZBX_HK_HISTORY_MIN, row[22]))
+	config->config->hk.history_mode = atoi(row[19]);
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.history_global = atoi(row[20])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.history, 0, ZBX_HK_HISTORY_MIN, row[21]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
 				" store their history due to invalid global override settings");
@@ -1138,9 +1093,9 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	}
 #endif
 
-	config->config->hk.trends_mode = atoi(row[23]);
-	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[24])) &&
-			SUCCEED != set_hk_opt(&config->config->hk.trends, 0, ZBX_HK_TRENDS_MIN, row[25]))
+	config->config->hk.trends_mode = atoi(row[22]);
+	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[23])) &&
+			SUCCEED != set_hk_opt(&config->config->hk.trends, 0, ZBX_HK_TRENDS_MIN, row[24]))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
 				" will store their history due to invalid global override settings");
@@ -1156,7 +1111,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 	}
 #endif
-	DCstrpool_replace(found, &config->config->default_timezone, row[33]);
+	DCstrpool_replace(found, &config->config->default_timezone, row[32]);
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -2850,8 +2805,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
-		flags &= ZBX_REFRESH_UNSUPPORTED_CHANGED;
-
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_STR2UCHAR(status, row[2]);
@@ -3325,7 +3278,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				char	*error = NULL;
 
-				if (FAIL == DCitem_nextcheck_update(item, host, item->state, flags, now, &error))
+				if (FAIL == DCitem_nextcheck_update(item, host, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
 
@@ -5283,6 +5236,12 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
 	zbx_dc_preproc_op_t	*p1 = *(zbx_dc_preproc_op_t **)d1;
 	zbx_dc_preproc_op_t	*p2 = *(zbx_dc_preproc_op_t **)d2;
 
+	if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == p1->type)
+		return -1;
+
+	if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == p2->type)
+		return 1;
+
 	ZBX_RETURN_IF_NOT_EQUAL(p1->step, p2->step);
 
 	return 0;
@@ -5445,9 +5404,15 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(itemid, row[1]);
-		ZBX_STR2UINT64(item_script_paramid, row[0]);
 
-		scriptitem = (ZBX_DC_SCRIPTITEM *) zbx_hashset_search(&config->scriptitems, &itemid);
+		if (NULL == (scriptitem = (ZBX_DC_SCRIPTITEM *) zbx_hashset_search(&config->scriptitems, &itemid)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,
+					"cannot find parent item for item parameters (itemid=" ZBX_FS_UI64")", itemid);
+			continue;
+		}
+
+		ZBX_STR2UINT64(item_script_paramid, row[0]);
 		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
 				item_script_paramid, sizeof(zbx_dc_scriptitem_param_t), &found);
 
@@ -9014,14 +8979,14 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 	return nextcheck;
 }
 
-static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, unsigned char new_state, int flags,
+static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags,
 		int lastclock)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock, NULL);
+	DCitem_nextcheck_update(dc_item, dc_host, flags, lastclock, NULL);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -9145,7 +9110,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
-			dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED, now);
+			dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, now);
 			continue;
 		}
 
@@ -9158,7 +9123,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 				if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type &&
 						ZBX_QUEUE_PRIORITY_LOW != dc_item->queue_priority)
 				{
-					dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED, now);
+					dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, now);
 					continue;
 				}
 			}
@@ -9170,8 +9135,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 				if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_JAVA == poller_type ||
 						disable_until > now)
 				{
-					dc_requeue_item(dc_item, dc_host, dc_item->state,
-							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
+					dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
+							now);
 					continue;
 				}
 
@@ -9260,7 +9225,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
-			dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED, now);
+			dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, now);
 			continue;
 		}
 
@@ -9271,8 +9236,8 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 			{
 				if (disable_until > now)
 				{
-					dc_requeue_item(dc_item, dc_host, dc_item->state,
-							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
+					dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
+							now);
 					continue;
 				}
 
@@ -9385,9 +9350,6 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 			continue;
 
-		if (0 == config->config->refresh_unsupported && ITEM_STATE_NOTSUPPORTED == dc_item->state)
-			continue;
-
 		if (items_num == items_alloc)
 		{
 			items_alloc += 8;
@@ -9406,8 +9368,7 @@ unlock:
 	return items_num;
 }
 
-static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
-		const int *errcodes, size_t num)
+static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -9443,13 +9404,13 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 			case AGENT_ERROR:
 			case CONFIG_ERROR:
 				dc_item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
-				dc_requeue_item(dc_item, dc_host, states[i], ZBX_ITEM_COLLECTED, lastclocks[i]);
+				dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED, lastclocks[i]);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
 				dc_item->queue_priority = ZBX_QUEUE_PRIORITY_LOW;
-				dc_requeue_item(dc_item, dc_host, states[i], ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
+				dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
 						time(NULL));
 				break;
 			default:
@@ -9458,22 +9419,22 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 	}
 }
 
-void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+void	DCrequeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num)
 {
 	WRLOCK_CACHE;
 
-	dc_requeue_items(itemids, states, lastclocks, errcodes, num);
+	dc_requeue_items(itemids, lastclocks, errcodes, num);
 
 	UNLOCK_CACHE;
 }
 
-void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
 {
 	WRLOCK_CACHE;
 
-	dc_requeue_items(itemids, states, lastclocks, errcodes, num);
+	dc_requeue_items(itemids, lastclocks, errcodes, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
 
 	UNLOCK_CACHE;
@@ -9520,7 +9481,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		dc_requeue_item(dc_item, dc_host, dc_item->state, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
+		dc_requeue_item(dc_item, dc_host, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
 				time(NULL));
 	}
 
@@ -11878,9 +11839,6 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE))
 		cfg->default_inventory_mode = config->config->default_inventory_mode;
 
-	if (0 != (flags & ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED))
-		cfg->refresh_unsupported = config->config->refresh_unsupported;
-
 	if (0 != (flags & ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING))
 		cfg->snmptrap_logging = config->config->snmptrap_logging;
 
@@ -12830,7 +12788,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec,
+			DCitem_nextcheck_update(dc_item, dc_host, ZBX_ITEM_COLLECTED, values[i].ts.sec,
 					NULL);
 	}
 
