@@ -123,7 +123,7 @@ class CRoleHelper {
 	public static function checkAccess(string $rule_name, int $roleid): bool {
 		self::loadRoleRules($roleid);
 
-		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api') {
+		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === self::SECTION_API) {
 			return false;
 		}
 
@@ -143,7 +143,7 @@ class CRoleHelper {
 	public static function getRoleApiMethods(int $roleid): array {
 		self::loadRoleRules($roleid);
 
-		return self::$roles[$roleid]['rules']['api'];
+		return self::$roles[$roleid]['rules'][self::SECTION_API];
 	}
 
 	/**

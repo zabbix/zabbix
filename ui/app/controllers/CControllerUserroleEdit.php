@@ -175,13 +175,13 @@ class CControllerUserroleEdit extends CController {
 
 		if (count($response['rules'][CRoleHelper::SECTION_UI])) {
 			foreach ($response['rules'][CRoleHelper::SECTION_UI] as $ui_rule) {
-				$result[CRoleHelper::SECTION_UI.'.'.$ui_rule['name']] = $ui_rule['status'];
+				$result[CRoleHelper::SECTION_UI][CRoleHelper::SECTION_UI.'.'.$ui_rule['name']] = $ui_rule['status'];
 			}
 		}
 
 		if (count($response['rules'][CRoleHelper::SECTION_ACTIONS])) {
 			foreach ($response['rules'][CRoleHelper::SECTION_ACTIONS] as $action_rule) {
-				$result[CRoleHelper::SECTION_ACTIONS.'.'.$action_rule['name']] = $action_rule['status'];
+				$result[CRoleHelper::SECTION_ACTIONS][CRoleHelper::SECTION_ACTIONS.'.'.$action_rule['name']] = $action_rule['status'];
 			}
 		}
 
@@ -189,6 +189,15 @@ class CControllerUserroleEdit extends CController {
 			foreach ($response['rules'][CRoleHelper::SECTION_MODULES] as $module_rule) {
 				$result[CRoleHelper::SECTION_MODULES][$module_rule['moduleid']] = $module_rule['status'];
 			}
+		}
+
+		if (count($response['rules'][CRoleHelper::SECTION_API])) {
+			$result[CRoleHelper::SECTION_API] = array_map(function (string $method): array {
+				return [
+					'id' => $method,
+					'name' => $method
+				];
+			}, $response['rules'][CRoleHelper::SECTION_API]);
 		}
 
 		// TODO: add mapping for api methods.

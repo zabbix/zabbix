@@ -61,8 +61,6 @@ type client struct {
 	exporters map[uint64]exporterTaskAccessor
 	// plugins used by client
 	pluginsInfo map[*pluginAgent]*pluginInfo
-	// server refresh unsupported value
-	refreshUnsupported int
 	// server global regular expression bundle
 	globalRegexp unsafe.Pointer
 	// plugin result sink, can be nil for bulk passive checks (in future)
@@ -71,16 +69,9 @@ type client struct {
 
 // ClientAccessor interface exports client data required for scheduler tasks.
 type ClientAccessor interface {
-	RefreshUnsupported() int
 	Output() plugin.ResultWriter
 	GlobalRegexp() *glexpr.Bundle
 	ID() uint64
-}
-
-// RefreshUnsupported returns scheduling interval for unsupported items.
-// This function is used only by scheduler, no synchronization is required.
-func (c *client) RefreshUnsupported() int {
-	return c.refreshUnsupported
 }
 
 // GlobalRegexp returns global regular expression bundle.
@@ -146,7 +137,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
 
-			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
+			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now); err != nil {
 				return err
 			}
 			if tacc, ok = c.exporters[r.Itemid]; ok {

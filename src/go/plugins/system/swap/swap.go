@@ -1,5 +1,3 @@
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,4 +17,71 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package win32
+package swap
+
+import (
+	"errors"
+	"fmt"
+
+	"zabbix.com/pkg/plugin"
+)
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if key != "system.swap.size" {
+		return nil, plugin.UnsupportedMetricError
+	}
+
+	if len(params) > 2 {
+		return nil, errors.New("Too many parameters.")
+	}
+
+	if len(params) > 0 && params[0] != "" && params[0] != "all" {
+		return nil, errors.New("Invalid first parameter.")
+	}
+
+	total, avail, err := getSwap()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get swap data: %s", err.Error())
+	}
+
+	if avail > total {
+		avail = total
+	}
+
+	var mode string
+	if len(params) == 2 && params[1] != "" {
+		mode = params[1]
+	}
+
+	if total == 0 && mode != "total" {
+		return nil, errors.New("Cannot be calculated because swap file size is 0.")
+	}
+
+	switch mode {
+	case "total":
+		return total, nil
+	case "", "free":
+		return avail, nil
+	case "used":
+		return total - avail, nil
+	case "pfree":
+		return float64(avail) / float64(total) * 100, nil
+	case "pused":
+		return float64(total-avail) / float64(total) * 100, nil
+	default:
+		return nil, errors.New("Invalid second parameter.")
+	}
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "Swap",
+		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
+	)
+}

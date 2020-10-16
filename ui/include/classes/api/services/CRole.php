@@ -225,7 +225,7 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => '0,1', 'default' => '1'],
-				'modules' =>				['type' => API_OBJECTS, 'fields' => [
+				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
@@ -310,7 +310,7 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => '0,1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => '0,1'],
-				'modules' =>				['type' => API_OBJECTS, 'fields' => [
+				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 					'status' =>					['type' => API_INT32, 'in' => '0,1']
 				]],
@@ -848,7 +848,7 @@ class CRole extends CApiService {
 					$role_rules['api.mode'] = $rules[$roleid]['api.mode'];
 				}
 				if (in_array('api', $options['selectRules'])) {
-					$role_rules['api'] = $rules[$roleid]['api'];
+					$role_rules['api'] = array_values($rules[$roleid]['api']);
 				}
 				if (in_array('actions', $options['selectRules'])) {
 					$role_rules['actions'] = [];
