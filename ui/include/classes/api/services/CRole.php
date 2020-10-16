@@ -485,7 +485,6 @@ class CRole extends CApiService {
 				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
 				'filter' => ['roleid' => array_keys($roles)]
 			]);
-			$role_uirules = array_fill_keys(array_keys($roles), false);
 
 			// Move rules in database to $delete if it is not accessible anymore by role type.
 			foreach ($db_rows as $db_row) {
@@ -495,10 +494,6 @@ class CRole extends CApiService {
 				$is_api_wildcard = ($section === CRoleHelper::SECTION_API
 					&& strpos($db_row['value_str'], CRoleHelper::API_WILDCARD) !== false
 				);
-
-				if ($section === CRoleHelper::SECTION_UI && $db_row['value']) {
-					$role_uirules[$db_row['roleid']] = true;
-				}
 
 				if ($section === CRoleHelper::SECTION_API && !$is_api_wildcard) {
 					$rule_name = CRoleHelper::API_METHOD.$db_row['value_str'];
@@ -511,24 +506,17 @@ class CRole extends CApiService {
 					$delete[] = $db_row['role_ruleid'];
 				}
 			}
-
-			if (array_search(false, $role_uirules) !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('At least one UI element must be checked.')
-				);
-			}
 		}
 		else {
 			foreach ($roles as $role) {
-				$role += [
-					CRoleHelper::UI_DEFAULT_ACCESS => 1,
-					CRoleHelper::SECTION_UI => []
-				];
+				if (!array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])
+						|| !$role['rules'][CRoleHelper::SECTION_UI]) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
+				}
 
-				if (!$role[CRoleHelper::UI_DEFAULT_ACCESS] && !$role[CRoleHelper::SECTION_UI]) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('At least one UI element must be checked.')
-					);
+				$status = array_column($role['rules'][CRoleHelper::SECTION_UI], 'status');
+				if (array_sum($status) === 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
 				}
 			}
 		}
