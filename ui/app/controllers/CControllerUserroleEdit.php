@@ -166,8 +166,8 @@ class CControllerUserroleEdit extends CController {
 
 		$response = API::Role()->get([
 			'output' => ['roleid'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access',
-				'api.mode', 'api.methods', 'actions', 'actions.default_access'
+			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
+				'api', 'actions', 'actions.default_access'
 			],
 			'roleids' => $roleid
 		]);

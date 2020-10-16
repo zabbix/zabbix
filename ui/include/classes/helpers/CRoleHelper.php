@@ -123,7 +123,7 @@ class CRoleHelper {
 	public static function checkAccess(string $rule_name, int $roleid): bool {
 		self::loadRoleRules($roleid);
 
-		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api.methods') {
+		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === 'api') {
 			return false;
 		}
 
@@ -143,7 +143,7 @@ class CRoleHelper {
 	public static function getRoleApiMethods(int $roleid): array {
 		self::loadRoleRules($roleid);
 
-		return self::$roles[$roleid]['rules']['api.methods'];
+		return self::$roles[$roleid]['rules']['api'];
 	}
 
 	/**
@@ -163,7 +163,7 @@ class CRoleHelper {
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
 			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
-				'api.methods', 'actions', 'actions.default_access'
+				'api', 'actions', 'actions.default_access'
 			],
 			'roleids' => $roleid
 		]);
@@ -179,7 +179,7 @@ class CRoleHelper {
 			self::MODULES_DEFAULT_ACCESS => (bool) $role['rules'][self::MODULES_DEFAULT_ACCESS],
 			self::API_ACCESS => (bool) $role['rules'][self::API_ACCESS],
 			self::API_MODE => (bool) $role['rules'][self::API_MODE],
-			'api.methods' => $role['rules']['api.methods'],
+			self::SECTION_API => $role['rules'][self::SECTION_API],
 			self::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][self::ACTIONS_DEFAULT_ACCESS],
 		];
 
