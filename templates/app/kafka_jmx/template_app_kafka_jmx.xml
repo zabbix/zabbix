@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-15T12:05:40Z</date>
+   <date>2020-10-16T12:32:17Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template APP Apache Kafka by JMX</name>
          <description>Official JMX Template from Apache Kafka.&#13;
   The metrics are collected by JMX.&#13;
-  You can set {$KAFKA.USERNAME} and {$KAFKA.PASSWORD} macros in the template for using on the host level.&#13;
+  You can set {$KAFKA.USER} and {$KAFKA.PASSWORD} macros in the template for using on the host level.&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
@@ -701,7 +701,7 @@ Template tooling version used: 0.38</description>
                <type>JMX</type>
                <key>jmx["kafka.server:type=app-info","start-time-ms"]</key>
                <history>7d</history>
-               <units>unixtime</units>
+               <units>s</units>
                <username>{$KAFKA.USER}</username>
                <password>{$KAFKA.PASSWORD}</password>
                <description>Service uptime in seconds.</description>
@@ -712,18 +712,14 @@ Template tooling version used: 0.38</description>
                </applications>
                <preprocessing>
                   <step>
-                     <type>MULTIPLIER</type>
-                     <params>0.001</params>
-                  </step>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <type>JAVASCRIPT</type>
+                     <params>return (Math.floor((Date.now()-Number(value))/1000))</params>
                   </step>
                </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <triggers>
                   <trigger>
-                     <expression>{fuzzytime(600)}=1</expression>
+                     <expression>{last()}&lt;10m</expression>
                      <name>Kafka: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
                      <description>Uptime is less than 10 minutes</description>
@@ -810,7 +806,7 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
-               <name>Kafka: Byte rejected per second</name>
+               <name>Kafka: Bytes rejected per second</name>
                <type>JMX</type>
                <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec","Count"]</key>
                <history>7d</history>
@@ -1163,6 +1159,12 @@ Template tooling version used: 0.38</description>
                      <name>Kafka</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
@@ -1180,6 +1182,12 @@ Template tooling version used: 0.38</description>
                      <name>Kafka</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
@@ -1197,6 +1205,12 @@ Template tooling version used: 0.38</description>
                      <name>Kafka</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
@@ -1214,6 +1228,12 @@ Template tooling version used: 0.38</description>
                      <name>Kafka</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
@@ -1311,7 +1331,7 @@ Template tooling version used: 0.38</description>
                </filter>
                <item_prototypes>
                   <item_prototype>
-                     <name>Kafka {#JMXTOPIC}: Byte rejected per second</name>
+                     <name>Kafka {#JMXTOPIC}: Bytes rejected per second</name>
                      <type>JMX</type>
                      <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic={#JMXTOPIC}","Count"]</key>
                      <history>7d</history>
@@ -1413,6 +1433,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}</macro>
                <value>30</value>
+               <description>The minimum Network processor average idle percent for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$KAFKA.PASSWORD}</macro>
@@ -1421,6 +1442,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}</macro>
                <value>30</value>
+               <description>The minimum Request handler average idle percent for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$KAFKA.TOPIC.MATCHES}</macro>

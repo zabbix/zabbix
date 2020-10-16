@@ -19,7 +19,7 @@ This template was tested on:
 Metrics are collected by JMX.
 
 1. Enable and configure JMX access to Apache cassandra. See documentation for [instructions](https://kafka.apache.org/documentation/#remote_jmx).
-2. Set the user name and password in host macros {$KAFKA.USERNAME} and {$KAFKA.PASSWORD}.
+2. Set the user name and password in host macros {$KAFKA.USER} and {$KAFKA.PASSWORD}.
 
 
 ## Zabbix configuration
@@ -30,9 +30,9 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} |<p>-</p> |`30` |
+|{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} |<p>The minimum Network processor average idle percent for trigger expression.</p> |`30` |
 |{$KAFKA.PASSWORD} |<p>-</p> |`zabbix` |
-|{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} |<p>-</p> |`30` |
+|{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} |<p>The minimum Request handler average idle percent for trigger expression.</p> |`30` |
 |{$KAFKA.TOPIC.MATCHES} |<p>Filter of discoverable topics</p> |`.*` |
 |{$KAFKA.TOPIC.NOT_MATCHES} |<p>Filter to exclude discovered topics</p> |`__consumer_offsets` |
 |{$KAFKA.USER} |<p>-</p> |`zabbix` |
@@ -65,7 +65,7 @@ There are no template links in this template.
 |Kafka |Kafka: Bytes out per second |<p>The rate at which data is fetched and read from the broker by consumers.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka: Bytes in per second |<p>The rate at which data sent from producers is consumed by the broker.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka: Messages in per second |<p>The rate at which individual messages are consumed by the broker.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Kafka |Kafka: Byte rejected per second |<p>The rate at which bytes rejected per second by the broker.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Kafka |Kafka: Bytes rejected per second |<p>The rate at which bytes rejected per second by the broker.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka: Client fetch request failed per second |<p>Number of client fetch request failures per second.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka: Produce requests failed per second |<p>Number of failed produce requests per second.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka: Request handler average idle percent |<p>Indicates the percentage of time that the request handler (IO) threads are not in use.</p> |JMX |jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `100`</p> |
@@ -109,17 +109,17 @@ There are no template links in this template.
 |Kafka |Kafka: Number of reassigning partitions |<p>The number of reassigning leader partitions on a broker.</p> |JMX |jmx["kafka.server:type=ReplicaManager,name=ReassigningPartitions","Value"] |
 |Kafka |Kafka: Request queue size |<p>The size of the delay queue.</p> |JMX |jmx["kafka.server:type=Request","queue-size"] |
 |Kafka |Kafka: Version |<p>Current version of brocker.</p> |JMX |jmx["kafka.server:type=app-info","version"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Kafka |Kafka: Uptime |<p>Service uptime in seconds.</p> |JMX |jmx["kafka.server:type=app-info","start-time-ms"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Kafka |Kafka: Uptime |<p>Service uptime in seconds.</p> |JMX |jmx["kafka.server:type=app-info","start-time-ms"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (Math.floor((Date.now()-Number(value))/1000))`</p> |
 |Kafka |Kafka: ZooKeeper client request latency |<p>Latency in millseconds for ZooKeeper requests from broker.</p> |JMX |jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"] |
 |Kafka |Kafka: ZooKeeper connection status |<p>Connection status of broker's ZooKeeper session.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"] |
-|Kafka |Kafka: ZooKeeper disconnect rate |<p>ZooKeeper client disconnect per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"] |
-|Kafka |Kafka: ZooKeeper session expiration rate |<p>ZooKeeper client session expiration  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"] |
-|Kafka |Kafka: ZooKeeper readonly rate |<p>ZooKeeper client readonly  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"] |
-|Kafka |Kafka: ZooKeeper sync rate |<p>ZooKeeper client sync  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"] |
+|Kafka |Kafka: ZooKeeper disconnect rate |<p>ZooKeeper client disconnect per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Kafka |Kafka: ZooKeeper session expiration rate |<p>ZooKeeper client session expiration  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Kafka |Kafka: ZooKeeper readonly rate |<p>ZooKeeper client readonly  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Kafka |Kafka: ZooKeeper sync rate |<p>ZooKeeper client sync  per second.</p> |JMX |jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka {#JMXTOPIC}: Messages in per second |<p>The rate at which individual messages are consumed by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka {#JMXTOPIC}: Bytes in per second |<p>The rate at which data sent from producers is consumed by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Kafka |Kafka {#JMXTOPIC}: Bytes out per second |<p>The rate at which data is fetched and read from the broker by consumers (by topic).</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Kafka |Kafka {#JMXTOPIC}: Byte rejected per second |<p>Rejected bytes rate by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Kafka |Kafka {#JMXTOPIC}: Bytes rejected per second |<p>Rejected bytes rate by topic.</p> |JMX |jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic={#JMXTOPIC}","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 
 ## Triggers
 
@@ -134,7 +134,7 @@ There are no template links in this template.
 |Kafka: There are partitions under the min ISR |<p>The Under min ISR partitions metric displays the number of partitions, where the number of In-Sync Replicas (ISR) is less than the minimum number of in-sync replicas specified. The two most common causes of under-min ISR partitions are that one or more brokers is unresponsive, or the cluster is experiencing performance issues and one or more brokers are falling behind.</p> |`{TEMPLATE_NAME:jmx["kafka.server:type=ReplicaManager,name=UnderMinIsrPartitionCount","Value"].last()}>0` |AVERAGE | |
 |Kafka: There are under replicated partitions |<p>The Under replicated partitions metric displays the number of partitions that do not have enough replicas to meet the desired replication factor. A partition will also be considered under-replicated if the correct number of replicas exist, but one or more of the replicas have fallen significantly behind the partition leader. The two most common causes of under-replicated partitions are that one or more brokers is unresponsive, or the cluster is experiencing performance issues and one or more brokers have fallen behind.</p> |`{TEMPLATE_NAME:jmx["kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions","Value"].last()}>0` |AVERAGE | |
 |Kafka: Version has changed (new version: {ITEM.VALUE}) |<p>Kafka version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["kafka.server:type=app-info","version"].diff()}=1 and {TEMPLATE_NAME:jmx["kafka.server:type=app-info","version"].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Kafka: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:jmx["kafka.server:type=app-info","start-time-ms"].fuzzytime(600)}=1` |INFO |<p>Manual close: YES</p> |
+|Kafka: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:jmx["kafka.server:type=app-info","start-time-ms"].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Kafka: Broker is not connected to ZooKeeper |<p>-</p> |`{TEMPLATE_NAME:jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"].regexp("CONNECTED")}=0` |AVERAGE | |
 
 ## Feedback
