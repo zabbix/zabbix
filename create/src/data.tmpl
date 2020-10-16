@@ -37,6 +37,7 @@ ROW   |11     |Templates/Server hardware  |0       |0    |
 ROW   |12     |Templates/Applications     |0       |0    |
 ROW   |13     |Templates/Databases        |0       |0    |
 ROW   |14     |Templates/Virtualization   |0       |0    |
+ROW   |15     |Templates/Telephony        |0       |0    |
 
 TABLE |drules
 FIELDS|druleid|proxy_hostid|name         |iprange        |delay|status|
@@ -704,8 +705,8 @@ ROW   |7          |5       |23           |0       |2    |      |
 ROW   |8          |6       |23           |0       |4    |      |
 
 TABLE |config
-FIELDS|configid|refresh_unsupported|work_period    |alert_usrgrpid|discovery_groupid|
-ROW   |1       |10m                |1-5,09:00-18:00|7             |5                |
+FIELDS|configid|work_period    |alert_usrgrpid|discovery_groupid|
+ROW   |1       |1-5,09:00-18:00|7             |5                |
 
 TABLE |graph_theme
 FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|colorpalette                                                                                                                                      |

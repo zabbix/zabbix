@@ -26,8 +26,10 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
+$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
+
 $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $fields['rf_rate']
+	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
 $scripts = [];
@@ -60,7 +62,9 @@ if (array_key_exists('itemid', $fields)) {
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_legend']), CWidgetHelper::getCheckBox($fields['show_legend']));
 
 // Dynamic item.
-$form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
+if ($data['templateid'] === null) {
+	$form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
+}
 
 $form->addItem($form_list);
 

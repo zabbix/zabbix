@@ -547,7 +547,6 @@ class CScreenHistory extends CScreenBase {
 			}
 			else {
 				$timeControlData['id'] = $this->getDataId();
-				$timeControlData['mainObject'] = 1;
 			}
 
 			if ($this->mode == SCREEN_MODE_JS) {

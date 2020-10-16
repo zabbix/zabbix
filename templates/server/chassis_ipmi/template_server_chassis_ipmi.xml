@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>5.0</version>
-   <date>2020-08-06T06:08:54Z</date>
+   <version>5.2</version>
+   <date>2020-10-06T01:32:03Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template Server Chassis by IPMI</template>
-         <name>Template Server Chassis by IPMI</name>
+         <template>Chassis by IPMI</template>
+         <name>Chassis by IPMI</name>
          <description>Template for monitoring servers with BMC over IPMI that work without any external scripts. &#13;
 All metrics are collected at once, thanks to Zabbix's bulk data collection. The template is available starting from Zabbix version 5.0. &#13;
 It collects metrics by polling BMC remotely using an IPMI agent.&#13;
@@ -22,7 +22,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398023-discussion-thread-for-official-zabbix-template-ipmi&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Server hardware</name>
@@ -206,11 +206,11 @@ Template tooling version used: 0.37</description>
                            <dependencies>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is below critical low (less than {#SENSOR_LO_CRIT} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_CRIT}</expression>
+                                 <expression>{Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_CRIT}</expression>
                               </dependency>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
+                                 <expression>{Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -222,7 +222,7 @@ Template tooling version used: 0.37</description>
                            <dependencies>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is below non-recoverable low (less than {#SENSOR_LO_DISAST} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
+                                 <expression>{Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&lt;{#SENSOR_LO_DISAST}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -240,11 +240,11 @@ Template tooling version used: 0.37</description>
                            <dependencies>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is above critical high (greater than {#SENSOR_HI_CRIT} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_CRIT}</expression>
+                                 <expression>{Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_CRIT}</expression>
                               </dependency>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
+                                 <expression>{Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -256,7 +256,7 @@ Template tooling version used: 0.37</description>
                            <dependencies>
                               <dependency>
                                  <name>IPMI: {#SENSOR_ID} value is above non-recoverable high (greater than {#SENSOR_HI_DISAST} for 5m)</name>
-                                 <expression>{Template Server Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
+                                 <expression>{Chassis by IPMI:ipmi.value[{#SENSOR_ID}].min(5m)}&gt;{#SENSOR_HI_DISAST}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -277,7 +277,7 @@ Template tooling version used: 0.37</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Template Server Chassis by IPMI</host>
+                              <host>Chassis by IPMI</host>
                               <key>ipmi.value[{#SENSOR_ID}]</key>
                            </item>
                         </graph_item>

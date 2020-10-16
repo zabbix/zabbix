@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Template OS Linux by Zabbix agent';
+	public $templateName = 'Linux by Zabbix agent';
 
 	use FilterTrait;
 	use TableTrait;
@@ -44,7 +44,7 @@ class testPageTemplates extends CLegacyWebTest {
 
 		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = ['', 'Name', 'Hosts', 'Applications', 'Items', 'Triggers', 'Graphs',
-				'Screens', 'Discovery', 'Web', 'Linked templates', 'Linked to templates', 'Tags'];
+				'Dashboards', 'Discovery', 'Web', 'Linked templates', 'Linked to templates', 'Tags'];
 		$this->assertSame($headers, $table->getHeadersText());
 
 		foreach (['Export', 'Mass update', 'Delete', 'Delete and clear'] as $button) {
@@ -120,12 +120,12 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Linked templates')->fill([
-				'values' => 'Template Module ICMP Ping',
+				'values' => 'ICMP Ping',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMP']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Generic SNMP']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 

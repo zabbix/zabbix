@@ -55,7 +55,6 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 								.prev('.msg-bad')
 								.remove();
 
-							$('#refresh_unsupported').val("<?= DB::getDefault('config', 'refresh_unsupported') ?>");
 							$('#discovery_groupid').multiSelect('clean');
 							$('#default_inventory_mode input[value=<?= $default_inventory_mode ?>]')
 								.prop('checked', true);

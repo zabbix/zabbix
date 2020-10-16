@@ -511,6 +511,7 @@ class CItemPrototype extends CItemGeneral {
 			DB::insertBatch('item_application_prototype', $item_application_prototypes);
 		}
 
+		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
 	}
 
@@ -741,6 +742,7 @@ class CItemPrototype extends CItemGeneral {
 			CItemPrototypeManager::deleteUnusedApplicationPrototypes(array_keys($application_prototypes_to_remove));
 		}
 
+		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
 	}
 
@@ -857,6 +859,17 @@ class CItemPrototype extends CItemGeneral {
 			else {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
+			}
+
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
+						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
+					$item['params'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$item['timeout'] = $defaults['timeout'];
+				}
 			}
 		}
 		unset($item);

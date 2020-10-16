@@ -21,9 +21,20 @@
 
 class CWidgetFieldMsItemPrototype extends CWidgetFieldMs {
 
-	public function __construct($name, $label) {
+	public function __construct($name, $label, $hostid = null) {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE);
+
+		if ($hostid === null) {
+			$this->filter_parameters += [
+				'real_hosts' => true
+			];
+		}
+		else {
+			$this->filter_parameters += [
+				'hostid' => $hostid
+			];
+		}
 	}
 }
