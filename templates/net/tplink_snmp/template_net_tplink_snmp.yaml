@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:35Z'
+  date: '2020-10-16T13:27:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -9,7 +9,7 @@ zabbix_export:
       template: 'TP-LINK SNMP'
       name: 'TP-LINK SNMP'
       description: |
-        Template Net TP-LINK JetStream
+        Template Net TP-LINK
         
         MIBs used:
         TPLINK-SYSINFO-MIB
@@ -17,12 +17,12 @@ zabbix_export:
         
         Known Issues:
         
-          Description: default sysLocation, sysName and sysContact is not filled with proper data. Real hostname and location can be found only in private branch(TPLINK-SYSINFO-MIB). Please check whether this problem exists in the latest firware: http://www.tp-linkru.com/download/T2600G-28TS.html#Firmware
-          Version: 2.0.0 Build 20170628 Rel.55184(Beta)
+          Description: Default sysLocation, sysName and sysContact is not filled with proper data. Real hostname and location can be found only in private branch (TPLINK-SYSINFO-MIB). Please check whether this problem exists in the latest firmware: https://www.tp-link.com/en/support/download/t2600g-28ts/#Firmware
+          Version: 2.0.0 Build 20170628 Rel.55184 (Beta)
           Device: T2600G-28TS 2.0
         
-          Description: The Serial number of the product(tpSysInfoSerialNum) is missing in HW versions prior to V2_170323
-          Version: prior to version V2_170323
+          Description: The Serial number of the product (tpSysInfoSerialNum) is missing in HW versions prior to V2_170323
+          Version: Prior to version V2_170323
           Device: T2600G-28TS 2.0
         
         Template tooling version used: 0.38
@@ -60,8 +60,7 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
+              params: 1d
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -89,8 +88,7 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
+              params: 1d
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -110,8 +108,7 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
+              params: 1d
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -137,8 +134,7 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
+              params: 1d
       discovery_rules:
         -
           name: 'CPU Discovery'
