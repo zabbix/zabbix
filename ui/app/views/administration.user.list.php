@@ -202,7 +202,7 @@ foreach ($data['users'] as $user) {
 		$online,
 		$blocked,
 		(new CSpan(user_auth_type2str($user['gui_access'])))->addClass($gui_access_style),
-		(CRoleHelper::checkAccess('api', $user['roleid']))
+		(CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $user['roleid']))
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
