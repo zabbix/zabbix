@@ -189,8 +189,10 @@ $form_grid
 				->setModern(true)
 				->setReadonly($data['readonly'])
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-	])
-	->addItem(
+	]);
+
+if (!$data['readonly']) {
+	$form_grid->addItem(
 		(new CFormField(
 			(new CPatternSelect([
 				'name' => 'api_methods[]',
@@ -209,12 +211,14 @@ $form_grid
 		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
-	)
-	->addItem(
-		(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);
+}
+
+$form_grid->addItem(
+	(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')))
+		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+);
 
 $actions = [];
 foreach ($data['labels']['actions'] as $action => $label) {
