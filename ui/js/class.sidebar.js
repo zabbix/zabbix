@@ -205,9 +205,6 @@ class CSidebar extends CBaseComponent {
 					if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
 						setTimeout(() => this.close());
 					}
-					else {
-						ZABBIX.MenuMain.expandSelected();
-					}
 
 					this.fire(SIDEBAR_EVENT_BLUR);
 				}
