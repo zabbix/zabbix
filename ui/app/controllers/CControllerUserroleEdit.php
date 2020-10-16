@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -90,7 +90,7 @@ class CControllerUserroleEdit extends CController {
 				CRoleHelper::MODULES_DEFAULT_ACCESS => true,
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
 				CRoleHelper::API_ACCESS => true,
-				CRoleHelper::API_MODE => '0',
+				CRoleHelper::API_MODE => '1',
 				CRoleHelper::UI_MONITORING_DASHBOARD => true,
 				CRoleHelper::UI_MONITORING_PROBLEMS => true,
 				CRoleHelper::UI_MONITORING_HOSTS => true,
@@ -118,7 +118,7 @@ class CControllerUserroleEdit extends CController {
 			$data['name'] = $this->role['name'];
 			$data['type'] = $this->role['type'];
 			$data['readonly'] = $this->role['readonly'];
-			$data['rules'] = $this->getRulesValue($this->role['roleid']);
+			$data['rules'] = $this->getRulesValue((int) $this->role['roleid']);
 		}
 
 		// TODO: Overwrite with input variables.

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -76,10 +76,12 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	$ui = [];
 	foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
 		$ui[] = new CDiv(
-			(new CCheckBox($rule_key, 1))
+			(new CCheckBox(str_replace('.', '_', $rule_key), 1))
+				->setId($rule_key)
 				->setChecked(array_key_exists($rule_key, $data['rules']) && $data['rules'][$rule_key])
 				->setReadonly($data['readonly'])
 				->setLabel($rule_label)
+				->setUncheckedValue(0)
 		);
 	}
 	$form_grid->addItem([
@@ -105,9 +107,11 @@ if (!$data['readonly']) {
 $form_grid->addItem([
 	new CLabel(_('Default access to new UI elements'), 'ui.default_access'),
 	(new CFormField(
-		(new CCheckBox('ui.default_access', 1))
+		(new CCheckBox('ui_default_access', 1))
+			->setId('ui.default_access')
 			->setChecked($data['rules'][CRoleHelper::UI_DEFAULT_ACCESS])
 			->setReadonly($data['readonly'])
+			->setUncheckedValue(0)
 	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 ]);
 
@@ -124,6 +128,7 @@ foreach ($data['labels']['modules'] as $moduleid => $label) {
 			->setChecked($data['rules']['modules'][$moduleid])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
+			->setUncheckedValue(0)
 	);
 }
 
@@ -152,9 +157,11 @@ $form_grid
 	->addItem([
 		new CLabel(_('Default access to new modules'), 'modules.default_access'),
 		(new CFormField(
-			(new CCheckBox('modules.default_access', 1))
+			(new CCheckBox('modules_default_access', 1))
+				->setId('modules.default_access')
 				->setChecked($data['rules'][CRoleHelper::MODULES_DEFAULT_ACCESS])
 				->setReadonly($data['readonly'])
+				->setUncheckedValue(0)
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	])
 	->addItem(
@@ -165,15 +172,18 @@ $form_grid
 	->addItem([
 		new CLabel(_('Enabled'), 'api.access'),
 		(new CFormField(
-			(new CCheckBox('api.access', 1))
+			(new CCheckBox('api_access', 1))
+				->setId('api.access')
 				->setChecked($data['rules'][CRoleHelper::API_ACCESS])
 				->setReadonly($data['readonly'])
+				->setUncheckedValue(0)
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	])
 	->addItem([
 		new CLabel(_('API methods'), 'api.mode'),
 		(new CFormField(
-			(new CRadioButtonList('api.mode', $data['rules'][CRoleHelper::API_MODE]))
+			(new CRadioButtonList('api_mode', $data['rules'][CRoleHelper::API_MODE]))
+				->setId('api.mode')
 				->addValue(_('Allow list'), '0')
 				->addValue(_('Deny list'), '1')
 				->setModern(true)
@@ -210,10 +220,12 @@ $form_grid
 $actions = [];
 foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = new CDiv(
-		(new CCheckBox($action, 1))
+		(new CCheckBox(str_replace('.', '_', $action), 1))
+			->setId($action)
 			->setChecked(array_key_exists($action, $data['rules']) && $data['rules'][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
+			->setUncheckedValue(0)
 	);
 }
 
@@ -226,9 +238,11 @@ $form_grid->addItem(
 $form_grid->addItem([
 	new CLabel(_('Default access to new actions'), 'actions.default_access'),
 	(new CFormField(
-		(new CCheckBox('actions.default_access'))
+		(new CCheckBox('actions_default_access', 1))
+			->setId('actions.default_access')
 			->setChecked($data['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS])
 			->setReadonly($data['readonly'])
+			->setUncheckedValue(0)
 	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 ]);
 
