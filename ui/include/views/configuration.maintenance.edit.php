@@ -91,7 +91,7 @@ $periods_container = (new CDiv($maintenance_period_table))
 
 $table = (new CFormList('maintenanceFormList'))
 	->addRow(
-		(new CLabel(_('Name'), 'mname'))->setAsteriskMark($data['allowed_edit']),
+		(new CLabel(_('Name'), 'mname'))->setAsteriskMark(),
 		(new CTextBox('mname', $data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -107,14 +107,14 @@ $table = (new CFormList('maintenanceFormList'))
 			->setEnabled($data['allowed_edit'])
 	)
 	// Show date and time in shorter format without seconds.
-	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark($data['allowed_edit']),
+	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
 		(new CDateSelector('active_since', $data['active_since']))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
 			->setEnabled($data['allowed_edit'])
 	)
-	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark($data['allowed_edit']),
+	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
 		(new CDateSelector('active_till', $data['active_till']))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
@@ -122,7 +122,7 @@ $table = (new CFormList('maintenanceFormList'))
 			->setEnabled($data['allowed_edit'])
 	)
 	->addRow(
-		(new CLabel(_('Periods'), $periods_container->getId()))->setAsteriskMark($data['allowed_edit']), $periods_container
+		(new CLabel(_('Periods'), $periods_container->getId()))->setAsteriskMark(), $periods_container
 	);
 
 /*
@@ -240,13 +240,10 @@ $table
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-if ($data['allowed_edit']) {
-	$table->addRow('',
-		(new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark()
-	);
-}
-
 $table
+	->addRow('',
+		(new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark()
+	)
 	->addRow(_('Tags'),
 		(new CDiv($tag_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
