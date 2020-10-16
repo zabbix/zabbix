@@ -42,12 +42,12 @@ if (array_key_exists('filter_options', $data)) { ?>
 		/**
 		 * Update on filter changes.
 		 */
-		filter.on(TABFILTER_EVENT_URLSET, (e) => {
+		filter.on(TABFILTER_EVENT_URLSET, () => {
 			let url = new Curl();
 
 			url.setArgument('action', 'problem.view.csv');
 			$('#export_csv').attr('data-url', url.getUrl());
-			refreshResults(e.detail.target._active_item);
+			refreshResults();
 			refreshCounters();
 
 			if (active_filter !== filter._active_item) {
@@ -86,11 +86,11 @@ if (array_key_exists('filter_options', $data)) { ?>
 		/**
 		 * Refresh results table via window.flickerfreeScreen.refresh call.
 		 */
-		function refreshResults(item) {
+		function refreshResults() {
 			let url = new Curl(),
 				screen = window.flickerfreeScreen.screens['problem'],
 				data = $.extend(<?= json_encode($data['filter_defaults']) ?>,
-					global_timerange, item._data, url.getArgumentsObject()
+					global_timerange, url.getArgumentsObject()
 				);
 
 			data.inventory = data.inventory
