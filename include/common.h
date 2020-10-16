@@ -1567,6 +1567,7 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 #define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
 #define ZBX_PREPROC_CSV_TO_JSON			24
 #define ZBX_PREPROC_STR_REPLACE			25
+#define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0

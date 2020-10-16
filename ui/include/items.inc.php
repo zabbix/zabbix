@@ -1866,6 +1866,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 			'group' => _('Validation'),
 			'name' => _('Check for error using regular expression')
 		],
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED => [
+			'group' => _('Validation'),
+			'name' => _('Check for not supported value')
+		],
 		ZBX_PREPROC_THROTTLE_VALUE => [
 			'group' => _('Throttling'),
 			'name' => _('Discard unchanged')
