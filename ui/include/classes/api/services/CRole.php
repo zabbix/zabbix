@@ -225,7 +225,7 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => '0,1', 'default' => '1'],
-				'modules' =>				['type' => API_OBJECT, 'fields' => [
+				'modules' =>				['type' => API_OBJECTS, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
@@ -310,7 +310,7 @@ class CRole extends CApiService {
 					'status' =>					['type' => API_INT32, 'in' => '0,1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => '0,1'],
-				'modules' =>				['type' => API_OBJECT, 'fields' => [
+				'modules' =>				['type' => API_OBJECTS, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 					'status' =>					['type' => API_INT32, 'in' => '0,1']
 				]],
