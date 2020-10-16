@@ -1,0 +1,1861 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:00Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Elasticsearch Cluster by HTTP'
+      name: 'Elasticsearch Cluster by HTTP'
+      description: |
+        The template to monitor Elasticsearch by Zabbix that work without any external scripts.
+        It works with both standalone and cluster instances.
+        The metrics are collected in one pass remotely using an HTTP agent. 
+        They are getting values from REST API _cluster/health, _cluster/stats, _nodes/stats requests.
+        You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
+        If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
+        
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: 'ES cluster'
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'ES: Delayed unassigned shards'
+          type: DEPENDENT
+          key: es.cluster.delayed_unassigned_shards
+          delay: '0'
+          history: 7d
+          description: 'The number of shards whose allocation has been delayed by the timeout settings.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.delayed_unassigned_shards
+          master_item:
+            key: es.cluster.get_health
+        -
+          name: 'ES: Get cluster health'
+          type: HTTP_AGENT
+          key: es.cluster.get_health
+          history: 0h
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$ELASTICSEARCH.USERNAME}'
+          password: '{$ELASTICSEARCH.PASSWORD}'
+          description: 'Returns the health status of a cluster.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: 15s
+          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
+          status_codes: ''
+        -
+          name: 'ES: Get cluster stats'
+          type: HTTP_AGENT
+          key: es.cluster.get_stats
+          history: 0h
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$ELASTICSEARCH.USERNAME}'
+          password: '{$ELASTICSEARCH.PASSWORD}'
+          description: 'Returns cluster statistics.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: 15s
+          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/stats'
+        -
+          name: 'ES: Inactive shards percentage'
+          type: DEPENDENT
+          key: es.cluster.inactive_shards_percent_as_number
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The ratio of inactive shards in the cluster expressed as a percentage.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.active_shards_percent_as_number
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (100 - value)'
+          master_item:
+            key: es.cluster.get_health
+        -
+          name: 'ES: Number of initializing shards'
+          type: DEPENDENT
+          key: es.cluster.initializing_shards
+          delay: '0'
+          history: 7d
+          description: 'The number of shards that are under initialization.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.initializing_shards
+          master_item:
+            key: es.cluster.get_health
+          triggers:
+            -
+              expression: '{min(10m)}>0'
+              name: 'ES: Cluster has the initializing shards'
+              priority: AVERAGE
+              description: 'The cluster has the initializing shards longer than 10 minutes.'
+        -
+          name: 'ES: Number of data nodes'
+          type: DEPENDENT
+          key: es.cluster.number_of_data_nodes
+          delay: '0'
+          history: 7d
+          description: 'The number of nodes that are dedicated to data nodes.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.number_of_data_nodes
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_health
+        -
+          name: 'ES: Number of nodes'
+          type: DEPENDENT
+          key: es.cluster.number_of_nodes
+          delay: '0'
+          history: 7d
+          description: 'The number of nodes within the cluster.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.number_of_nodes
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_health
+          triggers:
+            -
+              expression: '{change()}<0'
+              name: 'ES: The number of nodes within the cluster has decreased'
+              priority: INFO
+              manual_close: 'YES'
+            -
+              expression: '{change()}>0'
+              name: 'ES: The number of nodes within the cluster has increased'
+              priority: INFO
+              manual_close: 'YES'
+        -
+          name: 'ES: Number of pending tasks'
+          type: DEPENDENT
+          key: es.cluster.number_of_pending_tasks
+          delay: '0'
+          history: 7d
+          description: 'The number of cluster-level changes that have not yet been executed.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.number_of_pending_tasks
+          master_item:
+            key: es.cluster.get_health
+        -
+          name: 'ES: Number of relocating shards'
+          type: DEPENDENT
+          key: es.cluster.relocating_shards
+          delay: '0'
+          history: 7d
+          description: 'The number of shards that are under relocation.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.relocating_shards
+          master_item:
+            key: es.cluster.get_health
+        -
+          name: 'ES: Cluster health status'
+          type: DEPENDENT
+          key: es.cluster.status
+          delay: '0'
+          history: 7d
+          description: |
+            Health status of the cluster, based on the state of its primary and replica shards. Statuses are:
+            green
+            All shards are assigned.
+            yellow
+            All primary shards are assigned, but one or more replica shards are unassigned. If a node in the cluster fails, some data could be unavailable until that node is repaired.
+            red
+            One or more primary shards are unassigned, so some data is unavailable. This can occur briefly during cluster startup as primary shards are assigned.
+          applications:
+            -
+              name: 'ES cluster'
+          valuemap:
+            name: 'ES cluster state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var state = ['green', 'yellow', 'red'];
+                  
+                  return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_health
+          triggers:
+            -
+              expression: '{last()}=2'
+              name: 'ES: Health is RED'
+              priority: HIGH
+              description: |
+                One or more primary shards are unassigned, so some data is unavailable. 
+                This can occur briefly during cluster startup as primary shards are assigned.
+            -
+              expression: '{last()}=255'
+              name: 'ES: Health is UNKNOWN'
+              priority: HIGH
+              description: 'The health status of the cluster is unknown or cannot be obtained.'
+            -
+              expression: '{last()}=1'
+              name: 'ES: Health is YELLOW'
+              priority: AVERAGE
+              description: |
+                All primary shards are assigned, but one or more replica shards are unassigned. 
+                If a node in the cluster fails, some data could be unavailable until that node is repaired.
+        -
+          name: 'ES: Task max waiting in queue'
+          type: DEPENDENT
+          key: es.cluster.task_max_waiting_in_queue
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The time expressed in seconds since the earliest initiated task is waiting for being performed.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.task_max_waiting_in_queue_millis
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: es.cluster.get_health
+        -
+          name: 'ES: Number of unassigned shards'
+          type: DEPENDENT
+          key: es.cluster.unassigned_shards
+          delay: '0'
+          history: 7d
+          description: 'The number of shards that are not allocated.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.unassigned_shards
+          master_item:
+            key: es.cluster.get_health
+          triggers:
+            -
+              expression: '{min(10m)}>0'
+              name: 'ES: Cluster has the unassigned shards'
+              priority: AVERAGE
+              description: 'The cluster has the unassigned shards longer than 10 minutes.'
+        -
+          name: 'ES: Indices with shards assigned to nodes'
+          type: DEPENDENT
+          key: es.indices.count
+          delay: '0'
+          history: 7d
+          description: 'The total number of indices with shards assigned to the selected nodes.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.count
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_stats
+        -
+          name: 'ES: Number of non-deleted documents'
+          type: DEPENDENT
+          key: es.indices.docs.count
+          delay: '0'
+          history: 7d
+          description: |
+            The total number of non-deleted documents across all primary shards assigned to the selected nodes.
+            This number is based on the documents in Lucene segments and may include the documents from nested fields.
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.docs.count
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_stats
+        -
+          name: 'ES: Nodes with the data role'
+          type: DEPENDENT
+          key: es.nodes.count.data
+          delay: '0'
+          history: 7d
+          description: 'The number of selected nodes with the data role.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.count.data
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_stats
+        -
+          name: 'ES: Nodes with the ingest role'
+          type: DEPENDENT
+          key: es.nodes.count.ingest
+          delay: '0'
+          history: 7d
+          description: 'The number of selected nodes with the ingest role.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.count.ingest
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_stats
+        -
+          name: 'ES: Nodes with the master role'
+          type: DEPENDENT
+          key: es.nodes.count.master
+          delay: '0'
+          history: 7d
+          description: 'The number of selected nodes with the master role.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.count.master
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_stats
+          triggers:
+            -
+              expression: '{last()}=2'
+              name: 'ES: Cluster has only two master nodes'
+              priority: DISASTER
+              description: 'The cluster has only two nodes with a master role and will be unavailable if one of them breaks.'
+        -
+          name: 'ES: Total available size to JVM in all file stores'
+          type: DEPENDENT
+          key: es.nodes.fs.available_in_bytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: |
+            The total number of bytes available to JVM in the file stores across all selected nodes.
+            Depending on OS or process-level restrictions, this number may be less than nodes.fs.free_in_byes. 
+            This is the actual amount of free disk space the selected Elasticsearch nodes can use.
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.fs.available_in_bytes
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_stats
+        -
+          name: 'ES: Total size of all file stores'
+          type: DEPENDENT
+          key: es.nodes.fs.total_in_bytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total size in bytes of all file stores across all selected nodes.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.fs.total_in_bytes
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: es.cluster.get_stats
+        -
+          name: 'ES: Get nodes stats'
+          type: HTTP_AGENT
+          key: es.nodes.get_stats
+          history: 0h
+          trends: '0'
+          value_type: TEXT
+          authtype: BASIC
+          username: '{$ELASTICSEARCH.USERNAME}'
+          password: '{$ELASTICSEARCH.PASSWORD}'
+          description: 'Returns cluster nodes statistics.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          timeout: 30s
+          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_nodes/stats'
+        -
+          name: 'ES: Cluster uptime'
+          type: DEPENDENT
+          key: 'es.nodes.jvm.max_uptime[{#ES.NODE}]'
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Uptime duration in seconds since JVM has last started.'
+          applications:
+            -
+              name: 'ES cluster'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.jvm.max_uptime_in_millis
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: es.cluster.get_stats
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'ES: Cluster has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'ES: Service response time'
+          type: SIMPLE
+          key: 'net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Checks performance of the TCP service.'
+          applications:
+            -
+              name: 'ES cluster'
+          triggers:
+            -
+              expression: '{min(5m)}>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
+              name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: 'The performance of the TCP service is very low.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'ES: Service is down'
+                  expression: '{Elasticsearch Cluster by HTTP:net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"].last()}=0'
+        -
+          name: 'ES: Service status'
+          type: SIMPLE
+          key: 'net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]'
+          history: 7d
+          description: 'Checks if the service is running and accepting TCP connections.'
+          applications:
+            -
+              name: 'ES cluster'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'ES: Service is down'
+              priority: AVERAGE
+              description: 'The service is unavailable or does not accept TCP connections.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Cluster nodes discovery'
+          type: HTTP_AGENT
+          key: es.nodes.discovery
+          delay: 1h
+          authtype: BASIC
+          username: '{$ELASTICSEARCH.USERNAME}'
+          password: '{$ELASTICSEARCH.PASSWORD}'
+          description: 'Discovery ES cluster nodes.'
+          item_prototypes:
+            -
+              name: 'ES {#ES.NODE}: Total available size'
+              type: DEPENDENT
+              key: 'es.node.fs.total.available_in_bytes[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: |
+                The total number of bytes available to this Java virtual machine on all file stores. 
+                Depending on OS or process level restrictions, this might appear less than fs.total.free_in_bytes. 
+                This is the actual amount of free disk space the Elasticsearch node can utilize.
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].fs.total.available_in_bytes.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Total size'
+              type: DEPENDENT
+              key: 'es.node.fs.total.total_in_bytes[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size (in bytes) of all file stores.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].fs.total.total_in_bytes.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Number of open HTTP connections'
+              type: DEPENDENT
+              key: 'es.node.http.current_open[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of currently open HTTP connections for the node.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].http.current_open.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Rate of HTTP connections opened'
+              type: DEPENDENT
+              key: 'es.node.http.opened.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of HTTP connections opened for the node per second.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].http.total_opened.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Flush latency'
+              type: CALCULATED
+              key: 'es.node.indices.flush.latency[{#ES.NODE}]'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              params: 'last(es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.flush.total[{#ES.NODE}]) + (last(es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
+              description: 'The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
+                  name: 'ES {#ES.NODE}: Flush latency is too high (over {$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}ms for 5m)'
+                  priority: WARNING
+                  description: |
+                    If you see this metric increasing steadily, it may indicate a problem with slow disks; this problem may escalate 
+                    and eventually prevent you from being able to add new information to your index.
+            -
+              name: 'ES {#ES.NODE}: Total number of index flushes to disk'
+              type: DEPENDENT
+              key: 'es.node.indices.flush.total[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of flush operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.flush.total.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Total time spent on flushing indices to disk'
+              type: DEPENDENT
+              key: 'es.node.indices.flush.total_time_in_millis[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: ms
+              description: 'Total time in milliseconds spent performing flush operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.flush.total_time_in_millis.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Current indexing operations'
+              type: DEPENDENT
+              key: 'es.node.indices.indexing.index_current[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of indexing operations currently running.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_current.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Indexing latency'
+              type: CALCULATED
+              key: 'es.node.indices.indexing.index_latency[{#ES.NODE}]'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              params: 'last(es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.indexing.index_total[{#ES.NODE}]) + (last(es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
+              description: 'The average indexing latency calculated from the available index_total and index_time_in_millis metrics.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
+                  name: 'ES {#ES.NODE}: Indexing latency is too high (over {$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}ms for 5m)'
+                  priority: WARNING
+                  description: |
+                    If the latency is increasing, it may indicate that you are indexing too many documents at the same time (Elasticsearch’s documentation 
+                    recommends starting with a bulk indexing size of 5 to 15 megabytes and increasing slowly from there).
+            -
+              name: 'ES {#ES.NODE}: Total time spent performing indexing'
+              type: DEPENDENT
+              key: 'es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: ms
+              description: 'Total time in milliseconds spent performing indexing operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_time_in_millis.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Total number of indexing'
+              type: DEPENDENT
+              key: 'es.node.indices.indexing.index_total[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of indexing operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_total.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Time spent throttling operations'
+              type: DEPENDENT
+              key: 'es.node.indices.indexing.throttle_time[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time in seconds spent throttling operations for the last measuring span.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.throttle_time_in_millis.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Time spent throttling merge operations'
+              type: DEPENDENT
+              key: 'es.node.indices.merges.total_throttled_time[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time in seconds spent throttling merge operations for the last measuring span.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.merges.total_throttled_time_in_millis.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Time spent throttling recovery operations'
+              type: DEPENDENT
+              key: 'es.node.indices.recovery.throttle_time[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time in seconds spent throttling recovery operations for the last measuring span.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.recovery.throttle_time_in_millis.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Rate of index refreshes'
+              type: DEPENDENT
+              key: 'es.node.indices.refresh.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of refresh operations per second.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.refresh.total.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Time spent performing refresh'
+              type: DEPENDENT
+              key: 'es.node.indices.refresh.time[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time in seconds spent performing refresh operations for the last measuring span.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.refresh.total_time_in_millis.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Rate of fetch'
+              type: DEPENDENT
+              key: 'es.node.indices.search.fetch.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of fetch operations per second.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_total.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Current fetch operations'
+              type: DEPENDENT
+              key: 'es.node.indices.search.fetch_current[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of fetch operations currently running.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_current.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Fetch latency'
+              type: CALCULATED
+              key: 'es.node.indices.search.fetch_latency[{#ES.NODE}]'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              params: 'last(es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( last(es.node.indices.search.fetch_total[{#ES.NODE}]) + (last(es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
+              description: 'The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
+                  name: 'ES {#ES.NODE}: Fetch latency is too high (over {$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}ms for 5m)'
+                  priority: WARNING
+                  description: |
+                    The fetch phase should typically take much less time than the query phase. If you notice this metric consistently increasing, 
+                    this could indicate a problem with slow disks, enriching of documents (highlighting the relevant text in search results, etc.), 
+                    or requesting too many results.
+            -
+              name: 'ES {#ES.NODE}: Time spent performing fetch'
+              type: DEPENDENT
+              key: 'es.node.indices.search.fetch_time[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time in seconds spent performing fetch operations for the last measuring span.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_time_in_millis.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Total time spent performing fetch'
+              type: DEPENDENT
+              key: 'es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: ms
+              description: 'Time in milliseconds spent performing fetch operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_time_in_millis.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Total number of fetch'
+              type: DEPENDENT
+              key: 'es.node.indices.search.fetch_total[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of fetch operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_total.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Rate of queries'
+              type: DEPENDENT
+              key: 'es.node.indices.search.query.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of query operations per second.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_total.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Current query operations'
+              type: DEPENDENT
+              key: 'es.node.indices.search.query_current[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of query operations currently running.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_current.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Query latency'
+              type: CALCULATED
+              key: 'es.node.indices.search.query_latency[{#ES.NODE}]'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              params: |
+                last(es.node.indices.search.query_time_in_millis[{#ES.NODE}]) / 
+                ( last(es.node.indices.search.query_total[{#ES.NODE}]) + (last(es.node.indices.search.query_total[{#ES.NODE}]) = 0) )
+              description: 'The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
+                  name: 'ES {#ES.NODE}: Query latency is too high (over {$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}ms for 5m)'
+                  priority: WARNING
+                  description: 'If latency exceeds a threshold, look for potential resource bottlenecks, or investigate whether you need to optimize your queries.'
+            -
+              name: 'ES {#ES.NODE}: Time spent performing query'
+              type: DEPENDENT
+              key: 'es.node.indices.search.query_time[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time in seconds spent performing query operations for the last measuring span.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_time_in_millis.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Total time spent performing query'
+              type: DEPENDENT
+              key: 'es.node.indices.search.query_time_in_millis[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: ms
+              description: 'Time in milliseconds spent performing query operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_time_in_millis.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Total number of query'
+              type: DEPENDENT
+              key: 'es.node.indices.search.query_total[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of query operations.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_total.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Amount of JVM heap committed'
+              type: DEPENDENT
+              key: 'es.node.jvm.mem.heap_committed_in_bytes[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The amount of memory, in bytes, available for use by the heap.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_committed_in_bytes.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Maximum JVM memory available for use'
+              type: DEPENDENT
+              key: 'es.node.jvm.mem.heap_max_in_bytes[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The maximum amount of memory, in bytes, available for use by the heap.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_max_in_bytes.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Amount of JVM heap currently in use'
+              type: DEPENDENT
+              key: 'es.node.jvm.mem.heap_used_in_bytes[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The memory, in bytes, currently in use by the heap.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_used_in_bytes.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Percent of JVM heap currently in use'
+              type: DEPENDENT
+              key: 'es.node.jvm.mem.heap_used_percent[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'The percentage of memory currently in use by the heap.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_used_percent.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: es.nodes.get_stats
+              trigger_prototypes:
+                -
+                  expression: '{min(1h)}>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
+                  name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
+                  priority: HIGH
+                  description: |
+                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation. 
+                    To address this problem, you can either increase your heap size (as long as it remains below the recommended 
+                    guidelines stated above), or scale out the cluster by adding more nodes.
+                -
+                  expression: '{min(1h)}>{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
+                  name: 'ES {#ES.NODE}: Percent of JVM heap in use is high (over {$ELASTICSEARCH.HEAP_USED.MAX.WARN}% for 1h)'
+                  priority: WARNING
+                  description: |
+                    This indicates that the rate of garbage collection isn’t keeping up with the rate of garbage creation. 
+                    To address this problem, you can either increase your heap size (as long as it remains below the recommended 
+                    guidelines stated above), or scale out the cluster by adding more nodes.
+                  dependencies:
+                    -
+                      name: 'ES {#ES.NODE}: Percent of JVM heap in use is critical (over {$ELASTICSEARCH.HEAP_USED.MAX.CRIT}% for 1h)'
+                      expression: '{Elasticsearch Cluster by HTTP:es.node.jvm.mem.heap_used_percent[{#ES.NODE}].min(1h)}>{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
+            -
+              name: 'ES {#ES.NODE}: Node uptime'
+              type: DEPENDENT
+              key: 'es.node.jvm.uptime[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'JVM uptime in seconds.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.uptime_in_millis.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              master_item:
+                key: es.nodes.get_stats
+              trigger_prototypes:
+                -
+                  expression: '{last()}<10m'
+                  name: 'ES {#ES.NODE}: Node {#ES.NODE} has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  manual_close: 'YES'
+            -
+              name: 'ES {#ES.NODE}: Refresh thread pool active threads'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.refresh.active[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of active threads in the refresh thread pool.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.active.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Refresh thread pool executor tasks completed'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of tasks completed by the refresh thread pool executor.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.completed.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Refresh thread pool tasks in queue'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.refresh.queue[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of tasks in queue for the refresh thread pool.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.queue.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Refresh thread pool executor tasks rejected'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of tasks rejected by the refresh thread pool executor.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.rejected.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>0'
+                  name: 'ES {#ES.NODE}: Refresh thread pool executor has the rejected tasks (for 5m)'
+                  priority: WARNING
+                  description: 'The number of tasks rejected by the refresh thread pool executor is over 0 for 5m.'
+            -
+              name: 'ES {#ES.NODE}: Search thread pool active threads'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.search.active[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of active threads in the search thread pool.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.active.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Search thread pool executor tasks completed'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.search.completed.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of tasks completed by the search thread pool executor.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.completed.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Search thread pool tasks in queue'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.search.queue[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of tasks in queue for the search thread pool.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.queue.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Search thread pool executor tasks rejected'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.search.rejected.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of tasks rejected by the search thread pool executor.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.rejected.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>0'
+                  name: 'ES {#ES.NODE}: Search thread pool executor has the rejected tasks (for 5m)'
+                  priority: WARNING
+                  description: 'The number of tasks rejected by the search thread pool executor is over 0 for 5m.'
+            -
+              name: 'ES {#ES.NODE}: Write thread pool active threads'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.write.active[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of active threads in the write thread pool.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.active.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Write thread pool executor tasks completed'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.write.completed.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of tasks completed by the write thread pool executor.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.completed.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Write thread pool tasks in queue'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.write.queue[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of tasks in queue for the write thread pool.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.queue.first()'
+              master_item:
+                key: es.nodes.get_stats
+            -
+              name: 'ES {#ES.NODE}: Write thread pool executor tasks rejected'
+              type: DEPENDENT
+              key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: rps
+              description: 'The number of tasks rejected by the write thread pool executor.'
+              application_prototypes:
+                -
+                  name: 'ES {#ES.NODE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.rejected.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: es.nodes.get_stats
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>0'
+                  name: 'ES {#ES.NODE}: Write thread pool executor has the rejected tasks (for 5m)'
+                  priority: WARNING
+                  description: 'The number of tasks rejected by the write thread pool executor is over 0 for 5m.'
+          graph_prototypes:
+            -
+              name: 'ES {#ES.NODE}: Latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.indices.search.query_latency[{#ES.NODE}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.indices.indexing.index_latency[{#ES.NODE}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.indices.search.fetch_latency[{#ES.NODE}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.indices.flush.latency[{#ES.NODE}]'
+            -
+              name: 'ES {#ES.NODE}: Query load'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.indices.search.fetch_current[{#ES.NODE}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.indices.search.query_current[{#ES.NODE}]'
+            -
+              name: 'ES {#ES.NODE}: Refresh thread pool'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.refresh.active[{#ES.NODE}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.refresh.queue[{#ES.NODE}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]'
+            -
+              name: 'ES {#ES.NODE}: Search thread pool'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.search.active[{#ES.NODE}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.search.queue[{#ES.NODE}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.search.completed.rate[{#ES.NODE}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.search.rejected.rate[{#ES.NODE}]'
+            -
+              name: 'ES {#ES.NODE}: Write thread pool'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.write.active[{#ES.NODE}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.write.queue[{#ES.NODE}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.write.completed.rate[{#ES.NODE}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Elasticsearch Cluster by HTTP'
+                    key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
+          timeout: 15s
+          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_nodes/_all/nodes'
+          lld_macro_paths:
+            -
+              lld_macro: '{#ES.NODE}'
+              path: $..name.first()
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.nodes.[*]'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+      macros:
+        -
+          macro: '{$ELASTICSEARCH.FETCH_LATENCY.MAX.WARN}'
+          value: '100'
+          description: 'Maximum of fetch latency in milliseconds for trigger expression.'
+        -
+          macro: '{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}'
+          value: '100'
+          description: 'Maximum of flush latency in milliseconds for trigger expression.'
+        -
+          macro: '{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}'
+          value: '95'
+          description: 'The maximum percent in the use of JVM heap for critically trigger expression.'
+        -
+          macro: '{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
+          value: '85'
+          description: 'The maximum percent in the use of JVM heap for warning trigger expression.'
+        -
+          macro: '{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
+          value: '100'
+          description: 'Maximum of indexing latency in milliseconds for trigger expression.'
+        -
+          macro: '{$ELASTICSEARCH.PASSWORD}'
+          description: 'The password of the Elasticsearch.'
+        -
+          macro: '{$ELASTICSEARCH.PORT}'
+          value: '9200'
+          description: 'The port of the Elasticsearch host.'
+        -
+          macro: '{$ELASTICSEARCH.QUERY_LATENCY.MAX.WARN}'
+          value: '100'
+          description: 'Maximum of query latency in milliseconds for trigger expression.'
+        -
+          macro: '{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
+          value: 10s
+          description: 'The ES cluster maximum response time in seconds for trigger expression.'
+        -
+          macro: '{$ELASTICSEARCH.SCHEME}'
+          value: http
+          description: 'The scheme of the Elasticsearch (http/https).'
+        -
+          macro: '{$ELASTICSEARCH.USERNAME}'
+          description: 'The username of the Elasticsearch.'
+  triggers:
+    -
+      expression: '({Elasticsearch Cluster by HTTP:es.nodes.fs.total_in_bytes.last()}-{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()})/({Elasticsearch Cluster by HTTP:es.cluster.number_of_data_nodes.last()}-1)>{Elasticsearch Cluster by HTTP:es.nodes.fs.available_in_bytes.last()}'
+      name: 'ES: Cluster does not have enough space for resharding'
+      priority: HIGH
+      description: 'There is not enough disk space for index resharding.'
+  graphs:
+    -
+      name: 'ES: Cluster health'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Elasticsearch Cluster by HTTP'
+            key: es.cluster.inactive_shards_percent_as_number
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Elasticsearch Cluster by HTTP'
+            key: es.cluster.relocating_shards
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Elasticsearch Cluster by HTTP'
+            key: es.cluster.initializing_shards
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Elasticsearch Cluster by HTTP'
+            key: es.cluster.unassigned_shards
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Elasticsearch Cluster by HTTP'
+            key: es.cluster.delayed_unassigned_shards
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'Elasticsearch Cluster by HTTP'
+            key: es.cluster.number_of_pending_tasks
+        -
+          sortorder: '6'
+          color: AC8C14
+          item:
+            host: 'Elasticsearch Cluster by HTTP'
+            key: es.cluster.task_max_waiting_in_queue
+  value_maps:
+    -
+      name: 'ES cluster state'
+      mappings:
+        -
+          value: '0'
+          newvalue: green
+        -
+          value: '1'
+          newvalue: yellow
+        -
+          value: '2'
+          newvalue: red
+        -
+          value: '255'
+          newvalue: unknown
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

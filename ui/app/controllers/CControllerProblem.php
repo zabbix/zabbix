@@ -156,16 +156,22 @@ abstract class CControllerProblem extends CController {
 	 * @return array
 	 */
 	protected function cleanInput(array $input): array {
+		if (array_key_exists('filter_reset', $input) && $input['filter_reset']) {
+			return array_intersect_key(['filter_name' => ''], $input);
+		}
+
 		if (array_key_exists('tags', $input) && $input['tags']) {
 			$input['tags'] = array_filter($input['tags'], function($tag) {
 				return !($tag['tag'] === '' && $tag['value'] === '');
 			});
+			$input['tags'] = array_values($input['tags']);
 		}
 
 		if (array_key_exists('inventory', $input) && $input['inventory']) {
 			$input['inventory'] = array_filter($input['inventory'], function($inventory) {
 				return $inventory['value'] !== '';
 			});
+			$input['inventory'] = array_values($input['inventory']);
 		}
 
 		return $input;

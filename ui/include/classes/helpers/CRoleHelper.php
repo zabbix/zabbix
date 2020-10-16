@@ -60,13 +60,12 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_QUEUE = 'ui.administration.queue';
 	public const UI_DEFAULT_ACCESS = 'ui.default_access';
 	public const MODULES_MODULE = 'modules.module.';
-	public const MODULES_MODULE_STATUS = 'modules.module.status.';
 	public const MODULES_DEFAULT_ACCESS = 'modules.default_access';
 	public const API_ACCESS = 'api.access';
 	public const API_MODE = 'api.mode';
+	public const API_MODE_DENY = 0;
+	public const API_MODE_ALLOW = 1;
 	public const API_METHOD = 'api.method.';
-	public const API_MODE_ALLOW = 0;
-	public const API_MODE_DENY = 1;
 	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
 	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
 	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit_maintenance';
