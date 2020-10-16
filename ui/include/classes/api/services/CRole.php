@@ -459,10 +459,15 @@ class CRole extends CApiService {
 	/**
 	 * Update table "role_rule".
 	 *
-	 * @param array  $roles
+	 * @param array  $roles                   Array of roles.
+	 * @param int    $roles[<role>]['type']   Role type.
+	 * @param array  $roles[<role>]['rules']  Array or role rules to be updated.
 	 * @param string $method
 	 */
 	private function updateRules(array $roles, string $method): void {
+		$insert = [];
+		$update = [];
+		$delete = [];
 		$db_roles_rules = [];
 		$is_update = ($method === 'update');
 
@@ -472,6 +477,7 @@ class CRole extends CApiService {
 				'filter' => ['roleid' => array_column($roles, 'roleid')]
 			]);
 
+			// Move rules in database to $delete if it is not accessible anymore by role type.
 			foreach ($db_rows as $db_row) {
 				$db_roles_rules[$db_row['roleid']][$db_row['role_ruleid']] = $db_row;
 			}
@@ -511,13 +517,10 @@ class CRole extends CApiService {
 				CRoleHelper::UI_DEFAULT_ACCESS => '',
 				CRoleHelper::SECTION_UI => ''
 			]);
-
-			if (!$default_access) {
-				$roles_rules[$roleid][] = [
-					'name' => CRoleHelper::UI_DEFAULT_ACCESS,
-					'value_int' => $default_access
-				];
-			}
+			$roles_rules[$roleid][] = [
+				'name' => CRoleHelper::UI_DEFAULT_ACCESS,
+				'value_int' => $default_access
+			];
 
 			foreach ($rules[CRoleHelper::SECTION_UI] as $rule) {
 				if ($rule['status'] != $default_access) {
@@ -534,6 +537,10 @@ class CRole extends CApiService {
 				CRoleHelper::API_ACCESS => '',
 				CRoleHelper::SECTION_API => ''
 			]);
+			$roles_rules[$roleid][] = [
+				'name' => CRoleHelper::API_ACCESS,
+				'value_int' => $api_access
+			];
 
 			if ($api_access) {
 				$status = $rules[CRoleHelper::API_MODE];
@@ -554,12 +561,6 @@ class CRole extends CApiService {
 					];
 				}
 			}
-			else {
-				$roles_rules[$roleid][] = [
-					'name' => CRoleHelper::API_ACCESS,
-					'value_int' => 0
-				];
-			}
 
 			// Module rules.
 			$default_access = $rules[CRoleHelper::MODULES_DEFAULT_ACCESS];
@@ -567,13 +568,10 @@ class CRole extends CApiService {
 				CRoleHelper::MODULES_DEFAULT_ACCESS => '',
 				CRoleHelper::SECTION_MODULES => ''
 			]);
-
-			if (!$default_access) {
-				$roles_rules[$roleid][] = [
-					'name' => CRoleHelper::MODULES_DEFAULT_ACCESS,
-					'value_int' => 0
-				];
-			}
+			$roles_rules[$roleid][] = [
+				'name' => CRoleHelper::MODULES_DEFAULT_ACCESS,
+				'value_int' => $default_access
+			];
 
 			$index = 0;
 			foreach ($rules[CRoleHelper::SECTION_MODULES] as $module) {
@@ -596,13 +594,10 @@ class CRole extends CApiService {
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => '',
 				CRoleHelper::SECTION_ACTIONS => ''
 			]);
-
-			if (!$default_access) {
-				$roles_rules[$roleid][] = [
-					'name' => CRoleHelper::ACTIONS_DEFAULT_ACCESS,
-					'value_int' => 0
-				];
-			}
+			$roles_rules[$roleid][] = [
+				'name' => CRoleHelper::ACTIONS_DEFAULT_ACCESS,
+				'value_int' =>$default_access
+			];
 
 			foreach ($rules[CRoleHelper::SECTION_ACTIONS] as $rule) {
 				if ($rule['status'] != $default_access) {
@@ -614,10 +609,7 @@ class CRole extends CApiService {
 			}
 		}
 
-		$insert = [];
-		$update = [];
-		$delete = [];
-
+		// Fill rules to be inserted, updated or deleted.
 		foreach ($roles_rules as $roleid => $rules) {
 			if (!array_key_exists($roleid, $db_roles_rules)) {
 				foreach ($rules as $rule) {
@@ -637,11 +629,15 @@ class CRole extends CApiService {
 				}
 
 				$role_ruleid = $db_role_rules[$rule['name']]['role_ruleid'];
-				// TODO: add to update only when value is changes!
-				$update[] = [
-					'values' => $rule,
-					'where' => ['role_ruleid' => $role_ruleid]
-				];
+				$type_index = self::RULE_VALUE_TYPES[$db_role_rules[$rule['name']]['type']];
+
+				if (strval($db_role_rules[$rule['name']][$type_index]) != strval($rule[$type_index])) {
+					$update[] = [
+						'values' => $rule,
+						'where' => ['role_ruleid' => $role_ruleid]
+					];
+				}
+
 				unset($db_roles_rules[$roleid][$role_ruleid]);
 			}
 		}
