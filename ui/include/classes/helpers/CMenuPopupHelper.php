@@ -26,11 +26,12 @@ class CMenuPopupHelper {
 	 *
 	 * @param string $dashboardid
 	 */
-	public static function getDashboard($dashboardid) {
+	public static function getDashboard($dashboardid, $editable) {
 		return [
 			'type' => 'dashboard',
 			'data' => [
-				'dashboardid' => $dashboardid
+				'dashboardid' => $dashboardid,
+				'editable' => $editable
 			]
 		];
 	}

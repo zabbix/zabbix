@@ -19,7 +19,11 @@ SERVER_tests = \
 	convert_to_utf8 \
 	zbx_truncate_itemkey \
 	zbx_truncate_value \
-	zbx_dyn_escape_string
+	zbx_dyn_escape_string \
+	zbx_tm_add \
+	zbx_tm_sub \
+	zbx_tm_round_up \
+	zbx_tm_round_down
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -370,5 +374,65 @@ zbx_dyn_escape_string_LDADD += @SERVER_LIBS@
 zbx_dyn_escape_string_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_dyn_escape_string_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_tm_add
+
+zbx_tm_add_SOURCES = \
+	zbx_tm_add.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tm_add_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tm_add_LDADD += @SERVER_LIBS@
+
+zbx_tm_add_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_tm_add_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_tm_sub
+
+zbx_tm_sub_SOURCES = \
+	zbx_tm_sub.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tm_sub_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tm_sub_LDADD += @SERVER_LIBS@
+
+zbx_tm_sub_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_tm_sub_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_tm_round_up
+
+zbx_tm_round_up_SOURCES = \
+	zbx_tm_round_up.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tm_round_up_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tm_round_up_LDADD += @SERVER_LIBS@
+
+zbx_tm_round_up_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_tm_round_up_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_tm_round_up
+
+zbx_tm_round_down_SOURCES = \
+	zbx_tm_round_down.c \
+	$(COMMON_SRC_FILES)
+
+zbx_tm_round_down_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_tm_round_down_LDADD += @SERVER_LIBS@
+
+zbx_tm_round_down_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_tm_round_down_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

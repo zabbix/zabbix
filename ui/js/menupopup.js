@@ -79,7 +79,7 @@ function getMenuPopupHistory(options) {
  * @param {string} options[]['scriptid']         Script ID.
  * @param {string} options[]['confirmation']     Confirmation text.
  * @param {bool}   options['showGraphs']         Link to Monitoring->Hosts->Graphs page.
- * @param {bool}   options['showScreens']        Link to Monitoring->Screen page.
+ * @param {bool}   options['showDashboards']     Link to Monitoring->Hosts->Dashboards page.
  * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
  * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
  * @param {bool}   options['hasGoTo']            "Go to" block in popup.
@@ -110,8 +110,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs = {
 				label: t('Graphs')
 			},
-			screens = {
-				label: t('Screens')
+			dashboards = {
+				label: t('Dashboards')
 			},
 			web = {
 				label: t('Web')
@@ -167,14 +167,15 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs.url = graphs_url.getUrl();
 		}
 
-		if (!options.showScreens) {
-			screens.disabled = true;
+		if (!options.showDashboards) {
+			dashboards.disabled = true;
 		}
 		else {
-			var screens_url = new Curl('host_screen.php', false);
+			var dashboards_url = new Curl('zabbix.php', false);
 
-			screens_url.setArgument('hostid', options.hostid);
-			screens.url = screens_url.getUrl();
+			dashboards_url.setArgument('action', 'host.dashboard.view')
+			dashboards_url.setArgument('hostid', options.hostid)
+			dashboards.url = dashboards_url.getUrl();
 		}
 
 		if (!options.showWeb) {
@@ -193,7 +194,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			latest_data,
 			problems,
 			graphs,
-			screens,
+			dashboards,
 			web
 		];
 
@@ -552,6 +553,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	var $dashboard = jQuery('.dashbrd-grid-container'),
+		dashboard_data = $dashboard.dashboardGrid('getDashboardData'),
 		editMode = $dashboard.dashboardGrid('isEditMode'),
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
@@ -559,21 +561,23 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget_actions = [];
 
 	options.widgetid = widgetid;
-	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
+	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
 
-	widget_actions.push({
-		label: t('S_COPY'),
-		clickCallback: function() {
-			jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
-			jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			jQuery('#dashbrd-paste-widget').attr('disabled', false);
-		}
-	});
+	// Do not show "Copy" action for host dashboards.
+	if (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null) {
+		widget_actions.push({
+			label: t('S_COPY'),
+			clickCallback: function() {
+				jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			}
+		});
+	}
 
 	if (editMode) {
 		widget_actions.push({
 			label: t('S_PASTE'),
-			disabled: !$dashboard.dashboardGrid('isWidgetCopied'),
+			disabled: ($dashboard.dashboardGrid('getCopiedWidget') === null),
 			clickCallback: function() {
 				$dashboard.dashboardGrid('pasteWidget', widget, widget.pos);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
@@ -652,10 +656,10 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 			{
 				label: t('Sharing'),
 				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
 					var popup_options = {'dashboardid': options.dashboardid};
 					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
-
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 				},
 				disabled: !options.editable
 			},
@@ -669,12 +673,8 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 			},
 			{
 				label: t('Delete'),
-				url: 'javascript:void(0)',
 				clickCallback: function () {
-					var	obj = jQuery(this);
-
-					// hide menu
-					obj.closest('.menu-popup').hide();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
 					if (!confirm(t('Delete dashboard?'))) {
 						return false;

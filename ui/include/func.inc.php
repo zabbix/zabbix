@@ -1903,19 +1903,6 @@ function error($msgs, string $src = ''): void {
 	}
 }
 
-/**
- * Add multiple errors under single header.
- *
- * @param array  $data
- * @param string $data['header']  common header for all error messages
- * @param array  $data['msgs']    array of error messages
- */
-function error_group($data) {
-	foreach (zbx_toArray($data['msgs']) as $msg) {
-		error($data['header'] . ' ' . $msg);
-	}
-}
-
 function get_and_clear_messages(): array {
 	$messages = filter_messages();
 	CMessageHelper::clear();

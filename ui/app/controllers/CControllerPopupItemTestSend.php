@@ -69,13 +69,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'key'					=> 'string',
 			'interface'				=> 'array',
 			'ipmi_sensor'			=> 'string',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT]),
 			'jmx_endpoint'			=> 'string',
 			'macros'				=> 'array',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
+			'script'				=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -84,6 +85,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'privatekey'			=> 'string',
 			'publickey'				=> 'string',
 			'query_fields'			=> 'array',
+			'parameters'			=> 'array',
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'show_final_result'		=> 'in 0,1',
@@ -262,6 +264,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'params_ap' => 'params',
 				'params_es' => 'params',
 				'params_f' => 'params',
+				'script' => 'params',
 				'http_username' => 'username',
 				'http_password' => 'password',
 				'http_authtype' => 'authtype',
@@ -274,6 +277,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			if (array_key_exists('query_fields', $item_test_data)) {
 				$item_test_data['query_fields'] = $this->transformQueryFields($item_test_data['query_fields']);
+			}
+
+			if (array_key_exists('parameters', $item_test_data)) {
+				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
 			}
 
 			// Only non-empty fields need to be sent to server.
@@ -342,6 +349,12 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			elseif (is_array($result)) {
 				$test_failed = false;
 				$test_outcome = null;
+
+				$step_types = array_column($preproc_test_data['steps'], 'type');
+				$insert_index = array_search(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, $step_types);
+				if ($insert_index !== false) {
+					array_splice($result['steps'], $insert_index, 0, [['result' => ' ']]);
+				}
 
 				foreach ($preproc_test_data['steps'] as $i => &$step) {
 					if ($test_failed) {

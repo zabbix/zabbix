@@ -1,0 +1,734 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:04Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: Memcached
+      name: Memcached
+      description: |
+        Get Memcached metrics from plugin for the New Zabbix Agent (zabbix-agent2).
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: Memcached
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Memcached: Commands: FLUSH per second'
+          type: DEPENDENT
+          key: memcached.commands.flush.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn’t take place in production, so check your debug scripts.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.cmd_flush
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Commands: GET per second'
+          type: DEPENDENT
+          key: memcached.commands.get.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of GET requests received by server per second.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.cmd_get
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Commands: SET per second'
+          type: DEPENDENT
+          key: memcached.commands.set.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of SET requests received by server per second.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.cmd_set
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Maximum number of bytes'
+          type: DEPENDENT
+          key: memcached.config.limit_maxbytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Maximum number of bytes allowed in cache. You can adjust this setting via a config file or the command line while starting your Memcached server.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.limit_maxbytes
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Open connections'
+          type: DEPENDENT
+          key: memcached.connections.current
+          delay: '0'
+          history: 7d
+          description: 'The number of clients presently connected'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.curr_connections
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Max connections'
+          type: DEPENDENT
+          key: memcached.connections.max
+          delay: '0'
+          history: 7d
+          description: 'Max number of concurrent connections'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.max_connections
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Queued connections per second'
+          type: DEPENDENT
+          key: memcached.connections.queued.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times that memcached has hit its connections limit and disabled its listener'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.listen_disabled_num
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
+              name: 'Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)'
+              priority: WARNING
+              description: 'The max number of connections is reachedand and a new connection had to wait in the queue as a result.'
+        -
+          name: 'Memcached: New connections per second'
+          type: DEPENDENT
+          key: memcached.connections.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of connections opened per second'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_connections
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Connection structures'
+          type: DEPENDENT
+          key: memcached.connections.structures
+          delay: '0'
+          history: 7d
+          description: 'Number of  connection structures allocated by the server'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.connection_structures
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Throttled connections'
+          type: DEPENDENT
+          key: memcached.connections.throttled.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a client connection was throttled. When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.conn_yields
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
+              name: 'Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)'
+              priority: WARNING
+              description: |
+                Number of times a client connection was throttled is too hight.
+                When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.
+        -
+          name: 'Memcached: CPU sys'
+          type: DEPENDENT
+          key: memcached.cpu.sys
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'System CPU consumed by the Memcached server'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.rusage_system
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'Memcached: Failed to fetch info data (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 30 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Memcached: Service is down'
+                  expression: '{Memcached:memcached.ping["{$MEMCACHED.CONN.URI}"].last()}=0'
+        -
+          name: 'Memcached: CPU user'
+          type: DEPENDENT
+          key: memcached.cpu.user
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'User CPU consumed by the Memcached server'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.rusage_user
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Ping'
+          key: 'memcached.ping["{$MEMCACHED.CONN.URI}"]'
+          history: 7d
+          applications:
+            -
+              name: Memcached
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Memcached: Service is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: 'Memcached: Process id'
+          type: DEPENDENT
+          key: memcached.process_id
+          delay: '0'
+          history: 7d
+          description: 'PID of the server process'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pid
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Bytes used'
+          type: DEPENDENT
+          key: memcached.stats.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Current number of bytes used to store items.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bytes
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Read bytes per second'
+          type: DEPENDENT
+          key: memcached.stats.bytes_read.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The network''s read rate per second in B/sec'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bytes_read
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Written bytes per second'
+          type: DEPENDENT
+          key: memcached.stats.bytes_written.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The network''s read rate per second in B/sec'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.bytes_written
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Current number of items stored'
+          type: DEPENDENT
+          key: memcached.stats.curr_items
+          delay: '0'
+          history: 7d
+          description: 'Current number of items stored by this instance.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.curr_items
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Evictions per second'
+          type: DEPENDENT
+          key: memcached.stats.evictions.rate
+          delay: '0'
+          history: 7d
+          description: |
+            "An eviction is when an item that still has time to live is removed from the cache because a brand new item needs to be allocated.
+            The item is selected with a pseudo-LRU mechanism.
+            A high number of evictions coupled with a low hit rate means your application is setting a large number of keys that are never used again."
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.evictions
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Hits per second'
+          type: DEPENDENT
+          key: memcached.stats.hits.rate
+          delay: '0'
+          history: 7d
+          description: 'Number of successful GET requests (items requested and found) per second.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.get_hits
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Misses per second'
+          type: DEPENDENT
+          key: memcached.stats.misses.rate
+          delay: '0'
+          history: 7d
+          description: 'Number of missed GET requests (items requested but not found) per second.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.get_misses
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Threads'
+          type: DEPENDENT
+          key: memcached.stats.threads
+          delay: '0'
+          history: 7d
+          description: 'Number of worker threads requested'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.threads
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: New items per second'
+          type: DEPENDENT
+          key: memcached.stats.total_items.rate
+          delay: '0'
+          history: 7d
+          description: 'Number of new items stored per second.'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_items
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+        -
+          name: 'Memcached: Get status'
+          key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Memcached: Uptime'
+          type: DEPENDENT
+          key: memcached.uptime
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Number of seconds since Memcached server start'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Memcached: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'Memcached: Memcached version'
+          type: DEPENDENT
+          key: memcached.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the Memcached server'
+          applications:
+            -
+              name: Memcached
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Memcached version has changed. Ack to close.'
+              manual_close: 'YES'
+      macros:
+        -
+          macro: '{$MEMCACHED.CONN.PRC.MAX.WARN}'
+          value: '80'
+          description: 'Maximum percentage of connected clients'
+        -
+          macro: '{$MEMCACHED.CONN.QUEUED.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of queued connections per second'
+        -
+          macro: '{$MEMCACHED.CONN.THROTTLED.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of throttled connections per second'
+        -
+          macro: '{$MEMCACHED.CONN.URI}'
+          value: 'tcp://localhost:11211'
+          description: 'Connection string in the URI format (password is not used). This param overwrites a value configured in the "Plugins.Memcached.Uri" option of the configuration file (if it''s set), otherwise, the plugin''s default value is used: "tcp://localhost:11211"'
+        -
+          macro: '{$MEMCACHED.MEM.PUSED.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of memory used'
+  triggers:
+    -
+      expression: '{Memcached:memcached.stats.bytes.min(5m)}/{Memcached:memcached.config.limit_maxbytes.last()}*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}'
+      name: 'Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)'
+      priority: WARNING
+    -
+      expression: '{Memcached:memcached.connections.current.min(5m)}/{Memcached:memcached.connections.max.last()}*100>{$MEMCACHED.CONN.PRC.MAX.WARN}'
+      name: 'Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)'
+      priority: WARNING
+      description: 'When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.'
+  graphs:
+    -
+      name: 'Memcached: Commands'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: Memcached
+            key: memcached.commands.flush.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: Memcached
+            key: memcached.commands.set.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: Memcached
+            key: memcached.commands.get.rate
+    -
+      name: 'Memcached: Connections'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Memcached
+            key: memcached.connections.max
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: Memcached
+            key: memcached.connections.current
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: F63100
+          item:
+            host: Memcached
+            key: memcached.connections.structures
+    -
+      name: 'Memcached: Connections rate'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: Memcached
+            key: memcached.connections.rate
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: Memcached
+            key: memcached.connections.throttled.rate
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: Memcached
+            key: memcached.connections.queued.rate
+    -
+      name: 'Memcached: Keyspace'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: Memcached
+            key: memcached.stats.hits.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: Memcached
+            key: memcached.stats.misses.rate
+    -
+      name: 'Memcached: Network'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Memcached
+            key: memcached.stats.bytes_read.rate
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: Memcached
+            key: memcached.stats.bytes_written.rate
+    -
+      name: 'Memcached: Uptime'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: Memcached
+            key: memcached.uptime
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

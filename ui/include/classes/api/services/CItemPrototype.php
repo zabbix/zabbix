@@ -41,7 +41,8 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
 		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
 	];
 
 	public function __construct() {
@@ -510,6 +511,7 @@ class CItemPrototype extends CItemGeneral {
 			DB::insertBatch('item_application_prototype', $item_application_prototypes);
 		}
 
+		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
 	}
 
@@ -740,6 +742,7 @@ class CItemPrototype extends CItemGeneral {
 			CItemPrototypeManager::deleteUnusedApplicationPrototypes(array_keys($application_prototypes_to_remove));
 		}
 
+		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
 	}
 
@@ -856,6 +859,17 @@ class CItemPrototype extends CItemGeneral {
 			else {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
+			}
+
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
+						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
+					$item['params'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$item['timeout'] = $defaults['timeout'];
+				}
 			}
 		}
 		unset($item);

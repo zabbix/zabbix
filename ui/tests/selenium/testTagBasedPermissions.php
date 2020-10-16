@@ -201,6 +201,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($name);
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 			//Reset filter
@@ -306,6 +307,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter
@@ -406,6 +408,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter

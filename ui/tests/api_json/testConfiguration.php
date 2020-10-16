@@ -477,7 +477,7 @@ class testConfiguration extends CAPITest {
 				'unexpected' => ['deleteMissing']
 			]],
 			[[
-				'parameter' => 'templateScreens',
+				'parameter' => 'templateDashboards',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
 				'unexpected' => []
 			]],

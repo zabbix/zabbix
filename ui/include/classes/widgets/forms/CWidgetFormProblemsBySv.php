@@ -24,8 +24,8 @@
  */
 class CWidgetFormProblemsBySv extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_PROBLEMS_BY_SV);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_PROBLEMS_BY_SV);
 
 		$this->data = self::convertDottedKeys($this->data);
 

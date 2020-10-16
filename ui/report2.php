@@ -551,8 +551,7 @@ else {
 		'domid' => 'avail_report',
 		'loadSBox' => 0,
 		'loadImage' => 0,
-		'dynamic' => 0,
-		'mainObject' => 1
+		'dynamic' => 0
 	];
 	zbx_add_post_js(
 		'timeControl.addObject("avail_report", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');'

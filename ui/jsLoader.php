@@ -138,8 +138,6 @@ $tranStrings = [
 		'Edit' => _('Edit'),
 		'Cancel' => _('Cancel'),
 		'Delete' => _('Delete'),
-		'You have unsaved changes.' => _('You have unsaved changes.'),
-		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
 		'Add a new widget' => _('Add a new widget'),
@@ -395,7 +393,7 @@ if (empty($_GET['files'])) {
 	require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
-		$session = unserialize(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)));
+		$session = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 		$js .= 'window.ZBX_SESSION_NAME = "'.crc32($session['sessionid']).'";';
 		$files[] = 'class.localstorage.js';
 	}

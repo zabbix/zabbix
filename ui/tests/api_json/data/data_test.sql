@@ -123,9 +123,9 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (32, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (4, 32, 13);
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (6, 'API map', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 14, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200021, 'API screen', 1, 1, NULL, 15, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200021, 'API screen', 1, 1, 15, 0);
 INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200004, 'API slide show', 10, 16, 0);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200022, 'API screen for slide show', 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, userid, private) VALUES (200022, 'API screen for slide show', 1, 1, 1, 0);
 INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200012, 200004, 200022, 0, 0);
 
 -- scripts

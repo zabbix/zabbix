@@ -71,7 +71,7 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
 	 * @param string|array  $options['selectApplications']                 Return an "applications" property with host applications.
 	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
-	 * @param string|array  $options['selectScreens']                      Return a "screens" property with host screens.
+	 * @param string|array  $options['selectDashboards']                   Return a "dashboards" property with host dashboards.
 	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
@@ -154,7 +154,7 @@ class CHost extends CHostGeneral {
 			'selectGraphs'						=> null,
 			'selectApplications'				=> null,
 			'selectMacros'						=> null,
-			'selectScreens'						=> null,
+			'selectDashboards'					=> null,
 			'selectInterfaces'					=> null,
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
@@ -1636,43 +1636,48 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// adding screens
-		if ($options['selectScreens'] !== null) {
-			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
-				$screens = API::TemplateScreen()->get([
-					'output' => $this->outputExtend($options['selectScreens'], ['hostid']),
-					'hostids' => $hostids,
-					'nopermissions' => true
+		// Adding dashboards.
+		if ($options['selectDashboards'] !== null) {
+			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
+
+			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
+				$dashboards = API::TemplateDashboard()->get([
+					'output' => $this->outputExtend($options['selectDashboards'], ['templateid']),
+					'templateids' => $templateids
 				]);
+
 				if (!is_null($options['limitSelects'])) {
-					order_result($screens, 'name');
+					order_result($dashboards, 'name');
 				}
 
-				// inherited screens do not have a unique screenid, so we're building a map using array keys
-				$relationMap = new CRelationMap();
-				foreach ($screens as $key => $screen) {
-					$relationMap->addRelation($screen['hostid'], $key);
+				foreach ($result as &$host) {
+					foreach ($hosts_templates[$host['hostid']] as $templateid) {
+						foreach ($dashboards as $dashboard) {
+							if ($dashboard['templateid'] == $templateid) {
+								$host['dashboards'][] = $dashboard;
+							}
+						}
+					}
 				}
-
-				$screens = $this->unsetExtraFields($screens, ['hostid'], $options['selectScreens']);
-				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
+				unset($host);
 			}
 			else {
-				$screens = API::TemplateScreen()->get([
-					'hostids' => $hostids,
-					'nopermissions' => true,
+				$dashboards = API::TemplateDashboard()->get([
+					'templateids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
 
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['screens'] = 0;
+					$result[$hostid]['dashboards'] = 0;
 
-					foreach ($screens as $screen) {
-						if (bccomp($screen['hostid'], $hostid) == 0) {
-							$result[$hostid]['screens'] += $screen['rowscount'];
+					foreach ($dashboards as $dashboard) {
+						if (in_array($dashboard['templateid'], $hosts_templates[$hostid])) {
+							$result[$hostid]['dashboards'] += $dashboard['rowscount'];
 						}
 					}
+
+					$result[$hostid]['dashboards'] = (string) $result[$hostid]['dashboards'];
 				}
 			}
 		}

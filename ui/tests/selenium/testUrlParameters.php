@@ -281,7 +281,7 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'screenedit.php?screenid=16',
+						'url' => 'screenedit.php?screenid=1',
 						'text_present' => 'Screens: Zabbix server'
 					],
 					[

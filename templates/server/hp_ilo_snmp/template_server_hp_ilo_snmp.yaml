@@ -1,0 +1,1608 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:41Z'
+  groups:
+    -
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      template: 'HP iLO SNMP'
+      name: 'HP iLO SNMP'
+      description: |
+        Template Server HP iLO
+        
+        MIBs used:
+        CPQSINFO-MIB
+        CPQHLTH-MIB
+        CPQIDA-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      applications:
+        -
+          name: 'Disk arrays'
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: 'Physical disks'
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+        -
+          name: 'Virtual disks'
+      items:
+        -
+          name: 'System: Temperature status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
+          key: 'sensor.temp.status[cpqHeThermalCondition.0]'
+          delay: 3m
+          history: 2w
+          trends: 0d
+          description: |
+            MIB: CPQHLTH-MIB
+            This value specifies the overall condition of the system's thermal environment.
+            This value will be one of the following:
+            other(1)  Temperature could not be determined.
+            ok(2)  The temperature sensor is within normal operating range.
+            degraded(3)  The temperature sensor is outside of normal operating range.
+            failed(4)  The temperature sensor detects a condition that could  permanently damage the system.
+          applications:
+            -
+              name: Temperature
+          valuemap:
+            name: 'CPQSINFO-MIB::status'
+        -
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: CPQSINFO-MIB
+            The machine product name.The name of the machine used in this system.
+          inventory_link: MODEL
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: CPQSINFO-MIB
+            The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Overall system health status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
+          key: 'system.status[cpqHeMibCondition.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          description: |
+            MIB: CPQHLTH-MIB
+            The overall condition. This object represents the overall status of the server information represented by this MIB.
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'CPQSINFO-MIB::status'
+          triggers:
+            -
+              expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+              name: 'System status is in critical state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for errors'
+            -
+              expression: '{count(#1,{$HEALTH_WARN_STATUS},eq)}=1'
+              name: 'System status is in warning state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the device for warnings'
+              dependencies:
+                -
+                  name: 'System status is in critical state'
+                  expression: '{HP iLO SNMP:system.status[cpqHeMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+      discovery_rules:
+        -
+          name: 'Array Controller Cache Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#CACHE_STATUS},1.3.6.1.4.1.232.3.2.2.2.1.2,{#CACHE_CNTRL_INDEX},1.3.6.1.4.1.232.3.2.2.2.1.1]'
+          key: array.cache.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CPQIDA-MIB::cpqDaAccelTable'
+          item_prototypes:
+            -
+              name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.6.{#SNMPINDEX}'
+              key: 'system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]'
+              history: 1w
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Cache Module Board Backup Power Status. This monitors the status of each backup power source on the board.
+                The backup power source can only recharge when the system has power applied. The type of backup power source used is indicated by cpqDaAccelBackupPowerSource.
+                The following values are valid:
+                Other (1)  Indicates that the instrument agent does not recognize  backup power status.  You may need to update your software.
+                
+                Ok (2)  The backup power source is fully charged.
+                
+                Recharging (3)  The array controller has one or more cache module backup power  sources that are recharging.
+                Cache module operations such as Battery/Flash Backed Write Cache, Expansion, Extension and Migration are temporarily suspended until the backup power source is fully charged.
+                Cache module operations will automatically resume  when charging is complete.
+                
+                Failed (4)  The battery pack is below the sufficient voltage level and  has not recharged in 36 hours.
+                Your Cache Module board  needs to be serviced.
+                
+                Degraded (5)  The battery is still operating, however, one of the batteries  in the pack has failed to recharge properly.
+                Your Cache  Module board should be serviced as soon as possible.
+                
+                NotPresent (6)  A backup power source is not present on the cache module board. Some controllers do not have backup power sources.
+                
+                Capacitor Failed (7)  The flash backed cache module capacitor is below the sufficient voltage level and has not recharged in 10 minutes.  Your Cache Module board needs to be serviced.
+              applications:
+                -
+                  name: 'Disk arrays'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaAccelBattery'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults'
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"degraded"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"notPresent"},eq)}=1'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!'
+                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1'
+            -
+              name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.2.{#SNMPINDEX}'
+              key: 'system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]'
+              history: 1w
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.
+                Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.
+              applications:
+                -
+                  name: 'Disk arrays'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaAccelStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults'
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
+                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"},ne)}=1'
+                  name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
+                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
+                    -
+                      name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
+                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
+        -
+          name: 'Array Controller Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.2.1.1.1,{#CNTLR_SLOT},1.3.6.1.4.1.232.3.2.2.1.1.5,{#CNTLR_LOCATION},1.3.6.1.4.1.232.3.2.2.1.1.20]'
+          key: array.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CPQIDA-MIB::cpqDaCntlrTable'
+          item_prototypes:
+            -
+              name: '{#CNTLR_LOCATION}: Disk array controller model'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}'
+              key: 'system.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]'
+              delay: 1d
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Array Controller Model. The type of controller card.
+              applications:
+                -
+                  name: 'Disk arrays'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaCntlrModel'
+            -
+              name: '{#CNTLR_LOCATION}: Disk array controller status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}'
+              key: 'system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]'
+              history: 1w
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                This value represents the overall condition of this controller,
+                and any associated logical drives,physical drives, and array accelerators.
+              applications:
+                -
+                  name: 'Disk arrays'
+              valuemap:
+                name: 'CPQSINFO-MIB::status'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1'
+                  name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults'
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_WARN_STATUS},eq)}=1'
+                  name: '{#CNTLR_LOCATION}: Disk array controller is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
+                      expression: '{HP iLO SNMP:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1'
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.7.1.9]'
+          key: fan.discovery
+          delay: 1h
+          description: 'CPQHLTH-MIB::cpqHeFltTolFanCondition'
+          item_prototypes:
+            -
+              name: 'Fan {#SNMPINDEX}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.7.1.9.{#SNMPINDEX}'
+              key: 'sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CPQHLTH-MIB
+                The condition of the fan.
+                This value will be one of the following:
+                other(1)  Fan status detection is not supported by this system or driver.
+                ok(2)  The fan is operating properly.
+                degraded(2)  A redundant fan is not operating properly.
+                failed(4)  A non-redundant fan is not operating properly.
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'CPQSINFO-MIB::status'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  name: 'Fan {#SNMPINDEX}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+                -
+                  expression: '{count(#1,{$FAN_WARN_STATUS},eq)}=1'
+                  name: 'Fan {#SNMPINDEX}: Fan is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit'
+                  dependencies:
+                    -
+                      name: 'Fan {#SNMPINDEX}: Fan is in critical state'
+                      expression: '{HP iLO SNMP:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+        -
+          name: 'Physical Disk Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.5.1.1.5,{#DISK_LOCATION},1.3.6.1.4.1.232.3.2.5.1.1.64]'
+          key: physicalDisk.discovery
+          delay: 1h
+          description: 'Scanning  table of physical drive entries CPQIDA-MIB::cpqDaPhyDrvTable.'
+          item_prototypes:
+            -
+              name: '{#DISK_LOCATION}: Physical disk media type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.69.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Drive Array Physical Drive Media Type.The following values are defined:
+                other(1)  The instrument agent is unable to determine the physical drive’s media type.
+                rotatingPlatters(2)  The physical drive media is composed of rotating platters.
+                solidState(3)  The physical drive media is composed of solid state electronics.
+              applications:
+                -
+                  name: 'Physical disks'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
+            -
+              name: '{#DISK_LOCATION}: Physical disk model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Model.This is a text description of the physical drive.
+                The text that appears depends upon who manufactured the drive and the drive type.
+                If a drive fails, note the model to identify the type of drive necessary for replacement.
+                If a model number is not present, you may not have properly initialized the drive array to which the physical drive is attached for monitoring.
+              applications:
+                -
+                  name: 'Physical disks'
+            -
+              name: '{#DISK_LOCATION}: Physical disk serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]'
+              delay: 1d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Serial Number.
+                This is the serial number assigned to the physical drive.
+                This value is based upon the serial number as returned by the SCSI inquiry command
+                but may have been modified due to space limitations.  This can be used for identification purposes.
+              applications:
+                -
+                  name: 'Physical disks'
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Disk serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              name: '{#DISK_LOCATION}: Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.45.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: 0d
+              units: B
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Size in MB.
+                This is the size of the physical drive in megabytes.
+                This value is calculated using the value 1,048,576 (2^20) as a megabyte.
+                Drive manufacturers sometimes use the number 1,000,000 as a megabyte when giving drive capacities so this value may differ
+                from the advertised size of a drive. This field is only applicable for controllers which support SCSI drives,
+                and therefore is not supported by the IDA or IDA-2 controllers. The field will contain 0xFFFFFFFF if the drive capacity cannot be calculated
+                or if the controller does not support SCSI drives.
+              applications:
+                -
+                  name: 'Physical disks'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+            -
+              name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.57.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]'
+              delay: 3m
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive S.M.A.R.T Status.The following values are defined:
+                other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.
+                ok(2)  Indicates the drive is functioning properly.
+                replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  error and should be replaced.
+              applications:
+                -
+                  name: 'Physical disks'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDrive"},eq)}=1 or {count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDriveSSDWearOut"},eq)}=1'
+                  name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Disk probably requires replacement.'
+                  dependencies:
+                    -
+                      name: '{#DISK_LOCATION}: Physical disk failed'
+                      expression: '{HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1'
+            -
+              name: '{#DISK_LOCATION}: Physical disk status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]'
+              delay: 3m
+              trends: 0d
+              description: |
+                MIB: CPQIDA-MIB
+                Physical Drive Status. This shows the status of the physical drive. The following values are valid for the physical drive status:
+                other (1)  Indicates that the instrument agent does not recognize  the drive.
+                You may need to upgrade your instrument agent  and/or driver software.
+                ok (2)  Indicates the drive is functioning properly.
+                failed (3)  Indicates that the drive is no longer operating and  should be replaced.
+                predictiveFailure(4)  Indicates that the drive has a predictive failure error and  should be replaced.
+              applications:
+                -
+                  name: 'Physical disks'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_FAIL_STATUS},eq)}=1'
+                  name: '{#DISK_LOCATION}: Physical disk failed'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check physical disk for warnings or errors'
+                -
+                  expression: '{count(#1,{$DISK_WARN_STATUS},eq)}=1'
+                  name: '{#DISK_LOCATION}: Physical disk is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check physical disk for warnings or errors'
+                  dependencies:
+                    -
+                      name: '{#DISK_LOCATION}: Physical disk failed'
+                      expression: '{HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.9.3.1.5,{#CHASSIS_NUM},1.3.6.1.4.1.232.6.2.9.3.1.1,{#BAY_NUM},1.3.6.1.4.1.232.6.2.9.3.1.2]'
+          key: psu.discovery
+          delay: 1h
+          description: 'CPQHLTH-MIB::cpqHeFltTolPowerSupplyStatus'
+          item_prototypes:
+            -
+              name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.9.3.1.4.{#SNMPINDEX}'
+              key: 'sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CPQHLTH-MIB
+                The condition of the power supply. This value will be one of the following:
+                other(1)  The status could not be determined or not present.
+                ok(2)  The power supply is operating normally.
+                degraded(3)  A temperature sensor, fan or other power supply component is  outside of normal operating range.
+                failed(4)  A power supply component detects a condition that could  permanently damage the system.
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'CPQSINFO-MIB::status'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+                -
+                  expression: '{count(#1,{$PSU_WARN_STATUS},eq)}=1'
+                  name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors'
+                  dependencies:
+                    -
+                      name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
+                      expression: '{HP iLO SNMP:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: tempDescr.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: (4|8|9|12|13)
+                formulaid: A
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable'
+          item_prototypes:
+            -
+              name: '{#SNMPINDEX}: Temperature sensor location'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}'
+              key: 'sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]'
+              delay: 1h
+              history: 1w
+              trends: 0d
+              description: |
+                MIB: CPQHLTH-MIB
+                This specifies the location of the temperature sensor present in the system.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
+            -
+              name: '{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}]'
+              delay: 6m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: {#SNMPINDEX}
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"{#SNMPINDEX}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"{#SNMPINDEX}"}-3'
+                  name: '{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPINDEX}"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"{#SNMPINDEX}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"{#SNMPINDEX}"}-3'
+                  name: '{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPINDEX}"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPINDEX}"}'
+                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"{#SNMPINDEX}"}'
+                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"{#SNMPINDEX}"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}+3'
+                  name: '{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery Ambient'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: tempDescr.discovery.ambient
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPINDEX}'
+                value: 0\.1
+                formulaid: B
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '11'
+                formulaid: A
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter'
+          item_prototypes:
+            -
+              name: 'Ambient: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: Ambient
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                  name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Ambient"}-3'
+                  name: 'Ambient: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  name: 'Ambient: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery CPU'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: tempDescr.discovery.cpu
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '6'
+                formulaid: A
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter'
+          item_prototypes:
+            -
+              name: 'CPU-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: CPU-{#SNMPINDEX}
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+                  name: 'CPU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"CPU"}-3'
+                  name: 'CPU-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'CPU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  name: 'CPU-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery System'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: tempDescr.discovery.io
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '3'
+                formulaid: A
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter'
+          item_prototypes:
+            -
+              name: 'System-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]'
+              delay: 6m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: System-{#SNMPINDEX}
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Device"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Device"}-3'
+                  name: 'System-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Device"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Device"}-3'
+                  name: 'System-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'System-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
+                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Device"}'
+                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Device"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Device"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Device"}+3'
+                  name: 'System-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery Memory'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: tempDescr.discovery.memory
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '7'
+                formulaid: A
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter'
+          item_prototypes:
+            -
+              name: 'Memory-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}]'
+              delay: 6m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: Memory-{#SNMPINDEX}
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Memory"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Memory"}-3'
+                  name: 'Memory-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Memory"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Memory"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Memory"}-3'
+                  name: 'Memory-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"Memory"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'Memory-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Memory"}'
+                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Memory"}'
+                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Memory"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Memory"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Memory"}+3'
+                  name: 'Memory-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"Memory"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery PSU'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: tempDescr.discovery.psu
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '10'
+                formulaid: A
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter'
+          item_prototypes:
+            -
+              name: 'PSU-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}]'
+              delay: 6m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: PSU-{#SNMPINDEX}
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"PSU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"PSU"}-3'
+                  name: 'PSU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"PSU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"PSU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"PSU"}-3'
+                  name: 'PSU-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"PSU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'PSU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"PSU"}'
+                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"PSU"}'
+                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"PSU"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"PSU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"PSU"}+3'
+                  name: 'PSU-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"PSU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Virtual Disk Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.3.1.1.2,{#DISK_NAME},1.3.6.1.4.1.232.3.2.3.1.1.14]'
+          key: virtualdisk.discovery
+          delay: 1h
+          description: 'CPQIDA-MIB::cpqDaLogDrvTable'
+          item_prototypes:
+            -
+              name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Layout type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}'
+              key: 'system.hw.virtualdisk.layout[cpqDaLogDrvFaultTol.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              description: |
+                Logical Drive Fault Tolerance.
+                This shows the fault tolerance mode of the logical drive.
+              applications:
+                -
+                  name: 'Virtual disks'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
+            -
+              name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.9.{#SNMPINDEX}'
+              key: 'system.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: 0d
+              units: B
+              description: |
+                Logical Drive Size.
+                This is the size of the logical drive in megabytes.  This value
+                is calculated using the value 1,048,576 (2^20) as a megabyte.
+                Drive manufacturers sometimes use the number 1,000,000 as a
+                megabyte when giving drive capacities so this value may
+                differ from the advertised size of a drive.
+              applications:
+                -
+                  name: 'Virtual disks'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+            -
+              name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}'
+              key: 'system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              description: 'Logical Drive Status.'
+              applications:
+                -
+                  name: 'Virtual disks'
+              valuemap:
+                name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$VDISK_CRIT_STATUS},eq)}=1'
+                  name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check virtual disk for warnings or errors'
+                -
+                  expression: '{count(#1,{$VDISK_OK_STATUS},ne)}=1'
+                  name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check virtual disk for warnings or errors'
+                  dependencies:
+                    -
+                      name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
+                      expression: '{HP iLO SNMP:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS},eq)}=1'
+      macros:
+        -
+          macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"}'
+          value: '7'
+        -
+          macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"}'
+          value: '4'
+        -
+          macro: '{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"degraded"}'
+          value: '5'
+        -
+          macro: '{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"notPresent"}'
+          value: '6'
+        -
+          macro: '{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"}'
+          value: '8'
+        -
+          macro: '{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"}'
+          value: '3'
+        -
+          macro: '{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"}'
+          value: '7'
+        -
+          macro: '{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"}'
+          value: '6'
+        -
+          macro: '{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"}'
+          value: '9'
+        -
+          macro: '{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}'
+          value: '2'
+        -
+          macro: '{$DISK_ARRAY_CRIT_STATUS}'
+          value: '4'
+        -
+          macro: '{$DISK_ARRAY_WARN_STATUS}'
+          value: '3'
+        -
+          macro: '{$DISK_FAIL_STATUS}'
+          value: '3'
+        -
+          macro: '{$DISK_SMART_FAIL_STATUS:"replaceDrive"}'
+          value: '3'
+        -
+          macro: '{$DISK_SMART_FAIL_STATUS:"replaceDriveSSDWearOut"}'
+          value: '4'
+        -
+          macro: '{$DISK_WARN_STATUS}'
+          value: '4'
+        -
+          macro: '{$FAN_CRIT_STATUS}'
+          value: '4'
+        -
+          macro: '{$FAN_WARN_STATUS}'
+          value: '3'
+        -
+          macro: '{$HEALTH_CRIT_STATUS}'
+          value: '4'
+        -
+          macro: '{$HEALTH_WARN_STATUS}'
+          value: '3'
+        -
+          macro: '{$PSU_CRIT_STATUS}'
+          value: '4'
+        -
+          macro: '{$PSU_WARN_STATUS}'
+          value: '3'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT:"Ambient"}'
+          value: '35'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN:"Ambient"}'
+          value: '30'
+        -
+          macro: '{$VDISK_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$VDISK_OK_STATUS}'
+          value: '2'
+  value_maps:
+    -
+      name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: unknown
+        -
+          value: '3'
+          newvalue: system
+        -
+          value: '4'
+          newvalue: systemBoard
+        -
+          value: '5'
+          newvalue: ioBoard
+        -
+          value: '6'
+          newvalue: cpu
+        -
+          value: '7'
+          newvalue: memory
+        -
+          value: '8'
+          newvalue: storage
+        -
+          value: '9'
+          newvalue: removableMedia
+        -
+          value: '10'
+          newvalue: powerSupply
+        -
+          value: '11'
+          newvalue: ambient
+        -
+          value: '12'
+          newvalue: chassis
+        -
+          value: '13'
+          newvalue: bridgeCard
+    -
+      name: 'CPQIDA-MIB::cpqDaAccelBattery'
+      mappings:
+        -
+          value: '1'
+          newvalue: Other
+        -
+          value: '2'
+          newvalue: Ok
+        -
+          value: '3'
+          newvalue: Recharging
+        -
+          value: '4'
+          newvalue: Failed
+        -
+          value: '5'
+          newvalue: Degraded
+        -
+          value: '6'
+          newvalue: 'Not Present'
+        -
+          value: '7'
+          newvalue: 'Capacitor failed'
+    -
+      name: 'CPQIDA-MIB::cpqDaAccelStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: invalid
+        -
+          value: '3'
+          newvalue: enabled
+        -
+          value: '4'
+          newvalue: tmpDisabled
+        -
+          value: '5'
+          newvalue: permDisabled
+        -
+          value: '6'
+          newvalue: cacheModFlashMemNotAttached
+        -
+          value: '7'
+          newvalue: cacheModDegradedFailsafeSpeed
+        -
+          value: '8'
+          newvalue: cacheModCriticalFailure
+        -
+          value: '9'
+          newvalue: cacheReadCacheNotMapped
+    -
+      name: 'CPQIDA-MIB::cpqDaCntlrModel'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: ida
+        -
+          value: '3'
+          newvalue: idaExpansion
+        -
+          value: '4'
+          newvalue: ida-2
+        -
+          value: '5'
+          newvalue: smart
+        -
+          value: '6'
+          newvalue: smart-2e
+        -
+          value: '7'
+          newvalue: smart-2p
+        -
+          value: '8'
+          newvalue: smart-2sl
+        -
+          value: '9'
+          newvalue: smart-3100es
+        -
+          value: '10'
+          newvalue: smart-3200
+        -
+          value: '11'
+          newvalue: smart-2dh
+        -
+          value: '12'
+          newvalue: smart-221
+        -
+          value: '13'
+          newvalue: sa-4250es
+        -
+          value: '14'
+          newvalue: sa-4200
+        -
+          value: '15'
+          newvalue: sa-integrated
+        -
+          value: '16'
+          newvalue: sa-431
+        -
+          value: '17'
+          newvalue: sa-5300
+        -
+          value: '18'
+          newvalue: raidLc2
+        -
+          value: '19'
+          newvalue: sa-5i
+        -
+          value: '20'
+          newvalue: sa-532
+        -
+          value: '21'
+          newvalue: sa-5312
+        -
+          value: '22'
+          newvalue: sa-641
+        -
+          value: '23'
+          newvalue: sa-642
+        -
+          value: '24'
+          newvalue: sa-6400
+        -
+          value: '25'
+          newvalue: sa-6400em
+        -
+          value: '26'
+          newvalue: sa-6i
+        -
+          value: '27'
+          newvalue: sa-generic
+        -
+          value: '29'
+          newvalue: sa-p600
+        -
+          value: '30'
+          newvalue: sa-p400
+        -
+          value: '31'
+          newvalue: sa-e200
+        -
+          value: '32'
+          newvalue: sa-e200i
+        -
+          value: '33'
+          newvalue: sa-p400i
+        -
+          value: '34'
+          newvalue: sa-p800
+        -
+          value: '35'
+          newvalue: sa-e500
+        -
+          value: '36'
+          newvalue: sa-p700m
+        -
+          value: '37'
+          newvalue: sa-p212
+        -
+          value: '38'
+          newvalue: sa-p410
+        -
+          value: '39'
+          newvalue: sa-p410i
+        -
+          value: '40'
+          newvalue: sa-p411
+        -
+          value: '41'
+          newvalue: sa-b110i
+        -
+          value: '42'
+          newvalue: sa-p712m
+        -
+          value: '43'
+          newvalue: sa-p711m
+        -
+          value: '44'
+          newvalue: sa-p812
+        -
+          value: '45'
+          newvalue: sw-1210m
+        -
+          value: '46'
+          newvalue: sa-p220i
+        -
+          value: '47'
+          newvalue: sa-p222
+        -
+          value: '48'
+          newvalue: sa-p420
+        -
+          value: '49'
+          newvalue: sa-p420i
+        -
+          value: '50'
+          newvalue: sa-p421
+        -
+          value: '51'
+          newvalue: sa-b320i
+        -
+          value: '52'
+          newvalue: sa-p822
+        -
+          value: '53'
+          newvalue: sa-p721m
+        -
+          value: '54'
+          newvalue: sa-b120i
+        -
+          value: '55'
+          newvalue: hps-1224
+        -
+          value: '56'
+          newvalue: hps-1228
+        -
+          value: '57'
+          newvalue: hps-1228m
+        -
+          value: '58'
+          newvalue: sa-p822se
+        -
+          value: '59'
+          newvalue: hps-1224e
+        -
+          value: '60'
+          newvalue: hps-1228e
+        -
+          value: '61'
+          newvalue: hps-1228em
+        -
+          value: '62'
+          newvalue: sa-p230i
+        -
+          value: '63'
+          newvalue: sa-p430i
+        -
+          value: '64'
+          newvalue: sa-p430
+        -
+          value: '65'
+          newvalue: sa-p431
+        -
+          value: '66'
+          newvalue: sa-p731m
+        -
+          value: '67'
+          newvalue: sa-p830i
+        -
+          value: '68'
+          newvalue: sa-p830
+        -
+          value: '69'
+          newvalue: sa-p831
+        -
+          value: '70'
+          newvalue: sa-p530
+        -
+          value: '71'
+          newvalue: sa-p531
+        -
+          value: '72'
+          newvalue: sa-p244br
+        -
+          value: '73'
+          newvalue: sa-p246br
+        -
+          value: '74'
+          newvalue: sa-p440
+        -
+          value: '75'
+          newvalue: sa-p440ar
+        -
+          value: '76'
+          newvalue: sa-p441
+        -
+          value: '77'
+          newvalue: sa-p741m
+        -
+          value: '78'
+          newvalue: sa-p840
+        -
+          value: '79'
+          newvalue: sa-p841
+        -
+          value: '80'
+          newvalue: sh-h240ar
+        -
+          value: '81'
+          newvalue: sh-h244br
+        -
+          value: '82'
+          newvalue: sh-h240
+        -
+          value: '83'
+          newvalue: sh-h241
+        -
+          value: '84'
+          newvalue: sa-b140i
+        -
+          value: '85'
+          newvalue: sh-generic
+        -
+          value: '88'
+          newvalue: sa-p840ar
+    -
+      name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
+      mappings:
+        -
+          value: '0'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: none
+        -
+          value: '3'
+          newvalue: RAID-1/RAID-10
+        -
+          value: '4'
+          newvalue: RAID-4
+        -
+          value: '5'
+          newvalue: RAID-5
+        -
+          value: '7'
+          newvalue: RAID-6
+        -
+          value: '8'
+          newvalue: RAID-50
+        -
+          value: '9'
+          newvalue: RAID-60
+        -
+          value: '10'
+          newvalue: 'RAID-1 ADM'
+        -
+          value: '11'
+          newvalue: 'RAID-10 ADM'
+    -
+      name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: ok
+        -
+          value: '3'
+          newvalue: failed
+        -
+          value: '4'
+          newvalue: unconfigured
+        -
+          value: '5'
+          newvalue: recovering
+        -
+          value: '6'
+          newvalue: readyForRebuild
+        -
+          value: '7'
+          newvalue: rebuilding
+        -
+          value: '8'
+          newvalue: wrongDrive
+        -
+          value: '9'
+          newvalue: badConnect
+        -
+          value: '10'
+          newvalue: overheating
+        -
+          value: '11'
+          newvalue: shutdown
+        -
+          value: '12'
+          newvalue: expanding
+        -
+          value: '13'
+          newvalue: notAvailable
+        -
+          value: '14'
+          newvalue: queuedForExpansion
+        -
+          value: '15'
+          newvalue: multipathAccessDegraded
+        -
+          value: '16'
+          newvalue: erasing
+        -
+          value: '17'
+          newvalue: predictiveSpareRebuildReady
+        -
+          value: '18'
+          newvalue: rapidParityInitInProgress
+        -
+          value: '19'
+          newvalue: rapidParityInitPending
+        -
+          value: '20'
+          newvalue: noAccessEncryptedNoCntlrKey
+        -
+          value: '21'
+          newvalue: unencryptedToEncryptedInProgress
+        -
+          value: '22'
+          newvalue: newLogDrvKeyRekeyInProgress
+        -
+          value: '23'
+          newvalue: noAccessEncryptedCntlrEncryptnNotEnbld
+        -
+          value: '24'
+          newvalue: unencryptedToEncryptedNotStarted
+        -
+          value: '25'
+          newvalue: newLogDrvKeyRekeyRequestReceived
+    -
+      name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
+      mappings:
+        -
+          value: '1'
+          newvalue: Other
+        -
+          value: '2'
+          newvalue: rotatingPlatters
+        -
+          value: '3'
+          newvalue: solidState
+    -
+      name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: ok
+        -
+          value: '3'
+          newvalue: replaceDrive
+        -
+          value: '4'
+          newvalue: replaceDriveSSDWearOut
+    -
+      name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: ok
+        -
+          value: '3'
+          newvalue: failed
+        -
+          value: '4'
+          newvalue: predictiveFailure
+    -
+      name: 'CPQSINFO-MIB::status'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: ok
+        -
+          value: '3'
+          newvalue: degraded
+        -
+          value: '4'
+          newvalue: failed

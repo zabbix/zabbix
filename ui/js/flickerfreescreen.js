@@ -514,8 +514,8 @@
 			this.screens = [];
 
 			for (var id in timeControl.objectList) {
-				if (id !== 'scrollbar' && timeControl.objectList.hasOwnProperty(id)) {
-					delete timeControl.objectList[id];
+				if (timeControl.objectList.hasOwnProperty(id)) {
+					timeControl.removeObject(id);
 				}
 			}
 		}

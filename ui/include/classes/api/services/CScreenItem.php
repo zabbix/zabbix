@@ -169,19 +169,6 @@ class CScreenItem extends CApiService {
 			'preservekeys' => true
 		]);
 
-		if (count($dbScreens) < count($screenIds)) {
-			$dbTemplateScreens = API::TemplateScreen()->get([
-				'output' => ['screenid', 'hsize', 'vsize', 'name'],
-				'screenids' => $screenIds,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			if ($dbTemplateScreens) {
-				$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
-			}
-		}
-
 		$dbScreenItems = API::getApiService()->select($this->tableName(), [
 			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan'],
 			'filter' => ['screenid' => array_keys($dbScreens)],
@@ -282,17 +269,6 @@ class CScreenItem extends CApiService {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		$dbTemplateScreens = API::TemplateScreen()->get([
-			'output' => ['screenid', 'hsize', 'vsize', 'name'],
-			'screenitemids' => $screenItemIds,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if ($dbTemplateScreens) {
-			$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
-		}
 
 		$dbScreenItems = API::getApiService()->select($this->tableName(), [
 			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
@@ -720,18 +696,6 @@ class CScreenItem extends CApiService {
 				'screenids' => $screenIds,
 				'preservekeys' => true
 			]);
-
-			if (count($dbScreens) < count($screenIds)) {
-				$dbTemplateScreens = API::TemplateScreen()->get([
-					'output' => ['screenid'],
-					'screenids' => $screenIds,
-					'preservekeys' => true
-				]);
-
-				if ($dbTemplateScreens) {
-					$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
-				}
-			}
 
 			foreach ($screenIds as $screenId) {
 				if (!isset($dbScreens[$screenId])) {

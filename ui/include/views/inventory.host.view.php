@@ -150,14 +150,19 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('filter_name', '')
 				->setArgument('hostids', [$data['host']['hostid']])
 		),
-		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+		new CLink(_('Graphs'),
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
 				->setArgument('filter_set', '1')
 				->setArgument('view_as', HISTORY_GRAPH)
 				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 				->setArgument('filter_hostids', [$data['host']['hostid']])
 		),
-		new CLink(_('Screens'), (new CUrl('host_screen.php'))->setArgument('hostid', $data['host']['hostid']))
+		new CLink(_('Dashboards'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.dashboard.view')
+				->setArgument('hostid', $data['host']['hostid'])
+		)
 	])
 );
 

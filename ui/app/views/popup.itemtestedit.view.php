@@ -51,7 +51,7 @@ foreach ($data['inputs'] as $name => $value) {
 	elseif ($name === 'proxy_hostid') {
 		continue;
 	}
-	elseif ($name === 'query_fields' || $name === 'headers') {
+	elseif ($name === 'query_fields' || $name === 'headers' || $name === 'parameters') {
 		foreach (['name', 'value'] as $key) {
 			if (array_key_exists($key, $value)) {
 				$form->addVar($name.'['.$key.']', $value[$key]);
@@ -324,7 +324,7 @@ if (count($data['steps']) > 0) {
 			->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
 
 		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
-		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
+		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON || $step['type'] == ZBX_PREPROC_VALIDATE_RANGE) {
 			$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
 		}
 		else {
@@ -332,8 +332,11 @@ if (count($data['steps']) > 0) {
 		}
 
 		$result_table->addRow([
-			$step['num'].':',
-			(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
+			(new CCol($step['num'].':'))
+				->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? ZBX_STYLE_DISABLED : null),
+			(new CCol($step['name']))
+				->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? ZBX_STYLE_DISABLED : null)
+				->setId('preproc-test-step-'.$i.'-name'),
 			(new CCol())
 				->addClass(ZBX_STYLE_RIGHT)
 				->setId('preproc-test-step-'.$i.'-result')

@@ -42,8 +42,8 @@ $widget = (new CWidget())
 					->setArgument('new', '1')
 					->getUrl()
 			))
-		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-		))
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+	))
 		->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -83,10 +83,6 @@ $table = (new CTableInfo())
 				->getUrl())
 	]);
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->setArgument('dashboardid', '');
-
 foreach ($data['dashboards'] as $dashboard) {
 	$tags = [];
 
@@ -105,7 +101,8 @@ foreach ($data['dashboards'] as $dashboard) {
 			->setEnabled($dashboard['editable']),
 		(new CDiv([
 			new CLink($dashboard['name'],
-				$url
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
 			),
@@ -118,7 +115,10 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
-		'dashboard.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected dashboards?')]
+		'dashboard.delete' => [
+			'name' => _('Delete'),
+			'confirm' => _('Delete selected dashboards?')
+		]
 	], 'dashboard')
 ]);
 

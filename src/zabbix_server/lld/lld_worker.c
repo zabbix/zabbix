@@ -102,7 +102,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 				zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts,
 						ITEM_STATE_NORMAL, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL,
-						NULL);
+						NULL, NULL);
 			}
 			else
 			{
@@ -111,7 +111,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 				zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts,
 						ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
-						NULL, error);
+						NULL, NULL, error);
 			}
 
 			zbx_process_events(NULL, NULL);

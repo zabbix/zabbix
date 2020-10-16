@@ -499,6 +499,17 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['headers'] = '';
 			}
 
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
+						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
+					$item['params'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$item['timeout'] = $defaults['timeout'];
+				}
+			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -701,7 +712,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata', 'discover'
+				'opdata', 'discover', 'event_name'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
@@ -909,8 +920,11 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::insert('item_rtdata', $items_rtdata, false);
 
 		$conditions = [];
+		$itemids = [];
+
 		foreach ($items as $key => &$item) {
 			$item['itemid'] = $create_items[$key]['itemid'];
+			$itemids[$key] = $item['itemid'];
 
 			// conditions
 			if (isset($item['filter'])) {
@@ -949,8 +963,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
-
 		$this->createOverrides($items);
 	}
 
@@ -1413,6 +1427,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
 
 		// Delete old overrides and replace with new ones if any.
@@ -2031,11 +2046,11 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
 			'itemids' => $discoveryid,
-			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt',
-				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'mtime', 'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url',
-				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt', 'valuemapid', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags',
+				'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url', 'query_fields',
+				'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
 			],
@@ -2172,7 +2187,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-				'allow_traps', 'discover'
+				'allow_traps', 'discover', 'parameters'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],

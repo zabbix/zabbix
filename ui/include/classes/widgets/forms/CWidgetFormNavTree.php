@@ -24,8 +24,8 @@
  */
 class CWidgetFormNavTree extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_NAV_TREE);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_NAV_TREE);
 
 		$this->data = self::convertDottedKeys($this->data);
 

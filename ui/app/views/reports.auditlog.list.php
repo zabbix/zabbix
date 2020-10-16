@@ -123,8 +123,7 @@ $obj = [
 	'domid' => 'auditlog',
 	'loadSBox' => 0,
 	'loadImage' => 0,
-	'dynamic' => 0,
-	'mainObject' => 1
+	'dynamic' => 0
 ];
 
 (new CScriptTag('timeControl.addObject("auditlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.

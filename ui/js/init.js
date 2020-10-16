@@ -233,6 +233,7 @@ jQuery(function($) {
 	 */
 	function isServerRequestRequired(type) {
 		switch (type) {
+			case 'dashboard':
 			case 'dropdown':
 			case 'submenu':
 				return false;

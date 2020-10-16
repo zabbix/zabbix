@@ -68,6 +68,12 @@ abstract class CControllerWidget extends CController {
 		return $this;
 	}
 
+	protected function getContext(): string {
+		return $this->hasInput('templateid')
+			? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+			: CWidgetConfig::CONTEXT_DASHBOARD;
+	}
+
 	/**
 	 * Set validation rules for input parameters.
 	 *
@@ -87,7 +93,7 @@ abstract class CControllerWidget extends CController {
 	 * @return string
 	 */
 	protected function getDefaultHeader() {
-		return CWidgetConfig::getKnownWidgetTypes()[$this->type];
+		return CWidgetConfig::getKnownWidgetTypes($this->getContext())[$this->type];
 	}
 
 	/**
@@ -96,14 +102,22 @@ abstract class CControllerWidget extends CController {
 	 * @return bool
 	 */
 	protected function checkInput() {
-		$ret = $this->validateInput($this->validation_rules);
+		$validation_rules = $this->validation_rules;
+
+		if (CWidgetConfig::isWidgetTypeSupportedInContext($this->type, CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)) {
+			$validation_rules['templateid'] = 'db dashboard.templateid';
+		}
+
+		$ret = $this->validateInput($validation_rules);
 
 		if ($ret) {
-			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', '{}'));
+			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', '{}'),
+				$this->hasInput('templateid') ? $this->getInput('templateid') : null
+			);
 
 			if ($errors = $this->form->validate()) {
 				foreach ($errors as $error) {
-					info($error);
+					error($error);
 				}
 
 				$ret = false;
@@ -112,12 +126,9 @@ abstract class CControllerWidget extends CController {
 
 		if (!$ret) {
 			$output = [
-				'header' => $this->getDefaultHeader()
+				'header' => $this->getDefaultHeader(),
+				'messages' => getMessages()->toString()
 			];
-
-			if (($messages = getMessages()) !== null) {
-				$output['messages'] = $messages->toString();
-			}
 
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()

@@ -160,7 +160,6 @@ abstract class CControllerHost extends CController {
 			],
 			'selectInterfaces' => ['ip', 'dns', 'port', 'main', 'type', 'useip'],
 			'selectGraphs' => API_OUTPUT_COUNT,
-			'selectScreens' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
 			'selectInheritedTags' => ['tag', 'value'],
@@ -199,6 +198,9 @@ abstract class CControllerHost extends CController {
 		}
 
 		foreach ($hosts as &$host) {
+			// Count number of dashboards for each host.
+			$host['dashboards'] = count(getHostDashboards($host['hostid']));
+
 			CArrayHelper::sort($host['interfaces'], [['field' => 'main', 'order' => ZBX_SORT_DOWN]]);
 
 			if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
