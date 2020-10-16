@@ -95,16 +95,16 @@ $table = (new CFormList('maintenanceFormList'))
 		(new CTextBox('mname', $data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->setReadonly(!$data['allowed_edit'])
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
-			->setEnabled($data['allowed_edit'])
 	)
 	->addRow((new CLabel(_('Maintenance type'), 'maintenance_type')),
 		(new CRadioButtonList('maintenance_type', (int) $data['maintenance_type']))
 			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
 			->setModern(true)
-			->setEnabled($data['allowed_edit'])
+			->setReadonly(!$data['allowed_edit'])
 	)
 	// Show date and time in shorter format without seconds.
 	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
@@ -173,7 +173,7 @@ foreach ($tags as $tag) {
 			(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setEnabled($data['allowed_edit']),
+				->setReadonly(!$data['allowed_edit']),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
 				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
 				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
@@ -182,7 +182,7 @@ foreach ($tags as $tag) {
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setEnabled($data['allowed_edit']),
+				->setReadonly(!$data['allowed_edit']),
 			(new CCol(
 				(new CButton('tags['.$i.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -252,7 +252,7 @@ $table
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setEnabled($data['allowed_edit'])
+			->setReadonly(!$data['allowed_edit'])
 	);
 
 // Append tabs to form.

@@ -65,6 +65,8 @@ class CRoleHelper {
 	public const API_ACCESS = 'api.access';
 	public const API_MODE = 'api.mode';
 	public const API_METHOD = 'api.method.';
+	public const API_MODE_ALLOW = 0;
+	public const API_MODE_DENY = 1;
 	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
 	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
 	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit_maintenance';

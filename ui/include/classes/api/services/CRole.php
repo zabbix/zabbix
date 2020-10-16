@@ -85,7 +85,9 @@ class CRole extends CApiService {
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'roleid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'type' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+				'readonly' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0,1']
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -119,9 +121,15 @@ class CRole extends CApiService {
 			'limit'		=> null
 		];
 
-		// editable + permission check
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['editable']) {
-			return $options['countOutput'] ? 0 : [];
+		// permission check + editable
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if ($options['editable']) {
+				return $options['countOutput'] ? 0 : [];
+			}
+
+			$sql_parts['from']['users'] = 'users u';
+			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
+			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
 		}
 
 		$output = $options['output'];

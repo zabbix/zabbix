@@ -7395,6 +7395,10 @@ z-select,
 	> span {
 		text-transform: none;
 		margin: 3px 3px 3px 0;
+
+		&:last-of-type {
+			margin-right: 0;
+		}
 	}
 
 	> .status-green:not(:last-of-type) {

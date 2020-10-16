@@ -5909,6 +5909,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .rules-status-container > span {
   text-transform: none;
   margin: 3px 3px 3px 0; }
+  .rules-status-container > span:last-of-type {
+    margin-right: 0; }
 .rules-status-container > .status-green:not(:last-of-type) {
   border-right: 1px solid #2f9f5e; }
 .rules-status-container > .status-grey:not(:last-of-type) {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -90,7 +90,26 @@ class CControllerUserroleEdit extends CController {
 				CRoleHelper::MODULES_DEFAULT_ACCESS => true,
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
 				CRoleHelper::API_ACCESS => true,
-				CRoleHelper::API_MODE => '0'
+				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
+				CRoleHelper::UI_MONITORING_DASHBOARD => true,
+				CRoleHelper::UI_MONITORING_PROBLEMS => true,
+				CRoleHelper::UI_MONITORING_HOSTS => true,
+				CRoleHelper::UI_MONITORING_OVERVIEW => true,
+				CRoleHelper::UI_MONITORING_LATEST_DATA => true,
+				CRoleHelper::UI_MONITORING_SCREENS => true,
+				CRoleHelper::UI_MONITORING_MAPS => true,
+				CRoleHelper::UI_MONITORING_SERVICES => true,
+				CRoleHelper::UI_INVENTORY_OVERVIEW => true,
+				CRoleHelper::UI_INVENTORY_HOSTS => true,
+				CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => true,
+				CRoleHelper::UI_REPORTS_TOP_TRIGGERS => true,
+				CRoleHelper::ACTIONS_EDIT_DASHBOARDS => true,
+				CRoleHelper::ACTIONS_EDIT_MAPS => true,
+				CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS => true,
+				CRoleHelper::ACTIONS_CLOSE_PROBLEMS => true,
+				CRoleHelper::ACTIONS_CHANGE_SEVERITY => true,
+				CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => true,
+				CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => true
 			]
 		];
 
@@ -99,7 +118,7 @@ class CControllerUserroleEdit extends CController {
 			$data['name'] = $this->role['name'];
 			$data['type'] = $this->role['type'];
 			$data['readonly'] = $this->role['readonly'];
-			$data['rules'] = $this->getRulesValue($this->role['roleid']);
+			$data['rules'] = $this->getRulesValue((int) $this->role['roleid']);
 		}
 
 		// TODO: Overwrite with input variables.

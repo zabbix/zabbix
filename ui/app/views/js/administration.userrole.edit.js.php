@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -25,7 +25,7 @@
 ?>
 <script type="text/javascript">
 	class UserRoleCheckboxDisabler {
-		static init(elem, default_value) {
+		static init(elem) {
 			const readonly = <?= $this->data['readonly']; ?>;
 
 			const access = {
@@ -51,7 +51,7 @@
 				'<?= CRoleHelper::UI_CONFIGURATION_HOSTS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
 				'<?= CRoleHelper::UI_CONFIGURATION_MAINTENANCE; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
 				'<?= CRoleHelper::UI_CONFIGURATION_ACTIONS; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
-				'<?= CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
+				'<?= CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
 				'<?= CRoleHelper::UI_CONFIGURATION_DISCOVERY; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
 				'<?= CRoleHelper::UI_CONFIGURATION_SERVICES; ?>': <?= USER_TYPE_ZABBIX_ADMIN; ?>,
 				'<?= CRoleHelper::UI_ADMINISTRATION_GENERAL; ?>': <?= USER_TYPE_SUPER_ADMIN; ?>,
@@ -74,12 +74,12 @@
 			};
 
 			if (readonly) {
-				console.log(readonly);
 				return false;
 			}
 
 			Object.keys(access).forEach((selector) => {
 				const checkbox = document.querySelector(`[id='${selector}']`);
+				const checkbox_state = checkbox.readOnly;
 
 				if (elem.value < access[selector]) {
 					checkbox.readOnly = true;
@@ -87,6 +87,9 @@
 				}
 				else {
 					checkbox.readOnly = false;
+					if (checkbox_state) {
+						checkbox.checked = true;
+					}
 				}
 			});
 		}
@@ -95,15 +98,10 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		const type_elem = document.querySelector('.js-userrole-usertype');
 
-		console.log(type_elem);
-
-		UserRoleCheckboxDisabler.init(type_elem, document.querySelector("[id='ui.default_access']").checked);
+		UserRoleCheckboxDisabler.init(type_elem);
 
 		type_elem.addEventListener('change', (event) => {
-			console.log('asd');
-			UserRoleCheckboxDisabler.init(event.currentTarget,
-				document.querySelector("[id='ui.default_access']").checked
-			);
+			UserRoleCheckboxDisabler.init(event.currentTarget);
 		});
 	});
 </script>

@@ -79,13 +79,16 @@ foreach ($this->data['roles'] as $role) {
 			&& $user['users_status'] != GROUP_STATUS_DISABLED
 		);
 
-		$users[] = (new CLink(getUserFullname($user), (new CUrl('zabbix.php'))
-			->setArgument('action', 'user.edit')
-			->setArgument('userid', $user['userid'])
-			->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass($user_has_access ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+		$user = $data['allowed_ui_users']
+			? (new CLink(getUserFullname($user), (new CUrl('zabbix.php'))
+				->setArgument('action', 'user.edit')
+				->setArgument('userid', $user['userid'])
+				->getUrl()
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+			: new CSpan(getUserFullname($user));
+
+		$users[] = $user->addClass($user_has_access ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 	}
 
 	if (count($role['users']) != $role['user_cnt']) {
@@ -102,13 +105,15 @@ foreach ($this->data['roles'] as $role) {
 		(new CCheckBox('roleids['.$role['roleid'].']', $role['roleid']))->setEnabled($role['readonly'] ? false : true),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			new CLink(_('Users'),
-				(new CUrl('zabbix.php'))
+			$data['allowed_ui_users']
+				? new CLink(_('Users'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'user.list')
 					->setArgument('filter_roles[]', $role['roleid'])
 					->setArgument('filter_set', 1)
 					->getUrl()
-			), CViewHelper::showNum($role['user_cnt'])
+				)
+				: _('Users'),
+			CViewHelper::showNum($role['user_cnt'])
 		],
 		$users
 	]);

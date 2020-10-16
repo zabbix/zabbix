@@ -90,7 +90,8 @@ class CControllerUsergroupList extends CController {
 				'filter' => ['users_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
 				'sortfield' => $sort_field,
 				'limit' => $limit
-			])
+			]),
+			'allowed_ui_users' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)
 		];
 
 		// data sort and pager
