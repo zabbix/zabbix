@@ -324,7 +324,7 @@ if (count($data['steps']) > 0) {
 			->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
 
 		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
-		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
+		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON || $step['type'] == ZBX_PREPROC_VALIDATE_RANGE) {
 			$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
 		}
 		else {
