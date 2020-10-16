@@ -1174,10 +1174,6 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
-		if (!$sessionid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
-		}
-
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
@@ -1292,7 +1288,7 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user = $this->createSession($db_user);
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1347,7 +1343,7 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-		$db_user = $this->createSession($db_user);
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1564,7 +1560,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function createSession(array $db_user): array {
+	private static function createSession(array $db_user): array {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
