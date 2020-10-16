@@ -2359,10 +2359,11 @@ function getTriggerParentTemplates(array $triggers, $flag) {
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
+function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($triggerid, $parent_templates['links'])) {
 		return null;
 	}
@@ -2381,7 +2382,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
 	$list = [];
 
 	foreach ($templates as $template) {
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
