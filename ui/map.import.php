@@ -53,7 +53,9 @@ $data = [
 		'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
-	'rules_preset' => getRequest('rules_preset')
+	'rules_preset' => getRequest('rules_preset'),
+	'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+	'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 ];
 
 if (hasRequest('import')) {
