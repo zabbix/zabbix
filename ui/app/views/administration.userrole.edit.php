@@ -125,7 +125,7 @@ $modules = [];
 foreach ($data['labels']['modules'] as $moduleid => $label) {
 	$modules[] = new CDiv(
 		(new CCheckBox(CRoleHelper::SECTION_MODULES.'['.$moduleid.']', 1))
-			->setChecked($data['rules']['modules'][$moduleid])
+			->setChecked(array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true)
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
@@ -196,7 +196,6 @@ $form_grid
 				'name' => 'api_methods[]',
 				'object_name' => 'api_methods',
 				'data' => $data['rules'][CRoleHelper::SECTION_API],
-				'placeholder' => _('type here to search'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'api_methods',
