@@ -1,1 +1,1 @@
-A......... [ZBXNEXT-6270] improved storage format of the preprocessing parameters in the XML, JSON and YAML files (Ivo, Sasha)
+A......... [ZBXNEXT-6270] improved storage format of the preprocessing parameters in the XML, JSON and YAML files; converted default XML templates to to YAML (Ivo, Sasha)
