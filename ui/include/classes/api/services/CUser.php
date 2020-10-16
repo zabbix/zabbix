@@ -1379,21 +1379,16 @@ class CUser extends CApiService {
 		$time = time();
 
 		$db_sessions = DB::select('sessions', [
-			'output' => ['userid', 'lastaccess', 'status'],
-			'sessionids' => $sessionid
+			'output' => ['userid', 'lastaccess'],
+			'sessionids' => $sessionid,
+			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
 
-		// If session not created.
 		if (!$db_sessions) {
-			return [];
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
 		$db_session = $db_sessions[0];
-
-		// If session not active.
-		if ($db_session['status'] != ZBX_SESSION_ACTIVE) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
-		}
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',

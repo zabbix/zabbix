@@ -105,7 +105,6 @@ class CWebUser {
 				]);
 
 				if (empty(self::$data)) {
-					CMessageHelper::clear();
 					throw new Exception();
 				}
 			}
@@ -117,6 +116,7 @@ class CWebUser {
 			return true;
 		}
 		catch (Exception $e) {
+			self::setDefault();
 			return false;
 		}
 	}
@@ -127,6 +127,8 @@ class CWebUser {
 	 * @static
 	 */
 	public static function setDefault(): void {
+		CMessageHelper::clear();
+
 		self::$data = [
 			'sessionid' => CEncryptHelper::generateKey(),
 			'alias' => ZBX_GUEST_USER,
