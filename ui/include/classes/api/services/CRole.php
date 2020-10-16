@@ -326,7 +326,7 @@ class CRole extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$roles = $this->extendObjectsByKey($roles, $db_roles, 'roleid', ['name']);
+		$roles = $this->extendObjectsByKey($roles, $db_roles, 'roleid', ['name', 'type']);
 
 		$names = [];
 
@@ -468,18 +468,35 @@ class CRole extends CApiService {
 		$insert = [];
 		$update = [];
 		$delete = [];
+		$roles = array_column($roles, null, 'roleid');
 		$db_roles_rules = [];
 		$is_update = ($method === 'update');
 
 		if ($is_update) {
 			$db_rows = DB::select('role_rule', [
 				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
-				'filter' => ['roleid' => array_column($roles, 'roleid')]
+				'filter' => ['roleid' => array_keys($roles)]
 			]);
 
 			// Move rules in database to $delete if it is not accessible anymore by role type.
 			foreach ($db_rows as $db_row) {
-				$db_roles_rules[$db_row['roleid']][$db_row['role_ruleid']] = $db_row;
+				$role_type = (int) $roles[$db_row['roleid']]['type'];
+				$rule_name = $db_row['name'];
+				$section = CRoleHelper::getRuleSection($rule_name);
+				$is_api_wildcard = ($section === CRoleHelper::SECTION_API
+					&& strpos($db_row['value_str'], CRoleHelper::API_WILDCARD) !== false
+				);
+
+				if ($section === CRoleHelper::SECTION_API && !$is_api_wildcard) {
+					$rule_name = CRoleHelper::API_METHOD.$db_row['value_str'];
+				}
+
+				if ($is_api_wildcard || CRoleHelper::checkAccess($rule_name, $role_type)) {
+					$db_roles_rules[$db_row['roleid']][$db_row['role_ruleid']] = $db_row;
+				}
+				else {
+					$delete[] = $db_row['role_ruleid'];
+				}
 			}
 		}
 
@@ -496,7 +513,7 @@ class CRole extends CApiService {
 				CRoleHelper::UI_DEFAULT_ACCESS => 1,
 				CRoleHelper::API_ACCESS => 1,
 				CRoleHelper::API_MODE => 1,
-				CRoleHelper::SECTION_API => [],
+				'api.methods' => [],
 				CRoleHelper::MODULES_DEFAULT_ACCESS => 1,
 				CRoleHelper::SECTION_MODULES => [],
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => 1,
