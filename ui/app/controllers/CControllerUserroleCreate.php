@@ -77,7 +77,7 @@ class CControllerUserroleCreate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$error = $this->getValidationError();
 
 		if (!$ret) {
 			switch ($error) {
