@@ -106,7 +106,9 @@ foreach ($data['proxies'] as $proxy) {
 			$hosts[] = ', ';
 		}
 
-		$hosts[] = (new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid']))->addClass($style);
+		$hosts[] = $data['allowed_ui_conf_hosts']
+			? (new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid']))->addClass($style)
+			: (new CSpan($host['name']))->addClass($style);
 	}
 
 	$name = new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']);
