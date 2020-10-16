@@ -418,7 +418,7 @@ function saveItemTestInputs() {
 	<?php if ($data['step_obj'] == -2): ?>
 		$test_obj = jQuery('.tfoot-buttons');
 	<?php elseif ($data['step_obj'] == -1): ?>
-		$test_obj = jQuery('preprocessing-list-foot', jQuery('#preprocessing'));
+		$test_obj = jQuery('.preprocessing-list-foot', jQuery('#preprocessing'));
 	<?php else: ?>
 		$test_obj = jQuery('.preprocessing-list-item[data-step=<?= $data['step_obj'] ?>]', jQuery('#preprocessing'));
 	<?php endif ?>

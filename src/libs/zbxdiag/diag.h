@@ -84,5 +84,6 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 
 int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
+void	diag_add_locks_info(struct zbx_json *json);
 
 #endif
