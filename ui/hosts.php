@@ -1396,6 +1396,8 @@ elseif (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['add_templates']))
 	];
 
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
 	$hostView = new CView('configuration.host.edit', $data);
 }
 else {

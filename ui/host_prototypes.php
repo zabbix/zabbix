@@ -492,9 +492,9 @@ if (hasRequest('form')) {
 		$data['host_prototype']['interfaces'] = array_values($data['host_prototype']['interfaces']);
 	}
 
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	$data['templates'] = makeHostPrototypeTemplatesHtml($data['host_prototype']['hostid'],
-		getHostPrototypeParentTemplates([$data['host_prototype']]),
-		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		getHostPrototypeParentTemplates([$data['host_prototype']]), $data['allowed_ui_conf_templates']
 	);
 
 	// Select writable templates
