@@ -73,11 +73,8 @@ class CControllerUserroleCreate extends CController {
 			'actions_add_problem_comments' => 'in 0,1',
 			'actions_execute_scripts' => 'in 0,1',
 			'modules' => 'array',
-			'api_access' => 'in 0,1',
-			'api_mode' => 'in 0,1',
 			'api_methods' => 'array'
 		];
-
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
