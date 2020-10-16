@@ -848,16 +848,17 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
  *
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates) {
+function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($host_prototypeid, $parent_templates['links'])) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
 
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = new CLink(CHtml::encode($template['name']),
 				(new CUrl('host_prototypes.php'))
 					->setArgument('form', 'update')

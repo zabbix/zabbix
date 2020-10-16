@@ -493,7 +493,8 @@ if (hasRequest('form')) {
 	}
 
 	$data['templates'] = makeHostPrototypeTemplatesHtml($data['host_prototype']['hostid'],
-		getHostPrototypeParentTemplates([$data['host_prototype']])
+		getHostPrototypeParentTemplates([$data['host_prototype']]),
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 	);
 
 	// Select writable templates

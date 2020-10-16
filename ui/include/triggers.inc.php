@@ -2416,10 +2416,11 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
+function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($triggerid, $parent_templates['links'])) {
@@ -2438,7 +2439,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
 		}
 
 		foreach ($templates as $template) {
-			if ($template['permission'] == PERM_READ_WRITE) {
+			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$url = (new CUrl('trigger_prototypes.php'))
 						->setArgument('form', 'update')
