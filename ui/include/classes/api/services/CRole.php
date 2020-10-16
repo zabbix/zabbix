@@ -521,7 +521,7 @@ class CRole extends CApiService {
 				CRoleHelper::UI_DEFAULT_ACCESS => 1,
 				CRoleHelper::API_ACCESS => 1,
 				CRoleHelper::API_MODE => 1,
-				'api.methods' => [],
+				CRoleHelper::SECTION_API => [],
 				CRoleHelper::MODULES_DEFAULT_ACCESS => 1,
 				CRoleHelper::SECTION_MODULES => [],
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => 1,
