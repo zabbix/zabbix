@@ -176,12 +176,20 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 			goto out;
 		}
 
-		step = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t));
-		step->type = step_type;
-		step->params = step_params;
-		step->error_handler = error_handler;
-		step->error_handler_params = error_handler_params;
-		zbx_vector_ptr_append(steps, step);
+		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != step_type)
+		{
+			step = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t));
+			step->type = step_type;
+			step->params = step_params;
+			step->error_handler = error_handler;
+			step->error_handler_params = error_handler_params;
+			zbx_vector_ptr_append(steps, step);
+		}
+		else
+		{
+			zbx_free(step_params);
+			zbx_free(error_handler_params);
+		}
 
 		step_params = NULL;
 		error_handler_params = NULL;
