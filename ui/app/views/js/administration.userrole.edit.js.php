@@ -80,6 +80,7 @@
 
 			Object.keys(access).forEach((selector) => {
 				const checkbox = document.querySelector(`[id='${selector}']`);
+				const checkbox_state = checkbox.readOnly;
 
 				if (elem.value < access[selector]) {
 					checkbox.readOnly = true;
@@ -87,6 +88,9 @@
 				}
 				else {
 					checkbox.readOnly = false;
+					if (checkbox_state) {
+						checkbox.checked = true;
+					}
 				}
 			});
 		}
