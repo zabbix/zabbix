@@ -1961,6 +1961,7 @@ Changes for 4.0.26rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
 ........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
 ..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
 ..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
