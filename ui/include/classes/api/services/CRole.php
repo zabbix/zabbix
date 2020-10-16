@@ -839,31 +839,15 @@ class CRole extends CApiService {
 					$role_rules['ui.default_access'] = $rules[$roleid]['ui.default_access'];
 				}
 				if (in_array('modules', $options['selectRules'])) {
+					$modules = array_flip($rules[$roleid]['modules']);
+
 					$role_rules['modules'] = [];
-
-					$modules = [];
-					foreach ($rules[$roleid]['modules'] as $key => $value) {
-						$index = mb_substr($key, mb_strrpos($key, '.') + 1);
-
-						if (mb_strpos($key, 'module.moduleid') === 0) {
-							$modules[$index]['moduleid'] = $value;
-						}
-						else {
-							$modules[$index]['status'] = $value;
-						}
-					}
-
-					$denied_modules = [];
-					foreach ($modules as $module) {
-						if (array_key_exists('moduleid', $module) && $module['status'] == 0) {
-							$denied_modules[$module['moduleid']] = true;
-						}
-					}
-
 					foreach ($enabled_modules as $module) {
 						$role_rules['modules'][] = [
 							'moduleid' => $module['moduleid'],
-							'status' => array_key_exists($module['moduleid'], $denied_modules) ? '0' : '1'
+							'status' => array_key_exists($module['moduleid'], $modules)
+								? (!$rules[$roleid]['modules.default_access'] ? '1' : '0')
+								: $rules[$roleid]['modules.default_access']
 						];
 					}
 				}
