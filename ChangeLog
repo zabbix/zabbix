@@ -1,8 +1,21 @@
 Changes for 5.2.0rc1
 
 New features:
+A......... [ZBXNEXT-6270] improved storage format of the preprocessing parameters in the XML, JSON and YAML files; converted default XML templates to YAML (Ivo, Sasha)
+A.F....PS. [ZBXNEXT-6035] added pre-processing rule for overriding item errors with custom value (akozlovs, ashubin, gcalenko)
+..FG...PS. [ZBXNEXT-6220] removed "Refresh unsupported items" parameter (akozlovs, rlataria)
+.D.....PS. [ZBXNEXT-6245] added locks section to diaginfo runtime command to log adresses of the mutexes and read write locks (vso)
+A.F....PS. [ZBXNEXT-5969] added support of data collection using JavaScript (asestakovs, Ivo)
+.........T [ZBXNEXT-6232] added LTE monitoring to Mikrotik SNMP template (mchudinov)
 
 Bug fixes:
+..F....... [ZBX-18498] fixed javascript error in map widget configuration for navigation tree source (vmurzins)
+..F....... [ZBX-18396] fixed undefined offset in item test form (Ivo)
+..F....... [ZBX-18415] fixed value caching for item test dialog when opened by 'Test all steps' button (miks)
+...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
+...G...... [ZBX-17975] fixed Hostname and HostnameItem for Zabbix Agent 2 test and print execution (esneiders)
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.0beta2
