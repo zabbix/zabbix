@@ -158,18 +158,20 @@ foreach ($data['users'] as $user) {
 			$users_groups[] = ', ';
 		}
 
-		$users_groups[] = (new CLink(
-			$user_group['name'],
-			(new CUrl('zabbix.php'))
+		$group = $data['allowed_ui_user_grpups']
+			? (new CLink($user_group['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
 				->setArgument('usrgrpid', $user_group['usrgrpid'])
 				->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass($user_group['gui_access'] == GROUP_GUI_ACCESS_DISABLED
-					|| $user_group['users_status'] == GROUP_STATUS_DISABLED
+			))->addClass(ZBX_STYLE_LINK_ALT)
+			: new CSpan($user_group['name']);
+
+		$style = ($user_group['gui_access'] == GROUP_GUI_ACCESS_DISABLED
+					|| $user_group['users_status'] == GROUP_STATUS_DISABLED)
 				? ZBX_STYLE_RED
-				: ZBX_STYLE_GREEN);
+				: ZBX_STYLE_GREEN;
+
+		$users_groups[] = $group->addClass($style);
 	}
 
 	// GUI Access style.
