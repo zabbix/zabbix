@@ -1007,7 +1007,9 @@ function getItemFormData(array $item = [], array $options = []) {
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 
-		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag);
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 	}
 
 	// caption
@@ -1738,7 +1740,8 @@ function getTriggerFormData(array $data) {
 
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
-			getTriggerParentTemplates([$trigger], $flag), $flag
+			getTriggerParentTemplates([$trigger], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		if ($data['show_inherited_tags']) {

@@ -340,6 +340,13 @@ class API {
 	}
 
 	/**
+	 * @return CRole
+	 */
+	public static function Role() {
+		return self::getApi('role');
+	}
+
+	/**
 	 * @return CScreen
 	 */
 	public static function Screen() {

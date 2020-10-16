@@ -27,7 +27,7 @@ $widget = (new CWidget())->setTitle(_('Screens'));
 
 $form = (new CForm('get'))->cleanItems();
 
-$content_control = (new CList())->addItem(new CSubmit('form', _('Create screen')));
+$content_control = (new CList())->addItem((new CSubmit('form', _('Create screen')))->setEnabled($data['allowed_edit']));
 
 $widget->setTitleSubmenu([
 	'main_section' => [
@@ -40,6 +40,7 @@ $widget->setTitleSubmenu([
 
 $content_control->addItem(
 	(new CButton('form', _('Import')))
+		->setEnabled($data['allowed_edit'])
 		->onClick('redirect("screen.import.php?rules_preset=screen")')
 		->removeId()
 );
@@ -84,8 +85,12 @@ foreach ($data['screens'] as $screen) {
 
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN || $screen['editable']) {
 		$checkbox = new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']);
-		$action = new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid']);
-		$constructor = new CLink(_('Constructor'), 'screenedit.php?screenid='.$screen['screenid']);
+		$action = $data['allowed_edit']
+			? new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'])
+			: _('Properties');
+		$constructor = $data['allowed_edit']
+			? new CLink(_('Constructor'), 'screenedit.php?screenid='.$screen['screenid'])
+			: _('Constructor');
 	}
 	else {
 		$checkbox = (new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']))
@@ -113,7 +118,9 @@ $buttons['screen.export'] = [
 	)
 ];
 
-$buttons['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?')];
+$buttons['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?'),
+	'disabled' => $data['allowed_edit'] ? null : 'disabled'
+];
 
 // append table to form
 $screenForm->addItem([

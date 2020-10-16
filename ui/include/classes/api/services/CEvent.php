@@ -24,6 +24,11 @@
  */
 class CEvent extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'acknowledge' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
@@ -763,11 +768,36 @@ class CEvent extends CApiService {
 		}
 
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
+		$has_ack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
 		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
 		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
+		$has_unack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
 
-		if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) &&
-				($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)) {
+		// Check access rules.
+		if ($has_close_action && !self::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_('no permissions to close problems')
+			));
+		}
+		if ($has_message_action && !self::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_('no permissions to add problem comments')
+			));
+		}
+		if ($has_severity_action && !self::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_('no permissions to change problem severity')
+			));
+		}
+		if (($has_ack_action || $has_unack_action) && !self::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				$has_ack_action
+					? _('no permissions to acknowledge problems')
+					: _('no permissions to unacknowledge problems')
+			));
+		}
+
+		if ($has_ack_action && $has_unack_action) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
 					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE

@@ -51,7 +51,7 @@ class CControllerDashboardList extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD);
 	}
 
 	protected function doAction() {
@@ -86,7 +86,8 @@ class CControllerDashboardList extends CController {
 			'sortorder' => $sort_order,
 			'filter' => $filter,
 			'profileIdx' => 'web.dashbrd.filter',
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
+			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+			'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 		];
 
 		// list of dashboards

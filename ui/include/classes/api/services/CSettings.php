@@ -23,6 +23,13 @@
  * Class containing methods for operations with the main part of administration settings.
  */
 class CSettings extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getglobal' => [],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	/**
 	 * @var string
 	 */

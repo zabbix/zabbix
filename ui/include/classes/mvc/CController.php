@@ -125,6 +125,17 @@ abstract class CController {
 	}
 
 	/**
+	 * Checks access of current user to specific access rule.
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return bool  Returns true if user has access to rule, false - otherwise.
+	 */
+	public function checkAccess(string $rule_name): bool {
+		return CWebUser::checkAccess($rule_name);
+	}
+
+	/**
 	 * Return user SID, first 16 bytes of session ID.
 	 *
 	 * @return string

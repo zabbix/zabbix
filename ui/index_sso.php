@@ -235,7 +235,7 @@ try {
 			throw new Exception(_('GUI access disabled.'));
 		}
 
-		$redirect = array_filter([$request, $user['url'], $relay_state, ZBX_DEFAULT_URL]);
+		$redirect = array_filter([$request, $user['url'], $relay_state, CMenuHelper::getFirstUrl()]);
 		redirect(reset($redirect));
 	}
 

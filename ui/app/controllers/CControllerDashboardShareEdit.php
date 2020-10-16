@@ -46,6 +46,11 @@ class CControllerDashboardShareEdit extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+				|| !$this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)) {
+			return false;
+		}
+
 		$dashboards = API::Dashboard()->get([
 			'output' => ['dashboardid', 'private'],
 			'selectUsers' => ['userid', 'permission'],

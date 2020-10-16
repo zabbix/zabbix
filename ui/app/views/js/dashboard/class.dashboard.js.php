@@ -60,9 +60,10 @@
 						'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
 						'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 						'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-						'editable': this.data.editable,
+						'editable': this.data.allowed_edit ? this.data.editable : false,
 						'edit_mode': (this.data.dashboardid === null),
-						'kioskmode': (this.web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
+						'kioskmode': (this.web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>),
+						'allowed_edit': this.data.allowed_edit
 					}
 				})
 				.dashboardGrid('setWidgetDefaults', this.widget_defaults)

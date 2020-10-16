@@ -87,7 +87,9 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($data['items'] as $item) {
 	// description
 	$description = [];
-	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
@@ -148,7 +150,7 @@ foreach ($data['items'] as $item) {
 
 		$trigger_description = [];
 		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
-			ZBX_FLAG_DISCOVERY_NORMAL
+			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 		);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');

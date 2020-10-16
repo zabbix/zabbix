@@ -5889,6 +5889,25 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     background-color: #e0e0e0;
     border-color: #e0e0e0; }
 
+.multiselect-description-container {
+  display: flex;
+  align-items: center; }
+  .multiselect-description-container > .multiselect-control {
+    margin-right: 5px; }
+
+.rules-status-container > span {
+  text-transform: none;
+  margin: 3px 3px 3px 0; }
+  .rules-status-container > span:last-of-type {
+    margin-right: 0; }
+.rules-status-container > .status-green:not(:last-of-type) {
+  border-right: 1px solid #2f9f5e; }
+.rules-status-container > .status-grey:not(:last-of-type) {
+  border-right: 1px solid #5a5a5a; }
+
+.input-section-header {
+  padding-top: 10px; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
 .sidebar button:focus {

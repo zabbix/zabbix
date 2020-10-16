@@ -89,10 +89,16 @@ else {
 	$screen = [];
 }
 
+$allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
 /*
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	DBstart();
 
 	if (hasRequest('update')) {
@@ -201,6 +207,10 @@ if (hasRequest('add') || hasRequest('update')) {
 }
 elseif ((hasRequest('delete') && hasRequest('screenid'))
 		|| (hasRequest('action') && getRequest('action') === 'screen.massdelete' && hasRequest('screens'))) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$screenids = getRequest('screens', []);
 	if (hasRequest('screenid')) {
 		$screenids[] = getRequest('screenid');
@@ -237,6 +247,10 @@ elseif ((hasRequest('delete') && hasRequest('screenid'))
  * Display
  */
 if (hasRequest('form')) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$current_userid = CWebUser::$data['userid'];
 	$userids[$current_userid] = true;
 	$user_groupids = [];
@@ -299,6 +313,7 @@ if (hasRequest('form')) {
 	$data['form'] = getRequest('form');
 	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh');
+	$data['allowed_edit'] = hasRequest('templateid') || $allowed_edit;
 
 	// render view
 	echo (new CView('monitoring.screen.edit', $data))->getOutput();
@@ -314,7 +329,8 @@ else {
 
 	$data = [
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'allowed_edit' => hasRequest('templateid') || $allowed_edit
 	];
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 

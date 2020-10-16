@@ -30,6 +30,10 @@ function getMenuPopupHistory(options) {
 	var items = [],
 		url = new Curl('history.php', false);
 
+	if (!options.allowed_ui_latest_data) {
+		return [];
+	}
+
 	url.setArgument('itemids[]', options.itemid);
 
 	// latest graphs
@@ -73,23 +77,28 @@ function getMenuPopupHistory(options) {
 /**
  * Get menu popup host section data.
  *
- * @param {string} options['hostid']             Host ID.
- * @param {array}  options['scripts']            Host scripts (optional).
- * @param {string} options[]['name']             Script name.
- * @param {string} options[]['scriptid']         Script ID.
- * @param {string} options[]['confirmation']     Confirmation text.
- * @param {bool}   options['showGraphs']         Link to Monitoring->Hosts->Graphs page.
- * @param {bool}   options['showDashboards']     Link to Monitoring->Hosts->Dashboards page.
- * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
- * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
- * @param {bool}   options['hasGoTo']            "Go to" block in popup.
- * @param {array}  options['severities']         (optional)
- * @param {bool}   options['show_suppressed']    (optional)
- * @param {array}  options['urls']               (optional)
+ * @param {string} options['hostid']                  Host ID.
+ * @param {array}  options['scripts']                 Host scripts (optional).
+ * @param {string} options[]['name']                  Script name.
+ * @param {string} options[]['scriptid']              Script ID.
+ * @param {string} options[]['confirmation']          Confirmation text.
+ * @param {bool}   options['showGraphs']              Link to Monitoring->Hosts->Graphs page.
+ * @param {bool}   options['showDashboards']          Link to Monitoring->Hosts->Dashboards page.
+ * @param {bool}   options['showWeb']		          Link to Monitoring->Hosts->Web page.
+ * @param {bool}   options['showTriggers']            Link to Monitoring->Problems page.
+ * @param {bool}   options['hasGoTo']                 "Go to" block in popup.
+ * @param {array}  options['severities']              (optional)
+ * @param {bool}   options['show_suppressed']         (optional)
+ * @param {array}  options['urls']                    (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
- * @param {string} options['filter_application'] (optional) Application name for filter by application.
- * @param {object} trigger_elmnt                 UI element which triggered opening of overlay dialogue.
+ * @param {string} options['filter_application']      (optional) Application name for filter by application.
+ * @param {bool}   options['allowed_ui_inventory']    Whether user has access to inventory hosts page.
+ * @param {bool}   options['allowed_ui_latest_data']  Whether user has access to latest data page.
+ * @param {bool}   options['allowed_ui_problems']     Whether user has access to problems page.
+ * @param {bool}   options['allowed_ui_hosts']        Whether user has access to monitoring hosts pages.
+ * @param {bool}   options['allowed_ui_conf_hosts']   Whether user has access to configuration hosts page.
+ * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -189,16 +198,27 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			web.url = web_url.getUrl();
 		}
 
-		var items = [
-			host_inventory,
-			latest_data,
-			problems,
-			graphs,
-			dashboards,
-			web
-		];
+		var items = [];
 
-		if (options.showConfig) {
+		if (options.allowed_ui_inventory) {
+			items.push(host_inventory);
+		}
+
+		if (options.allowed_ui_latest_data) {
+			items.push(latest_data);
+		}
+
+		if (options.allowed_ui_problems) {
+			items.push(problems);
+		}
+
+		if (options.allowed_ui_hosts) {
+			items.push(graphs);
+			items.push(dashboards);
+			items.push(web);
+		}
+
+		if (options.allowed_ui_conf_hosts) {
 			var config = {
 				label: t('Configuration')
 			};
@@ -216,10 +236,12 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			items.push(config);
 		}
 
-		sections.push({
-			label: t('Host'),
-			items: items
-		});
+		if (items.length) {
+			sections.push({
+				label: t('Host'),
+				items: items
+			});
+		}
 	}
 
 	// urls
@@ -262,6 +284,10 @@ function getMenuPopupMapElementSubmap(options) {
 			', "' + options.widget_uniqueid + '");', false);
 	}
 	else {
+		if (!options.allowed_ui_maps) {
+			return [];
+		}
+
 		submap_url = new Curl('zabbix.php', false);
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
@@ -303,6 +329,10 @@ function getMenuPopupMapElementSubmap(options) {
  * @return array
  */
 function getMenuPopupMapElementGroup(options) {
+	if (!options.allowed_ui_problems) {
+		return [];
+	}
+
 	var sections = [],
 		problems_url = new Curl('zabbix.php', false);
 
@@ -351,6 +381,10 @@ function getMenuPopupMapElementGroup(options) {
  * @return array
  */
 function getMenuPopupMapElementTrigger(options) {
+	if (!options.allowed_ui_problems) {
+		return [];
+	}
+
 	var sections = [],
 		problems_url = new Curl('zabbix.php', false);
 
@@ -558,13 +592,15 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
-		widget_actions = [];
+		widget_actions = [],
+		menu;
 
 	options.widgetid = widgetid;
 	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
 
 	// Do not show "Copy" action for host dashboards.
-	if (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null) {
+	if ($dashboard.data('dashboardGrid')['options']['allowed_edit']
+			&& (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null)) {
 		widget_actions.push({
 			label: t('S_COPY'),
 			clickCallback: function() {
@@ -708,10 +744,11 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	var sections = [],
 		items = [];
 
-	// events
-	var events = {
-		label: t('Problems')
-	};
+	if (options.allowed_ui_problems) {
+		// events
+		var events = {
+			label: t('Problems')
+		};
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php', false);
@@ -719,16 +756,17 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids[]', options.triggerid);
 
-		events.url = url.getUrl();
-	}
-	else {
-		events.disabled = true;
-	}
+			events.url = url.getUrl();
+		}
+		else {
+			events.disabled = true;
+		}
 
-	items[items.length] = events;
+		items[items.length] = events;
+	}
 
 	// acknowledge
-	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
+	if (options.allowed_ack && typeof options.acknowledge !== 'undefined' && options.acknowledge) {
 		items[items.length] = {
 			label: t('Acknowledge'),
 			clickCallback: function() {
@@ -740,7 +778,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	}
 
 	// configuration
-	if (typeof options.configuration !== 'undefined' && options.configuration) {
+	if (options.allowed_ui_conf_hosts) {
 		var url = new Curl('triggers.php', false);
 
 		url.setArgument('form', 'update');
@@ -752,10 +790,12 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
-	sections[sections.length] = {
-		label: t('S_TRIGGER'),
-		items: items
-	};
+	if (items.length) {
+		sections[sections.length] = {
+			label: t('S_TRIGGER'),
+			items: items
+		};
+	}
 
 	// urls
 	if ('urls' in options) {
@@ -766,7 +806,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	}
 
 	// items
-	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
+	if (options.allowed_ui_latest_data && typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {

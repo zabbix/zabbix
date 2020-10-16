@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0rc1');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010052);
+define('ZABBIX_DB_VERSION',		5010067);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -252,6 +252,7 @@ define('AUDIT_RESOURCE_SETTINGS',			40);
 define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
 define('AUDIT_RESOURCE_AUTHENTICATION',		42);
 define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
+define('AUDIT_RESOURCE_USER_ROLE',			44);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1522,8 +1523,6 @@ define('THEME_DEFAULT', 'default');
 
 // the default theme
 define('ZBX_DEFAULT_THEME', 'blue-theme');
-
-define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
 
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');

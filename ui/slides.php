@@ -56,7 +56,7 @@ validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 /*
  * Permissions
  */
-$data = [];
+$data = ['allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)];
 
 if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
 	access_deny();

@@ -7380,3 +7380,37 @@ z-select,
 		}
 	}
 }
+
+.multiselect-description-container {
+	display: flex;
+	align-items: center;
+
+	> .multiselect-control {
+		margin-right: 5px;
+	}
+}
+
+// Users permissions tab.
+.rules-status-container {
+	> span {
+		text-transform: none;
+		margin: 3px 3px 3px 0;
+
+		&:last-of-type {
+			margin-right: 0;
+		}
+	}
+
+	> .status-green:not(:last-of-type) {
+		border-right: 1px solid darken(desaturate($alt-green, 10%), 20%);
+	}
+
+	> .status-grey:not(:last-of-type) {
+		border-right: 1px solid $form-disabled-border-color;
+	}
+}
+
+// Used in form lists to separate input elements on sections.
+.input-section-header {
+	padding-top: 10px;
+}

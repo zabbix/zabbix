@@ -95,7 +95,7 @@ $widget = (new CWidget())
 				(new CList())
 					->addItem(
 						(new CButton('dashbrd-edit', _('Edit dashboard')))
-							->setEnabled($data['dashboard']['editable'])
+							->setEnabled($data['allowed_edit'] && $data['dashboard']['editable'])
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
@@ -103,6 +103,7 @@ $widget = (new CWidget())
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))
+							->setEnabled($data['allowed_edit'])
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 								$data['dashboard']['editable']

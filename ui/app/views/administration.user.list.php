@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->addJsFile('multiselect.js');
+
 if ($data['uncheck']) {
 	uncheckTableRows('user');
 }
@@ -62,13 +64,20 @@ $widget = (new CWidget())
 			(new CFormList())->addRow(_('Surname'),
 				(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			),
-			(new CFormList())->addRow(_('User type'),
-				(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
-					->addValue(_('Any'), -1)
-					->addValue(user_type2str(USER_TYPE_ZABBIX_USER), USER_TYPE_ZABBIX_USER)
-					->addValue(user_type2str(USER_TYPE_ZABBIX_ADMIN), USER_TYPE_ZABBIX_ADMIN)
-					->addValue(user_type2str(USER_TYPE_SUPER_ADMIN), USER_TYPE_SUPER_ADMIN)
-					->setModern(true)
+			(new CFormList())->addRow((new CLabel(_('User roles'), 'filter_roles')),
+				(new CMultiSelect([
+					'name' => 'filter_roles[]',
+					'object_name' => 'roles',
+					'data' => $data['filter']['roles'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'roles',
+							'srcfld1' => 'roleid',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_roles_'
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 		])
 		->addVar('action', 'user.list')
@@ -91,11 +100,12 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Alias'), 'alias', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Surname'), 'surname', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('User type'), 'type', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('User role'), 'role_name', $data['sort'], $data['sortorder'], $url),
 		_('Groups'),
 		_('Is online?'),
 		_('Login'),
 		_('Frontend access'),
+		_('API access'),
 		_('Debug mode'),
 		_('Status')
 	]);
@@ -148,18 +158,20 @@ foreach ($data['users'] as $user) {
 			$users_groups[] = ', ';
 		}
 
-		$users_groups[] = (new CLink(
-			$user_group['name'],
-			(new CUrl('zabbix.php'))
+		$group = $data['allowed_ui_user_grpups']
+			? (new CLink($user_group['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
 				->setArgument('usrgrpid', $user_group['usrgrpid'])
 				->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass($user_group['gui_access'] == GROUP_GUI_ACCESS_DISABLED
-					|| $user_group['users_status'] == GROUP_STATUS_DISABLED
+			))->addClass(ZBX_STYLE_LINK_ALT)
+			: new CSpan($user_group['name']);
+
+		$style = ($user_group['gui_access'] == GROUP_GUI_ACCESS_DISABLED
+					|| $user_group['users_status'] == GROUP_STATUS_DISABLED)
 				? ZBX_STYLE_RED
-				: ZBX_STYLE_GREEN);
+				: ZBX_STYLE_GREEN;
+
+		$users_groups[] = $group->addClass($style);
 	}
 
 	// GUI Access style.
@@ -181,17 +193,39 @@ foreach ($data['users'] as $user) {
 		->setArgument('userid', $userid)
 	);
 
+	if (!CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $user['roleid'])) {
+		$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
+	}
+	else {
+		$api_access = (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
+		$api_methods = CRoleHelper::getRoleApiMethods($user['roleid']);
+
+		if ($api_methods) {
+			$hint_api_methods = [];
+			$status_class = CRoleHelper::checkAccess(CRoleHelper::API_MODE, $user['roleid'])
+				? ZBX_STYLE_STATUS_GREEN
+				: ZBX_STYLE_STATUS_GREY;
+
+			foreach ($api_methods as $api_method) {
+				$hint_api_methods[] = (new CSpan($api_method))->addClass($status_class);
+			}
+
+			$api_access->setHint((new CDiv($hint_api_methods))->addClass('rules-status-container'));
+		}
+	}
+
 	// Append user to table.
 	$table->addRow([
 		new CCheckBox('userids['.$userid.']', $userid),
 		(new CCol($alias))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
-		user_type2str($user['type']),
+		$user['role']['name'],
 		$users_groups,
 		$online,
 		$blocked,
 		(new CSpan(user_auth_type2str($user['gui_access'])))->addClass($gui_access_style),
+		$api_access,
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_ORANGE)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREEN),

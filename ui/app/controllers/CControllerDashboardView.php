@@ -46,8 +46,12 @@ class CControllerDashboardView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
 			return false;
+		}
+
+		if ($this->hasInput('new') || $this->hasInput('source_dashboardid')) {
+			return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 
 		if ($this->hasInput('hostid')) {
@@ -97,7 +101,8 @@ class CControllerDashboardView extends CController {
 			'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
 				? getTimeSelectorPeriod($time_selector_options)
 				: null,
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
+			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+			'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 		];
 
 		if (self::hasDynamicWidgets($dashboard['widgets'])) {
@@ -227,6 +232,10 @@ class CControllerDashboardView extends CController {
 					// In case if previous dashboard is deleted, show dashboard list.
 				}
 			}
+		}
+
+		if ($dashboard !== null) {
+			$dashboard['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 
 		return [$dashboard, $error];

@@ -38,7 +38,7 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 $house_keeper_tab = (new CFormList())
-	->addRow(new CTag('h4', true, _('Events and alerts')))
+	->addRow((new CTag('h4', true, _('Events and alerts')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
 		(new CCheckBox('hk_events_mode'))
@@ -83,8 +83,7 @@ $house_keeper_tab = (new CFormList())
 			->setEnabled($data['hk_events_mode'] == 1)
 			->setAriaRequired()
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('Services')))
+	->addRow((new CTag('h4', true, _('Services')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
 		(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)
@@ -97,8 +96,7 @@ $house_keeper_tab = (new CFormList())
 			->setEnabled($data['hk_services_mode'] == 1)
 			->setAriaRequired()
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('Audit')))
+	->addRow((new CTag('h4', true, _('Audit')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
 		(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
@@ -111,8 +109,7 @@ $house_keeper_tab = (new CFormList())
 			->setEnabled($data['hk_audit_mode'] == 1)
 			->setAriaRequired()
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('User sessions')))
+	->addRow((new CTag('h4', true, _('User sessions')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
 		(new CCheckBox('hk_sessions_mode'))->setChecked($data['hk_sessions_mode'] == 1)
@@ -125,8 +122,7 @@ $house_keeper_tab = (new CFormList())
 			->setEnabled($data['hk_sessions_mode'] == 1)
 			->setAriaRequired()
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('History')))
+	->addRow((new CTag('h4', true, _('History')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
 		(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
@@ -143,8 +139,7 @@ $house_keeper_tab = (new CFormList())
 			->setEnabled($data['hk_history_global'] == 1)
 			->setAriaRequired()
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('Trends')))
+	->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
 		(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
@@ -164,8 +159,7 @@ $house_keeper_tab = (new CFormList())
 
 	if ($data['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB) {
 		$house_keeper_tab
-			->addRow(null)
-			->addRow(new CTag('h4', true, _('History and trends compression')))
+			->addRow((new CTag('h4', true, _('History and trends compression')))->addClass('input-section-header'))
 			->addRow(
 				new CLabel(_('Enable compression'), 'compression_status'),
 				(new CCheckBox('compression_status'))

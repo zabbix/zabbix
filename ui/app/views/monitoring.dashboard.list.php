@@ -34,17 +34,20 @@ $web_layout_mode = $this->getLayoutMode();
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create dashboard'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'dashboard.view')
-					->setArgument('new', '1')
-					->getUrl()
-			))
-			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-	))
-		->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CRedirectButton(_('Create dashboard'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->setArgument('new', '1')
+							->getUrl()
+					))->setEnabled($data['allowed_edit'])
+				)
+				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+			)
+		)->setAttribute('aria-label', _('Content controls'))
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
