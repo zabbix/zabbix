@@ -25,7 +25,7 @@
 ?>
 <script type="text/javascript">
 	class UserRoleCheckboxDisabler {
-		static init(elem, default_value) {
+		static init(elem) {
 			const readonly = <?= $this->data['readonly']; ?>;
 
 			const access = {
@@ -98,12 +98,10 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		const type_elem = document.querySelector('.js-userrole-usertype');
 
-		UserRoleCheckboxDisabler.init(type_elem, document.querySelector("[id='ui.default_access']").checked);
+		UserRoleCheckboxDisabler.init(type_elem);
 
 		type_elem.addEventListener('change', (event) => {
-			UserRoleCheckboxDisabler.init(event.currentTarget,
-				document.querySelector("[id='ui.default_access']").checked
-			);
+			UserRoleCheckboxDisabler.init(event.currentTarget);
 		});
 	});
 </script>
