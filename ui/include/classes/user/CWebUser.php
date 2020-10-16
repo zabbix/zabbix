@@ -116,7 +116,6 @@ class CWebUser {
 			return true;
 		}
 		catch (Exception $e) {
-			self::setDefault();
 			return false;
 		}
 	}
