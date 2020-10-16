@@ -78,10 +78,23 @@ class CControllerUserroleCreate extends CController {
 			'api_methods' => 'array'
 		];
 
+
 		$ret = $this->validateInput($fields);
+		$error = $this->GetValidationError();
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($error) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect('zabbix.php?action=userrole.edit');
+					$response->setFormData($this->getInputAll());
+					CMessageHelper::setErrorTitle(_('Cannot create user role'));
+					$this->setResponse($response);
+					break;
+
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;

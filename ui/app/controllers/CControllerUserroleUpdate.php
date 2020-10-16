@@ -28,8 +28,8 @@ class CControllerUserroleUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'roleid' => 'db users.roleid',
-			'name' => 'not_empty|db role.name',
+			'roleid' => 'fatal|required|db users.roleid',
+			'name' => 'required|db role.name|not_empty',
 			'type' => 'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
 			'ui_monitoring_dashboard' => 'in 0,1',
 			'ui_monitoring_problems' => 'in 0,1',
@@ -83,9 +83,21 @@ class CControllerUserroleUpdate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+		$error = $this->GetValidationError();
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($error) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect('zabbix.php?action=userrole.edit');
+					$response->setFormData($this->getInputAll());
+					CMessageHelper::setErrorTitle(_('Cannot update user role'));
+					$this->setResponse($response);
+					break;
+
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;
