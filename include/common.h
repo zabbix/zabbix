@@ -792,7 +792,7 @@ typedef enum
 zbx_user_role_permission_t;
 
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
-#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute.scripts"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
 
 /* user permissions */
 typedef enum
