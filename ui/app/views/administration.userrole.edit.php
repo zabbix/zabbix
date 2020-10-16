@@ -67,7 +67,7 @@ else {
 }
 
 $form_grid->addItem(
-	(new CFormField((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section')))
+	(new CFormField((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header')))
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
@@ -116,7 +116,7 @@ $form_grid->addItem([
 ]);
 
 $form_grid->addItem(
-	(new CFormField((new CTag('h4', true, _('Access to modules')))->addClass('input-section')))
+	(new CFormField((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')))
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 );
@@ -165,7 +165,7 @@ $form_grid
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	])
 	->addItem(
-		(new CFormField((new CTag('h4', true, _('Access to API')))->addClass('input-section')))
+		(new CFormField((new CTag('h4', true, _('Access to API')))->addClass('input-section-header')))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	)
@@ -212,7 +212,7 @@ $form_grid
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	)
 	->addItem(
-		(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section')))
+		(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);
@@ -269,15 +269,6 @@ $tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_grid);
 
 $form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_grid));
 $widget->addItem($form);
-
-echo '<style type="text/css">'
-. '
-.input-section {
-	padding-top: 10px;
-}
-'
-.'</style>';
-
 $widget->show();
 
 $this->addJsFile('multiselect.js');
