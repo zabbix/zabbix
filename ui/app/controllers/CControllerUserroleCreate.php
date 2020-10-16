@@ -72,7 +72,10 @@ class CControllerUserroleCreate extends CController {
 			'actions_change_severity' => 'in 0,1',
 			'actions_add_problem_comments' => 'in 0,1',
 			'actions_execute_scripts' => 'in 0,1',
-			'modules' => 'array'
+			'modules' => 'array',
+			'api_access' => 'in 0,1',
+			'api_mode' => 'in 0,1',
+			'api_methods' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -127,6 +130,13 @@ class CControllerUserroleCreate extends CController {
 					'status' => $modules[$moduleid]
 				];
 			}, $moduelids);
+		}
+
+		$rules[CRoleHelper::API_ACCESS] = $this->getInput('api_access');
+		$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
+
+		if ($this->hasInput('api_methods')) {
+			$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
 		}
 
 		$role['rules'] = $rules;
