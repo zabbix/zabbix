@@ -573,7 +573,7 @@ class CRole extends CApiService {
 				$index = 0;
 				foreach ($rules[CRoleHelper::SECTION_API] as $method) {
 					$roles_rules[$roleid][] = [
-						'name' => sprintf('%s.%s', CRoleHelper::API_METHOD, $index),
+						'name' => CRoleHelper::API_METHOD.$index,
 						'value_str' => $method
 					];
 					$index++;
@@ -602,11 +602,11 @@ class CRole extends CApiService {
 			foreach ($rules[CRoleHelper::SECTION_MODULES] as $module) {
 				if ($module['status'] != $default_access) {
 					$roles_rules[$roleid][] = [
-						'name' => sprintf('%s.%d', CRoleHelper::MODULES_MODULE, $index),
+						'name' => CRoleHelper::MODULES_MODULE.$index,
 						'module_id' => $module['moduleid']
 					];
 					$roles_rules[$roleid][] = [
-						'name' => sprintf('%s.%d', CRoleHelper::MODULES_MODULE_STATUS, $index),
+						'name' => CRoleHelper::MODULES_MODULE_STATUS.$index,
 						'value_int' => $module['status']
 					];
 					$index++;
@@ -621,7 +621,7 @@ class CRole extends CApiService {
 			]);
 			$roles_rules[$roleid][] = [
 				'name' => CRoleHelper::ACTIONS_DEFAULT_ACCESS,
-				'value_int' =>$default_access
+				'value_int' => $default_access
 			];
 
 			foreach ($rules[CRoleHelper::SECTION_ACTIONS] as $rule) {
