@@ -121,9 +121,15 @@ class CRole extends CApiService {
 			'limit'		=> null
 		];
 
-		// editable + permission check
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['editable']) {
-			return $options['countOutput'] ? 0 : [];
+		// permission check + editable
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if ($options['editable']) {
+				return $options['countOutput'] ? 0 : [];
+			}
+
+			$sql_parts['from']['users'] = 'users u';
+			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
+			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
 		}
 
 		$output = $options['output'];
