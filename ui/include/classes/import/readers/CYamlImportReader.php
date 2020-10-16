@@ -55,6 +55,27 @@ class CYamlImportReader extends CImportReader {
 			throw new ErrorException(_s('Cannot read YAML: %1$s.', _('Invalid YAML file contents')));
 		}
 
+		return self::trimEmptyLine($data);
+	}
+
+	/**
+	 * Removes trailing empty line from multiline strings.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	private static function trimEmptyLine(array $data): array {
+		foreach ($data as &$value) {
+			if (is_array($value)) {
+				$value = self::trimEmptyLine($value);
+			}
+			else if (is_string($value) && $value !== '' && $value[strlen($value) - 1] === "\n") {
+				$value = substr($value, 0, -1);
+			}
+		}
+		unset($value);
+
 		return $data;
 	}
 }

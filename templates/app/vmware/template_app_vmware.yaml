@@ -1,0 +1,1127 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:08Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: VMware
+      name: VMware
+      description: |
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'VMware macros'
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: VMware
+      items:
+        -
+          name: 'VMware: Event log'
+          type: SIMPLE
+          key: 'vmware.eventlog[{$VMWARE.URL},skip]'
+          history: 7d
+          trends: '0'
+          value_type: LOG
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/current/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Full name'
+          type: SIMPLE
+          key: 'vmware.fullname[{$VMWARE.URL}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'VMware service full name.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: Version'
+          type: SIMPLE
+          key: 'vmware.version[{$VMWARE.URL}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'VMware service version.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+      discovery_rules:
+        -
+          name: 'Discover VMware clusters'
+          type: SIMPLE
+          key: 'vmware.cluster.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of clusters'
+          item_prototypes:
+            -
+              name: 'VMware: Status of "{#CLUSTER.NAME}" cluster'
+              type: SIMPLE
+              key: 'vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware cluster status.'
+              applications:
+                -
+                  name: VMware
+              valuemap:
+                name: 'VMware status'
+        -
+          name: 'Discover VMware datastores'
+          type: SIMPLE
+          key: 'vmware.datastore.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'VMware: Average read latency of the datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Amount of time for a read operation from the datastore (milliseconds).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
+              type: SIMPLE
+              key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]'
+              delay: 5m
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware datastore space in percentage from total.'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Total size of datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]'
+              delay: 5m
+              history: 7d
+              units: B
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware datastore space in bytes.'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average write latency of the datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Amount of time for a write operation to the datastore (milliseconds).'
+              applications:
+                -
+                  name: VMware
+        -
+          name: 'Discover VMware hypervisors'
+          type: SIMPLE
+          key: 'vmware.hv.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of hypervisors.'
+          host_prototypes:
+            -
+              host: '{#HV.UUID}'
+              name: '{#HV.NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: '{#CLUSTER.NAME}'
+                -
+                  name: '{#DATACENTER.NAME}'
+              templates:
+                -
+                  name: 'VMware Hypervisor'
+        -
+          name: 'Discover VMware VMs'
+          type: SIMPLE
+          key: 'vmware.vm.discovery[{$VMWARE.URL}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of guest virtual machines.'
+          host_prototypes:
+            -
+              host: '{#VM.UUID}'
+              name: '{#VM.NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: '{#CLUSTER.NAME} (vm)'
+                -
+                  name: '{#DATACENTER.NAME} (vm)'
+                -
+                  name: '{#HV.NAME}'
+              templates:
+                -
+                  name: 'VMware Guest'
+    -
+      template: 'VMware Guest'
+      name: 'VMware Guest'
+      description: 'Template tooling version used: 0.38'
+      templates:
+        -
+          name: 'VMware macros'
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: VMware
+      items:
+        -
+          name: 'VMware: Cluster name'
+          type: SIMPLE
+          key: 'vmware.vm.cluster.name[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Cluster name of the guest VM.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: Number of virtual CPUs'
+          type: SIMPLE
+          key: 'vmware.vm.cpu.num[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Number of virtual CPUs assigned to the guest.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: CPU ready'
+          type: SIMPLE
+          key: 'vmware.vm.cpu.ready[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: ms
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Time that the virtual machine was ready, but could not get scheduled to run on the physical CPU during last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds)'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: CPU usage'
+          type: SIMPLE
+          key: 'vmware.vm.cpu.usage[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: Hz
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Current upper-bound on CPU usage. The upper-bound is based on the host the virtual machine is current running on, as well as limits configured on the virtual machine itself or any parent resource pool. Valid while the virtual machine is running.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Datacenter name'
+          type: SIMPLE
+          key: 'vmware.vm.datacenter.name[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Datacenter name of the guest VM.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: Hypervisor name'
+          type: SIMPLE
+          key: 'vmware.vm.hv.name[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Hypervisor name of the guest VM.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: Ballooned memory'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.ballooned[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The amount of guest physical memory that is currently reclaimed through the balloon driver.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Compressed memory'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.compressed[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The amount of memory currently in the compression cache for this VM.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Private memory'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.private[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Amount of memory backed by host memory and not being shared.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Shared memory'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.shared[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The amount of guest physical memory shared through transparent page sharing.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Swapped memory'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.swapped[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The amount of guest physical memory swapped out to the VM''s swap device by ESX.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Guest memory usage'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The amount of guest physical memory that is being used by the VM.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Host memory usage'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size.usage.host[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The amount of host physical memory allocated to the VM, accounting for saving from memory sharing with other VMs.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Memory size'
+          type: SIMPLE
+          key: 'vmware.vm.memory.size[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Total size of configured memory.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: Power state'
+          type: SIMPLE
+          key: 'vmware.vm.powerstate[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The current power state of the virtual machine.'
+          applications:
+            -
+              name: VMware
+          valuemap:
+            name: 'VMware VirtualMachinePowerState'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          name: 'VMware: Committed storage space'
+          type: SIMPLE
+          key: 'vmware.vm.storage.committed[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Total storage space, in bytes, committed to this virtual machine across all datastores.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Uncommitted storage space'
+          type: SIMPLE
+          key: 'vmware.vm.storage.uncommitted[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Additional storage space, in bytes, potentially used by this virtual machine on all datastores.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Unshared storage space'
+          type: SIMPLE
+          key: 'vmware.vm.storage.unshared[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Total storage space, in bytes, occupied by the virtual machine across all datastores, that is not shared with any other virtual machine.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Uptime'
+          type: SIMPLE
+          key: 'vmware.vm.uptime[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: uptime
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'System uptime.'
+          applications:
+            -
+              name: VMware
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'VMware: {HOST.HOST} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Network device discovery'
+          type: SIMPLE
+          key: 'vmware.vm.net.if.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of all network devices.'
+          item_prototypes:
+            -
+              name: 'VMware: Number of bytes received on interface {#IFDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps]'
+              history: 7d
+              units: Bps
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine network interface input statistics (bytes per second).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Number of packets received on interface {#IFDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine network interface input statistics (packets per second).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Number of bytes transmitted on interface {#IFDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps]'
+              history: 7d
+              units: Bps
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine network interface output statistics (bytes per second).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Number of packets transmitted on interface {#IFDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine network interface output statistics (packets per second).'
+              applications:
+                -
+                  name: VMware
+        -
+          name: 'Disk device discovery'
+          type: SIMPLE
+          key: 'vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of all disk devices.'
+          item_prototypes:
+            -
+              name: 'VMware: Average number of bytes read from the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps]'
+              history: 7d
+              units: Bps
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine disk device read statistics (bytes per second).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average number of reads from the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine disk device read statistics (operations per second).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average number of bytes written to the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps]'
+              history: 7d
+              units: Bps
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine disk device write statistics (bytes per second).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average number of writes to the disk {#DISKDESC}'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops]'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine disk device write statistics (operations per second).'
+              applications:
+                -
+                  name: VMware
+        -
+          name: 'Mounted filesystem discovery'
+          type: SIMPLE
+          key: 'vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Discovery of all guest file systems.'
+          item_prototypes:
+            -
+              name: 'VMware: Free disk space on {#FSNAME}'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},free]'
+              history: 7d
+              units: B
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine file system statistics (bytes).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Free disk space on {#FSNAME} (percentage)'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},pfree]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine file system statistics (percentages).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Total disk space on {#FSNAME}'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},total]'
+              delay: 1h
+              history: 7d
+              units: B
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine total disk space (bytes).'
+              applications:
+                -
+                  name: VMware
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+            -
+              name: 'VMware: Used disk space on {#FSNAME}'
+              type: SIMPLE
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},used]'
+              history: 7d
+              units: B
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware virtual machine used disk space (bytes).'
+              applications:
+                -
+                  name: VMware
+    -
+      template: 'VMware Hypervisor'
+      name: 'VMware Hypervisor'
+      description: 'Template tooling version used: 0.38'
+      templates:
+        -
+          name: 'VMware macros'
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: VMware
+      items:
+        -
+          name: 'VMware: Cluster name'
+          type: SIMPLE
+          key: 'vmware.hv.cluster.name[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Cluster name of the guest VM.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: CPU usage'
+          type: SIMPLE
+          key: 'vmware.hv.cpu.usage[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: Hz
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Datacenter name'
+          type: SIMPLE
+          key: 'vmware.hv.datacenter.name[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Datacenter name of the hypervisor.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: Full name'
+          type: SIMPLE
+          key: 'vmware.hv.fullname[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The complete product name, including the version information.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: CPU frequency'
+          type: SIMPLE
+          key: 'vmware.hv.hw.cpu.freq[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          units: Hz
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: CPU model'
+          type: SIMPLE
+          key: 'vmware.hv.hw.cpu.model[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The CPU model.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: CPU cores'
+          type: SIMPLE
+          key: 'vmware.hv.hw.cpu.num[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Number of physical CPU cores on the host. Physical CPU cores are the processors contained by a CPU package.'
+          applications:
+            -
+              name: VMware
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'VMware: CPU threads'
+          type: SIMPLE
+          key: 'vmware.hv.hw.cpu.threads[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Number of physical CPU threads on the host.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Total memory'
+          type: SIMPLE
+          key: 'vmware.hv.hw.memory[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The physical memory size.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Model'
+          type: SIMPLE
+          key: 'vmware.hv.hw.model[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The system model identification.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Bios UUID'
+          type: SIMPLE
+          key: 'vmware.hv.hw.uuid[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The hardware BIOS identification.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Vendor'
+          type: SIMPLE
+          key: 'vmware.hv.hw.vendor[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The hardware vendor identification.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Ballooned memory'
+          type: SIMPLE
+          key: 'vmware.hv.memory.size.ballooned[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The amount of guest physical memory that is currently reclaimed through the balloon driver. Sum of all guest VMs.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Used memory'
+          type: SIMPLE
+          key: 'vmware.hv.memory.used[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: B
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Physical memory usage on the host.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Number of bytes received'
+          type: SIMPLE
+          key: 'vmware.hv.network.in[{$VMWARE.URL},{HOST.HOST},bps]'
+          delay: '{$VMWARE_PERF_INTERVAL}'
+          history: 7d
+          units: Bps
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'VMware hypervisor network input statistics (bytes per second).'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Number of bytes transmitted'
+          type: SIMPLE
+          key: 'vmware.hv.network.out[{$VMWARE.URL},{HOST.HOST},bps]'
+          delay: '{$VMWARE_PERF_INTERVAL}'
+          history: 7d
+          units: Bps
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'VMware hypervisor network output statistics (bytes per second).'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Health state rollup'
+          type: SIMPLE
+          key: 'vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
+          applications:
+            -
+              name: VMware
+          valuemap:
+            name: 'VMware status'
+          triggers:
+            -
+              expression: '{last()}=3'
+              name: 'VMware: The {HOST.HOST} health is Red'
+              priority: HIGH
+              description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
+              dependencies:
+                -
+                  name: 'VMware: The {HOST.HOST} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+            -
+              expression: '{last()}=2'
+              name: 'VMware: The {HOST.HOST} health is Yellow'
+              priority: AVERAGE
+              description: 'One or more components in the appliance might become overloaded soon.'
+              dependencies:
+                -
+                  name: 'VMware: The {HOST.HOST} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+                -
+                  name: 'VMware: The {HOST.HOST} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+                -
+                  name: 'VMware: The {HOST.HOST} health is Yellow'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2'
+        -
+          name: 'VMware: Overall status'
+          type: SIMPLE
+          key: 'vmware.hv.status[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'The overall alarm status of the host: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
+          applications:
+            -
+              name: VMware
+          valuemap:
+            name: 'VMware status'
+          triggers:
+            -
+              expression: '{last()}=3'
+              name: 'VMware: The {HOST.HOST} health is Red'
+              priority: HIGH
+              description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
+            -
+              expression: '{last()}=2'
+              name: 'VMware: The {HOST.HOST} health is Yellow'
+              priority: AVERAGE
+              description: 'One or more components in the appliance might become overloaded soon.'
+              dependencies:
+                -
+                  name: 'VMware: The {HOST.HOST} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+        -
+          name: 'VMware: Uptime'
+          type: SIMPLE
+          key: 'vmware.hv.uptime[{$VMWARE.URL},{HOST.HOST}]'
+          history: 7d
+          units: uptime
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'System uptime.'
+          applications:
+            -
+              name: VMware
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'VMware: {HOST.HOST} has been restarted (uptime < 10m)'
+              priority: WARNING
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'VMware: Version'
+          type: SIMPLE
+          key: 'vmware.hv.version[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Dot-separated version string.'
+          applications:
+            -
+              name: VMware
+        -
+          name: 'VMware: Number of guest VMs'
+          type: SIMPLE
+          key: 'vmware.hv.vm.num[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          history: 7d
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: 'Number of guest virtual machines.'
+          applications:
+            -
+              name: VMware
+      discovery_rules:
+        -
+          name: 'Datastore discovery'
+          type: SIMPLE
+          key: 'vmware.hv.datastore.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          delay: 1h
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'VMware: Average read latency of the datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.hv.datastore.read[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]'
+              delay: '{$VMWARE_PERF_INTERVAL}'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Average amount of time for a read operation from the datastore (milliseconds).'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
+              type: SIMPLE
+              key: 'vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},pfree]'
+              delay: 5m
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware datastore space in percentage from total.'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Total size of datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}]'
+              delay: 5m
+              history: 7d
+              units: B
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'VMware datastore space in bytes.'
+              applications:
+                -
+                  name: VMware
+            -
+              name: 'VMware: Average write latency of the datastore {#DATASTORE}'
+              type: SIMPLE
+              key: 'vmware.hv.datastore.write[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]'
+              delay: '{$VMWARE_PERF_INTERVAL}'
+              history: 7d
+              username: '{$VMWARE.USERNAME}'
+              password: '{$VMWARE.PASSWORD}'
+              description: 'Average amount of time for a write operation to the datastore (milliseconds).'
+              applications:
+                -
+                  name: VMware
+    -
+      template: 'VMware macros'
+      name: 'VMware macros'
+      description: 'Template tooling version used: 0.38'
+      groups:
+        -
+          name: Templates/Applications
+      macros:
+        -
+          macro: '{$VMWARE.PASSWORD}'
+          description: 'VMware service {$USERNAME} user password'
+        -
+          macro: '{$VMWARE.URL}'
+          description: 'VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)'
+        -
+          macro: '{$VMWARE.USERNAME}'
+          description: 'VMware service user name'
+  value_maps:
+    -
+      name: 'VMware status'
+      mappings:
+        -
+          value: '0'
+          newvalue: gray
+        -
+          value: '1'
+          newvalue: green
+        -
+          value: '2'
+          newvalue: yellow
+        -
+          value: '3'
+          newvalue: red
+    -
+      name: 'VMware VirtualMachinePowerState'
+      mappings:
+        -
+          value: '0'
+          newvalue: poweredOff
+        -
+          value: '1'
+          newvalue: poweredOn
+        -
+          value: '2'
+          newvalue: suspended

@@ -605,7 +605,7 @@ class CConfigurationExportBuilder {
 				'verify_peer' => $discoveryRule['verify_peer'],
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
-				'preprocessing' => $discoveryRule['preprocessing'],
+				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
 				'overrides' => $discoveryRule['overrides']
 			];
 
@@ -644,6 +644,27 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Format preprocessing steps.
+	 *
+	 * @param array $preprocessing_steps
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	private static function formatPreprocessingSteps(array $preprocessing_steps) {
+		foreach ($preprocessing_steps as &$preprocessing_step) {
+			$preprocessing_step['parameters'] = ($preprocessing_step['type'] == ZBX_PREPROC_SCRIPT)
+				? [$preprocessing_step['params']]
+				: explode("\n", $preprocessing_step['params']);
+			unset($preprocessing_step['params']);
+		}
+		unset($preprocessing_step);
+
+		return $preprocessing_steps;
 	}
 
 	/**
@@ -1026,7 +1047,7 @@ class CConfigurationExportBuilder {
 				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt'],
-				'preprocessing' => $item['preprocessing'],
+				'preprocessing' => self::formatPreprocessingSteps($item['preprocessing']),
 				'jmx_endpoint' => $item['jmx_endpoint'],
 				'timeout' => $item['timeout'],
 				'url' => $item['url'],

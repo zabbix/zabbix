@@ -1,0 +1,550 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:05Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'PHP-FPM by Zabbix agent'
+      name: 'PHP-FPM by Zabbix agent'
+      description: |
+        Get PHP-FPM metrics using Zabbix agent running on Linux.
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: PHP-FPM
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'PHP-FPM: Accepted connections per second'
+          type: DEPENDENT
+          key: php-fpm.conn_accepted.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of accepted requests per second.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''accepted conn'']'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Listen queue'
+          type: DEPENDENT
+          key: php-fpm.listen_queue
+          delay: '0'
+          history: 7d
+          description: 'The current number of connections that have been initiated, but not yet accepted.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''listen queue'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Listen queue, len'
+          type: DEPENDENT
+          key: php-fpm.listen_queue_len
+          delay: '0'
+          history: 7d
+          description: 'Size of the socket queue of pending connections.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''listen queue len'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Listen queue, max'
+          type: DEPENDENT
+          key: php-fpm.listen_queue_max
+          delay: '0'
+          history: 7d
+          description: 'The maximum number of requests in the queue of pending connections since this FPM pool has started.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''max listen queue'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Queue usage'
+          type: CALCULATED
+          key: php-fpm.listen_queue_usage
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+last(php-fpm.listen_queue_len)=0)*100'
+          description: 'Queue utilization'
+          applications:
+            -
+              name: PHP-FPM
+          triggers:
+            -
+              expression: '{min(15m)}  > {$PHP_FPM.QUEUE.WARN.MAX}'
+              name: 'PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)'
+              priority: WARNING
+              description: 'The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.'
+        -
+          name: 'PHP-FPM: Max children reached'
+          type: DEPENDENT
+          key: php-fpm.max_children
+          delay: '0'
+          history: 7d
+          description: 'The number of times that pm.max_children has been reached since the php-fpm pool started'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''max children reached'']'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Pool name'
+          type: DEPENDENT
+          key: php-fpm.name
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The name of current pool.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pool
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Ping'
+          type: DEPENDENT
+          key: php-fpm.ping
+          delay: '0'
+          history: 7d
+          applications:
+            -
+              name: PHP-FPM
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - '{$PHP_FPM.PING.REPLY}$'
+                - '1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"]'
+          triggers:
+            -
+              expression: '{last()}=0 or {nodata(3m)}=1'
+              name: 'PHP-FPM: Service is down'
+              priority: HIGH
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'PHP-FPM: Process is not running'
+                  expression: '{PHP-FPM by Zabbix agent:proc.num["{$PHP_FPM.PROCESS_NAME}"].last()}=0'
+        -
+          name: 'PHP-FPM: Processes, active'
+          type: DEPENDENT
+          key: php-fpm.processes_active
+          delay: '0'
+          history: 7d
+          description: 'The total number of active processes.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''active processes'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Processes, idle'
+          type: DEPENDENT
+          key: php-fpm.processes_idle
+          delay: '0'
+          history: 7d
+          description: 'The total number of idle processes.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''idle processes'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Processes, max active'
+          type: DEPENDENT
+          key: php-fpm.processes_max_active
+          delay: '0'
+          history: 7d
+          description: 'The highest value that ''active processes'' has reached since the php-fpm server started.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''max active processes'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Processes, total'
+          type: DEPENDENT
+          key: php-fpm.processes_total
+          delay: '0'
+          history: 7d
+          description: 'The total number of server processes currently running.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''total processes'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Process manager'
+          type: DEPENDENT
+          key: php-fpm.process_manager
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The method used by the process manager to control the number of child processes for this pool.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''process manager'']'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+          triggers:
+            -
+              expression: '{diff()}=1'
+              name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
+              priority: INFO
+              description: 'PHP-FPM manager changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'PHP-FPM: Slow requests'
+          type: DEPENDENT
+          key: php-fpm.slow_requests
+          delay: '0'
+          history: 7d
+          description: 'The number of requests that exceeded your request_slowlog_timeout value.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''slow requests'']'
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+          triggers:
+            -
+              expression: '{min(#3)}>0'
+              name: 'PHP-FPM: Detected slow requests'
+              priority: WARNING
+              description: 'PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).'
+        -
+          name: 'PHP-FPM: Start time'
+          type: DEPENDENT
+          key: php-fpm.start_time
+          delay: '0'
+          history: 7d
+          units: unixtime
+          description: 'The time when this pool was started.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''start time'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+        -
+          name: 'PHP-FPM: Uptime'
+          type: DEPENDENT
+          key: php-fpm.uptime
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'How long has this pool been running.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''start since'']'
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'PHP-FPM: Failed to fetch info data (or no data for 30m)'
+              priority: INFO
+              description: 'Zabbix has not received data for items for the last 30 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'PHP-FPM: Process is not running'
+                  expression: '{PHP-FPM by Zabbix agent:proc.num["{$PHP_FPM.PROCESS_NAME}"].last()}=0'
+            -
+              expression: '{last()}<10m'
+              name: 'PHP-FPM: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'PHP-FPM: Version'
+          type: DEPENDENT
+          key: php-fpm.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.'
+          applications:
+            -
+              name: PHP-FPM
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - '^[.\s\S]*X-Powered-By: PHP/([.\d]{1,})'
+                - \1
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'PHP-FPM: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'PHP-FPM version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'PHP-FPM: CPU utilization'
+          key: 'proc.cpu.util["{$PHP_FPM.PROCESS_NAME}"]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Process CPU utilization percentage.'
+          applications:
+            -
+              name: PHP-FPM
+        -
+          name: 'PHP-FPM: Memory usage, %'
+          key: 'proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,pmem]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory used percentage relative to total memory available.'
+          applications:
+            -
+              name: PHP-FPM
+        -
+          name: 'PHP-FPM: Memory usage (rss)'
+          key: 'proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,rss]'
+          history: 7d
+          units: B
+          description: 'Resident set size memory used by process in bytes.'
+          applications:
+            -
+              name: PHP-FPM
+        -
+          name: 'PHP-FPM: Number of processes running'
+          key: 'proc.num["{$PHP_FPM.PROCESS_NAME}"]'
+          history: 7d
+          applications:
+            -
+              name: PHP-FPM
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'PHP-FPM: Process is not running'
+              priority: HIGH
+        -
+          name: 'PHP-FPM: php-fpm_ping'
+          key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'PHP-FPM: Get status page'
+          key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - '^[.\s\S]*({.+})'
+                - \1
+      macros:
+        -
+          macro: '{$PHP_FPM.HOST}'
+          value: localhost
+          description: 'Hostname or IP of PHP-FPM status host or container.'
+        -
+          macro: '{$PHP_FPM.PING.PAGE}'
+          value: ping
+          description: 'The path of PHP-FPM ping page.'
+        -
+          macro: '{$PHP_FPM.PING.REPLY}'
+          value: pong
+          description: 'Expected reply to the ping.'
+        -
+          macro: '{$PHP_FPM.PORT}'
+          value: '80'
+          description: 'The port of PHP-FPM status host or container.'
+        -
+          macro: '{$PHP_FPM.PROCESS_NAME}'
+          value: php-fpm
+          description: 'PHP-FPM process name'
+        -
+          macro: '{$PHP_FPM.QUEUE.WARN.MAX}'
+          value: '80'
+          description: 'The maximum PHP-FPM queue usage percent for trigger expression.'
+        -
+          macro: '{$PHP_FPM.STATUS.PAGE}'
+          value: status
+          description: 'The path of PHP-FPM status page.'
+  graphs:
+    -
+      name: 'PHP-FPM: Process'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'PHP-FPM by Zabbix agent'
+            key: php-fpm.processes_max_active
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'PHP-FPM by Zabbix agent'
+            key: php-fpm.processes_idle
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'PHP-FPM by Zabbix agent'
+            key: php-fpm.processes_total
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'PHP-FPM by Zabbix agent'
+            key: php-fpm.processes_active
+    -
+      name: 'PHP-FPM: Queue'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'PHP-FPM by Zabbix agent'
+            key: php-fpm.listen_queue_len
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'PHP-FPM by Zabbix agent'
+            key: php-fpm.listen_queue
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'PHP-FPM by Zabbix agent'
+            key: php-fpm.listen_queue_max
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
