@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-Official JMX Template from Apache Cassandra DBSM.
+Official JMX Template for Apache Cassandra DBSM.
 
 
 This template was tested on:
@@ -21,7 +21,7 @@ Metrics are collected by JMX.
 
 1. Enable and configure JMX access to Apache cassandra.
  See documentation for [instructions](https://cassandra.apache.org/doc/latest/operating/security.html#jmx-access).
-2. Set the user name and password in host macros {$CASSANDRA.USERNAME} and {$CASSANDRA.PASSWORD}.
+2. Set the user name and password in host macros {$CASSANDRA.USER} and {$CASSANDRA.PASSWORD}.
 
 
 ## Zabbix configuration
@@ -79,7 +79,7 @@ There are no template links in this template.
 |Cassandra |Latency: Client request write median |<p>Total latency serving write requests from clients in milliseconds - median.</p> |JMX |jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","50thPercentile"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Cassandra |Latency: Client request write 75 percentile |<p>Total latency serving write requests from clients in milliseconds - p75.</p> |JMX |jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","75thPercentile"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
 |Cassandra |Latency: Client request write 95 percentile |<p>Total latency serving write requests from clients in milliseconds - p95.</p> |JMX |jmx["org.apache.cassandra.metrics:type=ClientRequest,scope=Write,name=Latency","95thPercentile"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Cassandra |KeyCache: Capacity |<p>Cache capacity in bytes.</p> |JMX |jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Capacity","Value"] |
+|Cassandra |KeyCache: Capacity |<p>Cache capacity in bytes.</p> |JMX |jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Capacity","Value"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Cassandra |KeyCache: Entries |<p>Total number of cache entries.</p> |JMX |jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Entries","Value"] |
 |Cassandra |KeyCache: HitRate |<p>All time cache hit rate.</p> |JMX |jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=HitRate","Value"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `100`</p> |
 |Cassandra |KeyCache: Hits per second |<p>Rate of cache hits.</p> |JMX |jmx["org.apache.cassandra.metrics:type=Cache,scope=KeyCache,name=Hits","Count"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |

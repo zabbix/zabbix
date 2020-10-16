@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-13T09:39:30Z</date>
+   <date>2020-10-16T11:20:02Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -14,7 +14,7 @@
          <description>The template to monitor Apache Cassandra by Zabbix that work without any external scripts.&#13;
 It works with both standalone and cluster instances.&#13;
 The metrics are collected by JMX.&#13;
-You can set {$CASSANDRA.USERNAME} and {$CASSANDRA.PASSWORD} macros in the template for using on the host level.&#13;
+You can set {$CASSANDRA.USER} and {$CASSANDRA.PASSWORD} macros in the template for using on the host level.&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410057-discussion-thread-for-official-zabbix-template-apache-cassandra&#13;
@@ -297,6 +297,12 @@ Template tooling version used: 0.38</description>
                      <name>Cassandra</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
             </item>
             <item>
