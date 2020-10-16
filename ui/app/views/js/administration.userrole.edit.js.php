@@ -74,7 +74,6 @@
 			};
 
 			if (readonly) {
-				console.log(readonly);
 				return false;
 			}
 
@@ -99,12 +98,9 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		const type_elem = document.querySelector('.js-userrole-usertype');
 
-		console.log(type_elem);
-
 		UserRoleCheckboxDisabler.init(type_elem, document.querySelector("[id='ui.default_access']").checked);
 
 		type_elem.addEventListener('change', (event) => {
-			console.log('asd');
 			UserRoleCheckboxDisabler.init(event.currentTarget,
 				document.querySelector("[id='ui.default_access']").checked
 			);
