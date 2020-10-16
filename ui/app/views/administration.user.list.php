@@ -191,6 +191,27 @@ foreach ($data['users'] as $user) {
 		->setArgument('userid', $userid)
 	);
 
+	if (!CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $user['roleid'])) {
+		$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
+	}
+	else {
+		$api_access = (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
+		$api_methods = CRoleHelper::getRoleApiMethods($user['roleid']);
+
+		if ($api_methods) {
+			$hint_api_methods = [];
+			$status_class = CRoleHelper::checkAccess(CRoleHelper::API_MODE, $user['roleid'])
+				? ZBX_STYLE_STATUS_GREEN
+				: ZBX_STYLE_STATUS_GREY;
+
+			foreach ($api_methods as $api_method) {
+				$hint_api_methods[] = (new CSpan($api_method))->addClass($status_class);
+			}
+
+			$api_access->setHint((new CDiv($hint_api_methods))->addClass('rules-status-container'));
+		}
+	}
+
 	// Append user to table.
 	$table->addRow([
 		new CCheckBox('userids['.$userid.']', $userid),
@@ -202,9 +223,7 @@ foreach ($data['users'] as $user) {
 		$online,
 		$blocked,
 		(new CSpan(user_auth_type2str($user['gui_access'])))->addClass($gui_access_style),
-		(CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $user['roleid']))
-			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
-			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),
+		$api_access,
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_ORANGE)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREEN),
