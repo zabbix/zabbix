@@ -207,7 +207,8 @@ if ($hostPrototype['templateid']) {
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-		if (array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				'templates.php?form=update&templateid='.$template['templateid']
 			))->setTarget('_blank');
@@ -236,7 +237,8 @@ else {
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-		if (array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				'templates.php?form=update&templateid='.$template['templateid']
 			))->setTarget('_blank');

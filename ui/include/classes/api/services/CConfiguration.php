@@ -167,6 +167,20 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		if (array_key_exists('maps', $params['rules']) && !self::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
+				&& ($params['rules']['maps']['createMissing'] || $params['rules']['maps']['updateExisting'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'rules',
+				_('no permissions to create and edit maps')
+			));
+		}
+
+		if (array_key_exists('screens', $params['rules']) && !self::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
+				&& ($params['rules']['screens']['createMissing'] || $params['rules']['screens']['updateExisting'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'rules',
+				_('no permissions to create and edit screens')
+			));
+		}
+
 		if ($params['format'] === CImportReaderFactory::XML) {
 			$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
 

@@ -226,7 +226,7 @@ class CLocalApiClient extends CApiClient {
 	}
 
 	/**
-	 * Returns true if the current user is permitted to call the given API method.
+	 * Returns true if the current user is permitted to call the given API method, and false otherwise.
 	 *
 	 * @param string $api
 	 * @param string $method
@@ -253,7 +253,8 @@ class CLocalApiClient extends CApiClient {
 				' AND ('.
 					'name LIKE "'.CRoleHelper::SECTION_API.'%"'.
 					(($action !== '') ? ' OR name='.zbx_dbstr($action) : '').
-				')'
+				')'.
+			' ORDER by name'
 		);
 
 		$api_access_mode = false;
@@ -270,7 +271,7 @@ class CLocalApiClient extends CApiClient {
 			if ($db_rule['name'] === CRoleHelper::API_MODE) {
 				$api_access_mode = (bool) $rule_value;
 			}
-			else {
+			elseif (strpos($db_rule['name'], CRoleHelper::API_METHOD) === 0) {
 				$api_methods[] = $rule_value;
 			}
 		}
