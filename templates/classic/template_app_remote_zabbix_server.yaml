@@ -1,0 +1,1498 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:12Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Remote Zabbix server'
+      name: 'Remote Zabbix server'
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: 'Zabbix server'
+      items:
+        -
+          name: 'LLD queue'
+          type: DEPENDENT
+          key: lld_queue
+          delay: '0'
+          history: 1w
+          description: 'Count of values enqueued in the preprocessing queue.'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.lld_queue
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Preprocessing queue'
+          type: DEPENDENT
+          key: preprocessing_queue
+          delay: '0'
+          history: 1w
+          description: 'Count of values enqueued in the preprocessing queue.'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.preprocessing_queue
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Utilization of alerter internal processes, in %'
+          type: DEPENDENT
+          key: process.alerter.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.process.alerter.busy.avg
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix alerter processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of alert manager internal processes, in %'
+          type: DEPENDENT
+          key: process.alert_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''alert manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix alert manager processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of alert syncer internal processes, in %'
+          type: DEPENDENT
+          key: process.alert_syncer.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''alert syncer''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix alert syncer processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of configuration syncer internal processes, in %'
+          type: DEPENDENT
+          key: process.configuration_syncer.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''configuration syncer''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix configuration syncer processes more than 75% busy'
+              priority: AVERAGE
+              description: 'Zabbix configuration syncer processes more than 75% busy'
+        -
+          name: 'Utilization of discoverer data collector processes, in %'
+          type: DEPENDENT
+          key: process.discoverer.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.process.discoverer.busy.avg
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix discoverer processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of escalator internal processes, in %'
+          type: DEPENDENT
+          key: process.escalator.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.process.escalator.busy.avg
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix escalator processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of history syncer internal processes, in %'
+          type: DEPENDENT
+          key: process.history_syncer.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''history syncer''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix history syncer processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of housekeeper internal processes, in %'
+          type: DEPENDENT
+          key: process.housekeeper.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.process.housekeeper.busy.avg
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(30m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(30m)}<65'
+              name: 'Zabbix housekeeper processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of http poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.http_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''http poller''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix http poller processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of icmp pinger data collector processes, in %'
+          type: DEPENDENT
+          key: process.icmp_pinger.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''icmp pinger''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix icmp pinger processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of ipmi manager internal processes, in %'
+          type: DEPENDENT
+          key: process.ipmi_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''ipmi manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix ipmi manager processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of ipmi poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.ipmi_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''ipmi poller''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix ipmi poller processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of java poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.java_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''java poller''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix java poller processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of LLD manager internal processes, in %'
+          type: DEPENDENT
+          key: process.lld_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''lld manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix LLD manager processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of LLD worker internal processes, in %'
+          type: DEPENDENT
+          key: process.lld_worker.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''lld worker''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix LLD worker processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.process.poller.busy.avg
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix poller processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of preprocessing manager internal processes, in %'
+          type: DEPENDENT
+          key: process.preprocessing_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''preprocessing manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix preprocessing manager processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of preprocessing worker internal processes, in %'
+          type: DEPENDENT
+          key: process.preprocessing_worker.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''preprocessing worker''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix preprocessing worker processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of proxy poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.proxy_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''proxy poller''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix proxy poller processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of self-monitoring internal processes, in %'
+          type: DEPENDENT
+          key: process.self-monitoring.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''self-monitoring''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix self-monitoring processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of snmp trapper data collector processes, in %'
+          type: DEPENDENT
+          key: process.snmp_trapper.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''snmp trapper''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix snmp trapper processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of task manager internal processes, in %'
+          type: DEPENDENT
+          key: process.task_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''task manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix task manager processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of timer internal processes, in %'
+          type: DEPENDENT
+          key: process.timer.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.process.timer.busy.avg
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix timer processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of trapper data collector processes, in %'
+          type: DEPENDENT
+          key: process.trapper.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.process.trapper.busy.avg
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix trapper processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of unreachable poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.unreachable_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''unreachable poller''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix unreachable poller processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of vmware data collector processes, in %'
+          type: DEPENDENT
+          key: process.vmware_collector.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''vmware collector''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix vmware collector processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Configuration cache, % used'
+          type: DEPENDENT
+          key: rcache.buffer.pused
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.rcache.pused
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{max(10m)}>75'
+              name: 'More than 75% used in the configuration cache'
+              priority: AVERAGE
+              description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file'
+        -
+          name: 'Value cache, % used'
+          type: DEPENDENT
+          key: vcache.buffer.pused
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.vcache.buffer.pused
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{max(10m)}>95'
+              name: 'More than 95% used in the value cache'
+              priority: AVERAGE
+              description: 'Consider increasing ValueCacheSize in the zabbix_server.conf configuration file'
+        -
+          name: 'Value cache hits'
+          type: DEPENDENT
+          key: vcache.cache.hits
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: vps
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.vcache.cache.hits
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Value cache misses'
+          type: DEPENDENT
+          key: vcache.cache.misses
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: vps
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.vcache.cache.misses
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Value cache operating mode'
+          type: DEPENDENT
+          key: vcache.cache.mode
+          delay: '0'
+          history: 1w
+          applications:
+            -
+              name: 'Zabbix server'
+          valuemap:
+            name: 'Value cache operating mode'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.vcache.cache.mode
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{last()}=1'
+              name: 'Zabbix value cache working in low memory mode'
+              priority: HIGH
+        -
+          name: Version
+          type: DEPENDENT
+          key: version
+          delay: '0'
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of Zabbix server.'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Zabbix version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Zabbix server version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'VMware cache, % used'
+          type: DEPENDENT
+          key: vmware.buffer.pused
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.vmware.pused
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{max(10m)}>75'
+              name: 'More than 75% used in the vmware cache'
+              priority: AVERAGE
+              description: 'Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file'
+        -
+          name: 'History write cache, % used'
+          type: DEPENDENT
+          key: wcache.history.pused
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.history.pused
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{max(10m)}>75'
+              name: 'More than 75% used in the history cache'
+              priority: AVERAGE
+              description: 'Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file'
+        -
+          name: 'History index cache, % used'
+          type: DEPENDENT
+          key: wcache.index.pused
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.index.pused
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{max(10m)}>75'
+              name: 'More than 75% used in the history index cache'
+              priority: AVERAGE
+              description: 'Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file'
+        -
+          name: 'Trend write cache, % used'
+          type: DEPENDENT
+          key: wcache.trend.pused
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.trend.pused
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{max(10m)}>75'
+              name: 'More than 75% used in the trends cache'
+              priority: AVERAGE
+              description: 'Consider increasing TrendCacheSize in the zabbix_server.conf configuration file'
+        -
+          name: 'Number of processed values per second'
+          type: DEPENDENT
+          key: wcache.values
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.values.all
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Number of processed numeric (float) values per second'
+          type: DEPENDENT
+          key: wcache.values.float
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.values.float
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Number of processed log values per second'
+          type: DEPENDENT
+          key: wcache.values.log
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.values.log
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Number of processed not supported values per second'
+          type: DEPENDENT
+          key: wcache.values.not_supported
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.wcache.values[''not supported'']'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Number of processed character values per second'
+          type: DEPENDENT
+          key: wcache.values.str
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.values.str
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Number of processed text values per second'
+          type: DEPENDENT
+          key: wcache.values.text
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.values.text
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Number of processed numeric (unsigned) values per second'
+          type: DEPENDENT
+          key: wcache.values.uint
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.wcache.values.uint
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Zabbix stats queue over $5'
+          type: INTERNAL
+          key: 'zabbix[stats,{$ADDRESS},{$PORT},queue,10m]'
+          delay: 10m
+          history: 1w
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.queue
+          triggers:
+            -
+              expression: '{min(10m)}>100'
+              name: 'More than 100 items having missing data for more than 10 minutes'
+              priority: WARNING
+              description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes'
+        -
+          name: 'Zabbix stats queue'
+          type: INTERNAL
+          key: 'zabbix[stats,{$ADDRESS},{$PORT},queue]'
+          history: 1w
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.queue
+        -
+          name: 'Zabbix stats'
+          type: INTERNAL
+          key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Zabbix server statistics master item.'
+          applications:
+            -
+              name: 'Zabbix server'
+      macros:
+        -
+          macro: '{$ADDRESS}'
+        -
+          macro: '{$PORT}'
+      dashboards:
+        -
+          name: 'Zabbix server health'
+          widgets:
+            -
+              type: GRAPH_CLASSIC
+              width: '12'
+              height: '6'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Zabbix server performance'
+                    host: 'Remote Zabbix server'
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              width: '12'
+              height: '6'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Zabbix data gathering process busy %'
+                    host: 'Remote Zabbix server'
+            -
+              type: GRAPH_CLASSIC
+              'y': '6'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Zabbix internal process busy %'
+                    host: 'Remote Zabbix server'
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '6'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Zabbix cache usage, % free'
+                    host: 'Remote Zabbix server'
+            -
+              type: GRAPH_CLASSIC
+              'y': '11'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Value cache effectiveness'
+                    host: 'Remote Zabbix server'
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '11'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Zabbix internal queues'
+                    host: 'Remote Zabbix server'
+  graphs:
+    -
+      name: 'Value cache effectiveness'
+      type: STACKED
+      graph_items:
+        -
+          color: C80000
+          item:
+            host: 'Remote Zabbix server'
+            key: vcache.cache.misses
+        -
+          sortorder: '1'
+          color: 00C800
+          item:
+            host: 'Remote Zabbix server'
+            key: vcache.cache.hits
+    -
+      name: 'Zabbix cache usage, % free'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          color: '009900'
+          item:
+            host: 'Remote Zabbix server'
+            key: wcache.trend.pused
+        -
+          sortorder: '1'
+          color: DD0000
+          item:
+            host: 'Remote Zabbix server'
+            key: rcache.buffer.pused
+        -
+          sortorder: '2'
+          color: 00DDDD
+          item:
+            host: 'Remote Zabbix server'
+            key: wcache.index.pused
+        -
+          sortorder: '3'
+          color: 3333FF
+          item:
+            host: 'Remote Zabbix server'
+            key: wcache.history.pused
+        -
+          sortorder: '4'
+          color: '999900'
+          item:
+            host: 'Remote Zabbix server'
+            key: vcache.buffer.pused
+        -
+          sortorder: '5'
+          color: 00FF00
+          item:
+            host: 'Remote Zabbix server'
+            key: vmware.buffer.pused
+    -
+      name: 'Zabbix data gathering process busy %'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          color: '990099'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.trapper.avg.busy
+        -
+          sortorder: '1'
+          color: '990000'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.poller.avg.busy
+        -
+          sortorder: '2'
+          color: 0000EE
+          item:
+            host: 'Remote Zabbix server'
+            key: process.ipmi_poller.avg.busy
+        -
+          sortorder: '3'
+          color: FF33FF
+          item:
+            host: 'Remote Zabbix server'
+            key: process.discoverer.avg.busy
+        -
+          sortorder: '4'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.icmp_pinger.avg.busy
+        -
+          sortorder: '5'
+          color: '003300'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.http_poller.avg.busy
+        -
+          sortorder: '6'
+          color: CCCC00
+          item:
+            host: 'Remote Zabbix server'
+            key: process.proxy_poller.avg.busy
+        -
+          sortorder: '7'
+          color: 33FFFF
+          item:
+            host: 'Remote Zabbix server'
+            key: process.unreachable_poller.avg.busy
+        -
+          sortorder: '8'
+          color: DD0000
+          item:
+            host: 'Remote Zabbix server'
+            key: process.java_poller.avg.busy
+        -
+          sortorder: '9'
+          color: '000099'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.snmp_trapper.avg.busy
+        -
+          sortorder: '10'
+          color: 00FF00
+          item:
+            host: 'Remote Zabbix server'
+            key: process.vmware_collector.avg.busy
+    -
+      name: 'Zabbix internal process busy %'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          color: 00EE00
+          item:
+            host: 'Remote Zabbix server'
+            key: process.timer.avg.busy
+        -
+          sortorder: '1'
+          color: 0000EE
+          item:
+            host: 'Remote Zabbix server'
+            key: process.escalator.avg.busy
+        -
+          sortorder: '2'
+          color: FFAA00
+          item:
+            host: 'Remote Zabbix server'
+            key: process.housekeeper.avg.busy
+        -
+          sortorder: '3'
+          color: 00EEEE
+          item:
+            host: 'Remote Zabbix server'
+            key: process.alerter.avg.busy
+        -
+          sortorder: '4'
+          color: '990099'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.configuration_syncer.avg.busy
+        -
+          sortorder: '5'
+          color: EE0000
+          item:
+            host: 'Remote Zabbix server'
+            key: process.history_syncer.avg.busy
+        -
+          sortorder: '6'
+          color: FF66FF
+          item:
+            host: 'Remote Zabbix server'
+            key: process.self-monitoring.avg.busy
+        -
+          sortorder: '7'
+          color: '009999'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.task_manager.avg.busy
+        -
+          sortorder: '8'
+          color: BBBB00
+          item:
+            host: 'Remote Zabbix server'
+            key: process.ipmi_manager.avg.busy
+        -
+          sortorder: '9'
+          color: AA0000
+          item:
+            host: 'Remote Zabbix server'
+            key: process.alert_manager.avg.busy
+        -
+          sortorder: '10'
+          color: '990000'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.preprocessing_manager.avg.busy
+        -
+          sortorder: '11'
+          color: '008800'
+          item:
+            host: 'Remote Zabbix server'
+            key: process.preprocessing_worker.avg.busy
+        -
+          sortorder: '12'
+          color: 80B0E0
+          item:
+            host: 'Remote Zabbix server'
+            key: process.lld_manager.avg.busy
+        -
+          sortorder: '13'
+          color: 4080B0
+          item:
+            host: 'Remote Zabbix server'
+            key: process.lld_worker.avg.busy
+        -
+          sortorder: '14'
+          color: 8000FF
+          item:
+            host: 'Remote Zabbix server'
+            key: process.alert_syncer.avg.busy
+    -
+      name: 'Zabbix internal queues'
+      graph_items:
+        -
+          color: '008800'
+          item:
+            host: 'Remote Zabbix server'
+            key: preprocessing_queue
+        -
+          sortorder: '1'
+          color: EE0000
+          item:
+            host: 'Remote Zabbix server'
+            key: lld_queue
+    -
+      name: 'Zabbix server performance'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 00C800
+          item:
+            host: 'Remote Zabbix server'
+            key: wcache.values
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Remote Zabbix server'
+            key: 'zabbix[stats,{$ADDRESS},{$PORT},queue]'
+  value_maps:
+    -
+      name: 'Value cache operating mode'
+      mappings:
+        -
+          value: '0'
+          newvalue: Normal
+        -
+          value: '1'
+          newvalue: 'Low memory'
