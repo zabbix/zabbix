@@ -351,6 +351,12 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				$test_failed = false;
 				$test_outcome = null;
 
+				$step_types = array_column($preproc_test_data['steps'], 'type');
+				$insert_index = array_search(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, $step_types);
+				if ($insert_index !== false) {
+					array_splice($result['steps'], $insert_index, 0, [['result' => ' ']]);
+				}
+
 				foreach ($preproc_test_data['steps'] as $i => &$step) {
 					if ($test_failed) {
 						// If test is failed, proceesing steps are skipped from results.
