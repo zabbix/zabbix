@@ -327,6 +327,7 @@ class CMenuHelper {
 	 */
 	private static function getFirstMenuItem(): CMenuItem {
 		// FIXME: components menu store menu for guest, not for user. Because they initialized before we login.
+		// $menu = APP::Component()->get('menu.main');
 		$menu = self::getMainMenu();
 
 		foreach (CRoleHelper::getUiSectionsLabels(CWebUser::$data['type']) as $section_label) {
