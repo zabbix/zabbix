@@ -182,10 +182,10 @@ $form_grid
 	->addItem([
 		new CLabel(_('API methods'), 'api.mode'),
 		(new CFormField(
-			(new CRadioButtonList('api_mode', $data['rules'][CRoleHelper::API_MODE]))
+			(new CRadioButtonList('api_mode', (int) $data['rules'][CRoleHelper::API_MODE]))
 				->setId('api.mode')
-				->addValue(_('Allow list'), '0')
-				->addValue(_('Deny list'), '1')
+				->addValue(_('Allow list'), CRoleHelper::API_MODE_ALLOW)
+				->addValue(_('Deny list'), CRoleHelper::API_MODE_DENY)
 				->setModern(true)
 				->setReadonly($data['readonly'])
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)

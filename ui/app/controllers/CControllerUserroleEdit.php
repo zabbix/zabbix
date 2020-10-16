@@ -90,7 +90,7 @@ class CControllerUserroleEdit extends CController {
 				CRoleHelper::MODULES_DEFAULT_ACCESS => true,
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
 				CRoleHelper::API_ACCESS => true,
-				CRoleHelper::API_MODE => '1',
+				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
 				CRoleHelper::UI_MONITORING_DASHBOARD => true,
 				CRoleHelper::UI_MONITORING_PROBLEMS => true,
 				CRoleHelper::UI_MONITORING_HOSTS => true,
