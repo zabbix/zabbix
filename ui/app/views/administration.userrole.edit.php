@@ -125,7 +125,7 @@ $modules = [];
 foreach ($data['labels']['modules'] as $moduleid => $label) {
 	$modules[] = new CDiv(
 		(new CCheckBox(CRoleHelper::SECTION_MODULES.'['.$moduleid.']', 1))
-			->setChecked($data['rules']['modules'][$moduleid])
+			->setChecked(array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true)
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
@@ -193,19 +193,18 @@ $form_grid
 	->addItem(
 		(new CFormField(
 			(new CPatternSelect([
-				'name' => 'api_denied[]',
-				'object_name' => 'hosts',
-				'data' => [],
-				'placeholder' => _('API method pattern'),
+				'name' => 'api_methods[]',
+				'object_name' => 'api_methods',
+				'data' => $data['rules'][CRoleHelper::SECTION_API],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'hosts',
-						'srcfld1' => 'host',
+						'srctbl' => 'api_methods',
+						'srcfld1' => 'name',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => zbx_formatDomId('api_denied'.'[]')
+						'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
+						'user_type' => $data['type']
 					]
-				],
-				// 'add_post_js' => false
+				]
 			]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)

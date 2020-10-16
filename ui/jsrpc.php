@@ -578,6 +578,21 @@ switch ($data['method']) {
 
 				$db_result = API::Graph()->get($options);
 				break;
+
+			case 'api_methods':
+				$db_result = [];
+				$api_methods = array_slice(
+					preg_grep('/'.preg_quote($search).'/', CRoleHelper::getApiMethods(
+						// array_key_exists('user_type', $data) ? $data['user_type'] : USER_TYPE_ZABBIX_USER
+						USER_TYPE_SUPER_ADMIN
+					)),
+					0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+				);
+
+				foreach ($api_methods as $api_method) {
+					$db_result[] = ['name' => $api_method];
+				}
+				break;
 		}
 
 		$result[] = [

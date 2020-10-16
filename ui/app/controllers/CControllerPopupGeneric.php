@@ -385,7 +385,19 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
-			]
+			],
+			'api_methods' => [
+				'title' => _('Api methods'),
+				'min_user_type' => USER_TYPE_SUPER_ADMIN,
+				'allowed_src_fields' => 'id,name',
+				'form' => [
+					'name' => 'apimethodform',
+					'id' => 'apimethods'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
 		];
 	}
 
@@ -444,7 +456,8 @@ class CControllerPopupGeneric extends CController {
 			'submit_parent' =>						'in 1',
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
-			'filter_hostid_rst' =>					'in 1'
+			'filter_hostid_rst' =>					'in 1',
+			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
 		// Set destination and source field validation roles.
@@ -1291,12 +1304,23 @@ class CControllerPopupGeneric extends CController {
 
 			case 'roles':
 				$options += [
-					'output' => ['roleid', 'name']
+					'output' => ['roleid', 'name'],
+					'preservekeys' => true
 				];
 
 				$records = API::Role()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
+				break;
+			case 'api_methods':
+				// $api_methods = CRoleHelper::getApiMethods($this->getInput('user_type', USER_TYPE_ZABBIX_USER));
+				$api_methods = CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN);
+
+				foreach ($api_methods as $api_method) {
+					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];
+				}
+
+				CArrayHelper::sort($records, ['name']);
 				break;
 		}
 
