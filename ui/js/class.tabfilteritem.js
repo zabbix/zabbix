@@ -377,7 +377,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {string} value  Argument value.
 	 */
 	setUrlArgument(name, value) {
-		let apply_url = new URLSearchParams(this._apply_url),
+		let apply_url = new URLSearchParams(this._apply_url || (this.getFilterParams()).toString()),
 			src_url = new URLSearchParams(this._src_url);
 
 		apply_url.set(name, value);
