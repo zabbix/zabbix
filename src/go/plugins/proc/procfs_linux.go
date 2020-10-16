@@ -221,12 +221,9 @@ func getMemory() (mem float64, err error) {
 }
 
 func byteFromProcFileData(data []byte, valueName string) (float64, bool, error) {
-	str := string(data)
-	split := strings.Split(str, "\n")
-
-	for _, line := range split {
+	for _, line := range strings.Split(string(data), "\n") {
 		i := strings.Index(line, ":")
-		if i < 0 || valueName != line[:i] || len(line) <= i {
+		if i < 0 || valueName != line[:i] {
 			continue
 		}
 
