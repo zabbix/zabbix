@@ -569,7 +569,7 @@ if (array_key_exists('render_html', $data)) {
 				let form = this.getForm(),
 					tabfilter = ev.detail.target;
 
-				if (tabfilter._active_item !== this) {
+				if (ev.detail.filter_property !== 'properties' || tabfilter._active_item !== this) {
 					return;
 				}
 
