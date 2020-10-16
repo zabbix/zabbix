@@ -82,7 +82,8 @@ class CControllerUserroleList extends CController {
 				'sortfield' => $sort_field,
 				'limit' => $limit,
 				'preservekeys' => true
-			])
+			]),
+			'allowed_ui_users' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)
 		];
 
 		// Data sort and pager.
