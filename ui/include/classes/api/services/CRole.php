@@ -284,6 +284,20 @@ class CRole extends CApiService {
 
 		$this->updateRules($roles, __FUNCTION__);
 
+		$check_roles = $this->get([
+			'output' => ['roleid'],
+			'selectRules' => [CRoleHelper::SECTION_UI],
+			'roleids' => array_column($roles, 'roleid')
+		]);
+
+		foreach ($check_roles as $check_role) {
+			$status = array_column($check_role['rules'][CRoleHelper::SECTION_UI], 'status');
+
+			if (!array_sum($status)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
+			}
+		}
+
 		foreach ($db_roles as $db_roleid => $db_role) {
 			unset($db_roles[$db_roleid]['rules']);
 		}
@@ -515,7 +529,7 @@ class CRole extends CApiService {
 				}
 
 				$status = array_column($role['rules'][CRoleHelper::SECTION_UI], 'status');
-				if (array_sum($status) === 0) {
+				if (!array_sum($status)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
 				}
 			}
