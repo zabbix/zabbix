@@ -98,6 +98,7 @@ class CWebUser {
 			]);
 
 			if (empty(self::$data)) {
+				CMessageHelper::clear();
 				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -126,8 +127,6 @@ class CWebUser {
 	 * @static
 	 */
 	public static function setDefault(): void {
-		CMessageHelper::clear();
-
 		self::$data = [
 			'sessionid' => CEncryptHelper::generateKey(),
 			'alias' => ZBX_GUEST_USER,
