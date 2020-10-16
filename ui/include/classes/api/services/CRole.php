@@ -820,8 +820,8 @@ class CRole extends CApiService {
 						$role_rules['modules'][] = [
 							'moduleid' => $module['moduleid'],
 							'status' => array_key_exists($module['moduleid'], $modules)
-								? (!$rules[$roleid]['ui.default_access'] ? '1' : '0')
-								: $rules[$roleid]['ui.default_access']
+								? (!$rules[$roleid]['modules.default_access'] ? '1' : '0')
+								: $rules[$roleid]['modules.default_access']
 						];
 					}
 				}
