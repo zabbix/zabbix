@@ -432,11 +432,7 @@ class CRole extends CApiService {
 
 			if (array_key_exists('api', $role['rules'])) {
 				foreach ($role['rules']['api'] as $api_method) {
-					if (!in_array($api_method, CRoleHelper::getApiMethods((int) $role['type']))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('API method "%1$s" is not available.', $api_method)
-						);
-					}
+					$this->validateApiMethod($api_method, (int) $role['type']);
 				}
 			}
 
@@ -468,6 +464,36 @@ class CRole extends CApiService {
 					);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Checks if the given API method is valid and allowed for the given user type.
+	 *
+	 * @param string $api_method
+	 * @param int    $user_type
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateApiMethod(string $api_method, int $user_type): void {
+		if ($api_method === CRoleHelper::API_WILDCARD || $api_method === CRoleHelper::API_WILDCARD_ALIAS) {
+			return;
+		}
+
+		if (!preg_match('/([a-z]+|\*)\.([a-z]+|\*)/', $api_method)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid API method "%1$s".', $api_method));
+		}
+
+		if (!in_array($api_method, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN))
+				&& !in_array($api_method, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid API method "%1$s".', $api_method));
+		}
+
+		if (!in_array($api_method, CRoleHelper::getApiMethodMasks($user_type))
+				&& !in_array($api_method, CRoleHelper::getApiMethods($user_type))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('API method "%1$s" is not available for role with user type "%2$s".', $api_method, $user_type)
+			);
 		}
 	}
 

@@ -110,6 +110,13 @@ class CRoleHelper {
 	private static $api_methods = [];
 
 	/**
+	 * Array for storing all API methods with masks by user type.
+	 *
+	 * @var array
+	 */
+	private static $api_method_masks = [];
+
+	/**
 	 * Checks the access of specific role to specific rule.
 	 *
 	 * @static
@@ -503,6 +510,23 @@ class CRoleHelper {
 	}
 
 	/**
+	 * Returns a list of API methods with masks for the given user type.
+	 *
+	 * @static
+	 *
+	 * @param int|null $user_type
+	 *
+	 * @return array
+	 */
+	public static function getApiMethodMasks(?int $user_type = null): array {
+		if (!self::$api_method_masks) {
+			self::loadApiMethods();
+		}
+
+		return ($user_type !== null) ? self::$api_method_masks[$user_type] : self::$api_method_masks;
+	}
+
+	/**
 	 * Collects all API methods for all user types.
 	 *
 	 * @static
@@ -513,6 +537,7 @@ class CRoleHelper {
 			USER_TYPE_ZABBIX_ADMIN => [],
 			USER_TYPE_SUPER_ADMIN => []
 		];
+		$api_method_masks = $api_methods;
 
 		foreach (CApiServiceFactory::API_SERVICES as $service => $class_name) {
 			foreach (constant($class_name.'::ACCESS_RULES') as $method => $rules) {
@@ -524,17 +549,30 @@ class CRoleHelper {
 					switch ($rules['min_user_type']) {
 						case USER_TYPE_ZABBIX_USER:
 							$api_methods[USER_TYPE_ZABBIX_USER][] = $service.'.'.$method;
-							// break; is not missing here
+							$api_method_masks[USER_TYPE_ZABBIX_USER][$service.self::API_ANY_METHOD] = true;
+							$api_method_masks[USER_TYPE_ZABBIX_USER][self::API_ANY_SERVICE.$method] = true;
+						// break; is not missing here
 						case USER_TYPE_ZABBIX_ADMIN:
 							$api_methods[USER_TYPE_ZABBIX_ADMIN][] = $service.'.'.$method;
-							// break; is not missing here
+							$api_method_masks[USER_TYPE_ZABBIX_ADMIN][$service.self::API_ANY_METHOD] = true;
+							$api_method_masks[USER_TYPE_ZABBIX_ADMIN][self::API_ANY_SERVICE.$method] = true;
+						// break; is not missing here
 						case USER_TYPE_SUPER_ADMIN:
 							$api_methods[USER_TYPE_SUPER_ADMIN][] = $service.'.'.$method;
+							$api_method_masks[USER_TYPE_SUPER_ADMIN][$service.self::API_ANY_METHOD] = true;
+							$api_method_masks[USER_TYPE_SUPER_ADMIN][self::API_ANY_SERVICE.$method] = true;
 					}
 				}
 			}
 		}
 
+		foreach ($api_method_masks as $user_type => $masks) {
+			$api_method_masks[$user_type] = array_merge([self::API_WILDCARD, self::API_WILDCARD_ALIAS],
+				array_keys($masks)
+			);
+		}
+
 		self::$api_methods = $api_methods;
+		self::$api_method_masks = $api_method_masks;
 	}
 }
