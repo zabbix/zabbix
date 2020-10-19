@@ -472,6 +472,10 @@ class ZSelect extends HTMLElement {
 	registerEvents() {
 		this._events = {
 			button_mousedown: (e) => {
+				if (this._button.readOnly) {
+					return;
+				}
+
 				// Safari fix - event needs to be prevented, else blur event is fired on this button.
 				e.preventDefault();
 				// Safari fix - a click button on label would not focus button element.
@@ -489,6 +493,10 @@ class ZSelect extends HTMLElement {
 			},
 
 			button_keydown: (e) => {
+				if (this._button.readOnly) {
+					return;
+				}
+
 				!this._isVisible() && this.scrollIntoView({block: 'nearest'})
 
 				if (e.which !== KEY_SPACE && !e.metaKey && !e.ctrlKey && e.key.length === 1) {
@@ -589,6 +597,10 @@ class ZSelect extends HTMLElement {
 			},
 
 			button_blur: () => {
+				if (this._button.readOnly) {
+					return;
+				}
+
 				this._change(this._preselected_index);
 				this._collapse();
 			},

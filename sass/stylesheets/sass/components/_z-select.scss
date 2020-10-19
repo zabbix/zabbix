@@ -105,8 +105,7 @@ z-select,
 		}
 	}
 
-	&[disabled],
-	&[readonly] {
+	&[disabled] {
 		button {
 			pointer-events: none;
 			@extend %form-disabled;
@@ -115,7 +114,12 @@ z-select,
 
 	&[readonly] {
 		button {
+			@extend %form-disabled;
 			color: $font-color !important;
+
+			&:focus {
+				border-color: $form-border-focus-color;
+			}
 		}
 	}
 }
