@@ -167,10 +167,12 @@ class CControllerUserroleUpdate extends CController {
 		}
 
 		$rules[CRoleHelper::API_ACCESS] = $this->getInput('api_access');
-		$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
+		if ($rules[CRoleHelper::API_ACCESS]) {
+			$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
 
-		if ($this->hasInput('api_methods')) {
-			$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
+			if ($this->hasInput('api_methods')) {
+				$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
+			}
 		}
 
 		$role['rules'] = $rules;

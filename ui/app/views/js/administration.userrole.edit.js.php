@@ -24,9 +24,16 @@
  */
 ?>
 <script type="text/javascript">
-	class UserRoleCheckboxDisabler {
-		static init(elem) {
-			const readonly = <?= $this->data['readonly']; ?>;
+	class UserRoleUiManager {
+		constructor(readonly = false) {
+			this.readonly = readonly;
+		}
+
+		disableUiCheckbox() {
+			const usertype = document.querySelector('.js-userrole-usertype');
+			if (!usertype || this.readonly) {
+				return  false;
+			}
 
 			const access = {
 				'<?= CRoleHelper::UI_MONITORING_DASHBOARD; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
@@ -73,15 +80,11 @@
 				'<?= CRoleHelper::ACTIONS_EXECUTE_SCRIPTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>
 			};
 
-			if (readonly) {
-				return false;
-			}
-
 			Object.keys(access).forEach((selector) => {
 				const checkbox = document.querySelector(`[id='${selector}']`);
 				const checkbox_state = checkbox.readOnly;
 
-				if (elem.value < access[selector]) {
+				if (usertype.value < access[selector]) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;
 				}
@@ -93,19 +96,31 @@
 				}
 			});
 		}
+
+		disableApiSection() {
+			const checkbox_state = document.querySelector('.js-userrole-apiaccess').checked;
+			if (this.readonly) {
+				return false;
+			}
+
+			[...document.querySelectorAll('.js-userrole-apimode input')].map((elem) => {
+				elem.disabled = !checkbox_state;
+			});
+
+			$('#api_methods_').multiSelect(!checkbox_state ? 'disable' : 'enable');
+		}
 	}
 
 	document.addEventListener('DOMContentLoaded', () => {
+		const ui_manager = new UserRoleUiManager(<?php echo (bool) $this->data['readonly']; ?>);
 		const type_elem = document.querySelector('.js-userrole-usertype');
 
 		if (!type_elem) {
 			return false;
 		}
 
-		UserRoleCheckboxDisabler.init(type_elem);
-
 		type_elem.addEventListener('change', (event) => {
-			UserRoleCheckboxDisabler.init(event.currentTarget);
+			ui_manager.disableUiCheckbox();
 
 			let user_type = type_elem.options[type_elem.selectedIndex].value,
 				url,
@@ -122,5 +137,11 @@
 
 			$('#api_methods_').data('multiSelect', ms_data);
 		});
+
+		document.querySelector('.js-userrole-apiaccess').addEventListener('change', (event) => {
+			ui_manager.disableApiSection();
+		});
+
+		ui_manager.disableUiCheckbox();
 	});
 </script>

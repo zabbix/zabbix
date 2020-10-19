@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->addJsFile('multiselect.js');
 $this->includeJsFile('administration.userrole.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('User roles'));
@@ -177,6 +178,7 @@ $form_grid
 				->setChecked($data['rules'][CRoleHelper::API_ACCESS])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
+				->addClass('js-userrole-apiaccess')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	])
 	->addItem([
@@ -187,32 +189,34 @@ $form_grid
 				->addValue(_('Allow list'), CRoleHelper::API_MODE_ALLOW)
 				->addValue(_('Deny list'), CRoleHelper::API_MODE_DENY)
 				->setModern(true)
-				->setReadonly($data['readonly'])
+				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
+				->addClass('js-userrole-apimode')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	]);
 
-if (!$data['readonly']) {
-	$form_grid->addItem(
-		(new CFormField(
-			(new CPatternSelect([
-				'name' => 'api_methods[]',
-				'object_name' => 'api_methods',
-				'data' => $data['rules'][CRoleHelper::SECTION_API],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'api_methods',
-						'srcfld1' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
-						'user_type' => $data['type']
-					]
+$form_grid->addItem(
+	(new CFormField(
+		(new CPatternSelect([
+			'name' => 'api_methods[]',
+			'object_name' => 'api_methods',
+			'data' => $data['rules'][CRoleHelper::SECTION_API],
+			'disabled' => (bool) $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'api_methods',
+					'srcfld1' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
+					'user_type' => $data['type']
 				]
-			]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
-	);
-}
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->addClass('js-userrole-ms')
+	))
+		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+);
 
 $form_grid->addItem(
 	(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')))
@@ -273,5 +277,3 @@ $tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_grid);
 $form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_grid));
 $widget->addItem($form);
 $widget->show();
-
-$this->addJsFile('multiselect.js');

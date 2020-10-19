@@ -29,7 +29,7 @@ class CControllerUserroleCreate extends CController {
 			'modules_default_access' => 'required|in 0,1',
 			'actions_default_access' => 'required|in 0,1',
 			'api_access' => 'required|in 0,1',
-			'api_mode' => 'required|in 0,1',
+			'api_mode' => 'in 0,1',
 			'ui_monitoring_dashboard' => 'in 0,1',
 			'ui_monitoring_problems' => 'in 0,1',
 			'ui_monitoring_hosts' => 'in 0,1',
@@ -143,10 +143,12 @@ class CControllerUserroleCreate extends CController {
 		}
 
 		$rules[CRoleHelper::API_ACCESS] = $this->getInput('api_access');
-		$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
+		if ($rules[CRoleHelper::API_ACCESS]) {
+			$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
 
-		if ($this->hasInput('api_methods')) {
-			$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
+			if ($this->hasInput('api_methods')) {
+				$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
+			}
 		}
 
 		$role['rules'] = $rules;
