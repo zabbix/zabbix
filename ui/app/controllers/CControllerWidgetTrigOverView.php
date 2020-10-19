@@ -62,7 +62,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		];
 
 		list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
+			$data['hosts_by_name'], $data['exceeded_limit']
 		) = getTriggersOverviewData(getSubGroups($fields['groupids']), $fields['application'], $host_options,
 			$trigger_options, $problem_options
 		);
