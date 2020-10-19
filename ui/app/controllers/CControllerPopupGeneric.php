@@ -1313,8 +1313,7 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
 			case 'api_methods':
-				// $api_methods = CRoleHelper::getApiMethods($this->getInput('user_type', USER_TYPE_ZABBIX_USER));
-				$api_methods = CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN);
+				$api_methods = CRoleHelper::getApiMethods($this->getInput('user_type', USER_TYPE_ZABBIX_USER));
 
 				foreach ($api_methods as $api_method) {
 					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];

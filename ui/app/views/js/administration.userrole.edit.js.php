@@ -106,6 +106,21 @@
 
 		type_elem.addEventListener('change', (event) => {
 			UserRoleCheckboxDisabler.init(event.currentTarget);
+
+			let user_type = type_elem.options[type_elem.selectedIndex].value,
+				url,
+				search,
+				ms_data = $('#api_methods_').data('multiSelect');
+
+			[url, search] = ms_data.options.url.split('?', 2);
+
+			let params = new URLSearchParams(search);
+			params.set('user_type', user_type);
+
+			ms_data.options.url = url + '?' + params.toString();
+			ms_data.options.popup.parameters.user_type = user_type;
+
+			$('#api_methods_').data('multiSelect', ms_data);
 		});
 	});
 </script>
