@@ -1139,13 +1139,15 @@ z-select,
   .z-select.is-expanded > ul {
     display: block;
     position: fixed; }
-  z-select[disabled] button, z-select[readonly] button,
-  .z-select[disabled] button,
-  .z-select[readonly] button {
+  z-select[disabled] button,
+  .z-select[disabled] button {
     pointer-events: none; }
   z-select[readonly] button,
   .z-select[readonly] button {
     color: #1f2c33 !important; }
+    z-select[readonly] button:focus,
+    .z-select[readonly] button:focus {
+      border-color: #02659f; }
 
 .link-action {
   border-bottom: 1px dotted;
@@ -2727,8 +2729,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: .3;
     background-color: transparent; }
 
-z-select[disabled] button, z-select[readonly] button,
-.z-select[disabled] button,
+z-select[disabled] button,
+.z-select[disabled] button, z-select[readonly] button,
 .z-select[readonly] button, .multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
 .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .input-group button.btn-dropdown-toggle:disabled {
   color: #acbbc2;
