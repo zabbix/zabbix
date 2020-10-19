@@ -1,7 +1,7 @@
 Changes for 5.2.0rc1
 
 New features:
-A.F.....S. [ZBXNEXT-6148,ZBXNEXT-6150] implemented user roles with more granular permissions (agriscenko, gcalenko, arimdjonoks, rlataria, talbergs, vmaksimovs)
+A.F.....S. [ZBXNEXT-6148,ZBXNEXT-6150] implemented user roles with more granular permissions (agriscenko, arimdjonoks, gcalenko, rlataria, talbergs, vmaksimovs)
 A......... [ZBXNEXT-6270] improved storage format of the preprocessing parameters in the XML, JSON and YAML files; converted default XML templates to YAML (Ivo, Sasha)
 A.F....PS. [ZBXNEXT-6035] added pre-processing rule for overriding item errors with custom value (akozlovs, ashubin, gcalenko)
 ..FG...PS. [ZBXNEXT-6220] removed "Refresh unsupported items" parameter (akozlovs, rlataria)
