@@ -48,15 +48,72 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
 	$link = 'hostid='.$hostid;
 	$visible_name = make_decoration($host['name'], $data['search']);
-	$name = $host['editable'] ? new CLink($visible_name, 'hosts.php?form=update&'.$link) : new CSpan($visible_name);
-	$app_count = CViewHelper::showNum($host['applications']);
-	$item_count = CViewHelper::showNum($host['items']);
-	$trigger_count = CViewHelper::showNum($host['triggers']);
-	$graph_count = CViewHelper::showNum($host['graphs']);
-	$discovery_count = CViewHelper::showNum($host['discoveries']);
-	$httptest_count = CViewHelper::showNum($host['httpTests']);
 
-	$applications_link = $host['editable']
+	$name_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
+		? new CLink($visible_name, (new CUrl('hosts.php'))
+			->setArgument('form', 'update')
+			->setArgument('hostid', $hostid)
+		)
+		: new CSpan($visible_name);
+
+	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+		$name_link
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_RED);
+	}
+
+	// Display the host name only if it matches the search string and is different from the visible name.
+	if ($host['host'] !== $host['name'] && stripos($host['host'], $data['search']) !== false) {
+		$name_link = [$name_link, BR(), '(', make_decoration($host['host'], $data['search']), ')'];
+	}
+
+	$latest_data_link = $data['allowed_ui_latest_data']
+		? new CLink(_('Latest data'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		)
+		: _('Latest data');
+
+	$problems_link = $data['allowed_ui_problems']
+		? new CLink(_('Problems'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('filter_name', '')
+				->setArgument('hostids', [$hostid])
+		)
+		: _('Problems');
+
+	$charts_link = $data['allowed_ui_hosts']
+		? new CLink(_('Graphs'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'charts.view')
+				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		)
+		: _('Graphs');
+
+	$dashboards_link = $data['allowed_ui_hosts']
+		? new CLink(_('Dashboards'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.dashboard.view')
+				->setArgument('hostid', $hostid)
+		)
+		: _('Dashboards');
+
+	$web_link = $data['allowed_ui_hosts']
+		? new CLink(_('Web'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		)
+		: _('Web');
+
+	$app_count = CViewHelper::showNum($host['applications']);
+	$applications_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Applications'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'application.list')
 			->setArgument('filter_set', '1')
@@ -64,86 +121,55 @@ foreach ($data['hosts'] as $hostid => $host) {
 		), $app_count]
 		: [_('Applications'), $app_count];
 
-	$items_link = $host['editable']
+	$item_count = CViewHelper::showNum($host['items']);
+	$items_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Items'), (new CUrl('items.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $item_count]
 		: [_('Items'), $item_count];
 
-	$triggers_link = $host['editable']
+	$trigger_count = CViewHelper::showNum($host['triggers']);
+	$triggers_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $trigger_count]
 		: [_('Triggers'), $trigger_count];
 
-	$graphs_link = $host['editable']
+	$graph_count = CViewHelper::showNum($host['graphs']);
+	$graphs_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $graph_count]
 		: [_('Graphs'), $graph_count];
 
-	$discovery_link = $host['editable']
+	$discovery_count = CViewHelper::showNum($host['discoveries']);
+	$discovery_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $discovery_count]
 		: [_('Discovery'), $discovery_count];
 
-	$httptests_link = $host['editable']
+	$httptest_count = CViewHelper::showNum($host['httpTests']);
+	$httptests_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $httptest_count]
 		: [_('Web'), $httptest_count];
 
-	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$name
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_RED);
-	}
-
-	// Display the host name only if it matches the search string and is different from the visible name.
-	if ($host['host'] !== $host['name'] && stripos($host['host'], $data['search']) !== false) {
-		$name = [$name, BR(), '(', make_decoration($host['host'], $data['search']), ')'];
-	}
-
 	$table->addRow([
-		$name,
+		$name_link,
 		$interface ? make_decoration($interface['ip'], $data['search']) : '',
 		$interface ? make_decoration($interface['dns'], $data['search']) : '',
-		new CLink(_('Latest data'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'latest.view')
-				->setArgument('filter_hostids[]', $hostid)
-				->setArgument('filter_set', '1')
-		),
-		new CLink(_('Problems'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
-				->setArgument('hostids', [$hostid])
-		),
-		new CLink(_('Graphs'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'charts.view')
-				->setArgument('view_as', HISTORY_GRAPH)
-				->setArgument('filter_hostids[]', $hostid)
-				->setArgument('filter_set', '1')
-		),
-		new CLink(_('Dashboards'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.dashboard.view')
-				->setArgument('hostid', $hostid)
-		),
-		new CLink(_('Web'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'web.view')
-				->setArgument('filter_hostids[]', $hostid)
-				->setArgument('filter_set', '1')
-		),
+		$latest_data_link,
+		$problems_link,
+		$charts_link,
+		$dashboards_link,
+		$web_link,
 		$applications_link,
 		$items_link,
 		$triggers_link,
