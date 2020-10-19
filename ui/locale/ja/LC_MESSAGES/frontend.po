@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 11:32+0300\n"
-"PO-Revision-Date: 2020-10-13 04:32+0300\n"
+"PO-Revision-Date: 2020-10-19 08:47+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1602556365.000000\n"
+"X-POOTLE-MTIME: 1603090032.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -371,16 +371,16 @@ msgstr "AND"
 
 #: app/views/administration.user.list.php:108
 msgid "API access"
-msgstr ""
+msgstr "APIアクセス"
 
 #: include/classes/api/services/CRole.php:444
 #, c-format
 msgid "API method \"%1$s\" is not available."
-msgstr ""
+msgstr "APIメソッド\"%1$s\"は使用できません。"
 
 #: app/views/administration.userrole.edit.php:183
 msgid "API methods"
-msgstr ""
+msgstr "APIメソッド"
 
 #: app/views/report.services.php:72 app/views/report.services.php:73
 #: app/views/report.services.php:74 app/views/report.services.php:75
@@ -399,22 +399,22 @@ msgstr "アクセスは拒否されました！"
 #: app/views/administration.user.edit.php:439
 #: app/views/administration.userrole.edit.php:168
 msgid "Access to API"
-msgstr ""
+msgstr "APIへのアクセス"
 
 #: app/views/administration.user.edit.php:394
 #: app/views/administration.userrole.edit.php:70
 msgid "Access to UI elements"
-msgstr ""
+msgstr "UI要素へのアクセス"
 
 #: app/views/administration.user.edit.php:466
 #: app/views/administration.userrole.edit.php:218
 msgid "Access to actions"
-msgstr ""
+msgstr "アクションへのアクセス"
 
 #: app/views/administration.user.edit.php:413
 #: app/views/administration.userrole.edit.php:119
 msgid "Access to modules"
-msgstr ""
+msgstr "モジュールへのアクセス"
 
 #: include/classes/api/services/CUser.php:1365
 #: include/classes/api/services/CUser.php:1408
@@ -439,7 +439,7 @@ msgstr "障害確認"
 
 #: include/classes/helpers/CRoleHelper.php:439
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "障害の確認"
 
 #: app/views/popup.condition.common.php:652 include/actions.inc.php:2066
 #: include/events.inc.php:173
@@ -538,7 +538,7 @@ msgstr "アクション\"%1$s\"はすでに存在しています。"
 #: include/classes/api/services/CRole.php:454
 #, c-format
 msgid "Action \"%1$s\" is not available."
-msgstr ""
+msgstr "アクション\"%1$s\"は使用できません。"
 
 #: include/classes/api/services/CAction.php:2913
 #: include/classes/api/services/CAction.php:3114
@@ -819,7 +819,7 @@ msgstr "新しいオーバーライドの追加"
 
 #: include/classes/helpers/CRoleHelper.php:442
 msgid "Add problem comments"
-msgstr ""
+msgstr "障害対応メッセージの追加"
 
 #: include/views/configuration.graph.edit.php:411
 #: include/views/configuration.trigger.prototype.edit.php:613
@@ -998,7 +998,7 @@ msgstr "すべてのテンプレート"
 
 #: app/views/administration.userrole.edit.php:187
 msgid "Allow list"
-msgstr ""
+msgstr "許可リスト"
 
 #: include/triggers.inc.php:1239
 #: include/views/configuration.trigger.prototype.edit.php:511
@@ -1018,7 +1018,7 @@ msgstr "許可されたホスト"
 
 #: app/views/administration.user.edit.php:459
 msgid "Allowed methods"
-msgstr ""
+msgstr "許可されたメソッド"
 
 #: include/classes/setup/CSetupWizard.php:654
 msgid "Alternatively, you can install it manually:"
@@ -1076,7 +1076,7 @@ msgstr "いずれかの文字列が含まれる"
 
 #: app/controllers/CControllerPopupGeneric.php:390
 msgid "Api methods"
-msgstr ""
+msgstr "APIメソッド"
 
 #: app/controllers/CControllerAuditLogList.php:194
 #: app/partials/common.filter.trigger.php:93
@@ -1265,7 +1265,7 @@ msgstr "開始時刻 (時:分)"
 #: include/classes/api/services/CRole.php:528
 #: include/classes/api/services/CRole.php:533
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "少なくとも1つのUI要素をチェックしてください。"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
@@ -1275,7 +1275,7 @@ msgstr "少なくとも1つのアクションが必要です。"
 #: include/classes/api/services/CUser.php:1163
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "少なくとも1人の有効なユーザーを役割\"%1$s\"と共に指定してください。"
 
 #: include/classes/api/services/CMaintenance.php:286
 #: include/classes/api/services/CMaintenance.php:711
@@ -2041,7 +2041,7 @@ msgstr "設定ファイルが作成できません。"
 
 #: app/controllers/CControllerUserroleCreate.php:87
 msgid "Cannot create user role"
-msgstr ""
+msgstr "ユーザの役割が作成できません"
 
 #: include/classes/api/services/CDashboard.php:314
 #: include/classes/api/services/CTemplateDashboard.php:334
@@ -2187,7 +2187,7 @@ msgstr[0] "プロキシを削除できません"
 #: include/classes/api/services/CRole.php:757
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "読み込み専用のユーザーの役割\"%1$s\"を削除できません。"
 
 #: app/controllers/CControllerRegExDelete.php:83
 msgid "Cannot delete regular expression"
@@ -2300,7 +2300,7 @@ msgstr[0] "ユーザーグループを削除できません"
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] ""
+msgstr[0] "ユーザーの役割を削除できません"
 
 #: app/controllers/CControllerValuemapDelete.php:70
 msgid "Cannot delete value map"
@@ -3027,7 +3027,7 @@ msgstr "ディスカバリされたホスト\"%1$s\"のプロキシを更新で�
 #: include/classes/api/services/CRole.php:367
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
-msgstr ""
+msgstr "読み込み専用のユーザーの役割\"%1$s\"を更新できません。"
 
 #: app/controllers/CControllerRegExUpdate.php:45
 #: app/controllers/CControllerRegExUpdate.php:101
@@ -3117,7 +3117,7 @@ msgstr[0] "ユーザーグループを更新できません"
 #: app/controllers/CControllerUserroleUpdate.php:93
 #: app/controllers/CControllerUserroleUpdate.php:195
 msgid "Cannot update user role"
-msgstr ""
+msgstr "ユーザーの役割を更新できません"
 
 #: app/controllers/CControllerValuemapUpdate.php:44
 #: app/controllers/CControllerValuemapUpdate.php:102
@@ -3769,7 +3769,7 @@ msgstr "ユーザーグループの設定"
 #: app/controllers/CControllerUserroleEdit.php:134
 #: app/controllers/CControllerUserroleList.php:130
 msgid "Configuration of user roles"
-msgstr ""
+msgstr "ユーザの役割が作成できません"
 
 #: app/controllers/CControllerUserEdit.php:205
 #: app/controllers/CControllerUserList.php:170
@@ -4098,15 +4098,15 @@ msgstr "アクションの作成"
 
 #: include/classes/helpers/CRoleHelper.php:430
 msgid "Create and edit dashboards and screens"
-msgstr ""
+msgstr "ダッシュボードとスクリーンの作成と変更"
 
 #: include/classes/helpers/CRoleHelper.php:435
 msgid "Create and edit maintenance"
-msgstr ""
+msgstr "メンテナンス期間の作成と変更"
 
 #: include/classes/helpers/CRoleHelper.php:431
 msgid "Create and edit maps"
-msgstr ""
+msgstr "マップの作成と変更"
 
 #: app/views/configuration.application.list.php:173
 msgid "Create application"
@@ -4293,7 +4293,7 @@ msgstr "ユーザーグループの作成"
 
 #: app/views/administration.userrole.list.php:34
 msgid "Create user role"
-msgstr ""
+msgstr "ユーザーの役割の作成"
 
 #: app/views/administration.valuemap.list.php:37
 msgid "Create value map"
@@ -5123,7 +5123,7 @@ msgstr "拒否"
 
 #: app/views/administration.userrole.edit.php:188
 msgid "Deny list"
-msgstr ""
+msgstr "拒否リスト"
 
 #: include/views/configuration.services.edit.php:347
 #: include/views/configuration.trigger.prototype.edit.php:595
@@ -12233,7 +12233,7 @@ msgstr "ディスカバリルールIDが設定されていません。"
 #: app/views/administration.user.edit.php:416
 #: app/views/administration.userrole.edit.php:150
 msgid "No enabled modules found."
-msgstr ""
+msgstr "有効なモジュールがありません。"
 
 #: app/views/administration.autoreg.edit.php:48
 #: app/views/administration.proxy.edit.php:94
