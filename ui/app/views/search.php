@@ -204,45 +204,49 @@ foreach ($data['groups'] as $groupid => $group) {
 	$templates_link = null;
 
 	if ($data['admin']) {
-		$hosts_link = $group['editable']
-			? $group['hosts']
-				? [new CLink(_('Hosts'), (new CUrl('hosts.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_groups', [$groupid])
-				), CViewHelper::showNum($group['hosts'])]
-				: _('Hosts')
+		$hosts_link = ($group['editable'] && $data['allowed_ui_conf_hosts'] && $group['hosts'])
+			? [new CLink(_('Hosts'), (new CUrl('hosts.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_groups', [$groupid])
+			), CViewHelper::showNum($group['hosts'])]
 			: _('Hosts');
 
-		$templates_link = $group['editable']
-			? $group['templates']
-				? [new CLink(_('Templates'), (new CUrl('templates.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_groups', [$groupid])
-				), CViewHelper::showNum($group['templates'])]
-				: _('Templates')
+		$templates_link = ($group['editable'] && $data['allowed_ui_conf_templates'] && $group['templates'])
+			? [new CLink(_('Templates'), (new CUrl('templates.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_groups', [$groupid])
+			), CViewHelper::showNum($group['templates'])]
 			: _('Templates');
 	}
 
 	$table->addRow([
-		$group['editable'] ? new CLink($caption, 'hostgroups.php?form=update&'.$link) : new CSpan($caption),
-		new CLink(_('Latest data'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'latest.view')
-				->setArgument('filter_groupids[]', $groupid)
-				->setArgument('filter_set', '1')
-		),
-		new CLink(_('Problems'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
-				->setArgument('groupids', [$groupid])
-		),
-		new CLink(_('Web'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'web.view')
-				->setArgument('filter_groupids[]', $groupid)
-				->setArgument('filter_set', '1')
-		),
+		$group['editable'] && $data['allowed_ui_conf_host_groups']
+			? new CLink($caption, 'hostgroups.php?form=update&'.$link)
+			: new CSpan($caption),
+		$data['allowed_ui_latest_data']
+			? new CLink(_('Latest data'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'latest.view')
+					->setArgument('filter_groupids[]', $groupid)
+					->setArgument('filter_set', '1')
+			)
+			: _('Latest data'),
+		$data['allowed_ui_problems']
+			? new CLink(_('Problems'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'problem.view')
+					->setArgument('filter_name', '')
+					->setArgument('groupids', [$groupid])
+			)
+			: _('Problems'),
+		$data['allowed_ui_hosts']
+			? new CLink(_('Web'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'web.view')
+					->setArgument('filter_groupids[]', $groupid)
+					->setArgument('filter_set', '1')
+			)
+			:_('Web'),
 		$hosts_link,
 		$templates_link
 	]);
