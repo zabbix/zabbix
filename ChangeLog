@@ -11,11 +11,11 @@ A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history c
 .........T [ZBXNEXT-6159] added "Template App PHP-FPM by HTTP" and "Template App PHP-FPM by Zabbix agent" (ychukina)
 ..F....... [ZBXNEXT-6157] reworked UI for setup to simplify db encryption configuration (rlataria)
 .........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
+...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
 
 Bug fixes:
 ..F....... [ZBX-18396] fixed undefined offset in item test form (Ivo)
 ..F....... [ZBX-18415] fixed value caching for item test dialog when opened by 'Test all steps' button (miks)
-...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
 ...G...... [ZBX-17975] fixed Hostname and HostnameItem for Zabbix Agent 2 test and print execution (esneiders)
 ..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
 ........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
@@ -1793,8 +1793,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 
 --------------------------------------------------------------------------------
 Changes for 4.0.26rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
