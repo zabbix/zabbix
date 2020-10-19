@@ -98,6 +98,10 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		const type_elem = document.querySelector('.js-userrole-usertype');
 
+		if (!type_elem) {
+			return false;
+		}
+
 		UserRoleCheckboxDisabler.init(type_elem);
 
 		type_elem.addEventListener('change', (event) => {
