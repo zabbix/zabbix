@@ -251,7 +251,7 @@ class CLocalApiClient extends CApiClient {
 			' FROM role_rule'.
 			' WHERE roleid='.zbx_dbstr($user_data['roleid']).
 				' AND ('.
-					'name LIKE "'.CRoleHelper::SECTION_API.'%"'.
+					'name LIKE '.zbx_dbstr(CRoleHelper::SECTION_API.'%').
 					(($action !== '') ? ' OR name='.zbx_dbstr($action) : '').
 				')'.
 			' ORDER by name'
