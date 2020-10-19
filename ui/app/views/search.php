@@ -275,14 +275,14 @@ if ($data['admin']) {
 		$discovery_count = CViewHelper::showNum($template['discoveries']);
 		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
-		$template_cell = $template['editable']
+		$template_cell = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink($visible_name, (new CUrl('templates.php'))
 				->setArgument('form', 'update')
 				->setArgument('templateid', $templateid)
 			)]
 			: [new CSpan($visible_name)];
 
-		$applications_link = $template['editable']
+		$applications_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Applications'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'application.list')
 				->setArgument('filter_set', '1')
@@ -290,28 +290,28 @@ if ($data['admin']) {
 			), $app_count]
 			: [_('Applications'), $app_count];
 
-		$items_link = $template['editable']
+		$items_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Items'), (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $item_count]
 			: [_('Items'), $item_count];
 
-		$triggers_link = $template['editable']
+		$triggers_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $trigger_count]
 			: [_('Triggers'), $trigger_count];
 
-		$graphs_link = $template['editable']
+		$graphs_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $graph_count]
 			: [_('Graphs'), $graph_count];
 
-		$dashboards_link = $template['editable']
+		$dashboards_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [
 				new CLink(_('Dashboards'),
 					(new CUrl('zabbix.php'))
@@ -322,14 +322,14 @@ if ($data['admin']) {
 			]
 			: [_('Dashboards'), $dashboard_count];
 
-		$discovery_link = $template['editable']
+		$discovery_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $discovery_count]
 			: [_('Discovery'), $discovery_count];
 
-		$httptests_link = $template['editable']
+		$httptests_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
