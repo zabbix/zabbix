@@ -528,6 +528,23 @@ switch ($data['method']) {
 					$result = CArrayHelper::renameObjectsKeys($roles, ['roleid' => 'id']);
 				}
 				break;
+
+			case 'api_methods':
+				$result = [];
+				$user_type = array_key_exists('user_type', $data) ? $data['user_type'] : USER_TYPE_ZABBIX_USER;
+				$search = array_key_exists('search', $data) ? $data['search'] : '';
+
+				$api_methods = array_slice(
+					preg_grep('/'.preg_quote($search).'/',
+						array_merge(CRoleHelper::getApiMethodMasks($user_type), CRoleHelper::getApiMethods($user_type))
+					),
+					0, $limit
+				);
+
+				foreach ($api_methods as $api_method) {
+					$result[] = ['id' => $api_method, 'name' => $api_method];
+				}
+				break;
 		}
 		break;
 
@@ -577,20 +594,6 @@ switch ($data['method']) {
 				];
 
 				$db_result = API::Graph()->get($options);
-				break;
-
-			case 'api_methods':
-				$db_result = [];
-				$api_methods = array_slice(
-					preg_grep('/'.preg_quote($search).'/', CRoleHelper::getApiMethods(
-						array_key_exists('user_type', $data) ? $data['user_type'] : USER_TYPE_ZABBIX_USER
-					)),
-					0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
-				);
-
-				foreach ($api_methods as $api_method) {
-					$db_result[] = ['name' => $api_method];
-				}
 				break;
 		}
 

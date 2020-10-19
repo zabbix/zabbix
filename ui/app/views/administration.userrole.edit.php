@@ -196,7 +196,7 @@ $form_grid
 
 $form_grid->addItem(
 	(new CFormField(
-		(new CPatternSelect([
+		(new CMultiSelect([
 			'name' => 'api_methods[]',
 			'object_name' => 'api_methods',
 			'data' => $data['rules'][CRoleHelper::SECTION_API],
