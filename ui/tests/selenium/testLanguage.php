@@ -253,6 +253,8 @@ class testLanguage extends CWebTest {
 		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
+		$form->selectTab('Permissions');
+		$form->fill(['Role' => 'Super Admin role']);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
