@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-10-19T13:32:26Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Apache Activemq by JMX</template>
+         <name>Apache Activemq by JMX</name>
+         <description>The template to monitor Apache ActiveMQ by Zabbix that work without any external scripts.&#13;
+The metrics are collected by JMX.&#13;
+You can set macro values and add macros with context for specific brokers or destinations following macro description.&#13;
+&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411049-discussion-thread-for-official-zabbix-template-amq&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>ActiveMQ</name>
+            </application>
+         </applications>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Destinations discovery</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache.activemq:type=Broker,brokerName=*,destinationType=*,destinationName=*"]</key>
+               <delay>1h</delay>
+               <username>{$ACTIVEMQ.USER}</username>
+               <password>{$ACTIVEMQ.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXBROKERNAME}</macro>
+                        <value>{$ACTIVEMQ.LLD.FILTER.DESTINATION.MATCHES:"{#JMXBROKERNAME}"}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXBROKERNAME}</macro>
+                        <value>{$ACTIVEMQ.LLD.FILTER.DESTINATION.NOT_MATCHES:"{#JMXBROKERNAME}"}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery of destinations</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Consumers count</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},ConsumerCount]</key>
+                     <history>7d</history>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Number of consumers attached to this destination..</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min({$ACTIVEMQ.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;={$ACTIVEMQ.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</expression>
+                           <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Consumers count less or equal {$ACTIVEMQ.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"}</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Messages dequeue rate</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},DequeueCount]</key>
+                     <history>7d</history>
+                     <units>messages/sec</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Rate of messages that has been acknowledged (and removed) from the destination.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Messages enqueue rate</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},EnqueueCount]</key>
+                     <history>7d</history>
+                     <units>messages/sec</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Rate of messages that have been sent to the destination.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Expired messages count</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},ExpiredCount]</key>
+                     <history>7d</history>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Number of messages that have been expired.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}</expression>
+                           <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Expired messages count higer than {$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}</name>
+                           <priority>AVERAGE</priority>
+                           <description>This metric represents the number of messages that expired before they could be delivered. If you expect all messages to be delivered and acknowledged within a certain amount of time, you can set an expiration for each message, and investigate if your ExpiredCount metric rises above zero.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Memory usage in percents</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},MemoryPercentUsage]</key>
+                     <history>7d</history>
+                     <units>%</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>The percentage of the memory limit used.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}</expression>
+                           <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Memory usage is too high (&gt;$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}</expression>
+                           <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Memory usage is too high (&gt;$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Producers count</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},ProducerCount]</key>
+                     <history>7d</history>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Number of producers attached to this destination.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min({$ACTIVEMQ.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;={$ACTIVEMQ.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</expression>
+                           <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Producers count less or equal {$ACTIVEMQ.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"}</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Queue size</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},QueueSize]</key>
+                     <history>7d</history>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Number of messages on this destination, including any that have been dispatched but not acknowledged.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min({$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} and {$ACTIVEMQ.QUEUE.ENABLED:"{#JMXDESTINATIONNAME}"}=1</expression>
+                           <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Queue size higer than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}</name>
+                           <priority>AVERAGE</priority>
+                           <description>Queue size is higer than treshold. It may indicate performance problems.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Apache Activemq by JMX:jmx[{#JMXOBJ},EnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{Apache Activemq by JMX:jmx[{#JMXOBJ},DequeueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}</expression>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}</name>
+                     <priority>AVERAGE</priority>
+                     <description>Enqueue rate is higer than dequeue rate. It may indicate performance problems.</description>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Memory usage</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},MemoryPercentUsage]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Messages rate</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},EnqueueCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},DequeueCount]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>{#JMXDESTINATIONTYPE} "{#JMXDESTINATIONNAME}" on {#JMXBROKERNAME}: Producers and consumers</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},ProducerCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},ConsumerCount]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Brokers discovery</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"org.apache.activemq:type=Broker,brokerName=*"]</key>
+               <delay>1h</delay>
+               <username>{$ACTIVEMQ.USER}</username>
+               <password>{$ACTIVEMQ.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXBROKERNAME}</macro>
+                        <value>{$ACTIVEMQ.LLD.FILTER.BROKER.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXBROKERNAME}</macro>
+                        <value>{$ACTIVEMQ.LLD.FILTER.BROKER.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery of brokers</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Brocker version</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},BrokerVersion]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>The version of the broker.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                           <name>Broker {#JMXBROKERNAME}: Version has been changed</name>
+                           <priority>INFO</priority>
+                           <description>Broker {#JMXBROKERNAME} version has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Memory limit</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},MemoryLimit]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Memory limit, in bytes, used for holding undelivered messages before paging to temporary storage.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Memory usage in percents</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},MemoryPercentUsage]</key>
+                     <history>7d</history>
+                     <units>%</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Percent of memory limit used.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Memory usage is too high (&gt;$ACTIVEMQ.MEM.MAX.WARN}%)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Memory usage is too high (&gt;$ACTIVEMQ.MEM.MAX.WARN}%)</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Storage limit</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},StoreLimit]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Disk limit, in bytes, used for persistent messages before producers are blocked.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Storage usage in percents</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},StorePercentUsage]</key>
+                     <history>7d</history>
+                     <units>%</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Percent of store limit used.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.STORE.MAX.WARN}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Storage usage is too high (&gt;$ACTIVEMQ.STORE.MAX.WARN}%)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.STORE.MAX.HIGH}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Storage usage is too high (&gt;$ACTIVEMQ.STORE.MAX.WARN}%)</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Temp limit</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},TempLimit]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Disk limit, in bytes, used for non-persistent messages and temporary data before producers are blocked.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.TEMP.MAX.WARN}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Temp usage is too high (&gt;$ACTIVEMQ.TEMP.MAX.WARN}%)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;{$ACTIVEMQ.TEMP.MAX.HIGH}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Temp usage is too high (&gt;$ACTIVEMQ.TEMP.MAX.WARN}%)</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Temp usage in percents</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},TempPercentUsage]</key>
+                     <history>7d</history>
+                     <units>%</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Percent of temp limit used.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Messages dequeue rate</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},TotalDequeueCount]</key>
+                     <history>7d</history>
+                     <units>messages/sec</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Rate of messages that have been delivered by the broker and acknowledged by consumers.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Messages enqueue rate</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},TotalEnqueueCount]</key>
+                     <history>7d</history>
+                     <units>messages/sec</units>
+                     <username>{$ACTIVEMQ.USER}</username>
+                     <password>{$ACTIVEMQ.PASSWORD}</password>
+                     <description>Rate of messages that have been sent to the broker.</description>
+                     <applications>
+                        <application>
+                           <name>ActiveMQ</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Apache Activemq by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}&gt;{Apache Activemq by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}</expression>
+                     <name>Broker {#JMXBROKERNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}</name>
+                     <priority>AVERAGE</priority>
+                     <description>Enqueue rate is higer than dequeue rate. It may indicate performance problems.</description>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Messages rate</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},TotalEnqueueCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},TotalDequeueCount]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Broker {#JMXBROKERNAME}: Resources usage</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},MemoryPercentUsage]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},StorePercentUsage]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Apache Activemq by JMX</host>
+                              <key>jmx[{#JMXOBJ},TempPercentUsage]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$ACTIVEMQ.CONSUMERS.MIN.HIGH}</macro>
+               <value>0</value>
+               <description>Minimum amaunt of consumers for destination. Can be used with destination name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.CONSUMERS.MIN.TIME}</macro>
+               <value>10m</value>
+               <description>Time during which there may be no consumers in destination. Can be used with destination name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.EXPIRIED.WARN}</macro>
+               <value>0</value>
+               <description>Threshold for expiried messages count. Can be used with destination name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.LLD.FILTER.BROKER.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable discovered brokers</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.LLD.FILTER.BROKER.NOT_MATCHES}</macro>
+               <value>CHANGE IF NEEDED</value>
+               <description>Filter to exclude discovered brokers</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.LLD.FILTER.DESTINATION.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable discovered destinations</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.LLD.FILTER.DESTINATION.NOT_MATCHES}</macro>
+               <value>CHANGE IF NEEDED</value>
+               <description>Filter to exclude discovered destinations</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.MEM.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>Memory threshold for HIGH trigger. Can be used with destination or broker name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.MEM.MAX.WARN}</macro>
+               <value>75</value>
+               <description>Memory threshold for AVERAGE trigger. Can be used with destination or broker name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.MSG.RATE.WARN.TIME}</macro>
+               <value>15m</value>
+               <description>The time for message enqueue/dequeue rate. Can be used with destination or broker name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.PASSWORD}</macro>
+               <value>activemq</value>
+               <description>Password for JMX</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.PORT}</macro>
+               <value>1099</value>
+               <description>Port for JMX</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.PRODUCERS.MIN.HIGH}</macro>
+               <value>0</value>
+               <description>Minimum amaunt of producers for destination. Can be used with destination name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.PRODUCERS.MIN.TIME}</macro>
+               <value>10m</value>
+               <description>Time during which there may be no producers in destination.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.QUEUE.ENABLED}</macro>
+               <value>1</value>
+               <description>Use this to disable alerting for specific destination. 1 = enabled, 0 = disabled. Can be used with destination name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.QUEUE.TIME}</macro>
+               <value>10m</value>
+               <description>Time during which the QueueSize can be higher than threshold. Can be used with destination name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.QUEUE.WARN}</macro>
+               <value>100</value>
+               <description>Threshold for QueueSize. Can be used with destination name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.STORE.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>Storage threshold for HIGH trigger. Can be used with broker name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.STORE.MAX.WARN}</macro>
+               <value>75</value>
+               <description>Storage threshold for AVERAGE trigger. Can be used with broker name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.TEMP.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>Temp threshold for HIGH trigger. Can be used with broker name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.TEMP.MAX.WARN}</macro>
+               <value>75</value>
+               <description>Temp threshold for AVERAGE trigger. Can be used with broker name as context.</description>
+            </macro>
+            <macro>
+               <macro>{$ACTIVEMQ.USER}</macro>
+               <value>admin</value>
+               <description>User for JMX</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
