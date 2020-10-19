@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'multiselect.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'multiselect.js', 'report2.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -190,7 +190,6 @@ else {
 	$select_mode = (new CSelect('mode'))
 		->setValue($report_mode)
 		->setFocusableElementId('mode')
-		->onChange('$(this).closest("form").submit()')
 		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_HOST, _('By host')))
 		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template')));
 
@@ -203,7 +202,9 @@ else {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$select_mode
 			])
-	));
+		)
+		->setName('report2')
+	);
 
 	/*
 	 * Filter
@@ -247,7 +248,6 @@ else {
 		$select_filter_hostid = (new CSelect('filter_templateid'))
 			->setValue($data['filter']['hostids'])
 			->setFocusableElementId('filter-templateid')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($templates as $templateid => $template) {
@@ -291,7 +291,6 @@ else {
 		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
 			->setValue($data['filter']['tpl_triggerid'])
 			->setFocusableElementId('tpl-triggerid')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		$tpl_triggerids = [];
@@ -319,7 +318,6 @@ else {
 		$select_hostgroupid = (new CSelect('hostgroupid'))
 			->setValue($data['filter']['hostgroupid'])
 			->setFocusableElementId('hostgroupid')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($host_groups as $groupid => $group) {
@@ -377,7 +375,6 @@ else {
 			->setAttribute('autofocus', 'autofocus')
 			->setValue($data['filter']['groups'])
 			->setFocusableElementId('filter-groups')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($groups as $groupid => $group) {
