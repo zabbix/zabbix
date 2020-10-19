@@ -190,8 +190,9 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
  * Return value: FAIL - for further error handling                            *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_validate_notsupport(void)
+static int	item_preproc_validate_notsupport(char **errmsg)
 {
+	*errmsg = zbx_dsprintf(NULL, "item is not supported");
 	return FAIL;
 }
 
@@ -2198,7 +2199,7 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			ret = item_preproc_str_replace(value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-			ret = item_preproc_validate_notsupport();
+			ret = item_preproc_validate_notsupport(error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");
