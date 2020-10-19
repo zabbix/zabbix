@@ -134,8 +134,7 @@ $data = [
 	'dependencies' => [],
 	'triggers_by_name' => [],
 	'hosts_by_name' => [],
-	'exceeded_hosts' => false,
-	'exceeded_trigs' => false
+	'exceeded_limit' => false
 ];
 
 // fetch trigger data
@@ -213,7 +212,7 @@ if ($type == SHOW_TRIGGERS) {
 	}
 
 	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-		$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
+		$data['hosts_by_name'], $data['exceeded_limit']
 	) = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
 
 	$data['filter'] = $filter;
