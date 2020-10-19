@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T13:27:00Z'
+  date: '2020-10-19T10:58:50Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -60,7 +60,8 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              params: 1d
+              parameters:
+                - 1d
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -88,7 +89,8 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              params: 1d
+              parameters:
+                - 1d
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
@@ -108,7 +110,8 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              params: 1d
+              parameters:
+                - 1d
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -134,7 +137,8 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              params: 1d
+              parameters:
+                - 1d
       discovery_rules:
         -
           name: 'CPU Discovery'
