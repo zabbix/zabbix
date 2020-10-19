@@ -119,7 +119,7 @@ class CRoleHelper {
 	 *
 	 * @return bool  Returns true if role have access to specified rule, false - otherwise.
 	 */
-	public static function checkAccess(string $rule_name, int $roleid): bool {
+	public static function checkAccess(string $rule_name, $roleid): bool {
 		self::loadRoleRules($roleid);
 
 		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === self::SECTION_API) {
@@ -127,6 +127,45 @@ class CRoleHelper {
 		}
 
 		return self::$roles[$roleid]['rules'][$rule_name];
+	}
+
+	/**
+	 * Check rule can be defined for specific role type.
+	 *
+	 * @param string $rule_name  Rule full name, with section prefix.
+	 * @param int    $role_type  Role access type.
+	 *
+	 * @return bool
+	 */
+	public static function checkRuleAllowedByType($rule_name, int $role_type): bool {
+		$allowed = [
+			self::UI_DEFAULT_ACCESS, self::API_ACCESS, self::API_MODE, self::MODULES_DEFAULT_ACCESS,
+			self::ACTIONS_DEFAULT_ACCESS
+		];
+
+		if (in_array($rule_name, $allowed)) {
+			return true;
+		}
+
+		switch (self::getRuleSection($rule_name)) {
+			case self::SECTION_UI:
+				$allowed = self::getAllUiElements($role_type);
+				break;
+
+			case self::SECTION_API:
+				$allowed = self::getApiMethods($role_type);
+				break;
+
+			case self::SECTION_MODULES:
+				$allowed = [$rule_name];
+				break;
+
+			case self::SECTION_ACTIONS:
+				$allowed = self::getAllActions($role_type);
+				break;
+		}
+
+		return in_array($rule_name, $allowed);
 	}
 
 	/**
@@ -154,7 +193,7 @@ class CRoleHelper {
 	 *
 	 * @param integer $roleid  Role ID.
 	 */
-	private static function loadRoleRules(int $roleid): void {
+	private static function loadRoleRules($roleid): void {
 		if (array_key_exists($roleid, self::$roles)) {
 			return;
 		}
