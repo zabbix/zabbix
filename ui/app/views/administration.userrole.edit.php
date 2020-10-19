@@ -211,7 +211,7 @@ $form_grid->addItem(
 				]
 			]
 		]))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->addClass('js-userrole-ms')
 	))
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
