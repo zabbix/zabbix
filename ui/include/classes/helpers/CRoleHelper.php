@@ -62,6 +62,8 @@ class CRoleHelper {
 	public const MODULES_MODULE = 'modules.module.';
 	public const MODULES_DEFAULT_ACCESS = 'modules.default_access';
 	public const API_ACCESS = 'api.access';
+	public const API_ACCESS_DISABLED = 0;
+	public const API_ACCESS_ENABLED = 1;
 	public const API_MODE = 'api.mode';
 	public const API_MODE_DENY = 0;
 	public const API_MODE_ALLOW = 1;
@@ -75,6 +77,8 @@ class CRoleHelper {
 	public const ACTIONS_ADD_PROBLEM_COMMENTS = 'actions.add_problem_comments';
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
+	public const DEFAULT_ACCESS_DISABLED = 0;
+	public const DEFAULT_ACCESS_ENABLED = 1;
 
 	public const SECTION_UI = 'ui';
 	public const SECTION_MODULES = 'modules';
