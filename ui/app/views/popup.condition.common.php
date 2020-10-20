@@ -46,11 +46,15 @@ switch ($data['type']) {
 		require_once dirname(__FILE__).'/../../include/correlation.inc.php';
 
 		// Type select.
-		$condition_type_combobox = new CComboBox('condition_type', $condition_type,
-			"reloadPopup(this.form, 'popup.condition.event.corr');", corrConditionTypes()
+		$form_list->addRow(new CLabel(_('Type'), 'label-condition-type'), (new CSelect('condition_type'))
+			->setFocusableElementId('label-condition-type')
+			->setValue($condition_type)
+			->setId('condition-type')
+			->addOptions(CSelect::createOptionsFromArray(corrConditionTypes()))
 		);
 
-		$form_list->addRow(_('Type'), $condition_type_combobox);
+		$inline_js .= '$(() => $("#condition-type").on("change",'
+			.'e => reloadPopup($(e.target).closest("form").get(0), "popup.condition.event.corr")));';
 
 		switch ($condition_type) {
 			// Old|New event tag form elements.
@@ -154,11 +158,15 @@ switch ($data['type']) {
 		}
 
 		// Type select.
-		$action_condition_type_combobox = new CComboBox('condition_type', $condition_type,
-			"reloadPopup(this.form, 'popup.condition.actions');", $action_condition_options
+		$form_list->addRow(new CLabel(_('Type'), 'label-condition-type'), (new CSelect('condition_type'))
+			->setFocusableElementId('label-condition-type')
+			->setValue($condition_type)
+			->setId('condition-type')
+			->addOptions(CSelect::createOptionsFromArray($action_condition_options))
 		);
 
-		$form_list->addRow(_('Type'), $action_condition_type_combobox);
+		$inline_js .= '$(() => $("#condition-type").on("change",'
+			.'e => reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")));';
 
 		switch ($condition_type) {
 			// Trigger form elements.
@@ -524,16 +532,16 @@ switch ($data['type']) {
 
 			// Received value form elements.
 			case CONDITION_TYPE_DVALUE:
-				$operator = new CComboBox('operator', CONDITION_OPERATOR_EQUAL, '',
-					$combobox_options[CONDITION_TYPE_DVALUE]
-				);
-
 				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $new_condition_value->getPostJS();
 
 				$form_list
-					->addRow(_('Operator'), $operator)
+					->addRow(new CLabel(_('Operator'), 'label-operator'), (new CSelect('operator'))
+						->setValue(CONDITION_OPERATOR_EQUAL)
+						->setFocusableElementId('label-operator')
+						->addOptions(CSelect::createOptionsFromArray($combobox_options[CONDITION_TYPE_DVALUE]))
+					)
 					->addRow(_('Value'), $new_condition_value);
 				break;
 
@@ -561,11 +569,12 @@ switch ($data['type']) {
 				$discovery_check_types = discovery_check_type2str();
 				order_result($discovery_check_types);
 
-				$new_condition_value = new CComboBox('value', null, null, $discovery_check_types);
-
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Service type'), $new_condition_value);
+					->addRow(new CLabel(_('Service type'), 'label-condition-service-type'), (new CSelect('value'))
+						->setFocusableElementId('label-condition-service-type')
+						->addOptions(CSelect::createOptionsFromArray($discovery_check_types))
+					);
 				break;
 
 			// Discovery uptime|downtime form elements.
@@ -607,11 +616,13 @@ switch ($data['type']) {
 					->addValue($combobox_options[CONDITION_TYPE_EVENT_TYPE][CONDITION_OPERATOR_EQUAL],
 						CONDITION_OPERATOR_EQUAL
 					);
-				$new_condition_value = new CComboBox('value', null, null, eventType());
 
 				$form_list
 					->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-					->addRow(_('Event type'), $new_condition_value);
+					->addRow(new CLabel(_('Event type'), 'label-condition-event-type'), (new CSelect('value'))
+						->setFocusableElementId('label-condition-event-type')
+						->addOptions(CSelect::createOptionsFromArray(eventType()))
+					);
 				break;
 		}
 		break;
@@ -626,11 +637,15 @@ switch ($data['type']) {
 		}
 
 		// Type select.
-		$opcondition_type_combobox = new CComboBox('condition_type', $condition_type,
-			"reloadPopup(this.form, 'popup.condition.operations');", $combobox_options
+		$form_list->addRow(new CLabel(_('Type'), 'label-condition-type'), (new CSelect('condition_type'))
+			->setFocusableElementId('label-condition-type')
+			->setValue($condition_type)
+			->setId('condition-type')
+			->addOptions(CSelect::createOptionsFromArray($combobox_options))
 		);
 
-		$form_list->addRow(_('Type'), $opcondition_type_combobox);
+		$inline_js .= '$(() => $("#condition-type").on("change",'
+			.'e => reloadPopup($(e.target).closest("form").get(0), "popup.condition.operations")));';
 
 		// Acknowledge form elements.
 		$operators_options = [];
