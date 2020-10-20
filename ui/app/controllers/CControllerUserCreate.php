@@ -28,7 +28,6 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
-		$roleids = array_keys(API::Role()->get(['output' => ['roleid'], 'preservekeys' => true]));
 
 		$fields = [
 			'alias' =>			'required|db users.alias|not_empty',
@@ -46,14 +45,14 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'url' =>			'db users.url',
 			'refresh' =>		'required|db users.refresh|not_empty',
 			'rows_per_page' =>	'required|db users.rows_per_page',
-			'roleid' =>			'db users.roleid|in '.implode(',', $roleids),
+			'roleid' =>			'db users.roleid',
 			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword()) {
+		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
 			$error = self::VALIDATION_ERROR;
 			$ret = false;
 		}
