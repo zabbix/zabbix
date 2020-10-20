@@ -37,6 +37,7 @@ import (
 	_ "zabbix.com/plugins/system/swap"
 	_ "zabbix.com/plugins/system/uname"
 	_ "zabbix.com/plugins/system/uptime"
+	_ "zabbix.com/plugins/system/users"
 	_ "zabbix.com/plugins/systemd"
 	_ "zabbix.com/plugins/systemrun"
 	_ "zabbix.com/plugins/vfs/dev"
