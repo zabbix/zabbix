@@ -36,4 +36,8 @@ int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int e
 int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 
+/* trends function cache */
+int	zbx_tfc_init(char **error);
+
+
 #endif
