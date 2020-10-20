@@ -235,11 +235,13 @@ class ZBase {
 					}
 					else {
 						$session = new CCookieSession();
-						if (!$session->session_start($session->extractSessionId() ?: '')) {
+						$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+
+						if (!$session->session_start($sessionid)) {
 							throw new Exception(_('Session initialization error.'));
 						}
 
-						CSessionHelper::set('sessionid', session_id());
+						CSessionHelper::set('sessionid', $sessionid);
 					}
 				}
 				break;
