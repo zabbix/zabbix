@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 11:32+0300\n"
-"PO-Revision-Date: 2020-10-19 08:47+0300\n"
+"PO-Revision-Date: 2020-10-20 00:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1603090032.000000\n"
+"X-POOTLE-MTIME: 1603147757.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -3255,7 +3255,7 @@ msgstr "正規表現使用時のエラーチェック"
 
 #: include/items.inc.php:1875
 msgid "Check for not supported value"
-msgstr ""
+msgstr "サポートしていない値のチェック"
 
 #: include/classes/setup/CSetupWizard.php:49
 #: include/classes/setup/CSetupWizard.php:274
@@ -3445,7 +3445,7 @@ msgstr "障害のクローズ"
 
 #: include/classes/helpers/CRoleHelper.php:440
 msgid "Close problems"
-msgstr ""
+msgstr "障害のクローズ"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
 #: include/classes/widgets/CWidgetHelper.php:952 jsLoader.php:245
@@ -4696,15 +4696,15 @@ msgstr "標準"
 
 #: app/views/administration.userrole.edit.php:108
 msgid "Default access to new UI elements"
-msgstr ""
+msgstr "デフォルトで新しいUI要素に対してアクセス"
 
 #: app/views/administration.userrole.edit.php:242
 msgid "Default access to new actions"
-msgstr ""
+msgstr "デフォルトで新しいアクションに対してアクセス"
 
 #: app/views/administration.userrole.edit.php:158
 msgid "Default access to new modules"
-msgstr ""
+msgstr "デフォルトで新しいモジュールに対してアクセス"
 
 #: app/views/administration.authentication.edit.php:31
 msgid "Default authentication"
@@ -5011,7 +5011,7 @@ msgstr "選択した正規表現を削除しますか？"
 
 #: app/views/administration.userrole.list.php:126
 msgid "Delete selected roles?"
-msgstr ""
+msgstr "選択した役割を削除しますか？"
 
 #: include/views/monitoring.screen.list.php:121
 msgid "Delete selected screens?"
@@ -5113,7 +5113,7 @@ msgstr "区切り文字"
 
 #: app/views/administration.user.edit.php:459
 msgid "Denied methods"
-msgstr ""
+msgstr "拒否されたメソッド"
 
 #: app/partials/administration.usergroup.grouprights.html.php:71
 #: app/views/administration.usergroup.edit.php:134 include/perm.inc.php:33
@@ -6320,7 +6320,7 @@ msgstr "次で実行"
 
 #: include/classes/helpers/CRoleHelper.php:443
 msgid "Execute scripts"
-msgstr ""
+msgstr "スクリプトの実行"
 
 #: include/actions.inc.php:2118
 #: include/views/administration.auditacts.list.php:77
@@ -6938,7 +6938,7 @@ msgstr "次のページへ移動"
 #: app/views/system.warning.php:31 include/func.inc.php:1525
 #, c-format
 msgid "Go to \"%1$s\""
-msgstr ""
+msgstr "\"%1$s\"に戻る"
 
 #: include/classes/helpers/CPagerHelper.php:188
 msgid "Go to first page"
@@ -11631,7 +11631,7 @@ msgstr "モジュールを更新しました： %1$s。"
 #: include/classes/api/services/CRole.php:474
 #, c-format
 msgid "Module with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のモジュールは使用できません。"
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -12389,7 +12389,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/clients/CLocalApiClient.php:115
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
-msgstr ""
+msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 
 #: app/controllers/CControllerChartsView.php:132
 #: app/controllers/CControllerChartsView.php:154
@@ -13124,7 +13124,7 @@ msgstr "ユニークかどうかだけチェックします。"
 
 #: include/classes/api/services/CItemGeneral.php:1610
 msgid "Only one not supported value check is allowed."
-msgstr ""
+msgstr "サポートしていない値のチェックは1つだけにしてください。"
 
 #: include/classes/api/services/CItemGeneral.php:1433
 #: include/classes/api/services/CItemGeneral.php:1478
@@ -15082,7 +15082,7 @@ msgstr "末尾文字列削除"
 #: app/views/administration.user.edit.php:346
 #: app/views/administration.user.edit.php:356
 msgid "Role"
-msgstr ""
+msgstr "ユーザーの役割"
 
 #: include/locales.inc.php:72
 msgid "Romanian (ro_RO)"
@@ -15111,7 +15111,7 @@ msgstr "ページあたりの表示行数"
 
 #: include/classes/helpers/CRoleHelper.php:220
 msgid "Rule section was not found."
-msgstr ""
+msgstr "役割のセクションが存在しません。"
 
 #: include/views/conf.import.php:135
 msgid "Rules"
@@ -16442,7 +16442,7 @@ msgstr "スペイン語(es_ES)"
 
 #: include/classes/helpers/CRoleHelper.php:171
 msgid "Specified role was not found."
-msgstr ""
+msgstr "指定された役割が存在しません。"
 
 #: include/classes/api/services/CAction.php:1860
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
@@ -16721,7 +16721,7 @@ msgstr "日曜"
 
 #: include/users.inc.php:54
 msgid "Super admin"
-msgstr ""
+msgstr "特権管理者"
 
 #: include/classes/helpers/CMenuHelper.php:268
 #: include/views/general.login.php:97
@@ -17267,7 +17267,7 @@ msgstr "受信したリモートプロシージャーは存在しないか利用
 #: include/classes/api/services/CRole.php:763
 #, c-format
 msgid "The role \"%1$s\" is assigned to at least one user and cannot be deleted."
-msgstr ""
+msgstr "役割\"%1$s\"は少なくとも1人のユーザーに割り当てられているので削除できません。"
 
 #: include/html.inc.php:760
 #, c-format
@@ -17950,7 +17950,7 @@ msgstr "タイプ"
 #: include/classes/api/services/CRole.php:428
 #, c-format
 msgid "UI element \"%1$s\" is not available."
-msgstr ""
+msgstr "UI要素\"%1$s\"は存在しません。"
 
 #: app/views/js/administration.regex.edit.js.php:197
 #: include/translateDefines.inc.php:25
@@ -18503,7 +18503,7 @@ msgstr "ユーザーエージェント文字列"
 
 #: app/views/administration.user.edit.php:349
 msgid "User can't change role for himself"
-msgstr ""
+msgstr "ユーザーは自身の役割を変更できません"
 
 #: include/classes/api/services/CUserGroup.php:542
 #: include/classes/api/services/CUser.php:863
@@ -18512,7 +18512,7 @@ msgstr "ユーザーは無効のグループやGUIアクセスが無効のグル
 
 #: include/classes/api/services/CUser.php:850
 msgid "User cannot change their role."
-msgstr ""
+msgstr "ユーザーは自身の役割を変更できません。"
 
 #: app/controllers/CControllerUserDelete.php:56
 msgid "User deleted"
@@ -18639,27 +18639,27 @@ msgstr "ユーザープロファイル"
 #: app/views/administration.userrole.edit.php:271
 #: app/views/administration.userrole.edit.php:273
 msgid "User role"
-msgstr ""
+msgstr "ユーザーの役割"
 
 #: app/controllers/CControllerUserroleDelete.php:56
 msgid "User role deleted"
 msgid_plural "User roles deleted"
-msgstr[0] ""
+msgstr[0] "ユーザーの役割を削除しました"
 
 #: app/controllers/CControllerUserroleCreate.php:163
 #: app/controllers/CControllerUserroleUpdate.php:187
 msgid "User role updated"
-msgstr ""
+msgstr "ユーザーの役割を更新しました"
 
 #: include/classes/api/services/CUser.php:680
 #, c-format
 msgid "User role with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のユーザーの役割は存在しません。"
 
 #: include/classes/api/services/CRole.php:399
 #, c-format
 msgid "User role with name \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\"という名前のユーザーの役割は存在しません。"
 
 #: app/controllers/CControllerPopupGeneric.php:378
 #: app/views/administration.user.list.php:67
@@ -18668,7 +18668,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:220
 #: include/classes/helpers/CRoleHelper.php:404
 msgid "User roles"
-msgstr ""
+msgstr "ユーザーの役割"
 
 #: app/views/administration.housekeeping.edit.php:112
 msgid "User sessions"
@@ -19750,7 +19750,7 @@ msgstr "操作に対する権限がありません。"
 
 #: include/classes/api/services/CRole.php:216
 msgid "You do not have permissions to create user roles."
-msgstr ""
+msgstr "あなたはユーザーの役割を作成する権限を持っていません。"
 
 #: include/classes/api/services/CUser.php:271
 msgid "You do not have permissions to create users."
@@ -20842,31 +20842,31 @@ msgstr "データなし"
 
 #: include/classes/api/services/CEvent.php:795
 msgid "no permissions to acknowledge problems"
-msgstr ""
+msgstr "障害の確認の権限がありません"
 
 #: include/classes/api/services/CEvent.php:784
 msgid "no permissions to add problem comments"
-msgstr ""
+msgstr "障害対応メッセージ追加の権限がありません"
 
 #: include/classes/api/services/CEvent.php:789
 msgid "no permissions to change problem severity"
-msgstr ""
+msgstr "深刻度の変更の権限がありません"
 
 #: include/classes/api/services/CEvent.php:779
 msgid "no permissions to close problems"
-msgstr ""
+msgstr "障害のクローズの権限がありません"
 
 #: include/classes/api/services/CConfiguration.php:173
 msgid "no permissions to create and edit maps"
-msgstr ""
+msgstr "マップの作成と変更の権限がありません"
 
 #: include/classes/api/services/CConfiguration.php:180
 msgid "no permissions to create and edit screens"
-msgstr ""
+msgstr "ダッシュボードとスクリーンの作成と変更の権限がありません"
 
 #: include/classes/api/services/CEvent.php:796
 msgid "no permissions to unacknowledge problems"
-msgstr ""
+msgstr "障害を未確認にする権限がありません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:411
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
