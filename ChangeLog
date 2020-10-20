@@ -10,7 +10,6 @@ A.F....PS. [ZBXNEXT-5969] added support of data collection using JavaScript (ase
 .........T [ZBXNEXT-6232] added LTE monitoring to Mikrotik SNMP template (mchudinov)
 ...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
 
-
 Bug fixes:
 ..F....... [ZBX-18498] fixed javascript error in map widget configuration for navigation tree source (vmurzins)
 ..F....... [ZBX-18396] fixed undefined offset in item test form (Ivo)
