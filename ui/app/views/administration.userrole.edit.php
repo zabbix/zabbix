@@ -207,7 +207,8 @@ $form_grid->addItem(
 					'srcfld1' => 'name',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
-					'user_type' => $data['type']
+					'user_type' => $data['type'],
+					'check_selected' => true
 				]
 			]
 		]))

@@ -111,9 +111,53 @@
 		}
 	}
 
+	class UserRoleApiManager {
+		constructor(readonly = false) {
+			this.api_methods = <?= $data['api_methods_by_user_types'] ?>;
+			this.$ms = $('#api_methods_');
+		}
+
+		updateMultiselectOptions(user_type) {
+			let url = this.$ms.multiSelect('getOption', 'url'),
+				popup = this.$ms.multiSelect('getOption', 'popup'),
+				pathname,
+				search;
+
+			[pathname, search] = url.split('?', 2);
+
+			let params = new URLSearchParams(search);
+			params.set('user_type', user_type);
+
+			popup.parameters.user_type = user_type
+
+			this.$ms.multiSelect('modify', {
+				url: pathname + '?' + params.toString(),
+				popup: popup
+			});
+		}
+
+		cleanNotAvailableMethods(user_type) {
+			let ms_data = this.$ms.data('multiSelect'),
+				selected_values = { ...ms_data.values.selected },
+				new_selected_values = [];
+
+			this.$ms.multiSelect('clean');
+
+			for (let selected_value in selected_values) {
+				if (this.api_methods[user_type].includes(selected_value)) {
+					new_selected_values.push(selected_values[selected_value]);
+				}
+			}
+
+			this.$ms.multiSelect('addData', new_selected_values, false);
+		}
+	}
+
 	document.addEventListener('DOMContentLoaded', () => {
 		const ui_manager = new UserRoleUiManager(<?php echo (bool) $this->data['readonly']; ?>);
+		const api_manager = new UserRoleApiManager(<?php echo (bool) $this->data['readonly']; ?>);
 		const type_elem = document.querySelector('.js-userrole-usertype');
+		const api_mask_methods = <?= $data['api_mask_methods_by_user_types'] ?>;
 
 		if (!type_elem) {
 			return false;
@@ -122,20 +166,10 @@
 		type_elem.addEventListener('change', (event) => {
 			ui_manager.disableUiCheckbox();
 
-			let user_type = type_elem.options[type_elem.selectedIndex].value,
-				url,
-				search,
-				ms_data = $('#api_methods_').data('multiSelect');
+			let user_type = type_elem.options[type_elem.selectedIndex].value;
 
-			[url, search] = ms_data.options.url.split('?', 2);
-
-			let params = new URLSearchParams(search);
-			params.set('user_type', user_type);
-
-			ms_data.options.url = url + '?' + params.toString();
-			ms_data.options.popup.parameters.user_type = user_type;
-
-			$('#api_methods_').data('multiSelect', ms_data);
+			api_manager.updateMultiselectOptions(user_type);
+			api_manager.cleanNotAvailableMethods(user_type);
 		});
 
 		document
@@ -143,6 +177,62 @@
 			.addEventListener('change', (event) => {
 				ui_manager.disableApiSection();
 			});
+
+		$('#api_methods_').on('normalize_popup_values', function(e, data) {
+			let methods = data.values.map(value => value['id']),
+				ms_methods = $(this).multiSelect('getData').map(value => value['id'])
+				user_type = type_elem.options[type_elem.selectedIndex].value,
+				normalized_methods = [],
+				data_values = [];
+
+			if (methods.length > 1) {
+				for (let index in ms_methods) {
+					if (!methods.includes(ms_methods[index])) {
+						ms_methods.splice(index, 1);
+					}
+				}
+			}
+
+			let selected_methods = [...new Set([...methods, ...ms_methods])];
+
+			mask_loop:
+			for (mask in api_mask_methods[user_type]) {
+				let selected_methods_names = [];
+
+				api_method_loop:
+				for (api_method of api_mask_methods[user_type][mask]) {
+					if (selected_methods.includes(api_method)) {
+						selected_methods_names.push(api_method);
+					}
+					else {
+						selected_methods_names = [];
+						break api_method_loop;
+					}
+				}
+
+				if (selected_methods_names.length) {
+					for (api_method of selected_methods_names) {
+						selected_methods.splice(selected_methods.indexOf(api_method), 1);
+					}
+
+					normalized_methods.push(mask);
+
+					if (selected_methods.length === 0) {
+						break mask_loop;
+					}
+				}
+			}
+
+			normalized_methods = [...new Set([...normalized_methods, ...selected_methods])];
+
+			for (api_method of normalized_methods) {
+				data_values.push({id: api_method, name: api_method});
+			}
+
+			data.values = data_values;
+
+			$(this).multiSelect('clean');
+		});
 
 		ui_manager.disableUiCheckbox();
 	});

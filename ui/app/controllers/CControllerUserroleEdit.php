@@ -170,6 +170,19 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			]
 		];
 
+		$data['api_methods_by_user_types'] = [];
+		$data['api_mask_methods_by_user_types'] = [];
+
+		foreach ([USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN] as $user_type) {
+			$data['api_methods_by_user_types'][$user_type] = array_merge(CRoleHelper::getApiMethodMasks($user_type),
+				CRoleHelper::getApiMethods($user_type)
+			);
+			$data['api_mask_methods_by_user_types'][$user_type] = CRoleHelper::getApiMaskMethods($user_type);
+		}
+
+		$data['api_methods_by_user_types'] = json_encode($data['api_methods_by_user_types']);
+		$data['api_mask_methods_by_user_types'] = json_encode($data['api_mask_methods_by_user_types']);
+
 		if ($this->getInput('roleid', 0) != 0) {
 			$data['roleid'] = $this->role['roleid'];
 			$data['name'] = $this->role['name'];

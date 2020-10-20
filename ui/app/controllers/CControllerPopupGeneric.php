@@ -389,7 +389,7 @@ class CControllerPopupGeneric extends CController {
 			'api_methods' => [
 				'title' => _('Api methods'),
 				'min_user_type' => USER_TYPE_SUPER_ADMIN,
-				'allowed_src_fields' => 'id,name',
+				'allowed_src_fields' => 'name',
 				'form' => [
 					'name' => 'apimethodform',
 					'id' => 'apimethods'
@@ -457,7 +457,9 @@ class CControllerPopupGeneric extends CController {
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
 			'filter_hostid_rst' =>					'in 1',
-			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'check_selected' =>						'in 1',
+			'selectedids' =>						'array'
 		];
 
 		// Set destination and source field validation roles.
@@ -803,6 +805,7 @@ class CControllerPopupGeneric extends CController {
 		$records = $this->fetchResults();
 		$this->applyExcludedids($records);
 		$this->applyDisableids($records);
+		$this->applySelectedids($records);
 		$this->transformRecordsForPatternSelector($records);
 
 		$data = [
@@ -857,6 +860,44 @@ class CControllerPopupGeneric extends CController {
 		foreach ($disableids as $disableid) {
 			if (array_key_exists($disableid, $records)) {
 				$records[$disableid]['_disabled'] = true;
+			}
+		}
+	}
+
+	/**
+	 * Mark records having IDs passed in 'selectedids' as selected.
+	 *
+	 * @param array $records
+	 */
+	protected function applySelectedids(array &$records) {
+		if ($this->getInput('check_selected')) {
+			$selectedids = $this->getInput('selectedids', []);
+
+			switch ($this->source_table) {
+				case 'api_methods':
+					$api_mask_methods = CRoleHelper::getApiMaskMethods(
+						$this->getInput('user_type', USER_TYPE_ZABBIX_USER)
+					);
+					$selectedids_with_method_masks = $selectedids;
+
+					foreach ($selectedids_with_method_masks as $index => $selectedid) {
+						if (mb_strpos($selectedid, '*') !== false && array_key_exists($selectedid, $api_mask_methods)) {
+							unset($selectedids[$index]);
+
+							foreach ($api_mask_methods[$selectedid] as $method) {
+								if (!in_array($method, $selectedids)) {
+									$selectedids[] = $method;
+								}
+							}
+						}
+					}
+					break;
+			}
+
+			foreach ($selectedids as $selectedid) {
+				if (array_key_exists($selectedid, $records)) {
+					$records[$selectedid]['_selected'] = true;
+				}
 			}
 		}
 	}

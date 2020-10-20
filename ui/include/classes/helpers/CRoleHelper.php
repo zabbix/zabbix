@@ -531,6 +531,29 @@ class CRoleHelper {
 	}
 
 	/**
+	 * Returns a list of API methods for each method mask for the given user type.
+	 *
+	 * @static
+	 *
+	 * @param int $user_type
+	 *
+	 * @return array
+	 */
+	public static function getApiMaskMethods(int $user_type): array {
+		$api_methods = CRoleHelper::getApiMethods($user_type);
+		$result = ['*' => $api_methods, '*.*' => $api_methods];
+
+		foreach ($api_methods as &$api_method) {
+			[$service, $method] = explode('.', $api_method, 2);
+			$result[$service.'.*'][] = $api_method;
+			$result['*.'.$method][] = $api_method;
+		}
+		unset($api_method);
+
+		return $result;
+	}
+
+	/**
 	 * Collects all API methods for all user types.
 	 *
 	 * @static
