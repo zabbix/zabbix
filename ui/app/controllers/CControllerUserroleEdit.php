@@ -180,7 +180,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$data = $this->overwriteInputs($data);
 
 		if ($this->getInput('roleid', 0) != 0) {
-			$data['rules'] = $data['rules'] + $this->getRulesValue((int) $this->role['roleid']);
+			$data['rules'] = array_merge($data['rules'], $this->getRulesValue((int) $this->role['roleid']));
 		}
 
 		$response = new CControllerResponseData($data);
