@@ -551,12 +551,14 @@ class CRole extends CApiService {
 				}
 			}
 
-			// Validate UI section should contain at least one allowed element.
+			// Validate UI section if it is updated, it should contain at least one allowed element.
 			foreach ($roles as $role) {
 				$rules = array_key_exists('rules', $role) ? $role['rules'] : [];
-				$rules += [
-					CRoleHelper::SECTION_UI => []
-				];
+
+				if (!array_key_exists(CRoleHelper::SECTION_UI, $rules)) {
+					continue;
+				}
+
 				$rules[CRoleHelper::SECTION_UI] = array_column($rules[CRoleHelper::SECTION_UI], 'status', 'name');
 
 				foreach ($db_roles_rules[$role['roleid']] as $db_rule) {
