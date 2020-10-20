@@ -232,7 +232,7 @@ class CRole extends CApiService {
 				'modules.default_access' =>	['type' => API_INT32, 'in' => '0,1', 'default' => '1'],
 				'api.access' =>				['type' => API_INT32, 'in' => '0,1'],
 				'api.mode' =>				['type' => API_INT32, 'in' => '0,1'],
-				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE],
+				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
@@ -317,7 +317,7 @@ class CRole extends CApiService {
 				'modules.default_access' =>	['type' => API_INT32, 'in' => '0,1'],
 				'api.access' =>				['type' => API_INT32, 'in' => '0,1'],
 				'api.mode' =>				['type' => API_INT32, 'in' => '0,1'],
-				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE],
+				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'status' =>					['type' => API_INT32, 'in' => '0,1']
@@ -480,11 +480,8 @@ class CRole extends CApiService {
 			return;
 		}
 
-		if (!preg_match('/([a-z]+|\*)\.([a-z]+|\*)/', $api_method)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid API method "%1$s".', $api_method));
-		}
-
-		if (!in_array($api_method, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN))
+		if (!preg_match('/([a-z]+|\*)\.([a-z]+|\*)/', $api_method)
+				&& !in_array($api_method, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN))
 				&& !in_array($api_method, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid API method "%1$s".', $api_method));
 		}
