@@ -127,7 +127,6 @@ class CSelect extends CTag {
 	}
 
 	/**
-	 *
 	 * Enable or disable readonly mode for the element.
 	 *
 	 * @param bool $value
