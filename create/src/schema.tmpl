@@ -22,6 +22,13 @@
 -- Tables must be sorted to match referential integrity rules
 --
 
+TABLE|role|roleid|ZBX_DATA
+FIELD		|roleid		|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|readonly	|t_integer	|'0'	|NOT NULL	|0
+UNIQUE		|1		|name
+
 TABLE|users|userid|ZBX_DATA
 FIELD		|userid		|t_id		|	|NOT NULL	|0
 FIELD		|alias		|t_varchar(100)	|''	|NOT NULL	|0
@@ -1861,13 +1868,6 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|items
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|itemid
-
-TABLE|role|roleid|ZBX_DATA
-FIELD		|roleid		|t_id		|	|NOT NULL	|0
-FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|readonly	|t_integer	|'0'	|NOT NULL	|0
-UNIQUE		|1		|name
 
 TABLE|role_rule|role_ruleid|ZBX_DATA
 FIELD		|role_ruleid	|t_id		|	|NOT NULL	|0
