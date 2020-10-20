@@ -226,7 +226,12 @@ class ZBase {
 						exit;
 					}
 					else {
-						new CCookieSession();
+						$session = new CCookieSession();
+						if (!$session->session_start($session->extractSessionId() ?: '')) {
+							throw new Exception(_('Session initialization error.'));
+						}
+
+						CSessionHelper::set('sessionid', session_id());
 					}
 				}
 				break;
