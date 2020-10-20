@@ -116,7 +116,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(ZBX_DEFAULT_URL);
+			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {

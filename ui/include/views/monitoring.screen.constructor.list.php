@@ -27,10 +27,6 @@ $this->includeJsFile('monitoring.screen.js.php');
 
 $widget = (new CWidget())->setTitle(_('Screens').': '.$data['screen']['name']);
 
-if (array_key_exists('templateid', $data['screen'])) {
-	$widget->addItem(get_header_host_table('screens', $data['screen']['templateid']));
-}
-
 $screenBuilder = new CScreenBuilder([
 	'isFlickerfree' => false,
 	'screen' => $data['screen'],

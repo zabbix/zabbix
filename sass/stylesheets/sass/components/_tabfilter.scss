@@ -1,0 +1,240 @@
+$tab-label-color: $btn-font-color;
+$tab-label-bg-color: $btn-bg-color;
+$tab-label-focus-bg-color: $btn-form-hover-color;
+$tab-label-selected-color: $btn-font-color;
+$tab-label-selected-bg-color: $btn-bg-color;
+$tab-label-selected-border-color: $btn-bg-color;
+$tab-label-expanded-color: $font-color;
+$tab-label-expanded-bg-color: $ui-bg-color;
+$tab-label-expanded-border-color: $ui-border-color;
+$tab-label-hover-color: $btn-font-color;
+$tab-label-hover-bg-color: $btn-bg-color;
+$tab-label-counter-color: $form-font-color;
+$tab-label-counter-bg-color: $form-disabled-bg-color;
+
+.filter-container.tabfilter-container {
+	padding: 0;
+	border: 0 none;
+	background-color: transparent;
+	margin: 0;
+
+	.form-buttons {
+		[name="filter_new"],
+		[name="filter_update"] {
+			margin-right: 20px;
+		}
+	}
+
+	/* All tab filters content container */
+	.tabfilter-content-container {
+		border: 1px solid $ui-border-color;
+		background-color: $ui-bg-color;
+		padding: 10px 0;
+		margin-bottom: 6px;
+	}
+
+	/* Top navigation labels */
+	nav > ul {
+		display: flex;
+		flex: 1;
+		justify-content: space-between;
+		background-color: $body-bg-color;
+		// Sortable container have padding-top 3px for focused state be visible, therefore filter content shift compensated with negative margin of same size.
+		margin-top: -3px;
+	}
+
+	nav > ul > li {
+		margin: 0 3px 5px 0;
+		padding-top: 3px;
+
+		// Container with sortable tab items. Occupy space left with overflow and scrolling of content (javascript).
+		&:nth-child(2) {
+			flex-grow: 1;
+			overflow: hidden;
+			padding-bottom: 2px;
+			margin: 0 3px -2px -3px;
+			height: 30px;
+
+			ul {
+				white-space: nowrap;
+				margin-left: 3px;
+				margin-right: 3px;
+			}
+		}
+
+		&:nth-child(3) {
+			> ul > li {
+				vertical-align: top;
+			}
+		}
+
+		// Left and right navigation containers. Occupy as much space as needed to render it content.
+		&:nth-child(1),
+		&:nth-child(3) {
+			white-space: nowrap;
+		}
+	}
+
+	nav {
+		margin-bottom: -1px;
+
+		li {
+			display: inline-block;
+			height: 22px;
+			line-height: 22px;
+			vertical-align: middle;
+
+			button {
+				vertical-align: middle;
+				// Remove global defined margin-top for buttons.
+				margin-top: 0;
+			}
+		}
+	}
+
+	// Tab filter label li element.
+	.tabfilter-item-label {
+		&:hover {
+			color: $tab-label-hover-color;
+			background-color: darken($tab-label-hover-bg-color, 5%);
+		}
+
+		display: inline-block;
+		background-color: $tab-label-bg-color;
+		border-radius: 2px;
+		border: 1px solid transparent;
+		color: $tab-label-color;
+		margin-right: 3px;
+
+		&.unsaved .tabfilter-item-link {
+			font-style: italic;
+
+			&::before {
+				content: '*';
+			}
+
+			&[data-counter]::after {
+				display: none;
+			}
+		}
+
+		&.selected.expanded {
+			position: relative;
+			background-color: $tab-label-expanded-bg-color;
+			border: 1px solid $tab-label-expanded-border-color;
+			border-bottom: 0;
+			padding-bottom: 8px;
+			margin-top: -1px;
+			vertical-align: baseline;
+
+			.tabfilter-item-link {
+				color: $tab-label-expanded-color;
+			}
+
+			&:hover {
+				background: $tab-label-focus-bg-color;
+			}
+
+			.icon-edit {
+				background: url($sprite-path) no-repeat -42px -621px;
+			}
+		}
+
+		&.selected {
+			background-color: darken($tab-label-selected-bg-color, 5%);
+
+			.tabfilter-item-link {
+				color: $tab-label-selected-color;
+			}
+
+			.tabfilter-item-link[data-counter]::after {
+				display: none;
+			}
+		}
+
+		&.focused {
+			box-shadow: 0 0 0 2px rgba($blue, .35);
+		}
+
+		&.disabled {
+			box-shadow: none;
+			pointer-events: none;
+		}
+
+		.icon-home.tabfilter-item-link[data-counter]::after {
+			display: none;
+		}
+	}
+
+	// Tab filter label li clickable a element.
+	.tabfilter-item-link {
+		display: inline-block;
+		color: $tab-label-color;
+		border: 1px transparent;
+		line-height: 22px;
+		vertical-align: middle;
+		padding: 0 8px;
+	}
+
+	.icon-edit {
+		@extend %btn-widget-defaults;
+		width: 24px;
+		height: 22px;
+		background: url($sprite-path) no-repeat -354px -621px;
+
+		cursor: pointer;
+		margin: 0;
+		vertical-align: middle;
+		display: inline-block;
+		opacity: 0;
+	}
+
+	// Tab filter contents container.
+	.tabfilter-tabs-container {
+		.filter-container.time-selection-container {
+			border: 0 none;
+		}
+	}
+}
+
+[data-counter]::after {
+	margin-left: .4em;
+	padding: 0.1em 0.4em;
+	font-size: $font-h3-size;
+	background-color: $tab-label-counter-bg-color;
+	border-radius: 2px;
+	color: $tab-label-counter-color;
+	content: attr(data-counter);
+}
+
+[data-counter=""]::after {
+	display: none;
+}
+
+.menu-popup {
+	.menu-popup-item[data-counter]::after {
+		display: block;
+		position: absolute;
+		top: 2px;
+		right: 15px;
+		line-height: 18px;
+	}
+
+	.menu-popup-item[data-counter] {
+		padding-right: 35px;
+	}
+}
+
+.icon-home::before {
+	display: block;
+	width: 22px;
+	height: 24px;
+	content: '';
+	// white icon
+	background: url($sprite-path) no-repeat -433px -510px;
+}
+
+.selected.expanded .icon-home::before {
+	// grey icon
+	background: url($sprite-path) no-repeat -121px -510px;
+}

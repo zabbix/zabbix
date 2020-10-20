@@ -1,13 +1,13 @@
 
-# Template App PHP-FPM by HTTP
+# PHP-FPM by HTTP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor PHP-FPM by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`Template App PHP-FPM by HTTP` collects metrics by polling PHP-FPM status-page with HTTP agent remotely.
+Template `PHP-FPM by HTTP` collects metrics by polling PHP-FPM status-page with HTTP agent remotely.
 
 Note that this solution supports https and redirects.
 
@@ -19,7 +19,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Open the php-fpm configuration file and enable the status page as shown.
     ```

@@ -24,6 +24,10 @@
  */
 class CDHost extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'dhosts';
 	protected $tableAlias = 'dh';
 	protected $sortColumns = ['dhostid', 'druleid'];

@@ -36,11 +36,11 @@ class CEncryptedCookieSession extends CCookieSession {
 
 		$session_data = $this->parseData();
 
-		if ($session_data === '' || !$this->checkSign($session_data)) {
+		if (!$this->checkSign($session_data)) {
 			return null;
 		}
 
-		$session_data = unserialize($session_data);
+		$session_data = json_decode($session_data, true);
 
 		if (!array_key_exists('sessionid', $session_data)) {
 			return null;
@@ -56,16 +56,14 @@ class CEncryptedCookieSession extends CCookieSession {
 	 *
 	 * @return string
 	 */
-	protected function prepareData(string $data): string {
-		$data = unserialize($data);
-
+	protected function prepareData(array $data): string {
 		if (array_key_exists('sign', $data)) {
 			unset($data['sign']);
 		}
 
-		$data['sign'] = CEncryptHelper::sign(serialize($data));
+		$data['sign'] = CEncryptHelper::sign(json_encode($data));
 
-		return base64_encode(serialize($data));
+		return base64_encode(json_encode($data));
 	}
 
 	/**
@@ -76,15 +74,15 @@ class CEncryptedCookieSession extends CCookieSession {
 	 * @return boolean
 	 */
 	protected function checkSign(string $data): bool {
-		$data = unserialize($data);
+		$data = json_decode($data, true);
 
-		if (!array_key_exists('sign', $data)) {
+		if (!is_array($data) || !array_key_exists('sign', $data)) {
 			return false;
 		}
 
 		$session_sign = $data['sign'];
 		unset($data['sign']);
-		$sign = CEncryptHelper::sign(serialize($data));
+		$sign = CEncryptHelper::sign(json_encode($data));
 
 		return $session_sign && $sign && CEncryptHelper::checkSign($session_sign, $sign);
 	}

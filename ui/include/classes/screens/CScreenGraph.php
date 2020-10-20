@@ -198,7 +198,8 @@ class CScreenGraph extends CScreenBase {
 			);
 		}
 
-		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault) {
+		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault
+				|| !CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS)) {
 			$item = new CDiv();
 		}
 		elseif ($this->mode == SCREEN_MODE_PREVIEW) {

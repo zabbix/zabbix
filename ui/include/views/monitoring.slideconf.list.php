@@ -38,7 +38,7 @@ $widget = (new CWidget())
 			->cleanItems()
 			->addItem(
 				(new CList())
-					->addItem(new CSubmit('form', _('Create slide show')))
+					->addItem((new CSubmit('form', _('Create slide show')))->setEnabled($data['allowed_edit']))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -80,8 +80,10 @@ foreach ($this->data['slides'] as $slide) {
 
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN || $slide['editable']) {
 		$checkbox = new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']);
-		$properties = (new CLink(_('Properties'), '?form=update&slideshowid='.$slide['slideshowid']))
-			->addClass('action');
+		$properties = $data['allowed_edit']
+			?(new CLink(_('Properties'), '?form=update&slideshowid='.$slide['slideshowid']))
+				->addClass('action')
+			: _('Properties');
 	}
 	else {
 		$checkbox = (new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']))
@@ -103,7 +105,9 @@ $form->addItem([
 	$slidesTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'shows', [
-		'slideshow.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected slide shows?')]
+		'slideshow.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'),
+			'disabled' => $data['allowed_edit'] ? null : 'disabled'
+		]
 	])
 ]);
 

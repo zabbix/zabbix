@@ -122,17 +122,20 @@ if ($filter['groupby'] !== '') {
 
 	order_result($report, $sortField, $sortOrder);
 
+	$allowed_ui_inventory = CWebUser::checkAccess(CRoleHelper::UI_INVENTORY_HOSTS);
 	foreach ($report as $rep) {
 		$table->addRow([
 			zbx_str2links($rep['inventory_field']),
-			new CLink($rep['host_count'],
-				(new CUrl('hostinventories.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_exact', '1')
-					->setArgument('filter_groups', array_keys($ms_groups))
-					->setArgument('filter_field', $filter['groupby'])
-					->setArgument('filter_field_value', $rep['inventory_field'])
-			)
+			$allowed_ui_inventory
+				? new CLink($rep['host_count'],
+					(new CUrl('hostinventories.php'))
+						->setArgument('filter_set', '1')
+						->setArgument('filter_exact', '1')
+						->setArgument('filter_groups', array_keys($ms_groups))
+						->setArgument('filter_field', $filter['groupby'])
+						->setArgument('filter_field_value', $rep['inventory_field'])
+				)
+				: $rep['host_count']
 		]);
 	}
 }

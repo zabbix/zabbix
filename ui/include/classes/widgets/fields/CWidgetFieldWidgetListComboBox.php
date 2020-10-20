@@ -69,12 +69,11 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return
-			'var dashboard = jQuery(".dashbrd-grid-container"),'.
-				'dashboard_data = dashboard.data("dashboardGrid"),'.
+			'var dashboard_data = dashboard.$target.data("dashboardGrid"),'.
 				'filters_box = jQuery("#'.$this->getName().'");'.
 			'jQuery("<option />").text("'._('Select widget').'").val("").appendTo(filters_box);'.
 			'jQuery.each('.
-				'dashboard.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
+				'dashboard.$target.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
 				'function(i, widget) {'.
 					'if (widget !== dashboard_data["dialogue"]["widget"]) {'. // Widget currently edited or null for new widgets.
 						'jQuery("<option />")'.

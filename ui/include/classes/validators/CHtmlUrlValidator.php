@@ -58,7 +58,8 @@ class CHtmlUrlValidator {
 		}
 
 		if ($options['allow_inventory_macro'] != INVENTORY_URL_MACRO_NONE) {
-			$macro_parser = new CMacroParser(['{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}'], [
+			$macro_parser = new CMacroParser([
+				'macros' => ['{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}'],
 				'ref_type' => ($options['allow_inventory_macro'] == INVENTORY_URL_MACRO_TRIGGER)
 					? CMacroParser::REFERENCE_NUMERIC
 					: CMacroParser::REFERENCE_NONE
@@ -71,7 +72,10 @@ class CHtmlUrlValidator {
 		}
 
 		if ($options['allow_event_tags_macro'] === true) {
-			$macro_parser = new CMacroParser(['{EVENT.TAGS}'], ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]);
+			$macro_parser = new CMacroParser([
+				'macros' => ['{EVENT.TAGS}'],
+				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
+			]);
 
 			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
 				if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {

@@ -47,6 +47,7 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 	ZBX_UNUSED(macro_type);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
+	ZBX_UNUSED(tz);
 
 	return SUCCEED;
 }

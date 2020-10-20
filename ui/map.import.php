@@ -39,7 +39,7 @@ $data = [
 		'groups' => ['createMissing' => false],
 		'hosts' => ['updateExisting' => false, 'createMissing' => false],
 		'templates' => ['updateExisting' => false, 'createMissing' => false],
-		'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
 		'applications' => ['createMissing' => false, 'deleteMissing' => false],
 		'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -53,7 +53,9 @@ $data = [
 		'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
-	'rules_preset' => getRequest('rules_preset')
+	'rules_preset' => getRequest('rules_preset'),
+	'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+	'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 ];
 
 if (hasRequest('import')) {

@@ -43,6 +43,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => ['host', 'user'],
 			'method' => 'resolveTexts'
 		],
+		'hostInterfaceDetailsSecurityname' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsAuthPassphrase' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsPrivPassphrase' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsContextName' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
+		'hostInterfaceDetailsCommunity' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
 		'hostInterfacePort' => [
 			'types' => ['user'],
 			'method' => 'resolveTexts'
@@ -1020,19 +1040,25 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 									$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
 								}
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-									$link = (new CLink($function['host'].':'.$function['key_'],
-										'disc_prototypes.php?form=update&itemid='.$function['itemid'].
-										'&parent_discoveryid='.$function['parent_itemid']
-									))
-										->addClass(ZBX_STYLE_LINK_ALT)
-										->addClass($style);
+									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+										? (new CLink($function['host'].':'.$function['key_'],
+											'disc_prototypes.php?form=update&itemid='.$function['itemid'].
+											'&parent_discoveryid='.$function['parent_itemid']
+										))
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->addClass($style)
+										: (new CSpan($function['host'].':'.$function['key_']))
+											->addClass($style);
 								}
 								else {
-									$link = (new CLink($function['host'].':'.$function['key_'],
+									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+									? (new CLink($function['host'].':'.$function['key_'],
 										'items.php?form=update&itemid='.$function['itemid']
 									))
 										->addClass(ZBX_STYLE_LINK_ALT)
 										->setAttribute('data-itemid', $function['itemid'])
+										->addClass($style)
+									: (new CSpan($function['host'].':'.$function['key_']))
 										->addClass($style);
 								}
 

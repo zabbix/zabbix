@@ -24,8 +24,8 @@
  */
 class CWidgetFormActionLog extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_ACTION_LOG);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_ACTION_LOG);
 
 		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',

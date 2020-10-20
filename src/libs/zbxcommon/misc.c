@@ -3557,17 +3557,22 @@ int	is_discovery_macro(const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_time_function                                                 *
+ * Function: zbx_get_function_type                                            *
  *                                                                            *
- * Return value:  SUCCEED - given function is time-based                      *
- *                FAIL - otherwise                                            *
+ * Purpose: Returns function type based on its name                           *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Return value:  Function type.                                              *
  *                                                                            *
  ******************************************************************************/
-int	is_time_function(const char *func)
+zbx_function_type_t	zbx_get_function_type(const char *func)
 {
-	return str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ',');
+	if (0 == strncmp(func, "trend", 5))
+		return ZBX_FUNCTION_TYPE_TRENDS;
+
+	if (SUCCEED == str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ','))
+		return ZBX_FUNCTION_TYPE_TIMER;
+
+	return ZBX_FUNCTION_TYPE_HISTORY;
 }
 
 /******************************************************************************
@@ -3629,6 +3634,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_SCRIPT:
 			return INTERFACE_TYPE_ANY;
 		default:
 			return INTERFACE_TYPE_UNKNOWN;
@@ -3878,27 +3884,20 @@ void	zbx_update_env(double time_now)
  * Purpose: calculate item nextcheck for zabix agent type items               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
-		int refresh_unsupported, int *nextcheck, char **error)
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
+		int *nextcheck, char **error)
 {
-	if (ITEM_STATE_NORMAL == state)
-	{
-		int			simple_interval;
-		zbx_custom_interval_t	*custom_intervals;
+	int			simple_interval;
+	zbx_custom_interval_t	*custom_intervals;
 
-		if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, error))
-		{
-			*nextcheck = ZBX_JAN_2038;
-			return FAIL;
-		}
-
-		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
-		zbx_custom_interval_free(custom_intervals);
-	}
-	else	/* for items notsupported for other reasons use refresh_unsupported interval */
+	if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, error))
 	{
-		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, refresh_unsupported, NULL, now);
+		*nextcheck = ZBX_JAN_2038;
+		return FAIL;
 	}
+
+	*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
+	zbx_custom_interval_free(custom_intervals);
 
 	return SUCCEED;
 }

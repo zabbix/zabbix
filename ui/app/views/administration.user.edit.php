@@ -326,46 +326,159 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 if ($data['action'] === 'user.edit') {
 	$permissions_form_list = new CFormList('permissionsFormList');
 
-	$type_combobox = new CComboBox('type', $data['type'], 'submit()', user_type2str());
+	$role_multiselect = (new CMultiSelect([
+		'name' => 'roleid',
+		'object_name' => 'roles',
+		'data' => $data['role'],
+		'multiple' => false,
+		'disabled' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
+		'popup' => [
+			'parameters' => [
+				'srctbl' => 'roles',
+				'srcfld1' => 'roleid',
+				'dstfrm' => 'user_form',
+				'dstfld1' => 'roleid'
+			]
+		]
+	]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-		$type_combobox->setEnabled(false);
-		$permissions_form_list->addRow(_('User type'),
-			[$type_combobox, ' ', new CSpan(_('User can\'t change type for himself'))]
+		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(),
+			(new CDiv([
+				$role_multiselect,
+				new CDiv(_('User can\'t change role for himself'))
+			]))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('multiselect-description-container')
 		);
 	}
 	else {
-		$permissions_form_list->addRow(_('User type'), $type_combobox);
+		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(), $role_multiselect);
 	}
 
-	$permissions_table = (new CTable())
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Host group'), _('Permissions')]);
+	if ($data['roleid']) {
+		$permissions_form_list->addRow(_('User type'),
+			new CTextBox('user_type', user_type2str($data['user_type']), true)
+		);
 
-	if ($data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$permissions_table->addRow([italic(_('All groups')), permissionText(PERM_READ_WRITE)]);
-	}
-	else {
-		foreach ($data['groups_rights'] as $groupid => $group_rights) {
-			if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
-				$group_name = ($groupid == 0)
-					? italic(_('All groups'))
-					: [$group_rights['name'], SPACE, italic('('._('including subgroups').')')];
-			}
-			else {
-				$group_name = $group_rights['name'];
-			}
-			$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
+		$permissions_table = (new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader([_('Host group'), _('Permissions')]);
+
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+			$permissions_table->addRow([italic(_('All groups')), permissionText(PERM_READ_WRITE)]);
 		}
-	}
+		else {
+			foreach ($data['groups_rights'] as $groupid => $group_rights) {
+				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+					$group_name = ($groupid == 0)
+						? italic(_('All groups'))
+						: [$group_rights['name'], SPACE, italic('('._('including subgroups').')')];
+				}
+				else {
+					$group_name = $group_rights['name'];
+				}
+				$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
+			}
+		}
 
-	$permissions_form_list
-		->addRow(_('Permissions'),
-			(new CDiv($permissions_table))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		)
-		->addInfo(_('Permissions can be assigned for user groups only.'));
+		$permissions_form_list
+			->addRow(_('Permissions'),
+				(new CDiv($permissions_table))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			)
+			->addInfo(_('Permissions can be assigned for user groups only.'));
+
+		$permissions_form_list
+			->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
+
+		foreach (CRoleHelper::getUiSectionsLabels($data['user_type']) as $section_name => $section_label) {
+			$elements = [];
+
+			foreach (CRoleHelper::getUiSectionRulesLabels($section_name, $data['user_type']) as $rule_name => $rule_label) {
+				$elements[] = (new CSpan($rule_label))->addClass(
+					CRoleHelper::checkAccess($rule_name, $data['roleid']) ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				);
+			}
+
+			if ($elements) {
+				$permissions_form_list->addRow($section_label, (new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+				);
+			}
+		}
+
+		$permissions_form_list->addRow((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header'));
+
+		if (!$data['modules']) {
+			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
+		}
+		else {
+			$elements = [];
+
+			foreach ($data['modules'] as $moduleid => $module) {
+				$elements[] = (new CSpan($module['id']))->addClass(
+					CRoleHelper::checkAccess(CRoleHelper::MODULES_MODULE.$moduleid, $data['roleid'])
+						? ZBX_STYLE_STATUS_GREEN
+						: ZBX_STYLE_STATUS_GREY
+				);
+			}
+
+			if ($elements) {
+				$permissions_form_list->addRow((new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+				);
+			}
+		}
+
+		$api_access_enabled = CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $data['roleid']);
+		$permissions_form_list
+			->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
+			->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
+					$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				)))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass('rules-status-container')
+			);
+
+		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+
+		if ($api_methods) {
+			$api_access_mode_allowed = CRoleHelper::checkAccess(CRoleHelper::API_MODE, $data['roleid']);
+			$elements = [];
+
+			foreach ($api_methods as $api_method) {
+				$elements[] = (new CSpan($api_method))->addClass(
+					$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
+				);
+			}
+
+			$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+				(new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		$permissions_form_list->addRow((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header'));
+		$elements = [];
+
+		foreach (CRoleHelper::getActionsLabels($data['user_type']) as $rule_name => $rule_label) {
+			$elements[] = (new CSpan($rule_label))
+				->addClass(CRoleHelper::checkAccess($rule_name, $data['roleid'])
+					? ZBX_STYLE_STATUS_GREEN
+					: ZBX_STYLE_STATUS_GREY
+				);
+		}
+
+		$permissions_form_list->addRow((new CDiv($elements))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('rules-status-container')
+		);
+	}
 
 	$tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 }
@@ -494,7 +607,7 @@ if ($data['action'] === 'user.edit') {
 else {
 	$tabs->setFooter(makeFormFooter(
 		(new CSubmitButton(_('Update'), 'action', 'userprofile.update'))->setId('update'),
-		[(new CRedirectButton(_('Cancel'), ZBX_DEFAULT_URL))->setId('cancel')]
+		[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->setId('cancel')]
 	));
 }
 

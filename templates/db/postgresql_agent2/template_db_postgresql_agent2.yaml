@@ -1,0 +1,2003 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:22Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'PostgreSQL Agent 2'
+      name: 'PostgreSQL Agent 2'
+      description: 'Template tooling version used: 0.38'
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: PostgreSQL
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Archive: Count of archive files'
+          type: DEPENDENT
+          key: pgsql.archive.count_archived_files
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            Collect all metrics from pg_stat_activity
+            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.archived_count
+          master_item:
+            key: 'pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Archive: Count of files in archive_status need to archive'
+          type: DEPENDENT
+          key: pgsql.archive.count_files_to_archive
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.count_files
+          master_item:
+            key: 'pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Archive: Count of attempts to archive files'
+          type: DEPENDENT
+          key: pgsql.archive.failed_trying_to_archive
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            Collect all metrics from pg_stat_activity
+            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.failed_count
+          master_item:
+            key: 'pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Archive: Count of files need to archive'
+          type: DEPENDENT
+          key: pgsql.archive.size_files_to_archive
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Size of files to archive'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.size_files
+          master_item:
+            key: 'pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'PostgreSQL: Get archive'
+          key: 'pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Collect archive status metrics'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Autovacuum: Count of autovacuum workers'
+          key: 'pgsql.autovacuum.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of autovacuum workers.'
+          applications:
+            -
+              name: PostgreSQL
+        -
+          name: 'Bgwriter: Buffers allocated'
+          type: DEPENDENT
+          key: pgsql.bgwriter.buffers_alloc.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of buffers allocated'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.buffers_alloc
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Bgwriter: Buffers written directly by a backend'
+          type: DEPENDENT
+          key: pgsql.bgwriter.buffers_backend.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of buffers written directly by a backend'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.buffers_backend
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Bgwriter: Times a backend execute its own fsync'
+          type: DEPENDENT
+          key: pgsql.bgwriter.buffers_backend_fsync.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.buffers_backend_fsync
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Checkpoint: Buffers checkpoints written'
+          type: DEPENDENT
+          key: pgsql.bgwriter.buffers_checkpoint.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of buffers written during checkpoints'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.buffers_checkpoint
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Checkpoint: Buffers background written'
+          type: DEPENDENT
+          key: pgsql.bgwriter.buffers_clean.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of buffers written by the background writer'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.buffers_clean
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Checkpoint: Requested'
+          type: DEPENDENT
+          key: pgsql.bgwriter.checkpoints_req.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of requested checkpoints that have been performed'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.checkpoints_req
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Checkpoint: By timeout'
+          type: DEPENDENT
+          key: pgsql.bgwriter.checkpoints_timed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of scheduled checkpoints that have been performed'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.checkpoints_timed
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Checkpoint: Checkpoint write time'
+          type: DEPENDENT
+          key: pgsql.bgwriter.checkpoint_write_time.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.checkpoint_write_time
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Bgwriter: Number of bgwriter stopped'
+          type: DEPENDENT
+          key: pgsql.bgwriter.maxwritten_clean.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times the background writer stopped a cleaning scan because it had written too many buffers'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.maxwritten_clean
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Checkpoint: Checkpoint sync time'
+          type: DEPENDENT
+          key: pgsql.bgwriter.sync_time.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sync_time
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'PostgreSQL: Get bgwriter'
+          key: 'pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'PostgreSQL: Cache hit'
+          key: 'pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: PostgreSQL
+        -
+          name: 'Connections sum: Active'
+          type: DEPENDENT
+          key: pgsql.connections.active
+          delay: '0'
+          history: 7d
+          description: 'Total number of connections executing a query'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.active
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Disabled'
+          type: DEPENDENT
+          key: pgsql.connections.disabled
+          delay: '0'
+          history: 7d
+          description: 'Total number of disabled connections'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.disabled
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Fastpath function call'
+          type: DEPENDENT
+          key: pgsql.connections.fastpath_function_call
+          delay: '0'
+          history: 7d
+          description: 'Total number of connections executing a fast-path function'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.idle_in_transaction
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Idle'
+          type: DEPENDENT
+          key: pgsql.connections.idle
+          delay: '0'
+          history: 7d
+          description: 'Total number of connections waiting for a new client command'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.idle
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Idle in transaction'
+          type: DEPENDENT
+          key: pgsql.connections.idle_in_transaction
+          delay: '0'
+          history: 7d
+          description: 'Total number of connections in a transaction state, but not executing a query'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.idle_in_transaction
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Idle in transaction (aborted)'
+          type: DEPENDENT
+          key: pgsql.connections.idle_in_transaction_aborted
+          delay: '0'
+          history: 7d
+          description: 'Total number of connections in a transaction state, but not executing a query and one of the statements in the transaction caused an error.'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.idle_in_transaction_aborted
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Prepared'
+          type: DEPENDENT
+          key: pgsql.connections.prepared
+          delay: '0'
+          history: 7d
+          description: |
+            Total number of prepared transactions
+            https://www.postgresql.org/docs/current/sql-prepare-transaction.html
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.prepared
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Total'
+          type: DEPENDENT
+          key: pgsql.connections.total
+          delay: '0'
+          history: 7d
+          description: 'Total number of connections'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Connections sum: Total %'
+          type: DEPENDENT
+          key: pgsql.connections.total_pct
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Total number of connections in percentage'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_pct
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          triggers:
+            -
+              expression: '{min(5m)} > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
+              name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
+              priority: AVERAGE
+        -
+          name: 'Connections sum: Waiting'
+          type: DEPENDENT
+          key: pgsql.connections.waiting
+          delay: '0'
+          history: 7d
+          description: |
+            Total number of waiting connections
+            https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.waiting
+          master_item:
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'PostgreSQL: Get connections'
+          key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            Collect all metrics from pg_stat_activity
+            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Dbstat: Hit blocks read'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.blks_hit.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times disk blocks were found already in the buffer cache'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.blks_hit
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Disk blocks read'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.blks_read.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of disk blocks read'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.blks_read
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Blocks read time'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.blk_read_time
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Time spent reading data file blocks by backends, in milliseconds'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.blk_read_time
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Blocks write time'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.blk_write_time
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Time spent writing data file blocks by backends, in milliseconds'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.blk_read_time
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Checksum failures'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.checksum_failures.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.checksum_failures
+            -
+              type: MATCHES_REGEX
+              parameters:
+                - '^\d*$'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'ZBX_NOTSUPPORTED: Checksum failures metric is supported only in PostgreSQL 12 or higher.'
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Conflicts'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.conflicts.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of queries canceled due to conflicts with recovery.  (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.conflicts
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Deadlocks'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.deadlocks.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of deadlocks detected'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.deadlocks
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Backends connected'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.numbackends
+          delay: '0'
+          history: 7d
+          description: 'Number of connected backends'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.numbackends
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Number temp bytes'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.temp_bytes.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: b
+          description: 'Total amount of data written to temporary files by queries'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.temp_bytes
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Number temp bytes'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.temp_files.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of temporary files created by queries'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.temp_files
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Rows deleted'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.tup_deleted.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of rows deleted by queries'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.tup_deleted
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Rows fetched'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.tup_fetched.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of rows fetched by queries'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.tup_fetched
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Rows inserted'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.tup_inserted.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of rows inserted by queries'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.tup_inserted
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Rows returned'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.tup_returned.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of rows returned by queries'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.tup_returned
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Rows updated'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.tup_updated.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of rows updated by queries'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.tup_updated
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Committed transactions'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.xact_commit.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of transactions that have been committed'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.xact_commit
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'Dbstat: Roll backed transactions'
+          type: DEPENDENT
+          key: pgsql.dbstat.sum.xact_rollback.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of transactions that have been rolled back'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.xact_rollback
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'PostgreSQL: Get dbstat sum'
+          key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            Collect all metrics from pg_stat_database per database
+            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'PostgreSQL: Get dbstat'
+          key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            Collect all metrics from pg_stat_database per database
+            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'PostgreSQL: Get locks'
+          key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            Collect all metrics from pg_locks per database
+            https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'PostgreSQL: Age of oldest xid'
+          key: 'pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Age of oldest xid.'
+          applications:
+            -
+              name: PostgreSQL
+          triggers:
+            -
+              expression: '{last()} > 18000000'
+              name: 'PostgreSQL: Oldest xid is too big'
+              priority: AVERAGE
+        -
+          name: 'PostgreSQL: Ping'
+          key: 'pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'PostgreSQL: Service is down'
+              priority: HIGH
+        -
+          name: 'Replication: Standby count'
+          key: 'pgsql.replication.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          description: 'Number of standby servers'
+          applications:
+            -
+              name: PostgreSQL
+        -
+          name: 'Replication: Lag in bytes'
+          key: 'pgsql.replication.lag.b["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          units: B
+          description: 'Replication lag with Master in byte.'
+          applications:
+            -
+              name: PostgreSQL
+        -
+          name: 'Replication: Lag in seconds'
+          key: 'pgsql.replication.lag.sec["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          units: s
+          description: 'Replication lag with Master in seconds.'
+          applications:
+            -
+              name: PostgreSQL
+        -
+          name: 'Replication: Recovery role'
+          key: 'pgsql.replication.recovery_role["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          description: 'Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.'
+          applications:
+            -
+              name: PostgreSQL
+          valuemap:
+            name: 'PostgreSQL recovery role'
+        -
+          name: 'Replication: Status'
+          key: 'pgsql.replication.status["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode'
+          applications:
+            -
+              name: PostgreSQL
+          valuemap:
+            name: 'PostgreSQL replication status'
+        -
+          name: 'PostgreSQL: Uptime'
+          key: 'pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          applications:
+            -
+              name: PostgreSQL
+          triggers:
+            -
+              expression: '{last()} < 600'
+              name: 'PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE})'
+              priority: AVERAGE
+        -
+          name: 'WAL: Segments count'
+          type: DEPENDENT
+          key: pgsql.wal.count
+          delay: '0'
+          history: 7d
+          description: 'Number of WAL segments'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.write
+          master_item:
+            key: 'pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+        -
+          name: 'PostgreSQL: Get WAL'
+          key: 'pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          delay: 5m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Collect WAL metrics'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'WAL: Bytes written'
+          type: DEPENDENT
+          key: pgsql.wal.write
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'WAL write in bytes'
+          applications:
+            -
+              name: PostgreSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.write
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+      discovery_rules:
+        -
+          name: 'Database discovery'
+          key: 'pgsql.db.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DBNAME}'
+                value: '{$PG.LLD.FILTER.DBNAME}'
+                formulaid: A
+          item_prototypes:
+            -
+              name: 'DB {#DBNAME}: Database age'
+              key: 'pgsql.db.age["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+              delay: 15m
+              history: 7d
+              description: 'Database age'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+            -
+              name: 'DB {#DBNAME}: Get bloating tables'
+              key: 'pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+              history: 7d
+              description: 'Number of bloating tables'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+            -
+              name: 'DB {#DBNAME}: Database size'
+              key: 'pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+              delay: 5m
+              history: 7d
+              units: B
+              description: 'Database size'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+            -
+              name: 'DB {#DBNAME}: Blocks hit per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of times disk blocks were found already in the buffer cache, so that a read was not necessary'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].blks_hit'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Disk blocks read per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of disk blocks read in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].blks_read'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Disk blocks read per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time spent reading data file blocks by backends, in milliseconds'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].blk_read_time'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Disk blocks read per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Time spent writing data file blocks by backends, in milliseconds'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].blk_write_time'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Checksum failures'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.checksum_failures.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of data page checksum failures detected in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].checksum_failures'
+                -
+                  type: MATCHES_REGEX
+                  parameters:
+                    - '^\d*$'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: 'ZBX_NOTSUPPORTED: Checksum failures metric is supported only in PostgreSQL 12 or higher.'
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Detected conflicts per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of queries canceled due to conflicts with recovery in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].conflicts'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)} > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
+                  name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  priority: AVERAGE
+                  description: |
+                    The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
+                    https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT
+            -
+              name: 'DB {#DBNAME}: Detected deadlocks per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of detected deadlocks in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].deadlocks'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)} > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
+                  name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  priority: HIGH
+            -
+              name: 'DB {#DBNAME}: Backends connected'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.numbackends["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of backends currently connected to this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].numbackends'
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Temp_bytes written per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total amount of data written to temporary files by queries in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].temp_bytes'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Temp_files created per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of temporary files created by queries in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].temp_files'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Tuples deleted per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of rows deleted by queries in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tup_deleted'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Tuples fetched per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of rows fetched by queries in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tup_fetched'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Tuples inserted per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of rows inserted by queries in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tup_inserted'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Tuples returned per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of rows returned by queries in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tup_returned'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Tuples updated per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of rows updated by queries in this database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].tup_updated'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Commits per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of transactions in this database that have been committed'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].xact_commit'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Rollbacks per second'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of transactions in this database that have been rolled back'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].xact_rollback'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of accessexclusive locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.accessexclusive["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of accessexclusive locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].accessexclusive'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of accessshare locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.accessshare["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of accessshare locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].accessshare'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of exclusive locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.exclusive["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of exclusive locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].exclusive'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of rowexclusive locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.rowexclusive["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of rowexclusive locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].rowexclusive'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of rowshare locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.rowshare["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of rowshare locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].rowshare'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of sharerowexclusive locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.sharerowexclusive["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of total sharerowexclusive for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].sharerowexclusive'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of shareupdateexclusive locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.shareupdateexclusive["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of shareupdateexclusive locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].shareupdateexclusive'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of share locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.share["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of share locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].share'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            -
+              name: 'DB {#DBNAME}: Num of total locks'
+              type: DEPENDENT
+              key: 'pgsql.locks.total["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of total locks for each database'
+              application_prototypes:
+                -
+                  name: 'PostgreSQL: DB {#DBNAME}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}''].total'
+              master_item:
+                key: 'pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          graph_prototypes:
+            -
+              name: 'DB {#DBNAME}: Locks'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.total["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.accessexclusive["{#DBNAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.accessshare["{#DBNAME}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.exclusive["{#DBNAME}"]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.rowexclusive["{#DBNAME}"]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.rowshare["{#DBNAME}"]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.sharerowexclusive["{#DBNAME}"]'
+                -
+                  sortorder: '7'
+                  color: 611F27
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.shareupdateexclusive["{#DBNAME}"]'
+                -
+                  sortorder: '8'
+                  color: F230E0
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.share["{#DBNAME}"]'
+                -
+                  sortorder: '9'
+                  color: FFAD40
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.locks.share["{#DBNAME}"]'
+            -
+              name: 'DB {#DBNAME}: Number of bloating tables'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+            -
+              name: 'DB {#DBNAME}: pg_stat_database metrics'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
+                -
+                  sortorder: '7'
+                  color: 611F27
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
+                -
+                  sortorder: '8'
+                  color: F230E0
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
+                -
+                  sortorder: '9'
+                  color: FFAD40
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
+                -
+                  sortorder: '10'
+                  color: 40CDFF
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
+                -
+                  sortorder: '11'
+                  color: 40FFA0
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
+                -
+                  sortorder: '12'
+                  color: AE4500
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
+            -
+              name: 'DB {#DBNAME}: Size'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'PostgreSQL Agent 2'
+                    key: 'pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+      macros:
+        -
+          macro: '{$PG.CONFLICTS.MAX.WARN}'
+          value: '0'
+        -
+          macro: '{$PG.CONN_TOTAL_PCT.MAX.WARN}'
+          value: '90'
+        -
+          macro: '{$PG.DEADLOCKS.MAX.WARN}'
+          value: '0'
+        -
+          macro: '{$PG.LLD.FILTER.DBNAME}'
+          value: (.+)
+        -
+          macro: '{$PG.PASSWORD}'
+          value: postgres
+        -
+          macro: '{$PG.URI}'
+          value: 'tcp://localhost:5432'
+        -
+          macro: '{$PG.USER}'
+          value: postgres
+      dashboards:
+        -
+          name: 'PostgreSQL databases'
+          widgets:
+            -
+              type: GRAPH_PROTOTYPE
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: columns
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: rows
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  name: graphid
+                  value:
+                    name: 'DB {#DBNAME}: pg_stat_database metrics'
+                    host: 'PostgreSQL Agent 2'
+            -
+              type: GRAPH_PROTOTYPE
+              x: '12'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: columns
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: rows
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  name: graphid
+                  value:
+                    name: 'DB {#DBNAME}: Locks'
+                    host: 'PostgreSQL Agent 2'
+            -
+              type: GRAPH_PROTOTYPE
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: columns
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: rows
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  name: graphid
+                  value:
+                    name: 'DB {#DBNAME}: Size'
+                    host: 'PostgreSQL Agent 2'
+            -
+              type: GRAPH_PROTOTYPE
+              x: '12'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: columns
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: rows
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  name: graphid
+                  value:
+                    name: 'DB {#DBNAME}: Number of bloating tables'
+                    host: 'PostgreSQL Agent 2'
+  value_maps:
+    -
+      name: 'PostgreSQL recovery role'
+      mappings:
+        -
+          value: '0'
+          newvalue: Master
+        -
+          value: '1'
+          newvalue: Standby
+    -
+      name: 'PostgreSQL replication status'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
+        -
+          value: '2'
+          newvalue: Master

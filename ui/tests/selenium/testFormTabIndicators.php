@@ -41,7 +41,7 @@ class testFormTabIndicators extends CWebTest {
 						[
 							'name' => 'Linked templates',
 							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template', 'Template App Docker']
+								'Link new templates' => ['Empty template', 'Form test template', 'Docker']
 							],
 							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
 							'count' => 3
@@ -185,7 +185,7 @@ class testFormTabIndicators extends CWebTest {
 						[
 							'name' => 'Templates',
 							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template', 'Template DB MySQL']
+								'Link new templates' => ['Empty template', 'Form test template', 'MySQL by Zabbix agent']
 							],
 							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
 							'count' => 3

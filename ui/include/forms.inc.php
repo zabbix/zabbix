@@ -759,6 +759,61 @@ function prepareItemHttpAgentFormData(array $item) {
 }
 
 /**
+ * Prepare ITEM_TYPE_SCRIPT type item data for create or update API calls.
+ * - Converts 'parameters' from array of keys and array of values to arrays of names and values.
+ *   IN:
+ *   Array (
+ *       [name] => Array (
+ *           [0] => a
+ *           [1] => c
+ *       )
+ *       [value] => Array (
+ *           [0] => b
+ *           [1] => d
+ *       )
+ *   )
+ *
+ *   OUT:
+ *   Array (
+ *       [0] => Array (
+ *           [name] => a
+ *           [value] => b
+ *       )
+ *       [1] => Array (
+ *           [name] => c
+ *           [value] => d
+ *       )
+ *   )
+ *
+ * @param array $item                          Array of form fields data for ITEM_TYPE_SCRIPT item.
+ * @param array $item['parameters']            Item parameters array.
+ * @param array $item['parameters']['name']    Item parameter names array.
+ * @param array $item['parameters']['values']  Item parameter values array.
+ *
+ * @return array
+ */
+function prepareScriptItemFormData(array $item): array {
+	$values = [];
+
+	if (is_array($item['parameters']) && array_key_exists('name', $item['parameters'])
+			&& array_key_exists('value', $item['parameters'])) {
+		foreach ($item['parameters']['name'] as $index => $key) {
+			if (array_key_exists($index, $item['parameters']['value'])
+					&& ($key !== '' || $item['parameters']['value'][$index] !== '')) {
+				$values[] = [
+					'name' => $key,
+					'value' => $item['parameters']['value'][$index]
+				];
+			}
+		}
+	}
+
+	$item['parameters'] = $values;
+
+	return $item;
+}
+
+/**
  * Get data for item edit page.
  *
  * @param array $item                          Item, item prototype, LLD rule or LLD item to take the data from.
@@ -811,6 +866,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 		'url' => getRequest('url'),
 		'query_fields' => getRequest('query_fields', []),
+		'parameters' => getRequest('parameters', []),
 		'posts' => getRequest('posts'),
 		'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
 		'follow_redirects' => hasRequest('form_refresh')
@@ -838,7 +894,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	if ($data['parent_discoveryid'] != 0) {
 		$data['discover'] = hasRequest('form_refresh')
 			? getRequest('discover', DB::getDefault('items', 'discover'))
-			: ($item
+			: (($item && array_key_exists('discover', $item))
 				? $item['discover']
 				: DB::getDefault('items', 'discover')
 			);
@@ -858,10 +914,32 @@ function getItemFormData(array $item = [], array $options = []) {
 			}
 			$data[$property] = $values;
 		}
+
+		$data['parameters'] = [];
+	}
+	elseif ($data['type'] == ITEM_TYPE_SCRIPT) {
+		$values = [];
+
+		if (is_array($data['parameters']) && array_key_exists('name', $data['parameters'])
+				&& array_key_exists('value', $data['parameters'])) {
+			foreach ($data['parameters']['name'] as $index => $key) {
+				if (array_key_exists($index, $data['parameters']['value'])) {
+					$values[] = [
+						'name' => $key,
+						'value' => $data['parameters']['value'][$index]
+					];
+				}
+			}
+		}
+		$data['parameters'] = $values;
+
+		$data['headers'] = [];
+		$data['query_fields'] = [];
 	}
 	else {
 		$data['headers'] = [];
 		$data['query_fields'] = [];
+		$data['parameters'] = [];
 	}
 
 	// Dependent item initialization by master_itemid.
@@ -929,7 +1007,9 @@ function getItemFormData(array $item = [], array $options = []) {
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 
-		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag);
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 	}
 
 	// caption
@@ -983,6 +1063,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['timeout'] = $data['item']['timeout'];
 		$data['url'] = $data['item']['url'];
 		$data['query_fields'] = $data['item']['query_fields'];
+		$data['parameters'] = $data['item']['parameters'];
 		$data['posts'] = $data['item']['posts'];
 		$data['status_codes'] = $data['item']['status_codes'];
 		$data['follow_redirects'] = $data['item']['follow_redirects'];
@@ -1010,6 +1091,9 @@ function getItemFormData(array $item = [], array $options = []) {
 			}
 
 			$data['headers'] = $headers;
+		}
+		elseif ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
+			CArrayHelper::sort($data['parameters'], ['name']);
 		}
 
 		$data['preprocessing'] = $data['item']['preprocessing'];
@@ -1209,6 +1293,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
+	$have_validate_not_supported = in_array(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, array_column($preprocessing, 'type'));
 
 	foreach ($preprocessing as $step) {
 		// Create a combo box with preprocessing types.
@@ -1218,7 +1303,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			$cb_group = new COptGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
+				$enabled = (!$have_validate_not_supported || $type != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED || $type == $step['type']);
+
+				$cb_group->addItem(
+					(new CComboItem($type, $label, ($type == $step['type'])))
+						->setEnabled($enabled)
+				);
 			}
 
 			$preproc_types_cbbox->addItem($cb_group);
@@ -1366,6 +1456,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$on_fail->setEnabled(false);
 				break;
 
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				$on_fail
+					->setEnabled(false)
+					->setChecked(true);
+				break;
+
 			default:
 				$on_fail->setEnabled(!$readonly);
 
@@ -1425,6 +1521,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('preprocessing-step-test')
+							->setEnabled($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED)
 							->removeId(),
 						(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
@@ -1582,6 +1679,8 @@ function getTriggerMassupdateFormData() {
  * @param string      $data['recovery_expr_temp']               Trigger temporary recovery expression.
  * @param string      $data['recovery_mode']                    Trigger recovery mode.
  * @param string      $data['description']                      Trigger description.
+ * @param string      $data['event_name']                       Trigger event name.
+ * @param string      $data['opdata']                           Trigger operational data.
  * @param int         $data['type']                             Trigger problem event generation mode.
  * @param string      $data['priority']                         Trigger severity.
  * @param int         $data['status']                           Trigger status.
@@ -1594,6 +1693,10 @@ function getTriggerMassupdateFormData() {
  * @param string      $data['hostid']                           Host ID.
  * @param string      $data['expression_action']                Trigger expression action.
  * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
+ * @param string      $data['tags']                             Trigger tags.
+ * @param string      $data['correlation_mode']                 Trigger correlation mode.
+ * @param string      $data['correlation_tag']                  Trigger correlation tag.
+ * @param string      $data['manual_close']                     Trigger manual close.
  *
  * @return array
  */
@@ -1637,7 +1740,8 @@ function getTriggerFormData(array $data) {
 
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
-			getTriggerParentTemplates([$trigger], $flag), $flag
+			getTriggerParentTemplates([$trigger], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		if ($data['show_inherited_tags']) {
@@ -1736,6 +1840,7 @@ function getTriggerFormData(array $data) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $trigger['description'];
+			$data['event_name'] = $trigger['event_name'];
 			$data['opdata'] = $trigger['opdata'];
 			$data['type'] = $trigger['type'];
 			$data['recovery_mode'] = $trigger['recovery_mode'];

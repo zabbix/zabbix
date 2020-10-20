@@ -80,12 +80,12 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 		]);
 	}
 
-	$redirect = array_filter([CWebUser::isGuest() ? '' : $request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
+	$redirect = array_filter([CWebUser::isGuest() ? '' : $request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 	redirect(reset($redirect));
 }
 
 if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
-	redirect(CWebUser::$data['url'] ? CWebUser::$data['url'] : ZBX_DEFAULT_URL);
+	redirect(CWebUser::$data['url'] ? : CMenuHelper::getFirstUrl());
 }
 
 $messages = get_and_clear_messages();

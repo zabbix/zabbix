@@ -229,21 +229,21 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
 	return array_keys($db_groups);
 }
 
-/*
+/**
  * Creates a hintbox suitable for Problem hosts widget.
  *
- * @param array  $hosts                                                   Array of problematic hosts.
- * @param array  $data                                                    Array of host data, filter settings and
- *                                                                        severity configuration.
- * @param array  $data['filter']['severities']                            Array of severities.
- * @param string $data['hosts_data'][<hostid>]['host']                    Host name.
- * @param int    $data['hosts_data'][<hostid>]['severities'][<severity>]  Severity count.
- * @param CUrl   $url                                                     URL that leads to problems view having hostid
- *                                                                        in its filter.
+ * @param array      $hosts                                                   Array of problematic hosts.
+ * @param array      $data                                                    Array of host data, filter settings and
+ *                                                                            severity configuration.
+ * @param array      $data['filter']['severities']                            Array of severities.
+ * @param string     $data['hosts_data'][<hostid>]['host']                    Host name.
+ * @param int        $data['hosts_data'][<hostid>]['severities'][<severity>]  Severity count.
+ * @param CUrl|null  $url                                                     URL that leads to problems view having
+ *                                                                            hostid in its filter.
  *
  * @return CTableInfo
  */
-function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
+function makeProblemHostsHintBox(array $hosts, array $data, ?CUrl $url) {
 	// Set trigger severities as table header, ordered starting from highest severity.
 	$header = [_('Host')];
 
@@ -274,8 +274,13 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 
 	foreach ($hosts as $hostid => $host) {
 		$host_data = $data['hosts_data'][$hostid];
-		$url->setArgument('filter_hostids', [$hostid]);
-		$host_name = new CLink($host_data['host'], $url->getUrl());
+		if ($url !== null) {
+			$url->setArgument('hostids', [$hostid]);
+			$host_name = new CLink($host_data['host'], $url->getUrl());
+		}
+		else {
+			$host_name = $host_data['host'];
+		}
 
 		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			if (array_key_exists($host_data['maintenanceid'], $db_maintenances)) {

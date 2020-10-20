@@ -38,7 +38,6 @@ $fields = [
 	'screenid' =>		[T_ZBX_INT, O_NO,  P_SYS,	DB_ID,
 		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
 	],
-	'templateid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'hsize' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_MIN_SIZE, SCREEN_MAX_SIZE),
 		'isset({add}) || isset({update})', _('Columns')
@@ -72,22 +71,13 @@ check_fields($fields);
  * Permissions
  */
 if (hasRequest('screenid')) {
-	if (hasRequest('templateid')) {
-		$screens = API::TemplateScreen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid'],
-			'screenids' => getRequest('screenid'),
-			'editable' => true
-		]);
-	}
-	else {
-		$screens = API::Screen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize', 'userid', 'private'],
-			'selectUsers' => ['userid', 'permission'],
-			'selectUserGroups' => ['usrgrpid', 'permission'],
-			'screenids' => getRequest('screenid'),
-			'editable' => true
-		]);
-	}
+	$screens = API::Screen()->get([
+		'output' => ['screenid', 'name', 'hsize', 'vsize', 'userid', 'private'],
+		'selectUsers' => ['userid', 'permission'],
+		'selectUserGroups' => ['usrgrpid', 'permission'],
+		'screenids' => getRequest('screenid'),
+		'editable' => true
+	]);
 
 	if (!$screens) {
 		access_deny();
@@ -99,10 +89,16 @@ else {
 	$screen = [];
 }
 
+$allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
 /*
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	DBstart();
 
 	if (hasRequest('update')) {
@@ -116,47 +112,35 @@ if (hasRequest('add') || hasRequest('update')) {
 		$messageSuccess = _('Screen updated');
 		$messageFailed = _('Cannot update screen');
 
-		if (hasRequest('templateid')) {
-			$screenOld = API::TemplateScreen()->get([
-				'screenids' => getRequest('screenid'),
-				'output' => API_OUTPUT_EXTEND,
-				'editable' => true
-			]);
-			$screenOld = reset($screenOld);
+		$screen['userid'] = getRequest('userid', '');
+		$screen['private'] = getRequest('private', PRIVATE_SHARING);
+		$screen['users'] = getRequest('users', []);
+		$screen['userGroups'] = getRequest('userGroups', []);
 
-			$result = API::TemplateScreen()->update($screen);
+		// Only administrators can set screen owner.
+		if (CWebUser::getType() == USER_TYPE_ZABBIX_USER) {
+			unset($screen['userid']);
 		}
-		else {
-			$screen['userid'] = getRequest('userid', '');
-			$screen['private'] = getRequest('private', PRIVATE_SHARING);
-			$screen['users'] = getRequest('users', []);
-			$screen['userGroups'] = getRequest('userGroups', []);
+		// Screen update with inaccessible user.
+		elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN && $screen['userid'] === '') {
+			$user_exist = API::User()->get([
+				'output' => ['userid'],
+				'userids' => [$screen['userid']]
+			]);
 
-			// Only administrators can set screen owner.
-			if (CWebUser::getType() == USER_TYPE_ZABBIX_USER) {
+			if (!$user_exist) {
 				unset($screen['userid']);
 			}
-			// Screen update with inaccessible user.
-			elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN && $screen['userid'] === '') {
-				$user_exist = API::User()->get([
-					'output' => ['userid'],
-					'userids' => [$screen['userid']]
-				]);
-
-				if (!$user_exist) {
-					unset($screen['userid']);
-				}
-			}
-
-			$screenOld = API::Screen()->get([
-				'screenids' => getRequest('screenid'),
-				'output' => API_OUTPUT_EXTEND,
-				'editable' => true
-			]);
-			$screenOld = reset($screenOld);
-
-			$result = API::Screen()->update($screen);
 		}
+
+		$screenOld = API::Screen()->get([
+			'screenids' => getRequest('screenid'),
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => true
+		]);
+		$screenOld = reset($screenOld);
+
+		$result = API::Screen()->update($screen);
 
 		if ($result) {
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens',
@@ -179,20 +163,12 @@ if (hasRequest('add') || hasRequest('update')) {
 				'valign', 'haligh', 'style', 'url', 'max_columns'
 			];
 
-			if (hasRequest('templateid')) {
-				$screen['screenitems'] = API::TemplateScreenItem()->get([
-					'output' => $output,
-					'screenids' => [getRequest('screenid')]
-				]);
-			}
-			else {
-				array_push($output, 'dynamic', 'sort_triggers', 'application');
+			array_push($output, 'dynamic', 'sort_triggers', 'application');
 
-				$screen['screenitems'] = API::ScreenItem()->get([
-					'output' => $output,
-					'screenids' => [getRequest('screenid')]
-				]);
-			}
+			$screen['screenitems'] = API::ScreenItem()->get([
+				'output' => $output,
+				'screenids' => [getRequest('screenid')]
+			]);
 
 			$max_x = $screen['hsize'] - 1;
 			$max_y = $screen['vsize'] - 1;
@@ -204,19 +180,12 @@ if (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		if (hasRequest('templateid')) {
-			$screen['templateid'] = getRequest('templateid');
+		$screen['userid'] = getRequest('userid', '');
+		$screen['private'] = getRequest('private', PRIVATE_SHARING);
+		$screen['users'] = getRequest('users', []);
+		$screen['userGroups'] = getRequest('userGroups', []);
 
-			$screenids = API::TemplateScreen()->create($screen);
-		}
-		else {
-			$screen['userid'] = getRequest('userid', '');
-			$screen['private'] = getRequest('private', PRIVATE_SHARING);
-			$screen['users'] = getRequest('users', []);
-			$screen['userGroups'] = getRequest('userGroups', []);
-
-			$screenids = API::Screen()->create($screen);
-		}
+		$screenids = API::Screen()->create($screen);
 
 		$result = (bool) $screenids;
 
@@ -238,6 +207,10 @@ if (hasRequest('add') || hasRequest('update')) {
 }
 elseif ((hasRequest('delete') && hasRequest('screenid'))
 		|| (hasRequest('action') && getRequest('action') === 'screen.massdelete' && hasRequest('screens'))) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$screenids = getRequest('screens', []);
 	if (hasRequest('screenid')) {
 		$screenids[] = getRequest('screenid');
@@ -245,28 +218,15 @@ elseif ((hasRequest('delete') && hasRequest('screenid'))
 
 	DBstart();
 
-	if (hasRequest('templateid')) {
-		$parent_id = getRequest('templateid');
+	$parent_id = null;
 
-		$screens = API::TemplateScreen()->get([
-			'screenids' => $screenids,
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => true
-		]);
+	$screens = API::Screen()->get([
+		'screenids' => $screenids,
+		'output' => API_OUTPUT_EXTEND,
+		'editable' => true
+	]);
 
-		$result = API::TemplateScreen()->delete($screenids);
-	}
-	else {
-		$parent_id = null;
-
-		$screens = API::Screen()->get([
-			'screenids' => $screenids,
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => true
-		]);
-
-		$result = API::Screen()->delete($screenids);
-	}
+	$result = API::Screen()->delete($screenids);
 
 	$result = DBend($result);
 
@@ -287,49 +247,51 @@ elseif ((hasRequest('delete') && hasRequest('screenid'))
  * Display
  */
 if (hasRequest('form')) {
+	if (!hasRequest('templateid') && !$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$current_userid = CWebUser::$data['userid'];
 	$userids[$current_userid] = true;
 	$user_groupids = [];
 
-	if (!hasRequest('templateid') && !array_key_exists('templateid', $screen)) {
-		if (!hasRequest('screenid') || hasRequest('form_refresh')) {
-			// Screen owner.
-			$screen_owner = getRequest('userid', $current_userid);
-			$userids[$screen_owner] = true;
+	if (!hasRequest('screenid') || hasRequest('form_refresh')) {
+		// Screen owner.
+		$screen_owner = getRequest('userid', $current_userid);
+		$userids[$screen_owner] = true;
 
-			foreach (getRequest('users', []) as $user) {
-				$userids[$user['userid']] = true;
-			}
-
-			foreach (getRequest('userGroups', []) as $user_group) {
-				$user_groupids[$user_group['usrgrpid']] = true;
-			}
-		}
-		else {
-			// Screen owner.
-			$userids[$screen['userid']] = true;
-
-			foreach ($screen['users'] as $user) {
-				$userids[$user['userid']] = true;
-			}
-
-			foreach ($screen['userGroups'] as $user_group) {
-				$user_groupids[$user_group['usrgrpid']] = true;
-			}
+		foreach (getRequest('users', []) as $user) {
+			$userids[$user['userid']] = true;
 		}
 
-		$data['users'] = API::User()->get([
-			'output' => ['userid', 'alias', 'name', 'surname'],
-			'userids' => array_keys($userids),
-			'preservekeys' => true
-		]);
-
-		$data['user_groups'] = API::UserGroup()->get([
-			'output' => ['usrgrpid', 'name'],
-			'usrgrpids' => array_keys($user_groupids),
-			'preservekeys' => true
-		]);
+		foreach (getRequest('userGroups', []) as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = true;
+		}
 	}
+	else {
+		// Screen owner.
+		$userids[$screen['userid']] = true;
+
+		foreach ($screen['users'] as $user) {
+			$userids[$user['userid']] = true;
+		}
+
+		foreach ($screen['userGroups'] as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = true;
+		}
+	}
+
+	$data['users'] = API::User()->get([
+		'output' => ['userid', 'alias', 'name', 'surname'],
+		'userids' => array_keys($userids),
+		'preservekeys' => true
+	]);
+
+	$data['user_groups'] = API::UserGroup()->get([
+		'output' => ['usrgrpid', 'name'],
+		'usrgrpids' => array_keys($user_groupids),
+		'preservekeys' => true
+	]);
 
 	if (!hasRequest('screenid') || hasRequest('form_refresh')) {
 		$data['screen'] = [
@@ -339,15 +301,10 @@ if (hasRequest('form')) {
 			'vsize' => getRequest('vsize', 1)
 		];
 
-		if (hasRequest('templateid')) {
-			$data['screen']['templateid'] = getRequest('templateid');
-		}
-		else {
-			$data['screen']['userid'] = getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid);
-			$data['screen']['private'] = getRequest('private', PRIVATE_SHARING);
-			$data['screen']['users'] = getRequest('users', []);
-			$data['screen']['userGroups'] = getRequest('userGroups', []);
-		}
+		$data['screen']['userid'] = getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid);
+		$data['screen']['private'] = getRequest('private', PRIVATE_SHARING);
+		$data['screen']['users'] = getRequest('users', []);
+		$data['screen']['userGroups'] = getRequest('userGroups', []);
 	}
 	else {
 		$data['screen'] = $screen;
@@ -356,6 +313,7 @@ if (hasRequest('form')) {
 	$data['form'] = getRequest('form');
 	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh');
+	$data['allowed_edit'] = hasRequest('templateid') || $allowed_edit;
 
 	// render view
 	echo (new CView('monitoring.screen.edit', $data))->getOutput();
@@ -370,67 +328,56 @@ else {
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	$data = [
-		'templateid' => getRequest('templateid'),
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'allowed_edit' => hasRequest('templateid') || $allowed_edit
 	];
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
-	if ($data['templateid']) {
-		$data['screens'] = API::TemplateScreen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize'],
-			'templateids' => $data['templateid'],
-			'sortfield' => $sortField,
-			'limit' => $limit,
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.screenconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	}
+	elseif (hasRequest('filter_rst')) {
+		DBStart();
+		CProfile::delete('web.screenconf.filter_name');
+		DBend();
+	}
+
+	$data['filter'] = [
+		'name' => CProfile::get('web.screenconf.filter_name', '')
+	];
+
+	$data['screens'] = API::Screen()->get([
+		'output' => ['screenid', 'name', 'hsize', 'vsize'],
+		'sortfield' => $sortField,
+		'limit' => $limit,
+		'search' => [
+			'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
+		],
+		'preservekeys' => true
+	]);
+
+	$user_type = CWebUser::getType();
+
+	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		$editable_screens = API::Screen()->get([
+			'output' => [],
+			'screenids' => array_keys($data['screens']),
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		foreach ($data['screens'] as &$screen) {
+			$screen['editable'] = array_key_exists($screen['screenid'], $editable_screens);
+		}
+		unset($screen);
 	}
-	else {
-		if (hasRequest('filter_set')) {
-			CProfile::update('web.screenconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-		}
-		elseif (hasRequest('filter_rst')) {
-			DBStart();
-			CProfile::delete('web.screenconf.filter_name');
-			DBend();
-		}
 
-		$data['filter'] = [
-			'name' => CProfile::get('web.screenconf.filter_name', '')
-		];
+	$data += [
+		'profileIdx' => 'web.screenconf.filter',
+		'active_tab' => CProfile::get('web.screenconf.filter.active', 1)
+	];
 
-		$data['screens'] = API::Screen()->get([
-			'output' => ['screenid', 'name', 'hsize', 'vsize'],
-			'sortfield' => $sortField,
-			'limit' => $limit,
-			'search' => [
-				'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
-			],
-			'preservekeys' => true
-		]);
-
-		$user_type = CWebUser::getType();
-
-		if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
-			$editable_screens = API::Screen()->get([
-				'output' => [],
-				'screenids' => array_keys($data['screens']),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			foreach ($data['screens'] as &$screen) {
-				$screen['editable'] = array_key_exists($screen['screenid'], $editable_screens);
-			}
-			unset($screen);
-		}
-
-		$data += [
-			'profileIdx' => 'web.screenconf.filter',
-			'active_tab' => CProfile::get('web.screenconf.filter.active', 1)
-		];
-	}
 	order_result($data['screens'], $sortField, $sortOrder);
 
 	// pager

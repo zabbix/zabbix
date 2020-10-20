@@ -27,7 +27,8 @@ class CControllerWidgetClockView extends CControllerWidget {
 		$this->setType(WIDGET_CLOCK);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
@@ -43,41 +44,72 @@ class CControllerWidgetClockView extends CControllerWidget {
 
 		switch ($fields['time_type']) {
 			case TIME_TYPE_HOST:
-				$items = API::Item()->get([
-					'output' => ['itemid', 'value_type'],
-					'selectHosts' => ['name'],
-					'itemids' => $fields['itemid'],
-					'webitems' => true
-				]);
+				if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) {
+					if ($this->hasInput('dynamic_hostid')) {
+						$template_items = API::Item()->get([
+							'output' => ['key_'],
+							'itemids' => $fields['itemid'],
+							'webitems' => true
+						]);
 
-				if ($items) {
-					$item = $items[0];
-					$name = $item['hosts'][0]['name'];
-					unset($items, $item['hosts']);
-
-					$last_value = Manager::History()->getLastValues([$item]);
-
-					if ($last_value) {
-						$last_value = $last_value[$item['itemid']][0];
-
-						try {
-							$now = new DateTime($last_value['value']);
-
-							$time_zone_string = _s('GMT%1$s', $now->format('P'));
-							$time_zone_offset = $now->format('Z');
-
-							$time = time() - ($last_value['clock'] - $now->getTimestamp());
+						if ($template_items) {
+							$items = API::Item()->get([
+								'output' => ['itemid', 'value_type'],
+								'selectHosts' => ['name'],
+								'hostids' => [$this->getInput('dynamic_hostid')],
+								'filter' => [
+									'key_' => $template_items[0]['key_']
+								],
+								'webitems' => true
+							]);
 						}
-						catch (Exception $e) {
-							$error = _('Incorrect data.');
+						else {
+							$items = [];
 						}
 					}
+					// Editing template dashboard?
 					else {
 						$error = _('No data.');
 					}
 				}
 				else {
-					$critical_error = _('No permissions to referred object or it does not exist!');
+					$items = API::Item()->get([
+						'output' => ['itemid', 'value_type'],
+						'selectHosts' => ['name'],
+						'itemids' => $fields['itemid'],
+						'webitems' => true
+					]);
+				}
+
+				if ($error === null) {
+					if ($items) {
+						$item = $items[0];
+						$name = $item['hosts'][0]['name'];
+
+						$last_value = Manager::History()->getLastValues([$item]);
+
+						if ($last_value) {
+							$last_value = $last_value[$item['itemid']][0];
+
+							try {
+								$now = new DateTime($last_value['value']);
+
+								$time_zone_string = _s('GMT%1$s', $now->format('P'));
+								$time_zone_offset = $now->format('Z');
+
+								$time = time() - ($last_value['clock'] - $now->getTimestamp());
+							}
+							catch (Exception $e) {
+								$error = _('Incorrect data.');
+							}
+						}
+						else {
+							$error = _('No data.');
+						}
+					}
+					else {
+						$critical_error = _('No permissions to referred object or it does not exist!');
+					}
 				}
 				break;
 

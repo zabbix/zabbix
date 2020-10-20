@@ -237,7 +237,7 @@ try {
 
 		CSessionHelper::set('sessionid', $user['sessionid']);
 
-		$redirect = array_filter([$request, $user['url'], $relay_state, ZBX_DEFAULT_URL]);
+		$redirect = array_filter([$request, $user['url'], $relay_state, CMenuHelper::getFirstUrl()]);
 		redirect(reset($redirect));
 	}
 

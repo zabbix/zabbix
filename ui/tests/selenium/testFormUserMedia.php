@@ -448,6 +448,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'SMS',
 						'Send to' => '+371 74661x'
 					],
+					'role' => 'Super Admin role',
 					'expected_message' => 'User added'
 				]
 			],
@@ -485,6 +486,10 @@ class testFormUserMedia extends CWebTest {
 			$this->page->query('button:Create user')->one()->click();
 			$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 			$user_form->fill($data['user_fields']);
+
+			$user_form->selectTab('Permissions');
+			$user_form->fill(['Role' => $data['role']]);
+
 		}
 		else {
 			$this->query('link', $data['username'])->waitUntilVisible()->one()->click();

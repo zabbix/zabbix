@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in dashboard,history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
+			'type' => 'required|in history,host,item,item_prototype,map_element,refresh,trigger,trigger_macro,widget_actions',
 			'data' => 'array'
 		];
 
@@ -43,39 +43,6 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkPermissions() {
 		return true;
-	}
-
-	/**
-	 * Prepare data for dashboard context menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['dashboardid']
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataDashboard(array $data) {
-		$db_dashboards = API::Dashboard()->get([
-			'output' => [],
-			'dashboardids' => $data['dashboardid'],
-		]);
-
-		if ($db_dashboards) {
-			$db_dashboard = $db_dashboards[0];
-
-			return [
-				'type' => 'dashboard',
-				'dashboardid' => $data['dashboardid'],
-				'editable' => (bool) API::Dashboard()->get([
-					'output' => [],
-					'dashboardids' => $data['dashboardid'],
-					'editable' => true
-				])
-			];
-		}
-
-		error(_('No permissions to referred object or it does not exist!'));
-
-		return null;
 	}
 
 	/**
@@ -99,7 +66,8 @@ class CControllerMenuPopup extends CController {
 			return [
 				'type' => 'history',
 				'itemid' => $data['itemid'],
-				'hasLatestGraphs' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+				'hasLatestGraphs' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 			];
 		}
 
@@ -130,7 +98,6 @@ class CControllerMenuPopup extends CController {
 			? API::Host()->get([
 				'output' => ['hostid', 'status'],
 				'selectGraphs' => API_OUTPUT_COUNT,
-				'selectScreens' => API_OUTPUT_COUNT,
 				'selectHttpTests' => API_OUTPUT_COUNT,
 				'hostids' => $data['hostid']
 			])
@@ -151,7 +118,9 @@ class CControllerMenuPopup extends CController {
 				]);
 			}
 
-			$scripts = API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']];
+			$scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
+				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
+				: [];
 
 			foreach ($scripts as &$script) {
 				$script['name'] = trimPath($script['name']);
@@ -163,14 +132,18 @@ class CControllerMenuPopup extends CController {
 			$menu_data = [
 				'type' => 'host',
 				'hostid' => $data['hostid'],
-				'hasGoTo' => (bool) $has_goto
+				'hasGoTo' => (bool) $has_goto,
+				'allowed_ui_inventory' => CWebUser::checkAccess(CRoleHelper::UI_INVENTORY_HOSTS),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
+				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 
 			if ($has_goto) {
 				$menu_data['showGraphs'] = (bool) $db_host['graphs'];
-				$menu_data['showScreens'] = (bool) $db_host['screens'];
+				$menu_data['showDashboards'] = (bool) getHostDashboards($data['hostid']);
 				$menu_data['showWeb'] = (bool) $db_host['httpTests'];
-				$menu_data['showConfig'] = (CWebUser::getType() > USER_TYPE_ZABBIX_USER);
 				$menu_data['isWriteable'] = $rw_hosts;
 				$menu_data['showTriggers'] = ($db_host['status'] == HOST_STATUS_MONITORED);
 				if (array_key_exists('severity_min', $data)) {
@@ -335,6 +308,8 @@ class CControllerMenuPopup extends CController {
 		}
 
 		CArrayHelper::sort($selement['urls'], ['name']);
+		$selement['urls'] = array_values($selement['urls']);
+
 		// Prepare urls for processing in menupopup.js.
 		$selement['urls'] = CArrayHelper::renameObjectsKeys($selement['urls'], ['name' => 'label']);
 
@@ -388,7 +363,8 @@ class CControllerMenuPopup extends CController {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$menu_data = [
 							'type' => 'map_element_submap',
-							'sysmapid' => $selement['elements'][0]['sysmapid']
+							'sysmapid' => $selement['elements'][0]['sysmapid'],
+							'allowed_ui_maps' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_MAPS)
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severity_min'] = $data['severity_min'];
@@ -404,7 +380,8 @@ class CControllerMenuPopup extends CController {
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$menu_data = [
 							'type' => 'map_element_group',
-							'groupid' => $selement['elements'][0]['groupid']
+							'groupid' => $selement['elements'][0]['groupid'],
+							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
@@ -441,7 +418,8 @@ class CControllerMenuPopup extends CController {
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$menu_data = [
 							'type' => 'map_element_trigger',
-							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid')
+							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid'),
+							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 						];
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severities'] = array_column(getSeverities($data['severity_min']), 'value');
@@ -572,7 +550,13 @@ class CControllerMenuPopup extends CController {
 				'triggerid' => $data['triggerid'],
 				'items' => $items,
 				'showEvents' => $show_events,
-				'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'allowed_ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 			];
 
 			if ($db_trigger['url'] !== '') {
@@ -681,10 +665,6 @@ class CControllerMenuPopup extends CController {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
 		switch ($this->getInput('type')) {
-			case 'dashboard':
-				$menu_data = self::getMenuDataDashboard($data);
-				break;
-
 			case 'history':
 				$menu_data = self::getMenuDataHistory($data);
 				break;

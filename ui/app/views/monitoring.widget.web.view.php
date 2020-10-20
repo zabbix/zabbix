@@ -30,15 +30,23 @@ $table = (new CTableInfo())
 	->setHeader([[_('Host group'), $sort_div], _('Ok'), _('Failed'), _('Unknown')])
 	->setHeadingColumn(0);
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'web.view')
-	->setArgument('filter_set', '1');
+$url = $data['allowed_ui_hosts']
+	? (new CUrl('zabbix.php'))
+		->setArgument('action', 'web.view')
+		->setArgument('filter_set', '1')
+	: null;
 
 foreach ($data['groups'] as $group) {
-	$url->setArgument('filter_groupids', [$group['groupid']]);
+	if ($url !== null) {
+		$url->setArgument('filter_groupids', [$group['groupid']]);
+		$group_name = new CLink($group['name'], $url->getUrl());
+	}
+	else {
+		$group_name = $group['name'];
+	}
 
 	$table->addRow([
-		new CLink($group['name'], $url->getUrl()),
+		$group_name,
 		($group['ok'] != 0) ? (new CSpan($group['ok']))->addClass(ZBX_STYLE_GREEN) : '',
 		($group['failed'] != 0) ? (new CSpan($group['failed']))->addClass(ZBX_STYLE_RED) : '',
 		($group['unknown'] != 0) ? (new CSpan($group['unknown']))->addClass(ZBX_STYLE_GREY) : ''

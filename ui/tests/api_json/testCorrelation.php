@@ -91,17 +91,17 @@ class testCorrelation extends CAPITest {
 			[
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'correlation' => ['99003'],
-				'expected_error'=> 'You do not have permission to perform this operation.'
+				'expected_error'=> 'No permissions to call "correlation.delete".'
 			],
 			[
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'correlation' => ['99003'],
-				'expected_error'=> 'You do not have permission to perform this operation.'
+				'expected_error'=> 'No permissions to call "correlation.delete".'
 			],
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
 				'correlation' => ['99003'],
-				'expected_error'=> 'You do not have permission to perform this operation.'
+				'expected_error'=> 'No permissions to call "correlation.delete".'
 			]
 		];
 	}

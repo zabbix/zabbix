@@ -31,6 +31,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
+		$roleids = array_keys(API::Role()->get(['output' => ['roleid'], 'preservekeys' => true]));
 
 		$fields = [
 			'userid' =>			'fatal|required|db users.userid',
@@ -49,7 +50,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'refresh' =>		'db users.refresh|not_empty',
 			'rows_per_page' =>	'db users.rows_per_page',
 			'url' =>			'db users.url',
-			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'roleid' =>			'db users.roleid|in '.implode(',', $roleids),
 			'form_refresh' =>	'int32'
 		];
 
@@ -80,7 +81,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)) {
 			return false;
 		}
 
@@ -95,7 +96,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$user = [];
 
 		$this->getInputs($user, ['userid', 'alias', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
-			'autologout', 'refresh', 'rows_per_page', 'url', 'type'
+			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 

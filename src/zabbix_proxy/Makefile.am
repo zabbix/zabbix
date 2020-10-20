@@ -74,6 +74,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxdiag/libzbxdiag_proxy.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
+	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
 	libzbxproxy.a
