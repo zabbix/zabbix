@@ -46,6 +46,41 @@ class CCookieSession implements SessionHandlerInterface {
 	/**
 	 * @inheritDoc
 	 *
+	 * @return boolean
+	 */
+	public function close() {
+		echo ob_get_clean();
+
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @param string $session_id
+	 *
+	 * @return boolean
+	 */
+	public function destroy($session_id) {
+		CCookieHelper::unset(self::COOKIE_NAME);
+
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @param integer $maxlifetime
+	 *
+	 * @return integer
+	 */
+	public function gc($maxlifetime) {
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 *
 	 * @param string $save_path
 	 * @param string $session_name
 	 *
@@ -55,17 +90,6 @@ class CCookieSession implements SessionHandlerInterface {
 		ob_start();
 
 		return session_status() === PHP_SESSION_ACTIVE;
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @return boolean
-	 */
-	public function close() {
-		echo ob_get_clean();
-
-		return true;
 	}
 
 	/**
@@ -94,30 +118,6 @@ class CCookieSession implements SessionHandlerInterface {
 			throw new \Exception(_('Cannot set session cookie.'));
 		}
 
-		return true;
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @param string $session_id
-	 *
-	 * @return boolean
-	 */
-	public function destroy($session_id) {
-		CCookieHelper::unset(self::COOKIE_NAME);
-
-		return true;
-	}
-
-	/**
-	 * @inheritDoc
-	 *
-	 * @param integer $maxlifetime
-	 *
-	 * @return integer
-	 */
-	public function gc($maxlifetime) {
 		return true;
 	}
 
