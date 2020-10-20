@@ -110,7 +110,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 
 	protected function doAction() {
 		$role = [
-			'name' => $this->getInput('name'),
+			'name' => trim($this->getInput('name')),
 			'type' => $this->getInput('type')
 		];
 

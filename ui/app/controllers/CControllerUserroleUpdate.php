@@ -131,7 +131,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 	protected function doAction() {
 		$role = [
 			'roleid' => $this->getInput('roleid', '0'),
-			'name' => $this->getInput('name'),
+			'name' => trim($this->getInput('name')),
 			'type' => $this->getInput('type', USER_TYPE_ZABBIX_USER)
 		];
 
