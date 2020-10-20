@@ -79,7 +79,10 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 		$ui[] = new CDiv(
 			(new CCheckBox(str_replace('.', '_', $rule_key), 1))
 				->setId($rule_key)
-				->setChecked(array_key_exists($rule_key, $data['rules'][CRoleHelper::SECTION_UI]) && $data['rules'][CRoleHelper::SECTION_UI][$rule_key])
+				->setChecked(
+					array_key_exists($rule_key, $data['rules'][CRoleHelper::SECTION_UI])
+					&& $data['rules'][CRoleHelper::SECTION_UI][$rule_key]
+				)
 				->setReadonly($data['readonly'])
 				->setLabel($rule_label)
 				->setUncheckedValue(0)
@@ -106,7 +109,7 @@ if (!$data['readonly']) {
 }
 
 $form_grid->addItem([
-	new CLabel(_('Default access to new UI elements'), 'ui.default_access'),
+	new CLabel(_('Default access to new UI elements'), $data['readonly'] ? '' : 'ui.default_access'),
 	(new CFormField(
 		(new CCheckBox('ui_default_access', 1))
 			->setId('ui.default_access')
@@ -126,7 +129,9 @@ $modules = [];
 foreach ($data['labels']['modules'] as $moduleid => $label) {
 	$modules[] = new CDiv(
 		(new CCheckBox(CRoleHelper::SECTION_MODULES.'['.$moduleid.']', 1))
-			->setChecked(array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true)
+			->setChecked(
+				array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true
+			)
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
@@ -156,7 +161,7 @@ else {
 
 $form_grid
 	->addItem([
-		new CLabel(_('Default access to new modules'), 'modules.default_access'),
+		new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
 		(new CFormField(
 			(new CCheckBox('modules_default_access', 1))
 				->setId('modules.default_access')
@@ -171,7 +176,7 @@ $form_grid
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	)
 	->addItem([
-		new CLabel(_('Enabled'), 'api.access'),
+		new CLabel(_('Enabled'), $data['readonly'] ? '' : 'api.access'),
 		(new CFormField(
 			(new CCheckBox('api_access', 1))
 				->setId('api.access')
@@ -230,7 +235,10 @@ foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = new CDiv(
 		(new CCheckBox(str_replace('.', '_', $action), 1))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules'][CRoleHelper::SECTION_ACTIONS]) && $data['rules'][CRoleHelper::SECTION_ACTIONS][$action])
+			->setChecked(
+				array_key_exists($action, $data['rules'][CRoleHelper::SECTION_ACTIONS])
+				&& $data['rules'][CRoleHelper::SECTION_ACTIONS][$action]
+			)
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
@@ -244,7 +252,7 @@ $form_grid->addItem(
 );
 
 $form_grid->addItem([
-	new CLabel(_('Default access to new actions'), 'actions.default_access'),
+	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),
 	(new CFormField(
 		(new CCheckBox('actions_default_access', 1))
 			->setId('actions.default_access')
