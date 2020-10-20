@@ -870,17 +870,22 @@ class CHostInterface extends CApiService {
 	}
 
 	private function checkHostInterfaces(array $interfaces, $hostid) {
-		$interfacesWithMissingData = [];
+		$interfaces_with_missing_data = [];
 
 		foreach ($interfaces as $interface) {
-			if (!isset($interface['type'], $interface['main'])) {
-				$interfacesWithMissingData[] = $interface['interfaceid'];
+			if (array_key_exists('interfaceid', $interface)) {
+				if (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+					$interfaces_with_missing_data[] = $interface['interfaceid'];
+				}
+			}
+			elseif (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 		}
 
-		if ($interfacesWithMissingData) {
+		if ($interfaces_with_missing_data) {
 			$dbInterfaces = API::HostInterface()->get([
-				'interfaceids' => $interfacesWithMissingData,
+				'interfaceids' => $interfaces_with_missing_data,
 				'output' => ['main', 'type'],
 				'preservekeys' => true,
 				'nopermissions' => true
