@@ -138,9 +138,11 @@
 			$('#api_methods_').data('multiSelect', ms_data);
 		});
 
-		document.querySelector('.js-userrole-apiaccess').addEventListener('change', (event) => {
-			ui_manager.disableApiSection();
-		});
+		document
+			.querySelector('.js-userrole-apiaccess')
+			.addEventListener('change', (event) => {
+				ui_manager.disableApiSection();
+			});
 
 		ui_manager.disableUiCheckbox();
 	});
