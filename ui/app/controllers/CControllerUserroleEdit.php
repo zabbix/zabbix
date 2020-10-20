@@ -177,11 +177,11 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$data['readonly'] = $this->role['readonly'];
 		}
 
-		$data = $this->overwriteInputs($data);
-
 		if ($this->getInput('roleid', 0) != 0) {
 			$data['rules'] = array_merge($data['rules'], $this->getRulesValue((int) $this->role['roleid']));
 		}
+
+		$data = $this->overwriteInputs($data);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));
