@@ -127,10 +127,20 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 *
+	 * Enable or disable readonly mode for the element.
+	 *
+	 * @param bool $value
+	 *
 	 * @return self
 	 */
-	public function setReadonly(): self {
-		$this->setAttribute('readonly', 'true');
+	public function setReadonly($value): self {
+		if ($value) {
+			$this->setAttribute('readonly', 'readonly');
+		}
+		else {
+			$this->removeAttribute('readonly');
+		}
 
 		return $this;
 	}
