@@ -56,7 +56,7 @@ class CControllerRegExUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() == USER_TYPE_SUPER_ADMIN) {
+		if ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return (bool) DBfetch(DBselect(
 				'SELECT NULL FROM regexps WHERE '.dbConditionInt('regexpid', (array) $this->getInput('regexid'))
 			));

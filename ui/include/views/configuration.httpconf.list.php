@@ -126,7 +126,7 @@ $httpTests = $this->data['httpTests'];
 
 foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
-	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates']);
+	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
 	$name[] = new CLink(CHtml::encode($httpTest['name']),
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')

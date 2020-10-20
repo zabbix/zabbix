@@ -128,7 +128,8 @@ class CControllerWidgetWebView extends CControllerWidget {
 			'groups' => $groups,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_hosts' => $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
 		]));
 	}
 }

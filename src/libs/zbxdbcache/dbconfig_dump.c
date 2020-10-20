@@ -34,7 +34,6 @@ static void	DCdump_config(void)
 	if (NULL == config->config)
 		goto out;
 
-	zabbix_log(LOG_LEVEL_TRACE, "refresh_unsupported:%d", config->config->refresh_unsupported);
 	zabbix_log(LOG_LEVEL_TRACE, "discovery_groupid:" ZBX_FS_UI64, config->config->discovery_groupid);
 	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%hhu", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
@@ -514,6 +513,21 @@ static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 			httpitem->verify_peer, httpitem->verify_host);
 }
 
+static void	DCdump_scriptitem(const ZBX_DC_SCRIPTITEM *scriptitem)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "  script:[timeout:'%s' script:'%s']", scriptitem->timeout, scriptitem->script);
+
+	for (i = 0; i < scriptitem->params.values_num; i++)
+	{
+		zbx_dc_scriptitem_param_t	*params = (zbx_dc_scriptitem_param_t *)scriptitem->params.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "      item_script_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
+				params->item_script_paramid, params->name, params->value);
+	}
+}
+
 static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:[username:'%s' password:'%s' params:'%s']", telnetitem->username,
@@ -599,6 +613,7 @@ static void	DCdump_items(void)
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
 		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
+		{&config->scriptitems, (zbx_dc_dump_func_t)DCdump_scriptitem},
 	};
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
@@ -796,10 +811,10 @@ static void	DCdump_functions(void)
 	for (i = 0; i < index.values_num; i++)
 	{
 		function = (ZBX_DC_FUNCTION *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "functionid:" ZBX_FS_UI64 " triggerid:" ZBX_FS_UI64 " itemid:"
-				ZBX_FS_UI64 " function:'%s' parameter:'%s' timer:%u", function->functionid,
-				function->triggerid, function->itemid, function->function, function->parameter,
-				function->timer);
+		zabbix_log(LOG_LEVEL_DEBUG, "functionid:" ZBX_FS_UI64 " triggerid:" ZBX_FS_UI64 " itemid:"
+				ZBX_FS_UI64 " function:'%s' parameter:'%s' type:%u timer_revision:%d",
+				function->functionid, function->triggerid, function->itemid, function->function,
+				function->parameter, function->type, function->timer_revision);
 
 	}
 
@@ -851,9 +866,9 @@ static void	DCdump_triggers(void)
 	{
 		trigger = (ZBX_DC_TRIGGER *)index.values[i];
 
-		zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " description:'%s' type:%u status:%u priority:%u",
-					trigger->triggerid, trigger->description, trigger->type, trigger->status,
-					trigger->priority);
+		zabbix_log(LOG_LEVEL_TRACE, "triggerid:" ZBX_FS_UI64 " description:'%s' event_name:'%s' type:%u"
+				" status:%u priority:%u", trigger->triggerid, trigger->description, trigger->event_name,
+				trigger->type, trigger->status, trigger->priority);
 		zabbix_log(LOG_LEVEL_TRACE, "  expression:'%s' recovery_expression:'%s'", trigger->expression,
 				trigger->recovery_expression);
 		zabbix_log(LOG_LEVEL_TRACE, "  value:%u state:%u error:'%s' lastchange:%d", trigger->value,

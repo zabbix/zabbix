@@ -10,7 +10,7 @@ use Time::HiRes qw(time);
 use File::Basename qw(dirname);
 use Getopt::Long qw(GetOptions);
 use Cwd qw(getcwd);
-
+use Pod::Usage;
 
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
 use constant TEST_CASE_ATTRIBUTES	=> ('name', 'assertions', 'time');
@@ -108,11 +108,15 @@ sub launch($$$)
 
 my $xml;
 my $target_suite;
+my $help = 0;
 
-die("Bad command-line arguments") unless(GetOptions((
-		'xml:s' => \$xml,
-		'suite=s' => \$target_suite
-		)));
+GetOptions(
+	'help|?' => \$help,
+	'xml:s' => \$xml,
+	'suite=s' => \$target_suite
+) or pod2usage(2);
+
+pod2usage(-verbose => 2, -noperldoc => 1) if ($help);
 
 my $iter = path(".")->iterator({
 	'recurse'		=> 1,
@@ -390,3 +394,41 @@ foreach my $test_suite (@test_suites)
 {
 	exit(-1) unless ($test_suite->{'failures'} + $test_suite->{'errors'} == 0);
 }
+
+__END__
+
+=head1 SYNOPSIS
+
+tests_run.pl [options]
+
+  Options:
+
+    -s|--suite <suite>        run specific test suite instead of all
+    -x|--xml                  output in XML format
+    -h|--help                 show help message
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--suite> name
+
+Run the test cases of specified test suite. Usually it's the name of the function for which the test suite is written.
+
+=item B<--xml>
+
+Output results in XML format.
+
+=item B<--help>
+
+Print this help message and exit.
+
+=back
+
+=cut
+
+=head1 EXAMPLE
+
+The following example will run all the test cases of convert_to_utf8 test suite:
+
+  tests/tests_run.pl -s convert_to_utf8

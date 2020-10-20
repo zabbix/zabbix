@@ -667,10 +667,11 @@ function getTopLevelTemplates($applicationid, array $parent_templates) {
  *
  * @param string $applicationid
  * @param array  $parent_templates  The list of the templates, prepared by getApplicationParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeApplicationTemplatePrefix($applicationid, array $parent_templates) {
+function makeApplicationTemplatePrefix($applicationid, array $parent_templates, bool $provide_links) {
 	if (!array_key_exists($applicationid, $parent_templates['links'])) {
 		return null;
 	}
@@ -681,7 +682,7 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 	$list = [];
 
 	foreach ($templates as $template) {
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = (new CLink(CHtml::encode($template['name']),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'application.list')
@@ -814,10 +815,11 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
  *
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates) {
+function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates, bool $provide_links) {
 	if (!array_key_exists($host_prototypeid, $parent_templates['links'])) {
 		return null;
 	}
@@ -828,7 +830,7 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 
 	$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
 
-	if ($template['permission'] == PERM_READ_WRITE) {
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$name = (new CLink(CHtml::encode($template['name']),
 			(new CUrl('host_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
@@ -846,16 +848,17 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
  *
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates) {
+function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($host_prototypeid, $parent_templates['links'])) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
 
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = new CLink(CHtml::encode($template['name']),
 				(new CUrl('host_prototypes.php'))
 					->setArgument('form', 'update')
@@ -1454,6 +1457,19 @@ function renderInterfaceHeaders() {
 					)
 				])
 		);
+}
+
+function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
+	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
+	$dashboard_fields = array_keys(array_flip($dashboard_fields));
+
+	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
+
+	return API::TemplateDashboard()->get([
+		'output' => $dashboard_fields,
+		'templateids' => $templateids,
+		'preservekeys' => true
+	]);
 }
 
 /**

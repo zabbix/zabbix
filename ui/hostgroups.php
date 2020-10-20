@@ -274,7 +274,9 @@ else {
 		'active_tab' => CProfile::get('web.groups.filter.active', 1),
 		'config' => [
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
-		]
+		],
+		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 	];
 
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;

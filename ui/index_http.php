@@ -68,7 +68,7 @@ if ($http_user) {
 		);
 
 		if ($user) {
-			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
+			$redirect = array_filter([$request, $user['url'], CMenuHelper::getFirstUrl()]);
 			redirect(reset($redirect));
 		}
 	}

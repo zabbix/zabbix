@@ -44,6 +44,10 @@ class CControllerPopupScriptExec extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)) {
+			return false;
+		}
+
 		return (bool) API::Host()->get([
 			'output' => [],
 			'hostids' => $this->getInput('hostid')

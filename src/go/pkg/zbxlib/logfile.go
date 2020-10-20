@@ -62,7 +62,6 @@ void metric_get_meta(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize, int *
 void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric)
 {
 	metric->state = ITEM_STATE_NOTSUPPORTED;
-	metric->refresh_unsupported = 0;
 	metric->error_count = 0;
 	metric->start_time = 0.0;
 	metric->processed_bytes = 0;
@@ -79,7 +78,6 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 		if (ITEM_STATE_NOTSUPPORTED == metric->state)
 		{
 			metric->state = ITEM_STATE_NORMAL;
-			metric->refresh_unsupported = 0;
 		}
 
 		if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||

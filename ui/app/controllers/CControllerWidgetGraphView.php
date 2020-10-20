@@ -87,11 +87,10 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'objDims' => $graph_dims,
 			'loadSBox' => 0,
 			'loadImage' => 1,
-			'reloadOnAdd' => 1,
-			'onDashboard' => 1
+			'reloadOnAdd' => 1
 		];
 
-		// data for flickerscreen
+		// Data for flickerscreen.
 		$fs_data = [
 			'id' => $dataid,
 			'interval' => CWebUser::getRefresh(),
@@ -101,8 +100,11 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'profileIdx2' => $profileIdx2
 		];
 
+		$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);
+		$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
+
 		// Replace graph item by particular host item if dynamic items are used.
-		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+		if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
@@ -264,19 +266,23 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					->setArgument('to', $timeline['to']);
 
 				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
-				$header_label = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+
+				$header_label = $is_template_dashboard
+					? $item['name_expanded']
+					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
 
-				if (count($graph['hosts']) == 1 || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid != 0) {
-					$header_label = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
-				}
-				else {
-					$header_label = $graph['name'];
-				}
+				$prepend_host_name = $is_template_dashboard
+					? false
+					: (count($graph['hosts']) == 1 || $is_dynamic_item && $dynamic_hostid != 0);
 
-				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
+				$header_label = $prepend_host_name
+					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
+					: $graph['name'];
+
+				if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
 					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
 						$graph_src = (new CUrl('chart7.php'))
 							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
@@ -310,14 +316,14 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+					if (!$is_dynamic_item || $graph_src === '') {
 						$graph_src = (new CUrl('chart6.php'))
 							->setArgument('graphid', $resourceid)
 							->setArgument('graph3d', $graph['show_3d']);
 					}
 				}
 				else {
-					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
+					if (!$is_dynamic_item || $graph_src === '') {
 						$graph_src = (new CUrl('chart2.php'))->setArgument('graphid', $resourceid);
 					}
 
@@ -345,20 +351,59 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-				$item_graph_url = (new CUrl('zabbix.php'))
-					->setArgument('action', 'charts.view')
-					->setArgument('view_as', HISTORY_GRAPH)
-					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-					->setArgument('filter_graphids', [$resourceid])
-					->setArgument('filter_set', '1');
+			if ($edit_mode || ($is_template_dashboard && !$this->hasInput('dynamic_hostid'))) {
+				$item_graph_url = null;
 			}
 			else {
-				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+				if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+					if ($is_dynamic_item && $dynamic_hostid) {
+						$template_graphs = API::Graph()->get([
+							'output' => ['name'],
+							'graphids' => [$resourceid]
+						]);
+
+						$resourceid = null;
+
+						if ($template_graphs) {
+							$host_graphs = API::Graph()->get([
+								'output' => ['graphid'],
+								'hostids' => [$dynamic_hostid],
+								'filter' => [
+									'name' => $template_graphs[0]['name']
+								]
+							]);
+
+							if ($host_graphs) {
+								$resourceid = $host_graphs[0]['graphid'];
+							}
+						}
+					}
+
+					if ($resourceid !== null) {
+						$item_graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
+							? (new CUrl('zabbix.php'))
+								->setArgument('action', 'charts.view')
+								->setArgument('view_as', HISTORY_GRAPH)
+								->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+								->setArgument('filter_graphids', [$resourceid])
+								->setArgument('filter_set', '1')
+								->setArgument('from', $timeline['from'])
+								->setArgument('to', $timeline['to'])
+							: null;
+					}
+					else {
+						$item_graph_url = null;
+					}
+				}
+				else {
+					$item_graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+						? (new CUrl('history.php'))
+							->setArgument('itemids', [$resourceid])
+							->setArgument('from', $timeline['from'])
+							->setArgument('to', $timeline['to'])
+						: null;
+				}
 			}
-			$item_graph_url
-				->setArgument('from', $timeline['from'])
-				->setArgument('to', $timeline['to']);
 		}
 
 		$response = [
@@ -366,10 +411,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'graph' => [
 				'dataid' => $dataid,
 				'containerid' => $containerid,
-				'timestamp' => time(),
 				'unavailable_object' => $unavailable_object
 			],
-			'item_graph_url' => $unavailable_object ? '' : $item_graph_url,
+			'item_graph_url' => $unavailable_object ? null : $item_graph_url,
 			'widget' => [
 				'uniqueid' => $uniqueid,
 				'initial_load' => (int) $this->getInput('initial_load', 0),

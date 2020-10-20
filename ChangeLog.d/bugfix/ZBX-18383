@@ -1,1 +1,0 @@
-.........T [ZBX-18383] fixed the value of the {$HAPROXY.FRONT_SUTIL.MAX.WARN} macro in Template App HAProxy by HTTP (mchudinov)

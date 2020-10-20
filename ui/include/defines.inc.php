@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.2.0beta2');
+define('ZABBIX_VERSION',		'5.2.0rc1');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010033);
+define('ZABBIX_DB_VERSION',		5010067);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -251,6 +251,8 @@ define('AUDIT_RESOURCE_MODULE',				39);
 define('AUDIT_RESOURCE_SETTINGS',			40);
 define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
 define('AUDIT_RESOURCE_AUTHENTICATION',		42);
+define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
+define('AUDIT_RESOURCE_USER_ROLE',			44);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -489,6 +491,7 @@ define('ITEM_TYPE_SNMPTRAP',		17);
 define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
 define('ITEM_TYPE_SNMP',			20);
+define('ITEM_TYPE_SCRIPT',			21);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);
@@ -560,31 +563,32 @@ define('ITEM_DELAY_FLEXIBLE',	0);
 define('ITEM_DELAY_SCHEDULING',	1);
 
 // Item pre-processing types.
-define('ZBX_PREPROC_MULTIPLIER',			1);
-define('ZBX_PREPROC_RTRIM',					2);
-define('ZBX_PREPROC_LTRIM',					3);
-define('ZBX_PREPROC_TRIM',					4);
-define('ZBX_PREPROC_REGSUB',				5);
-define('ZBX_PREPROC_BOOL2DEC',				6);
-define('ZBX_PREPROC_OCT2DEC',				7);
-define('ZBX_PREPROC_HEX2DEC',				8);
-define('ZBX_PREPROC_DELTA_VALUE',			9);
-define('ZBX_PREPROC_DELTA_SPEED',			10);
-define('ZBX_PREPROC_XPATH',					11);
-define('ZBX_PREPROC_JSONPATH',				12);
-define('ZBX_PREPROC_VALIDATE_RANGE',		13);
-define('ZBX_PREPROC_VALIDATE_REGEX',		14);
-define('ZBX_PREPROC_VALIDATE_NOT_REGEX',	15);
-define('ZBX_PREPROC_ERROR_FIELD_JSON',		16);
-define('ZBX_PREPROC_ERROR_FIELD_XML',		17);
-define('ZBX_PREPROC_ERROR_FIELD_REGEX',		18);
-define('ZBX_PREPROC_THROTTLE_VALUE',		19);
-define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
-define('ZBX_PREPROC_SCRIPT',				21);
-define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
-define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
-define('ZBX_PREPROC_CSV_TO_JSON',			24);
-define('ZBX_PREPROC_STR_REPLACE',			25);
+define('ZBX_PREPROC_MULTIPLIER',				1);
+define('ZBX_PREPROC_RTRIM',						2);
+define('ZBX_PREPROC_LTRIM',						3);
+define('ZBX_PREPROC_TRIM',						4);
+define('ZBX_PREPROC_REGSUB',					5);
+define('ZBX_PREPROC_BOOL2DEC',					6);
+define('ZBX_PREPROC_OCT2DEC',					7);
+define('ZBX_PREPROC_HEX2DEC',					8);
+define('ZBX_PREPROC_DELTA_VALUE',				9);
+define('ZBX_PREPROC_DELTA_SPEED',				10);
+define('ZBX_PREPROC_XPATH',						11);
+define('ZBX_PREPROC_JSONPATH',					12);
+define('ZBX_PREPROC_VALIDATE_RANGE',			13);
+define('ZBX_PREPROC_VALIDATE_REGEX',			14);
+define('ZBX_PREPROC_VALIDATE_NOT_REGEX',		15);
+define('ZBX_PREPROC_ERROR_FIELD_JSON',			16);
+define('ZBX_PREPROC_ERROR_FIELD_XML',			17);
+define('ZBX_PREPROC_ERROR_FIELD_REGEX',			18);
+define('ZBX_PREPROC_THROTTLE_VALUE',			19);
+define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',		20);
+define('ZBX_PREPROC_SCRIPT',					21);
+define('ZBX_PREPROC_PROMETHEUS_PATTERN',		22);
+define('ZBX_PREPROC_PROMETHEUS_TO_JSON',		23);
+define('ZBX_PREPROC_CSV_TO_JSON',				24);
+define('ZBX_PREPROC_STR_REPLACE',				25);
+define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -1520,8 +1524,6 @@ define('THEME_DEFAULT', 'default');
 // the default theme
 define('ZBX_DEFAULT_THEME', 'blue-theme');
 
-define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
-
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 
@@ -1695,6 +1697,7 @@ define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
+define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
 define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
@@ -1713,6 +1716,7 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
+define('ZBX_STYLE_HEADER_COMBOBOX', 'header-combobox');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');

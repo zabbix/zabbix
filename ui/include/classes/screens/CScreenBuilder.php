@@ -164,19 +164,10 @@ class CScreenBuilder {
 
 			// get resourcetype from screenitem
 			if (!array_key_exists('screenitem', $options) && array_key_exists('screenitemid', $options)) {
-				if (array_key_exists('hostid', $options) && $options['hostid'] > 0) {
-					$options['screenitem'] = API::TemplateScreenItem()->get([
-						'screenitemids' => $options['screenitemid'],
-						'hostids' => $options['hostid'],
-						'output' => API_OUTPUT_EXTEND
-					]);
-				}
-				else {
-					$options['screenitem'] = API::ScreenItem()->get([
-						'screenitemids' => $options['screenitemid'],
-						'output' => API_OUTPUT_EXTEND
-					]);
-				}
+				$options['screenitem'] = API::ScreenItem()->get([
+					'screenitemids' => $options['screenitemid'],
+					'output' => API_OUTPUT_EXTEND
+				]);
 				$options['screenitem'] = reset($options['screenitem']);
 			}
 
@@ -226,7 +217,6 @@ class CScreenBuilder {
 				return new CScreenDataOverview($options);
 
 			case SCREEN_RESOURCE_URL:
-				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenUrl($options);
 
 			case SCREEN_RESOURCE_ACTIONS:
@@ -248,11 +238,9 @@ class CScreenBuilder {
 				return new CScreenHistory($options);
 
 			case SCREEN_RESOURCE_LLD_GRAPH:
-				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldGraph($options);
 
 			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldSimpleGraph($options);
 
 			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
@@ -270,27 +258,6 @@ class CScreenBuilder {
 			default:
 				return null;
 		}
-	}
-
-	/**
-	 * Appends boolean option 'isTemplatedScreen' to output options.
-	 *
-	 * @param array $options
-	 *
-	 * @return array
-	 */
-	protected static function appendTemplatedScreenOption(array $options) {
-		if (array_key_exists('screen', $options)) {
-			$options['isTemplatedScreen'] = (bool) array_key_exists('templateid', $options['screen']);
-		}
-		elseif (array_key_exists('screenid', $options) && $options['screenid'] > 0) {
-			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get([
-				'screenids' => [$options['screenid']],
-				'output' => []
-			]);
-		}
-
-		return $options;
 	}
 
 	/**
@@ -343,9 +310,7 @@ class CScreenBuilder {
 						->addClass(ZBX_STYLE_DISABLED);
 				}
 				else {
-					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
-						url_param('templateid').'&add_col='.$i
-					))
+					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].'&add_col='.$i))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addSID();
 				}
@@ -361,7 +326,7 @@ class CScreenBuilder {
 					->addClass(ZBX_STYLE_DISABLED);
 			}
 			else {
-				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
+				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
 					'&add_col='.$this->screen['hsize']
 				))
 					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
@@ -388,9 +353,7 @@ class CScreenBuilder {
 						->addClass(ZBX_STYLE_DISABLED);
 				}
 				else {
-					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
-						url_param('templateid').'&add_row='.$r
-					))
+					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$r))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addSID();
 				}
@@ -443,11 +406,11 @@ class CScreenBuilder {
 				// action
 				if ($this->mode == SCREEN_MODE_EDIT) {
 					if ($screenitem['screenitemid'] != 0) {
-						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).
+						$action = 'screenedit.php?form=update'.url_param('screenid').
 							'&screenitemid='.$screenitem['screenitemid'];
 					}
 					else {
-						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).'&x='.$c.'&y='.$r;
+						$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
 					}
 				}
 				else {
@@ -550,9 +513,7 @@ class CScreenBuilder {
 						->addClass(ZBX_STYLE_DISABLED);
 				}
 				else {
-					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].
-						url_param('templateid').'&rmv_row='.$r
-					))
+					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addSID();
 					if (!$emptyScreenRow) {
@@ -575,7 +536,7 @@ class CScreenBuilder {
 					->addClass(ZBX_STYLE_DISABLED);
 			}
 			else {
-				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
+				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
 					'&add_row='.$this->screen['vsize']
 				))
 					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
@@ -595,9 +556,7 @@ class CScreenBuilder {
 						->addClass(ZBX_STYLE_DISABLED);
 				}
 				else {
-					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].
-						url_param('templateid').'&rmv_col='.$i
-					))
+					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].'&rmv_col='.$i))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addSID();
 
@@ -616,22 +575,6 @@ class CScreenBuilder {
 		}
 
 		return $screenTable;
-	}
-
-	/**
-	 * Insert javascript to create scroll in time control.
-	 *
-	 * @static
-	 *
-	 * @param array $timeline
-	 */
-	private static function insertScreenScrollJs(array $timeline) {
-		$obj_data = [
-			'id' => 'scrollbar',
-			'mainObject' => 1
-		];
-
-		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($obj_data).');');
 	}
 
 	/**
@@ -671,7 +614,6 @@ class CScreenBuilder {
 	 * @static
 	 */
 	public static function insertScreenStandardJs(array $timeline) {
-		CScreenBuilder::insertScreenScrollJs($timeline);
 		CScreenBuilder::insertProcessObjectsJs();
 	}
 

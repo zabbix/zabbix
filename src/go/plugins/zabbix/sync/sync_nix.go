@@ -31,7 +31,6 @@ func getMetrics() []string {
 		"system.hw.devices", "Listing of PCI or USB devices.",
 		"system.sw.packages", "Listing of installed packages.",
 		"system.users.num", "Number of users logged in.",
-		"system.swap.size", "Swap space size in bytes or in percentage from total.",
 		"vfs.dir.count", "Directory entry count.",
 		"vfs.dir.size", "Directory size (in bytes).",
 		"vm.memory.size", "Memory size in bytes or in percentage from total.",

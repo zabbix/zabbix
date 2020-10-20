@@ -131,7 +131,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	char			tmp[MAX_STRING_LEN + 1], **pvalue;
 	DC_ITEM			item;
 	static const ZBX_TABLE	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
-	struct zbx_json_parse	jp_interface, jp_host, jp_details;
+	struct zbx_json_parse	jp_interface, jp_host, jp_details, jp_script_params;
 	AGENT_RESULT		result;
 	int			errcode, ret = FAIL;
 
@@ -189,6 +189,15 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.ssl_key_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
 	item.ssl_key_password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
+
+	if (ITEM_TYPE_SCRIPT == item.type &&
+			SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
+	{
+		item.script_params = zbx_dsprintf(NULL, "%.*s",
+				(int)(jp_script_params.end - jp_script_params.start + 1), jp_script_params.start);
+	}
+	else
+		item.script_params = zbx_strdup(NULL, "");
 
 	if (NULL == table_interface)
 		table_interface = DBget_table("interface");
@@ -380,6 +389,7 @@ out:
 	zbx_free(item.snmpv3_authpassphrase);
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
+	zbx_free(item.script_params);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

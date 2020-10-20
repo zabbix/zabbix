@@ -40,7 +40,7 @@ class CImportReferencer {
 	protected $iconMaps = [];
 	protected $maps = [];
 	protected $screens = [];
-	protected $templateScreens = [];
+	protected $templateDashboards = [];
 	protected $macros = [];
 	protected $proxies = [];
 	protected $hostPrototypes = [];
@@ -57,7 +57,7 @@ class CImportReferencer {
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $screensRefs;
-	protected $templateScreensRefs;
+	protected $templateDashboardsRefs;
 	protected $macrosRefs;
 	protected $proxiesRefs;
 	protected $hostPrototypesRefs;
@@ -119,18 +119,18 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get template id by host.
+	 * Get template id by template name.
 	 *
 	 * @param string $host
 	 *
 	 * @return string|bool
 	 */
-	public function resolveTemplate($host) {
+	public function resolveTemplate($name) {
 		if ($this->templatesRefs === null) {
 			$this->selectTemplates();
 		}
 
-		return isset($this->templatesRefs[$host]) ? $this->templatesRefs[$host] : false;
+		return isset($this->templatesRefs[$name]) ? $this->templatesRefs[$name] : false;
 	}
 
 	/**
@@ -289,20 +289,20 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get templated screen ID by template ID and screen name.
+	 * Get template dashboard ID by template ID and dashboard name.
 	 *
-	 * @param string $templateId
-	 * @param string $screenName
+	 * @param string $templateid
+	 * @param string $name
 	 *
 	 * @return string|bool
 	 */
-	public function resolveTemplateScreen($templateId, $screenName) {
-		if ($this->templateScreensRefs === null) {
-			$this->selectTemplateScreens();
+	public function resolveTemplateDashboards($templateid, $name) {
+		if ($this->templateDashboardsRefs === null) {
+			$this->selectTemplateDashboards();
 		}
 
-		return isset($this->templateScreensRefs[$templateId][$screenName])
-			? $this->templateScreensRefs[$templateId][$screenName]
+		return isset($this->templateDashboardsRefs[$templateid][$name])
+			? $this->templateDashboardsRefs[$templateid][$name]
 			: false;
 	}
 
@@ -623,18 +623,18 @@ class CImportReferencer {
 	 *
 	 * @param array $screens
 	 */
-	public function addTemplateScreens(array $screens) {
-		$this->templateScreens = array_unique(array_merge($this->templateScreens, $screens));
+	public function addTemplateDashboards(array $dashboards) {
+		$this->templateDashboards = array_unique(array_merge($this->templateDashboards, $dashboards));
 	}
 
 	/**
-	 * Add template screen name association with template screen ID.
+	 * Add template dashboard name association with template dashboard ID.
 	 *
-	 * @param string $screenName
-	 * @param string $templateScreenId
+	 * @param string $name
+	 * @param string $template_dashboardid
 	 */
-	public function addTemplateScreenRef($screenName, $templateScreenId) {
-		$this->templateScreensRefs[$screenName] = $templateScreenId;
+	public function addTemplateDashboardsRef($name, $template_dashboardid) {
+		$this->templateDashboardsRefs[$name] = $template_dashboardid;
 	}
 
 	/**
@@ -1030,21 +1030,21 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Select template screen IDs for previously added screen names and template IDs.
+	 * Select template dashboard IDs for previously added dashboard names and template IDs.
 	 */
-	protected function selectTemplateScreens() {
-		if ($this->templateScreens) {
-			$this->templateScreensRefs = [];
+	protected function selectTemplateDashboards() {
+		if ($this->templateDashboards) {
+			$this->templateDashboardsRefs = [];
 
-			$db_template_screens = API::TemplateScreen()->get([
-				'filter' => ['name' => $this->templateScreens],
-				'output' => ['screenid', 'name', 'templateid']
+			$db_template_dashboards = API::TemplateDashboard()->get([
+				'output' => ['dashboardid', 'name', 'templateid'],
+				'filter' => ['name' => $this->templateDashboards]
 			]);
-			foreach ($db_template_screens as $screen) {
-				$this->templateScreensRefs[$screen['templateid']][$screen['name']] = $screen['screenid'];
+			foreach ($db_template_dashboards as $dashboard) {
+				$this->templateDashboardsRefs[$dashboard['templateid']][$dashboard['name']] = $dashboard['dashboardid'];
 			}
 
-			$this->templateScreens = [];
+			$this->templateDashboards = [];
 		}
 	}
 

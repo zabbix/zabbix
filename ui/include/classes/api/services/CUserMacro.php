@@ -24,6 +24,16 @@
  */
 class CUserMacro extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'createglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'updateglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'deleteglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	protected $tableName = 'hostmacro';
 	protected $tableAlias = 'hm';
 	protected $sortColumns = ['macro'];

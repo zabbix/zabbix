@@ -32,7 +32,7 @@ $titles = [
 	'groups' => _('Groups'),
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
-	'templateScreens' => _('Template screens'),
+	'templateDashboards' => _('Template dashboards'),
 	'templateLinkage' => _('Template linkage'),
 	'applications' => _('Applications'),
 	'items' => _('Items'),
@@ -65,6 +65,12 @@ foreach ($titles as $key => $title) {
 				&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$cbExist->setAttribute('disabled', 'disabled');
 		}
+		elseif ($key === 'maps') {
+			$cbExist->setAttribute('disabled', $data['allowed_edit_maps'] ? null : true);
+		}
+		elseif ($key === 'screens') {
+			$cbExist->setAttribute('disabled', $data['allowed_edit_screens'] ? null : true);
+		}
 
 		if ($key === 'images') {
 			$cbExist->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
@@ -85,6 +91,12 @@ foreach ($titles as $key => $title) {
 	if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
 			&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
 		$cbMissed->setAttribute('disabled', 'disabled');
+	}
+	elseif ($key === 'maps') {
+		$cbMissed->setAttribute('disabled', $data['allowed_edit_maps'] ? null : true);
+	}
+	elseif ($key === 'screens') {
+		$cbMissed->setAttribute('disabled', $data['allowed_edit_screens'] ? null : true);
 	}
 
 	if (array_key_exists('deleteMissing', $data['rules'][$key])) {

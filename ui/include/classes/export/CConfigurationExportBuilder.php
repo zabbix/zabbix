@@ -268,7 +268,7 @@ class CConfigurationExportBuilder {
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'screens' => $this->formatScreens($template['screens']),
+				'dashboards' => $this->formatDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags'])
 			];
 		}
@@ -589,6 +589,7 @@ class CConfigurationExportBuilder {
 				'timeout' => $discoveryRule['timeout'],
 				'url' => $discoveryRule['url'],
 				'query_fields' => $discoveryRule['query_fields'],
+				'parameters' => $discoveryRule['parameters'],
 				'posts' => $discoveryRule['posts'],
 				'status_codes' => $discoveryRule['status_codes'],
 				'follow_redirects' => $discoveryRule['follow_redirects'],
@@ -604,7 +605,7 @@ class CConfigurationExportBuilder {
 				'verify_peer' => $discoveryRule['verify_peer'],
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
-				'preprocessing' => $discoveryRule['preprocessing'],
+				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
 				'overrides' => $discoveryRule['overrides']
 			];
 
@@ -643,6 +644,27 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Format preprocessing steps.
+	 *
+	 * @param array $preprocessing_steps
+	 *
+	 * @static
+	 *
+	 * @return array
+	 */
+	private static function formatPreprocessingSteps(array $preprocessing_steps) {
+		foreach ($preprocessing_steps as &$preprocessing_step) {
+			$preprocessing_step['parameters'] = ($preprocessing_step['type'] == ZBX_PREPROC_SCRIPT)
+				? [$preprocessing_step['params']]
+				: explode("\n", $preprocessing_step['params']);
+			unset($preprocessing_step['params']);
+		}
+		unset($preprocessing_step);
+
+		return $preprocessing_steps;
 	}
 
 	/**
@@ -883,6 +905,7 @@ class CConfigurationExportBuilder {
 				'recovery_mode' => $trigger['recovery_mode'],
 				'recovery_expression' => $trigger['recovery_expression'],
 				'name' => $trigger['description'],
+				'event_name' => $trigger['event_name'],
 				'opdata' => $trigger['opdata'],
 				'correlation_mode' => $trigger['correlation_mode'],
 				'correlation_tag' => $trigger['correlation_tag'],
@@ -1024,11 +1047,12 @@ class CConfigurationExportBuilder {
 				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt'],
-				'preprocessing' => $item['preprocessing'],
+				'preprocessing' => self::formatPreprocessingSteps($item['preprocessing']),
 				'jmx_endpoint' => $item['jmx_endpoint'],
 				'timeout' => $item['timeout'],
 				'url' => $item['url'],
 				'query_fields' => $item['query_fields'],
+				'parameters' => $item['parameters'],
 				'posts' => $item['posts'],
 				'status_codes' => $item['status_codes'],
 				'follow_redirects' => $item['follow_redirects'],
@@ -1271,6 +1295,79 @@ class CConfigurationExportBuilder {
 				'resource' => $screenItem['resourceid'],
 				'max_columns' => $screenItem['max_columns'],
 				'application' => $screenItem['application']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format dashboards.
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	protected function formatDashboards(array $dashboards) {
+		$result = [];
+
+		CArrayHelper::sort($dashboards, ['name']);
+
+		foreach ($dashboards as $dashboard) {
+			$result[] = [
+				'name' => $dashboard['name'],
+				'widgets' => $this->formatWidgets($dashboard['widgets'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format widgets.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return array
+	 */
+	protected function formatWidgets(array $widgets) {
+		$result = [];
+
+		CArrayHelper::sort($widgets, ['name']);
+
+		foreach ($widgets as $widget) {
+			$result[] = [
+				'type' => $widget['type'],
+				'name' => $widget['name'],
+				'x' => $widget['x'],
+				'y' => $widget['y'],
+				'width' => $widget['width'],
+				'height' => $widget['height'],
+				'hide_header' => $widget['view_mode'],
+				'fields' => $this->formatWidgetFields($widget['fields'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format widget fields.
+	 *
+	 * @param array $widgets
+	 *
+	 * @return array
+	 */
+	protected function formatWidgetFields(array $fields) {
+		$result = [];
+
+		CArrayHelper::sort($fields, ['type']);
+
+		foreach ($fields as $field) {
+			$result[] = [
+				'type' => $field['type'],
+				'name' => $field['name'],
+				'value' => $field['value']
 			];
 		}
 

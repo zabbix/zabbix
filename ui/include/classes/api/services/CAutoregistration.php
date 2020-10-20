@@ -24,6 +24,11 @@
  */
 class CAutoregistration extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	protected $tableName = 'config';
 	protected $tableAlias = 'c';
 

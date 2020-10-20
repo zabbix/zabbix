@@ -46,7 +46,7 @@ class CControllerProxyList extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES);
 	}
 
 	protected function doAction() {
@@ -77,7 +77,8 @@ class CControllerProxyList extends CController {
 			'sortorder' => $sortOrder,
 			'filter' => $filter,
 			'profileIdx' => 'web.proxies.filter',
-			'active_tab' => CProfile::get('web.proxies.filter.active', 1)
+			'active_tab' => CProfile::get('web.proxies.filter.active', 1),
+			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 		];
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;

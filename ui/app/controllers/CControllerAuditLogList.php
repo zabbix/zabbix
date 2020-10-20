@@ -44,7 +44,7 @@ class CControllerAuditLogList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_REPORTS_AUDIT);
 	}
 
 	protected function doAction(): void {
@@ -218,7 +218,8 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_MODULE => _('Module'),
 			AUDIT_RESOURCE_SETTINGS => _('Settings'),
 			AUDIT_RESOURCE_HOUSEKEEPING => _('Housekeeping'),
-			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication')
+			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication'),
+			AUDIT_RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard')
 		];
 	}
 

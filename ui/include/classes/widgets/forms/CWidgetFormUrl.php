@@ -24,8 +24,8 @@
  */
 class CWidgetFormUrl extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_URL);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_URL);
 
 		// URL field.
 		$field_url = (new CWidgetFieldUrl('url', _('URL')))
@@ -38,12 +38,14 @@ class CWidgetFormUrl extends CWidgetForm {
 		$this->fields[$field_url->getName()] = $field_url;
 
 		// Dynamic item.
-		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
+		if ($templateid === null) {
+			$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 
-		if (array_key_exists('dynamic', $this->data)) {
-			$field_dynamic->setValue($this->data['dynamic']);
+			if (array_key_exists('dynamic', $this->data)) {
+				$field_dynamic->setValue($this->data['dynamic']);
+			}
+
+			$this->fields[$field_dynamic->getName()] = $field_dynamic;
 		}
-
-		$this->fields[$field_dynamic->getName()] = $field_dynamic;
 	}
 }

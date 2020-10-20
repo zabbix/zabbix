@@ -34,17 +34,20 @@ $web_layout_mode = $this->getLayoutMode();
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create dashboard'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'dashboard.view')
-					->setArgument('new', '1')
-					->getUrl()
-			))
-		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-		))
-		->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CRedirectButton(_('Create dashboard'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->setArgument('new', '1')
+							->getUrl()
+					))->setEnabled($data['allowed_edit'])
+				)
+				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+			)
+		)->setAttribute('aria-label', _('Content controls'))
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
@@ -83,10 +86,6 @@ $table = (new CTableInfo())
 				->getUrl())
 	]);
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->setArgument('dashboardid', '');
-
 foreach ($data['dashboards'] as $dashboard) {
 	$tags = [];
 
@@ -105,7 +104,8 @@ foreach ($data['dashboards'] as $dashboard) {
 			->setEnabled($dashboard['editable']),
 		(new CDiv([
 			new CLink($dashboard['name'],
-				$url
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
 			),
@@ -118,7 +118,10 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
-		'dashboard.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected dashboards?')]
+		'dashboard.delete' => [
+			'name' => _('Delete'),
+			'confirm' => _('Delete selected dashboards?')
+		]
 	], 'dashboard')
 ]);
 

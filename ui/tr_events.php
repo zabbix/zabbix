@@ -153,6 +153,14 @@ $mediatypes = API::Mediatype()->get([
 	'preservekeys' => true
 ]);
 
+$allowed = [
+	'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
+];
+
 /*
  * Display
  */
@@ -160,7 +168,7 @@ $event_tab = (new CDiv([
 	new CDiv([
 		(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['eventid'])))
 			->setHeader(_('Trigger details')),
-		(new CUiWidget(WIDGET_HAT_EVENTDETAILS, make_event_details($event)))
+		(new CUiWidget(WIDGET_HAT_EVENTDETAILS, make_event_details($event, $allowed)))
 			->setHeader(_('Event details'))
 	]),
 	new CDiv([
@@ -170,7 +178,7 @@ $event_tab = (new CDiv([
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
 			->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state')
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID),
-		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event)))
+		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event, $allowed)))
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
 			->setHeader(_('Event list [previous 20]'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state')
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)

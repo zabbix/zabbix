@@ -101,12 +101,12 @@ class testDRule extends CAPITest {
 			[
 				'login' => ['user' => 'guest', 'password' => ''],
 				'drule' => ['14'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "drule.delete".'
 			],
 			[
 				'login' => ['user' => 'action-user', 'password' => 'zabbix'],
 				'drule' => ['14'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "drule.delete".'
 			],
 			[
 				'login' => ['user' => 'action-admin', 'password' => 'zabbix'],

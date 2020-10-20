@@ -34,9 +34,19 @@ class CMenu extends CBaseComponent {
 	}
 
 	init() {
+		this._expanded_item = null;
+		this._selected_item = null;
 		this._items = [];
+
 		for (const el of this._target.childNodes) {
-			this._items.push(new CMenuItem(el));
+			const item = new CMenuItem(el);
+			if (item.isExpanded()) {
+				this._expanded_item = item;
+			}
+			if (item.isSelected()) {
+				this._selected_item = item;
+			}
+			this._items.push(item);
 		}
 
 		if (this.hasClass('submenu')) {
@@ -44,52 +54,44 @@ class CMenu extends CBaseComponent {
 		}
 	}
 
-	collapseAll(excluded_item = null) {
-		for (const item of this._items) {
-			if (item !== excluded_item && item.hasSubmenu()) {
-				item.collapseSubmenu();
-			}
-		}
+	getItems() {
+		return this._items;
+	}
 
-		return this;
+	collapseExpanded() {
+		this._expanded_item !== null && this._expanded_item.collapseSubmenu();
+		this._expanded_item = null;
 	}
 
 	expandSelected() {
-		for (const item of this._items) {
-			if (item.hasSubmenu()) {
-				if (item.isSelected()) {
-					item.expandSubmenu();
-				}
-				else {
-					item.collapseSubmenu();
-				}
-			}
+		if (this._selected_item !== null && this._selected_item !== this._expanded_item) {
+			this.collapseExpanded();
+			this._selected_item.hasSubmenu() && this._selected_item.expandSubmenu();
 		}
 
 		return this;
 	}
 
 	focusSelected() {
-		for (const item of this._items) {
-			if (item.hasSubmenu()) {
-				item.getSubmenu().focusSelected();
+		if (this._selected_item !== null) {
+			if (this._selected_item.hasSubmenu()) {
+				this.expandSelected();
+				this._selected_item.getSubmenu().focusSelected();
 			}
-			else if (item.isSelected()) {
-				item.focus();
+			else {
+				this._selected_item.focus();
 			}
 		}
 
 		return this;
 	}
 
-	getSelected() {
-		for (const item of this._items) {
-			if (item.hasSubmenu() && item.isSelected()) {
-				return item;
-			}
-		}
+	getExpanded() {
+		return this._expanded_item;
+	}
 
-		return null;
+	getSelected() {
+		return this._selected_item;
 	}
 
 	/**
@@ -105,8 +107,14 @@ class CMenu extends CBaseComponent {
 			},
 
 			expand: (e) => {
-				this.collapseAll(e.detail.target);
+				this._expanded_item !== e.detail.target && this.collapseExpanded();
+				this._expanded_item = e.detail.target;
+
 				this.fire(MENU_EVENT_EXPAND, {menu_item: e.detail.target});
+			},
+
+			collapse: (e) => {
+				this._expanded_item = null;
 			}
 		};
 
@@ -115,6 +123,7 @@ class CMenu extends CBaseComponent {
 		for (const item of this._items) {
 			if (item.hasSubmenu()) {
 				item.on(MENUITEM_EVENT_EXPAND, this._events.expand);
+				item.on(MENUITEM_EVENT_COLLAPSE, this._events.collapse);
 			}
 		}
 	}

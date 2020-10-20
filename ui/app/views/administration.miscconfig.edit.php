@@ -31,14 +31,6 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $from_list = (new CFormList())
-	->addRow((new CLabel(_('Refresh unsupported items'), 'refresh_unsupported'))->setAsteriskMark(),
-		(new CTextBox('refresh_unsupported', $data['refresh_unsupported'], false,
-			DB::getFieldLength('config', 'refresh_unsupported')
-		))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-	)
 	->addRow((new CLabel(_('Group for discovered hosts'), 'discovery_groupid'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'discovery_groupid',
@@ -86,8 +78,7 @@ $from_list = (new CFormList())
 			->setUncheckedValue('0')
 			->setChecked($data['snmptrap_logging'] == 1)
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('Authorization')))
+	->addRow((new CTag('h4', true, _('Authorization')))->addClass('input-section-header'))
 	->addRow((new CLabel(_('Login attempts'), 'login_attempts'))->setAsteriskMark(),
 		(new CNumericBox('login_attempts', $data['login_attempts'], 2))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
@@ -99,8 +90,7 @@ $from_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('Security')))
+	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
 	->addRow(_('Validate URI schemes'),
 		(new CCheckBox('validate_uri_schemes'))
 			->setUncheckedValue('0')
@@ -134,8 +124,7 @@ $from_list = (new CFormList())
 			->setEnabled($data['iframe_sandboxing_enabled'] == 1)
 			->setAriaRequired()
 	)
-	->addRow(null)
-	->addRow(new CTag('h4', true, _('Communication with Zabbix server')))
+	->addRow((new CTag('h4', true, _('Communication with Zabbix server')))->addClass('input-section-header'))
 	->addRow(
 		(new CLabel(_('Network timeout'), 'socket_timeout'))->setAsteriskMark(),
 		(new CTextBox('socket_timeout', $data['socket_timeout'], false, DB::getFieldLength('config', 'socket_timeout')))
