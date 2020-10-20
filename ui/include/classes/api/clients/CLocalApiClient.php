@@ -244,35 +244,63 @@ class CLocalApiClient extends CApiClient {
 			return false;
 		}
 
-		$action = array_key_exists('action', $method_rules) ? $method_rules['action'] : '';
+		$exists_action_rule = array_key_exists('action', $method_rules);
+
+		$name_conditions = 'name LIKE '.zbx_dbstr(CRoleHelper::SECTION_API.'%');
+		if ($exists_action_rule) {
+			$name_conditions = '('.
+				$name_conditions.
+				' OR name='.zbx_dbstr($method_rules['action']).
+				' OR name='.zbx_dbstr(CRoleHelper::ACTIONS_DEFAULT_ACCESS).
+			')';
+		}
 
 		$db_rules = DBselect(
 			'SELECT type,name,value_str,value_int'.
 			' FROM role_rule'.
 			' WHERE roleid='.zbx_dbstr($user_data['roleid']).
-				' AND ('.
-					'name LIKE '.zbx_dbstr(CRoleHelper::SECTION_API.'%').
-					(($action !== '') ? ' OR name='.zbx_dbstr($action) : '').
-				')'.
+				' AND '.$name_conditions.
 			' ORDER by name'
 		);
 
-		$api_access_mode = false;
+		$api_access_mode = (bool) CRoleHelper::API_MODE_DENY;
 		$api_methods = [];
+		$actions_default_access = (bool) CRoleHelper::DEFAULT_ACCESS_ENABLED;
+		$is_action_allowed = null;
 
 		while ($db_rule = DBfetch($db_rules)) {
 			$rule_value = $db_rule[CRole::RULE_VALUE_TYPES[$db_rule['type']]];
 
-			if ($rule_value == 0 && (($db_rule['name'] !== '' && $db_rule['name'] === $action)
-					|| $db_rule['name'] === CRoleHelper::API_ACCESS)) {
-				return false;
-			}
+			switch ($db_rule['name']) {
+				case CRoleHelper::API_ACCESS:
+					if ($rule_value == CRoleHelper::API_ACCESS_DISABLED) {
+						return false;
+					}
+					break;
 
-			if ($db_rule['name'] === CRoleHelper::API_MODE) {
-				$api_access_mode = (bool) $rule_value;
+				case CRoleHelper::API_MODE:
+					$api_access_mode = (bool) $rule_value;
+					break;
+
+				case CRoleHelper::ACTIONS_DEFAULT_ACCESS:
+					$actions_default_access = (bool) $rule_value;
+					break;
+
+				default:
+					if (strpos($db_rule['name'], CRoleHelper::API_METHOD) === 0) {
+						$api_methods[] = $rule_value;
+					}
+					elseif ($exists_action_rule && $db_rule['name'] === $method_rules['action']) {
+						$is_action_allowed = (bool) $rule_value;
+					}
 			}
-			elseif (strpos($db_rule['name'], CRoleHelper::API_METHOD) === 0) {
-				$api_methods[] = $rule_value;
+		}
+
+		if ($exists_action_rule) {
+			$is_action_allowed = ($is_action_allowed !== null) ? $is_action_allowed : $actions_default_access;
+
+			if (!$is_action_allowed) {
+				return false;
 			}
 		}
 
