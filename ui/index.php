@@ -72,6 +72,7 @@ if (!hasRequest('form') && CAuthenticationHelper::get(CAuthenticationHelper::HTT
 // login via form
 if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), getRequest('password', ''))) {
 	CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+	API::getWrapper()->auth = CWebUser::$data['sessionid'];
 
 	if (CWebUser::$data['autologin'] != $autologin) {
 		API::User()->update([

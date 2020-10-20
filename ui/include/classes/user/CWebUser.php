@@ -57,7 +57,6 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			// TODO: fix me
 			API::getWrapper()->auth = CSessionHelper::getId();
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
