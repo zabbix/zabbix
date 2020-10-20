@@ -187,7 +187,7 @@ class CSelect extends CTag {
 		$options = [];
 
 		foreach ($values as $value => $label) {
-			$options[] = new CSelectOption($value, $label);
+			$options[] = new CSelectOption($value, (string) $label);
 		}
 
 		return $options;
