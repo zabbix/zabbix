@@ -243,21 +243,39 @@ function createFontSelect(string $name): CSelect {
 					->addRow(_('Icons'),
 						(new CDiv(
 							(new CTable())
-								->addRow([new CLabel(_('Default'), 'iconid_off'), new CComboBox('iconid_off')])
+								->addRow([
+									new CLabel(_('Default'), 'label-iconid-off'),
+									(new CSelect('iconid_off'))
+										->setId('iconid_off')
+										->setFocusableElementId('label-iconid-off')
+										->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+								])
 								->addRow(
-									(new CRow([new CLabel(_('Problem'), 'iconid_on'), new CComboBox('iconid_on')]))
+									(new CRow([
+										new CLabel(_('Problem'), 'label-iconid-on'),
+										(new CSelect('iconid_on'))
+											->setId('iconid_on')
+											->setFocusableElementId('label-iconid-on')
+											->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+									]))
 										->setId('iconProblemRow')
 								)
 								->addRow(
 									(new CRow([
-										new CLabel(_('Maintenance'), 'iconid_maintenance'),
-										new CComboBox('iconid_maintenance')
+										new CLabel(_('Maintenance'), 'label-iconid-maintenance'),
+										(new CSelect('iconid_maintenance'))
+											->setId('iconid_maintenance')
+											->setFocusableElementId('label-iconid-maintenance')
+											->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									]))->setId('iconMainetnanceRow')
 								)
 								->addRow(
 									(new CRow([
-										new CLabel(_('Disabled'), 'iconid_disabled'),
-										new CComboBox('iconid_disabled')
+										new CLabel(_('Disabled'), 'label-iconid-disabled'),
+										(new CSelect('iconid_disabled'))
+											->setId('iconid_disabled')
+											->setFocusableElementId('label-iconid-disabled')
+											->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									]))->setId('iconDisabledRow')
 								)
 								->setAttribute('style', 'width: 100%;')
