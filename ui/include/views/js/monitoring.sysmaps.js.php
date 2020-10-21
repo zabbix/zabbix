@@ -138,14 +138,16 @@ function createFontSelect(string $name): CSelect {
 							->setRows(2)
 							->setId('elementLabel')
 					)
-					->addRow(_('Label location'),
-						new CComboBox('label_location', null, null, [
-							MAP_LABEL_LOC_DEFAULT => _('Default'),
-							MAP_LABEL_LOC_BOTTOM => _('Bottom'),
-							MAP_LABEL_LOC_LEFT => _('Left'),
-							MAP_LABEL_LOC_RIGHT => _('Right'),
-							MAP_LABEL_LOC_TOP => _('Top')
-						])
+					->addRow(new CLabel(_('Label location'), 'label-label-location'),
+						(new CSelect('label_location'))
+							->setFocusableElementId('label-label-location')
+							->addOptions(CSelect::createOptionsFromArray([
+								MAP_LABEL_LOC_DEFAULT => _('Default'),
+								MAP_LABEL_LOC_BOTTOM => _('Bottom'),
+								MAP_LABEL_LOC_LEFT => _('Left'),
+								MAP_LABEL_LOC_RIGHT => _('Right'),
+								MAP_LABEL_LOC_TOP => _('Top')
+							]))
 					)
 					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup_ms'))->setAsteriskMark(),
 						(new CMultiSelect([
