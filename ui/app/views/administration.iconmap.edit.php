@@ -65,14 +65,16 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan(($i + 1).':'))->addClass('rowNum'),
-			(new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'],
-				null, $data['inventory_list']
-			)),
+			(new CSelect('iconmap[mappings]['.$i.'][inventory_link]'))
+				->setValue($mapping['inventory_link'])
+				->addOptions(CSelect::createOptionsFromArray($data['inventory_list'])),
 			(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 				->setAttribute('maxlength', 64),
-			(new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid'], null, $data['icon_list']))
+			(new CSelect('iconmap[mappings]['.$i.'][iconid]'))
+				->setValue($mapping['iconid'])
+				->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
 				->addClass('mappingIcon'),
 			(new CCol(
 				(new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
@@ -104,7 +106,9 @@ $table
 	]))->setId('iconMapListFooter'))
 	->addRow([
 		(new CCol(_('Default')))->setColSpan(4),
-		(new CComboBox('iconmap[default_iconid]', $data['iconmap']['default_iconid'], null, $data['icon_list']))
+		(new CSelect('iconmap[default_iconid]'))
+			->setValue($data['iconmap']['default_iconid'])
+			->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
 			->addClass('mappingIcon'),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].
