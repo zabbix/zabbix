@@ -288,6 +288,7 @@ ActionProcessor.prototype = {
 		for (elementId in elementsList) {
 			var elem = jQuery('#' + elementId);
 			switch (elem.get(0).nodeName.toLowerCase()) {
+				case 'z-select':
 				case 'select':
 					elem.change(handler);
 					break;
