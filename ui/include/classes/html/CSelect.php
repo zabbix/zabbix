@@ -112,9 +112,16 @@ class CSelect extends CTag {
 
 	/**
 	 * @return self
+	 *
+	 * @param bool $value
 	 */
-	public function setDisabled(): self {
-		$this->setAttribute('disabled', 'disabled');
+	public function setDisabled(bool $value = true): self {
+		if ($value) {
+			$this->setAttribute('disabled', 'disabled');
+		}
+		else {
+			$this->removeAttribute('disabled');
+		}
 
 		return $this;
 	}
