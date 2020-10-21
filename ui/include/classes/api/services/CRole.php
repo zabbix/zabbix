@@ -494,8 +494,8 @@ class CRole extends CApiService {
 		}
 
 		if (!preg_match('/([a-z]+|\*)\.([a-z]+|\*)/', $api_method)
-				&& !in_array($api_method, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN))
-				&& !in_array($api_method, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN))) {
+				|| (!in_array($api_method, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN))
+					&& !in_array($api_method, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN)))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid API method "%1$s".', $api_method));
 		}
 

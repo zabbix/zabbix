@@ -578,12 +578,12 @@ class CRoleHelper {
 							$api_methods[USER_TYPE_ZABBIX_USER][] = $service.'.'.$method;
 							$api_method_masks[USER_TYPE_ZABBIX_USER][$service.self::API_ANY_METHOD] = true;
 							$api_method_masks[USER_TYPE_ZABBIX_USER][self::API_ANY_SERVICE.$method] = true;
-						// break; is not missing here
+							// break; is not missing here
 						case USER_TYPE_ZABBIX_ADMIN:
 							$api_methods[USER_TYPE_ZABBIX_ADMIN][] = $service.'.'.$method;
 							$api_method_masks[USER_TYPE_ZABBIX_ADMIN][$service.self::API_ANY_METHOD] = true;
 							$api_method_masks[USER_TYPE_ZABBIX_ADMIN][self::API_ANY_SERVICE.$method] = true;
-						// break; is not missing here
+							// break; is not missing here
 						case USER_TYPE_SUPER_ADMIN:
 							$api_methods[USER_TYPE_SUPER_ADMIN][] = $service.'.'.$method;
 							$api_method_masks[USER_TYPE_SUPER_ADMIN][$service.self::API_ANY_METHOD] = true;
