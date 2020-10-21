@@ -159,12 +159,6 @@ class CDateSelector extends CTag {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		$btn_enabled = true;
-
-		if ($this->readonly || !$this->enabled) {
-			$btn_enabled = false;
-		}
-
 		$this
 			->addItem(
 				(new CTextBox($this->name, $this->value))
@@ -176,7 +170,7 @@ class CDateSelector extends CTag {
 			)
 			->addItem((new CButton($this->name.'_calendar'))
 				->addClass(ZBX_STYLE_ICON_CAL)
-				->setEnabled($btn_enabled)
+				->setEnabled($this->enabled && !$this->readonly)
 				->onClick('toggleCalendar(this, "'.$this->name.'", "'.$this->date_format.'");'));
 
 		return parent::toString($destroy);
