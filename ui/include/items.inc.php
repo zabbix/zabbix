@@ -345,7 +345,7 @@ function interfaceType2str($type) {
 		INTERFACE_TYPE_AGENT => _('Agent'),
 		INTERFACE_TYPE_SNMP => _('SNMP'),
 		INTERFACE_TYPE_JMX => _('JMX'),
-		INTERFACE_TYPE_IPMI => _('IPMI'),
+		INTERFACE_TYPE_IPMI => _('IPMI')
 	];
 
 	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
@@ -1227,6 +1227,59 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name)));
 
 	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
+}
+
+/**
+ * Prepares interfaces select element with options.
+ *
+ * @param array $interfaces
+ *
+ * @return CSelect
+ */
+function getInterfaceSelect(array $interfaces): CSelect {
+	$interface_select = new CSelect('interfaceid');
+
+	/** @var CSelectOption[] $options_by_type */
+	$options_by_type = [];
+
+	foreach ($interfaces as $interface) {
+		$label = $interface['useip']
+			? $interface['ip'].' : '.$interface['port']
+			: $interface['dns'].' : '.$interface['port'];
+
+		$option = new CSelectOption($interface['interfaceid'], $label);
+
+		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			$version = $interface['details']['version'];
+			if ($version == SNMP_V3) {
+				$option->setExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
+					_('Context name'), $interface['details']['contextname']
+				));
+			} else {
+				$option->setExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
+					_x('Community', 'SNMP Community'), $interface['details']['community']
+				));
+			}
+		}
+
+		$options_by_type[$interface['type']][] = $option;
+	}
+
+	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+		if (array_key_exists($interface_type, $options_by_type)) {
+			$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
+
+			if ($interface_type == INTERFACE_TYPE_SNMP) {
+				$interface_group->setOptionTemplate('#{label}'.(new CDiv('#{description}'))->addClass('description'));
+			}
+
+			$interface_group->addOptions($options_by_type[$interface_type]);
+
+			$interface_select->addOptionGroup($interface_group);
+		}
+	}
+
+	return $interface_select;
 }
 
 /**

@@ -58,4 +58,32 @@ class CTestArrayHelper {
 	public static function isAssociative($array) {
 		return $array && array_keys($array) !== range(0, count($array) - 1);
 	}
+
+	/**
+	 * Sort array by multiple fields. This function assigns new keys to the elements in $array.
+	 *
+	 * @static
+	 *
+	 * @param array $array   The input array.
+	 * @param array $fields  Fields to sort, can be either string with field name or array with 'field' and 'order' keys.
+	 */
+	public static function usort(array &$array, array $fields) {
+		foreach ($fields as $i => $field) {
+			if (is_string($field)) {
+				$fields[$i] = ['field' => $field, 'order' => ZBX_SORT_UP];
+			}
+		}
+
+		usort($array, function($a, $b) use ($fields) {
+			foreach ($fields as $field) {
+				$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
+
+				if ($cmp != 0) {
+					return $cmp * ($field['order'] == ZBX_SORT_UP ? 1 : -1);
+				}
+			}
+
+			return 0;
+		});
+	}
 }

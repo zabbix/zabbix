@@ -1,6 +1,61 @@
+Changes for 5.0.5rc1
+
+New features:
+.D.....PS. [ZBXNEXT-6245] added locks section to diaginfo runtime command to log adresses of the mutexes and read write locks (vso)
+.........T [ZBXNEXT-6232] added LTE monitoring in Template Net Mikrotik SNMP (mchudinov)
+.........T [ZBXNEXT-6189] added "Template Tel Asterisk by HTTP" (mchudinov)
+.........T [ZBXNEXT-6020] added template "Template App Ceph by Zabbix Agent2" (ychukina)
+.........T [ZBXNEXT-6180] added Squid template (tuskov)
+...G...... [ZBXNEXT-6142] added Ceph monitoring plugin (vadimipatov)
+A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history cache contents (miks, wiper)
+.........T [ZBXNEXT-6159] added "Template App PHP-FPM by HTTP" and "Template App PHP-FPM by Zabbix agent" (ychukina)
+..F....... [ZBXNEXT-6157] reworked UI for setup to simplify db encryption configuration (rlataria)
+.........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
+...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
+
+Bug fixes:
+..F....... [ZBX-18396] fixed undefined offset in item test form (Ivo)
+..F....... [ZBX-18415] fixed value caching for item test dialog when opened by 'Test all steps' button (miks)
+...G...... [ZBX-17975] fixed Hostname and HostnameItem for Zabbix Agent 2 test and print execution (esneiders)
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
+........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
+..F....... [ZBX-18443] fixed undefined index in item prototype form when creating dependent item using wizard (Ivo)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
+..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
+.......PS. [ZBX-17178] fixed multi-line value truncation in snmp lld (asestakovs)
+..F....... [ZBX-18378] fixed map context menu not opening for images with URLs (vmurzins)
+.......PS. [ZBX-18462] fixed inconsistent auto-registration behaviour for hosts without metadata on Oracle DB compared to other databases when using Zabbix proxy (viktors)
+........S. [ZBX-18118] sorted event tag macro selection (arimdjonoks)
+..F....... [ZBX-18456] fixed encryption field sent in form for non-supported encryption database (rlataria)
+.......PS. [ZBX-18407] fixed dependent items not working if it's master item is calculated and host is monitored by Zabbix proxy (vso)
+.......PS. [ZBX-18364] fixed inconsistency with autoregistration behaviour for hosts without metadata on Oracle compared to other databases (viktors)
+........S. [ZBX-18210] fixed preprocessor crashing on Solaris due to incorrect byteorder (arimdjonoks)
+.........T [ZBX-18383] fixed the value of the {$HAPROXY.FRONT_SUTIL.MAX.WARN} macro in Template App HAProxy by HTTP (mchudinov)
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+...G...... [ZBX-18385] fixed segmentation violation in oracle plugin (vadimipatov)
+.......PS. [ZBX-18193] added logging for snmp_cache_reload (arimdjonoks)
+.......PS. [ZBX-18400] fixed http(s) requests from JavaScript to use SourceIP parameter in connections (Andris)
+..F....... [ZBX-17877] fixed details not displayed on SNMP interfaces within select element (ashubin, talbergs)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+A......... [ZBX-18417] fixed unexpected tag errors while importing JSON-exported data (averza)
+.......PS. [ZBX-17916] removed inserting of "wait" into "system.run[]" when executing frontend scripts (Andris)
+........S. [ZBX-18386] fixed server crash after removing snmp host interface from parent host (arimdjonoks)
+...G...... [ZBX-18199] changed the default log filename for agent2 on windows (arimdjonoks)
+...G...... [ZBX-18366] fixed agent reporting absence of 'Processor Information' counter on old Windows systems (arimdjonoks)
+..F....... [ZBX-18238] fixed JavaScript error when "invalid URL" error is displayed (talbergs)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.4
+
+5.0.4rc1 was released as 5.0.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.4rc1
 
 New features:
+...G...... [ZBXNEXT-6023] added Windows service support for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6019] added Oracle Database plugin (vadimipatov)
 ........S. [ZBXNEXT-6139] added GetHeaders method to CurlHttpRequest javascript object (wiper)
 .........T [ZBXNEXT-6116] added SysAid media type (afayantsev)
 .......PS. [ZBXNEXT-6167] added diaginfo runtime command to log internal diagnostic information (wiper)
@@ -11,8 +66,33 @@ New features:
 .........T [ZBXCTR-10] added iLert media type (roman-ilert)
 
 Bug fixes:
-.........T [ZBX-18190] removed triggers for items Log growths, Log shrinks (mchudinov)
-.........T [ZBX-18122] fixed russian character in setup section (afayantsev)
+........S. [ZBX-17993] fixed ZabbixWeb Test Item for Admin is not working (arimdjonoks)
+.........T [ZBX-13384] fixed minor template issues to follow guidelines (tuskov)
+.D..I..... [ZBX-18114] fixed documentation for Agent2 PersistentBuffer (akozlovs)
+.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
+.......PS. [ZBX-17848] fixed fping interval detection, added log prints of detected options in debug mode, re-detect options every hour (dimir)
+.........T [ZBX-18341] removed media_jira_with_CF_example.xml and moved example with custom fields example to readme (tuskov)
+.........T [ZBX-18131] added support of single-select, checkbox and radio button customfield types and "__zbx" tag filter for labels in Jira webhook (tuskov)
+...G...... [ZBX-18065] add help flag to Zabbix Agent 2 (esneiders)
+.......PS. [ZBX-17906] fixed HTTP agent JSON output when using HTTP/2; thanks to Mike Noordermeer for the patch (viktors)
+..F....... [ZBX-18206] fixed incorrect housekeeping form behaviour (agriscenko)
+..F....... [ZBX-18167] fixed filter block in lld overrides popup (rlataria)
+........S. [ZBX-18174] fixed oracle errors for host macro updates when linking templates (arimdjonoks)
+........S. [ZBX-18188] increased age and duration related macro resolution to seconds (viktors)
+..F....... [ZBX-18152] fixed incorrect selected menu option for template screens page (vmaksimovs)
+.......PS. [ZBX-18340] added runtime command diaginfo option to command line help messages (wiper)
+..F....... [ZBX-18250] changed link to "Web monitoring" page in context menu with filtering parameters (kustalovs)
+........S. [ZBX-18170] fixed LLD override for applications (viktors, wiper)
+.......PS. [ZBX-15904] added check of required cache size for vmware event messages (asestakovs)
+.......PS. [ZBX-18121] fixed SSH monitoring when compiled with libssh; thanks to MATSUDA Daiki for the patch (Andris, viktors)
+...G...... [ZBX-17927] fixed Agent2 user-defined parameter key testing (viktors)
+.........T [ZBX-18314] fixed description of URI field in Template DB MySQL by Zabbix agent 2 (mchudinov)
+..F....... [ZBX-18067] fixed using outdated dynamic host when editing dynamic widgets on dashboard (kustalovs)
+..F....... [ZBX-18261] fixed performance of the "Latest data" screen with partitioned history tables (Sasha)
+...G...... [ZBX-18322] enabled Memcached and MySQL plugins for Windows (vadimipatov)
+.........T [ZBX-17982] added non-trigger event types support to webhooks (tuskov)
+.........T [ZBX-18190] removed triggers for items Log growths, Log shrinks for MSSQL ODBC template (mchudinov)
+.........T [ZBX-18122] fixed russian character in setup section and templates for Oracle ODBC and PostgreSQL agent2 (afayantsev)
 ..F....... [ZBX-18074] fixed unresolved macros in item names in data overview table (talbergs)
 ...G...... [ZBX-18195] changed log level increase command for Agent 2 to match Agent 1 (esneiders)
 ...G...... [ZBX-17984] added support of ipv6 and unix sockets for memcached plugin (vadimipatov)
@@ -27,7 +107,7 @@ A......... [ZBX-18181] fixed undefined index when importing host with non-existi
 ..F....... [ZBX-17692] fixed column sizes and paddings for items in graph edit form (vmaksimovs)
 ..F....... [ZBX-17812] fixed incorrect copying of severeties in Problem widgets (vmaksimovs)
 ..F....... [ZBX-17886] fixed SNMP type item test form not sending and resolving interface macros (Ivo)
-..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS function (averza)
+..F....... [ZBX-18183] fixed displaying negative time in convertUnitsS() function (averza)
 .........T [ZBX-18103] fixed host connection macro in Slack media type (vjaceslavs)
 .........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
 .........T [ZBX-18072] fixed Discord API version in Discord media type (vjaceslavs)
@@ -1712,11 +1792,36 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.25rc1
-
-New features:
+Changes for 4.0.26rc1
 
 Bug fixes:
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
+........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
+..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
+.......PS. [ZBX-17178] fixed multi-line value truncation in snmp lld (asestakovs)
+.......PS. [ZBX-18462] fixed inconsistent auto-registration behaviour for hosts without metadata on Oracle DB compared to other databases when using Zabbix proxy (viktors)
+.......PS. [ZBX-18364] fixed inconsistency with autoregistration behaviour for hosts without metadata on Oracle compared to other databases (viktors)
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.25
+
+4.0.25rc1 was released as 4.0.25 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.25rc1
+
+Bug fixes:
+.........T [ZBX-17842] updated VMware template to follow guidelines (tuskov)
+.......PS. [ZBX-17848] fixed fping interval detection, added log prints of detected options in debug mode, re-detect options every hour (dimir)
+........S. [ZBX-18188] increased age and duration related macro resolution to seconds (viktors)
+........S. [ZBX-15651] fixed handling of overlapping IP addresses in network discovery received from single Zabbix proxy (vso)
+..F....... [ZBX-18326] fixed unsupported code for internet explorer (rlataria)
+.......PS. [ZBX-15904] added check of required cache size for vmware event messages (asestakovs)
+.......PS. [ZBX-18121] fixed SSH monitoring when compiled with libssh; thanks to MATSUDA Daiki for the patch (Andris, viktors)
 .........T [ZBX-14503] updated JMX template to follow guidelines (tuskov)
 ........S. [ZBX-18189] fixed crash when performing housekeeping with disabled value cache (viktors)
 A......... [ZBX-18181] fixed undefined index when importing host with non-existing interface (Ivo)

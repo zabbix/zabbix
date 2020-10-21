@@ -27,6 +27,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
+@import "components/z-select";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -2790,6 +2791,11 @@ $form-icon-btn: (
 		margin-bottom: 40px;
 		justify-content: flex-start;
 	}
+
+	#tls_encryption_hint {
+		font-style: italic;
+		color: $font-alt-color;
+	}
 }
 
 .setup-left {
@@ -2824,15 +2830,6 @@ $form-icon-btn: (
 
 	.list-table {
 		border: 0;
-	}
-
-	.table-forms-td-left {
-		text-align: left;
-		width: auto;
-	}
-
-	.table-forms-td-right {
-		width: 100%;
 	}
 
 	h1 {
@@ -4089,15 +4086,6 @@ $form-icon-btn: (
 		&.modal-popup-generic {
 			min-width: 650px;
 		}
-	}
-
-	.hintbox-scrollable {
-		overflow: auto;
-		width: 100%;
-		max-height: calc(100vh - 190px);
-		max-width: 45vw;
-		white-space: nowrap;
-		@extend %webkit-scrollbar;
 	}
 
 	.hintbox-wrap {
@@ -7249,4 +7237,22 @@ table.preprocessing-test-results {
 	.table-col-y-axis-side { width: 85px; }
 	.table-col-colour { width: 105px; }
 	.table-col-action { width: 55px; }
+}
+
+z-select,
+.z-select {
+	&.z-select-host-interface {
+		.description:not(:empty) {
+			display: block;
+			margin-top: 5px;
+			color: $input-placeholder-color;
+		}
+
+		&[disabled],
+		li[disabled] {
+			.description:not(:empty) {
+				color: $form-disabled-font-color;
+			}
+		}
+	}
 }

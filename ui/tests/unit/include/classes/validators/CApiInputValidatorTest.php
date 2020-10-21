@@ -1181,6 +1181,20 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/": the parameter "name" is missing.'
 			],
 			[
+				['type' => API_OBJECT, 'fields' => [
+					'roles' => ['type' => API_OBJECT, 'default' => [], 'fields' => [
+						'value' => ['type' => API_STRING_UTF8, 'default' => 'test']
+					]]
+				]],
+				[],
+				'/',
+				[
+					'roles' => [
+						'value' => 'test'
+					]
+				]
+			],
+			[
 				['type' => API_IDS],
 				[],
 				'/',

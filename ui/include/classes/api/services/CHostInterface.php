@@ -525,7 +525,7 @@ class CHostInterface extends CApiService {
 				$interface['type'] = INTERFACE_TYPE_SNMP;
 			}
 
-			// Merge details with db values or set only vaules from db.
+			// Merge details with db values or set only values from db.
 			$interface['details'] = array_key_exists('details', $interface)
 				? $interface['details'] + $db_interfaces[$interfaceid]['details']
 				: $db_interfaces[$interfaceid]['details'];

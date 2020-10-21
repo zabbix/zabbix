@@ -269,7 +269,7 @@ switch ($data['type']) {
 					->addRow(_('Host groups'), $hostgroup_multiselect);
 				break;
 
-			// Problem is supressed form elements.
+			// Problem is suppressed form elements.
 			case CONDITION_TYPE_SUPPRESSED:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_NO))->setModern(true);
 				foreach ($combobox_options[CONDITION_TYPE_SUPPRESSED] as $key => $value) {

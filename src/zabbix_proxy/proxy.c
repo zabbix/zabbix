@@ -95,6 +95,9 @@ const char	*help_message[] = {
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
 	"                                 target is not specified",
 	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
+	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
+	"                                 section (historycache, preprocessing, locks) or",
+	"                                 everything if section is not specified",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
@@ -970,7 +973,8 @@ static void	zbx_main_sigusr_handler(int flags)
 		int	scope = ZBX_RTC_GET_SCOPE(flags);
 
 		if (ZBX_DIAGINFO_ALL == scope)
-			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) |	(1 << ZBX_DIAGINFO_PREPROCESSING);
+			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) |
+			(1 << ZBX_DIAGINFO_LOCKS);
 		else
 			zbx_diaginfo_scope = 1 << scope;
 	}

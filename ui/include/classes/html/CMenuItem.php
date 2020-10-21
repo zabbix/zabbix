@@ -109,7 +109,17 @@ class CMenuItem extends CTag {
 	/**
 	 * Set action name aliases.
 	 *
-	 * @param array $aliases
+	 * @param array $aliases  The aliases of menu item. Is able to specify the alias in following formats:
+	 *                        - {action_name} - The alias is applicable to page with specified action name with any GET
+	 *                          parameters in URL or without them;
+	 *                        - {action_name}?{param}={value} - The alias is applicable to page with specified action
+	 *                          when specified GET parameter exists in URL and have the same value;
+	 *                        - {action_name}?{param}=* - The alias is applicable to page with specified action
+	 *                          when specified GET parameter exists in URL and have any value;
+	 *                        - {action_name}?!{param}={value} - The alias is applicable to page with specified action
+	 *                          when specified GET parameter not exists in URL or have different value;
+	 *                        - {action_name}?!{param}=* - The alias is applicable to page with specified action
+	 *                          when specified GET parameter not exists in URL.
 	 *
 	 * @return CMenuItem
 	 */
@@ -178,7 +188,36 @@ class CMenuItem extends CTag {
 	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = true): bool {
 		if (array_key_exists($action_name, $this->aliases)) {
 			foreach ($this->aliases[$action_name] as $alias_params) {
-				if (!array_diff_assoc($alias_params, $request_params)) {
+				$no_unacceptable_params = true;
+				$unacceptable_params = [];
+				foreach ($alias_params as $name => $value) {
+					if ($name[0] === '!') {
+						$unacceptable_params[substr($name, 1)] = $value;
+						unset($alias_params[$name]);
+					}
+				}
+
+				if ($unacceptable_params) {
+					$unacceptable_params_existing = array_intersect_assoc($unacceptable_params, $request_params);
+					foreach ($unacceptable_params as $name => $value) {
+						if ($value === '*' && array_key_exists($name, $request_params)) {
+							$unacceptable_params_existing[$name] = '*';
+						}
+					}
+
+					$no_unacceptable_params = array_diff_assoc($unacceptable_params, $unacceptable_params_existing)
+						? true
+						: false;
+				}
+
+				$alias_params_diff = array_diff_assoc($alias_params, $request_params);
+				foreach ($alias_params_diff as $name => $value) {
+					if ($value === '*') {
+						unset($alias_params_diff[$name]);
+					}
+				}
+
+				if ($no_unacceptable_params && !$alias_params_diff) {
 					$this->setSelected();
 
 					return true;

@@ -38,7 +38,7 @@ abstract class CControllerHost extends CController {
 	 * @param string $filter['evaltype']            Filter hosts by tags.
 	 * @param string $filter['tags']                Filter hosts by tag names and values.
 	 * @param string $filter['severities']          Filter problems on hosts by severities.
-	 * @param string $filter['show_suppressed']     Filter supressed problems.
+	 * @param string $filter['show_suppressed']     Filter suppressed problems.
 	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
 	 * @param int    $filter['page']                Page number.
 	 * @param string $sort						    Sorting field.
@@ -124,7 +124,7 @@ abstract class CControllerHost extends CController {
 		// Split result array and create paging.
 		$paging = CPagerHelper::paginate($filter['page'], $hosts, $sortorder, $view_curl);
 
-		// Get additonal data to limited host amount.
+		// Get additional data to limited host amount.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type',
 				'available', 'snmp_available', 'jmx_available', 'ipmi_available', 'error', 'ipmi_error', 'snmp_error',

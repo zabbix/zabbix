@@ -46,6 +46,7 @@ $fields = [
 	'password' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'schema' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'tls_encryption' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'verify_certificate' =>	[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
 	'verify_host' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
 	'key_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'cert_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
@@ -110,6 +111,7 @@ if (!CWebUser::$data) {
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)
 		->setArgument('lang', CWebUser::$data['lang'])
+		->setArgument('files', ['setup.js'])
 		->getUrl()
 	)
 	->display();

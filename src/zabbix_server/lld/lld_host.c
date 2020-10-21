@@ -107,6 +107,7 @@ typedef struct
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
 #define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000080)	/* interfaces which should be deleted */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE	__UINT64_C(0x00000100)	/* snmp data which should be deleted */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS	__UINT64_C(0x00000200)	/* there is snmp data */
 	zbx_uint64_t	flags;
 	union _data
 	{
@@ -122,7 +123,7 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 	zbx_free(interface->dns);
 	zbx_free(interface->ip);
 
-	if (INTERFACE_TYPE_SNMP == interface->type)
+	if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 	{
 		zbx_free(interface->data.snmp->community);
 		zbx_free(interface->data.snmp->securityname);
@@ -2242,7 +2243,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 
-			if (INTERFACE_TYPE_SNMP == interface->type)
+			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 			{
 				if (0 == interface->interfaceid)
 					interface->data.snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE;
@@ -2564,7 +2565,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
 			}
 
-			if (INTERFACE_TYPE_SNMP == interface->type)
+			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 			{
 				if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
 				{
@@ -3071,9 +3072,13 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
 			snmp->contextname = zbx_strdup(NULL, row[16]);
 			interface->data.snmp = snmp;
+			interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 		}
 		else
+		{
 			interface->data.snmp = NULL;
+			interface->flags = 0x00;
+		}
 
 		zbx_vector_ptr_append(interfaces, interface);
 	}
@@ -3216,6 +3221,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			continue;
 
 		zbx_vector_ptr_reserve(&host->interfaces, interfaces->values_num);
+
 		for (j = 0; j < interfaces->values_num; j++)
 		{
 			interface = (zbx_lld_interface_t *)interfaces->values[j];
@@ -3230,7 +3236,6 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->ip = zbx_strdup(NULL, interface->ip);
 			new_interface->dns = zbx_strdup(NULL, interface->dns);
 			new_interface->port = zbx_strdup(NULL, interface->port);
-			new_interface->flags = 0x00;
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -3247,11 +3252,14 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 				snmp->authprotocol = interface->data.snmp->authprotocol;
 				snmp->privprotocol = interface->data.snmp->privprotocol;
 				snmp->contextname = zbx_strdup(NULL, interface->data.snmp->contextname);
-				snmp->flags = 0x00;
+				new_interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 				new_interface->data.snmp = snmp;
 			}
 			else
+			{
+				new_interface->flags = 0x00;
 				new_interface->data.snmp = NULL;
+			}
 
 			zbx_vector_ptr_append(&host->interfaces, new_interface);
 		}
@@ -3439,7 +3447,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 								zbx_interface_type_string(interface->type_orig),
 								host->host);
 
-						/* return an original interface type and drop the correspond flag */
+						/* return an original interface type and drop the corresponding flag */
 						interface->type = interface->type_orig;
 						interface->flags &= ~ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE;
 					}
@@ -3502,7 +3510,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 							" the interface is used by items.\n",
 							zbx_interface_type_string(interface->type), host->host);
 
-					/* drop the correspond flag */
+					/* drop the corresponding flag */
 					interface->flags &= ~ZBX_FLAG_LLD_INTERFACE_REMOVE;
 
 					if (SUCCEED == another_main_interface_exists(&host->interfaces, interface))

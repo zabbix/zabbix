@@ -364,7 +364,7 @@ function invalid_url($msg = null) {
 	}
 
 	// required global parameters for correct including page_header.php
-	global $DB, $ZBX_MESSAGES;
+	global $DB, $ZBX_MESSAGES, $page;
 
 	// backup messages before including page_header.php
 	$temp = $ZBX_MESSAGES;
@@ -377,6 +377,8 @@ function invalid_url($msg = null) {
 
 	unset_all();
 	show_error_message($msg);
+
+	(new CWidget())->show();
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 

@@ -252,7 +252,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 			elseif ($usermacros['macros'][$macro_name] === ZBX_SECRET_MASK) {
 				/*
-				 * Macro values were not set by user, so this means form was openened for the first time. So in this
+				 * Macro values were not set by user, so this means form was opened for the first time. So in this
 				 * case check if there are secret macros. If there are, clear the values and show warning message box.
 				 */
 

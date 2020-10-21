@@ -106,7 +106,7 @@ func PdhCloseQuery(query PDH_HQUERY) (err error) {
 
 func PdhAddCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
 	wcharPath, _ := syscall.UTF16PtrFromString(path)
-	ret, _, _ := syscall.Syscall6(pdhAddCounter, 1, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
+	ret, _, _ := syscall.Syscall6(pdhAddCounter, 4, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
 		uintptr(unsafe.Pointer(&counter)), 0, 0)
 
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
@@ -117,7 +117,7 @@ func PdhAddCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH
 
 func PdhAddEnglishCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
 	wcharPath, _ := syscall.UTF16PtrFromString(path)
-	ret, _, _ := syscall.Syscall6(pdhAddEnglishCounter, 1, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
+	ret, _, _ := syscall.Syscall6(pdhAddEnglishCounter, 4, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
 		uintptr(unsafe.Pointer(&counter)), 0, 0)
 
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
@@ -136,7 +136,7 @@ func PdhCollectQueryData(query PDH_HQUERY) (err error) {
 
 func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER) (value *float64, err error) {
 	var pdhValue PDH_FMT_COUNTERVALUE_DOUBLE
-	ret, _, _ := syscall.Syscall6(pdhGetFormattedCounterValue, 6, uintptr(counter),
+	ret, _, _ := syscall.Syscall6(pdhGetFormattedCounterValue, 4, uintptr(counter),
 		uintptr(PDH_FMT_DOUBLE|PDH_FMT_NOCAP100), 0, uintptr(unsafe.Pointer(&pdhValue)), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
@@ -149,7 +149,7 @@ func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER) (value *float64, er
 
 func PdhGetFormattedCounterValueInt64(counter PDH_HCOUNTER) (value *int64, err error) {
 	var pdhValue PDH_FMT_COUNTERVALUE_LARGE
-	ret, _, _ := syscall.Syscall6(pdhGetFormattedCounterValue, 6, uintptr(counter), uintptr(PDH_FMT_LARGE), 0,
+	ret, _, _ := syscall.Syscall6(pdhGetFormattedCounterValue, 4, uintptr(counter), uintptr(PDH_FMT_LARGE), 0,
 		uintptr(unsafe.Pointer(&pdhValue)), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		if ret == PDH_INVALID_DATA || ret == PDH_CSTATUS_INVALID_DATA {
@@ -230,7 +230,7 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	}
 	ptrNameUTF16 := uintptr(unsafe.Pointer(&nameUTF16[0]))
 
-	ret, _, _ := syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0,
+	ret, _, _ := syscall.Syscall9(pdhEnumObjectItems, 9, 0, 0,
 		ptrNameUTF16, 0, uintptr(unsafe.Pointer(&counterListSize)), 0,
 		uintptr(unsafe.Pointer(&instanceListSize)), uintptr(PERF_DETAIL_WIZARD), 0)
 	if ret != PDH_MORE_DATA {
@@ -256,7 +256,7 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 		instbuf = make([]uint16, instanceListSize)
 		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
 
-		ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0, ptrNameUTF16, uintptr(unsafe.Pointer(&counterbuf[0])),
+		ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 9, 0, 0, ptrNameUTF16, uintptr(unsafe.Pointer(&counterbuf[0])),
 			uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
 			uintptr(PERF_DETAIL_WIZARD), 0)
 		if ret == PDH_MORE_DATA {
