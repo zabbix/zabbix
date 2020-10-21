@@ -2678,14 +2678,22 @@ ZABBIX.apps.map = (function($) {
 			this.domNode = $(tpl.evaluate(formTplData)).appendTo(formContainer);
 
 			// populate icons selects
+			const select_icon_off = document.getElementById('iconid_off');
+			const select_icon_on = document.getElementById('iconid_on');
+			const select_icon_maintenance = document.getElementById('iconid_maintenance');
+			const select_icon_disabled = document.getElementById('iconid_disabled');
+
+			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0'});
+
 			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
-				$('#iconid_off, #iconid_on, #iconid_maintenance, #iconid_disabled')
-					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
+				select_icon_off.addOption({label: icon.name, value: icon.imageid});
+				select_icon_on.addOption({label: icon.name, value: icon.imageid});
+				select_icon_maintenance.addOption({label: icon.name, value: icon.imageid});
+				select_icon_disabled.addOption({label: icon.name, value: icon.imageid});
 			}
-			$('#iconid_on, #iconid_maintenance, #iconid_disabled')
-				.prepend('<option value="0">' + t('S_DEFAULT') + '</option>');
-			$('#iconid_on, #iconid_maintenance, #iconid_disabled').val(0);
 
 			// hosts
 			$('#elementNameHost').multiSelectHelper({
