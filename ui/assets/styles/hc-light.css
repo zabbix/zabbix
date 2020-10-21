@@ -1049,8 +1049,8 @@ footer {
 z-select,
 .z-select {
   display: inline-block; }
-  z-select button,
-  .z-select button {
+  z-select button.focusable,
+  .z-select button.focusable {
     position: relative;
     height: 24px;
     padding: 3px 18px 3px 4px;
@@ -1061,9 +1061,10 @@ z-select,
     word-break: break-all;
     white-space: pre;
     cursor: default;
-    border-radius: 0; }
-    z-select button::after,
-    .z-select button::after {
+    border-radius: 0;
+    line-height: initial; }
+    z-select button.focusable::after,
+    .z-select button.focusable::after {
       content: '';
       position: absolute;
       top: 6px;
@@ -1073,10 +1074,10 @@ z-select,
       border-right: 1.4px solid;
       border-bottom: 1.4px solid;
       transform: rotate(45deg); }
-    z-select button:active, z-select button:hover, z-select button:focus,
-    .z-select button:active,
-    .z-select button:hover,
-    .z-select button:focus {
+    z-select button.focusable:active, z-select button.focusable:hover, z-select button.focusable:focus,
+    .z-select button.focusable:active,
+    .z-select button.focusable:hover,
+    .z-select button.focusable:focus {
       color: #000000;
       background-color: #ffffff;
       border-color: #888888;
@@ -1099,7 +1100,9 @@ z-select,
       text-overflow: ellipsis;
       word-break: break-all;
       white-space: pre-wrap;
-      user-select: none; }
+      user-select: none;
+      float: none;
+      margin-right: 0px; }
       z-select .list li.hover,
       .z-select .list li.hover {
         background-color: #f4f4f4; }
@@ -2260,8 +2263,8 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   padding: 0 5px;
   min-height: 24px; }
 
-z-select button,
-.z-select button, z-select .list,
+z-select button.focusable,
+.z-select button.focusable, z-select .list,
 .z-select .list, .multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   background-color: #ffffff;
   border: 1px solid #888888;
@@ -2269,8 +2272,8 @@ z-select button,
   color: #000000;
   outline: 0;
   transition: border-color .2s ease-out, box-shadow .2s ease-out; }
-  z-select button:focus,
-  .z-select button:focus, z-select .list:focus,
+  z-select button.focusable:focus,
+  .z-select button.focusable:focus, z-select .list:focus,
   .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
     border-color: #000000; }
 
@@ -4739,16 +4742,16 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.msg-details ul::-webkit-scrollbar, z-select button::-webkit-scrollbar,
-.z-select button::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
+.msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
+.z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
 .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-.msg-details ul::-webkit-scrollbar-track, z-select button::-webkit-scrollbar-track,
-.z-select button::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
+.msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
+.z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
 .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #999999; }
-.msg-details ul::-webkit-scrollbar-thumb, z-select button::-webkit-scrollbar-thumb,
-.z-select button::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
+.msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
+.z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
 .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #f9f9f9;
   border: 1px solid #adadad; }
@@ -6211,8 +6214,8 @@ a.link-action {
   box-shadow: 0 0 0 1px #111111;
   transition: box-shadow .2s ease-out; }
 
-z-select button:focus,
-.z-select button:focus, z-select .list:focus,
+z-select button.focusable:focus,
+.z-select button.focusable:focus, z-select .list:focus,
 .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 1px #111111;
   transition: box-shadow .2s ease-out; }
