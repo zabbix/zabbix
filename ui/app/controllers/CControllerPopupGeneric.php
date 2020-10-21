@@ -870,7 +870,7 @@ class CControllerPopupGeneric extends CController {
 	 * @param array $records
 	 */
 	protected function applySelectedids(array &$records) {
-		if ($this->getInput('check_selected')) {
+		if ($this->getInput('check_selected', false)) {
 			$selectedids = $this->getInput('selectedids', []);
 
 			switch ($this->source_table) {
