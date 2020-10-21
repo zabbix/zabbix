@@ -31,13 +31,15 @@
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 		))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 		(new CSpan('#0:'))->addClass('rowNum'),
-		(new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]', null, null, $data['inventory_list']))
+		(new CSelect('iconmap[mappings][#{iconmappingid}][inventory_link]'))
+			->addOptions(CSelect::createOptionsFromArray($data['inventory_list']))
 			->setId('iconmap_mappings_#{iconmappingid}_inventory_link'),
 		(new CTextBox('iconmap[mappings][#{iconmappingid}][expression]', '', false, 64))
 			->setId('iconmap_mappings_#{iconmappingid}_expression')
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		(new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', null, null, $data['icon_list']))
+		(new CSelect('iconmap[mappings][#{iconmappingid}][iconid]'))
+			->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
 			->setId('iconmap_mappings_#{iconmappingid}_iconid')
 			->addClass('js-mapping-icon'),
 		(new CCol(
