@@ -246,7 +246,7 @@ $form_list
 				HTTPCHECK_REQUEST_PUT => 'PUT',
 				HTTPCHECK_REQUEST_HEAD => 'HEAD'
 			]))
-			->setReadOnly($data['limited'])
+			->setReadonly($data['limited'])
 			->setFocusableElementId('label-request-method')
 			->setId('request_method')
 			->setValue($data['request_method']),
