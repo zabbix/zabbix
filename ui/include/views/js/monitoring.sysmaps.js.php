@@ -85,14 +85,17 @@ function createFontSelect(string $name): CSelect {
 			->setId('selementForm')
 			->addItem(
 				(new CFormList())
-					->addRow(_('Type'),
-						(new CComboBox('elementtype', null, null, [
-							SYSMAP_ELEMENT_TYPE_HOST => _('Host'),
-							SYSMAP_ELEMENT_TYPE_MAP => _('Map'),
-							SYSMAP_ELEMENT_TYPE_TRIGGER => _('Trigger'),
-							SYSMAP_ELEMENT_TYPE_HOST_GROUP => _('Host group'),
-							SYSMAP_ELEMENT_TYPE_IMAGE => _('Image')
-						]))->setId('elementType')
+					->addRow(new CLabel(_('Type'), 'label-elementtype'),
+						(new CSelect('elementtype'))
+							->setFocusableElementId('label-elementtype')
+							->addOptions(CSelect::createOptionsFromArray([
+								SYSMAP_ELEMENT_TYPE_HOST => _('Host'),
+								SYSMAP_ELEMENT_TYPE_MAP => _('Map'),
+								SYSMAP_ELEMENT_TYPE_TRIGGER => _('Trigger'),
+								SYSMAP_ELEMENT_TYPE_HOST_GROUP => _('Host group'),
+								SYSMAP_ELEMENT_TYPE_IMAGE => _('Image')
+							]))
+							->setId('elementType')
 					)
 					->addRow(_('Show'),
 						(new CRadioButtonList('elementsubtype', SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP))
