@@ -368,16 +368,16 @@ function createFontSelect(string $name): CSelect {
 							BR(),
 							_('Horizontal align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
-								$horizontal_align_types
-							))
+							(new CSelect('text_halign'))
+								->setValue(SYSMAP_SHAPE_LABEL_HALIGN_CENTER)
+								->addOptions(CSelect::createOptionsFromArray($horizontal_align_types))
 								->setAttribute('style', 'margin-top: 4px'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Vertical align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
-								$vertical_align_types
-							))
+							(new CSelect('text_valign'))
+								->setValue(SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE)
+								->addOptions(CSelect::createOptionsFromArray($vertical_align_types))
 						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 						'shape-text-row'
 					)
@@ -396,7 +396,8 @@ function createFontSelect(string $name): CSelect {
 						(new CDiv([
 							_('Type'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('border_type', null, null, $shape_border_types)),
+							(new CSelect('border_type'))
+								->addOptions(CSelect::createOptionsFromArray($shape_border_types)),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Width'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
