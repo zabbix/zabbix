@@ -24,7 +24,7 @@ class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
-	public $userRole = 'Zabbix Super Admin';
+	public $userRole = 'Super Admin role';
 
 	public static function allUsers() {
 		return CDBHelper::getDataProvider('select * from users');
@@ -46,7 +46,7 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Alias']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Surname']");
-		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='User type']");
+		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='User role']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Groups')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Is online?')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Login')]");
@@ -118,7 +118,9 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('filter_alias', $this->userAlias);
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->userName);
 		$this->zbxTestInputTypeOverwrite('filter_surname', $this->userSurname);
-		$this->zbxTestClickXpath("//ul[@id='filter_type']//label[text()='$this->userRole']");
+		$this->zbxTestClickButtonMultiselect('filter_roles_');
+		$this->zbxTestLaunchOverlayDialog('User roles');
+		$this->zbxTestClickLinkTextWait($this->userRole);
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");

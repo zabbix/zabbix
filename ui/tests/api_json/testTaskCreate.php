@@ -332,7 +332,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '23287'
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "task.create".'
 			],
 			[
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
@@ -342,7 +342,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '23279'
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "task.create".'
 			],
 			[
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
@@ -352,7 +352,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '23287'
 					]
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "task.create".'
 			],
 			[
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
@@ -362,7 +362,7 @@ class testTaskCreate extends CAPITest {
 						'itemid' => '23279'
 					]
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "task.create".'
 			]
 		];
 	}
