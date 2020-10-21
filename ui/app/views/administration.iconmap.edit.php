@@ -65,9 +65,9 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan(($i + 1).':'))->addClass('rowNum'),
-			(new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'],
-				null, $data['inventory_list']
-			)),
+			(new CSelect('iconmap[mappings]['.$i.'][inventory_link]'))
+				->setValue($mapping['inventory_link'])
+				->addOptions(CSelect::createOptionsFromArray($data['inventory_list'])),
 			(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
