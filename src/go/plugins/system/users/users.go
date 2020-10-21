@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 
-	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 )
 
@@ -43,8 +42,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 }
 
 func (p *Plugin) Validate(options interface{}) error {
-	var o Options
-	return conf.Unmarshal(options, &o)
+	return nil
 }
 
 // Export -
