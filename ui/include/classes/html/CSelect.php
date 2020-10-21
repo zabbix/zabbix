@@ -133,7 +133,7 @@ class CSelect extends CTag {
 	 *
 	 * @return self
 	 */
-	public function setReadonly($value): self {
+	public function setReadonly(bool $value = true): self {
 		if ($value) {
 			$this->setAttribute('readonly', 'readonly');
 		}
