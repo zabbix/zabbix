@@ -213,7 +213,7 @@ $form_grid->addItem(
 					'dstfrm' => $form->getName(),
 					'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
 					'user_type' => $data['type'],
-					'check_selected' => true
+					'disable_selected' => true
 				]
 			]
 		]))

@@ -189,10 +189,6 @@ switch ($data['popup_type']) {
 				unset($data['table_records'][$item['id']]);
 			}
 			else {
-				if ($data['multiselect'] && array_key_exists('_selected', $item)) {
-					$check_box->setChecked(1);
-				}
-
 				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
 						zbx_jsvalue($item['id']).', '.$options['parentid'].');';
 

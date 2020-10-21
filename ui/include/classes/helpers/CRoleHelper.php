@@ -540,13 +540,13 @@ class CRoleHelper {
 	 * @return array
 	 */
 	public static function getApiMaskMethods(int $user_type): array {
-		$api_methods = CRoleHelper::getApiMethods($user_type);
-		$result = ['*' => $api_methods, '*.*' => $api_methods];
+		$api_methods = self::getApiMethods($user_type);
+		$result = [self::API_WILDCARD => $api_methods, self::API_WILDCARD_ALIAS => $api_methods];
 
 		foreach ($api_methods as &$api_method) {
 			[$service, $method] = explode('.', $api_method, 2);
-			$result[$service.'.*'][] = $api_method;
-			$result['*.'.$method][] = $api_method;
+			$result[$service.self::API_ANY_METHOD][] = $api_method;
+			$result[self::API_ANY_SERVICE.$method][] = $api_method;
 		}
 		unset($api_method);
 

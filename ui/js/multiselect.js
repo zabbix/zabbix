@@ -421,8 +421,8 @@ jQuery(function($) {
 						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj, MS_ACTION_POPUP));
 					}
 
-					if (typeof popup_options['check_selected'] !== 'undefined' && popup_options['check_selected']) {
-						popup_options['selectedids'] = Object.keys(ms.values.selected);
+					if (typeof popup_options['disable_selected'] !== 'undefined' && popup_options['disable_selected']) {
+						popup_options['disableids'] = Object.keys(ms.values.selected);
 					}
 
 					// Click used instead focus because in patternselect listen only click.

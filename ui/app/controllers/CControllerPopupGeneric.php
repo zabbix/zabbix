@@ -108,6 +108,13 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $group_preselect_required;
 
+	/**
+	 * Set of disabled options.
+	 *
+	 * @var array
+	 */
+	protected $disableids = [];
+
 	protected function init() {
 		$this->disableSIDvalidation();
 
@@ -457,9 +464,7 @@ class CControllerPopupGeneric extends CController {
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
 			'filter_hostid_rst' =>					'in 1',
-			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
-			'check_selected' =>						'in 1',
-			'selectedids' =>						'array'
+			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
 		// Set destination and source field validation roles.
@@ -474,6 +479,11 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		$ret = $this->validateInput($fields);
+
+		// Set disabled options to property for ability to modify them in result fetching.
+		if ($ret && $this->hasInput('disableids')) {
+			$this->disableids = $this->getInput('disableids');
+		}
 
 		if ($ret && $this->getInput('value_types', [])) {
 			foreach ($this->getInput('value_types') as $value_type) {
@@ -805,7 +815,6 @@ class CControllerPopupGeneric extends CController {
 		$records = $this->fetchResults();
 		$this->applyExcludedids($records);
 		$this->applyDisableids($records);
-		$this->applySelectedids($records);
 		$this->transformRecordsForPatternSelector($records);
 
 		$data = [
@@ -855,49 +864,9 @@ class CControllerPopupGeneric extends CController {
 	 * @param array $records
 	 */
 	protected function applyDisableids(array &$records) {
-		$disableids = $this->getInput('disableids', []);
-
-		foreach ($disableids as $disableid) {
+		foreach ($this->disableids as $disableid) {
 			if (array_key_exists($disableid, $records)) {
 				$records[$disableid]['_disabled'] = true;
-			}
-		}
-	}
-
-	/**
-	 * Mark records having IDs passed in 'selectedids' as selected.
-	 *
-	 * @param array $records
-	 */
-	protected function applySelectedids(array &$records) {
-		if ($this->getInput('check_selected', false)) {
-			$selectedids = $this->getInput('selectedids', []);
-
-			switch ($this->source_table) {
-				case 'api_methods':
-					$api_mask_methods = CRoleHelper::getApiMaskMethods(
-						$this->getInput('user_type', USER_TYPE_ZABBIX_USER)
-					);
-					$selectedids_with_method_masks = $selectedids;
-
-					foreach ($selectedids_with_method_masks as $index => $selectedid) {
-						if (mb_strpos($selectedid, '*') !== false && array_key_exists($selectedid, $api_mask_methods)) {
-							unset($selectedids[$index]);
-
-							foreach ($api_mask_methods[$selectedid] as $method) {
-								if (!in_array($method, $selectedids)) {
-									$selectedids[] = $method;
-								}
-							}
-						}
-					}
-					break;
-			}
-
-			foreach ($selectedids as $selectedid) {
-				if (array_key_exists($selectedid, $records)) {
-					$records[$selectedid]['_selected'] = true;
-				}
 			}
 		}
 	}
@@ -1354,7 +1323,21 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
 			case 'api_methods':
-				$api_methods = CRoleHelper::getApiMethods($this->getInput('user_type', USER_TYPE_ZABBIX_USER));
+				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
+				$api_methods = CRoleHelper::getApiMethods($user_type);
+				$api_mask_methods = CRoleHelper::getApiMaskMethods($user_type);
+				$modified_disableids = [];
+
+				foreach ($this->disableids as $disableid) {
+					if (array_key_exists($disableid, $api_mask_methods)) {
+						$modified_disableids = array_merge($modified_disableids, $api_mask_methods[$disableid]);
+					}
+					else if (!in_array($disableid, $modified_disableids)) {
+						$modified_disableids[] = $disableid;
+					}
+				}
+
+				$this->disableids = $modified_disableids;
 
 				foreach ($api_methods as $api_method) {
 					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];

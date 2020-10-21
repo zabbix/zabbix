@@ -353,8 +353,6 @@ jQuery(function($) {
 	$(document).on('add.popup', function(e, data) {
 		// multiselect check
 		if ($('#' + data.parentId).hasClass('multiselect')) {
-			$('#' + data.parentId).trigger('normalize_popup_values', data);
-
 			var items = [];
 			for (var i = 0; i < data.values.length; i++) {
 				if (typeof data.values[i].id !== 'undefined') {
