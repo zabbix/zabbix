@@ -605,6 +605,15 @@ class CRole extends CApiService {
 					}
 				}
 
+				if ($rules[CRoleHelper::UI_DEFAULT_ACCESS]) {
+					$skip = strlen(CRoleHelper::SECTION_UI.'.');
+
+					foreach (CRoleHelper::getAllUiElements((int) $role['type']) as $rule) {
+						$index = substr($rule, $skip);
+						$rules[CRoleHelper::SECTION_UI] += [$index => $rules[CRoleHelper::UI_DEFAULT_ACCESS]];
+					}
+				}
+
 				if (!in_array(1, $rules[CRoleHelper::SECTION_UI])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
 				}
