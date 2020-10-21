@@ -811,6 +811,12 @@ class CConfigurationImport {
 					$item['query_fields'] = $query_fields;
 				}
 
+				foreach ($item['preprocessing'] as &$preprocessing_step) {
+					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					unset($preprocessing_step['parameters']);
+				}
+				unset($preprocessing_step);
+
 				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
 
 				if ($itemsId) {
@@ -1036,6 +1042,12 @@ class CConfigurationImport {
 					unset($override);
 				}
 
+				foreach ($item['preprocessing'] as &$preprocessing_step) {
+					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					unset($preprocessing_step['parameters']);
+				}
+				unset($preprocessing_step);
+
 				if ($itemId) {
 					$item['itemid'] = $itemId;
 					$itemsToUpdate[] = $item;
@@ -1197,6 +1209,12 @@ class CConfigurationImport {
 					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);
 					$prototype['rule'] = ['hostid' => $hostId, 'key' => $item['key_']];
 					$prototype['ruleid'] = $this->referencer->resolveItem($hostId, $item['key_']);
+
+					foreach ($prototype['preprocessing'] as &$preprocessing_step) {
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+						unset($preprocessing_step['parameters']);
+					}
+					unset($preprocessing_step);
 
 					if ($prototypeId) {
 						if (!array_key_exists($level, $prototypes_to_update)) {

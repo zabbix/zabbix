@@ -97,7 +97,8 @@ class CControllerApplicationList extends CController {
 				? $filter_hostids[0]
 				: $this->getInput('hostid', 0),
 			'profileIdx' => 'web.applications.filter',
-			'active_tab' => CProfile::get('web.applications.filter.active', 1)
+			'active_tab' => CProfile::get('web.applications.filter.active', 1),
+			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 
 		// Get host groups.

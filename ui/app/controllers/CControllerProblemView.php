@@ -96,7 +96,7 @@ class CControllerProblemView extends CControllerProblem {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
 
 	protected function doAction() {
@@ -105,15 +105,21 @@ class CControllerProblemView extends CControllerProblem {
 			->read()
 			->setInput($this->cleanInput($this->getInputAll()));
 
-		foreach ($profile->getTabsWithDefaults() as $filter_tab) {
-			if ($filter_tab['show'] != TRIGGERS_OPTION_ALL) {
-				$filter_tab['filter_custom_time'] = 0;
+		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
+			if ($filter_tab['filter_custom_time']) {
+				$filter_tab['show'] = TRIGGERS_OPTION_ALL;
+				$filter_tab['filter_src']['show'] = TRIGGERS_OPTION_ALL;
+			}
+
+			if ($index == $profile->selected) {
+				// Initialize multiselect data for filter_scr to allow tabfilter correctly handle unsaved state.
+				$filter_tab['filter_src']['filter_view_data'] = $this->getAdditionalData($filter_tab['filter_src']);
 			}
 
 			$filter_tabs[] = $filter_tab + ['filter_view_data' => $this->getAdditionalData($filter_tab)];
 		}
 
-		$filter = $profile->getTabFilter($profile->selected);
+		$filter = $filter_tabs[$profile->selected];
 		$refresh_curl = (new CUrl('zabbix.php'));
 		$filter['action'] = 'problem.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
@@ -144,6 +150,10 @@ class CControllerProblemView extends CControllerProblem {
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('filter_reset'),
 			'page' => $this->getInput('page', 1),
+			'allowed_ack' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
 		];
 
 		$response = new CControllerResponseData($data);

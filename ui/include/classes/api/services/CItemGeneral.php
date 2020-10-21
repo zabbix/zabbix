@@ -24,6 +24,13 @@
  */
 abstract class CItemGeneral extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
 	const ERROR_EXISTS = 'exists';
 	const ERROR_NO_INTERFACE = 'noInterface';
@@ -1218,7 +1225,8 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_PATTERN;
 	 *                                                                  23 - ZBX_PREPROC_PROMETHEUS_TO_JSON;
 	 *                                                                  24 - ZBX_PREPROC_CSV_TO_JSON;
-	 *                                                                  25 - ZBX_PREPROC_STR_REPLACE.
+	 *                                                                  25 - ZBX_PREPROC_STR_REPLACE;
+	 *                                                                  26 - ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
 	 *                                                                 option. Multiple parameters are separated by LF
 	 *                                                                 (\n) character.
@@ -1580,6 +1588,27 @@ abstract class CItemGeneral extends CApiService {
 									)
 								);
 							}
+						}
+						break;
+
+					case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+						// Check if 'params' is empty, because it must be empty.
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] !== '' && $preprocessing['params'] !== null
+								&& $preprocessing['params'] !== false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
+							);
+						}
+
+						$preprocessing_types = array_column($item['preprocessing'], 'type');
+
+						if (count(array_keys($preprocessing_types, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED)) > 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('Only one not supported value check is allowed.')
+							);
 						}
 						break;
 				}

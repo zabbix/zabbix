@@ -107,21 +107,25 @@ foreach ($data['hosts'] as $hostid => $host) {
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),
 		[
-			new CLink(_('Latest data'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'latest.view')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$host['hostid']])
-			)
+			$data['allowed_ui_latest_data']
+				? new CLink(_('Latest data'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'latest.view')
+						->setArgument('filter_set', '1')
+						->setArgument('filter_hostids', [$host['hostid']])
+				)
+				: _('Latest data')
 		],
 		[
-			new CLink(_('Problems'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
-					->setArgument('severities', $data['filter']['severities'])
-					->setArgument('hostids', [$host['hostid']])
-			),
+			$data['allowed_ui_problems']
+				? new CLink(_('Problems'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('severities', $data['filter']['severities'])
+						->setArgument('hostids', [$host['hostid']])
+				)
+				: _('Problems'),
 			CViewHelper::showNum($total_problem_count)
 		],
 		$host['graphs']

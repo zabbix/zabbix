@@ -59,6 +59,13 @@ class ZBase {
 	private $component_registry;
 
 	/**
+	 * Application mode.
+	 *
+	 * @var string
+	 */
+	private $mode;
+
+	/**
 	 * @var CModuleManager
 	 */
 	private $module_manager;
@@ -121,7 +128,6 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
-		require_once 'include/menu.inc.php';
 		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
@@ -159,6 +165,8 @@ class ZBase {
 	 * @throws DBException
 	 */
 	public function run($mode) {
+		$this->mode = $mode;
+
 		$this->init();
 
 		$this->setMaintenanceMode();
@@ -243,6 +251,15 @@ class ZBase {
 				}
 				break;
 		}
+	}
+
+	/**
+	 * Returns the application mode.
+	 *
+	 * @return string
+	 */
+	public static function getMode(): string {
+		return self::getInstance()->mode;
 	}
 
 	/**
@@ -624,18 +641,18 @@ class ZBase {
 	 */
 	private function initComponents() {
 		$this->component_registry->register('router', new CRouter());
-		$this->component_registry->register('menu.main', getMainMenu());
-		$this->component_registry->register('menu.user', getUserMenu());
+		$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
+		$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
 	}
 
 	/**
-	 * Initialize module manager and load all enabled modules.
+	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
 	private function initModuleManager() {
 		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
 
 		$db_modules = API::getApiService('module')->get([
-			'output' => ['id', 'relative_path', 'config'],
+			'output' => ['moduleid', 'id', 'relative_path', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'sortfield' => 'relative_path'
 		], false);
@@ -643,6 +660,10 @@ class ZBase {
 		$modules_missing = [];
 
 		foreach ($db_modules as $db_module) {
+			if (!CWebUser::checkAccess(CRoleHelper::MODULES_MODULE.$db_module['moduleid'])) {
+				continue;
+			}
+
 			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['id'],
 				$db_module['config']
 			);

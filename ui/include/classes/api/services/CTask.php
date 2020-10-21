@@ -24,6 +24,11 @@
  */
 class CTask extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	protected $tableName = 'task';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['taskid'];

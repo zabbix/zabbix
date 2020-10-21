@@ -81,7 +81,8 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 			'screens' => $screens,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_screens' => $this->checkAccess(CRoleHelper::UI_MONITORING_SCREENS)
 		]));
 	}
 }

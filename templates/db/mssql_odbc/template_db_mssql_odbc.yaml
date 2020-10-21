@@ -1,0 +1,3606 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:18Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'MSSQL by ODBC'
+      name: 'MSSQL by ODBC'
+      description: |
+        1. Create an MSSQL user for monitoring.
+          View Server State and View Any Definition permissions should be granted to the user.
+          For more information please see the MSSQL documentation.
+        2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).
+          Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.
+          See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.
+          Note! Credentials in the odbc.ini do not work for MSSQL.
+        3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name, please.
+        The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.
+        
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: MSSQL
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'MSSQL: Get performance counters'
+          type: ODBC
+          key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          delay: 0;m0-59
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            SELECT object_name,counter_name,instance_name,cntr_value
+            FROM sys.dm_os_performance_counters
+            UNION
+            SELECT '{$MSSQL.INSTANCE}' as object_name,'Version' as counter_name,@@version as instance_name,0 as cntr_value
+            UNION
+            SELECT '{$MSSQL.INSTANCE}' as object_name,'Uptime' as counter_name,'' as instance_name,DATEDIFF(second,sqlserver_start_time,GETDATE()) as cntr_value
+            FROM sys.dm_os_sys_info
+            UNION
+            SELECT '{$MSSQL.INSTANCE}:Databases' as object_name,'State' as counter_name,name as instance_name,state as cntr_value
+            FROM sys.databases
+            UNION
+            SELECT a.object_name,'BufferCacheHitRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+            FROM sys.dm_os_performance_counters a
+            JOIN (SELECT cntr_value,OBJECT_NAME
+            FROM sys.dm_os_performance_counters
+            WHERE counter_name='Buffer cache hit ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager') b
+            ON a.OBJECT_NAME=b.OBJECT_NAME
+            WHERE a.counter_name='Buffer cache hit ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager'
+            UNION
+            SELECT a.object_name,'WorktablesFromCacheRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+            FROM sys.dm_os_performance_counters a
+            JOIN (SELECT cntr_value,OBJECT_NAME
+            FROM sys.dm_os_performance_counters
+            WHERE counter_name='Worktables From Cache Base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods') b
+            ON a.OBJECT_NAME=b.OBJECT_NAME
+            WHERE a.counter_name='Worktables From Cache Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods'
+            UNION
+            SELECT a.object_name,'CacheHitRatio' as counter_name,'_Total' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+            FROM sys.dm_os_performance_counters a
+            JOIN (SELECT cntr_value,OBJECT_NAME
+            FROM sys.dm_os_performance_counters
+            WHERE counter_name='Cache Hit Ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total') b
+            ON a.OBJECT_NAME=b.OBJECT_NAME
+            WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total'
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: 'The item gets server global status information.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MSSQL: Auto-param attempts per second'
+          type: DEPENDENT
+          key: mssql.autoparam_attempts_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of auto-parameterization attempts per second. Total should be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization occurs when an instance of SQL Server tries to parameterize a Transact-SQL request by replacing some literals with parameters so that reuse of the resulting cached execution plan across multiple similar-looking requests is possible. Note that auto-parameterizations are also known as simple parameterizations in newer versions of SQL Server. This counter does not include forced parameterizations.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Auto-Param Attempts/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Average latch wait time'
+          type: CALCULATED
+          key: mssql.average_latch_wait_time
+          delay: 0;m0-59s3
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          params: |
+            (last(mssql.average_latch_wait_time_raw) - prev(mssql.average_latch_wait_time_raw)) /
+            (last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base) + 
+            (last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base)=0))
+          description: 'Average latch wait time (in milliseconds) for latch requests that had to wait.'
+          applications:
+            -
+              name: MSSQL
+        -
+          name: 'MSSQL: Average latch wait time base'
+          type: DEPENDENT
+          key: mssql.average_latch_wait_time_base
+          delay: '0'
+          history: 7d
+          description: 'For internal use only.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Average Latch Wait Time Base'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Average latch wait time raw'
+          type: DEPENDENT
+          key: mssql.average_latch_wait_time_raw
+          delay: '0'
+          history: 7d
+          units: ms
+          description: 'Average latch wait time (in milliseconds) for latch requests that had to wait.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Average Latch Wait Time (ms)'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total average wait time'
+          type: CALCULATED
+          key: mssql.average_wait_time
+          delay: 0;m0-59s3
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          params: |
+            (last(mssql.average_wait_time_raw) - prev(mssql.average_wait_time_raw)) /
+            (last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base) + 
+            (last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base)=0))
+          description: 'The average wait time, in milliseconds, for each lock request that had to wait.'
+          applications:
+            -
+              name: MSSQL
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
+              name: 'MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)'
+              priority: WARNING
+              description: 'An average wait time longer than 500ms may indicate excessive blocking. This value should generally correlate to ''Lock Waits/sec'' and move up or down with it accordingly.'
+        -
+          name: 'MSSQL: Total average wait time base'
+          type: DEPENDENT
+          key: mssql.average_wait_time_base
+          delay: '0'
+          history: 7d
+          description: 'For internal use only.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Average Wait Time Base'' && @.instance_name==''_Total'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total average wait time raw'
+          type: DEPENDENT
+          key: mssql.average_wait_time_raw
+          delay: '0'
+          history: 7d
+          units: ms
+          description: 'Average amount of wait time (in milliseconds) for each lock request that resulted in a wait. Information for all locks.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Average Wait Time (ms)'' && @.instance_name==''_Total'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Batch requests per second'
+          type: DEPENDENT
+          key: mssql.batch_requests_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of Transact-SQL command batches received per second. This statistic is affected by all constraints (such as I/O, number of users, cache size, complexity of requests, and so on). High batch requests mean good throughput.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Batch Requests/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Buffer cache hit ratio'
+          type: DEPENDENT
+          key: mssql.buffer_cache_hit_ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Indicates the percentage of pages found in the buffer cache without having to read from disk. The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high. Generally, you can increase the buffer cache hit ratio by increasing the amount of memory available to SQL Server or by using the buffer pool extension feature.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''BufferCacheHitRatio'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
+              name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
+              priority: HIGH
+              description: 'Too low buffer cache hit ratio.'
+            -
+              expression: '{max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
+              name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)'
+              priority: WARNING
+              description: 'Low buffer cache hit ratio.'
+              dependencies:
+                -
+                  name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
+                  expression: '{MSSQL by ODBC:mssql.buffer_cache_hit_ratio.max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
+        -
+          name: 'MSSQL: Cache hit ratio'
+          type: DEPENDENT
+          key: mssql.cache_hit_ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Ratio between cache hits and lookups.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''CacheHitRatio'' && @.instance_name==''_Total'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Cache objects in use'
+          type: DEPENDENT
+          key: mssql.cache_objects_in_use
+          delay: '0'
+          history: 7d
+          description: 'Number of cache objects in use.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Objects in use'' && @.instance_name==''_Total'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Cache object counts'
+          type: DEPENDENT
+          key: mssql.cache_object_counts
+          delay: '0'
+          history: 7d
+          description: 'Number of cache objects in the cache.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Object Counts'' && @.instance_name==''_Total'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Cache pages'
+          type: DEPENDENT
+          key: mssql.cache_pages
+          delay: '0'
+          history: 7d
+          description: 'Number of 8-kilobyte (KB) pages used by cache objects.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Plan Cache'' && @.counter_name==''Cache Pages'' && @.instance_name==''_Total'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Checkpoint pages per second'
+          type: DEPENDENT
+          key: mssql.checkpoint_pages_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Checkpoint pages/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Database pages'
+          type: DEPENDENT
+          key: mssql.database_pages
+          delay: '0'
+          history: 7d
+          description: 'Indicates the number of pages in the buffer pool with database content.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Database pages'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total data file size'
+          type: DEPENDENT
+          key: mssql.data_files_size
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total size of all the data files.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Data File(s) Size (KB)'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total errors per second'
+          type: DEPENDENT
+          key: mssql.errors_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Failed auto-params per second'
+          type: DEPENDENT
+          key: mssql.failed_autoparams_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of failed auto-parameterization attempts per second. This should be small. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Failed Auto-Params/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Forwarded records per second'
+          type: DEPENDENT
+          key: mssql.forwarded_records_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of records per second fetched through forwarded record pointers.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Forwarded Records/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Free list stalls per second'
+          type: DEPENDENT
+          key: mssql.free_list_stalls_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Indicates the number of requests per second that had to wait for a free page.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Free list stalls/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.FREE_LIST_STALLS.MAX}'
+              name: 'MSSQL: Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)'
+              priority: WARNING
+              description: 'Some requests have to wait for a free page.'
+        -
+          name: 'MSSQL: Full scans per second'
+          type: DEPENDENT
+          key: mssql.full_scans_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that we are having table / Index page scans. If we see high CPU then we need to investigate this counter, otherwise if the full scans are on small tables we can ignore this counter.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Full Scans/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Granted Workspace Memory'
+          type: DEPENDENT
+          key: mssql.granted_workspace_memory
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Specifies the total amount of memory currently granted to executing processes, such as hash, sort, bulk copy, and index creation operations.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Granted Workspace Memory (KB)'')].cntr_value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Index searches per second'
+          type: DEPENDENT
+          key: mssql.index_searches_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of index searches per second. These are used to start a range scan, reposition a range scan, revalidate a scan point, fetch a single index record, and search down the index to locate where to insert a new row.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Index Searches/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Errors per second (Info errors)'
+          type: DEPENDENT
+          key: mssql.info_errors_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''Info Errors'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Errors per second (Kill connection errors)'
+          type: DEPENDENT
+          key: mssql.kill_connection_errors_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''Kill Connection Errors'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Latch waits per second'
+          type: DEPENDENT
+          key: mssql.latch_waits_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'The number of latch requests that could not be granted immediately. Latches are lightweight means of holding a very transient server resource, such as an address in memory.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Latch Waits/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Lazy writes per second'
+          type: DEPENDENT
+          key: mssql.lazy_writes_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Indicates the number of buffers written per second by the buffer manager''s lazy writer. The lazy writer is a system process that flushes out batches of dirty, aged buffers (buffers that contain changes that must be written back to disk before the buffer can be reused for a different page) and makes them available to user processes. The lazy writer eliminates the need to perform frequent checkpoints in order to create available buffers.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Lazy writes/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.LAZY_WRITES.MAX}'
+              name: 'MSSQL: Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)'
+              priority: WARNING
+              description: 'The number of buffers written per second by the buffer manager''s lazy writer exceeds the threshold.'
+        -
+          name: 'MSSQL: Total lock requests per second'
+          type: DEPENDENT
+          key: mssql.lock_requests_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of new locks and lock conversions per second requested from the lock manager.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Requests/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.LOCK_REQUESTS.MAX}'
+              name: 'MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
+              priority: WARNING
+              description: 'The number of new locks and lock conversions per second requested from the lock manager is high.'
+        -
+          name: 'MSSQL: Total lock requests per second that timed out'
+          type: DEPENDENT
+          key: mssql.lock_timeouts_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of lock requests per second that timed out, including requests for NOWAIT locks.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Timeouts/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.LOCK_TIMEOUTS.MAX}'
+              name: 'MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
+              priority: WARNING
+              description: 'The total number of lock requests per second that timed out, including requests for NOWAIT locks is high.'
+        -
+          name: 'MSSQL: Total lock requests per second that required waiting'
+          type: DEPENDENT
+          key: mssql.lock_waits_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of lock requests per second that required the caller to wait.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Waits/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>0'
+              name: 'MSSQL: Some blocking is occurring for 5m'
+              priority: AVERAGE
+              description: 'Values greater than zero indicate at least some blocking is occurring, while a value of zero can quickly eliminate blocking as a potential root-cause problem.'
+        -
+          name: 'MSSQL: Lock wait time'
+          type: DEPENDENT
+          key: mssql.lock_wait_time
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Average of total wait time (in milliseconds) for locks in the last second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Lock Wait Time (ms)'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Logins per second'
+          type: DEPENDENT
+          key: mssql.logins_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufcient connection pooling.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''Logins/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Logouts per second'
+          type: DEPENDENT
+          key: mssql.logouts_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of logout operations started per second. Any value over 2 may indicate insufcient connection pooling.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''Logouts/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total log file size'
+          type: DEPENDENT
+          key: mssql.log_files_size
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total size of all the transaction log files.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Size (KB)'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total log file used size'
+          type: DEPENDENT
+          key: mssql.log_files_used_size
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The cumulative used size of all the log files in the database.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Used Size (KB)'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Maximum workspace memory'
+          type: DEPENDENT
+          key: mssql.maximum_workspace_memory
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Indicates the maximum amount of memory available for executing processes, such as hash, sort, bulk copy, and index creation operations.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Maximum Workspace Memory (KB)'')].cntr_value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Memory grants outstanding'
+          type: DEPENDENT
+          key: mssql.memory_grants_outstanding
+          delay: '0'
+          history: 7d
+          description: 'Specifies the total number of processes that have successfully acquired a workspace memory grant.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Memory Grants Outstanding'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Memory grants pending'
+          type: DEPENDENT
+          key: mssql.memory_grants_pending
+          delay: '0'
+          history: 7d
+          description: 'Specifies the total number of processes waiting for a workspace memory grant.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Memory Grants Pending'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total lock requests per second that have deadlocks'
+          type: DEPENDENT
+          key: mssql.number_deadlocks_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of lock requests per second that resulted in a deadlock.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Locks'' && @.counter_name==''Number of Deadlocks/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.DEADLOCKS.MAX}'
+              name: 'MSSQL: Number of deadlock is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)'
+              priority: AVERAGE
+              description: 'Too many deadlocks are occurring currently.'
+        -
+          name: 'MSSQL: Errors per second (DB offline errors)'
+          type: DEPENDENT
+          key: mssql.offline_errors_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''DB Offline Errors'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Page life expectancy'
+          type: DEPENDENT
+          key: mssql.page_life_expectancy
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Indicates the number of seconds a page will stay in the buffer pool without references.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page life expectancy'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{max(15m)}<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
+              name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
+              priority: HIGH
+              description: 'The page stays in the buffer pool without references of less time than the threshold value.'
+        -
+          name: 'MSSQL: Page lookups per second'
+          type: DEPENDENT
+          key: mssql.page_lookups_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Indicates the number of requests per second to find a page in the buffer pool.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page lookups/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Page reads per second'
+          type: DEPENDENT
+          key: mssql.page_reads_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Indicates the number of physical database page reads that are issued per second. This statistic displays the total number of physical page reads across all databases. Because physical I/O is expensive, you may be able to minimize the cost, either by using a larger data cache, intelligent indexes, and more efficient queries, or by changing the database design.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page reads/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.PAGE_READS.MAX}'
+              name: 'MSSQL: Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)'
+              priority: WARNING
+              description: 'The physical database page reads are issued too frequently.'
+        -
+          name: 'MSSQL: Page splits per second'
+          type: DEPENDENT
+          key: mssql.page_splits_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of page splits per second that occur as the result of overflowing index pages.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Page Splits/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Page writes per second'
+          type: DEPENDENT
+          key: mssql.page_writes_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Indicates the number of physical database page writes that are issued per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Page writes/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.PAGE_WRITES.MAX}'
+              name: 'MSSQL: Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)'
+              priority: WARNING
+              description: 'The physical database page writes are issued too frequently.'
+        -
+          name: 'MSSQL: Percent of Adhoc queries running'
+          type: CALCULATED
+          key: mssql.percent_of_adhoc_queries
+          delay: 0;m0-59s3
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: |
+            last(mssql.sql_compilations_sec.rate) * 100 /
+            (last(mssql.batch_requests_sec.rate) + (last(mssql.batch_requests_sec.rate)=0))
+          description: 'The ratio of SQL compilations per second to Batch requests per second in percent.'
+          applications:
+            -
+              name: MSSQL
+          triggers:
+            -
+              expression: '{min(15m)} > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
+              name: 'MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
+              priority: WARNING
+              description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.'
+        -
+          name: 'MSSQL: Percent of Recompiled Transact-SQL Objects'
+          type: CALCULATED
+          key: mssql.percent_recompilations_to_compilations
+          delay: 0;m0-59s3
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: |
+            last(mssql.sql_recompilations_sec.rate) * 100 /
+            (last(mssql.sql_compilations_sec.rate) + (last(mssql.sql_compilations_sec.rate)=0))
+          description: 'The ratio of SQL re-compilations per second to SQL compilations per second in percent.'
+          applications:
+            -
+              name: MSSQL
+          triggers:
+            -
+              expression: '{min(15m)} > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
+              name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
+              priority: WARNING
+              description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.'
+        -
+          name: 'MSSQL: Number of blocked processes'
+          type: DEPENDENT
+          key: mssql.processes_blocked
+          delay: '0'
+          history: 7d
+          description: 'Number of currently blocked processes.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''Processes blocked'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Read-ahead pages per second'
+          type: DEPENDENT
+          key: mssql.readahead_pages_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Indicates the number of pages read per second in anticipation of use.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Readahead pages/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Safe auto-params per second'
+          type: DEPENDENT
+          key: mssql.safe_autoparams_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of safe auto-parameterization attempts per second. Safe refers to a determination that a cached execution plan can be shared between different similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization attempts some of which turn out to be safe and others fail. Note that auto-parameterizations are also known as simple parameterizations in later versions of SQL Server. This does not include forced parameterizations.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Safe Auto-Params/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Full scans to Index searches ratio'
+          type: CALCULATED
+          key: mssql.scan_to_search
+          delay: 0;m0-59s3
+          history: 7d
+          value_type: FLOAT
+          params: 'last(mssql.full_scans_sec.rate) / (last(mssql.index_searches_sec.rate) + (last(mssql.index_searches_sec.rate)=0))'
+          description: 'The ratio of Full scans per second to Index searches per second. The threshold recommendation is strictly for OLTP workloads.'
+          applications:
+            -
+              name: MSSQL
+          triggers:
+            -
+              expression: '{min(15m)} > 0.001'
+              name: 'MSSQL: Index and table scans are often than index searches for 15m'
+              priority: WARNING
+              description: 'Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.'
+        -
+          name: 'MSSQL: SQL compilations per second'
+          type: DEPENDENT
+          key: mssql.sql_compilations_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''SQL Compilations/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: SQL re-compilations per second'
+          type: DEPENDENT
+          key: mssql.sql_recompilations_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of statement recompiles per second. Counts the number of times statement recompiles are triggered. Generally, you want the recompiles to be low.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''SQL Re-Compilations/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Table lock escalations per second'
+          type: DEPENDENT
+          key: mssql.table_lock_escalations.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times locks on a table were escalated to the TABLE or HoBT granularity.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Table Lock Escalations/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Target pages'
+          type: DEPENDENT
+          key: mssql.target_pages
+          delay: '0'
+          history: 7d
+          description: 'The optimum number of pages in the buffer pool.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Buffer Manager'' && @.counter_name==''Target pages'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Target server memory'
+          type: DEPENDENT
+          key: mssql.target_server_memory
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Indicates the ideal amount of memory the server can consume.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Target Server Memory (KB)'')].cntr_value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total latch wait Time'
+          type: DEPENDENT
+          key: mssql.total_latch_wait_time
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Total latch wait time (in milliseconds) for latch requests in the last second. This value should stay stable compared to the number of latch waits per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Latches'' && @.counter_name==''Total Latch Wait Time (ms)'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total server memory'
+          type: DEPENDENT
+          key: mssql.total_server_memory
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Specifies the amount of memory the server has committed using the memory manager.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Memory Manager'' && @.counter_name==''Total Server Memory (KB)'')].cntr_value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total transactions number'
+          type: DEPENDENT
+          key: mssql.transactions
+          delay: '0'
+          history: 7d
+          description: 'The number of currently active transactions of all types.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Transactions'' && @.counter_name==''Transactions'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Total transactions per second'
+          type: DEPENDENT
+          key: mssql.transactions_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of transactions started for all databases per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Transactions/sec'' && @.instance_name==''_Total'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Unsafe auto-params per second'
+          type: DEPENDENT
+          key: mssql.unsafe_autoparams_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of unsafe auto-parameterization attempts per second. For example, the query has some characteristics that prevent the cached plan from being shared. These are designated as unsafe. This does not count the number of forced parameterizations.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Statistics'' && @.counter_name==''Unsafe Auto-Params/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Uptime'
+          type: DEPENDENT
+          key: mssql.uptime
+          delay: '0'
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: 'MS SQL Server uptime in ''N days, hh:mm:ss'' format.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}'' && @.counter_name==''Uptime'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
+              priority: INFO
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              dependencies:
+                -
+                  name: 'MSSQL: Service is unavailable'
+                  expression: '{MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0'
+            -
+              expression: '{last()}<10m'
+              name: 'MSSQL: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'MSSQL: Number users connected'
+          type: DEPENDENT
+          key: mssql.user_connections
+          delay: '0'
+          history: 7d
+          description: 'Number of users connected to MS SQL Server.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:General Statistics'' && @.counter_name==''User Connections'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Errors per second (User errors)'
+          type: DEPENDENT
+          key: mssql.user_errors_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors per second.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:SQL Errors'' && @.counter_name==''Errors/sec'' && @.instance_name==''User Errors'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+        -
+          name: 'MSSQL: Version'
+          type: DEPENDENT
+          key: mssql.version
+          delay: '0'
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MS SQL Server version.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}'' && @.counter_name==''Version'')].instance_name.first()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              priority: INFO
+              description: 'MSSQL version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'MSSQL: Work files created per second'
+          type: DEPENDENT
+          key: mssql.workfiles_created_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of work files created per second. For example, work files could be used to store temporary results for hash joins and hash aggregates.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Workfiles Created/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.WORK_FILES.MAX}'
+              name: 'MSSQL: Number work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
+              priority: AVERAGE
+              description: 'Too many work files created per second to store temporary results for hash joins and hash aggregates.'
+        -
+          name: 'MSSQL: Work tables created per second'
+          type: DEPENDENT
+          key: mssql.worktables_created_sec.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of work tables created per second. For example, work tables could be used to store temporary results for query spool, lob variables, XML variables, and cursors.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''Worktables Created/sec'')].cntr_value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MSSQL.WORK_TABLES.MAX}'
+              name: 'MSSQL: Number work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
+              priority: AVERAGE
+              description: 'Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.'
+        -
+          name: 'MSSQL: Worktables from cache ratio'
+          type: DEPENDENT
+          key: mssql.worktables_from_cache_ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of work tables created where the initial two pages of the work table were not allocated but were immediately available from the work table cache.'
+          applications:
+            -
+              name: MSSQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Access Methods'' && @.counter_name==''WorktablesFromCacheRatio'')].cntr_value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{max(5m)}<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
+              name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
+              priority: HIGH
+              description: 'A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or may indicate, on 32-bit systems, the need for an upgrade to a 64-bit system'
+        -
+          name: 'MSSQL: Service''s TCP port state'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]'
+          delay: 30s
+          history: 7d
+          description: 'Test the availability of MS SQL Server on TCP port.'
+          applications:
+            -
+              name: MSSQL
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'MSSQL: Service is unavailable'
+              priority: DISASTER
+              description: 'The TCP port of the MS SQL Server service is currently unavailable.'
+      discovery_rules:
+        -
+          name: 'Availability groups discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[availability_groups,"{$MSSQL.DSN}"]'
+          delay: 1h
+          params: |
+            SELECT name as group_name 
+            FROM sys.availability_groups
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: 'Discovery the existed availability groups.'
+          item_prototypes:
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'': Get replica states'
+              type: ODBC
+              key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              history: 0h
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT ag.name as group_name,
+                ISNULL(ags.primary_recovery_health, 2) as primary_recovery_health,
+                ISNULL(ags.primary_replica, 'Unknown') as primary_replica,
+                ISNULL(ags.secondary_recovery_health, 2) as secondary_recovery_health,
+                ags.synchronization_health as synchronization_health
+                FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag ON ag.group_id = ags.group_id
+              username: '{$MSSQL.USER}'
+              password: '{$MSSQL.PASSWORD}'
+              description: 'Getting replica states - name, primary and secondary health, synchronization health.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica recovery health'
+              type: DEPENDENT
+              key: 'mssql.primary_recovery_health["{#GROUP_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Indicates the recovery health of the primary replica:
+                0 = In progress
+                1 = Online
+                2 = Unavailable
+              application_prototypes:
+                -
+                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Recovery health'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'')].primary_recovery_health.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica recovery health in progress'
+                  priority: WARNING
+                  description: 'The primary replica is in the synchronization process.'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'': Primary replica name'
+              type: DEPENDENT
+              key: 'mssql.primary_replica["{#GROUP_NAME}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Name of the server instance that is hosting the current primary replica.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'')].primary_replica.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'': Secondary replica recovery health'
+              type: DEPENDENT
+              key: 'mssql.secondary_recovery_health["{#GROUP_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Indicates the recovery health of a secondary replica replica:
+                0 = In progress
+                1 = Online
+                2 = Unavailable
+              application_prototypes:
+                -
+                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Recovery health'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'')].secondary_recovery_health.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'': Secondary replica recovery health in progress'
+                  priority: WARNING
+                  description: 'The secondary replica is in the synchronization process.'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'': Synchronization health'
+              type: DEPENDENT
+              key: 'mssql.synchronization_health["{#GROUP_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Reflects a rollup of the synchronization_health of all availability replicas in the availability group:
+                0: Not healthy. None of the availability replicas have a healthy.
+                1: Partially healthy. The synchronization health of some, but not all, availability replicas is healthy.
+                2: Healthy. The synchronization health of every availability replica is healthy.
+              application_prototypes:
+                -
+                  name: 'MSSQL Availability Group ''{#GROUP_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Synchronization health'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'')].synchronization_health.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'': All replicas unhealthy'
+                  priority: DISASTER
+                  description: 'None of the availability replicas have a healthy.'
+                -
+                  expression: '{last()}=1'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'': Some replicas unhealthy'
+                  priority: HIGH
+                  description: 'The synchronization health of some, but not all, availability replicas is healthy.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Database discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[dbname,"{$MSSQL.DSN}"]'
+          delay: 1h
+          params: |
+            SELECT name as dbname 
+            FROM sys.databases
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DBNAME}'
+                value: '{$MSSQL.DBNAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DBNAME}'
+                value: '{$MSSQL.DBNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Scanning databases in DBMS.'
+          item_prototypes:
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Active transactions'
+              type: DEPENDENT
+              key: 'mssql.db.active_transactions["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of active transactions for the database.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Active Transactions'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Data file size'
+              type: DEPENDENT
+              key: 'mssql.db.data_files_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Cumulative size of all the data files in the database including any automatic growth. Monitoring this counter is useful, for example, for determining the correct size of tempdb.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Data File(s) Size (KB)'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log bytes flushed per second'
+              type: DEPENDENT
+              key: 'mssql.db.log_bytes_flushed_sec.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Total number of log bytes flushed per second. Useful for determining trends and utilization of the transaction log.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Bytes Flushed/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log file size'
+              type: DEPENDENT
+              key: 'mssql.db.log_files_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Cumulative size of all the transaction log files in the database.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Size (KB)'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log file used size'
+              type: DEPENDENT
+              key: 'mssql.db.log_files_used_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The cumulative used size of all the log files in the database.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log File(s) Used Size (KB)'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log flushes per second'
+              type: DEPENDENT
+              key: 'mssql.db.log_flushes_sec.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of log flushes per second.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Flushes/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log flush waits per second'
+              type: DEPENDENT
+              key: 'mssql.db.log_flush_waits_sec.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of commits per second waiting for the log flush.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Flush Waits/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m)'
+                  priority: WARNING
+                  description: 'Too many commits are waiting for the log flush.'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log flush wait time'
+              type: DEPENDENT
+              key: 'mssql.db.log_flush_wait_time["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Total wait time (in milliseconds) to flush the log. On an AlwaysOn secondary database, this value indicates the wait time for log records to be hardened to disk.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Flush Wait Time'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m)'
+                  priority: WARNING
+                  description: 'The wait time to flush the log is too long.'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log growths'
+              type: DEPENDENT
+              key: 'mssql.db.log_growths["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of times the transaction log for the database has been expanded.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Growths'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log shrinks'
+              type: DEPENDENT
+              key: 'mssql.db.log_shrinks["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of times the transaction log for the database has been shrunk.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Shrinks'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log truncations'
+              type: DEPENDENT
+              key: 'mssql.db.log_truncations["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'The number of times the transaction log has been shrunk.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Log Truncations'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Percent log used'
+              type: DEPENDENT
+              key: 'mssql.db.percent_log_used["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Percentage of space in the log that is in use.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Percent Log Used'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}'
+                  name: 'MSSQL DB ''{#DBNAME}'': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m)'
+                  priority: WARNING
+                  description: 'There''s not enough space left in the log.'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': State'
+              type: DEPENDENT
+              key: 'mssql.db.state["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                0 = ONLINE
+                1 = RESTORING
+                2 = RECOVERING | SQL Server 2008 and later
+                3 = RECOVERY_PENDING | SQL Server 2008 and later
+                4 = SUSPECT
+                5 = EMERGENCY | SQL Server 2008 and later
+                6 = OFFLINE | SQL Server 2008 and later
+                7 = COPYING | Azure SQL Database Active Geo-Replication
+                10 = OFFLINE_SECONDARY | Azure SQL Database Active Geo-Replication
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              valuemap:
+                name: 'MSSQL DB state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''State'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 15m
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}>1'
+                  name: 'MSSQL DB ''{#DBNAME}'': State is {ITEM.VALUE}'
+                  priority: HIGH
+                  description: 'The DB has a non-working state.'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Transactions per second'
+              type: DEPENDENT
+              key: 'mssql.db.transactions_sec.rate["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of transactions started for the database per second.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Database ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.object_name==''{$MSSQL.INSTANCE}:Databases'' && @.counter_name==''Transactions/sec'' && @.instance_name==''{#DBNAME}'')].cntr_value.first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]'
+          graph_prototypes:
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Log size'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.db.log_files_size["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.db.log_files_used_size["{#DBNAME}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Number of Log changes'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.db.log_growths["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.db.log_shrinks["{#DBNAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.db.log_truncations["{#DBNAME}"]'
+            -
+              name: 'MSSQL DB ''{#DBNAME}'': Size'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.db.data_files_size["{#DBNAME}"]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Local database discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[local_db,"{$MSSQL.DSN}"]'
+          delay: 1h
+          params: |
+            SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name,
+            db_name(drs.database_id) AS dbname, drs.is_local
+            FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs
+            ON arcs.replica_id = drs.replica_id
+            JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+            JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+            WHERE drs.is_local = 1
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: 'Discovery of the local availability databases.'
+          item_prototypes:
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Get local DB states'
+              type: ODBC
+              key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
+              history: 0h
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT drs.database_state as database_state, 
+                drs.is_suspended as is_suspended, 
+                drs.synchronization_health as synchronization_health, 
+                ag.name as group_name,
+                arcs.replica_server_name as replica_name,
+                db_name(drs.database_id) as dbname
+                FROM sys.dm_hadr_database_replica_states drs 
+                JOIN sys.dm_hadr_availability_replica_cluster_states arcs ON arcs.replica_id = drs.replica_id 
+                JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id 
+                JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+              username: '{$MSSQL.USER}'
+              password: '{$MSSQL.PASSWORD}'
+              description: 'Getting the states of the local availability database.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Suspended'
+              type: DEPENDENT
+              key: 'mssql.local_db.is_suspended["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Database state:
+                0 = Resumed
+                1 = Suspended
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].is_suspended.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': State'
+              type: DEPENDENT
+              key: 'mssql.local_db.state["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                0 = Online
+                1 = Restoring
+                2 = Recovering
+                3 = Recovery pending
+                4 = Suspect
+                5 = Emergency
+                6 = Offline
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
+              valuemap:
+                name: 'MSSQL DB state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].database_state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}>0'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
+                  priority: WARNING
+                  description: 'The local availability database has a non-working state.'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': Synchronization health'
+              type: DEPENDENT
+              key: 'mssql.local_db.synchronization_health["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Reflects the intersection of the synchronization state of a database that is joined to the availability group on the availability replica and the availability mode of the availability replica (synchronous-commit or asynchronous-commit mode):
+                0 = Not healthy. The synchronization_state of the database is 0 (NOT SYNCHRONIZING).
+                1 = Partially healthy. A database on a synchronous-commit availability replica is considered 
+                partially healthy if synchronization_state is 1 (SYNCHRONIZING).
+                2 = Healthy. A database on an synchronous-commit availability replica is considered healthy if synchronization_state is 2 (SYNCHRONIZED), and a database on an asynchronous-commit availability replica is considered healthy if synchronization_state is 1 (SYNCHRONIZING).
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'''
+              valuemap:
+                name: 'MSSQL AG Synchronization health'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].synchronization_health.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Not healthy'
+                  priority: HIGH
+                  description: 'The synchronization state of the local availability database is NOT SYNCHRONIZING.'
+                -
+                  expression: '{last()}=1'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Local DB ''{#DBNAME}'': "{#DBNAME}" is Partially healthy'
+                  priority: AVERAGE
+                  description: 'A database on a synchronous-commit availability replica is considered partially healthy if synchronization state is SYNCHRONIZING.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Mirroring discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[mirrors,"{$MSSQL.DSN}"]'
+          delay: 1h
+          params: |
+            SELECT db_name(database_id) as dbname
+            FROM sys.database_mirroring
+            WHERE mirroring_state_desc IS NOT NULL
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: |
+            To see the row for a database other than master or tempdb, you must
+            either be the database owner or have at least ALTER ANY DATABASE or VIEW ANY
+            DATABASE server-level permission or CREATE DATABASE permission in the master
+            database. To see non-NULL values on a mirror database, you must be a member
+            of the sysadmin fixed server role.
+          item_prototypes:
+            -
+              name: 'MSSQL Mirroring ''{#DBNAME}'': Get the mirror state'
+              type: ODBC
+              key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              history: 0h
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT ISNULL(m.mirroring_role,0) as mirroring_role,
+                ISNULL(m.mirroring_role_sequence,0) as mirroring_role_sequence,
+                ISNULL(m.mirroring_state,7) as mirroring_state,
+                ISNULL(m.mirroring_witness_state,3) as mirroring_witness_state,
+                ISNULL(m.mirroring_safety_level,3) as mirroring_safety_level,
+                db_name(m.database_id) as dbname 
+                FROM sys.database_mirroring as m
+                WHERE m.mirroring_state_desc IS NOT NULL
+              username: '{$MSSQL.USER}'
+              password: '{$MSSQL.PASSWORD}'
+              description: 'Getting mirrors state'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MSSQL Mirroring ''{#DBNAME}'': Role'
+              type: DEPENDENT
+              key: 'mssql.mirroring.role["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Current role of the local database plays in the database mirroring session.
+                1 = Principal
+                2 = Mirror
+              application_prototypes:
+                -
+                  name: 'MSSQL Mirroring ''{#DBNAME}'''
+              valuemap:
+                name: 'MSSQL Mirroring Role'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_role.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL Mirroring ''{#DBNAME}'': Role sequence'
+              type: DEPENDENT
+              key: 'mssql.mirroring.role_sequence["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'The number of times that mirroring partners have switched the principal and mirror roles due to a failover or forced service.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Mirroring ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_role_sequence.first()'
+                -
+                  type: SIMPLE_CHANGE
+                  parameters:
+                    - ''
+              master_item:
+                key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL Mirroring ''{#DBNAME}'': Safety level'
+              type: DEPENDENT
+              key: 'mssql.mirroring.safety_level["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Safety setting for updates on the mirror database:
+                0 = Unknown state
+                1 = Off [asynchronous]
+                2 = Full [synchronous]
+              application_prototypes:
+                -
+                  name: 'MSSQL Mirroring ''{#DBNAME}'''
+              valuemap:
+                name: 'MSSQL Safety level'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_safety_level.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL Mirroring ''{#DBNAME}'': State'
+              type: DEPENDENT
+              key: 'mssql.mirroring.state["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                State of the mirror database and of the database mirroring session.
+                0 = Suspended
+                1 = Disconnected from the other partner
+                2 = Synchronizing
+                3 = Pending Failover
+                4 = Synchronized
+                5 = The partners are not synchronized. Failover is not possible now.
+                6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for failover see, Database Mirroring Operating Modes.
+              application_prototypes:
+                -
+                  name: 'MSSQL Mirroring ''{#DBNAME}'''
+              valuemap:
+                name: 'MSSQL Mirroring State'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=3'
+                  name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
+                  priority: WARNING
+                  description: 'The state of the mirror database and of the database mirroring session is "Pending Failover".'
+                -
+                  expression: '{last()}=5'
+                  name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
+                  priority: HIGH
+                  description: 'The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.'
+                -
+                  expression: '{last()}>=0 and {last()}<=2'
+                  name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" is {ITEM.VALUE}'
+                  priority: INFO
+                  description: 'The state of the mirror database and of the database mirroring session is "Suspended", "Disconnected from the other partner", or "Synchronizing".'
+            -
+              name: 'MSSQL Mirroring ''{#DBNAME}'': Witness state'
+              type: DEPENDENT
+              key: 'mssql.mirroring.witness_state["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                State of the witness in the database mirroring session of the database:
+                0 = Unknown
+                1 = Connected
+                2 = Disconnected
+              application_prototypes:
+                -
+                  name: 'MSSQL Mirroring ''{#DBNAME}'''
+              valuemap:
+                name: 'MSSQL Witness state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.dbname==''{#DBNAME}'')].mirroring_witness_state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=2'
+                  name: 'MSSQL Mirroring ''{#DBNAME}'': "{#DBNAME}" Witness is disconnected'
+                  priority: WARNING
+                  description: 'The state of the witness in the database mirroring session of the database is "Disconnected".'
+          graph_prototypes:
+            -
+              name: 'MSSQL Mirroring ''{#DBNAME}'': States'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.mirroring.state["{#DBNAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MSSQL by ODBC'
+                    key: 'mssql.mirroring.witness_state["{#DBNAME}"]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Non-local database discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[non-local_db,"{$MSSQL.DSN}"]'
+          delay: 1h
+          params: |
+            SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name,
+            db_name(drs.database_id) AS dbname, drs.is_local
+            FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs 
+            ON arcs.replica_id = drs.replica_id 
+            JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+            JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+            WHERE drs.is_local = 0
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: 'Discovery of the non-local (not local to the SQL Server instance) availability databases.'
+          item_prototypes:
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Get non-local DB states'
+              type: ODBC
+              key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+              history: 0h
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT drs.log_send_queue_size as log_send_queue_size,
+                drs.redo_queue_size as redo_queue_size,
+                ag.name as group_name,
+                arcs.replica_server_name as replica_name,
+                db_name(drs.database_id) as dbname
+                FROM sys.dm_hadr_database_replica_states drs 
+                JOIN sys.dm_hadr_availability_replica_cluster_states arcs ON arcs.replica_id = drs.replica_id 
+                JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id 
+                JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+              username: '{$MSSQL.USER}'
+              password: '{$MSSQL.PASSWORD}'
+              description: 'Getting the states of the non-local availability database.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Log queue size'
+              type: DEPENDENT
+              key: 'mssql.non-local_db.log_send_queue_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Amount of log records of the primary database that has not been sent to the secondary databases.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].log_send_queue_size.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Log queue size is growing'
+                  priority: HIGH
+                  description: 'The log records of the primary database do not send to the secondary databases.'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Redo log queue size'
+              type: DEPENDENT
+              key: 'mssql.non-local_db.redo_queue_size["{#DBNAME}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Amount of log records in the log files of the secondary replica that has not yet been redone.'
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'''
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'' && @.dbname==''{#DBNAME}'')].redo_queue_size.first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last(#1)}>{last(#2)} and {last(#2)}>{last(#3)}'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Non-Local DB ''{#DBNAME}'': Redo log queue size is growing'
+                  priority: HIGH
+                  description: 'The log records in the log files of the secondary replica have not yet been redone.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Replication discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[replicas,"{$MSSQL.DSN}"]'
+          delay: 1h
+          params: |
+            SELECT ag.name as group_name, 
+            arcs.replica_server_name as replica_name
+            FROM sys.dm_hadr_availability_replica_cluster_states as arcs 
+            JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+            JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+          username: '{$MSSQL.USER}'
+          password: '{$MSSQL.PASSWORD}'
+          description: 'Discovery of the database replicas.'
+          item_prototypes:
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Get the replica state'
+              type: ODBC
+              key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              history: 0h
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT ars.connected_state as connected_state,
+                ars.is_local as is_local,
+                arcs.join_state as join_state,
+                ISNULL(ars.operational_state,6) as operational_state,
+                ISNULL(ars.recovery_health,2) as recovery_health,
+                ars.role as role,
+                ars.synchronization_health as synchronization_health,
+                ag.name as group_name, 
+                arcs.replica_server_name as replica_name
+                FROM sys.dm_hadr_availability_replica_cluster_states as arcs 
+                JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+                JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+                WHERE ag.name = '{#GROUP_NAME}' AND arcs.replica_server_name = '{#REPLICA_NAME}'
+              username: '{$MSSQL.USER}'
+              password: '{$MSSQL.PASSWORD}'
+              description: 'Getting the database replica states.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Connected state'
+              type: DEPENDENT
+              key: 'mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Whether a secondary replica is currently connected to the primary replica:
+                0 : Disconnected. The response of an availability replica to the DISCONNECTED state depends on its role:
+                On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect;
+                On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.
+                1 : Connected. Each primary replica tracks the connection state for every secondary replica in the same availability group. Secondary replicas track the connection state of only the primary replica.
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Connected state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].connected_state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Is local'
+              type: DEPENDENT
+              key: 'mssql.replica.is_local["{#GROUP_NAME}_{#REPLICA_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Whether the replica is local:
+                0 = Indicates a remote secondary replica in an availability group whose primary replica is hosted by the local server instance. This value occurs only on the primary replica location.
+                1 = Indicates a local replica. On secondary replicas, this is the only available value for the availability group to which the replica belongs.
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
+              valuemap:
+                name: 'MSSQL - Yes / No'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].is_local.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Join state'
+              type: DEPENDENT
+              key: 'mssql.replica.join_state["{#GROUP_NAME}_{#REPLICA_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                0 = Not joined
+                1 = Joined, standalone instance
+                2 = Joined, failover cluster instance
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Join state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].join_state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Operational state'
+              type: DEPENDENT
+              key: 'mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Current operational state of the replica:
+                0 = Pending failover
+                1 = Pending
+                2 = Online
+                3 = Offline
+                4 = Failed
+                5 = Failed, no quorum
+                6 = Not local
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Operational state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].operational_state.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0 or {last()}=1 or {last()}=3'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
+                  priority: WARNING
+                  description: 'The operational state of the replica in a given availability group is "Pending" or "Offline".'
+                -
+                  expression: '{last()}=4'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
+                  priority: AVERAGE
+                  description: 'The operational state of the replica in a given availability group is "Failed".'
+                -
+                  expression: '{last()}=5'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is {ITEM.VALUE}'
+                  priority: HIGH
+                  description: 'The operational state of the replica in a given availability group is "Failed, no quorum".'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Recovery health'
+              type: DEPENDENT
+              key: 'mssql.replica.recovery_health["{#GROUP_NAME}_{#REPLICA_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Rollup of the database_state column of the sys.dm_hadr_database_replica_states dynamic management view:
+                0 : In progress. At least one joined database has a database state other than ONLINE 
+                (database_state is not 0).
+                1 : Online. All the joined databases have a database state of ONLINE (database_state is 0).
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Recovery health'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].recovery_health.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} Recovery in progress'
+                  priority: INFO
+                  description: 'At least one joined database has a database state other than ONLINE.'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Role'
+              type: DEPENDENT
+              key: 'mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Current Always On availability groups role of a local replica or a connected remote replica:
+                0 = Resolving
+                1 = Primary
+                2 = Secondary
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Role'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].role.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+            -
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': Sync health'
+              type: DEPENDENT
+              key: 'mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: |
+                Reflects a rollup of the database synchronization state (synchronization_state)of all joined availability databases (also known as replicas) and the availability mode of the replica (synchronous-commit or asynchronous-commit mode). The rollup will reflect the least healthy accumulated state the databases on the replica:
+                0 : Not healthy. At least one joined database is in the NOT SYNCHRONIZING state.
+                1 : Partially healthy. Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.
+                2 : Healthy. All replicas are in the target synchronization state: synchronous-commit replicas are synchronized, and asynchronous-commit replicas are synchronizing.
+              application_prototypes:
+                -
+                  name: 'MSSQL Available Group ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'''
+              valuemap:
+                name: 'MSSQL AG Synchronization health'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.group_name==''{#GROUP_NAME}'' && @.replica_name==''{#REPLICA_NAME}'')].synchronization_health.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is Not healthy'
+                  priority: AVERAGE
+                  description: 'At least one joined database is in the NOT SYNCHRONIZING state.'
+                -
+                  expression: '{last()}=1'
+                  name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is Partially healthy'
+                  priority: WARNING
+                  description: 'Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.'
+          trigger_prototypes:
+            -
+              expression: '{MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2'
+              name: 'MSSQL AG ''{#GROUP_NAME}'' Replica ''{#REPLICA_NAME}'': {#REPLICA_NAME} is disconnected'
+              priority: WARNING
+              description: |
+                The response of an availability replica to the DISCONNECTED state depends on its role: 
+                On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect; On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+      macros:
+        -
+          macro: '{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
+          value: '500'
+          description: 'The maximum average wait time in ms for trigger expression.'
+        -
+          macro: '{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
+          value: '30'
+          description: 'The minimum % buffer cache hit ratio for high trigger expression.'
+        -
+          macro: '{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
+          value: '50'
+          description: 'The minimum % buffer cache hit ratio for warning trigger expression.'
+        -
+          macro: '{$MSSQL.DBNAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in database discovery. It can be overridden on the host or linked template level.'
+        -
+          macro: '{$MSSQL.DBNAME.NOT_MATCHES}'
+          value: master|tempdb|model|msdb
+          description: 'This macro is used in database discovery. It can be overridden on the host or linked template level.'
+        -
+          macro: '{$MSSQL.DEADLOCKS.MAX}'
+          value: '1'
+          description: 'The maximum deadlocks per second for trigger expression.'
+        -
+          macro: '{$MSSQL.DSN}'
+          value: '<Put your DSN here>'
+          description: 'System data source name.'
+        -
+          macro: '{$MSSQL.FREE_LIST_STALLS.MAX}'
+          value: '2'
+          description: 'The maximum free list stalls per second for trigger expression.'
+        -
+          macro: '{$MSSQL.INSTANCE}'
+          value: SQLServer
+          description: 'The instance name for the default instance is SQLServer. For named instance set macro value as MSSQL$instance name.'
+        -
+          macro: '{$MSSQL.LAZY_WRITES.MAX}'
+          value: '20'
+          description: 'The maximum lazy writes per second for trigger expression.'
+        -
+          macro: '{$MSSQL.LOCK_REQUESTS.MAX}'
+          value: '1000'
+          description: 'The maximum lock requests per second for trigger expression.'
+        -
+          macro: '{$MSSQL.LOCK_TIMEOUTS.MAX}'
+          value: '1'
+          description: 'The maximum lock timeouts per second for trigger expression.'
+        -
+          macro: '{$MSSQL.LOG_FLUSH_WAITS.MAX}'
+          value: '1'
+          description: 'The maximum log flush waits per second for trigger expression.'
+        -
+          macro: '{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX}'
+          value: '1'
+          description: 'The maximum log flush wait time in ms for trigger expression.'
+        -
+          macro: '{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
+          value: '300'
+          description: 'The minimum page life expectancy for trigger expression.'
+        -
+          macro: '{$MSSQL.PAGE_READS.MAX}'
+          value: '90'
+          description: 'The maximum page reads per second for trigger expression.'
+        -
+          macro: '{$MSSQL.PAGE_WRITES.MAX}'
+          value: '90'
+          description: 'The maximum page writes per second for trigger expression.'
+        -
+          macro: '{$MSSQL.PASSWORD}'
+          value: '<Put your password here>'
+          description: 'MSSQL user password.'
+        -
+          macro: '{$MSSQL.PERCENT_COMPILATIONS.MAX}'
+          value: '10'
+          description: 'The maximum percent of Transact-SQL compilations for trigger expression.'
+        -
+          macro: '{$MSSQL.PERCENT_LOG_USED.MAX}'
+          value: '80'
+          description: 'The maximum percent log used for trigger expression.'
+        -
+          macro: '{$MSSQL.PERCENT_READAHEAD.MAX}'
+          value: '20'
+          description: 'The maximum percent of pages read/sec in anticipation of use for trigger expression.'
+        -
+          macro: '{$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
+          value: '10'
+          description: 'The maximum percent of Transact-SQL recompilations for trigger expression.'
+        -
+          macro: '{$MSSQL.PORT}'
+          value: '1433'
+          description: 'MSSQL TCP port.'
+        -
+          macro: '{$MSSQL.USER}'
+          value: '<Put your username here>'
+          description: 'MSSQL username.'
+        -
+          macro: '{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
+          value: '90'
+          description: 'The minimum % worktables from cache ratio for high trigger expression.'
+        -
+          macro: '{$MSSQL.WORK_FILES.MAX}'
+          value: '20'
+          description: 'The maximum number of work files created per second for trigger expression.'
+        -
+          macro: '{$MSSQL.WORK_TABLES.MAX}'
+          value: '20'
+          description: 'The maximum number of work tables created per second for trigger expression.'
+  triggers:
+    -
+      expression: '{MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 > 10 * {MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}'
+      name: 'MSSQL: Too frequently pointers using'
+      priority: WARNING
+      description: 'Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.'
+    -
+      expression: '{MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * {MSSQL by ODBC:mssql.page_reads_sec.rate.last()}'
+      name: 'MSSQL: Too many physical reads occurring'
+      priority: WARNING
+      description: 'If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.'
+  graphs:
+    -
+      name: 'MSSQL: Access methods'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.forwarded_records_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.full_scans_sec.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.index_searches_sec.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.page_splits_sec.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.workfiles_created_sec.rate
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.worktables_created_sec.rate
+    -
+      name: 'MSSQL: Auto-params'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.autoparam_attempts_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.failed_autoparams_sec.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.safe_autoparams_sec.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.unsafe_autoparams_sec.rate
+    -
+      name: 'MSSQL: Cache objects'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.cache_object_counts
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.cache_objects_in_use
+    -
+      name: 'MSSQL: Compilations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.sql_compilations_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.sql_compilations_sec.rate
+    -
+      name: 'MSSQL: Database pages'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.database_pages
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.target_pages
+    -
+      name: 'MSSQL: Errors'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.errors_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.offline_errors_sec.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.info_errors_sec.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.kill_connection_errors_sec.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.user_errors_sec.rate
+    -
+      name: 'MSSQL: Locks'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.lock_requests_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.lock_timeouts_sec.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.number_deadlocks_sec.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.lock_waits_sec.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.average_wait_time
+    -
+      name: 'MSSQL: Logins per second and Logouts per second'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.logins_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.logouts_sec.rate
+    -
+      name: 'MSSQL: Memory/cache load'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.cache_hit_ratio
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.buffer_cache_hit_ratio
+    -
+      name: 'MSSQL: Memory grants outstanding and pending'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.memory_grants_outstanding
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.memory_grants_pending
+    -
+      name: 'MSSQL: Page life expectancy'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.page_life_expectancy
+    -
+      name: 'MSSQL: Pages'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.page_lookups_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.page_reads_sec.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.page_writes_sec.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.readahead_pages_sec.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.checkpoint_pages_sec.rate
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.free_list_stalls_sec.rate
+        -
+          sortorder: '6'
+          color: AC8C14
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.lazy_writes_sec.rate
+    -
+      name: 'MSSQL: Processes blocked'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.processes_blocked
+    -
+      name: 'MSSQL: Server memory'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.target_server_memory
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.total_server_memory
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.granted_workspace_memory
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.maximum_workspace_memory
+    -
+      name: 'MSSQL: Transactions'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.transactions_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.batch_requests_sec.rate
+    -
+      name: 'MSSQL: Waits per second'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.latch_waits_sec.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.lock_waits_sec.rate
+    -
+      name: 'MSSQL: Wait times'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.average_latch_wait_time
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.total_latch_wait_time
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.average_wait_time
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MSSQL by ODBC'
+            key: mssql.lock_wait_time
+  value_maps:
+    -
+      name: 'MSSQL - Yes / No'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'No'
+        -
+          value: '1'
+          newvalue: 'Yes'
+    -
+      name: 'MSSQL AG Connected state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Disconnected
+        -
+          value: '1'
+          newvalue: Connected
+    -
+      name: 'MSSQL AG Join state'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'Not joined'
+        -
+          value: '1'
+          newvalue: 'Joined, standalone instance'
+        -
+          value: '2'
+          newvalue: 'Joined, failover cluster instance'
+    -
+      name: 'MSSQL AG Operational state'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'Pending failover'
+        -
+          value: '1'
+          newvalue: Pending
+        -
+          value: '2'
+          newvalue: Online
+        -
+          value: '3'
+          newvalue: Offline
+        -
+          value: '4'
+          newvalue: Failed
+        -
+          value: '5'
+          newvalue: 'Failed, no quorum'
+        -
+          value: '6'
+          newvalue: 'Replica is not local'
+    -
+      name: 'MSSQL AG Recovery health'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'In progress'
+        -
+          value: '1'
+          newvalue: Online
+        -
+          value: '2'
+          newvalue: 'Replica is not local'
+    -
+      name: 'MSSQL AG Role'
+      mappings:
+        -
+          value: '0'
+          newvalue: Resolving
+        -
+          value: '1'
+          newvalue: Primary
+        -
+          value: '2'
+          newvalue: Secondary
+    -
+      name: 'MSSQL AG Synchronization health'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'Not healthy'
+        -
+          value: '1'
+          newvalue: 'Partially healthy'
+        -
+          value: '2'
+          newvalue: Healthy
+    -
+      name: 'MSSQL DB state'
+      mappings:
+        -
+          value: '0'
+          newvalue: ONLINE
+        -
+          value: '1'
+          newvalue: RESTORING
+        -
+          value: '2'
+          newvalue: RECOVERING
+        -
+          value: '3'
+          newvalue: RECOVERY_PENDING
+        -
+          value: '4'
+          newvalue: SUSPECT
+        -
+          value: '5'
+          newvalue: EMERGENCY
+        -
+          value: '6'
+          newvalue: OFFLINE
+        -
+          value: '7'
+          newvalue: COPYING
+        -
+          value: '10'
+          newvalue: OFFLINE_SECONDARY
+    -
+      name: 'MSSQL Mirroring Role'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'Database is inaccessible or is not mirrored'
+        -
+          value: '1'
+          newvalue: Principal
+        -
+          value: '2'
+          newvalue: Mirror
+    -
+      name: 'MSSQL Mirroring State'
+      mappings:
+        -
+          value: '0'
+          newvalue: Suspended
+        -
+          value: '1'
+          newvalue: 'Disconnected from the other partner'
+        -
+          value: '2'
+          newvalue: Synchronizing
+        -
+          value: '3'
+          newvalue: 'Pending Failover'
+        -
+          value: '4'
+          newvalue: Synchronized
+        -
+          value: '5'
+          newvalue: 'The partners are not synchronized. Failover is not possible now.'
+        -
+          value: '6'
+          newvalue: 'The partners are synchronized. Failover is potentially possible.'
+        -
+          value: '7'
+          newvalue: 'Database is inaccessible or is not mirrored'
+    -
+      name: 'MSSQL Safety level'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'Unknown state'
+        -
+          value: '1'
+          newvalue: 'Off [asynchronous]'
+        -
+          value: '2'
+          newvalue: 'Full [synchronous]'
+        -
+          value: '3'
+          newvalue: 'Database is inaccessible or is not mirrored'
+    -
+      name: 'MSSQL Witness state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Unknown
+        -
+          value: '1'
+          newvalue: Connected
+        -
+          value: '2'
+          newvalue: Disconnected
+        -
+          value: '3'
+          newvalue: 'No witness exists'
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

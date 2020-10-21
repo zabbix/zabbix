@@ -1329,7 +1329,8 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 	if (NULL == recipient_userid || *userid == *recipient_userid)
 		goto out;
 
-	result = DBselect("select type from users where userid=" ZBX_FS_UI64, *recipient_userid);
+	result = DBselect("select r.type from users u,role r where u.roleid=r.roleid and"
+			" userid=" ZBX_FS_UI64, *recipient_userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		user_type = atoi(row[0]);
@@ -3434,11 +3435,12 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
 	if (NULL == (result = DBselect(
-			"select u.userid,u.type"
-				" from sessions s,users u"
+			"select u.userid,u.roleid,r.type"
+				" from sessions s,users u,role r"
 			" where s.userid=u.userid"
 				" and s.sessionid='%s'"
-				" and s.status=%d",
+				" and s.status=%d"
+				" and u.roleid=r.roleid",
 			sessionid_esc, ZBX_SESSION_ACTIVE)))
 	{
 		goto out;
@@ -3448,7 +3450,8 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 		goto out;
 
 	ZBX_STR2UINT64(user->userid, row[0]);
-	user->type = atoi(row[1]);
+	ZBX_STR2UINT64(user->roleid, row[1]);
+	user->type = atoi(row[2]);
 
 	ret = SUCCEED;
 out:

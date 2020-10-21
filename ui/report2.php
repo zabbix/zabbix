@@ -514,6 +514,7 @@ else {
 	$page_num = getRequest('page', 1);
 	CPagerHelper::savePage($page['file'], $page_num);
 	$paging = CPagerHelper::paginate($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
+	$allowed_ui_problems = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
@@ -530,12 +531,14 @@ else {
 
 		$triggerTable->addRow([
 			$trigger['host_name'],
-			new CLink($trigger['description'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
-					->setArgument('triggerids', [$trigger['triggerid']])
-			),
+			$allowed_ui_problems
+				? new CLink($trigger['description'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('triggerids', [$trigger['triggerid']])
+				)
+				: $trigger['description'],
 			($availability['true'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),

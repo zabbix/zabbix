@@ -24,6 +24,10 @@
  */
 class CAuditLog extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	/**
 	 * @var string Database table name.
 	 */

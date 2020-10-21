@@ -1521,8 +1521,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				$data['buttons'][] = (new CButton('login', _('Login')))
 					->onClick('javascript: document.location = "index.php?request='.$url.'";');
 			}
-			$data['buttons'][] = (new CButton('back', _('Go to dashboard')))
-				->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"');
+
+			$data['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+				->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"');
 		}
 		// if the user is not logged in - offer to login
 		else {

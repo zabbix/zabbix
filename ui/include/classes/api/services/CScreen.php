@@ -24,6 +24,13 @@
  */
 class CScreen extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_DASHBOARDS],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_DASHBOARDS],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_DASHBOARDS]
+	];
+
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['screenid', 'name'];

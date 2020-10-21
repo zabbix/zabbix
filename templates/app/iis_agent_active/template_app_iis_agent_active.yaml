@@ -1,0 +1,862 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:03Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'IIS by Zabbix agent active'
+      name: 'IIS by Zabbix agent active'
+      description: |
+        Get metrics from IIS using Zabbix agent running on Windows
+        
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: IIS
+      items:
+        -
+          name: 'IIS: {$IIS.PORT} port ping'
+          type: SIMPLE
+          key: 'net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}]'
+          history: 7d
+          applications:
+            -
+              name: IIS
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'IIS: Port {$IIS.PORT} is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
+                  expression: '{IIS by Zabbix agent active:service_state[W3SVC].last()}<>0'
+        -
+          name: 'IIS: Anonymous users per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of requests from users over an anonymous connection per second. Average per minute.'
+          applications:
+            -
+              name: IIS
+        -
+          name: 'IIS: Bytes Received per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Bytes Received/sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The average rate per minute at which data bytes are received by the service at the Application Layer. Does not include protocol headers or control bytes.'
+          applications:
+            -
+              name: IIS
+        -
+          name: 'IIS: Bytes Sent per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Bytes Sent/sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The average rate per minute at which data bytes are sent by the service.'
+          applications:
+            -
+              name: IIS
+        -
+          name: 'IIS: Bytes Total per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Bytes Total/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The average rate per minute of total bytes/sec transferred by the Web service (sum of bytes sent/sec and bytes received/sec).'
+          applications:
+            -
+              name: IIS
+        -
+          name: 'IIS: Method CGI requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\CGI Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of CGI requests that are simultaneously being processed by the Web service. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Connection attempts per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Connection Attempts/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The average rate per minute that connections using the Web service are being attempted. The count is the average for all Web sites combined.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method COPY requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Copy Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests made using the COPY method. Copy requests are used for copying files and directories. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Current connections'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Current Connections"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of active connections.'
+          applications:
+            -
+              name: IIS
+        -
+          name: 'IIS: Method DELETE requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the DELETE method made. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method Method GET requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests made using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method HEAD requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the HEAD method made. HEAD requests generally indicate a client is querying the state of a document they already have to see if it needs to be refreshed. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method ISAPI requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\ISAPI Extension Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of ISAPI Extension requests that are simultaneously being processed by the Web service. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Locked errors per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Locked Errors/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of errors due to requests that couldn''t be satisfied by the server because the requested document was locked. These are generally reported as an HTTP 423 error code to the client. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method LOCK requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Lock Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests made using the LOCK method. Lock requests are used to lock a file for one user so that only that user can modify the file. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method MKCOL requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Mkcol Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the MKCOL method made. Mkcol requests are used to create directories on the server. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method MOVE requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Move Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the MOVE method made. Move requests are used for moving files and directories. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: NonAnonymous users per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\NonAnonymous Users/sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of requests from users over a non-anonymous connection per second. Average per minute.'
+          applications:
+            -
+              name: IIS
+        -
+          name: 'IIS: Not Found errors per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Not Found Errors/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of errors due to requests that couldn''t be satisfied by the server because the requested document could not be found. These are generally reported to the client with HTTP error code 404. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method OPTIONS requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Options Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the OPTIONS method made. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method Total Other requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total Other Request Methods is the number of HTTP requests that are not OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, MOVE, COPY, MKCOL, PROPFIND, PROPPATCH, SEARCH, LOCK or UNLOCK methods (since service startup). Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method POST requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Rate of HTTP requests using POST method. Generally used for forms or gateway requests. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method PROPFIND requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Propfind Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the PROPFIND method made. Propfind requests retrieve property values on files and directories. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method PROPPATCH requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Proppatch Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the PROPPATCH method made. Proppatch requests set property values on files and directories. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method PUT requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the PUT method made. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method MS-SEARCH requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Search Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the MS-SEARCH method made. Search requests are used to query the server to find resources that match a set of conditions provided by the client. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Uptime'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Service Uptime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Service uptime in seconds.'
+          applications:
+            -
+              name: IIS
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'IIS: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'IIS: Total connection attempts'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Total Connection Attempts (all instances)"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total number of connections to the Web or FTP service that have been attempted since service startup. The count is the total for all Web sites or FTP sites combined.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method Total requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of all HTTP requests received. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method TRACE requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the TRACE method made. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Method TRACE requests per second'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service(_Total)\Unlock Requests/Sec", 60]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The rate of HTTP requests using the UNLOCK method made. Unlock requests are used to remove locks from files. Average per minute.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: Files cache hits percentage'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service Cache\File Cache Hits %"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The ratio of user-mode file cache hits to total cache requests (since service startup). Note: This value might be low if the Kernel URI cache hits percentage is high.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: File cache misses'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service Cache\File Cache Misses"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total number of unsuccessful lookups in the user-mode file cache since service startup.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: URIs cache hits percentage'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service Cache\URI Cache Hits %"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The ratio of user-mode URI Cache Hits to total cache requests (since service startup)'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: URI cache misses'
+          type: ZABBIX_ACTIVE
+          key: 'perf_counter_en["\Web Service Cache\URI Cache Misses"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The total number of unsuccessful lookups in the user-mode URI cache since service startup.'
+          applications:
+            -
+              name: IIS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+        -
+          name: 'IIS: World Wide Web Publishing Service (W3SVC) state'
+          type: ZABBIX_ACTIVE
+          key: 'service_state[W3SVC]'
+          history: 7d
+          description: 'The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".'
+          applications:
+            -
+              name: IIS
+          valuemap:
+            name: 'Windows service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}<>0'
+              name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
+              priority: HIGH
+              description: 'The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.'
+              dependencies:
+                -
+                  name: 'IIS: Windows process Activation Service (WAS) is not the running'
+                  expression: '{IIS by Zabbix agent active:service_state[WAS].last()}<>0'
+        -
+          name: 'IIS: Windows Process Activation Service (WAS) state'
+          type: ZABBIX_ACTIVE
+          key: 'service_state[WAS]'
+          history: 7d
+          description: 'Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.'
+          applications:
+            -
+              name: IIS
+          valuemap:
+            name: 'Windows service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}<>0'
+              name: 'IIS: Windows process Activation Service (WAS) is not the running'
+              priority: HIGH
+              description: 'Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.'
+      discovery_rules:
+        -
+          name: 'Application pools discovery'
+          type: ZABBIX_ACTIVE
+          key: 'wmi.getall[root\webAdministration, select Name from ApplicationPool]'
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#APPPOOL}'
+                value: '{$IIS.APPPOOL.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#APPPOOL}'
+                value: '{$IIS.APPPOOL.MATCHES}'
+                formulaid: B
+          item_prototypes:
+            -
+              name: 'IIS: AppPool {#APPPOOL} state'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"]'
+              history: 7d
+              description: 'The state of the application pool.'
+              application_prototypes:
+                -
+                  name: '{#APPPOOL}'
+              valuemap:
+                name: 'Application pool state'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              trigger_prototypes:
+                -
+                  expression: '{last()}<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+                  name: 'IIS: Application pool {#APPPOOL} is not in Running state'
+                  priority: HIGH
+            -
+              name: 'IIS: {#APPPOOL} Uptime'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'The web application uptime period since the last restart.'
+              application_prototypes:
+                -
+                  name: '{#APPPOOL}'
+              trigger_prototypes:
+                -
+                  expression: '{last()}<10m'
+                  name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  manual_close: 'YES'
+            -
+              name: 'IIS: AppPool {#APPPOOL} recycles'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"]'
+              history: 7d
+              description: 'The number of times the application pool has been recycled since Windows Process Activation Service (WAS) started.'
+              application_prototypes:
+                -
+                  name: '{#APPPOOL}'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+                  name: 'IIS: Application pool {#APPPOOL} has been recycled'
+                  priority: INFO
+            -
+              name: 'IIS: AppPool {#APPPOOL} current queue size'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"]'
+              delay: 30s
+              history: 7d
+              description: 'The number of requests in the queue.'
+              application_prototypes:
+                -
+                  name: '{#APPPOOL}'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              trigger_prototypes:
+                -
+                  expression: '{min({$IIS.QUEUE.MAX.TIME})}>{$IIS.QUEUE.MAX.WARN}'
+                  name: 'IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN})'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'IIS: Application pool {#APPPOOL} is not in Running state'
+                      expression: '{IIS by Zabbix agent active:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
+          lld_macro_paths:
+            -
+              lld_macro: '{#APPPOOL}'
+              path: $.Name
+      macros:
+        -
+          macro: '{$IIS.APPPOOL.MATCHES}'
+          value: .+
+          description: 'This macro is used in application pools discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$IIS.APPPOOL.MONITORED}'
+          value: '1'
+          description: 'Monitoring status for discovered application pools. Use context to avoid trigger firing for specific application pools. "1" - enabled, "0" - disabled.'
+        -
+          macro: '{$IIS.APPPOOL.NOT_MATCHES}'
+          value: '<CHANGE_IF_NEEDED>'
+          description: 'This macro is used in application pools discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$IIS.PORT}'
+          value: '80'
+          description: 'Listening port.'
+        -
+          macro: '{$IIS.QUEUE.MAX.TIME}'
+          value: 5m
+          description: 'The time during which the queue length may exceed the threshold.'
+        -
+          macro: '{$IIS.QUEUE.MAX.WARN}'
+          description: 'Maximum application pool''s request queue length for trigger expression.'
+        -
+          macro: '{$IIS.SERVICE}'
+          value: http
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/current/ru/manual/config/items/itemtypes/simple_checks'
+  graphs:
+    -
+      name: 'IIS: Cache hits percentage'
+      type: STACKED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service Cache\URI Cache Hits %"]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service Cache\File Cache Hits %"]'
+    -
+      name: 'IIS: Cache misses'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service Cache\URI Cache Misses"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service Cache\File Cache Misses"]'
+    -
+      name: 'IIS: Requests rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]'
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]'
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]'
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]'
+        -
+          sortorder: '6'
+          color: AC8C14
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]'
+        -
+          sortorder: '7'
+          color: 611F27
+          item:
+            host: 'IIS by Zabbix agent active'
+            key: 'perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]'
+  value_maps:
+    -
+      name: 'Application pool state'
+      mappings:
+        -
+          value: '1'
+          newvalue: Uninitialized
+        -
+          value: '2'
+          newvalue: Initialized
+        -
+          value: '3'
+          newvalue: Running
+        -
+          value: '4'
+          newvalue: Disabling
+        -
+          value: '5'
+          newvalue: Disabled
+        -
+          value: '6'
+          newvalue: 'Shutdown Pending'
+        -
+          value: '7'
+          newvalue: 'Delete Pending'
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
+    -
+      name: 'Windows service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Running
+        -
+          value: '1'
+          newvalue: Paused
+        -
+          value: '2'
+          newvalue: 'Start pending'
+        -
+          value: '3'
+          newvalue: 'Pause pending'
+        -
+          value: '4'
+          newvalue: 'Continue pending'
+        -
+          value: '5'
+          newvalue: 'Stop pending'
+        -
+          value: '6'
+          newvalue: Stopped
+        -
+          value: '7'
+          newvalue: Unknown
+        -
+          value: '255'
+          newvalue: 'No such service'

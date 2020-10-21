@@ -81,6 +81,13 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (!$this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)) {
+			return false;
+		}
+
 		$events = API::Event()->get([
 			'countOutput' => true,
 			'eventids' => $this->getInput('eventids'),
@@ -96,12 +103,22 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$result = false;
 		$data = null;
 
-		$this->close_problems = ($this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_CLOSE);
-		$this->change_severity = ($this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SEVERITY);
-		$this->acknowledge = ($this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
-		$this->unacknowledge = ($this->getInput('unacknowledge_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
+		$this->close_problems = $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			? ($this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_CLOSE)
+			: ZBX_PROBLEM_UPDATE_NONE;
+		$this->change_severity = $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+			? ($this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SEVERITY)
+			: ZBX_PROBLEM_UPDATE_NONE;
+		$this->acknowledge = $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+			? ($this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE)
+			: ZBX_PROBLEM_UPDATE_NONE;
+		$this->unacknowledge = $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+			? ($this->getInput('unacknowledge_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)
+			: ZBX_PROBLEM_UPDATE_NONE;
 		$this->new_severity = $this->getInput('severity', '');
-		$this->message = $this->getInput('message', '');
+		$this->message = $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			? $this->getInput('message', '')
+			: '';
 
 		$eventids = array_flip($this->getInput('eventids'));
 

@@ -1,0 +1,546 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:08Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Apache Tomcat JMX'
+      name: 'Apache Tomcat JMX'
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: http-8080
+        -
+          name: http-8443
+        -
+          name: jk-8009
+        -
+          name: Sessions
+        -
+          name: Tomcat
+      items:
+        -
+          name: 'jk-8009 bytes received per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_AJP}\"", bytesReceived]'
+          history: 1w
+          value_type: FLOAT
+          units: B
+          applications:
+            -
+              name: jk-8009
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'jk-8009 bytes sent per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_AJP}\"",bytesSent]'
+          history: 1w
+          value_type: FLOAT
+          units: B
+          applications:
+            -
+              name: jk-8009
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'jk-8009 errors per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_AJP}\"",errorCount]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: jk-8009
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'jk-8009 request processing time'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_AJP}\"",processingTime]'
+          history: 1w
+          value_type: FLOAT
+          units: s
+          applications:
+            -
+              name: jk-8009
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'jk-8009 requests per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_AJP}\"",requestCount]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: jk-8009
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 bytes received per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",bytesReceived]'
+          history: 1w
+          value_type: FLOAT
+          units: B
+          applications:
+            -
+              name: http-8443
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 bytes sent per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTPS}\"", bytesSent]'
+          history: 1w
+          value_type: FLOAT
+          units: B
+          applications:
+            -
+              name: http-8443
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 errors per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",errorCount]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: http-8443
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 request processing time'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",processingTime]'
+          history: 1w
+          value_type: FLOAT
+          units: s
+          applications:
+            -
+              name: http-8443
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 requests per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",requestCount]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: http-8443
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 bytes received per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTP}\"",bytesReceived]'
+          history: 1w
+          value_type: FLOAT
+          units: B
+          applications:
+            -
+              name: http-8080
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 bytes sent per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTP}\"",bytesSent]'
+          history: 1w
+          value_type: FLOAT
+          units: B
+          applications:
+            -
+              name: http-8080
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 errors per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTP}\"",errorCount]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: http-8080
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 request processing time'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTP}\"",processingTime]'
+          history: 1w
+          value_type: FLOAT
+          units: s
+          applications:
+            -
+              name: http-8080
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 requests per second'
+          type: JMX
+          key: 'jmx["Catalina:type=GlobalRequestProcessor,name=\"{$PROTOCOL_HANDLER_HTTP}\"",requestCount]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: http-8080
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Number of active sessions at this moment'
+          type: JMX
+          key: 'jmx["Catalina:type=Manager,context=/,host=localhost",activeSessions]'
+          history: 1w
+          applications:
+            -
+              name: Sessions
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'The maximum number of active Sessions allowed, or -1 for no limit'
+          type: JMX
+          key: 'jmx["Catalina:type=Manager,context=/,host=localhost",maxActiveSessions]'
+          delay: 1h
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Sessions
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Maximum number of active sessions so far'
+          type: JMX
+          key: 'jmx["Catalina:type=Manager,context=/,host=localhost",maxActive]'
+          history: 1w
+          applications:
+            -
+              name: Sessions
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Number of sessions we rejected due to maxActive being reached'
+          type: JMX
+          key: 'jmx["Catalina:type=Manager,context=/,host=localhost",rejectedSessions]'
+          history: 1w
+          applications:
+            -
+              name: Sessions
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Number of sessions created by this manager per second'
+          type: JMX
+          key: 'jmx["Catalina:type=Manager,context=/,host=localhost",sessionCounter]'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: Sessions
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 gzip compression'
+          type: JMX
+          key: 'jmx["Catalina:type=ProtocolHandler,port=8080",compression]'
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: http-8080
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          triggers:
+            -
+              expression: '{str(off)} = 1'
+              name: 'gzip compression is off for connector http-8080 on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'http-8443 gzip compression'
+          type: JMX
+          key: 'jmx["Catalina:type=ProtocolHandler,port=8443",compression]'
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: http-8443
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          triggers:
+            -
+              expression: '{str(off)} = 1'
+              name: 'gzip compression is off for connector http-8443 on {HOST.NAME}'
+              priority: INFO
+        -
+          name: 'Tomcat version'
+          type: JMX
+          key: 'jmx["Catalina:type=Server",serverInfo]'
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: Tomcat
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'jk-8009 threads allocated'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",currentThreadCount]'
+          history: 1w
+          applications:
+            -
+              name: jk-8009
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'jk-8009 threads busy'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",currentThreadsBusy]'
+          history: 1w
+          applications:
+            -
+              name: jk-8009
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'jk-8009 threads max'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",maxThreads]'
+          delay: 1h
+          history: 1w
+          applications:
+            -
+              name: jk-8009
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 threads allocated'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",currentThreadCount]'
+          history: 1w
+          applications:
+            -
+              name: http-8443
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 threads busy'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",currentThreadsBusy]'
+          history: 1w
+          applications:
+            -
+              name: http-8443
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8443 threads max'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",maxThreads]'
+          delay: 1h
+          history: 1w
+          applications:
+            -
+              name: http-8443
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 threads allocated'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",currentThreadCount]'
+          history: 1w
+          applications:
+            -
+              name: http-8080
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 threads busy'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",currentThreadsBusy]'
+          history: 1w
+          applications:
+            -
+              name: http-8080
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'http-8080 threads max'
+          type: JMX
+          key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",maxThreads]'
+          delay: 1h
+          history: 1w
+          applications:
+            -
+              name: http-8080
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+      macros:
+        -
+          macro: '{$PROTOCOL_HANDLER_AJP}'
+          value: ajp-nio-8009
+        -
+          macro: '{$PROTOCOL_HANDLER_HTTP}'
+          value: http-nio-8080
+        -
+          macro: '{$PROTOCOL_HANDLER_HTTPS}'
+          value: https-openssl-nio-8443
+  triggers:
+    -
+      expression: '{Apache Tomcat JMX:jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",currentThreadsBusy].last()} > ({Apache Tomcat JMX:jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",maxThreads].last()} * 0.7)'
+      name: '70% http-8080 worker threads busy on {HOST.NAME}'
+      priority: WARNING
+    -
+      expression: '{Apache Tomcat JMX:jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",currentThreadsBusy].last()} > ({Apache Tomcat JMX:jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",maxThreads].last()} * 0.7)'
+      name: '70% http-8443 worker threads busy on {HOST.NAME}'
+      priority: WARNING
+    -
+      expression: '{Apache Tomcat JMX:jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",currentThreadsBusy].last()} > ({Apache Tomcat JMX:jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",maxThreads].last()}  *0.7)'
+      name: '70% jk-8009 worker threads busy on {HOST.NAME}'
+      priority: WARNING
+  graphs:
+    -
+      name: 'http-8080 worker threads'
+      graph_items:
+        -
+          color: C80000
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",maxThreads]'
+        -
+          sortorder: '1'
+          color: 00C800
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",currentThreadsBusy]'
+        -
+          sortorder: '2'
+          color: 0000C8
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTP}\"",currentThreadCount]'
+    -
+      name: 'http-8443 worker threads'
+      graph_items:
+        -
+          color: C80000
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",maxThreads]'
+        -
+          sortorder: '1'
+          color: 00C800
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",currentThreadsBusy]'
+        -
+          sortorder: '2'
+          color: 0000C8
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_HTTPS}\"",currentThreadCount]'
+    -
+      name: 'jk-8009 worker threads'
+      graph_items:
+        -
+          color: C80000
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",maxThreads]'
+        -
+          sortorder: '1'
+          color: 00C800
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",currentThreadsBusy]'
+        -
+          sortorder: '2'
+          color: 0000C8
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=ThreadPool,name=\"{$PROTOCOL_HANDLER_AJP}\"",currentThreadCount]'
+    -
+      name: 'sessions /'
+      graph_items:
+        -
+          color: C80000
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=Manager,context=/,host=localhost",rejectedSessions]'
+        -
+          sortorder: '1'
+          color: 00C800
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=Manager,context=/,host=localhost",activeSessions]'
+        -
+          sortorder: '2'
+          color: 0000C8
+          item:
+            host: 'Apache Tomcat JMX'
+            key: 'jmx["Catalina:type=Manager,context=/,host=localhost",maxActiveSessions]'

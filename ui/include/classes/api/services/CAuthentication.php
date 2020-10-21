@@ -23,6 +23,12 @@
  * Class containing methods for operations with authentication parameters.
  */
 class CAuthentication extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	/**
 	 * @var string
 	 */

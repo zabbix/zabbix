@@ -27,10 +27,12 @@ $table = (new CTableInfo())->setNoDataMessage(_('No maps added.'));
 
 foreach ($data['maps'] as $map) {
 	$table->addRow([
-		new CLink($map['label'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'map.view')
-			->setArgument('sysmapid', $map['sysmapid'])
-		),
+		$data['allowed_ui_maps']
+			? new CLink($map['label'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'map.view')
+				->setArgument('sysmapid', $map['sysmapid'])
+			)
+			: $map['label'],
 		(new CButton())
 			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")
 			->addClass(ZBX_STYLE_REMOVE_BTN)

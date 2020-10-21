@@ -380,24 +380,28 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					}
 
 					if ($resourceid !== null) {
-						$item_graph_url = (new CUrl('zabbix.php'))
-							->setArgument('action', 'charts.view')
-							->setArgument('view_as', HISTORY_GRAPH)
-							->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-							->setArgument('filter_graphids', [$resourceid])
-							->setArgument('filter_set', '1')
-							->setArgument('from', $timeline['from'])
-							->setArgument('to', $timeline['to']);
+						$item_graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
+							? (new CUrl('zabbix.php'))
+								->setArgument('action', 'charts.view')
+								->setArgument('view_as', HISTORY_GRAPH)
+								->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+								->setArgument('filter_graphids', [$resourceid])
+								->setArgument('filter_set', '1')
+								->setArgument('from', $timeline['from'])
+								->setArgument('to', $timeline['to'])
+							: null;
 					}
 					else {
 						$item_graph_url = null;
 					}
 				}
 				else {
-					$item_graph_url = (new CUrl('history.php'))
-						->setArgument('itemids', [$resourceid])
-						->setArgument('from', $timeline['from'])
-						->setArgument('to', $timeline['to']);
+					$item_graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+						? (new CUrl('history.php'))
+							->setArgument('itemids', [$resourceid])
+							->setArgument('from', $timeline['from'])
+							->setArgument('to', $timeline['to'])
+						: null;
 				}
 			}
 		}

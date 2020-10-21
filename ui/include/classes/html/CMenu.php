@@ -187,4 +187,8 @@ class CMenu extends CTag {
 
 		return $this;
 	}
+
+	public function getMenuItems(): array {
+		return $this->menu_items;
+	}
 }

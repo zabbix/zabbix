@@ -22,6 +22,13 @@
 -- Tables must be sorted to match referential integrity rules
 --
 
+TABLE|role|roleid|ZBX_DATA
+FIELD		|roleid		|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|readonly	|t_integer	|'0'	|NOT NULL	|0
+UNIQUE		|1		|name
+
 TABLE|users|userid|ZBX_DATA
 FIELD		|userid		|t_id		|	|NOT NULL	|0
 FIELD		|alias		|t_varchar(100)	|''	|NOT NULL	|0
@@ -33,13 +40,13 @@ FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
 FIELD		|lang		|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|refresh	|t_varchar(32)	|'30s'	|NOT NULL	|0
-FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
 FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
+FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
 UNIQUE		|1		|alias
 
 TABLE|maintenances|maintenanceid|ZBX_DATA
@@ -553,7 +560,6 @@ INDEX		|1		|actionid
 
 TABLE|config|configid|ZBX_DATA
 FIELD		|configid	|t_id		|	|NOT NULL	|0
-FIELD		|refresh_unsupported|t_varchar(32)|'10m'	|NOT NULL	|ZBX_PROXY
 FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
@@ -1863,7 +1869,18 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|itemid
 
+TABLE|role_rule|role_ruleid|ZBX_DATA
+FIELD		|role_ruleid	|t_id		|	|NOT NULL	|0
+FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
+INDEX		|1		|roleid
+INDEX		|2		|value_moduleid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5010051	|5010051
+ROW		|5010067	|5010067

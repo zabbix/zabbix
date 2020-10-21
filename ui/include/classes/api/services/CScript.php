@@ -24,6 +24,15 @@
  */
 class CScript extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getscriptsbyhosts' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'execute' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EXECUTE_SCRIPTS]
+	];
+
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['scriptid', 'name'];
