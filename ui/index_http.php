@@ -68,6 +68,8 @@ if ($http_user) {
 		);
 
 		if ($user) {
+			CSessionHelper::set('sessionid', $user['sessionid']);
+
 			$redirect = array_filter([$request, $user['url'], CMenuHelper::getFirstUrl()]);
 			redirect(reset($redirect));
 		}

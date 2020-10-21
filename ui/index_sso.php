@@ -235,6 +235,8 @@ try {
 			throw new Exception(_('GUI access disabled.'));
 		}
 
+		CSessionHelper::set('sessionid', $user['sessionid']);
+
 		$redirect = array_filter([$request, $user['url'], $relay_state, CMenuHelper::getFirstUrl()]);
 		redirect(reset($redirect));
 	}

@@ -1296,10 +1296,6 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
-		if (!$sessionid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
-		}
-
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
@@ -1414,9 +1410,6 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-
-		CSessionHelper::regenerateId();
-
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
@@ -1472,9 +1465,6 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-
-		CSessionHelper::regenerateId();
-
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
@@ -1516,10 +1506,8 @@ class CUser extends CApiService {
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
 
-		// If session not created.
 		if (!$db_sessions) {
-			// After created new session return empty array.
-			return [];
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
 		$db_session = $db_sessions[0];
@@ -1727,7 +1715,7 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private static function createSession(array $db_user): array {
-		$db_user['sessionid'] = CSessionHelper::getId();
+		$db_user['sessionid'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
