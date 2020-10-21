@@ -43,36 +43,34 @@ $vertical_align_types = [
 ];
 
 /**
- * Get font selection for Combobox.
+ * Get font select element.
  *
- * @param string $name				Combobox name.
+ * @param string $name
  *
- * @return CComboBox
+ * @return CSelect
  */
-function getFontComboBox($name) {
-	return (new CComboBox($name))
-		->addItem(
-			(new COptGroup(_('Serif')))
-				->addItem(new CComboItem(0, 'Georgia'))
-				->addItem(new CComboItem(1, 'Palatino'))
-				->addItem(new CComboItem(2, 'Times New Roman'))
-		)
-		->addItem(
-			(new COptGroup(_('Sans-Serif')))
-				->addItem(new CComboItem(3, 'Arial'))
-				->addItem(new CComboItem(4, 'Arial Black'))
-				->addItem(new CComboItem(5, 'Comic Sans'))
-				->addItem(new CComboItem(6, 'Impact'))
-				->addItem(new CComboItem(7, 'Lucida Sans'))
-				->addItem(new CComboItem(8, 'Tahoma'))
-				->addItem(new CComboItem(9, 'Helvetica'))
-				->addItem(new CComboItem(10, 'Verdana'))
-		)
-		->addItem(
-			(new COptGroup(_('Monospace')))
-				->addItem(new CComboItem(11, 'Courier New'))
-				->addItem(new CComboItem(12, 'Lucida Console'))
-		);
+function createFontSelect(string $name): CSelect {
+	return (new CSelect($name))
+		->setId($name)
+		->addOptionGroup((new CSelectOptionGroup(_('Serif')))->addOptions(CSelect::createOptionsFromArray([
+			0 => 'Georgia',
+			1 => 'Palatino',
+			2 => 'Times New Roman'
+		])))
+		->addOptionGroup((new CSelectOptionGroup(_('Sans-Serif')))->addOptions(CSelect::createOptionsFromArray([
+			3 => 'Arial',
+			4 => 'Arial Black',
+			5 => 'Comic Sans',
+			6 => 'Impact',
+			7 => 'Lucida Sans',
+			8 => 'Tahoma',
+			9 => 'Helvetica',
+			10 => 'Verdana'
+		])))
+		->addOptionGroup((new CSelectOptionGroup(_('Monospace')))->addOptions(CSelect::createOptionsFromArray([
+			11 => 'Courier New',
+			12 => 'Lucida Console'
+		])));
 }
 ?>
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
@@ -335,7 +333,7 @@ function getFontComboBox($name) {
 							BR(),
 							_('Font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							getFontComboBox('font'),
+							createFontSelect('font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Font size'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -489,7 +487,7 @@ function getFontComboBox($name) {
 					->addRow((new CCheckBox('chkbox_font'))
 							->setId('chkboxFont')
 							->setLabel(_('Font')),
-						getFontComboBox('mass_font'),
+						createFontSelect('mass_font'),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_font_size'))
