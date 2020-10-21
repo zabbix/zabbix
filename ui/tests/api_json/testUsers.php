@@ -1775,7 +1775,7 @@ class testUsers extends CAPITest {
 	* @dataProvider auth_data
 	*/
 	public function testUsers_Session($data) {
-		$this->checkResult($this->callRaw($data), 'Not authorised.');
+		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
 	}
 
 	public function testUsers_Logout() {
@@ -1801,7 +1801,7 @@ class testUsers extends CAPITest {
 			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
-		$this->checkResult($this->callRaw($data), 'Not authorised.');
+		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
 	}
 
 	public static function login_data() {

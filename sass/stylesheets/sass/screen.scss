@@ -5713,12 +5713,12 @@ $browser-logos: (
 }
 
 %cursor-drag {
-	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: move; // fallback if grab cursor is unsupported
 	cursor: grab;
 }
 
 %cursor-dragging {
-	cursor: move; /* fallback if grabbing cursor is unsupported */
+	cursor: move; // fallback if grabbing cursor is unsupported
 	cursor: grabbing;
 }
 

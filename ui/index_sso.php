@@ -235,6 +235,7 @@ try {
 			throw new Exception(_('GUI access disabled.'));
 		}
 
+		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
 		API::getWrapper()->auth = CWebUser::$data['sessionid'];
 
 		$redirect = array_filter([$request, CWebUser::$data['url'], $relay_state, CMenuHelper::getFirstUrl()]);
