@@ -49,7 +49,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'refresh' =>		'db users.refresh|not_empty',
 			'rows_per_page' =>	'db users.rows_per_page',
 			'url' =>			'db users.url',
-			'roleid' =>			'db users.roleid',
+			'roleid' =>			'required|db users.roleid',
 			'form_refresh' =>	'int32'
 		];
 
