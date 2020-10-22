@@ -379,7 +379,7 @@ int	zbx_tfc_init(char **error)
 	cache->lru_head = UINT32_MAX;
 	cache->lru_tail = UINT32_MAX;
 
-	cache->slots = (zbx_tfc_slot_t *)zbx_malloc(NULL, sizeof(zbx_tfc_slot_t) * cache->slots_num);
+	cache->slots = (zbx_tfc_slot_t *)__tfc_mem_malloc_func(NULL, sizeof(zbx_tfc_slot_t) * cache->slots_num);
 	cache->free_head = UINT32_MAX;
 	cache->free_slot = 0;
 
@@ -418,6 +418,8 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 	if (NULL == cache)
 		return FAIL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " period:%d-%d", __func__, itemid, start, end);
+
 	data_local.itemid = itemid;
 	data_local.start = start;
 	data_local.end = end;
@@ -439,6 +441,8 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 		cache->misses++;
 
 	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:%p", __func__, data);
 
 	return NULL != data ? SUCCEED : FAIL;
 }
@@ -506,6 +510,11 @@ void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num)
 	zbx_tfc_data_t	*root, *data, data_local;
 	int		i, next;
 
+	if (NULL == cache)
+		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, trends_num);
+
 	data_local.start = 0;
 	data_local.end = 0;
 	data_local.function = ZBX_TREND_FUNCTION_UNKNOWN;
@@ -519,6 +528,7 @@ void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num)
 		if (NULL == (root = (zbx_tfc_data_t *)zbx_hashset_search(&cache->index, &data_local)))
 			continue;
 
+
 		for (data = &cache->slots[root->next_value].data; data != root; data = &cache->slots[next].data)
 		{
 			next = data->next_value;
@@ -531,6 +541,8 @@ void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num)
 	}
 
 	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error)
