@@ -43,6 +43,7 @@ jQuery('#month_date_type').change(function() {
 
 	jQuery('#row_timeperiod_day').toggle(value == 0);
 	jQuery('#row_timeperiod_week,#row_timeperiod_week_days').toggle(value == 1);
+	overlays_stack.end().centerDialog();
 });
 
 jQuery('#timeperiod_type').change(function() {
