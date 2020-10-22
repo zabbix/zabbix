@@ -121,9 +121,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$db_defaults = DB::getDefaults('role');
 
 		$section_labels = CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN);
-		$rules_labels = $this->getRulesLabels($section_labels);
+		$rules_labels = $this->getUiLabels($section_labels);
 		$actions_labels = CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN);
-		$module_labels = $this->getModuleLabels();
+		$module_labels = $this->getModulesLabels();
 
 		$data = [
 			'roleid' => 0,
@@ -133,17 +133,13 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'labels' => [
 				'sections' => $section_labels,
 				'rules' => $rules_labels,
-				'actions' => $actions_labels,
-				'modules' => $module_labels
+				'modules' => $module_labels,
+				'actions' => $actions_labels
 			],
 			'rules' => [
 				CRoleHelper::UI_DEFAULT_ACCESS => true,
-				CRoleHelper::MODULES_DEFAULT_ACCESS => true,
 				CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
-				CRoleHelper::API_ACCESS => true,
-				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
-				CRoleHelper::SECTION_API => [],
-				CRoleHelper::SECTION_MODULES => [],
+				CRoleHelper::MODULES_DEFAULT_ACCESS => true,
 				CRoleHelper::SECTION_UI => [
 					CRoleHelper::UI_MONITORING_DASHBOARD => true,
 					CRoleHelper::UI_MONITORING_PROBLEMS => true,
@@ -166,7 +162,11 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 					CRoleHelper::ACTIONS_CHANGE_SEVERITY => true,
 					CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => true,
 					CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => true
-				]
+				],
+				CRoleHelper::SECTION_MODULES => [],
+				CRoleHelper::API_ACCESS => true,
+				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
+				CRoleHelper::SECTION_API => []
 			]
 		];
 

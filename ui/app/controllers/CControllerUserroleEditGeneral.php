@@ -69,7 +69,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 
 		$modules = $this->getInput(CRoleHelper::SECTION_MODULES);
 		return [
-			CRoleHelper::SECTION_MODULES =>  array_map(function (string $moduleid) use ($modules): array {
+			CRoleHelper::SECTION_MODULES => array_map(function (string $moduleid) use ($modules): array {
 				return [
 					'moduleid' => $moduleid,
 					'status' => $modules[$moduleid]
@@ -108,8 +108,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		return array_column($response, 'moduleid');
 	}
 
-
-	protected function getRulesLabels(array $sections): array {
+	protected function getUiLabels(array $sections): array {
 		$rules_labels = [];
 		foreach (array_keys($sections) as $section) {
 			$rules_labels[$section] = CRoleHelper::getUiSectionRulesLabels($section, USER_TYPE_SUPER_ADMIN);
@@ -118,7 +117,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		return $rules_labels;
 	}
 
-	protected function getModuleLabels(): array {
+	protected function getModulesLabels(): array {
 		$response = API::Module()->get([
 			'output' => ['moduleid', 'relative_path'],
 			'filter' => [
@@ -153,6 +152,10 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		]);
 		$response = $response[0];
 
+		$result[CRoleHelper::UI_DEFAULT_ACCESS] = $response['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
+		$result[CRoleHelper::ACTIONS_DEFAULT_ACCESS] = $response['rules'][CRoleHelper::ACTIONS_DEFAULT_ACCESS];
+		$result[CRoleHelper::MODULES_DEFAULT_ACCESS] = $response['rules'][CRoleHelper::MODULES_DEFAULT_ACCESS];
+
 		if (count($response['rules'][CRoleHelper::SECTION_UI])) {
 			foreach ($response['rules'][CRoleHelper::SECTION_UI] as $ui_rule) {
 				$result[CRoleHelper::SECTION_UI][CRoleHelper::SECTION_UI.'.'.$ui_rule['name']] = $ui_rule['status'];
@@ -171,6 +174,9 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			}
 		}
 
+		$result[CRoleHelper::API_ACCESS] = $response['rules'][CRoleHelper::API_ACCESS];
+		$result[CRoleHelper::API_MODE] = $response['rules'][CRoleHelper::API_MODE];
+
 		if (count($response['rules'][CRoleHelper::SECTION_API])) {
 			$result[CRoleHelper::SECTION_API] = array_map(function (string $method): array {
 				return [
@@ -179,12 +185,6 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				];
 			}, $response['rules'][CRoleHelper::SECTION_API]);
 		}
-
-		$result[CRoleHelper::UI_DEFAULT_ACCESS] = $response['rules']['ui.default_access'];
-		$result[CRoleHelper::MODULES_DEFAULT_ACCESS] = $response['rules']['modules.default_access'];
-		$result[CRoleHelper::ACTIONS_DEFAULT_ACCESS] = $response['rules']['actions.default_access'];
-		$result[CRoleHelper::API_ACCESS] = $response['rules']['api.access'];
-		$result[CRoleHelper::API_MODE] = $response['rules']['api.mode'];
 
 		return $result;
 	}
@@ -217,6 +217,11 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			}
 		}
 
+		// Overwrite modules section.
+		if ($this->hasInput(CRoleHelper::SECTION_MODULES)) {
+			$data['rules'][CRoleHelper::SECTION_MODULES] = $this->getInput('modules');
+		}
+
 		// Overwrite API section.
 		if ($this->hasInput('api_access')) {
 			$data['rules'][CRoleHelper::API_ACCESS] = $this->getInput('api_access');
@@ -228,11 +233,6 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			foreach ($this->getInput('api_methods') as $method) {
 				$data['rules'][CRoleHelper::SECTION_API][] = ['id' => $method, 'name' => $method];
 			}
-		}
-
-		// Overwrite modules section.
-		if ($this->hasInput(CRoleHelper::SECTION_MODULES)) {
-			$data['rules'][CRoleHelper::SECTION_MODULES] = $this->getInput('modules');
 		}
 
 		return $data;

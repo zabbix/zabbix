@@ -32,7 +32,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'modules_default_access' => 'required|in 0,1',
 			'actions_default_access' => 'required|in 0,1',
 			'api_access' => 'required|in 0,1',
-			'api_mode' => 'in 0,1',
 			'ui_monitoring_dashboard' => 'in 0,1',
 			'ui_monitoring_problems' => 'in 0,1',
 			'ui_monitoring_hosts' => 'in 0,1',
@@ -76,6 +75,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'actions_add_problem_comments' => 'in 0,1',
 			'actions_execute_scripts' => 'in 0,1',
 			'modules' => 'array',
+			'api_mode' => 'in 0,1',
 			'api_methods' => 'array'
 		];
 
@@ -125,13 +125,13 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 					->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('User role updated'));
+			CMessageHelper::setSuccessTitle(_('User role created'));
 		}
 		else {
 			$response = new CControllerResponseRedirect(
 				(new CUrl('zabbix.php'))->setArgument('action', 'userrole.edit')
 			);
-			CMessageHelper::setErrorTitle(_('Cannot update user role'));
+			CMessageHelper::setErrorTitle(_('Cannot create user role'));
 			$response->setFormData($this->getInputAll());
 		}
 
