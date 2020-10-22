@@ -23,7 +23,12 @@
 #include "zbxtrends.h"
 #include "trends.h"
 
-static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {NULL, "not enough data", "value is too large"};
+static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
+		"unknown error",
+		NULL,
+		"not enough data",
+		"value is too large"
+};
 
 /******************************************************************************
  *                                                                            *

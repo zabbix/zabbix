@@ -23,6 +23,7 @@
 #include "dbcache.h"
 #include "zbxself.h"
 #include "proxy.h"
+#include "zbxtrends.h"
 
 #include "../vmware/vmware.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
@@ -830,6 +831,44 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		}
 
 		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
+	}
+	else if (0 == strcmp(tmp, "tfcache"))			/* zabbix[tfcache,<mode>] */
+	{
+		char		*error = NULL;
+		zbx_tfc_stats_t	stats;
+
+		if (2 < nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		tmp = get_rparam(&request, 1);
+		tmp1 = (2 == nparams ? get_rparam(&request, 5) : NULL);
+
+		if (FAIL == zbx_tfc_get_stats(&stats, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			goto out;
+		}
+
+		if (NULL == tmp1 || 0 == strcmp(tmp1, "all"))
+		{
+			SET_UI64_RESULT(result, stats.hits + stats.misses);
+		}
+		else if (0 == strcmp(tmp1, "hits"))
+		{
+			SET_UI64_RESULT(result, stats.hits);
+		}
+		else if (0 == strcmp(tmp1, "misses"))
+		{
+			SET_UI64_RESULT(result, stats.misses);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
 	}
 	else
 	{

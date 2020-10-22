@@ -37,7 +37,14 @@ int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int e
 int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 
 /* trends function cache */
-int	zbx_tfc_init(char **error);
+typedef struct
+{
+	zbx_uint64_t	hits;
+	zbx_uint64_t	misses;
+}
+zbx_tfc_stats_t;
 
+int	zbx_tfc_init(char **error);
+int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error);
 
 #endif
