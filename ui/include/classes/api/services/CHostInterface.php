@@ -890,12 +890,10 @@ class CHostInterface extends CApiService {
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
-			foreach ($interfaces_with_missing_data as $interfaceid => $tmp) {
-				if (!array_key_exists($interfaceid, $dbInterfaces)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
+			if (count($interfaces_with_missing_data) != count($dbInterfaces)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 
