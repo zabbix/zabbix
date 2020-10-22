@@ -74,9 +74,12 @@ class CControllerMacrosUpdate extends CController {
 				// Remove item from new macros array.
 				unset($macros[$idx], $db_macros[$macro['globalmacroid']]);
 
-				// If the macro is unchanged - skip it.
+				/*
+				 * If the macro is unchanged - skip it. This will not work for secret macros. API request does not
+				 * return secret macro values, so they cannot be compared. All secret macros on page will be submitted.
+				 */
 				if ($dbMacro['macro'] === $macro['macro'] && (array_key_exists('value', $dbMacro)
-							&& $dbMacro['value'] === $macro['value']) && $dbMacro['type'] === $macro['type']
+							&& $dbMacro['value'] === $macro['value']) && $dbMacro['type'] == $macro['type']
 						&& $dbMacro['description'] === $macro['description']) {
 					continue;
 				}
