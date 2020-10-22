@@ -70,10 +70,12 @@ class CSelectOption {
 	}
 
 	/**
+	 * @param bool $value
+	 *
 	 * @return self
 	 */
-	public function setDisabled(): self {
-		$this->disabled = true;
+	public function setDisabled(bool $value = true): self {
+		$this->disabled = $value;
 
 		return $this;
 	}
