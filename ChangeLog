@@ -1,3 +1,10 @@
+Changes for 5.2.0rc2
+
+Bug fixes:
+A.F....... [ZBXNEXT-6148] fixed user roles and permissions (agriscenko, gcalenko, rlataria, talbergs, vmaksimovs)
+A.F....... [ZBXNEXT-5965] fixed session id generation (ashubin, rlataria)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.0rc1
 
 New features:
