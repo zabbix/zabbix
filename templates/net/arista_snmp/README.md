@@ -24,9 +24,6 @@ No specific Zabbix configuration is required.
 |{$FAN_CRIT_STATUS} |<p>-</p> |`3` |
 |{$MEMORY.NAME.NOT_MATCHES} |<p>Filter is overriden to ignore RAM(Cache) and RAM(Buffers) memory objects.</p> |`(Buffer|Cache)` |
 |{$PSU_CRIT_STATUS} |<p>-</p> |`2` |
-|{$TEMP_CRIT_LOW} |<p>-</p> |`5` |
-|{$TEMP_CRIT} |<p>-</p> |`60` |
-|{$TEMP_WARN} |<p>-</p> |`50` |
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>-</p> |`95` |
 |{$VFS.FS.PUSED.MAX.WARN} |<p>-</p> |`90` |
 
@@ -55,8 +52,8 @@ No specific Zabbix configuration is required.
 |-----|----|-----------|----|---------------------|
 |Fans |{#SENSOR_INFO}: Fan speed |<p>MIB: ENTITY-SENSORS-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p><p>To correctly interpret the value of this object, the associated entPhySensorType,</p><p>entPhySensorScale, and entPhySensorPrecision objects must also be examined.</p> |SNMP |sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}] |
 |Fans |{#SENSOR_INFO}: Fan status |<p>MIB: ENTITY-SENSORS-MIB</p><p>The operational status of the sensor {#SENSOR_INFO}</p> |SNMP |sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}] |
-|Inventory |{#ENT_NAME}: Hardware model name |<p>MIB: ENTITY-MIB</p> |SNMP |system.hw.model[entPhysicalModelName.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Inventory |{#ENT_NAME}: Hardware serial number |<p>MIB: ENTITY-MIB</p> |SNMP |system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Inventory |{#ENT_NAME}: Hardware model name |<p>MIB: ENTITY-MIB</p> |SNMP |system.hw.model[entPhysicalModelName.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Inventory |{#ENT_NAME}: Hardware serial number |<p>MIB: ENTITY-MIB</p> |SNMP |system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Power_supply |{#ENT_NAME}: Power supply status |<p>MIB: ENTITY-STATE-MIB</p> |SNMP |sensor.psu.status[entStateOper.{#SNMPINDEX}] |
 |Temperature |{#SENSOR_INFO}: Temperature |<p>MIB: ENTITY-SENSORS-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p><p>To correctly interpret the value of this object, the associated entPhySensorType,</p><p>entPhySensorScale, and entPhySensorPrecision objects must also be examined.</p> |SNMP |sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p> |
 |Temperature |{#SENSOR_INFO}: Temperature status |<p>MIB: ENTITY-SENSORS-MIB</p><p>The operational status of the sensor {#SENSOR_INFO}</p> |SNMP |sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}] |
@@ -67,6 +64,10 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m |<p>This trigger uses fan sensor values defined in the device.</p> |`{TEMPLATE_NAME:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_WARN}` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Fan is in critical state</p><p>- {#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m</p> |
+|{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m |<p>This trigger uses fan sensor values defined in the device.</p> |`{TEMPLATE_NAME:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_CRIT}` |HIGH |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Fan is in critical state</p> |
+|{#SENSOR_INFO}: Fan speed is above the warning threshold of {#THRESHOLD_HI_WARN}rpm for 5m |<p>This trigger uses fan sensor values defined in the device.</p> |`{TEMPLATE_NAME:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_WARN}` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Fan is in critical state</p><p>- {#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m</p> |
+|{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m |<p>This trigger uses fan sensor values defined in the device.</p> |`{TEMPLATE_NAME:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_CRIT}` |HIGH |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Fan is in critical state</p> |
 |{#SENSOR_INFO}: Fan is in critical state |<p>Please check the fan unit</p> |`{TEMPLATE_NAME:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1` |AVERAGE | |
 |{#ENT_NAME}: Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {TEMPLATE_NAME:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#ENT_NAME}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[entStateOper.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1` |AVERAGE | |
