@@ -501,7 +501,7 @@ void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functi
 	UNLOCK_CACHE;
 }
 
-void	zbx_tfc_invalidate(zbx_vector_uint64_pair_t *item_clock)
+void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num)
 {
 	zbx_tfc_data_t	*root, *data, data_local;
 	int		i, next;
@@ -512,9 +512,9 @@ void	zbx_tfc_invalidate(zbx_vector_uint64_pair_t *item_clock)
 
 	LOCK_CACHE;
 
-	for (i = 0; i < item_clock->values_num; i++)
+	for (i = 0; i < trends_num; i++)
 	{
-		data_local.itemid = item_clock->values[i].first;
+		data_local.itemid = trends[i].itemid;
 
 		if (NULL == (root = (zbx_tfc_data_t *)zbx_hashset_search(&cache->index, &data_local)))
 			continue;
@@ -523,14 +523,8 @@ void	zbx_tfc_invalidate(zbx_vector_uint64_pair_t *item_clock)
 		{
 			next = data->next_value;
 
-			if (item_clock->values[i].first != data->itemid || i >= item_clock->values_num)
+			if (trends[i].clock < data->start || trends[i].clock > data->end)
 				continue;
-
-			if ((int)item_clock->values[i].second < data->start ||
-					(int)item_clock->values[i].second > data->end)
-			{
-				continue;
-			}
 
 			tfc_free_data(data);
 		}

@@ -22,6 +22,7 @@
 #define ZABBIX_ZBXTRENDS_H
 
 #include "common.h"
+#include "dbcache.h"
 
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);
 
@@ -46,5 +47,6 @@ zbx_tfc_stats_t;
 
 int	zbx_tfc_init(char **error);
 int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error);
+void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num);
 
 #endif
