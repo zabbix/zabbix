@@ -529,17 +529,19 @@ function createFontSelect(string $name): CSelect {
 					->addRow((new CCheckBox('chkbox_text_halign'))
 							->setId('chkboxTextHalign')
 							->setLabel(_('Horizontal align')),
-						new CComboBox('mass_text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
-							$horizontal_align_types
-						),
+						(new CSelect('mass_text_halign'))
+							->setId('mass_text_halign')
+							->setValue(SYSMAP_SHAPE_LABEL_HALIGN_CENTER)
+							->addOptions(CSelect::createOptionsFromArray($horizontal_align_types)),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_text_valign'))
 							->setId('chkboxTextValign')
 							->setLabel(_('Vertical align')),
-						new CComboBox('mass_text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
-							$vertical_align_types
-						),
+						(new CSelect('mass_text_valign'))
+							->setId('mass_text_valign')
+							->setValue(SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE)
+							->addOptions(CSelect::createOptionsFromArray($vertical_align_types)),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_background'))
@@ -556,7 +558,9 @@ function createFontSelect(string $name): CSelect {
 								->setAttribute('data-value', _('Border type'))
 								->setAttribute('data-value-2', _('Line type'))
 							),
-						new CComboBox('mass_border_type', null, null, $shape_border_types)
+						(new CSelect('mass_border_type'))
+							->setId('mass_border_type')
+							->addOptions(CSelect::createOptionsFromArray($shape_border_types))
 					)
 					->addRow((new CCheckBox('chkbox_border_width'))
 							->setId('chkboxBorderWidth')
@@ -634,13 +638,15 @@ function createFontSelect(string $name): CSelect {
 						(new CCheckBox('chkbox_label_location'))
 							->setId('chkboxLabelLocation')
 							->setLabel(_('Label location')),
-						(new CComboBox('label_location', null, null, [
-							MAP_LABEL_LOC_DEFAULT => _('Default'),
-							MAP_LABEL_LOC_BOTTOM => _('Bottom'),
-							MAP_LABEL_LOC_LEFT => _('Left'),
-							MAP_LABEL_LOC_RIGHT => _('Right'),
-							MAP_LABEL_LOC_TOP => _('Top')
-						]))->setId('massLabelLocation')
+						(new CSelect('label_location'))
+							->addOptions(CSelect::createOptionsFromArray([
+								MAP_LABEL_LOC_DEFAULT => _('Default'),
+								MAP_LABEL_LOC_BOTTOM => _('Bottom'),
+								MAP_LABEL_LOC_LEFT => _('Left'),
+								MAP_LABEL_LOC_RIGHT => _('Right'),
+								MAP_LABEL_LOC_TOP => _('Top')
+							]))
+							->setId('massLabelLocation')
 					)
 					->addRow(
 						(new CCheckBox('chkbox_use_iconmap'))
@@ -653,25 +659,33 @@ function createFontSelect(string $name): CSelect {
 						(new CCheckBox('chkbox_iconid_off'))
 							->setId('chkboxMassIconidOff')
 							->setLabel(_('Icon (default)')),
-						(new CComboBox('iconid_off'))->setId('massIconidOff')
+						(new CSelect('iconid_off'))
+							->setId('massIconidOff')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
 						(new CCheckBox('chkbox_iconid_on'))
 							->setId('chkboxMassIconidOn')
 							->setLabel(_('Icon (problem)')),
-						(new CComboBox('iconid_on'))->setId('massIconidOn')
+						(new CSelect('iconid_on'))
+							->setId('massIconidOn')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
 						(new CCheckBox('chkbox_iconid_maintenance'))
 							->setId('chkboxMassIconidMaintenance')
 							->setLabel(_('Icon (maintenance)')),
-						(new CComboBox('iconid_maintenance'))->setId('massIconidMaintenance')
+						(new CSelect('iconid_maintenance'))
+							->setId('massIconidMaintenance')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
 						(new CCheckBox('chkbox_iconid_disabled'))
 							->setId('chkboxMassIconidDisabled')
 							->setLabel(_('Icon (disabled)')),
-						(new CComboBox('iconid_disabled'))->setId('massIconidDisabled')
+						(new CSelect('iconid_disabled'))
+							->setId('massIconidDisabled')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -738,14 +752,20 @@ function createFontSelect(string $name): CSelect {
 							->setRows(2)
 							->setId('linklabel')
 					)
-					->addRow(_('Connect to'), (new CComboBox('selementid2')), 'link-connect-to')
-					->addRow(_('Type (OK)'),
-						(new CComboBox('drawtype', null, null, [
-							GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-							GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-							GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-							GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
-						]))
+					->addRow(new CLabel(_('Connect to'), 'label-selementid2'), (new CSelect('selementid2'))
+							->setFocusableElementId('label-selementid2')
+							->setId('selementid2'),
+						'link-connect-to'
+					)
+					->addRow(new CLabel(_('Type (OK)'), 'label-drawtype'),
+						(new CSelect('drawtype'))
+							->setFocusableElementId('label-drawtype')
+							->addOptions(CSelect::createOptionsFromArray([
+								GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
+								GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
+								GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
+								GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+							]))
 					)
 					->addRow(_('Colour (OK)'),
 						(new CColor('color', '#{color}'))->appendColorPickerJs(false)
@@ -828,12 +848,14 @@ function createFontSelect(string $name): CSelect {
 				new CVar('linktrigger_#{linktriggerid}_desc_exp', '#{desc_exp}'),
 				new CVar('linktrigger_#{linktriggerid}_triggerid', '#{triggerid}'),
 				new CVar('linktrigger_#{linktriggerid}_linktriggerid', '#{linktriggerid}'),
-				(new CComboBox('linktrigger_#{linktriggerid}_drawtype', null, null, [
-					GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-					GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-					GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-					GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
-				]))
+				(new CSelect('linktrigger_#{linktriggerid}_drawtype'))
+					->setId('linktrigger_#{linktriggerid}_drawtype')
+					->addOptions(CSelect::createOptionsFromArray([
+						GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
+						GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
+						GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
+						GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+					]))
 			],
 			(new CColor('linktrigger_#{linktriggerid}_color', '#{color}'))->appendColorPickerJs(false),
 			(new CCol(
