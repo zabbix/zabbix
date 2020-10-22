@@ -152,7 +152,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 					CRoleHelper::UI_INVENTORY_OVERVIEW => true,
 					CRoleHelper::UI_INVENTORY_HOSTS => true,
 					CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => true,
-					CRoleHelper::UI_REPORTS_TOP_TRIGGERS => true,
+					CRoleHelper::UI_REPORTS_TOP_TRIGGERS => true
 				],
 				CRoleHelper::SECTION_ACTIONS => [
 					CRoleHelper::ACTIONS_EDIT_DASHBOARDS => true,
