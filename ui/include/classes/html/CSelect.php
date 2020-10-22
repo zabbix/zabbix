@@ -111,9 +111,9 @@ class CSelect extends CTag {
 	}
 
 	/**
-	 * @return self
-	 *
 	 * @param bool $value
+	 *
+	 * @return self
 	 */
 	public function setDisabled(bool $value = true): self {
 		if ($value) {
