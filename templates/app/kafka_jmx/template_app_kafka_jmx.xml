@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-16T12:32:17Z</date>
+   <date>2020-10-22T11:21:21Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template APP Apache Kafka by JMX</template>
          <name>Template APP Apache Kafka by JMX</name>
-         <description>Official JMX Template from Apache Kafka.&#13;
+         <description>Official JMX Template for Apache Kafka.&#13;
   The metrics are collected by JMX.&#13;
   You can set {$KAFKA.USER} and {$KAFKA.PASSWORD} macros in the template for using on the host level.&#13;
 &#13;
@@ -1135,6 +1135,12 @@ Template tooling version used: 0.38</description>
                      <name>Kafka</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <triggers>
                   <trigger>
