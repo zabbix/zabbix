@@ -19,7 +19,10 @@
 **/
 
 
-class CControllerUserroleCreate extends CController {
+/**
+ * Class containing operations with userrole create form.
+ */
+class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 
 	protected function checkInput() {
 		$fields = [
@@ -29,7 +32,6 @@ class CControllerUserroleCreate extends CController {
 			'modules_default_access' => 'required|in 0,1',
 			'actions_default_access' => 'required|in 0,1',
 			'api_access' => 'required|in 0,1',
-			'api_mode' => 'required|in 0,1',
 			'ui_monitoring_dashboard' => 'in 0,1',
 			'ui_monitoring_problems' => 'in 0,1',
 			'ui_monitoring_hosts' => 'in 0,1',
@@ -73,6 +75,7 @@ class CControllerUserroleCreate extends CController {
 			'actions_add_problem_comments' => 'in 0,1',
 			'actions_execute_scripts' => 'in 0,1',
 			'modules' => 'array',
+			'api_mode' => 'in 0,1',
 			'api_methods' => 'array'
 		];
 
@@ -107,49 +110,11 @@ class CControllerUserroleCreate extends CController {
 
 	protected function doAction() {
 		$role = [
-			'name' => $this->getInput('name'),
+			'name' => trim($this->getInput('name')),
 			'type' => $this->getInput('type')
 		];
 
-		$rules = [
-			CRoleHelper::UI_DEFAULT_ACCESS => $this->getInput('ui_default_access'),
-			CRoleHelper::ACTIONS_DEFAULT_ACCESS => $this->getInput('actions_default_access'),
-			CRoleHelper::MODULES_DEFAULT_ACCESS => $this->getInput('modules_default_access'),
-		];
-
-		$rules[CRoleHelper::SECTION_UI] = array_map(function (string $rule): array {
-			return [
-				'name' => str_replace(CRoleHelper::SECTION_UI.'.', '', $rule),
-				'status' => $this->getInput(str_replace('.', '_', $rule))
-			];
-		}, CRoleHelper::getAllUiElements((int) $role['type']));
-
-		$rules[CRoleHelper::SECTION_ACTIONS] = array_map(function (string $rule): array {
-			return [
-				'name' => str_replace(CRoleHelper::SECTION_ACTIONS.'.', '', $rule),
-				'status' => $this->getInput(str_replace('.', '_', $rule))
-			];
-		}, CRoleHelper::getAllActions((int) $role['type']));
-
-		$moduelids = $this->getModuleIds();
-		if ($moduelids) {
-			$modules = $this->getInput(CRoleHelper::SECTION_MODULES);
-			$rules[CRoleHelper::SECTION_MODULES] = array_map(function (string $moduleid) use ($modules): array {
-				return [
-					'moduleid' => $moduleid,
-					'status' => $modules[$moduleid]
-				];
-			}, $moduelids);
-		}
-
-		$rules[CRoleHelper::API_ACCESS] = $this->getInput('api_access');
-		$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
-
-		if ($this->hasInput('api_methods')) {
-			$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
-		}
-
-		$role['rules'] = $rules;
+		$role['rules'] = $this->getRules((int) $role['type']);
 
 		$result = API::Role()->create($role);
 
@@ -160,31 +125,16 @@ class CControllerUserroleCreate extends CController {
 					->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('User role updated'));
+			CMessageHelper::setSuccessTitle(_('User role created'));
 		}
 		else {
 			$response = new CControllerResponseRedirect(
 				(new CUrl('zabbix.php'))->setArgument('action', 'userrole.edit')
 			);
-			CMessageHelper::setErrorTitle(_('Cannot update user role'));
+			CMessageHelper::setErrorTitle(_('Cannot create user role'));
 			$response->setFormData($this->getInputAll());
 		}
 
 		$this->setResponse($response);
-	}
-
-	private function getModuleIds(): array {
-		$response = API::Module()->get([
-			'output' => ['moduleid'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
-		]);
-
-		if (!$response) {
-			return [];
-		}
-
-		return array_column($response, 'moduleid');
 	}
 }

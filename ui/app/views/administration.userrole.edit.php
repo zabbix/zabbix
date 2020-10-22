@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->addJsFile('multiselect.js');
 $this->includeJsFile('administration.userrole.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('User roles'));
@@ -78,7 +79,10 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 		$ui[] = new CDiv(
 			(new CCheckBox(str_replace('.', '_', $rule_key), 1))
 				->setId($rule_key)
-				->setChecked(array_key_exists($rule_key, $data['rules'][CRoleHelper::SECTION_UI]) && $data['rules'][CRoleHelper::SECTION_UI][$rule_key])
+				->setChecked(
+					array_key_exists($rule_key, $data['rules'][CRoleHelper::SECTION_UI])
+					&& $data['rules'][CRoleHelper::SECTION_UI][$rule_key]
+				)
 				->setReadonly($data['readonly'])
 				->setLabel($rule_label)
 				->setUncheckedValue(0)
@@ -105,7 +109,7 @@ if (!$data['readonly']) {
 }
 
 $form_grid->addItem([
-	new CLabel(_('Default access to new UI elements'), 'ui.default_access'),
+	new CLabel(_('Default access to new UI elements'), $data['readonly'] ? '' : 'ui.default_access'),
 	(new CFormField(
 		(new CCheckBox('ui_default_access', 1))
 			->setId('ui.default_access')
@@ -125,7 +129,9 @@ $modules = [];
 foreach ($data['labels']['modules'] as $moduleid => $label) {
 	$modules[] = new CDiv(
 		(new CCheckBox(CRoleHelper::SECTION_MODULES.'['.$moduleid.']', 1))
-			->setChecked(array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true)
+			->setChecked(
+				array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true
+			)
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
@@ -155,7 +161,7 @@ else {
 
 $form_grid
 	->addItem([
-		new CLabel(_('Default access to new modules'), 'modules.default_access'),
+		new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
 		(new CFormField(
 			(new CCheckBox('modules_default_access', 1))
 				->setId('modules.default_access')
@@ -170,13 +176,14 @@ $form_grid
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	)
 	->addItem([
-		new CLabel(_('Enabled'), 'api.access'),
+		new CLabel(_('Enabled'), $data['readonly'] ? '' : 'api.access'),
 		(new CFormField(
 			(new CCheckBox('api_access', 1))
 				->setId('api.access')
 				->setChecked($data['rules'][CRoleHelper::API_ACCESS])
 				->setReadonly($data['readonly'])
 				->setUncheckedValue(0)
+				->addClass('js-userrole-apiaccess')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	])
 	->addItem([
@@ -187,32 +194,35 @@ $form_grid
 				->addValue(_('Allow list'), CRoleHelper::API_MODE_ALLOW)
 				->addValue(_('Deny list'), CRoleHelper::API_MODE_DENY)
 				->setModern(true)
-				->setReadonly($data['readonly'])
+				->setReadonly($data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS])
+				->addClass('js-userrole-apimode')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	]);
 
-if (!$data['readonly']) {
-	$form_grid->addItem(
-		(new CFormField(
-			(new CPatternSelect([
-				'name' => 'api_methods[]',
-				'object_name' => 'api_methods',
-				'data' => $data['rules'][CRoleHelper::SECTION_API],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'api_methods',
-						'srcfld1' => 'name',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
-						'user_type' => $data['type']
-					]
+$form_grid->addItem(
+	(new CFormField(
+		(new CMultiSelect([
+			'name' => 'api_methods[]',
+			'object_name' => 'api_methods',
+			'data' => $data['rules'][CRoleHelper::SECTION_API],
+			'disabled' => (bool) $data['readonly'] || !$data['rules'][CRoleHelper::API_ACCESS],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'api_methods',
+					'srcfld1' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => zbx_formatDomId('api_methods'.'[]'),
+					'user_type' => $data['type'],
+					'disable_selected' => true
 				]
-			]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
-	);
-}
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->addClass('js-userrole-ms')
+	))
+		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
+);
 
 $form_grid->addItem(
 	(new CFormField((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header')))
@@ -225,7 +235,10 @@ foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = new CDiv(
 		(new CCheckBox(str_replace('.', '_', $action), 1))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules'][CRoleHelper::SECTION_ACTIONS]) && $data['rules'][CRoleHelper::SECTION_ACTIONS][$action])
+			->setChecked(
+				array_key_exists($action, $data['rules'][CRoleHelper::SECTION_ACTIONS])
+				&& $data['rules'][CRoleHelper::SECTION_ACTIONS][$action]
+			)
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 			->setUncheckedValue(0)
@@ -239,7 +252,7 @@ $form_grid->addItem(
 );
 
 $form_grid->addItem([
-	new CLabel(_('Default access to new actions'), 'actions.default_access'),
+	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),
 	(new CFormField(
 		(new CCheckBox('actions_default_access', 1))
 			->setId('actions.default_access')
@@ -273,5 +286,3 @@ $tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_grid);
 $form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_grid));
 $widget->addItem($form);
 $widget->show();
-
-$this->addJsFile('multiselect.js');

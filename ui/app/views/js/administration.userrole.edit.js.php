@@ -24,9 +24,16 @@
  */
 ?>
 <script type="text/javascript">
-	class UserRoleCheckboxDisabler {
-		static init(elem) {
-			const readonly = <?= $this->data['readonly']; ?>;
+	class UserRoleUiManager {
+		constructor(readonly = false) {
+			this.readonly = readonly;
+		}
+
+		disableUiCheckbox() {
+			const usertype = document.querySelector('.js-userrole-usertype');
+			if (!usertype || this.readonly) {
+				return  false;
+			}
 
 			const access = {
 				'<?= CRoleHelper::UI_MONITORING_DASHBOARD; ?>': <?= USER_TYPE_ZABBIX_USER; ?>,
@@ -73,15 +80,11 @@
 				'<?= CRoleHelper::ACTIONS_EXECUTE_SCRIPTS; ?>': <?= USER_TYPE_ZABBIX_USER; ?>
 			};
 
-			if (readonly) {
-				return false;
-			}
-
 			Object.keys(access).forEach((selector) => {
 				const checkbox = document.querySelector(`[id='${selector}']`);
 				const checkbox_state = checkbox.readOnly;
 
-				if (elem.value < access[selector]) {
+				if (usertype.value < access[selector]) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;
 				}
@@ -93,15 +96,58 @@
 				}
 			});
 		}
+
+		disableApiSection() {
+			const checkbox_state = document.querySelector('.js-userrole-apiaccess').checked;
+			if (this.readonly) {
+				return false;
+			}
+
+			[...document.querySelectorAll('.js-userrole-apimode input')].map((elem) => {
+				elem.disabled = !checkbox_state;
+			});
+
+			$('#api_methods_').multiSelect(!checkbox_state ? 'disable' : 'enable');
+		}
 	}
 
 	document.addEventListener('DOMContentLoaded', () => {
+		const ui_manager = new UserRoleUiManager(<?php echo (bool) $this->data['readonly']; ?>);
 		const type_elem = document.querySelector('.js-userrole-usertype');
 
-		UserRoleCheckboxDisabler.init(type_elem);
+		if (!type_elem) {
+			return false;
+		}
 
 		type_elem.addEventListener('change', (event) => {
-			UserRoleCheckboxDisabler.init(event.currentTarget);
+			ui_manager.disableUiCheckbox();
+
+			let user_type = type_elem.options[type_elem.selectedIndex].value,
+				$api_methods = $('#api_methods_'),
+				url = $api_methods.multiSelect('getOption', 'url'),
+				popup = $api_methods.multiSelect('getOption', 'popup'),
+				pathname,
+				search;
+
+			[pathname, search] = url.split('?', 2);
+
+			let params = new URLSearchParams(search);
+			params.set('user_type', user_type);
+
+			popup.parameters.user_type = user_type
+
+			$api_methods.multiSelect('modify', {
+				url: pathname + '?' + params.toString(),
+				popup: popup
+			});
 		});
+
+		document
+			.querySelector('.js-userrole-apiaccess')
+			.addEventListener('change', (event) => {
+				ui_manager.disableApiSection();
+			});
+
+		ui_manager.disableUiCheckbox();
 	});
 </script>
