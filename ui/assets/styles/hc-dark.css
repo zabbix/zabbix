@@ -3617,9 +3617,15 @@ z-select[disabled] button,
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0 0 10px; }
+      .overlay-dialogue.modal .overlay-dialogue-controls z-select {
+        text-align: left;
+        padding: inherit; }
       .overlay-dialogue.modal .overlay-dialogue-controls li {
         display: inline;
         padding-left: 10px; }
+      .overlay-dialogue.modal .overlay-dialogue-controls z-select li {
+        display: block;
+        padding-left: 5px; }
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
