@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-// include dirname(__FILE__).'/js/conf.import.js.php';
-
 $rulesTable = (new CTable())
 	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')]);
 

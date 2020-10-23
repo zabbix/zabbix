@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/config.inc.php';
-
 class CControllerPopupImport extends CController {
 
 	protected function checkInput() {
