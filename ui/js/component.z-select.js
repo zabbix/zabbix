@@ -210,6 +210,10 @@ class ZSelect extends HTMLElement {
 		this.setAttribute('name', name);
 	}
 
+	get options() {
+		return this.getOptions();
+	}
+
 	get value() {
 		return !this._is_connected
 			? this.getAttribute('value')

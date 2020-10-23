@@ -42,6 +42,11 @@ class CSelectOption {
 	protected $extra = [];
 
 	/**
+	 * @var array
+	 */
+	protected $class_names = [];
+
+	/**
 	 * @var bool
 	 */
 	protected $disabled = false;
@@ -81,6 +86,19 @@ class CSelectOption {
 	}
 
 	/**
+	 * @param string $class_name
+	 *
+	 * @return self
+	 */
+	public function addClass(?string $class_name): self {
+		if ($class_name) {
+			$this->class_names[] = $class_name;
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Formats this object into associative array.
 	 *
 	 * @return array
@@ -93,6 +111,10 @@ class CSelectOption {
 
 		if ($this->extra) {
 			$option['extra'] = $this->extra;
+		}
+
+		if ($this->class_names) {
+			$option['class_name'] = implode(' ', $this->class_names);
 		}
 
 		if ($this->disabled) {
