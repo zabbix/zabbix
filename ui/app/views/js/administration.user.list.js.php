@@ -25,14 +25,9 @@
 ?>
 
 <script type="text/javascript">
-	jQuery(function($) {
-		const $form = $('form[name="user_form"]');
-
-		$form.find('[name="type"]').on('change', () => $form.submit());
-		$form.submit(function() {
-			$(this).trimValues(['#alias', '#name', '#surname', '#password1', '#password2', '#autologout', '#refresh',
-				'#url'
-			]);
+	$(() => {
+		$('#filter-usrgrpid').on('change', () => {
+			document.forms['main_filter'].submit();
 		});
 	});
 </script>
