@@ -380,33 +380,29 @@ class CRole extends CApiService {
 
 		$db_roles = $this->get([
 			'output' => ['roleid', 'name', 'type', 'readonly'],
+			'roleids' => array_column($roles, 'roleid'),
 			'preservekeys' => true
 		]);
-
 		$roles = $this->extendObjectsByKey($roles, $db_roles, 'roleid', ['name', 'type']);
 
-		$names = [];
-
-		foreach ($roles as $index => $role) {
-			// Check if this user role exists.
-			if (!array_key_exists($role['roleid'], $db_roles)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$db_role = $db_roles[$role['roleid']];
-
-			if ($db_role['readonly'] == 1) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Cannot update readonly user role "%1$s".', $db_role['name'])
-				);
-			}
-
-			if ($role['name'] !== $db_role['name']) {
-				$names[] = $role['name'];
-			}
+		if (array_diff(array_column($roles, 'roleid'), array_column($db_roles, 'roleid'))) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		$readonly = array_search(1, array_column($db_roles, 'readonly', 'name'));
+
+		if ($readonly !== false) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update readonly user role "%1$s".', $readonly));
+		}
+
+		$role_type = array_column($roles, 'type', 'roleid');
+
+		if (array_key_exists(static::$userData['roleid'], $role_type)
+				&& $role_type[static::$userData['type']] != static::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('User cannot change their user role type.'));
+		}
+
+		$names = array_diff(array_column($roles, 'name'), array_column($db_roles, 'name'));
 
 		if ($names) {
 			$this->checkDuplicates($names);
