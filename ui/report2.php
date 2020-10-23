@@ -186,17 +186,22 @@ else {
 	/**
 	 * Report list view (both data presentation modes).
 	 */
+
+	$select_mode = (new CSelect('mode'))
+		->setValue($report_mode)
+		->setFocusableElementId('mode')
+		->onChange('$(this).closest("form").submit()')
+		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_HOST, _('By host')))
+		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template')));
+
 	$reportWidget->setControls((new CForm('get'))
 		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
 			->addItem([
-				new CLabel(_('Mode'), 'mode'),
+				new CLabel(_('Mode'), $select_mode->getFocusableElementId()),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('mode', $report_mode, 'submit()', [
-					AVAILABILITY_REPORT_BY_HOST => _('By host'),
-					AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
-				])
+				$select_mode
 			])
 	));
 
@@ -239,12 +244,14 @@ else {
 			$data['filter']['hostids'] = 0;
 		}
 
-		$filter_hostid_combobox = (new CComboBox('filter_templateid', $data['filter']['hostids'],
-			'javascript: submit();'
-		))->addItem(0, _('all'));
+		$select_filter_hostid = (new CSelect('filter_templateid'))
+			->setValue($data['filter']['hostids'])
+			->setFocusableElementId('filter-templateid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($templates as $templateid => $template) {
-			$filter_hostid_combobox->addItem($templateid, $template['name']);
+			$select_filter_hostid->addOption(new CSelectOption($templateid, $template['name']));
 		}
 
 		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" combo box.
@@ -281,15 +288,17 @@ else {
 			$data['filter']['tpl_triggerid'] = 0;
 		}
 
-		$tpl_triggerid_combobox = (new CComboBox('tpl_triggerid', $data['filter']['tpl_triggerid'], 'javascript: submit()'))
-			->addItem(0, _('all'));
+		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
+			->setValue($data['filter']['tpl_triggerid'])
+			->setFocusableElementId('tpl-triggerid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		$tpl_triggerids = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
-			$tpl_triggerid_combobox->addItem($triggerid,
-				(($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description']
-			);
+			$label = (($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description'];
+			$select_tpl_triggerid->addOption(new CSelectOption($triggerid, $label));
 
 			$tpl_triggerids[$triggerid] = true;
 		}
@@ -307,11 +316,14 @@ else {
 			$data['filter']['hostgroupid'] = 0;
 		}
 
-		$hostgroupid_combobox = (new CComboBox('hostgroupid', $data['filter']['hostgroupid'], 'javascript: submit()'))
-			->addItem(0, _('all'));
+		$select_hostgroupid = (new CSelect('hostgroupid'))
+			->setValue($data['filter']['hostgroupid'])
+			->setFocusableElementId('hostgroupid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($host_groups as $groupid => $group) {
-			$hostgroupid_combobox->addItem($groupid, $group['name']);
+			$select_hostgroupid->addOption(new CSelectOption($groupid, $group['name']));
 		}
 
 		$hostgroupids = [];
@@ -361,19 +373,34 @@ else {
 			$triggers = [];
 		}
 
-		$filter_groupid_combobox = (new CComboBox('filter_groups', $data['filter']['groups'], 'javascript: submit();'))
+		$select_filter_groupid = (new CSelect('filter_groups'))
 			->setAttribute('autofocus', 'autofocus')
-			->addItem(0, _('all'));
+			->setValue($data['filter']['groups'])
+			->setFocusableElementId('filter-groups')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($groups as $groupid => $group) {
-			$filter_groupid_combobox->addItem($groupid, $group['name']);
+			$select_filter_groupid->addOption(new CSelectOption($groupid, $group['name']));
 		}
 
 		$filter_column
-			->addRow(_('Template group'), $filter_groupid_combobox)
-			->addRow(_('Template'), $filter_hostid_combobox)
-			->addRow(_('Template trigger'), $tpl_triggerid_combobox)
-			->addRow(_('Host group'), $hostgroupid_combobox)
+			->addRow(
+				new CLabel(_('Template group'), $select_filter_groupid->getFocusableElementId()),
+				$select_filter_groupid
+			)
+			->addRow(
+				new CLabel(_('Template'), $select_filter_hostid->getFocusableElementId()),
+				$select_filter_hostid
+			)
+			->addRow(
+				new CLabel(_('Template trigger'), $select_tpl_triggerid->getFocusableElementId()),
+				$select_tpl_triggerid
+			)
+			->addRow(
+				new CLabel(_('Host group'), $select_hostgroupid->getFocusableElementId()),
+				$select_hostgroupid
+			)
 			->addVar('filter_set', '1');
 	}
 	// Report by host.
@@ -487,6 +514,7 @@ else {
 	$page_num = getRequest('page', 1);
 	CPagerHelper::savePage($page['file'], $page_num);
 	$paging = CPagerHelper::paginate($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
+	$allowed_ui_problems = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
@@ -503,12 +531,14 @@ else {
 
 		$triggerTable->addRow([
 			$trigger['host_name'],
-			new CLink($trigger['description'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids', [$trigger['triggerid']])
-					->setArgument('filter_set', '1')
-			),
+			$allowed_ui_problems
+				? new CLink($trigger['description'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('triggerids', [$trigger['triggerid']])
+				)
+				: $trigger['description'],
 			($availability['true'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
@@ -524,8 +554,7 @@ else {
 		'domid' => 'avail_report',
 		'loadSBox' => 0,
 		'loadImage' => 0,
-		'dynamic' => 0,
-		'mainObject' => 1
+		'dynamic' => 0
 	];
 	zbx_add_post_js(
 		'timeControl.addObject("avail_report", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');'

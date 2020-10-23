@@ -129,6 +129,7 @@ class CXmlExportWriter extends CExportWriter {
 			'headers' => 'header',
 			'variables' => 'variable',
 			'query_fields' => 'query_field',
+			'parameters' => 'parameter',
 			'posts' => 'post_field',
 			'shapes' => 'shape',
 			'lines' => 'line',
@@ -138,7 +139,10 @@ class CXmlExportWriter extends CExportWriter {
 			'parameters' => 'parameter',
 			'message_templates' => 'message_template',
 			'overrides' => 'override',
-			'operations' => 'operation'
+			'operations' => 'operation',
+			'dashboards' => 'dashboard',
+			'widgets' => 'widget',
+			'fields' => 'field'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

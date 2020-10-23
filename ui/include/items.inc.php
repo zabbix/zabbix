@@ -100,7 +100,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_JMX => _('JMX agent'),
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
-		ITEM_TYPE_DEPENDENT => _('Dependent item')
+		ITEM_TYPE_DEPENDENT => _('Dependent item'),
+		ITEM_TYPE_SCRIPT => _('Script')
 	];
 
 	if ($type === null) {
@@ -266,6 +267,7 @@ function orderItemsByTrends(array &$items, $sortorder){
  * @param array  $items
  * @param int    $items['type']
  * @param string $items['delay']
+ * @param string $items['key_']
  * @param string $sortorder
  * @param array  $options
  * @param bool   $options['usermacros']
@@ -275,7 +277,8 @@ function orderItemsByDelay(array &$items, $sortorder, array $options){
 	$update_interval_parser = new CUpdateIntervalParser($options);
 
 	foreach ($items as &$item) {
-		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])) {
+		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 			$item['delay_sort'] = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -345,7 +348,7 @@ function interfaceType2str($type) {
 		INTERFACE_TYPE_AGENT => _('Agent'),
 		INTERFACE_TYPE_SNMP => _('SNMP'),
 		INTERFACE_TYPE_JMX => _('JMX'),
-		INTERFACE_TYPE_IPMI => _('IPMI'),
+		INTERFACE_TYPE_IPMI => _('IPMI')
 	];
 
 	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
@@ -390,7 +393,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'password', 'publickey', 'privatekey', 'flags', 'description', 'inventory_link', 'jmx_endpoint',
 			'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes', 'follow_redirects',
 			'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file',
-			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -560,7 +563,7 @@ function copyItems($srcHostId, $dstHostId) {
 			'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 			'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-			'allow_traps'
+			'allow_traps', 'parameters'
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -902,10 +905,11 @@ function getItemParentTemplates(array $items, $flag) {
  * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
 		return null;
 	}
@@ -916,7 +920,7 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 
 	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
-	if ($template['permission'] == PERM_READ_WRITE) {
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
 			$url = (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
@@ -949,16 +953,17 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
  * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
+function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($itemid, $parent_templates['links'])) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
 				$url = (new CUrl('host_discovery.php'))
 					->setArgument('form', 'update')
@@ -1237,6 +1242,59 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 }
 
 /**
+ * Prepares interfaces select element with options.
+ *
+ * @param array $interfaces
+ *
+ * @return CSelect
+ */
+function getInterfaceSelect(array $interfaces): CSelect {
+	$interface_select = new CSelect('interfaceid');
+
+	/** @var CSelectOption[] $options_by_type */
+	$options_by_type = [];
+
+	foreach ($interfaces as $interface) {
+		$label = $interface['useip']
+			? $interface['ip'].' : '.$interface['port']
+			: $interface['dns'].' : '.$interface['port'];
+
+		$option = new CSelectOption($interface['interfaceid'], $label);
+
+		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			$version = $interface['details']['version'];
+			if ($version == SNMP_V3) {
+				$option->setExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
+					_('Context name'), $interface['details']['contextname']
+				));
+			} else {
+				$option->setExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
+					_x('Community', 'SNMP Community'), $interface['details']['community']
+				));
+			}
+		}
+
+		$options_by_type[$interface['type']][] = $option;
+	}
+
+	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+		if (array_key_exists($interface_type, $options_by_type)) {
+			$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
+
+			if ($interface_type == INTERFACE_TYPE_SNMP) {
+				$interface_group->setOptionTemplate('#{label}'.(new CDiv('#{description}'))->addClass('description'));
+			}
+
+			$interface_group->addOptions($options_by_type[$interface_type]);
+
+			$interface_select->addOptionGroup($interface_group);
+		}
+	}
+
+	return $interface_select;
+}
+
+/**
  * @param array $item
  * @param array $trigger
  *
@@ -1259,11 +1317,13 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 		$value = formatHistoryValue($item['value'], $item);
 	}
 
-	return (new CCol([$value, $ack]))
+	$col = (new CCol([$value, $ack]))
 		->addClass($css)
+		->addClass(ZBX_STYLE_NOWRAP)
 		->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->addClass(ZBX_STYLE_NOWRAP);
+		->addClass(ZBX_STYLE_CURSOR_POINTER);
+
+	return $col;
 }
 
 /**
@@ -1671,6 +1731,8 @@ function httpItemExists($items) {
 
 function getParamFieldNameByType($itemType) {
 	switch ($itemType) {
+		case ITEM_TYPE_SCRIPT:
+			return 'script';
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:
@@ -1686,6 +1748,8 @@ function getParamFieldNameByType($itemType) {
 
 function getParamFieldLabelByType($itemType) {
 	switch ($itemType) {
+		case ITEM_TYPE_SCRIPT:
+			return _('Script');
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:
@@ -1805,6 +1869,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 		ZBX_PREPROC_ERROR_FIELD_REGEX => [
 			'group' => _('Validation'),
 			'name' => _('Check for error using regular expression')
+		],
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED => [
+			'group' => _('Validation'),
+			'name' => _('Check for not supported value')
 		],
 		ZBX_PREPROC_THROTTLE_VALUE => [
 			'group' => _('Throttling'),

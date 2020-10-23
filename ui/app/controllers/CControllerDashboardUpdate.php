@@ -19,23 +19,15 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
-
 class CControllerDashboardUpdate extends CController {
 
 	private $widgets;
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->widgets = [];
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'dashboardid' => 'db dashboard.dashboardid',
-			'userid' => 'db dashboard.userid',
-			'name' => 'db dashboard.name|not_empty',
+			'userid' => 'required|db dashboard.userid',
+			'name' => 'required|db dashboard.name|not_empty',
 			'widgets' => 'array',
 			'sharing' => 'array'
 		];
@@ -43,147 +35,33 @@ class CControllerDashboardUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			/*
-			 * @var array  $sharing
-			 * @var int    $sharing['private']
-			 * @var array  $sharing['users']
-			 * @var array  $sharing['users'][]['userid']
-			 * @var array  $sharing['users'][]['permission']
-			 * @var array  $sharing['userGroups']
-			 * @var array  $sharing['userGroups'][]['usrgrpid']
-			 * @var array  $sharing['userGroups'][]['permission']
-			 */
-			$sharing = $this->getInput('sharing', []);
+			$sharing_errors = $this->validateSharing();
+			[
+				'widgets' => $this->widgets,
+				'errors' => $widgets_errors
+			] = CDashboardHelper::validateWidgets($this->getInput('widgets', []), null);
 
-			if ($sharing) {
-				if (!array_key_exists('private', $sharing)) {
-					error(_s('Invalid parameter "%1$s": %2$s.', 'sharing',
-						_s('the parameter "%1$s" is missing', 'private')
-					));
-					$ret = false;
-				}
+			$errors = array_merge($sharing_errors, $widgets_errors);
 
-				if (array_key_exists('users', $sharing) && $sharing['users']) {
-					foreach ($sharing['users'] as $index => $user) {
-						if (!array_key_exists('userid', $user)) {
-							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[users]['.$index.']',
-								_s('the parameter "%1$s" is missing', 'userid')
-							));
-							$ret = false;
-						}
-
-						if (!array_key_exists('permission', $user)) {
-							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[users]['.$index.']',
-								_s('the parameter "%1$s" is missing', 'permission')
-							));
-							$ret = false;
-						}
-					}
-				}
-
-				if (array_key_exists('userGroups', $sharing) && $sharing['userGroups']) {
-					foreach ($sharing['userGroups'] as $index => $usergrp) {
-						if (!array_key_exists('usrgrpid', $usergrp)) {
-							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[userGroups]['.$index.']',
-								_s('the parameter "%1$s" is missing', 'usrgrpid')
-							));
-							$ret = false;
-						}
-
-						if (!array_key_exists('permission', $usergrp)) {
-							error(_s('Invalid parameter "%1$s": %2$s.', 'sharing[userGroups]['.$index.']',
-								_s('the parameter "%1$s" is missing', 'permission')
-							));
-							$ret = false;
-						}
-					}
-				}
+			foreach ($errors as $error) {
+				error($error);
 			}
 
-			/*
-			 * @var array  $widgets
-			 * @var string $widget[]['widgetid']        (optional)
-			 * @var array  $widget[]['pos']             (optional)
-			 * @var int    $widget[]['pos']['x']
-			 * @var int    $widget[]['pos']['y']
-			 * @var int    $widget[]['pos']['width']
-			 * @var int    $widget[]['pos']['height']
-			 * @var string $widget[]['type']
-			 * @var string $widget[]['name']
-			 * @var string $widget[]['fields']          (optional) JSON object
-			 */
-			foreach ($this->getInput('widgets', []) as $index => $widget) {
-				if (!array_key_exists('pos', $widget)) {
-					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-						_s('the parameter "%1$s" is missing', 'pos')
-					));
-					$ret = false;
-				}
-				else {
-					foreach (['x', 'y', 'width', 'height'] as $field) {
-						if (!array_key_exists($field, $widget['pos'])) {
-							error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.'][pos]',
-								_s('the parameter "%1$s" is missing', $field)
-							));
-							$ret = false;
-						}
-					}
-				}
-
-				if (!array_key_exists('type', $widget)) {
-					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-						_s('the parameter "%1$s" is missing', 'type')
-					));
-					$ret = false;
-					break;
-				}
-
-				if (!array_key_exists('name', $widget)) {
-					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-						_s('the parameter "%1$s" is missing', 'name')
-					));
-					$ret = false;
-				}
-
-				if (!array_key_exists('view_mode', $widget)) {
-					error(_s('Invalid parameter "%1$s": %2$s.', 'widgets['.$index.']',
-						_s('the parameter "%1$s" is missing', 'view_mode')
-					));
-					$ret = false;
-					break;
-				}
-
-				$widget['fields'] = array_key_exists('fields', $widget) ? $widget['fields'] : '{}';
-				$widget['form'] = CWidgetConfig::getForm($widget['type'], $widget['fields']);
-				unset($widget['fields']);
-
-				if ($errors = $widget['form']->validate()) {
-					$widget_name = (array_key_exists('name', $widget) && $widget['name'] === '')
-						? CWidgetConfig::getKnownWidgetTypes()[$widget['type']]
-						: $widget['name'];
-
-					error_group(['header' => _s('Cannot save widget "%1$s".', $widget_name), 'msgs' => $errors]);
-
-					$ret = false;
-				}
-
-				$this->widgets[] = $widget;
-			}
+			$ret = !$errors;
 		}
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+			$this->setResponse(new CControllerResponseData([
+				'main_block' => json_encode(['errors' => getMessages()->toString()])
+			]));
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+				&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 	}
 
 	protected function doAction() {
@@ -199,12 +77,10 @@ class CControllerDashboardUpdate extends CController {
 			$dashboard['dashboardid'] = $this->getInput('dashboardid');
 		}
 
-		$sharing = $this->getInput('sharing', []);
+		if ($this->hasInput('sharing')) {
+			$sharing = $this->getInput('sharing');
 
-		if ($sharing) {
-			if (array_key_exists('private', $sharing)) {
-				$dashboard['private'] = $sharing['private'];
-			}
+			$dashboard['private'] = $sharing['private'];
 
 			if (array_key_exists('users', $sharing)) {
 				$dashboard['users'] = $sharing['users'];
@@ -216,13 +92,7 @@ class CControllerDashboardUpdate extends CController {
 		}
 
 		foreach ($this->widgets as $widget) {
-			$upd_widget = [];
-			if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
-					&& array_key_exists('dashboardid', $dashboard)) {
-				$upd_widget['widgetid'] = $widget['widgetid'];
-			}
-
-			$upd_widget += [
+			$save_widget = [
 				'x' => $widget['pos']['x'],
 				'y' => $widget['pos']['y'],
 				'width' => $widget['pos']['width'],
@@ -233,7 +103,12 @@ class CControllerDashboardUpdate extends CController {
 				'fields' => $widget['form']->fieldsToApi()
 			];
 
-			$dashboard['widgets'][] = $upd_widget;
+			if (array_key_exists('widgetid', $widget) // widgetid exist during clone action also
+					&& array_key_exists('dashboardid', $dashboard)) {
+				$save_widget['widgetid'] = $widget['widgetid'];
+			}
+
+			$dashboard['widgets'][] = $save_widget;
 		}
 
 		if (array_key_exists('dashboardid', $dashboard)) {
@@ -246,6 +121,7 @@ class CControllerDashboardUpdate extends CController {
 			$message = _('Dashboard created');
 			$error_msg = _('Failed to create dashboard');
 		}
+
 		if ($result) {
 			$data['redirect'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
@@ -265,5 +141,59 @@ class CControllerDashboardUpdate extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+	}
+
+	/**
+	 * Validate sharing input parameters.
+	 *
+	 * @var array  $sharing
+	 * @var int    $sharing['private']
+	 * @var array  $sharing['users']
+	 * @var array  $sharing['users'][]['userid']
+	 * @var array  $sharing['users'][]['permission']
+	 * @var array  $sharing['userGroups']
+	 * @var array  $sharing['userGroups'][]['usrgrpid']
+	 * @var array  $sharing['userGroups'][]['permission']
+	 *
+	 * @return array  Validation errors.
+	 */
+	protected function validateSharing(): array {
+		$errors = [];
+
+		if ($this->hasInput('sharing')) {
+			$sharing = $this->getInput('sharing');
+
+			if (!is_array($sharing) || !array_key_exists('private', $sharing)) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', 'sharing',
+					_s('the parameter "%1$s" is missing', 'private')
+				);
+			}
+
+			if (array_key_exists('users', $sharing) && is_array($sharing['users'])) {
+				foreach ($sharing['users'] as $index => $user) {
+					foreach (['userid', 'permission'] as $field) {
+						if (!array_key_exists($field, $user)) {
+							$errors[] = _s('Invalid parameter "%1$s": %2$s.', 'sharing[users]['.$index.']',
+								_s('the parameter "%1$s" is missing', $field)
+							);
+						}
+					}
+				}
+			}
+
+			if (array_key_exists('userGroups', $sharing) && is_array($sharing['userGroups'])) {
+				foreach ($sharing['userGroups'] as $index => $user_group) {
+					foreach (['usrgrpid', 'permission'] as $field) {
+						if (!array_key_exists($field, $user_group)) {
+							$errors[] = _s('Invalid parameter "%1$s": %2$s.', 'sharing[userGroups]['.$index.']',
+								_s('the parameter "%1$s" is missing', $field)
+							);
+						}
+					}
+				}
+			}
+		}
+
+		return $errors;
 	}
 }

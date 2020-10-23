@@ -33,9 +33,8 @@ typedef struct
 	const char		*error;
 	const char		*correlation_tag;
 	const char		*opdata;
+	const char		*event_name;
 	int			lastchange;
-	int			nextcheck;		/* time of next trigger recalculation,    */
-							/* valid for triggers with time functions */
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -46,7 +45,6 @@ typedef struct
 	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines      */
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
-	unsigned char		timer;			/* see ZBX_TRIGGER_TIMER_* defines       */
 
 	zbx_vector_ptr_t	tags;
 }
@@ -68,7 +66,9 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
-	unsigned char	timer;
+	int		revision;
+	int		timer_revision;
+	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
 
@@ -136,6 +136,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*units;
 	unsigned char	trends;
+	int		trends_sec;
 }
 ZBX_DC_NUMITEM;
 
@@ -273,6 +274,15 @@ typedef struct
 	unsigned char	allow_traps;
 }
 ZBX_DC_HTTPITEM;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	const char		*script;
+	const char		*timeout;
+	zbx_vector_ptr_t	params;
+}
+ZBX_DC_SCRIPTITEM;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
@@ -537,7 +547,6 @@ typedef struct
 	const char	*instanceid;
 	zbx_uint64_t	discovery_groupid;
 	int		default_inventory_mode;
-	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
 	const char	*default_timezone;
@@ -711,6 +720,15 @@ zbx_dc_preproc_op_t;
 
 typedef struct
 {
+	zbx_uint64_t	item_script_paramid;
+	zbx_uint64_t	itemid;
+	const char	*name;
+	const char	*value;
+}
+zbx_dc_scriptitem_param_t;
+
+typedef struct
+{
 	zbx_uint64_t		maintenanceid;
 	unsigned char		type;
 	unsigned char		tags_evaltype;
@@ -765,6 +783,7 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
+	int			sync_start_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 
@@ -795,6 +814,7 @@ typedef struct
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
 	zbx_hashset_t		httpitems;
+	zbx_hashset_t		scriptitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -832,6 +852,7 @@ typedef struct
 	zbx_vector_ptr_t	hostgroups_name;	/* host groups sorted by name */
 	zbx_vector_ptr_t	kvs_paths;
 	zbx_hashset_t		preprocops;
+	zbx_hashset_t		itemscript_params;
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;
@@ -842,7 +863,7 @@ typedef struct
 	zbx_hashset_t		data_sessions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
-	zbx_binary_heap_t	timer_queue;
+	zbx_binary_heap_t	trigger_queue;
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;

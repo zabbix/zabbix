@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/../include/CTest.php';
 require_once dirname(__FILE__).'/../../include/db.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/db/DBException.php';
 
 class makeSqlTest extends CTest {
 
@@ -78,11 +79,11 @@ class makeSqlTest extends CTest {
 					'output' => ['userid'],
 					'filter' => [
 						'userid' => [2],
-						'type' => [0, 1]
+						'roleid' => [3, 4]
 					]
 				],
-				'SELECT userid FROM users WHERE userid=2 AND type IN (0,1)',
-				'SELECT userid FROM users WHERE userid=2 AND type IN (0,1)'
+				'SELECT userid FROM users WHERE userid=2 AND roleid IN (3,4)',
+				'SELECT userid FROM users WHERE userid=2 AND roleid IN (3,4)'
 			]
 		];
 	}

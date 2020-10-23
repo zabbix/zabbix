@@ -35,7 +35,6 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'surname' =>		'db users.surname',
 			'password1' =>		'required|string',
 			'password2' =>		'required|string',
-			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>	'required|array_id|not_empty',
 			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
@@ -46,13 +45,14 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'url' =>			'db users.url',
 			'refresh' =>		'required|db users.refresh|not_empty',
 			'rows_per_page' =>	'required|db users.rows_per_page',
+			'roleid' =>			'required|db users.roleid',
 			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword()) {
+		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
 			$error = self::VALIDATION_ERROR;
 			$ret = false;
 		}
@@ -76,14 +76,14 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS);
 	}
 
 	protected function doAction() {
 		$user = [];
 
 		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
-			'rows_per_page', 'lang', 'type', 'timezone'
+			'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups'), 'usrgrpid');
 

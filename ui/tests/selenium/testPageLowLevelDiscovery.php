@@ -116,7 +116,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
 
-		// Check that filtered count mathces expected.
+		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
 		$this->assertRowCount(1);
 
@@ -274,9 +274,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Virtualization'
+						'Host groups' => 'Templates/Server hardware'
 					],
-					'rows' => 8
+					'rows' => 39
 				]
 			],
 			[
@@ -402,9 +402,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Block devices discovery',
-						'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
-						'Template Module Linux network interfaces by Zabbix agent: Network interface discovery'
+						'Linux block devices by Zabbix agent: Block devices discovery',
+						'Linux filesystems by Zabbix agent: Mounted filesystem discovery',
+						'Linux network interfaces by Zabbix agent: Network interface discovery'
 					]
 				]
 			],
@@ -415,7 +415,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Block devices discovery'
+						'Linux block devices by Zabbix agent: Block devices discovery'
 					]
 				]
 			],

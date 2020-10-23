@@ -568,7 +568,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'checkbox' => true,
 					'hostgroup' => 'Virtual machines',
 					'group_prototype' => 'New test {#MACRO}',
-					'template' => 'Template OS Windows by Zabbix agent',
+					'template' => 'Windows by Zabbix agent',
 					'inventory' => 'Automatic'
 				]
 			],
@@ -835,7 +835,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Clone_6 of Host prototype {#1}',
-					'template' => 'Template OS Mac OS X'
+					'template' => 'Mac OS X'
 				]
 			],
 			[

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 
 	public static function allValues() {
-		return CDBHelper::getDataProvider('SELECT refresh_unsupported, snmptrap_logging FROM config ORDER BY configid');
+		return CDBHelper::getDataProvider('SELECT snmptrap_logging FROM config ORDER BY configid');
 	}
 
 	public static function allGroups() {
@@ -45,7 +45,6 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=miscconfig.edit');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
-		$this->zbxTestAssertElementValue('refresh_unsupported', $allValues['refresh_unsupported']);
 
 		// checkbox "snmptrap_logging"
 		if ($allValues['snmptrap_logging']) {
@@ -54,7 +53,6 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		if ($allValues['snmptrap_logging']==0) {
 			$this->assertFalse($this->zbxTestCheckboxSelected('snmptrap_logging'));
 
-			$this->zbxTestAssertElementPresentId('refresh_unsupported');
 			$this->zbxTestAssertElementPresentId('snmptrap_logging');
 			$this->zbxTestAssertElementPresentId('default_inventory_mode');
 
@@ -78,8 +76,6 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 
-		$this->zbxTestInputType('refresh_unsupported', '700');
-
 		$form = $this->query('name:otherForm')->waitUntilPresent()->asForm()->one();
 		$form->fill(
 			[
@@ -91,8 +87,6 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
-		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='700'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=1';
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 
@@ -100,7 +94,6 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Other configuration parameters');
 
 		// trying to enter max possible value
-		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '86400');
 		$form->invalidate();
 		$form->checkValue(
 			[
@@ -112,17 +105,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
-		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='86400'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=0';
 		$this->assertEquals(1, CDBHelper::getCount($sql));
-
-		// trying to enter value > max_value
-		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestCheckHeader('Other configuration parameters');
-		$this->zbxTestInputTypeOverwrite('refresh_unsupported', '86401');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
-		$this->zbxTestTextPresent('Incorrect value for field "refresh_unsupported": value must be one of 0-86400.');
 	}
 }

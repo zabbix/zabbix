@@ -27,62 +27,41 @@ class CControllerDashboardPropertiesCheck extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>		'required|db dashboard.dashboardid',
-			'userid'	  =>		'required|db users.userid',
-			'name'		  =>		'string|not_empty'
+			'template' => 'in 1',
+			'userid' => 'db users.userid',
+			'name' => 'required|db dashboard.name|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
 
+		if (!$this->hasInput('template') && !$this->hasInput('userid')) {
+			error(_s('Field "%1$s" is mandatory.', 'userid'));
+
+			$ret = false;
+		}
+
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
-				]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseData([
+				'main_block' => json_encode(['errors' => getMessages()->toString()])
+			]));
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return true;
+		if ($this->hasInput('template')) {
+			return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
+		}
+		else {
+			return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		}
 	}
 
 	protected function doAction() {
-		// Dashboard with ID 0 is considered as newly created dashboard.
-		if ($this->getInput('dashboardid') != 0) {
-			$dashboards = API::Dashboard()->get([
-				'output' => [],
-				'dashboardids' => $this->getInput('dashboardid'),
-				'editable' => true
-			]);
+		$data = [];
 
-			if (!$dashboards) {
-				error(_('No permissions to referred object or it does not exist!'));
-			}
-		}
-
-		if (!hasErrorMesssages() && $this->getUserType() == USER_TYPE_SUPER_ADMIN) {
-			$users = API::User()->get([
-				'output' => [],
-				'userids' => $this->getInput('userid')
-			]);
-
-			if (!$users) {
-				error(_s('User with ID "%1$s" is not available.', $this->getInput('userid')));
-			}
-		}
-
-		$output = [];
-		if (($messages = getMessages()) !== null) {
-			$output = [
-				'errors' => $messages->toString()
-			];
-		}
-
-		$this->setResponse(
-			(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-		);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }

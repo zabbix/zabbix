@@ -46,7 +46,7 @@ class CControllerWebView extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
 	}
 
 	protected function doAction() {

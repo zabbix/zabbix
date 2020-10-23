@@ -129,7 +129,8 @@ static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
 
 	*user_timezone = NULL;
 
-	result = DBselect("select type,timezone from users where userid=" ZBX_FS_UI64, userid);
+	result = DBselect("select r.type,u.timezone from users u,role r where u.roleid=r.roleid and"
+			" userid=" ZBX_FS_UI64, userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 	{

@@ -44,7 +44,7 @@ class CControllerDiscoveryView extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DISCOVERY);
 	}
 
 	protected function doAction() {

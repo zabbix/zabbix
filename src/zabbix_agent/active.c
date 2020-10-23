@@ -34,6 +34,7 @@
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -102,14 +103,6 @@ static void	free_active_metrics(void)
 }
 #endif
 
-static int	metric_ready_to_process(const ZBX_ACTIVE_METRIC *metric)
-{
-	if (ITEM_STATE_NOTSUPPORTED == metric->state && 0 == metric->refresh_unsupported)
-		return FAIL;
-
-	return SUCCEED;
-}
-
 static int	get_min_nextcheck(void)
 {
 	int	i, min = -1;
@@ -119,9 +112,6 @@ static int	get_min_nextcheck(void)
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
 		const ZBX_ACTIVE_METRIC	*metric = (const ZBX_ACTIVE_METRIC *)active_metrics.values[i];
-
-		if (SUCCEED != metric_ready_to_process(metric))
-			continue;
 
 		if (metric->nextcheck < min || -1 == min)
 			min = metric->nextcheck;
@@ -178,15 +168,6 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->refresh = refresh;
 		}
 
-		if (ITEM_STATE_NOTSUPPORTED == metric->state)
-		{
-			/* Currently receiving list of active checks works as a signal to refresh unsupported */
-			/* items. Hopefully in the future this will be controlled by server (ZBXNEXT-2633). */
-			metric->refresh_unsupported = 1;
-			metric->start_time = 0.0;
-			metric->processed_bytes = 0;
-		}
-
 		goto out;
 	}
 
@@ -198,7 +179,6 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->refresh = refresh;
 	metric->nextcheck = 0;
 	metric->state = ITEM_STATE_NORMAL;
-	metric->refresh_unsupported = 0;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
 	/* existing log[], log.count[] and eventlog[] data can be skipped */
@@ -1173,9 +1153,6 @@ static void	process_active_checks(char *server, unsigned short port)
 		if (metric->nextcheck > now)
 			continue;
 
-		if (SUCCEED != metric_ready_to_process(metric))
-			continue;
-
 		/* for meta information update we need to know if something was sent at all during the check */
 		lastlogsize_last = metric->lastlogsize;
 		mtime_last = metric->mtime;
@@ -1206,9 +1183,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
 
 			metric->state = ITEM_STATE_NOTSUPPORTED;
-			metric->refresh_unsupported = 0;
 			metric->error_count = 0;
-			metric->start_time = 0.0;
 			metric->processed_bytes = 0;
 
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
@@ -1230,7 +1205,6 @@ static void	process_active_checks(char *server, unsigned short port)
 				{
 					/* item became supported */
 					metric->state = ITEM_STATE_NORMAL;
-					metric->refresh_unsupported = 0;
 				}
 
 				if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state,
@@ -1298,6 +1272,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
+	CONFIG_HOSTNAME = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->hostname);
 
 	zbx_free(args);
 

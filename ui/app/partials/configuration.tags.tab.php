@@ -42,6 +42,8 @@ $table = (new CTable())
 		$show_inherited_tags ? _('Parent templates') : null
 	]);
 
+$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
 // fields
 foreach ($data['tags'] as $i => $tag) {
 	if (!array_key_exists('type', $tag)) {
@@ -88,7 +90,7 @@ foreach ($data['tags'] as $i => $tag) {
 			CArrayHelper::sort($tag['parent_templates'], ['name']);
 
 			foreach ($tag['parent_templates'] as $templateid => $template) {
-				if ($template['permission'] == PERM_READ_WRITE) {
+				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
 					$template_list[] = (new CLink($template['name'],
 						(new CUrl('templates.php'))
 							->setArgument('form', 'update')

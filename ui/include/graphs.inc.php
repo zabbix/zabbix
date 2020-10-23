@@ -286,10 +286,11 @@ function getGraphParentTemplates(array $graphs, $flag) {
  * @param string $graphid
  * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
  * @param int    $flag              Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag) {
+function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($graphid, $parent_templates['links'])) {
 		return null;
 	}
@@ -300,7 +301,7 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag) {
 
 	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
-	if ($template['permission'] == PERM_READ_WRITE) {
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$url = (new CUrl('graphs.php'));
 
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
@@ -328,16 +329,17 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag) {
  * @param string $graphid
  * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag) {
+function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($graphid, $parent_templates['links'])) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$url = (new CUrl('graphs.php'))->setArgument('form', 'update');
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {

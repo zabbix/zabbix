@@ -695,7 +695,7 @@ class testUserGroup extends CAPITest {
 				'method' => 'usergroup.create',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => ['name' => 'API user group create as admin user'],
-				'expected_error' => 'Only Super Admins can create user groups.'
+				'expected_error' => 'No permissions to call "usergroup.create".'
 			],
 			[
 				'method' => 'usergroup.update',
@@ -704,19 +704,19 @@ class testUserGroup extends CAPITest {
 					'usrgrpid' => '13',
 					'name' => 'API user group update as admin user without peremissions'
 				],
-				'expected_error' => 'Only Super Admins can update user groups.'
+				'expected_error' => 'No permissions to call "usergroup.update".'
 			],
 			[
 				'method' => 'usergroup.delete',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => ['16'],
-				'expected_error' => 'Only Super Admins can delete user groups.'
+				'expected_error' => 'No permissions to call "usergroup.delete".'
 			],
 			[
 				'method' => 'usergroup.create',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => ['name' => 'API host group create as zabbix user'],
-				'expected_error' => 'Only Super Admins can create user groups.'
+				'expected_error' => 'No permissions to call "usergroup.create".'
 			],
 			[
 				'method' => 'usergroup.update',
@@ -725,13 +725,13 @@ class testUserGroup extends CAPITest {
 					'usrgrpid' => '13',
 					'name' => 'API user group update as zabbix user without peremissions'
 				],
-				'expected_error' => 'Only Super Admins can update user groups.'
+				'expected_error' => 'No permissions to call "usergroup.update".'
 			],
 			[
 				'method' => 'usergroup.delete',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => ['16'],
-				'expected_error' => 'Only Super Admins can delete user groups.'
+				'expected_error' => 'No permissions to call "usergroup.delete".'
 			],
 		];
 	}

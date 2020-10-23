@@ -758,6 +758,21 @@ class CScreenProblem extends CScreenBase {
 		$this->dataId = 'problem';
 
 		$url = (new CUrl('zabbix.php'))->setArgument('action', 'problem.view');
+		$args = [
+			'sort' => $this->data['sort'],
+			'sortorder' => $this->data['sortorder']
+		] + $this->data['filter'];
+
+		if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+			$args['from'] = $this->timeline['from'];
+			$args['to'] = $this->timeline['to'];
+		}
+
+		if (array_key_exists('severities', $args)) {
+			$args['severities'] = array_combine($args['severities'], $args['severities']);
+		}
+
+		array_map([$url, 'setArgument'], array_keys($args), $args);
 
 		$data = self::getData($this->data['filter'], true);
 		$data = self::sortData($data, $this->data['sort'], $this->data['sortorder']);
@@ -1087,10 +1102,14 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				// Create acknowledge link.
-				$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+				$problem_update_link = $this->data['allowed_ack']
+					? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+						->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+					: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+						$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+					);
 
 				// Add table row.
 				$table->addRow(array_merge($row, [
@@ -1119,7 +1138,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'popup.acknowledge.edit' => ['name' => _('Mass update')]
+				'popup.acknowledge.edit' => ['name' => _('Mass update'), 'disabled' => !$this->data['allowed_ack']]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
@@ -1240,12 +1259,12 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @static
 	 *
-	 * @param array $items  An array of trigger items.
+	 * @param array $items    An array of trigger items.
 	 * @param bool  $html
 	 *
 	 * @return array|string
 	 */
-	public static function getLatestValues(array $items, $html = true) {
+	public static function getLatestValues(array $items, bool $html = true) {
 		$latest_values = [];
 
 		$items = zbx_toHash($items, 'itemid');
@@ -1284,16 +1303,20 @@ class CScreenProblem extends CScreenBase {
 					new CCol($last_value['value']),
 					new CCol(
 						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-							? new CLink(_('Graph'), (new CUrl('history.php'))
-								->setArgument('action', HISTORY_GRAPH)
-								->setArgument('itemids[]', $itemid)
-								->getUrl()
-							)
-							: new CLink(_('History'), (new CUrl('history.php'))
-								->setArgument('action', HISTORY_VALUES)
-								->setArgument('itemids[]', $itemid)
-								->getUrl()
-							)
+							? (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+								? new CLink(_('Graph'), (new CUrl('history.php'))
+									->setArgument('action', HISTORY_GRAPH)
+									->setArgument('itemids[]', $itemid)
+									->getUrl()
+								)
+								: _('Graph'))
+							: (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+								? new CLink(_('History'), (new CUrl('history.php'))
+									->setArgument('action', HISTORY_VALUES)
+									->setArgument('itemids[]', $itemid)
+									->getUrl()
+								)
+								: _('History'))
 					)
 				]);
 

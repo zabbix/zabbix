@@ -108,6 +108,13 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $group_preselect_required;
 
+	/**
+	 * Set of disabled options.
+	 *
+	 * @var array
+	 */
+	protected $disableids = [];
+
 	protected function init() {
 		$this->disableSIDvalidation();
 
@@ -373,7 +380,31 @@ class CControllerPopupGeneric extends CController {
 					_('Execute on'),
 					_('Commands')
 				]
-			]
+			],
+			'roles' => [
+				'title' => _('User roles'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'roleid,name',
+				'form' => [
+					'name' => 'rolesform',
+					'id' => 'roles'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
+			'api_methods' => [
+				'title' => _('Api methods'),
+				'min_user_type' => USER_TYPE_SUPER_ADMIN,
+				'allowed_src_fields' => 'name',
+				'form' => [
+					'name' => 'apimethodform',
+					'id' => 'apimethods'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
 		];
 	}
 
@@ -432,7 +463,8 @@ class CControllerPopupGeneric extends CController {
 			'submit_parent' =>						'in 1',
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
-			'filter_hostid_rst' =>					'in 1'
+			'filter_hostid_rst' =>					'in 1',
+			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 		];
 
 		// Set destination and source field validation roles.
@@ -447,6 +479,11 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		$ret = $this->validateInput($fields);
+
+		// Set disabled options to property for ability to modify them in result fetching.
+		if ($ret && $this->hasInput('disableids')) {
+			$this->disableids = $this->getInput('disableids');
+		}
 
 		if ($ret && $this->getInput('value_types', [])) {
 			foreach ($this->getInput('value_types') as $value_type) {
@@ -768,7 +805,7 @@ class CControllerPopupGeneric extends CController {
 		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER);
 		$this->page_options = $this->getPageOptions();
 
-		// Make control filters. Must be called bedore extending groupids.
+		// Make control filters. Must be called before extending groupids.
 		$filters = $this->makeFilters();
 
 		// Select subgroups.
@@ -827,9 +864,7 @@ class CControllerPopupGeneric extends CController {
 	 * @param array $records
 	 */
 	protected function applyDisableids(array &$records) {
-		$disableids = $this->getInput('disableids', []);
-
-		foreach ($disableids as $disableid) {
+		foreach ($this->disableids as $disableid) {
 			if (array_key_exists($disableid, $records)) {
 				$records[$disableid]['_disabled'] = true;
 			}
@@ -1272,6 +1307,40 @@ class CControllerPopupGeneric extends CController {
 				}
 				else {
 					$records = [];
+				}
+
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'roles':
+				$options += [
+					'output' => ['roleid', 'name'],
+					'preservekeys' => true
+				];
+
+				$records = API::Role()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
+				break;
+			case 'api_methods':
+				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
+				$api_methods = CRoleHelper::getApiMethods($user_type);
+				$api_mask_methods = CRoleHelper::getApiMaskMethods($user_type);
+				$modified_disableids = [];
+
+				foreach ($this->disableids as $disableid) {
+					if (array_key_exists($disableid, $api_mask_methods)) {
+						$modified_disableids = array_merge($modified_disableids, $api_mask_methods[$disableid]);
+					}
+					else if (!in_array($disableid, $modified_disableids)) {
+						$modified_disableids[] = $disableid;
+					}
+				}
+
+				$this->disableids = $modified_disableids;
+
+				foreach ($api_methods as $api_method) {
+					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];
 				}
 
 				CArrayHelper::sort($records, ['name']);

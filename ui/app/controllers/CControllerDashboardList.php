@@ -23,7 +23,7 @@
  * controller dashboard list
  *
  */
-class CControllerDashboardList extends CControllerDashboardAbstract {
+class CControllerDashboardList extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -51,7 +51,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD);
 	}
 
 	protected function doAction() {
@@ -86,7 +86,8 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			'sortorder' => $sort_order,
 			'filter' => $filter,
 			'profileIdx' => 'web.dashbrd.filter',
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
+			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+			'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 		];
 
 		// list of dashboards
@@ -113,9 +114,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		if ($data['dashboards']) {
-			$this->prepareEditableFlag($data['dashboards']);
-		}
+		CDashboardHelper::updateEditableFlag($data['dashboards']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));

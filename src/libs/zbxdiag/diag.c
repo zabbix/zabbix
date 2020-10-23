@@ -85,6 +85,19 @@ int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *fi
 			}
 		}
 	}
+	else
+	{
+		if (SUCCEED == zbx_json_value_by_name(jp, "stats", value, sizeof(value), NULL) &&
+				0 == strcmp(value, "extend"))
+		{
+			*field_mask |= field_map->value;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "Unknown statistic field value: %s", value);
+			goto out;
+		}
+	}
 
 	/* parse requested top views */
 	if (SUCCEED == zbx_json_brackets_by_name(jp, "top", &jp_stats))
@@ -235,7 +248,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEMORY},
+					{"", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEMORY},
 					{"items", ZBX_DIAG_HISTORYCACHE_ITEMS},
 					{"values", ZBX_DIAG_HISTORYCACHE_VALUES},
 					{"memory", ZBX_DIAG_HISTORYCACHE_MEMORY},
@@ -386,7 +399,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_PREPROC_VALUES | ZBX_DIAG_PREPROC_VALUES_PREPROC},
+					{"", ZBX_DIAG_PREPROC_VALUES | ZBX_DIAG_PREPROC_VALUES_PREPROC},
 					{"values", ZBX_DIAG_PREPROC_VALUES},
 					{"preproc.values", ZBX_DIAG_PREPROC_VALUES_PREPROC},
 					{NULL, 0}
@@ -464,6 +477,47 @@ out:
 	return ret;
 }
 
+static void	zbx_json_addhex(struct zbx_json *j, const char *name, zbx_uint64_t value)
+{
+	char	buffer[MAX_ID_LEN];
+
+	zbx_snprintf(buffer, sizeof(buffer), "0x" ZBX_FS_UX64, value);
+	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_STRING);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_locks_info                                              *
+ *                                                                            *
+ * Purpose: add requested locks diagnostic information to json data           *
+ *                                                                            *
+ * Parameters: json  - [IN/OUT] the json to update                            *
+ *                                                                            *
+ ******************************************************************************/
+void	diag_add_locks_info(struct zbx_json *json)
+{
+	int		i;
+	const char	*names[ZBX_MUTEX_COUNT] = {"ZBX_MUTEX_LOG", "ZBX_MUTEX_CACHE", "ZBX_MUTEX_TRENDS",
+				"ZBX_MUTEX_CACHE_IDS", "ZBX_MUTEX_SELFMON", "ZBX_MUTEX_CPUSTATS", "ZBX_MUTEX_DISKSTATS",
+				"ZBX_MUTEX_ITSERVICES", "ZBX_MUTEX_VALUECACHE", "ZBX_MUTEX_VMWARE", "ZBX_MUTEX_SQLITE3",
+				"ZBX_MUTEX_PROCSTAT", "ZBX_MUTEX_PROXY_HISTORY", "ZBX_MUTEX_KSTAT"};
+
+	zbx_json_addarray(json, ZBX_DIAG_LOCKS);
+
+	for (i = 0; i < ZBX_MUTEX_COUNT; i++)
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_addhex(json, names[i], (zbx_uint64_t)zbx_mutex_addr_get(i));
+		zbx_json_close(json);
+	}
+
+	zbx_json_addobject(json, NULL);
+	zbx_json_addhex(json, "ZBX_RWLOCK_CONFIG", (zbx_uint64_t)zbx_rwlock_addr_get(ZBX_RWLOCK_CONFIG));
+	zbx_json_close(json);
+
+	zbx_json_close(json);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_diag_get_info                                                *
@@ -526,9 +580,7 @@ static void	diag_add_section_request(struct zbx_json *j, const char *section, ..
 	const char	*field;
 
 	zbx_json_addobject(j, section);
-	zbx_json_addarray(j, "stats");
-	zbx_json_addstring(j, NULL, "all", ZBX_JSON_TYPE_STRING);
-	zbx_json_close(j);
+	zbx_json_addstring(j, "stats", "extend", ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addobject(j, "top");
 
@@ -566,6 +618,9 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_ALERTING)))
 		diag_add_section_request(j, ZBX_DIAG_ALERTING, "media.alerts", "source.alerts", NULL);
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_LOCKS)))
+		diag_add_section_request(j, ZBX_DIAG_LOCKS, NULL);
 }
 
 /******************************************************************************
@@ -586,7 +641,6 @@ static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
 	struct zbx_json_parse	jp_value;
 	size_t			value_alloc = 0, msg_alloc = 0, msg_offset = 0;
 	zbx_json_type_t		type;
-
 
 	while (NULL != (pnext = zbx_json_pair_next(jp, pnext, key, sizeof(key))))
 	{
@@ -644,14 +698,14 @@ static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, c
 		{
 			const char	*pnext;
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "  buckets:");
+			zabbix_log(LOG_LEVEL_INFORMATION, "    buckets:");
 
 			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp_buckets, pnext));)
 			{
 				if (SUCCEED == zbx_json_brackets_open(pnext, &jp_bucket))
 				{
 					diag_get_simple_values(&jp_bucket, &msg);
-					zabbix_log(LOG_LEVEL_INFORMATION, "    %s", msg);
+					zabbix_log(LOG_LEVEL_INFORMATION, "      %s", msg);
 					zbx_free(msg);
 				}
 			}
@@ -676,7 +730,11 @@ static void	diag_log_top_view(struct zbx_json_parse *jp, const char *field, cons
 	const char		*pnext;
 	char			*msg = NULL;
 
-	if (FAIL == zbx_json_open_path(jp, path, &jp_top))
+	if (NULL == path)
+	{
+		jp_top = *jp;
+	}
+	else if (FAIL == zbx_json_open_path(jp, path, &jp_top))
 		return;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s:", field);
@@ -864,6 +922,12 @@ void	zbx_diag_log_info(unsigned int flags)
 				diag_log_lld(&jp_section);
 			else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
 				diag_log_alerting(&jp_section);
+			else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "== locks diagnostic information ==");
+				diag_log_top_view(&jp_section, ZBX_DIAG_LOCKS, NULL);
+				zabbix_log(LOG_LEVEL_INFORMATION, "==");
+			}
 		}
 	}
 	else

@@ -59,6 +59,13 @@ class ZBase {
 	private $component_registry;
 
 	/**
+	 * Application mode.
+	 *
+	 * @var string
+	 */
+	private $mode;
+
+	/**
 	 * @var CModuleManager
 	 */
 	private $module_manager;
@@ -121,7 +128,6 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
-		require_once 'include/menu.inc.php';
 		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
@@ -156,9 +162,11 @@ class ZBase {
 	 *
 	 * @param string $mode  Application initialization mode.
 	 *
-	 * @throws DBException
+	 * @throws Exception
 	 */
 	public function run($mode) {
+		$this->mode = $mode;
+
 		$this->init();
 
 		$this->setMaintenanceMode();
@@ -168,15 +176,9 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
-
 				$this->loadConfigFile();
 				$this->initDB();
-
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
-
-				// Start sesion only after DB initilized.
-				new CEncryptedCookieSession();
-
 				$this->authenticateUser();
 
 				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
@@ -208,9 +210,6 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-
-				new CEncryptedCookieSession();
-
 				$this->initLocales('en_gb');
 				break;
 
@@ -219,18 +218,43 @@ class ZBase {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
-
-					new CEncryptedCookieSession();
-
 					$this->authenticateUser();
-					$this->initComponents();
 					$this->initLocales(CWebUser::$data['lang']);
+					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {
-					new CCookieSession();
+					if ($e->getCode() == CConfigFile::CONFIG_VAULT_ERROR) {
+						echo (new CView('general.warning', [
+							'header' => _('Vault connection failed.'),
+							'messages' => [$e->getMessage()],
+							'theme' => ZBX_DEFAULT_THEME
+						]))->getOutput();
+
+						session_write_close();
+						exit;
+					}
+					else {
+						$session = new CCookieSession();
+						$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+
+						if (!$session->session_start($sessionid)) {
+							throw new Exception(_('Session initialization error.'));
+						}
+
+						CSessionHelper::set('sessionid', $sessionid);
+					}
 				}
 				break;
 		}
+	}
+
+	/**
+	 * Returns the application mode.
+	 *
+	 * @return string
+	 */
+	public static function getMode(): string {
+		return self::getInstance()->mode;
 	}
 
 	/**
@@ -379,6 +403,8 @@ class ZBase {
 	protected function initDB() {
 		$error = null;
 		if (!DBconnect($error)) {
+			CDataCacheHelper::clearValues(['db_username', 'db_password']);
+
 			throw new DBException($error);
 		}
 	}
@@ -445,16 +471,26 @@ class ZBase {
 
 	/**
 	 * Authenticate user.
+	 *
+	 * @throws Exception
 	 */
 	protected function authenticateUser(): void {
-		if (!CWebUser::checkAuthentication(CSessionHelper::getId())) {
+		$session = new CEncryptedCookieSession();
+
+		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
 			CWebUser::setDefault();
 		}
 
-		// set the authentication token for the API
-		API::getWrapper()->auth = CSessionHelper::getId();
+		if (!$session->session_start(CWebUser::$data['sessionid'])) {
+			throw new Exception(_('Session initialization error.'));
+		}
 
-		// enable debug mode in the API
+		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+
+		// Set the authentication token for the API.
+		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
 	}
 
@@ -610,18 +646,18 @@ class ZBase {
 	 */
 	private function initComponents() {
 		$this->component_registry->register('router', new CRouter());
-		$this->component_registry->register('menu.main', getMainMenu());
-		$this->component_registry->register('menu.user', getUserMenu());
+		$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
+		$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
 	}
 
 	/**
-	 * Initialize module manager and load all enabled modules.
+	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
 	private function initModuleManager() {
 		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
 
 		$db_modules = API::getApiService('module')->get([
-			'output' => ['id', 'relative_path', 'config'],
+			'output' => ['moduleid', 'id', 'relative_path', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'sortfield' => 'relative_path'
 		], false);
@@ -629,6 +665,10 @@ class ZBase {
 		$modules_missing = [];
 
 		foreach ($db_modules as $db_module) {
+			if (!CWebUser::checkAccess(CRoleHelper::MODULES_MODULE.$db_module['moduleid'])) {
+				continue;
+			}
+
 			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['id'],
 				$db_module['config']
 			);

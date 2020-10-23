@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CFormParametersBehavior.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
@@ -50,10 +49,6 @@ class testFormTagsHostPrototype extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			[
-				'class' => CFormParametersBehavior::class,
-				'table_selector' => 'id:tags-table'
-			],
 			CMessageBehavior::class
 		];
 	}
@@ -68,25 +63,25 @@ class testFormTagsHostPrototype extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '!@#$%^&*()_+<>,.\/',
+							'tag' => '!@#$%^&*()_+<>,.\/',
 							'value' => '!@#$%^&*()_+<>,.\/'
 						],
 						[
-							'name' => 'tag1',
+							'tag' => 'tag1',
 							'value' => 'value1'
 						],
 						[
-							'name' => 'tag2'
+							'tag' => 'tag2'
 						],
 						[
-							'name' => '{$MACRO:A}',
+							'tag' => '{$MACRO:A}',
 							'value' => '{$MACRO:A}'
 						],
 						[
-							'name' => '{$MACRO}',
+							'tag' => '{$MACRO}',
 							'value' => '{$MACRO}'],
 						[
-							'name' => 'Таг',
+							'tag' => 'Таг',
 							'value' => 'Значение'
 						]
 					]
@@ -100,11 +95,11 @@ class testFormTagsHostPrototype extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => 'tag3',
+							'tag' => 'tag3',
 							'value' => '3'
 						],
 						[
-							'name' => 'tag3',
+							'tag' => 'tag3',
 							'value' => '4'
 						]
 					]
@@ -118,11 +113,11 @@ class testFormTagsHostPrototype extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => 'tag4',
+							'tag' => 'tag4',
 							'value' => '5'
 						],
 						[
-							'name' => 'tag5',
+							'tag' => 'tag5',
 							'value' => '5'
 						]
 					]
@@ -151,11 +146,11 @@ class testFormTagsHostPrototype extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => 'tag',
+							'tag' => 'tag',
 							'value' => 'value'
 						],
 						[
-							'name' => 'tag',
+							'tag' => 'tag',
 							'value' => 'value'
 						]
 					],
@@ -184,7 +179,7 @@ class testFormTagsHostPrototype extends CWebTest {
 		$form->fill(['Groups' => 'Zabbix servers']);
 
 		$form->selectTab('Tags');
-		$this->fillParameters($data['tags']);
+		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -212,7 +207,7 @@ class testFormTagsHostPrototype extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '',
+							'tag' => '',
 							'value' => 'value1'
 						]
 					],
@@ -227,7 +222,8 @@ class testFormTagsHostPrototype extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
-							'name' => 'action', 'value' => 'update'
+							'tag' => 'action',
+							'value' => 'update'
 						]
 					],
 					'error' => 'Cannot update host prototype',
@@ -241,28 +237,28 @@ class testFormTagsHostPrototype extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '!@#$%^&*()_+<>,.\/',
+							'tag' => '!@#$%^&*()_+<>,.\/',
 							'value' => '!@#$%^&*()_+<>,.\/'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
-							'name' => 'tag1',
+							'tag' => 'tag1',
 							'value' => 'value1'
 						],
 						[
-							'name' => 'tag2'
+							'tag' => 'tag2'
 						],
 						[
-							'name' => '{$MACRO:A}',
+							'tag' => '{$MACRO:A}',
 							'value' => '{$MACRO:A}'
 						],
 						[
-							'name' => '{$MACRO}',
+							'tag' => '{$MACRO}',
 							'value' => '{$MACRO}'
 						],
 						[
-							'name' => 'Таг',
+							'tag' => 'Таг',
 							'value' => 'Значение'
 						]
 					]
@@ -286,7 +282,7 @@ class testFormTagsHostPrototype extends CWebTest {
 		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
-		$this->fillParameters($data['tags']);
+		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -317,7 +313,8 @@ class testFormTagsHostPrototype extends CWebTest {
 		$form->getField('Host name')->fill($new_name);
 
 		$form->selectTab('Tags');
-		$tags = $this->getValues();
+		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$tags = $element->getValue();
 
 		$this->query('button:Clone')->one()->click();
 		$form->submit();
@@ -336,7 +333,7 @@ class testFormTagsHostPrototype extends CWebTest {
 		$this->assertEquals($new_name, $form->getField('Host name')->getValue());
 
 		$form->selectTab('Tags');
-		$this->assertValues($tags);
+		$element->checkValue($tags);
 	}
 
 	private function checkTagFields($data) {
@@ -344,7 +341,14 @@ class testFormTagsHostPrototype extends CWebTest {
 		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.self::DICROVERY_RULE_ID.'&hostid='.$id);
 		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
-		$this->assertValues($data['tags']);
+
+		$expected = $data['tags'];
+		foreach ($expected as &$tag) {
+			unset($tag['action'], $tag['index']);
+		}
+		unset($tag);
+
+		$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected);
 	}
 }
 

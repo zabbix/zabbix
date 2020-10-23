@@ -23,99 +23,48 @@
 /**
  * Controller for the "Host->Monitoring" asynchronous refresh page.
  */
-class CControllerHostViewRefresh extends CControllerHost {
-
-	protected function init(): void {
-		$this->disableSIDValidation();
-	}
-
-	protected function checkInput(): bool {
-		$fields = [
-			'sort' =>						'in name,status',
-			'sortorder' =>					'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
-			'page' =>						'ge 1',
-			'filter_set' =>					'in 1',
-			'filter_rst' =>					'in 1',
-			'filter_name' =>				'string',
-			'filter_groupids' =>			'array_id',
-			'filter_ip' =>					'string',
-			'filter_dns' =>					'string',
-			'filter_port' =>				'string',
-			'filter_status' =>				'in -1,'.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED,
-			'filter_evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-			'filter_tags' =>				'array',
-			'filter_severities' =>			'array',
-			'filter_show_suppressed' =>		'in '.ZBX_PROBLEM_SUPPRESSED_FALSE.','.ZBX_PROBLEM_SUPPRESSED_TRUE,
-			'filter_maintenance_status' =>	'in '.HOST_MAINTENANCE_STATUS_OFF.','.HOST_MAINTENANCE_STATUS_ON
-		];
-
-		$ret = $this->validateInput($fields);
-
-		// Validate tags filter.
-		if ($ret && $this->hasInput('filter_tags')) {
-			foreach ($this->getInput('filter_tags') as $filter_tag) {
-				if (count($filter_tag) != 3
-						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
-						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
-						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
-
-		// Validate severity checkbox filter.
-		if ($ret && $this->hasInput('filter_severities')) {
-			foreach ($this->getInput('filter_severities') as $severity) {
-				if (!in_array($severity, range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))) {
-					$ret = false;
-					break;
-				}
-			}
-		}
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions(): bool {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
-	}
+class CControllerHostViewRefresh extends CControllerHostView {
 
 	protected function doAction(): void {
-		$filter = [
-			'name' => $this->getInput('filter_name', ''),
-			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
-			'ip' => $this->getInput('filter_ip', ''),
-			'dns' => $this->getInput('filter_dns', ''),
-			'port' => $this->getInput('filter_port', ''),
-			'status' => $this->getInput('filter_status', -1),
-			'evaltype' => $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
-			'tags' => $this->getInput('filter_tags', []),
-			'severities' => $this->getInput('filter_severities', []),
-			'show_suppressed' => $this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
-			'maintenance_status' => $this->getInput('filter_maintenance_status', HOST_MAINTENANCE_STATUS_ON),
-			'page' => $this->hasInput('page') ? $this->getInput('page') : null
-		];
+		$filter = static::FILTER_FIELDS_DEFAULT;
 
-		$sort = $this->getInput('sort', 'name');
-		$sortorder = $this->getInput('sortorder', ZBX_SORT_UP);
+		if ($this->getInput('filter_counters', 0)) {
+			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+			$filters = $this->hasInput('counter_index')
+				? [$profile->getTabFilter($this->getInput('counter_index'))]
+				: $profile->getTabsWithDefaults();
+			$filter_counters = [];
 
-		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
+			foreach ($filters as $index => $tabfilter) {
+				$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+			}
 
-		$prepared_data = $this->prepareData($filter, $sort, $sortorder);
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['filter_counters' => $filter_counters])
+				]))->disableView()
+			);
+		}
+		else {
+			$this->getInputs($filter, array_keys($filter));
+			$filter = $this->cleanInput($filter);
+			$prepared_data = $this->getData($filter);
 
-		$data = [
-			'filter' => $filter,
-			'sort' => $sort,
-			'sortorder' => $sortorder,
-			'view_curl' => $view_curl
-		] + $prepared_data;
+			$view_url = (new CUrl())
+				->setArgument('action', 'host.view')
+				->removeArgument('page');
 
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+			$data = [
+				'filter' => $filter,
+				'view_curl' => $view_url,
+				'sort' => $filter['sort'],
+				'sortorder' => $filter['sortorder'],
+				'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
+				'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+			] + $prepared_data;
+
+			$response = new CControllerResponseData($data);
+			$this->setResponse($response);
+		}
 	}
 }

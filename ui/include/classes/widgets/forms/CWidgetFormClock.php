@@ -24,8 +24,8 @@
  */
 class CWidgetFormClock extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_CLOCK);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_CLOCK);
 
 		// Time type field.
 		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), [
@@ -45,7 +45,7 @@ class CWidgetFormClock extends CWidgetForm {
 		// Item field.
 		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
 			// Item multiselector with single value.
-			$field_item = (new CWidgetFieldMsItem('itemid', _('Item')))
+			$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false);
 

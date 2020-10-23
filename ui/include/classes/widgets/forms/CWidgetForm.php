@@ -30,34 +30,40 @@ class CWidgetForm {
 	 */
 	protected $data;
 
-	public function __construct($data, $type) {
+	protected $templateid;
+
+	public function __construct($data, $templateid, $type) {
 		$this->data = json_decode($data, true);
+
+		$this->templateid = $templateid;
 
 		$this->fields = [];
 
-		// Refresh interval field.
-		$default_rf_rate = '';
+		if ($templateid === null) {
+			// Refresh interval field.
+			$default_rf_rate = '';
 
-		foreach (CWidgetConfig::getRfRates() as $rf_rate => $label) {
-			if ($rf_rate == CWidgetConfig::getDefaultRfRate($type)) {
-				$default_rf_rate = $label;
-				break;
+			foreach (CWidgetConfig::getRfRates() as $rf_rate => $label) {
+				if ($rf_rate == CWidgetConfig::getDefaultRfRate($type)) {
+					$default_rf_rate = $label;
+					break;
+				}
 			}
+
+			$rf_rates = [
+				-1 => _('Default').' ('.$default_rf_rate.')'
+			];
+			$rf_rates += CWidgetConfig::getRfRates();
+
+			$rf_rate_field = (new CWidgetFieldComboBox('rf_rate', _('Refresh interval'), $rf_rates))
+				->setDefault(-1);
+
+			if (array_key_exists('rf_rate', $this->data)) {
+				$rf_rate_field->setValue($this->data['rf_rate']);
+			}
+
+			$this->fields[$rf_rate_field->getName()] = $rf_rate_field;
 		}
-
-		$rf_rates = [
-			-1 => _('Default').' ('.$default_rf_rate.')'
-		];
-		$rf_rates += CWidgetConfig::getRfRates();
-
-		$rf_rate_field = (new CWidgetFieldComboBox('rf_rate', _('Refresh interval'), $rf_rates))
-			->setDefault(-1);
-
-		if (array_key_exists('rf_rate', $this->data)) {
-			$rf_rate_field->setValue($this->data['rf_rate']);
-		}
-
-		$this->fields[$rf_rate_field->getName()] = $rf_rate_field;
 
 		// Add Columns and Rows fields for Iterator widgets.
 

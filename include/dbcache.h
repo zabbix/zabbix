@@ -172,6 +172,7 @@ typedef struct
 	char			*units;
 	char			*delay;
 	int			history_sec;
+	int			trends_sec;
 	int			nextcheck;
 	int			lastclock;
 	int			mtime;
@@ -200,6 +201,7 @@ typedef struct
 	char			ssl_cert_file_orig[ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
 	char			ssl_key_file_orig[ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
 	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
+	char			*script_params;
 	char			*error;
 }
 DC_ITEM;
@@ -247,6 +249,7 @@ typedef struct _DC_TRIGGER
 	char			*new_error;
 	char			*correlation_tag;
 	char			*opdata;
+	char			*event_name;
 	zbx_timespec_t		timespec;
 	int			lastchange;
 	unsigned char		topoindex;
@@ -369,7 +372,6 @@ typedef struct
 	char		**severity_name;
 	zbx_uint64_t	discovery_groupid;
 	int		default_inventory_mode;
-	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
 	char		*default_timezone;
@@ -385,7 +387,6 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_SEVERITY_NAME			__UINT64_C(0x0000000000000001)
 #define ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID		__UINT64_C(0x0000000000000002)
 #define ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE		__UINT64_C(0x0000000000000004)
-#define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		__UINT64_C(0x0000000000000008)
 #define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		__UINT64_C(0x0000000000000010)
 #define ZBX_CONFIG_FLAGS_HOUSEKEEPER			__UINT64_C(0x0000000000000020)
 #define ZBX_CONFIG_FLAGS_DB_EXTENSION			__UINT64_C(0x0000000000000040)
@@ -702,9 +703,9 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 #define ZBX_HK_TRENDS_MIN	SEC_PER_DAY
 #define ZBX_HK_PERIOD_MAX	(25 * SEC_PER_YEAR)
 
-void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+void	DCrequeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num);
-void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
+void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
 int	DCconfig_activate_host(DC_ITEM *item);
@@ -900,11 +901,6 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids);
 
-void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
-void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
-void	zbx_dc_clear_timer_queue(void);
-
 /* data session support */
 
 typedef struct
@@ -993,5 +989,29 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
+
+typedef struct
+{
+	zbx_uint64_t		objectid;
+	zbx_uint64_t		triggerid;
+	zbx_function_type_t	type;
+	zbx_time_unit_t		trend_base;
+	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
+	int			revision;	/* function revision */
+	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
+	zbx_timespec_t		exec_ts;	/* real time when the timer must be executed */
+	const char		*parameter;	/* function parameters (for trend functions) */
+}
+zbx_trigger_timer_t;
+
+void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now);
+void	zbx_dc_get_trigger_timers(zbx_vector_ptr_t *timers, int now, int soft_limit, int hard_limit);
+void	zbx_dc_clear_timer_queue(zbx_vector_ptr_t *timers);
+void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+		const zbx_vector_ptr_t *timers);
+void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
+
+int	zbx_db_trigger_queue_locked(void);
+void	zbx_db_trigger_queue_unlock(void);
 
 #endif

@@ -1,0 +1,1180 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:01Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Generic Java JMX'
+      name: 'Generic Java JMX'
+      description: 'Template tooling version used: 0.38'
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: JMX
+      items:
+        -
+          name: 'ClassLoading: Loaded class count'
+          type: JMX
+          key: 'jmx["java.lang:type=ClassLoading","LoadedClassCount"]'
+          history: 7d
+          description: 'Displays number of classes that are currently loaded in the Java virtual machine.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'ClassLoading: Total loaded class count'
+          type: JMX
+          key: 'jmx["java.lang:type=ClassLoading","TotalLoadedClassCount"]'
+          history: 7d
+          description: 'Displays the total number of classes that have been loaded since the Java virtual machine has started execution.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'ClassLoading: Unloaded class count'
+          type: JMX
+          key: 'jmx["java.lang:type=ClassLoading","UnloadedClassCount"]'
+          history: 7d
+          description: 'Displays the total number of classes that have been loaded since the Java virtual machine has started execution.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Compilation: Name of the current JIT compiler'
+          type: JMX
+          key: 'jmx["java.lang:type=Compilation","Name"]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Displays the total number of classes unloaded since the Java virtual machine has started execution.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          triggers:
+            -
+              expression: '{str(Client)}=1'
+              name: 'Compilation: {HOST.NAME} uses suboptimal JIT compiler'
+              priority: INFO
+              manual_close: 'YES'
+        -
+          name: 'Compilation: Accumulated time spent'
+          type: JMX
+          key: 'jmx["java.lang:type=Compilation","TotalCompilationTime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Displays the approximate accumulated elapsed time spent in compilation, in seconds.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: ConcurrentMarkSweep number of collections per second'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Displays the total number of collections that have occurred per second.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: ConcurrentMarkSweep accumulated time spent in collection'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionTime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: Copy number of collections per second'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Displays the total number of collections that have occurred per second.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: Copy accumulated time spent in collection'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=Copy","CollectionTime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: MarkSweepCompact number of collections per second'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Displays the total number of collections that have occurred per second.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: MarkSweepCompact accumulated time spent in collection'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionTime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: ParNew number of collections per second'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Displays the total number of collections that have occurred per second.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: ParNew accumulated time spent in collection'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionTime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: PS MarkSweep number of collections per second'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Displays the total number of collections that have occurred per second.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: PS MarkSweep accumulated time spent in collection'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionTime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: PS Scavenge number of collections per second'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"]'
+          history: 7d
+          value_type: FLOAT
+          description: 'Displays the total number of collections that have occurred per second.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'GarbageCollector: PS Scavenge accumulated time spent in collection'
+          type: JMX
+          key: 'jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionTime"]'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Displays the approximate accumulated collection elapsed time, in seconds.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Memory: Heap memory committed'
+          type: JMX
+          key: 'jmx["java.lang:type=Memory","HeapMemoryUsage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current heap memory allocated. This amount of memory is guaranteed for the Java virtual machine to use.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Memory: Heap memory maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=Memory","HeapMemoryUsage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of heap that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Memory: Heap memory used'
+          type: JMX
+          key: 'jmx["java.lang:type=Memory","HeapMemoryUsage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage outside the heap.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Memory: Non-Heap memory committed'
+          type: JMX
+          key: 'jmx["java.lang:type=Memory","NonHeapMemoryUsage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated outside the heap. This amount of memory is guaranteed for the Java virtual machine to use.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Memory: Non-Heap memory maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of non-heap memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Memory: Non-Heap memory used'
+          type: JMX
+          key: 'jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage outside the heap'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Memory: Object pending finalization count'
+          type: JMX
+          key: 'jmx["java.lang:type=Memory","ObjectPendingFinalizationCount"]'
+          history: 7d
+          description: 'The approximate number of objects for which finalization is pending.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: CMS Old Gen committed'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: CMS Old Gen maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: CMS Old Gen used'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: CMS Perm Gen committed'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: CMS Perm Gen maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: CMS Perm Gen used'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Code Cache committed'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: CodeCache maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Code Cache used'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Perm Gen committed'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Perm Gen maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Perm Gen used'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: PS Old Gen'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: PS Old Gen maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: PS Old Gen used'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: PS Perm Gen committed'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: PS Perm Gen maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: PS Perm Gen used'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Tenured Gen committed'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.committed"]'
+          history: 7d
+          units: B
+          description: 'Current memory allocated'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Tenured Gen maximum size'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"]'
+          history: 7d
+          units: B
+          description: 'Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'MemoryPool: Tenured Gen used'
+          type: JMX
+          key: 'jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"]'
+          history: 7d
+          units: B
+          description: 'Current memory usage'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'OperatingSystem: File descriptors maximum count'
+          type: JMX
+          key: 'jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"]'
+          history: 7d
+          description: 'This is the number of file descriptors we can have opened in the same process, as determined by the operating system. You can never have more file descriptors than this number.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'OperatingSystem: File descriptors opened'
+          type: JMX
+          key: 'jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]'
+          history: 7d
+          description: 'This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you’re are opening file descriptors and never closing them.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'OperatingSystem: Process CPU Load'
+          type: JMX
+          key: 'jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'ProcessCpuLoad represents the CPU load in this process.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '100'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          triggers:
+            -
+              expression: '{min({$JMX.CPU.LOAD.TIME})}>{$JMX.CPU.LOAD.MAX}'
+              name: 'OperatingSystem: Process CPU Load more than {$JMX.CPU.LOAD.MAX}% for {$JMX.CPU.LOAD.TIME}'
+              priority: AVERAGE
+        -
+          name: 'Runtime: JVM uptime'
+          type: JMX
+          key: 'jmx["java.lang:type=Runtime","Uptime"]'
+          history: 7d
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          triggers:
+            -
+              expression: '{nodata(5m)}=1'
+              name: 'Runtime: JVM is not reachable'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: 'Runtime: JVM name'
+          type: JMX
+          key: 'jmx["java.lang:type=Runtime","VmName"]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          triggers:
+            -
+              expression: '{str(Server)}<>1'
+              name: 'Runtime: {HOST.NAME} runs suboptimal VM type'
+              priority: INFO
+              manual_close: 'YES'
+        -
+          name: 'Runtime: JVM version'
+          type: JMX
+          key: 'jmx["java.lang:type=Runtime","VmVersion"]'
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Threading: Daemon thread count'
+          type: JMX
+          key: 'jmx["java.lang:type=Threading","DaemonThreadCount"]'
+          history: 7d
+          description: 'Number of daemon threads running.'
+          applications:
+            -
+              name: JMX
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Threading: Peak thread count'
+          type: JMX
+          key: 'jmx["java.lang:type=Threading","PeakThreadCount"]'
+          history: 7d
+          description: 'Maximum number of threads being executed at the same time since the JVM was started or the peak was reset.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Threading: Thread count'
+          type: JMX
+          key: 'jmx["java.lang:type=Threading","ThreadCount"]'
+          history: 7d
+          description: 'The number of threads running at the current moment.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Threading: Total started thread count'
+          type: JMX
+          key: 'jmx["java.lang:type=Threading","TotalStartedThreadCount"]'
+          history: 7d
+          description: 'The number of threads started since the JVM was launched.'
+          applications:
+            -
+              name: JMX
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+      macros:
+        -
+          macro: '{$JMX.CPU.LOAD.MAX}'
+          value: '85'
+          description: 'A threshold in percent for CPU utilization trigger.'
+        -
+          macro: '{$JMX.CPU.LOAD.TIME}'
+          value: 5m
+          description: 'The time during which the CPU utilization may exceed the threshold.'
+        -
+          macro: '{$JMX.FILE.DESCRIPTORS.MAX}'
+          value: '85'
+          description: 'A threshold in percent for file descriptors count trigger.'
+        -
+          macro: '{$JMX.FILE.DESCRIPTORS.TIME}'
+          value: 3m
+          description: 'The time during which the file descriptors count may exceed the threshold.'
+        -
+          macro: '{$JMX.HEAP.MEM.USAGE.MAX}'
+          value: '85'
+          description: 'A threshold in percent for Heap memory utilization trigger.'
+        -
+          macro: '{$JMX.HEAP.MEM.USAGE.TIME}'
+          value: 10m
+          description: 'The time during which the Heap memory utilization may exceed the threshold.'
+        -
+          macro: '{$JMX.MP.USAGE.MAX}'
+          value: '85'
+          description: 'A threshold in percent for memory pools utilization trigger. Use a context to change the treshold for a specific pool.'
+        -
+          macro: '{$JMX.MP.USAGE.TIME}'
+          value: 10m
+          description: 'The time during which the memory pools utilization may exceed the threshold.'
+        -
+          macro: '{$JMX.NONHEAP.MEM.USAGE.MAX}'
+          value: '85'
+          description: 'A threshold in percent for Non-heap memory utilization trigger.'
+        -
+          macro: '{$JMX.NONHEAP.MEM.USAGE.TIME}'
+          value: 10m
+          description: 'The time during which the Non-heap memory utilization may exceed the threshold.'
+  triggers:
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"].last()}>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"].last()}'
+      name: 'GarbageCollector: Concurrent Mark Sweep in fire fighting mode'
+      priority: AVERAGE
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"].last()}>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"].last()}'
+      name: 'GarbageCollector: Mark Sweep Compact in fire fighting mode'
+      priority: AVERAGE
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"].last()}>{Generic Java JMX:jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"].last()}'
+      name: 'GarbageCollector: PS Mark Sweep in fire fighting mode'
+      priority: AVERAGE
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.used"].min({$JMX.HEAP.MEM.USAGE.TIME})}>({Generic Java JMX:jmx["java.lang:type=Memory","HeapMemoryUsage.max"].last()}*{$JMX.HEAP.MEM.USAGE.MAX}/100)'
+      name: 'Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"].min({$JMX.NONHEAP.MEM.USAGE.TIME})}>({Generic Java JMX:jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"].last()}*{$JMX.NONHEAP.MEM.USAGE.MAX}/100)'
+      name: 'Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Old Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Old Gen"}/100)'
+      name: 'MemoryPool: CMS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Old Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Old Gen"}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"CMS Perm Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"CMS Perm Gen"}/100)'
+      name: 'MemoryPool: CMS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"CMS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"CMS Perm Gen"}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"].min({$JMX.MP.USAGE.TIME:"Code Cache"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Code Cache"}/100)'
+      name: 'MemoryPool: Code Cache memory usage more than {$JMX.MP.USAGE.MAX:"Code Cache"}% for {$JMX.MP.USAGE.TIME:"Code Cache"}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Perm Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Perm Gen"}/100)'
+      name: 'MemoryPool: Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"Perm Gen"}% for {$JMX.MP.USAGE.TIME:"Perm Gen"}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Old Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Old Gen"}/100)'
+      name: 'MemoryPool: PS Old Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Old Gen"}% for {$JMX.MP.USAGE.TIME:"PS Old Gen"}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"PS Perm Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"PS Perm Gen"}/100)'
+      name: 'MemoryPool: PS Perm Gen memory usage more than {$JMX.MP.USAGE.MAX:"PS Perm Gen"}% for {$JMX.MP.USAGE.TIME:"PS Perm Gen"}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"].min({$JMX.MP.USAGE.TIME:"Tenured Gen"})}>({Generic Java JMX:jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"].last()}*{$JMX.MP.USAGE.MAX:"Tenured Gen"}/100)'
+      name: 'MemoryPool: Tenured Gen memory usage more than {$JMX.MP.USAGE.MAX:"Tenured Gen"}% for {$JMX.MP.USAGE.TIME:"Tenured Gen"}'
+      priority: WARNING
+    -
+      expression: '{Generic Java JMX:jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"].min({$JMX.FILE.DESCRIPTORS.TIME})}>({Generic Java JMX:jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"].last()}*{$JMX.FILE.DESCRIPTORS.MAX}/100)'
+      name: 'OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum'
+      priority: WARNING
+  graphs:
+    -
+      name: 'ClassLoading: Class Loader'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=ClassLoading","TotalLoadedClassCount"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=ClassLoading","UnloadedClassCount"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=ClassLoading","LoadedClassCount"]'
+    -
+      name: 'GarbageCollector: Garbage Collector collections per second'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=GarbageCollector,name=ConcurrentMarkSweep","CollectionCount"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=GarbageCollector,name=Copy","CollectionCount"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=GarbageCollector,name=ParNew","CollectionCount"]'
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=GarbageCollector,name=MarkSweepCompact","CollectionCount"]'
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=GarbageCollector,name=PS MarkSweep","CollectionCount"]'
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=GarbageCollector,name=PS Scavenge","CollectionCount"]'
+    -
+      name: 'MemoryPool: Memory Pool CMS Old Gen'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.max"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.committed"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=CMS Old Gen","Usage.used"]'
+    -
+      name: 'MemoryPool: Memory Pool CMS Perm Gen'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.max"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.committed"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=CMS Perm Gen","Usage.used"]'
+    -
+      name: 'MemoryPool: Memory Pool Code Cache'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.max"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.committed"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Code Cache","Usage.used"]'
+    -
+      name: 'MemoryPool: Memory Pool Perm Gen'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.max"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.committed"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Perm Gen","Usage.used"]'
+    -
+      name: 'MemoryPool: Memory Pool PS Old Gen'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.max"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.committed"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=PS Old Gen","Usage.used"]'
+    -
+      name: 'MemoryPool: Memory Pool PS Perm Gen'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.max"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.committed"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=PS Perm Gen","Usage.used"]'
+    -
+      name: 'MemoryPool: Memory Pool Tenured Gen'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.max"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.committed"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=MemoryPool,name=Tenured Gen","Usage.used"]'
+    -
+      name: 'OperatingSystem: File Descriptors'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]'
+    -
+      name: 'Threading: Threads'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=Threading","PeakThreadCount"]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=Threading","DaemonThreadCount"]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Generic Java JMX'
+            key: 'jmx["java.lang:type=Threading","ThreadCount"]'

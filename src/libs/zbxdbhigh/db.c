@@ -429,6 +429,22 @@ int	DBexecute_once(const char *fmt, ...)
 	return rc;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBis_null                                                        *
+ *                                                                            *
+ * Purpose: check if numeric field value is null                              *
+ *                                                                            *
+ * Parameters: field - [IN] field value to be checked                         *
+ *                                                                            *
+ * Return value: SUCCEED - field value is null                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: ATTENTION! This function should only be used with numeric fields *
+ *           since on Oracle empty string is returned instead of NULL and it  *
+ *           is not possible to differentiate empty string from NULL string   *
+ *                                                                            *
+ ******************************************************************************/
 int	DBis_null(const char *field)
 {
 	return zbx_db_is_null(field);
@@ -1313,7 +1329,8 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 	if (NULL == recipient_userid || *userid == *recipient_userid)
 		goto out;
 
-	result = DBselect("select type from users where userid=" ZBX_FS_UI64, *recipient_userid);
+	result = DBselect("select r.type from users u,role r where u.roleid=r.roleid and"
+			" userid=" ZBX_FS_UI64, *recipient_userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		user_type = atoi(row[0]);
@@ -1572,7 +1589,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata,a.listen_ip,a.listen_dns,"
-					"a.listen_port,a.flags"
+					"a.listen_port,a.flags,a.autoreg_hostid"
 				" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
@@ -1594,7 +1611,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
 				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
 
-				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[3]) ||
+				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[8]) ||
 						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
 						autoreg_host->flag != atoi(row[7]))
 				{
@@ -1776,7 +1793,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 		ts.sec = autoreg_host->now;
 		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
+				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
 	}
 
 	zbx_process_events(NULL, NULL);
@@ -3418,11 +3435,12 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
 	if (NULL == (result = DBselect(
-			"select u.userid,u.type"
-				" from sessions s,users u"
+			"select u.userid,u.roleid,r.type"
+				" from sessions s,users u,role r"
 			" where s.userid=u.userid"
 				" and s.sessionid='%s'"
-				" and s.status=%d",
+				" and s.status=%d"
+				" and u.roleid=r.roleid",
 			sessionid_esc, ZBX_SESSION_ACTIVE)))
 	{
 		goto out;
@@ -3432,7 +3450,8 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 		goto out;
 
 	ZBX_STR2UINT64(user->userid, row[0]);
-	user->type = atoi(row[1]);
+	ZBX_STR2UINT64(user->roleid, row[1]);
+	user->type = atoi(row[2]);
 
 	ret = SUCCEED;
 out:

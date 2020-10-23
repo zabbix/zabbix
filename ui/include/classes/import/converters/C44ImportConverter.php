@@ -174,25 +174,6 @@ class C44ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Remapping interface array keys.
-	 *
-	 * @param array $interfaces
-	 *
-	 * @return array
-	 */
-	protected function remapInterfaceKeys(array $interfaces): array {
-		$data = [];
-		$number = 0;
-
-		foreach ($interfaces as $interface) {
-			$data['interface'. (($number > 0) ? $number : '')] = $interface;
-			$number++;
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Extract SNMP fields from items, discovery rules and item prototypes.
 	 *
 	 * @param array $host
@@ -423,19 +404,19 @@ class C44ImportConverter extends CConverter {
 										function(array $iface) use ($item, $parent_interface): bool {
 											// If item port differs from interface ports it is 100% new interface.
 											if ($item['port'] === '') {
-												// Item port not set and interface port not equel parent port.
+												// Item port not set and interface port not equal parent port.
 												if ($iface['port'] !== $parent_interface['port']) {
 													return false;
 												}
 											}
 											else {
-												// If item port not equel interface ports it is 100% new interface.
+												// If item port not equal interface ports it is 100% new interface.
 												if ($iface['port'] !== $item['port']) {
 													return false;
 												}
 											}
 
-											// If interface community string is equel with item it is our interface.
+											// If interface community string is equal with item it is our interface.
 											if ($item['type'] === CXmlConstantName::SNMPV1
 													|| $item['type'] === CXmlConstantName::SNMPV2) {
 												return ($iface['details']['community'] === $item['community']);
@@ -508,8 +489,6 @@ class C44ImportConverter extends CConverter {
 
 			// Set proper default field for interfaces.
 			if (array_key_exists('interfaces', $host)) {
-				$host['interfaces'] = $this->remapInterfaceKeys($host['interfaces']);
-
 				$main = false;
 				foreach ($host['interfaces'] as &$interface) {
 					if (array_key_exists('type', $interface) && $interface['type'] === CXmlConstantName::SNMP) {

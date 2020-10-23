@@ -81,7 +81,7 @@ class testAuditLog extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Extend selectDetails and ouptut.
+			// Extend selectDetails and output.
 			[
 				'api_request' => [
 					'userids' => '1',
@@ -780,7 +780,7 @@ class testAuditLog extends CAPITest {
 				'$expected_result' => null,
 				'expected_error' => 'Invalid parameter "/filter/resourcetype/1": value must be one of 0, 2, 3, 4, 5,'.
 					' 6, 7, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,'.
-					' 34, 35, 36, 37, 38, 39, 40, 41, 42.'
+					' 34, 35, 36, 37, 38, 39, 40, 41, 42, 43.'
 			],
 			// Filter validation - ip.
 			[
@@ -1112,21 +1112,21 @@ class testAuditLog extends CAPITest {
 				'api_request' => [
 					'userids' => '1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "auditlog.get".'
 			],
 			[
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'api_request' => [
 					'userids' => '1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "auditlog.get".'
 			],
 			[
 				'user' => ['user' => 'guest', 'password' => ''],
 				'api_request' => [
 					'userids' => '1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "auditlog.get".'
 			]
 		];
 	}

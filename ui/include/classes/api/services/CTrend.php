@@ -24,6 +24,10 @@
  */
 class CTrend extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	public function __construct() {
 		// the parent::__construct() method should not be called.
 	}

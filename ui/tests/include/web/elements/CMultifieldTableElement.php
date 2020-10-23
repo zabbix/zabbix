@@ -142,6 +142,10 @@ class CMultifieldTableElement extends CTableElement {
 					if ($pos !== false) {
 						$name = substr($value, $pos + 1, -1);
 					}
+
+					if (!$name) {
+						$name = $label;
+					}
 				}
 			}
 			else {

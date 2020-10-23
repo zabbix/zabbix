@@ -792,20 +792,14 @@ static int	process_discovery(void)
 
 		if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 		{
-			zbx_config_t	cfg;
-
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					row[2], delay_str);
-
-			zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 			now = (int)time(NULL);
 
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
-					(0 == cfg.refresh_unsupported || 0 > now + cfg.refresh_unsupported ?
-					ZBX_JAN_2038 : now + cfg.refresh_unsupported), druleid);
+					0 > now ? ZBX_JAN_2038 : now, druleid);
 
-			zbx_config_clean(&cfg);
 			continue;
 		}
 
@@ -925,7 +919,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #ifdef HAVE_NETSNMP
 		if (1 == snmp_cache_reload_requested)
 		{
-			zbx_clear_cache_snmp();
+			zbx_clear_cache_snmp(process_type, process_num);
 			snmp_cache_reload_requested = 0;
 		}
 #endif

@@ -102,4 +102,27 @@ abstract class CControllerUserUpdateGeneral extends CController {
 
 		return true;
 	}
+
+	/**
+	 * Validate user role from user input.
+	 *
+	 * @return bool
+	 */
+	protected function validateUserRole(): bool {
+		if (!$this->hasInput('roleid')) {
+			error(_s('Field "%1$s" is mandatory.', 'roleid'));
+
+			return false;
+		}
+
+		$role = API::Role()->get(['output' => [], 'roleids' => [$this->getInput('roleid')]]);
+
+		if (!$role) {
+			error(_('No permissions to referred object or it does not exist!'));
+
+			return false;
+		}
+
+		return true;
+	}
 }

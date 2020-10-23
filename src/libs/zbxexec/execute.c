@@ -121,7 +121,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_popen_chdir                                                  *
+ * Function: zbx_popen                                                        *
  *                                                                            *
  * Purpose: this function opens a process by creating a pipe, forking,        *
  *          and invoking the shell                                            *
@@ -138,7 +138,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
+static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 {
 	int	fd[2], stdout_orig, stderr_orig;
 
@@ -192,16 +192,6 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL != dir)
-	{
-		if (0 != chdir(dir))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "%s(): cannot change directory to \"%s\": %s",
-					__func__, dir, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
-		}
-	}
-
 	fcntl(stdout_orig, F_SETFD, FD_CLOEXEC);
 	fcntl(stderr_orig, F_SETFD, FD_CLOEXEC);
 
@@ -210,6 +200,12 @@ static int	zbx_popen_chdir(pid_t *pid, const char *command, const char *dir)
 	dup2(fd[1], STDOUT_FILENO);
 	dup2(fd[1], STDERR_FILENO);
 	close(fd[1]);
+
+	if (NULL != dir && 0 != chdir(dir))
+	{
+		fprintf(stderr, "cannot change directory to UserParameterDir: %s\n", zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
@@ -293,7 +289,7 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_execute_from_dir                                             *
+ * Function: zbx_execute                                                      *
  *                                                                            *
  * Purpose: this function executes a script and returns result from stdout    *
  *                                                                            *
@@ -312,8 +308,8 @@ exit:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute_from_dir(const char *command, char **output, char *error, size_t max_error_len, int timeout,
-		unsigned char flag, const char* dir)
+int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
+		unsigned char flag, const char *dir)
 {
 	size_t			buf_size = PIPE_BUFFER_SIZE, offset = 0;
 	int			ret = FAIL;
@@ -468,7 +464,7 @@ close:
 
 	zbx_alarm_on(timeout);
 
-	if (-1 != (fd = zbx_popen_chdir(&pid, command, dir)))
+	if (-1 != (fd = zbx_popen(&pid, command, dir)))
 	{
 		int	rc, status;
 		char	tmp_buf[PIPE_BUFFER_SIZE];
@@ -542,19 +538,6 @@ close:
 		*output = buffer;
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_execute                                                      *
- *                                                                            *
- * Purpose: wrapper for zbx_execute_from_dir with dir set to NULL             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
-		unsigned char flag)
-{
-	return zbx_execute_from_dir(command, output, error, max_error_len, timeout, flag, NULL);
 }
 
 /******************************************************************************

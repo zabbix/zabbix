@@ -24,6 +24,16 @@
  */
 class CUserMacro extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'createglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'updateglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'deleteglobal' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	protected $tableName = 'hostmacro';
 	protected $tableAlias = 'hm';
 	protected $sortColumns = ['macro'];
@@ -255,7 +265,7 @@ class CUserMacro extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'macro')],
 			'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'value')],
-			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET],
+			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET.','.ZBX_MACRO_TYPE_VAULT],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
@@ -263,6 +273,10 @@ class CUserMacro extends CApiService {
 		}
 
 		$this->checkDuplicates(zbx_objectValues($globalmacros, 'macro'));
+
+		foreach ($globalmacros as $macro) {
+			$this->checkMacroValue($macro);
+		}
 	}
 
 	/**
@@ -351,7 +365,7 @@ class CUserMacro extends CApiService {
 			'globalmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('globalmacro', 'macro')],
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')],
-			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET],
+			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET.','.ZBX_MACRO_TYPE_VAULT],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
@@ -366,7 +380,7 @@ class CUserMacro extends CApiService {
 
 		$macros = [];
 
-		foreach ($globalmacros as $globalmacro) {
+		foreach ($globalmacros as $index => $globalmacro) {
 			if (!array_key_exists($globalmacro['globalmacroid'], $db_globalmacros)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
@@ -374,6 +388,15 @@ class CUserMacro extends CApiService {
 			}
 
 			$db_globalmacro = $db_globalmacros[$globalmacro['globalmacroid']];
+
+			if (!array_key_exists('type', $globalmacro)) {
+				$globalmacros[$index]['type'] = $db_globalmacro['type'];
+			}
+
+			// Use database value to bypass Vault macro validation in case if no value is given.
+			if ($globalmacros[$index]['type'] == ZBX_MACRO_TYPE_VAULT && !array_key_exists('value', $globalmacro)) {
+				$globalmacros[$index]['value'] = $db_globalmacro['value'];
+			}
 
 			if (array_key_exists('macro', $globalmacro)
 					&& $this->trimMacro($globalmacro['macro']) !== $this->trimMacro($db_globalmacro['macro'])) {
@@ -383,6 +406,10 @@ class CUserMacro extends CApiService {
 
 		if ($macros) {
 			$this->checkDuplicates($macros);
+		}
+
+		foreach ($globalmacros as $macro) {
+			$this->checkMacroValue($macro);
 		}
 	}
 
@@ -482,6 +509,7 @@ class CUserMacro extends CApiService {
 			$this->checkUnsupportedFields('hostmacro', $hostmacro,
 				_s('Wrong fields for macro "%1$s".', $hostmacro['macro']));
 			$this->checkMacroType($hostmacro);
+			$this->checkMacroValue($hostmacro);
 		}
 
 		$this->checkDuplicateMacros($hostmacros);
@@ -526,7 +554,7 @@ class CUserMacro extends CApiService {
 		}
 
 		// Make sure we have all the data we need.
-		$hostmacros = $this->extendObjects($this->tableName(), $hostmacros, ['macro', 'hostid']);
+		$hostmacros = $this->extendObjects($this->tableName(), $hostmacros, ['macro', 'hostid', 'type', 'value']);
 
 		$db_hostmacros = API::getApiService()->select($this->tableName(), [
 			'output' => ['hostmacroid', 'hostid', 'macro'],
@@ -554,6 +582,7 @@ class CUserMacro extends CApiService {
 				_s('Wrong fields for macro "%1$s".', $hostmacro['macro'])
 			);
 			$this->checkMacroType($hostmacro);
+			$this->checkMacroValue($hostmacro);
 		}
 
 		$this->checkDuplicateMacros($hostmacros);
@@ -736,9 +765,38 @@ class CUserMacro extends CApiService {
 	 * @param array $macro
 	 */
 	protected function checkMacroType(array $macro) {
-		if (array_key_exists('type', $macro) && $macro['type'] != ZBX_MACRO_TYPE_TEXT
-				&& $macro['type'] != ZBX_MACRO_TYPE_SECRET) {
+		if (array_key_exists('type', $macro)
+				&& !in_array($macro['type'], [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid type for macro "%1$s".', $macro['macro']));
+		}
+	}
+
+	/**
+	 * Validate the "value" field.
+	 *
+	 * @param array  $macro
+	 * @param int    $macro['type']
+	 * @param string $macro['value']
+	 *
+	 * @throws APIException if the field is empty.
+	 */
+	protected function checkMacroValue(array $macro) {
+		if (!array_key_exists('type', $macro) || $macro['type'] != ZBX_MACRO_TYPE_VAULT) {
+			return;
+		}
+
+		if ($macro['value'] === '') {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid value for macro "%1$s": %2$s.', $macro['macro'], _('cannot be empty'))
+			);
+		}
+
+		$vault_secret_parser = new CVaultSecretParser();
+
+		if ($vault_secret_parser->parse($macro['value']) != CParser::PARSE_SUCCESS) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid value for macro "%1$s": %2$s.', $macro['macro'], $vault_secret_parser->getError())
+			);
 		}
 	}
 

@@ -1063,7 +1063,7 @@ class testScripts extends CAPITest {
 					'name' => 'API script create as zabbix admin',
 					'command' => 'reboot server 1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "script.create".'
 			],
 			[
 				'method' => 'script.update',
@@ -1072,13 +1072,13 @@ class testScripts extends CAPITest {
 					'scriptid' => '6',
 					'name' => 'API script update as zabbix admin',
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "script.update".'
 			],
 			[
 				'method' => 'script.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => ['7'],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "script.delete".'
 			],
 			[
 				'method' => 'script.execute',
@@ -1097,7 +1097,7 @@ class testScripts extends CAPITest {
 					'name' => 'API script create as zabbix user',
 					'command' => 'reboot server 1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "script.create".'
 			],
 			[
 				'method' => 'script.update',
@@ -1106,13 +1106,13 @@ class testScripts extends CAPITest {
 					'scriptid' => '6',
 					'name' => 'API script update as zabbix user',
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "script.update".'
 			],
 			[
 				'method' => 'script.delete',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'script' => ['7'],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "script.delete".'
 			],
 			[
 				'method' => 'script.execute',

@@ -53,7 +53,6 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const PROBLEM_ACK_STYLE = 'problem_ack_style';
 	public const PROBLEM_UNACK_COLOR = 'problem_unack_color';
 	public const PROBLEM_UNACK_STYLE = 'problem_unack_style';
-	public const REFRESH_UNSUPPORTED = 'refresh_unsupported';
 	public const SCRIPT_TIMEOUT = 'script_timeout';
 	public const SEARCH_LIMIT = 'search_limit';
 	public const SERVER_CHECK_INTERVAL = 'server_check_interval';

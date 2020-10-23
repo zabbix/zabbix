@@ -509,8 +509,19 @@ class CElement extends CBaseElement implements IWaitable {
 				throw $exception;
 			}
 
-			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+			$this->forceClick();
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Force click on element.
+	 *
+	 * @return $this
+	 */
+	public function forceClick() {
+		CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 
 		return $this;
 	}
@@ -573,6 +584,10 @@ class CElement extends CBaseElement implements IWaitable {
 
 		if ($tag === 'select') {
 			return $this->asDropdown($options);
+		}
+
+		if ($tag === 'z-select') {
+			return $this->asZDropdown($options);
 		}
 
 		if ($tag === 'table') {

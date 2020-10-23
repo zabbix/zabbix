@@ -119,14 +119,14 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 			// Invalid URLs.
 			['http:?abc',												[],															false], // Scheme with no host.
 			['http:/',													[],															false], // Special case where single "/" is not allowed in path.
-			['http://',													[],															false], // url_parse() returs false.
-			['http:///',												[],															false], // url_parse() returs false.
+			['http://',													[],															false], // url_parse() returns false.
+			['http:///',												[],															false], // url_parse() returns false.
 			['http:',													[],															false], // Scheme with no host.
 			['http://?',												[],															false], // url_parse() returns false.
 			['javascript:alert(]',										[],															false], // Invalid scheme.
 			['protocol://{$INVALID!MACRO}',								[],															false], // Invalid scheme. Also macro is not valid, but that's secondary.
 			['',														[],															false], // Cannot be empty.
-			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returs false.
+			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returns false.
 			['vbscript:msgbox(]',										[],															false], // Invalid scheme.
 			['notexist://localhost',									[],															false] // Invalid scheme.
 		];

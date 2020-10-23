@@ -1,9 +1,9 @@
 
-# Template DB MySQL by Zabbix agent
+# MySQL by Zabbix agent
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template is developed for monitoring DBMS MySQL and its forks.
 
 This template was tested on:
@@ -15,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
 2. Copy `template_db_mysql.conf` into folder with Zabbix agent configuration (`/etc/zabbix/zabbix_agentd.d/` by default). Don't forget to restart zabbix-agent.
@@ -96,7 +96,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Databases discovery |<p>Scanning databases in DBMS.</p> |ZABBIX_PASSIVE |mysql.db.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.split("\n").map(function (name) {     return ({"{#DBNAME}": name}); }));`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- A: {#DBNAME} NOT_MATCHES_REGEX `information_schema`</p> |
-|Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ZABBIX_PASSIVE |mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var matches = value.match(/Master_Host.*>(.*)<.*/); if (matches) {     return JSON.stringify([{"{#MASTERHOST}": matches[1]}]); } return '[]';`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ZABBIX_PASSIVE |mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
 ## Items collected
 

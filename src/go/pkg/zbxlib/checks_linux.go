@@ -108,8 +108,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_IN)
 	case "system.swap.out":
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_OUT)
-	case "system.swap.size":
-		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_SIZE)
 	case "system.users.num":
 		cfunc = unsafe.Pointer(C.SYSTEM_USERS_NUM)
 	case "vfs.dir.count":
