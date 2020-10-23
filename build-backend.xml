@@ -168,7 +168,7 @@
 	<target name="make-db-oracle" unless="${with.oracle}">
 		<!-- Build Zabbix with oracle database -->
 		<sequential>
-			<make args="--enable-server --enable-agent --enable-proxy --with-oracle --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl --with-oracle-include=/usr/include/oracle/12.1/client64 --with-oracle-lib=/usr/lib/oracle/12.1/client64/lib"/>
+			<make args="--enable-server --enable-agent --enable-proxy --with-oracle --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl --with-oracle-include=/usr/include/oracle/19.8/client64 --with-oracle-lib=/usr/lib/oracle/19.8/client64/lib"/>
 		</sequential>
 	</target>
 
