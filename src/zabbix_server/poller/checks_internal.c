@@ -837,6 +837,12 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		char		*error = NULL;
 		zbx_tfc_stats_t	stats;
 
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
 		if (2 < nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
@@ -844,7 +850,6 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		}
 
 		tmp = get_rparam(&request, 1);
-		tmp1 = (2 == nparams ? get_rparam(&request, 5) : NULL);
 
 		if (FAIL == zbx_tfc_get_stats(&stats, &error))
 		{
@@ -852,15 +857,15 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		if (NULL == tmp1 || 0 == strcmp(tmp1, "all"))
+		if (NULL == tmp || 0 == strcmp(tmp, "all"))
 		{
 			SET_UI64_RESULT(result, stats.hits + stats.misses);
 		}
-		else if (0 == strcmp(tmp1, "hits"))
+		else if (0 == strcmp(tmp, "hits"))
 		{
 			SET_UI64_RESULT(result, stats.hits);
 		}
-		else if (0 == strcmp(tmp1, "misses"))
+		else if (0 == strcmp(tmp, "misses"))
 		{
 			SET_UI64_RESULT(result, stats.misses);
 		}
