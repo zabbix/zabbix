@@ -102,16 +102,19 @@ $widget = (new CWidget())
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
+			->setName('main_filter')
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem(new CInput('hidden', 'type', $this->data['type']))
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('Hosts location'), 'view_style'),
+					new CLabel(_('Hosts location'), 'label-view-style'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-						STYLE_TOP => _('Top'),
-						STYLE_LEFT => _('Left')
-					])
+					(new CSelect('view_style'))
+						->setId('hosts-location')
+						->setValue($data['view_style'])
+						->setFocusableElementId('label-view-style')
+						->addOption(new CSelectOption(STYLE_TOP, _('Top')))
+						->addOption(new CSelectOption(STYLE_LEFT, _('Left')))
 				])
 			),
 		(new CTag('nav', true, (new CList())
