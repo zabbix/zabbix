@@ -25,6 +25,8 @@ import (
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
+
+	"zabbix.com/pkg/log"
 )
 
 const S_FALSE = 0x1
@@ -48,6 +50,52 @@ type valueResult struct {
 	data interface{}
 }
 
+func clearQuals(quals *ole.VARIANT) {
+	err := quals.Clear()
+	if err != nil {
+		log.Errf("cannot clear qualifier: %s", err)
+	}
+}
+
+func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err error) {
+	rawQuals, err := propsCol.GetProperty("Qualifiers_")
+	if err != nil {
+		return false, err
+	}
+	defer clearQuals(rawQuals)
+
+	quals := rawQuals.ToIDispatch()
+	defer quals.Release()
+
+	isKeyProperty = false
+
+	// loop through Property Qualifiers to find if this Property
+	// is a Key and should be skipped unless specifically queried for
+	oleErr := oleutil.ForEach(quals, func(vc2 *ole.VARIANT) (err error) {
+		qualsCol := vc2.ToIDispatch()
+		defer qualsCol.Release()
+
+		qualsName, err := oleutil.GetProperty(qualsCol, "Name")
+		if err != nil {
+			return
+		}
+		defer clearQuals(qualsName)
+
+		if qualsName.Value().(string) == "key" {
+			isKeyProperty = true
+
+			return stopErrorCol
+		}
+
+		return
+	})
+	if _, ok := oleErr.(stopError); !ok {
+		return false, oleErr
+	}
+
+	return isKeyProperty, err
+}
+
 // Key Qualifier ('Name', 'DeviceID', 'Tag' etc.) is always appended to results which are sorted alphabetically,
 // so it's location is not fixed.
 // The following processing rules will be applied depending on query:
@@ -55,83 +103,63 @@ type valueResult struct {
 // * Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
 //   its Qualifiers_ property list
 func (r *valueResult) write(rs *ole.IDispatch) (err error) {
-	var property_key_field_value interface{}
+	var propertyKeyFieldValue interface{}
 	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
 		row := vr.ToIDispatch()
 		defer row.Release()
 
-		raw_props, err := row.GetProperty("Properties_")
+		rawProps, err := row.GetProperty("Properties_")
 		if err != nil {
 			return
 		}
-		defer raw_props.Clear()
+		defer clearQuals(rawProps)
 
-		props := raw_props.ToIDispatch()
+		props := rawProps.ToIDispatch()
 		defer props.Release()
 
 		err = oleutil.ForEach(props, func(vc *ole.VARIANT) (err error) {
-			props_col := vc.ToIDispatch()
-			defer props_col.Release()
+			propsCol := vc.ToIDispatch()
+			defer propsCol.Release()
 
-			props_name, err := oleutil.GetProperty(props_col, "Name")
+			propsName, err := oleutil.GetProperty(propsCol, "Name")
 			if err != nil {
 				return
 			}
-			defer props_name.Clear()
+			defer clearQuals(propsName)
 
-			props_val, err := oleutil.GetProperty(props_col, "Value")
+			propsVal, err := oleutil.GetProperty(propsCol, "Value")
 			if err != nil {
 				return
 			}
-			defer props_val.Clear()
+			defer clearQuals(propsVal)
 
-			raw_quals, err := props_col.GetProperty("Qualifiers_")
+			isKeyProperty, err := isPropertyKeyProperty(propsCol)
+
 			if err != nil {
 				return
 			}
-			defer raw_quals.Clear()
 
-			quals := raw_quals.ToIDispatch()
-			is_key_property := false
-
-			// loop through Property Qualifiers to find if this Property
-			// is a Key and shold be skipped unless specifically queried for
-			oleutil.ForEach(quals, func(vc2 *ole.VARIANT) (err error) {
-				quals_col := vc2.ToIDispatch()
-				defer quals_col.Release()
-
-				quals_name, err := oleutil.GetProperty(quals_col, "Name")
-				if err != nil {
-					return
-				}
-				defer quals_name.Clear()
-
-				if quals_name.Value().(string) == "key" {
-					is_key_property = true
-					return stopErrorCol
-				}
-				return
-			})
-
-			if !is_key_property {
-				r.data = props_val.Value()
+			if !isKeyProperty {
+				r.data = propsVal.Value()
 				return stopErrorCol
 			} else {
 				// remember key field value in the case it was the only selected column
-				property_key_field_value = props_val.Value()
+				propertyKeyFieldValue = propsVal.Value()
 			}
 			return
 		})
+
 		if err == nil {
 			return stopErrorRow
 		}
+
 		return
 	})
 	if stop, ok := oleErr.(stopError); !ok {
 		return oleErr
 	} else {
 		if oleErr == nil || stop == stopErrorRow {
-			r.data = property_key_field_value
+			r.data = propertyKeyFieldValue
 		}
 	}
 	return
