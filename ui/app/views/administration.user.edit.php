@@ -156,7 +156,7 @@ if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_U
 		->setReadonly();
 }
 else {
-	$has_unavailable_locale = false;
+	$any_unavailable_locale = false;
 
 	foreach (getLocales() as $localeid => $locale) {
 		if (!$locale['display']) {
@@ -171,7 +171,7 @@ else {
 
 		$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-		$has_unavailable_locale |= !$locale_available;
+		$any_unavailable_locale |= !$locale_available;
 	}
 
 	// Restoring original locale.
@@ -181,7 +181,7 @@ else {
 		$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
 		$lang_select->setReadonly();
 	}
-	elseif ($has_unavailable_locale) {
+	elseif ($any_unavailable_locale) {
 		$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 	}
 
