@@ -37,9 +37,13 @@ $widget = (new CWidget())
 				->addItem(new CRedirectButton(_('Create value map'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'valuemap.edit')
 				))
-				->addItem(new CRedirectButton(_('Import'), (new CUrl('conf.import.php'))
-					->setArgument('rules_preset', 'valuemap')
-				))
+				->addItem(
+					(new CButton('', _('Import')))
+						->onClick('return PopUp("popup.import", jQuery.extend('.
+							json_encode(['rules_preset' => 'valuemap']).', null), null, this);'
+						)
+						->removeId()
+				)
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
