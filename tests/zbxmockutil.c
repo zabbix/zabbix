@@ -36,7 +36,6 @@ const char	*zbx_mock_get_parameter_string(const char *path)
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &parameter)))
 	{
-		parameter = NULL;
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
 	}
 
@@ -52,7 +51,6 @@ const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const ch
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &member)))
 	{
-		member = NULL;
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 	}
 
@@ -240,7 +238,6 @@ zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &parameter)))
 	{
-		parameter = 0;
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
 	}
 
@@ -256,7 +253,6 @@ zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const c
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &member)))
 	{
-		member = 0;
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 	}
 
@@ -272,7 +268,6 @@ double	zbx_mock_get_parameter_float(const char *path)
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &parameter)))
 	{
-		parameter = 0.0;
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
 	}
 
@@ -288,7 +283,6 @@ double	zbx_mock_get_object_member_float(zbx_mock_handle_t object, const char *na
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &member)))
 	{
-		member = 0.0;
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 	}
 

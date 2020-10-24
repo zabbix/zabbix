@@ -172,7 +172,7 @@ tests: tests_build
 
 tests_clean: clean-recursive
 	cd tests && \
-	find . -type f -name '*.o' -delete
+	find . -type f -name '*.o' -o -name '*.a' -delete
 endif
 
 .PHONY: test tests

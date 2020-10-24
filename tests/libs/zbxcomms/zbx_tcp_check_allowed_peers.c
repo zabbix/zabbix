@@ -41,15 +41,12 @@ static void	mock_accept(zbx_socket_t *s)
 			break;
 		default:
 			fail_msg("Unexpected family");
-			goto out;
 	}
 
 	if (1 != inet_pton(s->peer_info.ss_family, (peer = zbx_mock_get_parameter_string("in.peer")), buf))
 		fail_msg("failed converting address '%s' from textual to binary", zbx_mock_get_parameter_string("in.peer"));
 
 	zbx_strlcpy(s->peer, peer, sizeof(s->peer));
-out:
-	return;
 }
 
 void	zbx_mock_test_entry(void **state)
