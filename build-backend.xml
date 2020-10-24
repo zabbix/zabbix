@@ -314,7 +314,9 @@
 	<target name="make-dist">
 		<!-- Create & build Zabbix distribution -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
-		<exec executable="./configure" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
 			<arg line="-j5"/>
@@ -326,12 +328,13 @@
 			<arg line="dist"/>
 		</exec>
 		<apply executable="tar">
-			<arg line="-zxf"/>
+			<arg line="xzf"/>
 			<fileset dir="." includes="zabbix-*.tar.gz"/>
 		</apply>
-		<dirset dir="." includes="zabbix-*" id="dist.dir"/>
-		<property name="prop.dist.dir" refid="dist.dir"/>
-		<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true"/>
+		<move tofile="sources">
+			<dirset dir="." includes="zabbix-*"/>
+		</move>
+		<ant antfile="../build-backend.xml" dir="sources" target="build-dist" inheritAll="true" inheritRefs="true"/>
 	</target>
 
 	<target name="build" depends="make-dist"/>
