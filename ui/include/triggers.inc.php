@@ -756,7 +756,9 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	] + $host_options;
 
 	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments',
+			'manual_close'
+		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectDependencies' => ['triggerid'],
 		'monitored' => true,
@@ -961,12 +963,18 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 /**
  * Creates and returns a trigger status cell for the trigger overview table.
  *
- * @param array  $trigger
- * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
+ * @param array $trigger
+ * @param array $dependencies                The list of trigger dependencies, prepared by getTriggerDependencies()
+ *                                           function.
+ * @param array $allowed                     An array of user role rules.
+ * @param bool  $allowed['add_comments']     Whether user is allowed to add problems comments.
+ * @param bool  $allowed['change_severity']  Whether user is allowed to change problems severity.
+ * @param bool  $allowed['acknowledge']      Whether user is allowed to acknowledge problems.
+ * @param bool  $allowed['close']            Whether user is allowed to close problems.
  *
  * @return CCol
  */
-function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
+function getTriggerOverviewCell(array $trigger, array $dependencies, array $allowed): CCol {
 	$ack = $trigger['problem']['acknowledged'] == 1 ? (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN) : null;
 	$desc = array_key_exists($trigger['triggerid'], $dependencies)
 		? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
@@ -988,7 +996,9 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 
 	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 		$eventid = $trigger['problem']['eventid'];
-		$acknowledge = true;
+		$acknowledge = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+				|| ($allowed['close'] && $trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+		);
 	}
 	else {
 		$acknowledge = false;

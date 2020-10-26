@@ -93,10 +93,10 @@ function getSystemStatusData(array $filter) {
 		'stats' => [],
 		'allowed' => [
 			'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-			'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+			'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+			'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+			'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 		]
 	];
 
@@ -163,7 +163,7 @@ function getSystemStatusData(array $filter) {
 		}
 
 		$options = [
-			'output' => ['priority'],
+			'output' => ['priority', 'manual_close'],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
@@ -334,7 +334,10 @@ function getSystemStatusData(array $filter) {
  * @param array  $data['triggers'][<triggerid>]['opdata']
  * @param array  $data['allowed']
  * @param bool   $data['allowed']['ui_problems']
- * @param bool   $data['allowed']['ack']
+ * @param bool   $data['allowed']['add_comments']
+ * @param bool   $data['allowed']['change_severity']
+ * @param bool   $data['allowed']['acknowledge']
+ * @param bool   $data['allowed']['close']
  *
  * @return CDiv
  */
@@ -761,7 +764,10 @@ function make_status_of_zbx() {
  * @param array  $filter['show_opdata']      (optional)
  * @param array  $allowed
  * @param bool   $allowed['ui_problems']
- * @param bool   $allowed['ack']
+ * @param bool   $allowed['add_comments']
+ * @param bool   $allowed['change_severity']
+ * @param bool   $allowed['acknowledge']
+ * @param bool   $allowed['close']
  *
  * @return CTableInfo
  */
@@ -901,7 +907,9 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 
 		// Create acknowledge link.
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-		$problem_update_link = $allowed['ack']
+		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+				|| ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close'])
+		)
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)

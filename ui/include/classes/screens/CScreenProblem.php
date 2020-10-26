@@ -298,7 +298,7 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority'],
+						'output' => ['priority', 'manual_close'],
 						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
@@ -965,10 +965,15 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = '';
 				}
 
+				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+						&& $this->data['allowed_close']
+				);
+
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
 					$value_str = _('RESOLVED');
 					$value_clock = $problem['r_clock'];
+					$can_be_closed = false;
 				}
 				else {
 					$in_closing = false;
@@ -976,6 +981,7 @@ class CScreenProblem extends CScreenBase {
 					foreach ($problem['acknowledges'] as $acknowledge) {
 						if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 							$in_closing = true;
+							$can_be_closed = false;
 							break;
 						}
 					}
@@ -1102,7 +1108,9 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				// Create acknowledge link.
-				$problem_update_link = $this->data['allowed_ack']
+				$problem_update_link = ($this->data['allowed_add_comments'] || $this->data['allowed_change_severity']
+						|| $this->data['allowed_acknowledge'] || $can_be_closed
+				)
 					? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 						->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 						->addClass(ZBX_STYLE_LINK_ALT)
@@ -1138,7 +1146,12 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'popup.acknowledge.edit' => ['name' => _('Mass update'), 'disabled' => !$this->data['allowed_ack']]
+				'popup.acknowledge.edit' => [
+					'name' => _('Mass update'),
+					'disabled' => !($this->data['allowed_add_comments'] || $this->data['allowed_change_severity']
+							|| $this->data['allowed_acknowledge'] || $this->data['allowed_close']
+					)
+				]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);

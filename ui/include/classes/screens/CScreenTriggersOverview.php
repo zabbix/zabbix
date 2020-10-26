@@ -37,7 +37,14 @@ class CScreenTriggersOverview extends CScreenBase {
 			(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$data = [];
+		$data = [
+			'allowed' => [
+				'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+				'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+				'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+				'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			]
+		];
 		list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
 		) = getTriggersOverviewData((array) $this->screenitem['resourceid'], $this->screenitem['application']);
