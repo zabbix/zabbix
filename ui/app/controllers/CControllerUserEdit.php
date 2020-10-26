@@ -141,10 +141,13 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['rows_per_page'] = $this->user['rows_per_page'];
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
-			$data['roleid'] = $this->user['roleid'];
-			$data['role'] = [['id' => $data['roleid'], 'name' => $this->user['role']['name']]];
-			$data['user_type'] = $this->user['role']['type'];
 			$data['db_user']['alias'] = $this->user['alias'];
+
+			if (!$this->getInput('form_refresh', 0)) {
+				$data['roleid'] = $this->user['roleid'];
+				$data['user_type'] = $this->user['role']['type'];
+				$data['role'] = [['id' => $data['roleid'], 'name' => $this->user['role']['name']]];
+			}
 		}
 		else {
 			$data['change_password'] = true;
@@ -171,15 +174,16 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
-		if (($data['userid'] == 0 && $data['roleid'] !== '')
-				|| ($data['userid'] != 0 && $data['roleid'] != $this->user['roleid'])) {
+		if ($data['form_refresh'] && $this->hasInput('roleid')) {
 			$roles = API::Role()->get([
 				'output' => ['name', 'type'],
 				'roleids' => $data['roleid']
 			]);
 
-			$data['role'] = [['id' => $data['roleid'], 'name' => $roles[0]['name']]];
-			$data['user_type'] = $roles[0]['type'];
+			if ($roles) {
+				$data['role'] = [['id' => $data['roleid'], 'name' => $roles[0]['name']]];
+				$data['user_type'] = $roles[0]['type'];
+			}
 		}
 
 		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {

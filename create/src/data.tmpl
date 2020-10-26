@@ -17,6 +17,13 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 
+TABLE |role
+FIELDS|roleid|name            |type|readonly|
+ROW   |1     |User role       |1   |0       |
+ROW   |2     |Admin role      |2   |0       |
+ROW   |3     |Super Admin role|3   |1       |
+ROW   |4     |Guest role      |1   |0       |
+
 TABLE |users
 FIELDS|userid|alias|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|rows_per_page|roleid|
 ROW   |1     |Admin|Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |50           |3     |
@@ -743,13 +750,6 @@ ROW   |12          |2       |^Nu[0-9.]*$                                        
 TABLE |config_autoreg_tls
 FIELDS|autoreg_tlsid|tls_psk_identity|tls_psk|
 ROW   |1            |                |       |
-
-TABLE |role
-FIELDS|roleid|name            |type|readonly|
-ROW   |1     |User role       |1   |0       |
-ROW   |2     |Admin role      |2   |0       |
-ROW   |3     |Super Admin role|3   |1       |
-ROW   |4     |Guest role      |1   |0       |
 
 TABLE |role_rule
 FIELDS|role_ruleid|roleid|type|name                  |value_int|value_str|value_moduleid|

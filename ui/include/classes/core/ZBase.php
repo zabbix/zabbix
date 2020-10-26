@@ -162,7 +162,7 @@ class ZBase {
 	 *
 	 * @param string $mode  Application initialization mode.
 	 *
-	 * @throws DBException
+	 * @throws Exception
 	 */
 	public function run($mode) {
 		$this->mode = $mode;
@@ -176,15 +176,9 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
-
 				$this->loadConfigFile();
 				$this->initDB();
-
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
-
-				// Start sesion only after DB initialized.
-				new CEncryptedCookieSession();
-
 				$this->authenticateUser();
 
 				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
@@ -216,9 +210,6 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-
-				new CEncryptedCookieSession();
-
 				$this->initLocales('en_gb');
 				break;
 
@@ -227,12 +218,9 @@ class ZBase {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
-
-					new CEncryptedCookieSession();
-
 					$this->authenticateUser();
-					$this->initComponents();
 					$this->initLocales(CWebUser::$data['lang']);
+					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {
 					if ($e->getCode() == CConfigFile::CONFIG_VAULT_ERROR) {
@@ -246,7 +234,14 @@ class ZBase {
 						exit;
 					}
 					else {
-						new CCookieSession();
+						$session = new CCookieSession();
+						$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+
+						if (!$session->session_start($sessionid)) {
+							throw new Exception(_('Session initialization error.'));
+						}
+
+						CSessionHelper::set('sessionid', $sessionid);
 					}
 				}
 				break;
@@ -476,16 +471,26 @@ class ZBase {
 
 	/**
 	 * Authenticate user.
+	 *
+	 * @throws Exception
 	 */
 	protected function authenticateUser(): void {
-		if (!CWebUser::checkAuthentication(CSessionHelper::getId())) {
+		$session = new CEncryptedCookieSession();
+
+		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
 			CWebUser::setDefault();
 		}
 
-		// set the authentication token for the API
-		API::getWrapper()->auth = CSessionHelper::getId();
+		if (!$session->session_start(CWebUser::$data['sessionid'])) {
+			throw new Exception(_('Session initialization error.'));
+		}
 
-		// enable debug mode in the API
+		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+
+		// Set the authentication token for the API.
+		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
 	}
 
