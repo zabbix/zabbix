@@ -48,19 +48,22 @@ class CWidgetHelper {
 		return (new CFormList())
 			->addItem((new CListItem([
 					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-					(new CSelect('type'))
-						->setFocusableElementId('label-type')
-						->setId('type')
-						->setValue($type)
-						->addOptions(CSelect::createOptionsFromArray($known_widget_types))
-						->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT),
-					(new CDiv((new CCheckBox('show_header'))
+					(new CDiv([
+						(new CDiv((new CCheckBox('show_header'))
 							->setLabel(_('Show header'))
 							->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
 							->setId('show_header')
-							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)))
-						->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-				]))->addClass('table-forms-row-with-second-field')
+							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
+						))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN),
+						(new CSelect('type'))
+							->setFocusableElementId('label-type')
+							->setId('type')
+							->setValue($type)
+							->setAttribute('autofocus', 'autofocus')
+							->addOptions(CSelect::createOptionsFromArray($known_widget_types))
+					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+				]))
+				->addClass('table-forms-row-with-second-field')
 			)
 			->addRow(_('Name'),
 				(new CTextBox('name', $dialogue_name))
