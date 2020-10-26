@@ -47,36 +47,37 @@ class CWidgetHelper {
 	public static function createFormList($name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
 		$form_list = (new CFormList())
 			->addItem((new CListItem([
-					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-					(new CDiv([
-						(new CDiv((new CCheckBox('show_header'))
+					(new CDiv(new CLabel(_('Type'), 'type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+					(new CDiv((new CSelect('type'))
+						->setFocusableElementId('label-type')
+						->setId('type')
+						->setValue($type)
+						->setAttribute('autofocus', 'autofocus')
+						->addOptions(CSelect::createOptionsFromArray($known_widget_types))
+					))
+						->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT),
+					(new CDiv((new CCheckBox('show_header'))
 							->setLabel(_('Show header'))
 							->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
 							->setId('show_header')
-							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
-						))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN),
-						(new CSelect('type'))
-							->setFocusableElementId('label-type')
-							->setId('type')
-							->setValue($type)
-							->setAttribute('autofocus', 'autofocus')
-							->addOptions(CSelect::createOptionsFromArray($known_widget_types))
-					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
-				]))
-				->addClass('table-forms-row-with-second-field')
+							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+				]))->addClass('table-forms-row-with-second-field')
 			)
+
+
 			->addRow(_('Name'),
 				(new CTextBox('name', $name))
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
+			->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
+				->setOnDocumentReady()
 			);
 
+
 		if ($field_rf_rate !== null) {
-			$form_list
-				->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate))
-				->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
-					->setOnDocumentReady()
-				);
+			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
 		}
 
 		return $form_list;
@@ -115,7 +116,7 @@ class CWidgetHelper {
 	/**
 	 * @param CWidgetFieldSelect $field
 	 *
-	 * @return CComboBox
+	 * @return CSelect
 	 */
 	public static function getSelect($field) {
 		return (new CSelect($field->getName()))
@@ -368,7 +369,7 @@ class CWidgetHelper {
 	 *
 	 * @param CWidgetFieldWidgetSelect $field
 	 *
-	 * @return CComboBox
+	 * @return CSelect
 	 */
 	public static function getEmptySelect($field) {
 		return (new CSelect($field->getName()))
@@ -1106,11 +1107,15 @@ class CWidgetHelper {
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregation function'),
-								(new CComboBox(
-									$field_name.'['.$row_num.'][aggregate_function]',
-									(int) $value['aggregate_function'], null,
-									[
+							->addRow(
+								new CLabel(_('Aggregation function'),
+									'label-'.$field_name.'_'.$row_num.'_aggregate_function'
+								),
+								(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
+									->setId($field_name.'_'.$row_num.'_aggregate_function')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
+									->setValue((int) $value['aggregate_function'])
+									->addOptions(CSelect::createOptionsFromArray([
 										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
 										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
 										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
@@ -1119,10 +1124,8 @@ class CWidgetHelper {
 										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
 										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
 										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
-									]
-								))
+									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-									->onChange('changeDataSetAggregateFunction(this);')
 							)
 							->addRow(_('Aggregation interval'),
 								(new CTextBox(

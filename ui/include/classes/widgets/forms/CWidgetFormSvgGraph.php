@@ -157,10 +157,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
-			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
-			->setAction('jQuery("#lefty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
-			);
+			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO);
 
 		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_lefty_units->setFlags(CWidgetField::FLAG_DISABLED);
@@ -232,10 +229,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
-			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
-			->setAction('jQuery("#righty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
-			);
+			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO);
 
 		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_righty_units->setFlags(CWidgetField::FLAG_DISABLED);
