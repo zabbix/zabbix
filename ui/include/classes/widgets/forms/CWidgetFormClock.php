@@ -33,8 +33,7 @@ class CWidgetFormClock extends CWidgetForm {
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')
 		]))
-			->setDefault(TIME_TYPE_LOCAL)
-			->setAction('updateWidgetConfigDialogue()');
+			->setDefault(TIME_TYPE_LOCAL);
 
 		if (array_key_exists('time_type', $this->data)) {
 			$field_time_type->setValue($this->data['time_type']);

@@ -47,8 +47,12 @@ class CWidgetHelper {
 	public static function createFormList($dialogue_name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
 		return (new CFormList())
 			->addItem((new CListItem([
-					(new CDiv(new CLabel(_('Type'), 'type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-					(new CDiv(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types)))
+					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+					(new CSelect('type'))
+						->setFocusableElementId('label-type')
+						->setId('type')
+						->setValue($type)
+						->addOptions(CSelect::createOptionsFromArray($known_widget_types))
 						->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT),
 					(new CDiv((new CCheckBox('show_header'))
 							->setLabel(_('Show header'))
@@ -87,6 +91,11 @@ class CWidgetHelper {
 	 * @return CLabel
 	 */
 	public static function getLabel($field) {
+		if ($field instanceof CWidgetFieldComboBox) {
+			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
+				->setAsteriskMark(self::isAriaRequired($field));
+		}
+
 		return (new CLabel($field->getLabel(), $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field));
 	}
@@ -94,14 +103,16 @@ class CWidgetHelper {
 	/**
 	 * @param CWidgetFieldComboBox $field
 	 *
-	 * @return CComboBox
+	 * @return CSelect
 	 */
 	public static function getComboBox($field) {
-		$combo_box = (new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
-			->setAriaRequired(self::isAriaRequired($field))
-			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
-
-		return $combo_box;
+		return (new CSelect($field->getName()))
+			->setId($field->getName())
+			->setFocusableElementId('label-'.$field->getName())
+			->setValue($field->getValue())
+			->addOptions(CSelect::createOptionsFromArray($field->getValues()))
+			->setDisabled($field->getFlags() & CWidgetField::FLAG_DISABLED)
+			->setAriaRequired(self::isAriaRequired($field));
 	}
 
 	/**
@@ -349,10 +360,12 @@ class CWidgetHelper {
 	 *
 	 * @param CWidgetFieldWidgetListComboBox $field
 	 *
-	 * @return CComboBox
+	 * @return CSelect
 	 */
 	public static function getEmptyComboBox($field) {
-		return (new CComboBox($field->getName(), [], $field->getAction(), []))
+		return (new CSelect($field->getName()))
+			->setFocusableElementId('label-'.$field->getName())
+			->setId($field->getName())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
 	}
@@ -1085,11 +1098,15 @@ class CWidgetHelper {
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregation function'),
-								(new CComboBox(
-									$field_name.'['.$row_num.'][aggregate_function]',
-									(int) $value['aggregate_function'], null,
-									[
+							->addRow(
+								new CLabel(_('Aggregation function'),
+									'label-'.$field_name.'_'.$row_num.'_aggregate_function'
+								),
+								(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
+									->setId($field_name.'_'.$row_num.'_aggregate_function')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
+									->setValue((int) $value['aggregate_function'])
+									->addOptions(CSelect::createOptionsFromArray([
 										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
 										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
 										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
@@ -1098,10 +1115,8 @@ class CWidgetHelper {
 										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
 										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
 										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
-									]
-								))
+									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-									->onChange('changeDataSetAggregateFunction(this);')
 							)
 							->addRow(_('Aggregation interval'),
 								(new CTextBox(
