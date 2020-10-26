@@ -46,6 +46,7 @@ typedef enum
 	ZBX_MUTEX_PROXY_HISTORY,
 	ZBX_MUTEX_KSTAT,
 	ZBX_MUTEX_MODBUS,
+	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }
 zbx_mutex_name_t;
