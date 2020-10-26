@@ -103,7 +103,7 @@ class testFormItemTest extends CWebTest {
 
 			for ($i = 0; $i < 2; $i++) {
 
-				if (($type === 'IPMI agent' || $type === 'SNMP agent') && $is_host === false) {
+				if ($type === 'IPMI agent' && $is_host === false) {
 					$enabled = false;
 				}
 				else {
@@ -579,9 +579,9 @@ class testFormItemTest extends CWebTest {
 			case TEST_GOOD:
 				$this->assertEquals('Test item', $dialog->getTitle());
 				$test_form = $this->query('id:preprocessing-test-form')
-					->waitUntilPresent()->asForm()->one()->waitUntilReady();
+					->waitUntilPresent()->one()->waitUntilReady();
 				// Check "Get value from host" checkbox.
-				$get_host_value = $test_form->getField('Get value from host');
+				$get_host_value = $test_form->query('id:get_value')->one()->asCheckbox();
 				$this->assertTrue($get_host_value->isEnabled());
 				$this->assertTrue($get_host_value->isChecked());
 
@@ -661,7 +661,7 @@ class testFormItemTest extends CWebTest {
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Click Test button in test form.
-				$test_form->submit();
+				$dialog->query('button:Get value and test')->one()->waitUntilVisible()->click();
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Check empty interface fields.
@@ -717,7 +717,7 @@ class testFormItemTest extends CWebTest {
 				}
 
 				if ($macros['expected']){
-					foreach ($test_form->getField('Macros')->asTable()->getRows() as $row) {
+					foreach ($test_form->query('class:textarea-flexible-container')->one()->asTable()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
 						 * Macro columns are represented in following way:
@@ -740,7 +740,7 @@ class testFormItemTest extends CWebTest {
 
 				// Compare preprocessing from data with steps from test table.
 				if (CTestArrayHelper::get($data, 'preprocessing')) {
-					$preprocessing_table = $test_form->getField('Preprocessing steps')
+					$preprocessing_table = $test_form->query('id:preprocessing-steps')->one()
 						->asTable();
 
 					foreach ($data['preprocessing'] as $i => $step) {
@@ -767,8 +767,8 @@ class testFormItemTest extends CWebTest {
 	 */
 	private function checkValueFields($data) {
 		$test_form = $this->query('id:preprocessing-test-form')
-			->waitUntilPresent()->asForm()->one()->waitUntilReady();
-		$get_host_value = $test_form->getField('Get value from host');
+			->waitUntilPresent()->one()->waitUntilReady();
+		$get_host_value = $test_form->query('id:get_value')->one()->asCheckbox();
 
 		$checked = $get_host_value->isChecked();
 		$prev_enabled = false;
@@ -799,7 +799,7 @@ class testFormItemTest extends CWebTest {
 				->one()->isEnabled($checked && $prev_enabled));
 
 		$this->assertFalse($test_form->query('id:time')->one()->isEnabled());
-		$this->assertTrue($test_form->getField('End of line sequence')->isEnabled());
+		$this->assertTrue($test_form->query('id:eol')->one()->isEnabled());
 	}
 
 	private function checkServerMessage($message) {
