@@ -132,8 +132,8 @@ Overlay.prototype.recoverFocus = function() {
 		return;
 	}
 
-	if (jQuery('[autofocus=autofocus]:focusable', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]:focusable', this.$dialogue).first().focus();
+	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
+		jQuery('[autofocus=autofocus]', this.$dialogue).first().focus();
 	}
 	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
 		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).first().focus();
