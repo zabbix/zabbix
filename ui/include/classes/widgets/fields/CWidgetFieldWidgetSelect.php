@@ -69,21 +69,24 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return
-			'var dashboard_data = dashboard.$target.data("dashboardGrid"),'.
-				'filters_box = jQuery("#'.$this->getName().'");'.
-			'jQuery("<option />").text("'._('Select widget').'").val("").appendTo(filters_box);'.
+			'var dashboard = jQuery(".dashbrd-grid-container"),'.
+				'dashboard_data = dashboard.$target.data("dashboardGrid"),'.
+				'filter_select = jQuery("#'.$this->getName().'").get(0);'.
+			'filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');'.
+			'filter_select.selectedIndex = 0;'.
 			'jQuery.each('.
 				'dashboard.$target.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
 				'function(i, widget) {'.
 					'if (widget !== dashboard_data["dialogue"]["widget"]) {'. // Widget currently edited or null for new widgets.
-						'jQuery("<option />")'.
-							'.text(widget["header"].length'.
+						'filter_select.addOption({'.
+							'"label": widget["header"].length'.
 								'? widget["header"]'.
-								': dashboard_data["widget_defaults"][widget["type"]]["header"]'.
-							')'.
-							'.val(widget["fields"]["reference"])'.
-							'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
-							'.appendTo(filters_box);'.
+								': dashboard_data["widget_defaults"][widget["type"]]["header"],'.
+							'"value": widget["fields"]["reference"]'.
+						'});'.
+						'if (widget["fields"]["reference"] === "'.$this->getValue().'") {'.
+							'filter_select.value = "'.$this->getValue().'";'.
+						'}'.
 					'}'.
 			'});';
 	}
@@ -94,5 +97,13 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 		}
 
 		return $this;
+	}
+
+	public function setAction($action) {
+		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
+	}
+
+	public function getAction() {
+		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
 	}
 }
