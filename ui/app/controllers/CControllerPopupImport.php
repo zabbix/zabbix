@@ -49,10 +49,10 @@ class CControllerPopupImport extends CController {
 
 		switch ($this->getInput('rules_preset')) {
 			case 'map' :
-				return CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
+				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
 
 			case 'screen':
-				return CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 
 			case 'host':
 			case 'template':
