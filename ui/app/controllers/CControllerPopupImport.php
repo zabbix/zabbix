@@ -45,7 +45,21 @@ class CControllerPopupImport extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		$user_type = $this->getUserType();
+
+		switch ($this->getInput('rules_preset')) {
+			case 'map' :
+				return CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
+
+			case 'screen':
+				return CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
+			case 'host':
+			case 'template':
+			case 'mediatype':
+			case 'valuemap':
+				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
+		}
 	}
 
 	protected function doAction() {
@@ -69,7 +83,7 @@ class CControllerPopupImport extends CController {
 		];
 
 		// Adjust defaults for given rule preset, if specified.
-		switch (getRequest('rules_preset')) {
+		switch ($this->getInput('rules_preset')) {
 			case 'host':
 				$rules['groups'] = ['createMissing' => true];
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
@@ -112,21 +126,23 @@ class CControllerPopupImport extends CController {
 				break;
 
 			case 'map':
-				$rules['maps'] = ['updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+				$rules['maps'] = [
+					'updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
 					'createMissing' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
 				];
 				$rules['images'] = ['updateExisting' => false, 'createMissing' => true];
 				break;
 
 			case 'screen':
-				$rules['screens'] = ['updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
+				$rules['screens'] = [
+					'updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
 					'createMissing' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
 				];
 				break;
 		}
 
 		if ($this->hasInput('import')) {
-			$request_rules = getRequest('rules', []);
+			$request_rules = $this->getInput('rules', []);
 
 			foreach ($rules as $rule_name => $rule) {
 				if (!array_key_exists($rule_name, $request_rules)) {

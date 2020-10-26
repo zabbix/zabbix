@@ -91,12 +91,8 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_MONITORING_HOSTS => ['host_screen.php', 'httpdetails.php'],
 				CRoleHelper::UI_MONITORING_OVERVIEW => ['overview.php'],
 				CRoleHelper::UI_MONITORING_LATEST_DATA => ['history.php'],
-				CRoleHelper::UI_MONITORING_SCREENS => ['screen.import.php', 'screens.php', 'slideconf.php',
-					'slides.php'
-				],
-				CRoleHelper::UI_MONITORING_MAPS => ['image.php', 'map.import.php', 'map.php', 'sysmap.php',
-					'sysmaps.php'
-				],
+				CRoleHelper::UI_MONITORING_SCREENS => ['screens.php', 'slideconf.php', 'slides.php'],
+				CRoleHelper::UI_MONITORING_MAPS => ['image.php', 'map.php', 'sysmap.php', 'sysmaps.php'],
 				CRoleHelper::UI_MONITORING_SERVICES => ['chart5.php', 'srv_status.php'],
 				CRoleHelper::UI_INVENTORY_OVERVIEW => ['hostinventoriesoverview.php'],
 				CRoleHelper::UI_INVENTORY_HOSTS => ['hostinventories.php'],
