@@ -1631,7 +1631,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	private function checkPopupContent($data, $widget, $show){
 		$expected_popup = [
 			'fields' => [
-				'Time' => '2018-10-23 12:33:48',
+				'Time' => '2020-10-23 15:33:48',
 				'Host' => 'ЗАББИКС Сервер',
 				'Problem' => 'Test trigger to check tag filter on problem page',
 				'Ack' => 'No'
