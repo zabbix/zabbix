@@ -936,6 +936,13 @@ class CScreenProblem extends CScreenBase {
 				$dependencies = getTriggerDependencies($data['triggers']);
 			}
 
+			$allowed = [
+				'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+				'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+				'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+				'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			];
+
 			// Add problems to table.
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
@@ -965,9 +972,7 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = '';
 				}
 
-				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
-						&& $this->data['allowed_close']
-				);
+				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']);
 
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
@@ -1108,8 +1113,8 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				// Create acknowledge link.
-				$problem_update_link = ($this->data['allowed_add_comments'] || $this->data['allowed_change_severity']
-						|| $this->data['allowed_acknowledge'] || $can_be_closed
+				$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity']
+						|| $allowed['acknowledge'] || $can_be_closed
 				)
 					? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 						->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
@@ -1148,8 +1153,8 @@ class CScreenProblem extends CScreenBase {
 			$footer = new CActionButtonList('action', 'eventids', [
 				'popup.acknowledge.edit' => [
 					'name' => _('Mass update'),
-					'disabled' => !($this->data['allowed_add_comments'] || $this->data['allowed_change_severity']
-							|| $this->data['allowed_acknowledge'] || $this->data['allowed_close']
+					'disabled' => !($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+							|| $allowed['close']
 					)
 				]
 			], 'problem');

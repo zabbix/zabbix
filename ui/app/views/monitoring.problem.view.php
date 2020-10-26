@@ -53,11 +53,7 @@ $options = [
 			'details' => $data['filter']['details'],
 			'highlight_row' => $data['filter']['highlight_row'],
 			'show_opdata' => $data['filter']['show_opdata']
-		],
-		'allowed_add_comments' => (int) $data['allowed_add_comments'],
-		'allowed_change_severity' => (int) $data['allowed_change_severity'],
-		'allowed_acknowledge' => (int) $data['allowed_acknowledge'],
-		'allowed_close' => (int) $data['allowed_close']
+		]
 	],
 ];
 
