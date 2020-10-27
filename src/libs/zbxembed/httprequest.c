@@ -398,7 +398,6 @@ static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_to_string(ctx, 0), err);
 out:
-
 	if (-1 != err_index)
 		return duk_throw(ctx);
 
