@@ -170,9 +170,8 @@ tests_build:
 tests: tests_build
 	tests/tests_run.pl
 
-tests_clean: clean-recursive
-	cd tests && \
-	find . -type f -name '*.o' -o -name '*.a' -delete
+clean: clean-recursive
+	(cd tests && make clean)
 endif
 
-.PHONY: test tests
+.PHONY: test tests clean
