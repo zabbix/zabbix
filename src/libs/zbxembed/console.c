@@ -90,7 +90,7 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	if (NULL == env->json)
 		goto out;
 
-	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)   /* approximate limit */
+	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "log exceeds the maximum size of "
 				ZBX_FS_UI64 " bytes.", ZBX_ES_LOG_MEMORY_LIMIT);
@@ -148,10 +148,10 @@ static duk_ret_t	es_console_error(duk_context *ctx)
 }
 
 static const duk_function_list_entry	console_methods[] = {
-	{"log",		es_console_log,		1},
-	{"warn",	es_console_warn,	1},
-	{"error",	es_console_error,	1},
-	{NULL,		NULL,			0}
+	{"log", es_console_log, 1},
+	{"warn", es_console_warn, 1},
+	{"error", es_console_error, 1},
+	{NULL, NULL, 0}
 };
 
 static int	es_console_create_object(duk_context *ctx)
