@@ -180,7 +180,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
-
-		return SYSINFO_RET_OK;
 	}
+
+	return SYSINFO_RET_OK;
 }
