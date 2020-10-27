@@ -1207,17 +1207,20 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	$i = 0;
 
 	foreach ($preprocessing as $step) {
-		// Create a combo box with preprocessing types.
-		$preproc_types_cbbox = (new CComboBox('preprocessing['.$i.'][type]', $step['type']))->setReadonly($readonly);
+		// Create a select with preprocessing types.
+		$preproc_types_select = (new CSelect('preprocessing['.$i.'][type]'))
+			->setId('preprocessing_'.$i.'_type')
+			->setValue($step['type'])
+			->setReadonly($readonly);
 
 		foreach (get_preprocessing_types(null, true, $types) as $group) {
-			$cb_group = new COptGroup($group['label']);
+			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
+				$opt_group->addOption(new CSelectOption($type, $label));
 			}
 
-			$preproc_types_cbbox->addItem($cb_group);
+			$preproc_types_select->addOptionGroup($opt_group);
 		}
 
 		// Depending on preprocessing type, display corresponding params field and placeholders.
@@ -1412,7 +1415,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					(new CDiv())
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
-					(new CDiv($preproc_types_cbbox))
+					(new CDiv($preproc_types_select))
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
