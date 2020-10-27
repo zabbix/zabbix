@@ -249,11 +249,13 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "error in setting the status flag to 0 (for %s): %s", device,
 				zbx_strerror(errno));
+
 		if (NULL != error)
 		{
 			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s", device,
 					zbx_strerror(errno));
 		}
+
 		return FAIL;
 	}
 

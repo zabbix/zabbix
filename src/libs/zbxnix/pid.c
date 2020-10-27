@@ -58,10 +58,11 @@ int	create_pid_file(const char *pidfile)
 	}
 
 	/* lock file */
-	if (-1 != (fdpid = fileno(fpid)))
+	if (-1 != (fdpid = fileno(fpid)) && (-1 == fcntl(fdpid, F_SETLK, &fl) || -1 == fcntl(fdpid,
+			F_SETFD, FD_CLOEXEC)))
 	{
-		fcntl(fdpid, F_SETLK, &fl);
-		fcntl(fdpid, F_SETFD, FD_CLOEXEC);
+		zbx_error("error in setting the status flag: %s", zbx_strerror(errno));
+		return FAIL;
 	}
 
 	/* write pid to file */
@@ -103,8 +104,11 @@ void	drop_pid_file(const char *pidfile)
 	fl.l_pid = zbx_get_thread_id();
 
 	/* unlock file */
-	if (-1 != fdpid)
-		fcntl(fdpid, F_SETLK, &fl);
+	if (-1 != fdpid && -1 == fcntl(fdpid, F_SETLK, &fl))
+	{
+		zbx_error("error in setting the status flag: %s", zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
 
 	/* close pid file */
 	zbx_fclose(fpid);

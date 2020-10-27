@@ -141,8 +141,15 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 {
 	int	fd[2], stdout_orig, stderr_orig;
+	DIR	*test_dir;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __func__, command);
+
+	if (NULL == (test_dir = opendir(dir)))
+		return -1;
+
+	if (-1 == closedir(test_dir))
+		return -1;
 
 	if (-1 == pipe(fd))
 		return -1;
@@ -215,7 +222,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 	if (NULL != dir && 0 != chdir(dir))
 	{
 		fprintf(stderr, "cannot change directory to UserParameterDir: %s\n", zbx_strerror(errno));
-		exit(127);
+		exit(EXIT_FAILURE);
 	}
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
@@ -505,10 +512,6 @@ close:
 		{
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
-		}
-		else if (127 == WEXITSTATUS(status))
-		{
-			zbx_snprintf(error, max_error_len, "cannot change directory to \"%s\"", dir);
 		}
 		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != WEXITSTATUS(status)))
 		{
