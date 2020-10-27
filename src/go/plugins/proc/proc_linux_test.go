@@ -21,7 +21,10 @@
 
 package proc
 
-import "testing"
+import (
+	"regexp"
+	"testing"
+)
 
 func Test_checkProccom(t *testing.T) {
 	type args struct {
@@ -29,24 +32,24 @@ func Test_checkProccom(t *testing.T) {
 		cmdline string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    bool
-		wantErr bool
+		name string
+		args args
+		want bool
 	}{
-		{"+base", args{"/foo/bar/foobar --start", "--start"}, true, false},
-		{"+empty_cmdline", args{"/foo/bar/foobar --start", ""}, true, false},
-		{"+complex_regex", args{"/foo/bar/foobar --start", "/.*/.*/.* --start"}, true, false},
-		{"+no_match", args{"/foo/bar/foobar --start", "--stop"}, false, false},
-		{"-fail_regex_compilation", args{"/foo/bar/foobar --start", "("}, false, true},
+		{"+base", args{"/foo/bar/foobar --start", "--start"}, true},
+		{"+empty_cmdline", args{"/foo/bar/foobar --start", ""}, true},
+		{"+complex_regex", args{"/foo/bar/foobar --start", "/.*/.*/.* --start"}, true},
+		{"+no_match", args{"/foo/bar/foobar --start", "--stop"}, false},
+		{"-fail_regex_compilation", args{"/foo/bar/foobar --start", "("}, true},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := checkProccom(tt.args.cmd, tt.args.cmdline)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("checkProccom() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			cmdRgx, err := regexp.Compile(tt.args.cmdline)
+			if err != nil {
+				cmdRgx = nil
 			}
+			got := checkProccom(tt.args.cmd, cmdRgx)
 			if got != tt.want {
 				t.Errorf("checkProccom() = %v, want %v", got, tt.want)
 			}

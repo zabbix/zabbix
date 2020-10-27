@@ -55,10 +55,16 @@ type Plugin struct {
 	stats   map[int64]*cpuUtil
 }
 
+type PluginExport struct {
+	plugin.Base
+}
+
 var impl Plugin = Plugin{
 	stats:   make(map[int64]*cpuUtil),
 	queries: make(map[procQuery]*cpuUtilStats),
 }
+
+var implExport PluginExport = PluginExport{}
 
 type historyIndex int
 
@@ -208,7 +214,7 @@ func (p *Plugin) Collect() (err error) {
 	p.scanid++
 	queries, flags := p.prepareQueries()
 	var processes []*procInfo
-	if processes, err = p.getProcesses(flags); err != nil {
+	if processes, err = getProcesses(flags); err != nil {
 		return
 	}
 	p.Tracef("%s() queries:%d", log.Caller(), len(p.queries))
@@ -309,17 +315,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("This item is available only in daemon mode.")
 	}
 
-	switch key {
-	case "proc.cpu.util":
-		return p.getCpuUtil(params)
-	case "proc.mem":
-		return p.getMem(params)
-	default:
-		return nil, errors.New("Unsupported item key.")
-	}
-}
-
-func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	var name, user, cmdline, mode, utiltype string
 	switch len(params) {
 	case 5:
@@ -417,7 +412,8 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	return
 }
 
-func (p *Plugin) getMem(params []string) (result interface{}, err error) {
+// Export -
+func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var name, mode, cmdline, memtype string
 	var usr *user.User
 
@@ -485,6 +481,29 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 	var count int
 	var memSize, value float64
 	var found bool
+	var cmdRgx *regexp.Regexp
+	if cmdline != "" {
+		cmdRgx, err = regexp.Compile(cmdline)
+		if err != nil {
+			p.Debugf("Failed to compile provided regex expression '%s': %s", cmdline, err.Error())
+			return 0, nil
+		}
+	}
+
+	var userID = int64(-1)
+	if usr != nil {
+		userID, err = strconv.ParseInt(usr.Uid, 10, 64)
+		if err != nil {
+			p.Logger.Tracef(
+				"failed to convert user id '%s' to uint64 for user '%s'", usr.Uid, usr.Username)
+			userID = -1
+		}
+	}
+
+	processes, err := getProcesses(procInfoName | procInfoCmdline | procInfoUser)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to obtain processes: %s", err.Error())
+	}
 
 	for _, file := range files {
 		if !file.IsDir() {
@@ -497,7 +516,7 @@ func (p *Plugin) getMem(params []string) (result interface{}, err error) {
 			continue
 		}
 
-		if !p.validFile(usr, pid, name, cmdline) {
+		if !p.validFile(processes, pid, name, userID, cmdRgx) {
 			continue
 		}
 
@@ -605,21 +624,16 @@ func checkProcessName(cmdName, stats, name string) bool {
 	return name == "" || stats == name || cmdName == name
 }
 
-func checkUserInfo(uid int64, usr *user.User) bool {
-	return usr == nil || strconv.FormatInt(uid, 10) == usr.Uid
+func checkUserInfo(uid, puid int64) bool {
+	return uid == -1 || uid == puid
 }
 
-func checkProccom(cmd, cmdline string) (bool, error) {
-	if cmdline == "" {
-		return true, nil
+func checkProccom(cmd string, cmdRgx *regexp.Regexp) bool {
+	if cmdRgx == nil {
+		return true
 	}
 
-	rx, err := regexp.Compile(cmdline)
-	if err != nil {
-		return false, err
-	}
-
-	return rx.MatchString(cmd), nil
+	return cmdRgx.MatchString(cmd)
 }
 
 func getTypeString(t string) (string, error) {
@@ -653,41 +667,39 @@ func getTypeString(t string) (string, error) {
 	}
 }
 
-func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
-	arg0, cmd, err := p.getProcessCmdline(pid, procInfoName|procInfoCmdline)
+func (p *PluginExport) validFile(processes []*procInfo, pid, name string, uid int64, cmdRgx *regexp.Regexp) bool {
+	var arg0, cmd, procName string
+	var procUID int64
+	procID, err := strconv.ParseInt(pid, 10, 64)
 	if err != nil {
-		p.Logger.Debugf("failed to get proccess cmdline for pid '%s': %s", pid, err.Error())
+		p.Logger.Tracef(
+			"failed to convert process id '%s' to uint64", pid)
 		return false
 	}
 
-	stats, err := p.getProcessName(pid)
-	if err != nil {
-		p.Logger.Debugf("failed to get proccess name for pid '%s': %s", pid, err.Error())
+	for _, proc := range processes {
+		if proc == nil {
+			continue
+		}
+
+		if procID == proc.pid {
+			arg0 = proc.arg0
+			cmd = proc.cmdline
+			procName = proc.name
+			procUID = proc.userid
+			break
+		}
+	}
+
+	if !checkProcessName(arg0, procName, name) {
 		return false
 	}
 
-	if !checkProcessName(arg0, stats, name) {
+	if !checkUserInfo(uid, procUID) {
 		return false
 	}
 
-	uid, err := p.getProcessUserID(pid)
-	if err != nil {
-		p.Logger.Debugf("failed to get proccess user id for pid '%s': %s", pid, err.Error())
-		return false
-	}
-
-	if !checkUserInfo(uid, user) {
-		return false
-	}
-
-	match, err := checkProccom(cmd, cmdline)
-	if err != nil {
-		p.Logger.Debugf(
-			"failed to compare provided regular expression for cmd '%s' for process '%s': %s", cmd, pid, err.Error())
-		return false
-	}
-
-	if !match {
+	if !checkProccom(cmd, cmdRgx) {
 		return false
 	}
 
@@ -695,8 +707,6 @@ func (p *Plugin) validFile(user *user.User, pid, name, cmdline string) bool {
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Proc",
-		"proc.cpu.util", "Process CPU utilization percentage.",
-		"proc.mem", "Process memory utilization values.",
-	)
+	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilization percentage.")
+	plugin.RegisterMetrics(&implExport, "ProcExporter", "proc.mem", "Process memory utilization values.")
 }
