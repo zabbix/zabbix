@@ -366,7 +366,7 @@ int	zbx_tfc_init(char **error)
 		goto out;
 	}
 
-	cache =  (zbx_tfc_t *)__tfc_mem_malloc_func(cache, sizeof(zbx_tfc_t));
+	cache =  (zbx_tfc_t *)__tfc_mem_realloc_func(NULL, sizeof(zbx_tfc_t));
 
 	/* (8 + 8) * 3 - overhead for 3 allocations */
 	CONFIG_TREND_FUNC_CACHE_SIZE -= size_reserved + sizeof(zbx_tfc_t) + (8 + 8) * 3;
@@ -555,7 +555,9 @@ int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error)
 {
 	if (NULL == cache)
 	{
-		*error = zbx_strdup(*error, "Trends function cache is disabled.");
+		if (NULL != error)
+			*error = zbx_strdup(*error, "Trends function cache is disabled.");
+
 		return FAIL;
 	}
 

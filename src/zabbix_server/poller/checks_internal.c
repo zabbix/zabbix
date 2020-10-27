@@ -889,19 +889,19 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / total));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / total * 100));
 		}
 		else if (0 == strcmp(tmp, "phits"))
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / total));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / total * 100));
 		}
 		else if (0 == strcmp(tmp, "pitems"))
 		{
 			zbx_uint64_t	total = stats.items_num + stats.requests_num;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / total));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / total * 100));
 		}
 		else
 		{
