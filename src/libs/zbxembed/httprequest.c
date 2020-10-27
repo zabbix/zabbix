@@ -488,29 +488,29 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 }
 
 static const duk_function_list_entry	curlhttprequest_methods[] = {
-	{"AddHeader", es_httprequest_add_header, 1},
-	{"ClearHeader", es_httprequest_clear_header, 0},
-	{"Get", es_httprequest_get, 2},
-	{"Put", es_httprequest_put, 2},
-	{"Post", es_httprequest_post, 2},
-	{"Delete", es_httprequest_delete, 2},
-	{"Status", es_httprequest_status, 0},
-	{"SetProxy", es_httprequest_set_proxy, 1},
-	{"GetHeaders", es_httprequest_get_headers, 0},
-	{NULL, NULL, 0}
+	{"AddHeader",	es_httprequest_add_header,	1},
+	{"ClearHeader",	es_httprequest_clear_header,	0},
+	{"Get",		es_httprequest_get,		2},
+	{"Put",		es_httprequest_put,		2},
+	{"Post",	es_httprequest_post,		2},
+	{"Delete",	es_httprequest_delete,		2},
+	{"Status",	es_httprequest_status,		0},
+	{"SetProxy",	es_httprequest_set_proxy,	1},
+	{"GetHeaders",	es_httprequest_get_headers,	0},
+	{NULL,		NULL,				0}
 };
 
 static const duk_function_list_entry	httprequest_methods[] = {
-	{"addHeader", es_httprequest_add_header, 1},
-	{"clearHeader", es_httprequest_clear_header, 0},
-	{"get", es_httprequest_get, 2},
-	{"put", es_httprequest_put, 2},
-	{"post", es_httprequest_post, 2},
-	{"delete", es_httprequest_delete, 2},
-	{"getStatus", es_httprequest_status, 0},
-	{"setProxy", es_httprequest_set_proxy, 1},
-	{"getHeaders", es_httprequest_get_headers, 0},
-	{NULL, NULL, 0}
+	{"addHeader",	es_httprequest_add_header,	1},
+	{"clearHeader",	es_httprequest_clear_header,	0},
+	{"get",		es_httprequest_get,		2},
+	{"put",		es_httprequest_put,		2},
+	{"post",	es_httprequest_post,		2},
+	{"delete",	es_httprequest_delete,		2},
+	{"getStatus",	es_httprequest_status,		0},
+	{"setProxy",	es_httprequest_set_proxy,	1},
+	{"getHeaders",	es_httprequest_get_headers,	0},
+	{NULL,		NULL,				0}
 };
 
 #else

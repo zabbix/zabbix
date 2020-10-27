@@ -148,10 +148,10 @@ static duk_ret_t	es_console_error(duk_context *ctx)
 }
 
 static const duk_function_list_entry	console_methods[] = {
-	{"log",			es_console_log,		1},
-	{"warn",		es_console_warn,	1},
-	{"error",		es_console_error,	1},
-	{NULL, NULL, 0}
+	{"log",		es_console_log,		1},
+	{"warn",	es_console_warn,	1},
+	{"error",	es_console_error,	1},
+	{NULL,		NULL,			0}
 };
 
 static int	es_console_create_object(duk_context *ctx)
