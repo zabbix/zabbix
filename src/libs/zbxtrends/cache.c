@@ -60,6 +60,7 @@ typedef struct
 	zbx_uint32_t	lru_tail;
 	zbx_uint64_t	hits;
 	zbx_uint64_t	misses;
+	zbx_uint64_t	items_num;
 }
 zbx_tfc_t;
 
@@ -273,7 +274,10 @@ static void	tfc_free_data(zbx_tfc_data_t *data)
 	tfc_value_remove(data);
 
 	if (data->prev_value == data->next_value)
+	{
 		zbx_hashset_remove_direct(&cache->index, &cache->slots[data->prev_value].data);
+		cache->items_num--;
+	}
 
 	zbx_hashset_remove_direct(&cache->index, data);
 }
@@ -385,6 +389,7 @@ int	zbx_tfc_init(char **error)
 
 	cache->hits = 0;
 	cache->misses = 0;
+	cache->items_num = 0;
 
 	ret = SUCCEED;
 out:
@@ -483,6 +488,7 @@ void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functi
 		root = tfc_index_add(&data_local);
 		root->prev_value = tfc_data_slot_index(root);
 		root->next_value = root->prev_value;
+		cache->items_num++;
 		tfc_reserve_slot();
 	}
 
@@ -557,6 +563,8 @@ int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error)
 
 	stats->hits = cache->hits;
 	stats->misses = cache->misses;
+	stats->items_num = cache->items_num;
+	stats->requests_num = cache->index.num_data - cache->items_num;
 
 	UNLOCK_CACHE;
 

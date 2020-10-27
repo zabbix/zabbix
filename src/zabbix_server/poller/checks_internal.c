@@ -832,24 +832,32 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
 	}
-	else if (0 == strcmp(tmp, "tfcache"))			/* zabbix[tfcache,<mode>] */
+	else if (0 == strcmp(tmp, "tcache"))			/* zabbix[tcache,cache,<parameter>] */
 	{
 		char		*error = NULL;
 		zbx_tfc_stats_t	stats;
 
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			goto out;
 		}
 
-		if (2 < nparams)
+		if (2 > nparams || 3 < nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
 		}
 
-		tmp = get_rparam(&request, 1);
+		tmp1 = get_rparam(&request, 1);
+
+		if (0 != strcmp(tmp1, "cache"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+		tmp = get_rparam(&request, 2);
 
 		if (FAIL == zbx_tfc_get_stats(&stats, &error))
 		{
@@ -869,9 +877,35 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		{
 			SET_UI64_RESULT(result, stats.misses);
 		}
+		else if (0 == strcmp(tmp, "items"))
+		{
+			SET_UI64_RESULT(result, stats.items_num);
+		}
+		else if (0 == strcmp(tmp, "requests"))
+		{
+			SET_UI64_RESULT(result, stats.requests_num);
+		}
+		else if (0 == strcmp(tmp, "pmisses"))
+		{
+			zbx_uint64_t	total = stats.hits + stats.misses;
+
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / total));
+		}
+		else if (0 == strcmp(tmp, "phits"))
+		{
+			zbx_uint64_t	total = stats.hits + stats.misses;
+
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / total));
+		}
+		else if (0 == strcmp(tmp, "pitems"))
+		{
+			zbx_uint64_t	total = stats.items_num + stats.requests_num;
+
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / total));
+		}
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
 		}
 	}

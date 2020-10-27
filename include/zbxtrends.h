@@ -42,6 +42,8 @@ typedef struct
 {
 	zbx_uint64_t	hits;
 	zbx_uint64_t	misses;
+	zbx_uint64_t	items_num;
+	zbx_uint64_t	requests_num;
 }
 zbx_tfc_stats_t;
 
