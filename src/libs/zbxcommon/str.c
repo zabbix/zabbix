@@ -4560,25 +4560,15 @@ int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc)
 				offset = 1;
 				continue;
 			case '0':
-				ZBX_FALLTHROUGH;
 			case '1':
-				ZBX_FALLTHROUGH;
 			case '2':
-				ZBX_FALLTHROUGH;
 			case '3':
-				ZBX_FALLTHROUGH;
 			case '4':
-				ZBX_FALLTHROUGH;
 			case '5':
-				ZBX_FALLTHROUGH;
 			case '6':
-				ZBX_FALLTHROUGH;
 			case '7':
-				ZBX_FALLTHROUGH;
 			case '8':
-				ZBX_FALLTHROUGH;
 			case '9':
-				ZBX_FALLTHROUGH;
 			case '.':
 				if (SUCCEED != zbx_suffixed_number_parse(s, &len))
 					return FAIL;
