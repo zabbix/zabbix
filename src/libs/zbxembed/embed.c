@@ -25,6 +25,7 @@
 #include "httprequest.h"
 #include "zabbix.h"
 #include "global.h"
+#include "console.h"
 
 #include "duktape.h"
 
@@ -204,6 +205,9 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	/* initialize Zabbix object */
 	zbx_es_init_zabbix(es, error);
+
+	/* initialize console object */
+	zbx_es_init_console(es, error);
 
 	/* remove Duktape object */
 	duk_push_global_object(es->env->ctx);
