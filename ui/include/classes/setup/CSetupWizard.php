@@ -227,8 +227,12 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_host', 0))->removeId()
 			]);
 
-		$table->addRow(_('Database type'),
-			new CComboBox('type', $DB['TYPE'], null, CFrontendSetup::getSupportedDatabases())
+		$table->addRow(new CLabel(_('Database type'), 'label-type'),
+			(new CSelect('type'))
+				->setId('type')
+				->setFocusableElementId('label-type')
+				->setValue($DB['TYPE'])
+				->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
 		);
 
 		$table->addRow(_('Database host'),
