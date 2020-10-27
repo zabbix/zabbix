@@ -26,7 +26,9 @@
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-tmpl">
 	<?php
-	$preproc_types_select = (new CSelect('preprocessing[#{rowNum}][type]'))->setId('preprocessing_#{rowNum}_type');
+	$preproc_types_select = (new CSelect('preprocessing[#{rowNum}][type]'))
+		->setId('preprocessing_#{rowNum}_type')
+		->setValue(ZBX_PREPROC_REGSUB);
 
 	foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
 		$opt_group = new CSelectOptionGroup($group['label']);
