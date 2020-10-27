@@ -467,7 +467,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				$this->assertTrue($prev_value->isEnabled($prev_enabled));
 				$this->assertTrue($prev_time->isEnabled($prev_enabled));
 
-				$radio = $form->getField('End of line sequence');
+				$radio = $form->query('id:eol')->one()->waitUntilPresent();
 				$this->assertTrue($radio->isEnabled());
 
 				$macros = [
@@ -478,7 +478,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				];
 
 				if ($macros['expected']) {
-					foreach ($form->getField('Macros')->asTable()->getRows() as $row) {
+					foreach ($form->query('class:textarea-flexible-container')->one()->asTable()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
 						 * Macro columns are represented in following way:
@@ -500,7 +500,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					$this->assertEquals($macros['expected'], $macros['actual']);
 				}
 
-				$table = $form->getField('Preprocessing steps')->asTable();
+				$table = $form->query('id:preprocessing-steps')->one()->waitUntilPresent()->asTable();
 
 				if ($id === null) {
 					foreach ($data['preprocessing'] as $i => $step) {
@@ -525,16 +525,16 @@ class testFormItemPreprocessingTest extends CWebTest {
 				$prev_value_string = '100';
 				$prev_time_string  = 'now-1s';
 
-				$form->getField('Value')->fill('$value_string');
-				$prev_value = $form->getField('Previous value');
-				$prev_time = $form->getField('Prev. time');
+				$form->query('id:value')->waitUntilPresent()->one()->asMultiline()->fill($value_string);
+				$prev_value = $form->query('id:prev_value')->waitUntilPresent()->one()->asMultiline();
+				$prev_time = $form->query('id:prev_time')->waitUntilPresent()->one();
 
 				if ($prev_value->isEnabled(true) && $prev_time->isEnabled(true)) {
 					$prev_value->fill($prev_value_string);
 					$prev_time->fill($prev_time_string);
 				}
-				$form->getField('End of line sequence')->fill('CRLF');
-				$form->submit();
+				$form->query('id:eol')->waitUntilPresent()->one()->asSegmentedRadio()->fill('CRLF');
+				$dialog->query('button:Test')->one()->waitUntilVisible()->click();
 
 				// Check Zabbix server down message.
 				$message = $form->getOverlayMessage();
