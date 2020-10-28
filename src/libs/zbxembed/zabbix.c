@@ -111,8 +111,8 @@ out:
 }
 
 static const duk_function_list_entry	zabbix_methods[] = {
-	{"Log",			es_zabbix_log,		2},
-	{"log",			es_zabbix_log,		2},
+	{"Log", es_zabbix_log, 2},
+	{"log", es_zabbix_log, 2},
 	{NULL, NULL, 0}
 };
 

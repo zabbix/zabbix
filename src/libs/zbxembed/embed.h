@@ -23,7 +23,7 @@
 #include "common.h"
 #include "duktape.h"
 
-#define ZBX_ES_LOG_MEMORY_LIMIT		(ZBX_MEBIBYTE * 8)
+#define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 
 struct zbx_es_env
 {
