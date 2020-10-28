@@ -490,13 +490,13 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 		}
 	}
 
-	var userID = int64(-1)
+	userID := int64(-1)
 	if usr != nil {
 		userID, err = strconv.ParseInt(usr.Uid, 10, 64)
 		if err != nil {
 			p.Logger.Tracef(
 				"failed to convert user id '%s' to uint64 for user '%s'", usr.Uid, usr.Username)
-			userID = -1
+			return 0, nil
 		}
 	}
 
