@@ -62,6 +62,8 @@ class CRoleHelper {
 	public const MODULES_MODULE = 'modules.module.';
 	public const MODULES_DEFAULT_ACCESS = 'modules.default_access';
 	public const API_ACCESS = 'api.access';
+	public const API_ACCESS_DISABLED = 0;
+	public const API_ACCESS_ENABLED = 1;
 	public const API_MODE = 'api.mode';
 	public const API_MODE_DENY = 0;
 	public const API_MODE_ALLOW = 1;
@@ -75,6 +77,8 @@ class CRoleHelper {
 	public const ACTIONS_ADD_PROBLEM_COMMENTS = 'actions.add_problem_comments';
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
+	public const DEFAULT_ACCESS_DISABLED = 0;
+	public const DEFAULT_ACCESS_ENABLED = 1;
 
 	public const SECTION_UI = 'ui';
 	public const SECTION_MODULES = 'modules';
@@ -110,6 +114,13 @@ class CRoleHelper {
 	private static $api_methods = [];
 
 	/**
+	 * Array for storing all API methods with masks by user type.
+	 *
+	 * @var array
+	 */
+	private static $api_method_masks = [];
+
+	/**
 	 * Checks the access of specific role to specific rule.
 	 *
 	 * @static
@@ -119,7 +130,7 @@ class CRoleHelper {
 	 *
 	 * @return bool  Returns true if role have access to specified rule, false - otherwise.
 	 */
-	public static function checkAccess(string $rule_name, int $roleid): bool {
+	public static function checkAccess(string $rule_name, $roleid): bool {
 		self::loadRoleRules($roleid);
 
 		if (!array_key_exists($rule_name, self::$roles[$roleid]['rules']) || $rule_name === self::SECTION_API) {
@@ -127,6 +138,45 @@ class CRoleHelper {
 		}
 
 		return self::$roles[$roleid]['rules'][$rule_name];
+	}
+
+	/**
+	 * Check rule can be defined for specific role type.
+	 *
+	 * @param string $rule_name  Rule full name, with section prefix.
+	 * @param int    $role_type  Role access type.
+	 *
+	 * @return bool
+	 */
+	public static function checkRuleAllowedByType($rule_name, int $role_type): bool {
+		$allowed = [
+			self::UI_DEFAULT_ACCESS, self::API_ACCESS, self::API_MODE, self::MODULES_DEFAULT_ACCESS,
+			self::ACTIONS_DEFAULT_ACCESS
+		];
+
+		if (in_array($rule_name, $allowed)) {
+			return true;
+		}
+
+		switch (self::getRuleSection($rule_name)) {
+			case self::SECTION_UI:
+				$allowed = self::getAllUiElements($role_type);
+				break;
+
+			case self::SECTION_API:
+				$allowed = self::getApiMethods($role_type);
+				break;
+
+			case self::SECTION_MODULES:
+				$allowed = [$rule_name];
+				break;
+
+			case self::SECTION_ACTIONS:
+				$allowed = self::getAllActions($role_type);
+				break;
+		}
+
+		return in_array($rule_name, $allowed);
 	}
 
 	/**
@@ -154,7 +204,7 @@ class CRoleHelper {
 	 *
 	 * @param integer $roleid  Role ID.
 	 */
-	private static function loadRoleRules(int $roleid): void {
+	private static function loadRoleRules($roleid): void {
 		if (array_key_exists($roleid, self::$roles)) {
 			return;
 		}
@@ -464,6 +514,46 @@ class CRoleHelper {
 	}
 
 	/**
+	 * Returns a list of API methods with masks for the given user type.
+	 *
+	 * @static
+	 *
+	 * @param int|null $user_type
+	 *
+	 * @return array
+	 */
+	public static function getApiMethodMasks(?int $user_type = null): array {
+		if (!self::$api_method_masks) {
+			self::loadApiMethods();
+		}
+
+		return ($user_type !== null) ? self::$api_method_masks[$user_type] : self::$api_method_masks;
+	}
+
+	/**
+	 * Returns a list of API methods for each method mask for the given user type.
+	 *
+	 * @static
+	 *
+	 * @param int $user_type
+	 *
+	 * @return array
+	 */
+	public static function getApiMaskMethods(int $user_type): array {
+		$api_methods = self::getApiMethods($user_type);
+		$result = [self::API_WILDCARD => $api_methods, self::API_WILDCARD_ALIAS => $api_methods];
+
+		foreach ($api_methods as &$api_method) {
+			[$service, $method] = explode('.', $api_method, 2);
+			$result[$service.self::API_ANY_METHOD][] = $api_method;
+			$result[self::API_ANY_SERVICE.$method][] = $api_method;
+		}
+		unset($api_method);
+
+		return $result;
+	}
+
+	/**
 	 * Collects all API methods for all user types.
 	 *
 	 * @static
@@ -474,6 +564,7 @@ class CRoleHelper {
 			USER_TYPE_ZABBIX_ADMIN => [],
 			USER_TYPE_SUPER_ADMIN => []
 		];
+		$api_method_masks = $api_methods;
 
 		foreach (CApiServiceFactory::API_SERVICES as $service => $class_name) {
 			foreach (constant($class_name.'::ACCESS_RULES') as $method => $rules) {
@@ -485,17 +576,30 @@ class CRoleHelper {
 					switch ($rules['min_user_type']) {
 						case USER_TYPE_ZABBIX_USER:
 							$api_methods[USER_TYPE_ZABBIX_USER][] = $service.'.'.$method;
+							$api_method_masks[USER_TYPE_ZABBIX_USER][$service.self::API_ANY_METHOD] = true;
+							$api_method_masks[USER_TYPE_ZABBIX_USER][self::API_ANY_SERVICE.$method] = true;
 							// break; is not missing here
 						case USER_TYPE_ZABBIX_ADMIN:
 							$api_methods[USER_TYPE_ZABBIX_ADMIN][] = $service.'.'.$method;
+							$api_method_masks[USER_TYPE_ZABBIX_ADMIN][$service.self::API_ANY_METHOD] = true;
+							$api_method_masks[USER_TYPE_ZABBIX_ADMIN][self::API_ANY_SERVICE.$method] = true;
 							// break; is not missing here
 						case USER_TYPE_SUPER_ADMIN:
 							$api_methods[USER_TYPE_SUPER_ADMIN][] = $service.'.'.$method;
+							$api_method_masks[USER_TYPE_SUPER_ADMIN][$service.self::API_ANY_METHOD] = true;
+							$api_method_masks[USER_TYPE_SUPER_ADMIN][self::API_ANY_SERVICE.$method] = true;
 					}
 				}
 			}
 		}
 
+		foreach ($api_method_masks as $user_type => $masks) {
+			$api_method_masks[$user_type] = array_merge([self::API_WILDCARD, self::API_WILDCARD_ALIAS],
+				array_keys($masks)
+			);
+		}
+
 		self::$api_methods = $api_methods;
+		self::$api_method_masks = $api_method_masks;
 	}
 }

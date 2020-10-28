@@ -25,28 +25,34 @@
 class CEncryptedCookieSession extends CCookieSession {
 
 	/**
-	 * Prepare data and check sign.
+	 * @inheritDoc
 	 *
-	 * @param array $data
-	 *
-	 * @return boolean
+	 * @return string|null
 	 */
-	protected function checkSign(array $data): bool {
-		if (!array_key_exists('sign', $data)) {
-			return false;
+	public function extractSessionId(): ?string {
+		if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
+			CEncryptHelper::updateKey(CEncryptHelper::generateKey());
 		}
 
-		$session_sign = $data['sign'];
-		unset($data['sign']);
-		$sign = CEncryptHelper::sign(json_encode($data));
+		$session_data = $this->parseData();
 
-		return $session_sign && $sign && CEncryptHelper::checkSign($session_sign, $sign);
+		if (!$this->checkSign($session_data)) {
+			return null;
+		}
+
+		$session_data = json_decode($session_data, true);
+
+		if (!array_key_exists('sessionid', $session_data)) {
+			return null;
+		}
+
+		return $session_data['sessionid'];
 	}
 
 	/**
 	 * Prepare session data.
 	 *
-	 * @param array $data
+	 * @param string $data
 	 *
 	 * @return string
 	 */
@@ -61,41 +67,23 @@ class CEncryptedCookieSession extends CCookieSession {
 	}
 
 	/**
-	 * @inheritDoc
+	 * Prepare data and check sign.
+	 *
+	 * @param string $data
 	 *
 	 * @return boolean
 	 */
-	protected function session_start(): bool {
-		if (!$this->checkSessionKey()) {
-			CEncryptHelper::updateKey(CEncryptHelper::generateKey());
-		}
+	protected function checkSign(string $data): bool {
+		$data = json_decode($data, true);
 
-		$session_data = json_decode($this->parseData(), true);
-
-		if ($session_data === null || !$this->checkSign($session_data)) {
-			return session_start();
-		}
-
-		$sessionid = $this->extractSessionId($session_data);
-		if ($sessionid) {
-			session_id($sessionid);
-		}
-
-		return session_start();
-	}
-
-	/**
-	 * Check exist secret session key.
-	 *
-	 * @throws \Exception
-	 *
-	 * @return boolean
-	 */
-	private function checkSessionKey(): bool {
-		if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
+		if (!is_array($data) || !array_key_exists('sign', $data)) {
 			return false;
 		}
 
-		return true;
+		$session_sign = $data['sign'];
+		unset($data['sign']);
+		$sign = CEncryptHelper::sign(json_encode($data));
+
+		return $session_sign && $sign && CEncryptHelper::checkSign($session_sign, $sign);
 	}
 }

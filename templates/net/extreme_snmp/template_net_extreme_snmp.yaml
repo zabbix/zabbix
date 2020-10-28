@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:31Z'
+  date: '2020-10-23T09:05:07Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -87,7 +87,7 @@ zabbix_export:
                   expression: |
                     {Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}>{$TEMP_CRIT:""}
                     or
-                    {Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}
+                    {Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last()}={$TEMP_CRIT_STATUS}
                   recovery_expression: '{Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}<{$TEMP_CRIT:""}-3'
             -
               expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
@@ -232,7 +232,6 @@ zabbix_export:
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
-              recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -431,7 +430,7 @@ zabbix_export:
       expression: |
         {Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}>{$TEMP_CRIT:""}
         or
-        {Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}
+        {Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last()}={$TEMP_CRIT_STATUS}
       recovery_mode: RECOVERY_EXPRESSION
       recovery_expression: '{Extreme EXOS SNMP:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}<{$TEMP_CRIT:""}-3'
       name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:""}'

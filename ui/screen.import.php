@@ -35,6 +35,11 @@ $fields = [
 check_fields($fields);
 
 $data = [
+	'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+	'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
+];
+
+$data += [
 	'rules' => [
 		'groups' => ['createMissing' => false],
 		'hosts' => ['updateExisting' => false, 'createMissing' => false],
@@ -47,15 +52,15 @@ $data = [
 		'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-		'screens' => ['updateExisting' => true, 'createMissing' => true],
+		'screens' => ['updateExisting' => $data['allowed_edit_screens'],
+			'createMissing' => $data['allowed_edit_screens']
+		],
 		'maps' => ['updateExisting' => false, 'createMissing' => false],
 		'images' => ['updateExisting' => false, 'createMissing' => false],
 		'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
-	'rules_preset' => getRequest('rules_preset'),
-	'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
-	'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
+	'rules_preset' => getRequest('rules_preset')
 ];
 
 if (hasRequest('import')) {

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-19 11:32+0300\n"
+"POT-Creation-Date: 2020-10-22 15:24+0300\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -379,12 +379,7 @@ msgstr "与"
 msgid "API access"
 msgstr ""
 
-#: include/classes/api/services/CRole.php:444
-#, c-format
-msgid "API method \"%1$s\" is not available."
-msgstr ""
-
-#: app/views/administration.userrole.edit.php:183
+#: app/views/administration.userrole.edit.php:190
 msgid "API methods"
 msgstr ""
 
@@ -403,27 +398,27 @@ msgid "Access denied!"
 msgstr "访问拒绝!"
 
 #: app/views/administration.user.edit.php:439
-#: app/views/administration.userrole.edit.php:168
+#: app/views/administration.userrole.edit.php:174
 msgid "Access to API"
 msgstr ""
 
 #: app/views/administration.user.edit.php:394
-#: app/views/administration.userrole.edit.php:70
+#: app/views/administration.userrole.edit.php:71
 msgid "Access to UI elements"
 msgstr ""
 
 #: app/views/administration.user.edit.php:466
-#: app/views/administration.userrole.edit.php:218
+#: app/views/administration.userrole.edit.php:228
 msgid "Access to actions"
 msgstr ""
 
 #: app/views/administration.user.edit.php:413
-#: app/views/administration.userrole.edit.php:119
+#: app/views/administration.userrole.edit.php:123
 msgid "Access to modules"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1365
-#: include/classes/api/services/CUser.php:1408
+#: include/classes/api/services/CUser.php:1361
+#: include/classes/api/services/CUser.php:1404
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -443,7 +438,7 @@ msgstr "确认"
 msgid "Acknowledge"
 msgstr "确认"
 
-#: include/classes/helpers/CRoleHelper.php:439
+#: include/classes/helpers/CRoleHelper.php:489
 msgid "Acknowledge problems"
 msgstr ""
 
@@ -541,7 +536,7 @@ msgstr "动作"
 msgid "Action \"%1$s\" already exists."
 msgstr "动作 \"%1$s\" 已经存在。"
 
-#: include/classes/api/services/CRole.php:454
+#: include/classes/api/services/CRole.php:492
 #, c-format
 msgid "Action \"%1$s\" is not available."
 msgstr ""
@@ -556,7 +551,7 @@ msgstr "动作 \"%1$s\" 没有定义操作。"
 msgid "Action added"
 msgstr "动作已添加"
 
-#: include/classes/core/ZBase.php:509
+#: include/classes/core/ZBase.php:514
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
@@ -576,7 +571,7 @@ msgid_plural "Actions enabled"
 msgstr[0] "激活 启用激活 启用"
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:128
-#: include/classes/helpers/CRoleHelper.php:361
+#: include/classes/helpers/CRoleHelper.php:411
 #: include/classes/screens/CScreenActions.php:168
 #: include/classes/widgets/CWidgetConfig.php:45 include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:26
@@ -591,7 +586,7 @@ msgstr "动作已更新"
 #: app/views/monitoring.dashboard.view.php:105
 #: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:799
 #: include/classes/helpers/CMenuHelper.php:169
-#: include/classes/helpers/CRoleHelper.php:379
+#: include/classes/helpers/CRoleHelper.php:429
 #: include/classes/screens/CScreenHostTriggers.php:210
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:915
@@ -659,7 +654,7 @@ msgstr "启用直到"
 #: app/views/administration.usergroup.edit.php:144
 #: app/views/administration.usergroup.edit.php:195
 #: app/views/administration.usergroup.edit.php:234
-#: app/views/administration.userrole.edit.php:258
+#: app/views/administration.userrole.edit.php:271
 #: app/views/administration.valuemap.edit.php:75
 #: app/views/administration.valuemap.edit.php:124
 #: app/views/configuration.application.edit.php:60
@@ -823,7 +818,7 @@ msgstr ""
 msgid "Add new override"
 msgstr "添加新的覆盖"
 
-#: include/classes/helpers/CRoleHelper.php:442
+#: include/classes/helpers/CRoleHelper.php:492
 msgid "Add problem comments"
 msgstr ""
 
@@ -865,7 +860,7 @@ msgid "Admin"
 msgstr "管理者"
 
 #: include/classes/helpers/CMenuHelper.php:247
-#: include/classes/helpers/CRoleHelper.php:305
+#: include/classes/helpers/CRoleHelper.php:355
 msgid "Administration"
 msgstr "管理"
 
@@ -929,7 +924,7 @@ msgstr ""
 msgid "Alert message"
 msgstr "告警消息"
 
-#: app/controllers/CControllerPopupGeneric.php:248
+#: app/controllers/CControllerPopupGeneric.php:255
 #: app/views/administration.user.edit.php:63
 #: app/views/administration.user.list.php:56
 #: app/views/administration.user.list.php:100 include/hosts.inc.php:114
@@ -1002,7 +997,7 @@ msgstr "所有标签"
 msgid "All templates"
 msgstr "所有模板"
 
-#: app/views/administration.userrole.edit.php:187
+#: app/views/administration.userrole.edit.php:194
 msgid "Allow list"
 msgstr ""
 
@@ -1080,7 +1075,7 @@ msgstr "任何"
 msgid "Any character string included"
 msgstr "包括任何字符串"
 
-#: app/controllers/CControllerPopupGeneric.php:390
+#: app/controllers/CControllerPopupGeneric.php:397
 msgid "Api methods"
 msgstr ""
 
@@ -1121,7 +1116,7 @@ msgstr[0] "分类已删除"
 msgid "Application error."
 msgstr "应用集 错误."
 
-#: app/controllers/CControllerPopupGeneric.php:188
+#: app/controllers/CControllerPopupGeneric.php:195
 #: include/views/configuration.item.prototype.edit.php:778
 #: include/views/configuration.item.prototype.massupdate.php:482
 msgid "Application prototypes"
@@ -1141,11 +1136,11 @@ msgstr "ID为 \"%1$s\"的应用集不在 \"%2$s\" 之中."
 msgid "Application with applicationid \"%1$s\" does not exist."
 msgstr "应用程序ID \"%1$s\" 不存在。"
 
-#: app/controllers/CControllerPopupGeneric.php:176
+#: app/controllers/CControllerPopupGeneric.php:183
 #: app/views/configuration.application.edit.php:29
 #: app/views/configuration.application.list.php:169 app/views/search.php:38
-#: app/views/search.php:60 app/views/search.php:65 app/views/search.php:234
-#: app/views/search.php:256 app/views/search.php:261 include/forms.inc.php:652
+#: app/views/search.php:117 app/views/search.php:122 app/views/search.php:264
+#: app/views/search.php:286 app/views/search.php:291 include/forms.inc.php:652
 #: include/html.inc.php:346 include/views/configuration.host.edit.php:228
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:411
@@ -1266,10 +1261,9 @@ msgstr "在 %1$s:%2$s 的天 %3$s 的每个 %4$s"
 msgid "At (hour:minute)"
 msgstr "于(时:分)"
 
-#: app/views/administration.userrole.edit.php:101
-#: include/classes/api/services/CRole.php:297
-#: include/classes/api/services/CRole.php:528
-#: include/classes/api/services/CRole.php:533
+#: app/views/administration.userrole.edit.php:105
+#: include/classes/api/services/CRole.php:471
+#: include/classes/api/services/CRole.php:618
 msgid "At least one UI element must be checked."
 msgstr ""
 
@@ -1332,7 +1326,7 @@ msgstr "尝试次数"
 
 #: app/views/administration.housekeeping.edit.php:99
 #: include/classes/helpers/CMenuHelper.php:125
-#: include/classes/helpers/CRoleHelper.php:360
+#: include/classes/helpers/CRoleHelper.php:410
 msgid "Audit"
 msgstr "审计"
 
@@ -1358,7 +1352,7 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:261
 #: app/views/administration.mediatype.edit.php:84
 #: include/classes/helpers/CMenuHelper.php:210
-#: include/classes/helpers/CRoleHelper.php:402
+#: include/classes/helpers/CRoleHelper.php:452
 #: include/views/configuration.httpconf.edit.php:234
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
@@ -1370,7 +1364,7 @@ msgstr "认证"
 msgid "Authentication algorithm"
 msgstr "认证算法"
 
-#: include/classes/api/services/CUser.php:1807
+#: include/classes/api/services/CUser.php:1795
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "验证失败: %1$s"
@@ -1469,7 +1463,7 @@ msgid "Availability"
 msgstr "可用性"
 
 #: include/classes/helpers/CMenuHelper.php:117
-#: include/classes/helpers/CRoleHelper.php:354 report2.php:25 report2.php:159
+#: include/classes/helpers/CRoleHelper.php:404 report2.php:25 report2.php:159
 msgid "Availability report"
 msgstr "可用性报表"
 
@@ -1538,7 +1532,7 @@ msgstr "绑定密码"
 msgid "Blocked"
 msgstr "锁定的"
 
-#: include/classes/core/ZBase.php:360
+#: include/classes/core/ZBase.php:355
 msgid "Blue"
 msgstr "蓝"
 
@@ -1704,7 +1698,7 @@ msgstr "无法被删除"
 #: app/views/administration.user.edit.php:579
 #: app/views/administration.user.edit.php:610
 #: app/views/administration.usergroup.edit.php:214
-#: app/views/administration.userrole.edit.php:260
+#: app/views/administration.userrole.edit.php:273
 #: app/views/administration.valuemap.edit.php:92
 #: app/views/configuration.application.edit.php:54
 #: app/views/configuration.dashboard.edit.php:49
@@ -1900,8 +1894,8 @@ msgstr "无法添加触发器"
 msgid "Cannot add trigger prototype"
 msgstr "无法添加触发器模板"
 
-#: app/controllers/CControllerUserCreate.php:66
-#: app/controllers/CControllerUserCreate.php:122
+#: app/controllers/CControllerUserCreate.php:65
+#: app/controllers/CControllerUserCreate.php:121
 msgid "Cannot add user"
 msgstr "无法添加用户"
 
@@ -2045,7 +2039,8 @@ msgstr "无法创建新的模板"
 msgid "Cannot create the configuration file."
 msgstr "无法创建配置文件。"
 
-#: app/controllers/CControllerUserroleCreate.php:87
+#: app/controllers/CControllerUserroleCreate.php:90
+#: app/controllers/CControllerUserroleCreate.php:134
 msgid "Cannot create user role"
 msgstr ""
 
@@ -2190,7 +2185,7 @@ msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "无法删除agent代理程序"
 
-#: include/classes/api/services/CRole.php:757
+#: include/classes/api/services/CRole.php:842
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
 msgstr ""
@@ -2617,14 +2612,13 @@ msgid "Cannot link template."
 msgstr "无法链接到模板。"
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:677
+#: include/classes/core/ZBase.php:682
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
 msgstr[0] ""
 
-#: include/classes/api/services/CUser.php:1300
-#: include/classes/api/services/CUser.php:1313
+#: include/classes/api/services/CUser.php:1309
 msgid "Cannot logout."
 msgstr "不能登出"
 
@@ -2766,7 +2760,7 @@ msgstr "无法设置审计字段为已经禁止的审计."
 msgid "Cannot set resource ID for screen element."
 msgstr "无法设置聚合图形元素的资源ID."
 
-#: include/classes/core/CCookieSession.php:136
+#: include/classes/core/CCookieSession.php:127
 msgid "Cannot set session cookie."
 msgstr ""
 
@@ -3030,7 +3024,7 @@ msgstr "无法更新agent代理程序"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "对于被自动发现的主机 \"%1$s\"无法更新其代理节点"
 
-#: include/classes/api/services/CRole.php:367
+#: include/classes/api/services/CRole.php:402
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
 msgstr ""
@@ -3107,8 +3101,8 @@ msgstr "无法更新触发器模板"
 
 #: app/controllers/CControllerUserProfileUpdate.php:65
 #: app/controllers/CControllerUserProfileUpdate.php:125
-#: app/controllers/CControllerUserUpdate.php:70
-#: app/controllers/CControllerUserUpdate.php:134
+#: app/controllers/CControllerUserUpdate.php:69
+#: app/controllers/CControllerUserUpdate.php:133
 msgid "Cannot update user"
 msgstr "无法更新用户"
 
@@ -3119,9 +3113,8 @@ msgid "Cannot update user group"
 msgid_plural "Cannot update user groups"
 msgstr[0] ""
 
-#: app/controllers/CControllerUserroleCreate.php:169
 #: app/controllers/CControllerUserroleUpdate.php:93
-#: app/controllers/CControllerUserroleUpdate.php:195
+#: app/controllers/CControllerUserroleUpdate.php:157
 msgid "Cannot update user role"
 msgstr ""
 
@@ -3358,7 +3351,7 @@ msgstr "模板 %1$s 存在环形引用。"
 msgid "Circular template linkage is not allowed."
 msgstr "不允许环形模板链接."
 
-#: include/classes/core/ZBase.php:503
+#: include/classes/core/ZBase.php:508
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3449,7 +3442,7 @@ msgstr "关闭过去的事件"
 msgid "Close problem"
 msgstr "关闭问题"
 
-#: include/classes/helpers/CRoleHelper.php:440
+#: include/classes/helpers/CRoleHelper.php:490
 msgid "Close problems"
 msgstr ""
 
@@ -3507,7 +3500,7 @@ msgstr "合并的结果"
 msgid "Command"
 msgstr "命令"
 
-#: app/controllers/CControllerPopupGeneric.php:374
+#: app/controllers/CControllerPopupGeneric.php:381
 #: app/partials/popup.operations.php:312 app/partials/popup.operations.php:323
 #: app/views/administration.script.edit.php:60
 #: app/views/administration.script.list.php:68
@@ -3616,7 +3609,7 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "条件复制关联项 \"%1$s\"。"
 
 #: include/classes/helpers/CMenuHelper.php:185
-#: include/classes/helpers/CRoleHelper.php:301
+#: include/classes/helpers/CRoleHelper.php:351
 #: include/views/inventory.host.view.php:224 jsLoader.php:278
 msgid "Configuration"
 msgstr "配置"
@@ -3772,12 +3765,12 @@ msgstr "配置触发器"
 msgid "Configuration of user groups"
 msgstr "配置用户组"
 
-#: app/controllers/CControllerUserroleEdit.php:134
+#: app/controllers/CControllerUserroleEdit.php:187
 #: app/controllers/CControllerUserroleList.php:130
 msgid "Configuration of user roles"
 msgstr ""
 
-#: app/controllers/CControllerUserEdit.php:205
+#: app/controllers/CControllerUserEdit.php:209
 #: app/controllers/CControllerUserList.php:170
 msgid "Configuration of users"
 msgstr "配置用户"
@@ -4091,15 +4084,15 @@ msgstr "监控日志文件行数统计。返回 整数"
 msgid "Create action"
 msgstr "创建动作"
 
-#: include/classes/helpers/CRoleHelper.php:430
+#: include/classes/helpers/CRoleHelper.php:480
 msgid "Create and edit dashboards and screens"
 msgstr ""
 
-#: include/classes/helpers/CRoleHelper.php:435
+#: include/classes/helpers/CRoleHelper.php:485
 msgid "Create and edit maintenance"
 msgstr ""
 
-#: include/classes/helpers/CRoleHelper.php:431
+#: include/classes/helpers/CRoleHelper.php:481
 msgid "Create and edit maps"
 msgstr ""
 
@@ -4424,7 +4417,7 @@ msgstr "DNS名称"
 msgid "Daily"
 msgstr "每日"
 
-#: include/classes/core/ZBase.php:361
+#: include/classes/core/ZBase.php:356
 msgid "Dark"
 msgstr "暗色"
 
@@ -4432,7 +4425,7 @@ msgstr "暗色"
 #: app/controllers/CControllerDashboardView.php:131
 #: app/views/monitoring.host.dashboard.view.php:60
 #: include/classes/helpers/CMenuHelper.php:34
-#: include/classes/helpers/CRoleHelper.php:325
+#: include/classes/helpers/CRoleHelper.php:375
 msgid "Dashboard"
 msgstr "仪表板"
 
@@ -4485,8 +4478,8 @@ msgstr "更新仪表盘"
 #: app/views/configuration.dashboard.list.php:74
 #: app/views/monitoring.dashboard.list.php:35
 #: app/views/monitoring.host.dashboard.view.php:32 app/views/search.php:36
-#: app/views/search.php:136 app/views/search.php:235 app/views/search.php:286
-#: app/views/search.php:293 include/html.inc.php:403
+#: app/views/search.php:99 app/views/search.php:104 app/views/search.php:265
+#: app/views/search.php:316 app/views/search.php:323 include/html.inc.php:403
 #: include/views/configuration.template.edit.php:309
 #: include/views/configuration.template.list.php:155
 #: include/views/configuration.template.list.php:273
@@ -4689,15 +4682,15 @@ msgstr "十二"
 msgid "Default"
 msgstr "默认"
 
-#: app/views/administration.userrole.edit.php:108
+#: app/views/administration.userrole.edit.php:112
 msgid "Default access to new UI elements"
 msgstr ""
 
-#: app/views/administration.userrole.edit.php:242
+#: app/views/administration.userrole.edit.php:255
 msgid "Default access to new actions"
 msgstr ""
 
-#: app/views/administration.userrole.edit.php:158
+#: app/views/administration.userrole.edit.php:164
 msgid "Default access to new modules"
 msgstr ""
 
@@ -5116,7 +5109,7 @@ msgstr ""
 msgid "Deny"
 msgstr "拒绝"
 
-#: app/views/administration.userrole.edit.php:188
+#: app/views/administration.userrole.edit.php:195
 msgid "Deny list"
 msgstr ""
 
@@ -5398,13 +5391,13 @@ msgid "Discovered items"
 msgstr "已发现的监控项"
 
 #: app/views/popup.mediatype.message.php:55 app/views/search.php:42
-#: app/views/search.php:89 app/views/search.php:93 app/views/search.php:235
-#: app/views/search.php:296 app/views/search.php:300
+#: app/views/search.php:150 app/views/search.php:154 app/views/search.php:265
+#: app/views/search.php:326 app/views/search.php:330
 #: include/classes/helpers/CMediatypeHelper.php:93
 #: include/classes/helpers/CMenuHelper.php:73
 #: include/classes/helpers/CMenuHelper.php:175
-#: include/classes/helpers/CRoleHelper.php:335
-#: include/classes/helpers/CRoleHelper.php:389 include/forms.inc.php:295
+#: include/classes/helpers/CRoleHelper.php:385
+#: include/classes/helpers/CRoleHelper.php:439 include/forms.inc.php:295
 #: include/forms.inc.php:687 include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:444
 #: include/views/configuration.template.list.php:156
@@ -5427,7 +5420,7 @@ msgstr "由agent代理程序自动发现"
 msgid "Discovery check"
 msgstr "自动发现检查"
 
-#: app/controllers/CControllerPopupGeneric.php:356
+#: app/controllers/CControllerPopupGeneric.php:363
 msgid "Discovery checks"
 msgstr "自动发现检查"
 
@@ -5498,7 +5491,7 @@ msgstr[0] "发现规则已经启用"
 msgid "Discovery rule updated"
 msgstr "自动发现规则已更新"
 
-#: app/controllers/CControllerPopupGeneric.php:344
+#: app/controllers/CControllerPopupGeneric.php:351
 #: app/views/popup.condition.common.php:455 include/html.inc.php:418
 #: include/views/configuration.discovery.edit.php:28
 #: include/views/configuration.discovery.list.php:27
@@ -5550,7 +5543,7 @@ msgstr "显示问题"
 msgid "Display stacked graph"
 msgstr "显示堆叠数据图"
 
-#: app/views/search.php:161 app/views/search.php:230 app/views/search.php:326
+#: app/views/search.php:187 app/views/search.php:260 app/views/search.php:356
 #: include/actions.inc.php:1723 include/actions.inc.php:1794
 #: include/actions.inc.php:1884 include/classes/helpers/CPagerHelper.php:147
 #: jsLoader.php:346 queue.php:316
@@ -6096,7 +6089,7 @@ msgstr "启用trapping"
 #: app/views/administration.user.list.php:200
 #: app/views/administration.user.list.php:230
 #: app/views/administration.user.list.php:234
-#: app/views/administration.userrole.edit.php:173 app/views/popup.media.php:85
+#: app/views/administration.userrole.edit.php:179 app/views/popup.media.php:85
 #: app/views/popup.triggerwizard.php:138 include/discovery.inc.php:107
 #: include/html.inc.php:302 include/httptest.inc.php:47
 #: include/items.inc.php:139 include/items.inc.php:142
@@ -6202,7 +6195,7 @@ msgstr "事件已确认"
 
 #: app/controllers/CControllerAuditLogList.php:215
 #: include/classes/helpers/CMenuHelper.php:172
-#: include/classes/helpers/CRoleHelper.php:384
+#: include/classes/helpers/CRoleHelper.php:434
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr "关联项事件"
@@ -6306,14 +6299,14 @@ msgstr "执行 WMI 查询返回第一个对象。返回整形、浮点、字符�
 msgid "Execute now"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:373
+#: app/controllers/CControllerPopupGeneric.php:380
 #: app/partials/popup.operations.php:231
 #: app/views/administration.script.edit.php:53
 #: app/views/administration.script.list.php:67
 msgid "Execute on"
 msgstr "执行在"
 
-#: include/classes/helpers/CRoleHelper.php:443
+#: include/classes/helpers/CRoleHelper.php:493
 msgid "Execute scripts"
 msgstr ""
 
@@ -6519,6 +6512,7 @@ msgstr "字段 \"%1$s\"不能被设置为空"
 #: app/controllers/CControllerDashboardPropertiesCheck.php:38
 #: app/controllers/CControllerDashboardPropertiesEdit.php:38
 #: app/controllers/CControllerPopupTriggerWizard.php:236
+#: app/controllers/CControllerUserUpdateGeneral.php:113
 #: include/classes/api/services/CAction.php:1692
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:325
@@ -6855,7 +6849,7 @@ msgstr "GSM 调制解调器"
 msgid "GUI"
 msgstr "界面设置"
 
-#: include/classes/user/CWebUser.php:64 index_sso.php:235
+#: include/classes/user/CWebUser.php:63 index_sso.php:235
 msgid "GUI access disabled."
 msgstr "图形化界面已经被禁用。"
 
@@ -6865,7 +6859,7 @@ msgid "GUI settings"
 msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:194
-#: include/classes/helpers/CRoleHelper.php:400
+#: include/classes/helpers/CRoleHelper.php:450
 msgid "General"
 msgstr "一般"
 
@@ -6914,7 +6908,7 @@ msgstr "找不到全局正则表达式 \"%1$s\" 。"
 msgid "Global script"
 msgstr "全局脚本"
 
-#: app/controllers/CControllerPopupGeneric.php:364
+#: app/controllers/CControllerPopupGeneric.php:371
 msgid "Global scripts"
 msgstr "全局脚本"
 
@@ -7101,7 +7095,7 @@ msgstr "数据图模板已更新"
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的聚合图形不可用。"
 
-#: app/controllers/CControllerPopupGeneric.php:304 include/html.inc.php:490
+#: app/controllers/CControllerPopupGeneric.php:311 include/html.inc.php:490
 #: include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:266
@@ -7119,8 +7113,8 @@ msgstr "数据图模板已经删除"
 msgid "Graph sum"
 msgstr "图形总数"
 
-#: app/controllers/CControllerPopupGeneric.php:300
-#: app/controllers/CControllerPopupGeneric.php:313
+#: app/controllers/CControllerPopupGeneric.php:307
+#: app/controllers/CControllerPopupGeneric.php:320
 #: include/views/configuration.graph.edit.php:101
 #: include/views/configuration.graph.list.php:139
 #: include/views/monitoring.history.php:239
@@ -7149,17 +7143,17 @@ msgstr "图表名称 \"%1$s\" 已经存在在图表或者图表原型."
 msgid "Graph with same name but other type exist."
 msgstr "同名但不同类型的图形已存在."
 
-#: app/controllers/CControllerPopupGeneric.php:291
+#: app/controllers/CControllerPopupGeneric.php:298
 #: app/partials/monitoring.host.view.html.php:37
 #: app/partials/monitoring.host.view.html.php:133
 #: app/partials/monitoring.host.view.html.php:141
 #: app/views/monitoring.charts.view.php:39
 #: app/views/monitoring.charts.view.php:107
 #: app/views/monitoring.charts.view.php:135 app/views/search.php:35
-#: app/views/search.php:41 app/views/search.php:82 app/views/search.php:86
-#: app/views/search.php:129 app/views/search.php:234 app/views/search.php:278
-#: app/views/search.php:282 graphs.php:480 include/html.inc.php:389
-#: include/views/configuration.graph.edit.php:30
+#: app/views/search.php:41 app/views/search.php:89 app/views/search.php:96
+#: app/views/search.php:142 app/views/search.php:146 app/views/search.php:264
+#: app/views/search.php:308 app/views/search.php:312 graphs.php:480
+#: include/html.inc.php:389 include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:43
 #: include/views/configuration.host.discovery.list.php:177
 #: include/views/configuration.host.edit.php:311
@@ -7418,11 +7412,11 @@ msgstr "阶"
 msgid "High"
 msgstr "严重"
 
-#: include/classes/core/ZBase.php:363
+#: include/classes/core/ZBase.php:358
 msgid "High-contrast dark"
 msgstr "高对比度暗色"
 
-#: include/classes/core/ZBase.php:362
+#: include/classes/core/ZBase.php:357
 msgid "High-contrast light"
 msgstr "高对比度亮色"
 
@@ -7626,7 +7620,7 @@ msgstr[0] "主机已启用"
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
-#: app/views/search.php:166 include/actions.inc.php:48
+#: app/views/search.php:192 include/actions.inc.php:48
 #: include/blocks.inc.php:354 include/maps.inc.php:25
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
@@ -7673,7 +7667,7 @@ msgstr "主机群组标签类型"
 msgid "Host group with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 主机组不可用。"
 
-#: app/controllers/CControllerPopupGeneric.php:152
+#: app/controllers/CControllerPopupGeneric.php:159
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/partials/common.filter.trigger.php:45
@@ -7684,9 +7678,9 @@ msgstr "ID为 \"%1$s\" 主机组不可用。"
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.web.view.php:48
 #: app/views/popup.condition.common.php:98
-#: app/views/popup.condition.common.php:269 app/views/search.php:228
+#: app/views/popup.condition.common.php:269 app/views/search.php:258
 #: hostinventoriesoverview.php:159 include/classes/helpers/CMenuHelper.php:147
-#: include/classes/helpers/CRoleHelper.php:375
+#: include/classes/helpers/CRoleHelper.php:425
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:31
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:33
@@ -7871,8 +7865,8 @@ msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "显示名称为\"%1$s\" 的主机已经存在"
 
 #: app/controllers/CControllerHostView.php:122
-#: app/controllers/CControllerPopupGeneric.php:116
-#: app/controllers/CControllerPopupGeneric.php:140
+#: app/controllers/CControllerPopupGeneric.php:123
+#: app/controllers/CControllerPopupGeneric.php:147
 #: app/partials/common.filter.trigger.php:63
 #: app/partials/dataoverview.table.left.php:29
 #: app/partials/monitoring.problem.filter.php:54
@@ -7882,14 +7876,14 @@ msgstr "显示名称为\"%1$s\" 的主机已经存在"
 #: app/views/monitoring.host.view.php:38
 #: app/views/monitoring.latest.view.php:66
 #: app/views/monitoring.web.view.php:67
-#: app/views/popup.condition.common.php:238 app/views/search.php:159
-#: app/views/search.php:170 app/views/search.php:183 app/views/search.php:187
-#: app/views/search.php:188 include/classes/helpers/CMenuHelper.php:44
+#: app/views/popup.condition.common.php:238 app/views/search.php:185
+#: app/views/search.php:196 app/views/search.php:208 app/views/search.php:212
+#: include/classes/helpers/CMenuHelper.php:44
 #: include/classes/helpers/CMenuHelper.php:98
 #: include/classes/helpers/CMenuHelper.php:157
-#: include/classes/helpers/CRoleHelper.php:327
-#: include/classes/helpers/CRoleHelper.php:344
 #: include/classes/helpers/CRoleHelper.php:377
+#: include/classes/helpers/CRoleHelper.php:394
+#: include/classes/helpers/CRoleHelper.php:427
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:39
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:51
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:51
@@ -8200,7 +8194,7 @@ msgstr "立即地"
 msgid "Import"
 msgstr "导入"
 
-#: conf.import.php:102 map.import.php:102 screen.import.php:102
+#: conf.import.php:102 map.import.php:105 screen.import.php:107
 msgid "Import failed"
 msgstr "导入失败"
 
@@ -8208,7 +8202,7 @@ msgstr "导入失败"
 msgid "Import file"
 msgstr "导入文件"
 
-#: conf.import.php:102 map.import.php:102 screen.import.php:102
+#: conf.import.php:102 map.import.php:105 screen.import.php:107
 msgid "Imported successfully"
 msgstr "已成功导入"
 
@@ -8883,7 +8877,7 @@ msgid "Incorrect media type ID."
 msgstr "错误的 媒介类型ID"
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1468
+#: include/classes/api/services/CUser.php:1461
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "不正确的方法 \"%1$s.%2$s\"."
@@ -9086,7 +9080,7 @@ msgstr "拓扑图 \"%1$s\" 用户组ID错误。"
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
 msgstr "聚合图形 \"%1$s\" 用户组ID错误。"
 
-#: app/controllers/CControllerPopupGeneric.php:479
+#: app/controllers/CControllerPopupGeneric.php:491
 #: include/classes/api/services/CAction.php:819
 #: include/classes/api/services/CAction.php:862
 #: include/classes/api/services/CAction.php:921
@@ -9662,6 +9656,11 @@ msgstr "IE浏览器"
 msgid "Interval"
 msgstr "间隔"
 
+#: include/classes/api/services/CRole.php:534
+#, c-format
+msgid "Invalid API method \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:820
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -9983,7 +9982,7 @@ msgid "Invalid value for macro \"%1$s\": %2$s."
 msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:105
-#: include/classes/helpers/CRoleHelper.php:296
+#: include/classes/helpers/CRoleHelper.php:346
 #: include/views/configuration.host.edit.php:695
 #: include/views/configuration.host.massupdate.php:315
 #: include/views/configuration.host.prototype.edit.php:355 jsLoader.php:296
@@ -10167,7 +10166,7 @@ msgstr[0] "项目模板已更新"
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的项目原型不可用。"
 
-#: app/controllers/CControllerPopupGeneric.php:317 include/html.inc.php:468
+#: app/controllers/CControllerPopupGeneric.php:324 include/html.inc.php:468
 #: include/views/configuration.host.discovery.list.php:252
 #: include/views/configuration.host.edit.php:360
 #: include/views/configuration.item.prototype.edit.php:26
@@ -10253,12 +10252,12 @@ msgstr "键值为 \"%1$s\"的监控项已存在于\"%2$s\" 为未知的监控项
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "键值为 \"%1$s\"的监控项已存在于\"%2$s\" ."
 
-#: app/controllers/CControllerPopupGeneric.php:254
+#: app/controllers/CControllerPopupGeneric.php:261
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/configuration.application.list.php:93
 #: app/views/configuration.application.list.php:141 app/views/search.php:39
-#: app/views/search.php:68 app/views/search.php:72 app/views/search.php:234
-#: app/views/search.php:264 app/views/search.php:268
+#: app/views/search.php:126 app/views/search.php:130 app/views/search.php:264
+#: app/views/search.php:294 app/views/search.php:298
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
 #: include/html.inc.php:361 include/views/configuration.graph.edit.php:445
 #: include/views/configuration.host.discovery.list.php:175
@@ -10405,9 +10404,9 @@ msgstr "资源周期不足"
 msgid "Kerberos"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:263
-#: app/controllers/CControllerPopupGeneric.php:274
-#: app/controllers/CControllerPopupGeneric.php:326
+#: app/controllers/CControllerPopupGeneric.php:270
+#: app/controllers/CControllerPopupGeneric.php:281
+#: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/popup.discovery.check.php:62 disc_prototypes.php:48
 #: host_discovery.php:52 include/forms.inc.php:292
 #: include/views/configuration.host.discovery.edit.php:72
@@ -10614,9 +10613,10 @@ msgstr "上周图形"
 #: app/partials/monitoring.host.view.html.php:111
 #: app/partials/monitoring.host.view.html.php:117
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:33
-#: app/views/search.php:117 app/views/search.php:167 app/views/search.php:202
+#: app/views/search.php:71 app/views/search.php:77 app/views/search.php:193
+#: app/views/search.php:227 app/views/search.php:233
 #: include/classes/helpers/CMenuHelper.php:55
-#: include/classes/helpers/CRoleHelper.php:329
+#: include/classes/helpers/CRoleHelper.php:379
 #: include/views/inventory.host.view.php:143
 #: include/views/inventory.host.view.php:149 jsLoader.php:298
 msgid "Latest data"
@@ -10875,7 +10875,7 @@ msgstr "日志与SNMP采集器不符"
 #: app/controllers/CControllerAuditLogList.php:166
 #: app/views/administration.authentication.edit.php:128
 #: app/views/administration.user.list.php:106 include/func.inc.php:1521
-#: include/func.inc.php:1537 index_http.php:87 index_sso.php:252
+#: include/func.inc.php:1537 index_http.php:90 index_sso.php:255
 msgid "Login"
 msgstr "登录"
 
@@ -10887,13 +10887,13 @@ msgstr ""
 msgid "Login blocking interval"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1401
+#: include/classes/api/services/CUser.php:1397
 msgid "Login failed."
 msgstr "登录失败！"
 
-#: include/classes/api/services/CUser.php:1378
-#: include/classes/api/services/CUser.php:1803
-#: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:80
+#: include/classes/api/services/CUser.php:1374
+#: include/classes/api/services/CUser.php:1791
+#: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:83
 msgid "Login name or password is incorrect."
 msgstr "登录名称或密码是错误的."
 
@@ -11012,7 +11012,7 @@ msgstr "主导航栏"
 
 #: app/controllers/CControllerAuditLogList.php:210
 #: include/classes/helpers/CMenuHelper.php:166
-#: include/classes/helpers/CRoleHelper.php:378
+#: include/classes/helpers/CRoleHelper.php:428
 #: include/views/configuration.maintenance.edit.php:259
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -11184,10 +11184,10 @@ msgstr "映射到"
 msgid "Mappings"
 msgstr "映射"
 
-#: app/controllers/CControllerPopupGeneric.php:332
+#: app/controllers/CControllerPopupGeneric.php:339
 #: app/views/monitoring.map.view.php:36
 #: include/classes/helpers/CMenuHelper.php:68
-#: include/classes/helpers/CRoleHelper.php:331
+#: include/classes/helpers/CRoleHelper.php:381
 #: include/views/conf.import.php:44
 #: include/views/monitoring.sysmap.list.php:27
 msgid "Maps"
@@ -11379,7 +11379,7 @@ msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
 #: app/views/administration.mediatype.edit.php:31
 #: app/views/administration.mediatype.list.php:31
 #: include/classes/helpers/CMenuHelper.php:230
-#: include/classes/helpers/CRoleHelper.php:406
+#: include/classes/helpers/CRoleHelper.php:456
 #: include/views/conf.import.php:51
 msgid "Media types"
 msgstr "报警媒介类型"
@@ -11627,7 +11627,7 @@ msgstr[0] ""
 msgid "Module updated: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CRole.php:474
+#: include/classes/api/services/CRole.php:512
 #, c-format
 msgid "Module with ID \"%1$s\" is not available."
 msgstr ""
@@ -11671,7 +11671,7 @@ msgid "Monitored host"
 msgstr "已监测的主机"
 
 #: include/classes/helpers/CMenuHelper.php:85
-#: include/classes/helpers/CRoleHelper.php:295
+#: include/classes/helpers/CRoleHelper.php:345
 #: include/views/inventory.host.view.php:133
 #: tests/selenium/modules/module_number_1/Module.php:18
 #: tests/selenium/modules/module_number_2/Module.php:18
@@ -11743,28 +11743,28 @@ msgstr "NNTP"
 msgid "NTLM"
 msgstr "NTLM"
 
-#: actionconf.php:38 app/controllers/CControllerPopupGeneric.php:124
-#: app/controllers/CControllerPopupGeneric.php:136
-#: app/controllers/CControllerPopupGeneric.php:148
-#: app/controllers/CControllerPopupGeneric.php:160
-#: app/controllers/CControllerPopupGeneric.php:172
-#: app/controllers/CControllerPopupGeneric.php:184
-#: app/controllers/CControllerPopupGeneric.php:196
-#: app/controllers/CControllerPopupGeneric.php:208
-#: app/controllers/CControllerPopupGeneric.php:222
-#: app/controllers/CControllerPopupGeneric.php:236
-#: app/controllers/CControllerPopupGeneric.php:262
-#: app/controllers/CControllerPopupGeneric.php:275
-#: app/controllers/CControllerPopupGeneric.php:287
-#: app/controllers/CControllerPopupGeneric.php:299
-#: app/controllers/CControllerPopupGeneric.php:312
-#: app/controllers/CControllerPopupGeneric.php:325
-#: app/controllers/CControllerPopupGeneric.php:340
-#: app/controllers/CControllerPopupGeneric.php:352
-#: app/controllers/CControllerPopupGeneric.php:360
-#: app/controllers/CControllerPopupGeneric.php:372
-#: app/controllers/CControllerPopupGeneric.php:386
-#: app/controllers/CControllerPopupGeneric.php:398
+#: actionconf.php:38 app/controllers/CControllerPopupGeneric.php:131
+#: app/controllers/CControllerPopupGeneric.php:143
+#: app/controllers/CControllerPopupGeneric.php:155
+#: app/controllers/CControllerPopupGeneric.php:167
+#: app/controllers/CControllerPopupGeneric.php:179
+#: app/controllers/CControllerPopupGeneric.php:191
+#: app/controllers/CControllerPopupGeneric.php:203
+#: app/controllers/CControllerPopupGeneric.php:215
+#: app/controllers/CControllerPopupGeneric.php:229
+#: app/controllers/CControllerPopupGeneric.php:243
+#: app/controllers/CControllerPopupGeneric.php:269
+#: app/controllers/CControllerPopupGeneric.php:282
+#: app/controllers/CControllerPopupGeneric.php:294
+#: app/controllers/CControllerPopupGeneric.php:306
+#: app/controllers/CControllerPopupGeneric.php:319
+#: app/controllers/CControllerPopupGeneric.php:332
+#: app/controllers/CControllerPopupGeneric.php:347
+#: app/controllers/CControllerPopupGeneric.php:359
+#: app/controllers/CControllerPopupGeneric.php:367
+#: app/controllers/CControllerPopupGeneric.php:379
+#: app/controllers/CControllerPopupGeneric.php:393
+#: app/controllers/CControllerPopupGeneric.php:405
 #: app/controllers/CControllerPopupLldOverride.php:79
 #: app/controllers/CControllerPopupTriggerWizard.php:136
 #: app/controllers/CControllerRegExCreate.php:78
@@ -11796,7 +11796,7 @@ msgstr "NTLM"
 #: app/views/administration.usergroup.list.php:44
 #: app/views/administration.usergroup.list.php:68
 #: app/views/administration.user.list.php:61
-#: app/views/administration.userrole.edit.php:42
+#: app/views/administration.userrole.edit.php:43
 #: app/views/administration.userrole.list.php:44
 #: app/views/administration.userrole.list.php:61
 #: app/views/administration.valuemap.edit.php:46
@@ -11906,7 +11906,7 @@ msgstr "NTLM"
 msgid "Name"
 msgstr "名称"
 
-#: app/controllers/CControllerPopupGeneric.php:249
+#: app/controllers/CControllerPopupGeneric.php:256
 #: app/views/administration.user.edit.php:71
 #: app/views/administration.user.list.php:101
 msgctxt "user first name"
@@ -12230,7 +12230,7 @@ msgid "No discovery rule IDs given."
 msgstr "没有所称的自动发现规则ID"
 
 #: app/views/administration.user.edit.php:416
-#: app/views/administration.userrole.edit.php:150
+#: app/views/administration.userrole.edit.php:156
 msgid "No enabled modules found."
 msgstr ""
 
@@ -12380,8 +12380,8 @@ msgstr ""
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "关联项 \"%1$s\" 没有操作类型"
 
-#: include/classes/api/services/CUser.php:1383
-#: include/classes/api/services/CUser.php:1817
+#: include/classes/api/services/CUser.php:1379
+#: include/classes/api/services/CUser.php:1805
 msgid "No permissions for system access."
 msgstr "没有系统访问权限。"
 
@@ -12406,6 +12406,7 @@ msgstr ""
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:56
 #: app/controllers/CControllerPopupMediatypeTestSend.php:73
 #: app/controllers/CControllerPopupScriptExec.php:103
+#: app/controllers/CControllerUserUpdateGeneral.php:121
 #: app/controllers/CControllerWidgetClockView.php:111
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:303
@@ -12513,8 +12514,8 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:706
 #: include/classes/api/services/CProxy.php:740
 #: include/classes/api/services/CProxy.php:827
-#: include/classes/api/services/CRole.php:359
-#: include/classes/api/services/CRole.php:749
+#: include/classes/api/services/CRole.php:394
+#: include/classes/api/services/CRole.php:834
 #: include/classes/api/services/CScreenItem.php:378
 #: include/classes/api/services/CScreenItem.php:425
 #: include/classes/api/services/CScreen.php:738
@@ -12697,7 +12698,6 @@ msgid "Not allowed to set theme for user \"guest\"."
 msgstr ""
 
 #: include/classes/api/clients/CLocalApiClient.php:174
-#: include/classes/api/clients/CLocalApiClient.php:180
 msgid "Not authorised."
 msgstr "没有认证."
 
@@ -12739,7 +12739,7 @@ msgid "Notification report"
 msgstr "警报汇总"
 
 #: include/classes/helpers/CMenuHelper.php:131
-#: include/classes/helpers/CRoleHelper.php:366 report4.php:69
+#: include/classes/helpers/CRoleHelper.php:416 report4.php:69
 msgid "Notifications"
 msgstr "警报"
 
@@ -13422,8 +13422,8 @@ msgstr "覆盖"
 
 #: include/classes/helpers/CMenuHelper.php:52
 #: include/classes/helpers/CMenuHelper.php:94
-#: include/classes/helpers/CRoleHelper.php:328
-#: include/classes/helpers/CRoleHelper.php:343
+#: include/classes/helpers/CRoleHelper.php:378
+#: include/classes/helpers/CRoleHelper.php:393
 #: include/views/inventory.host.view.php:238 overview.php:27
 msgid "Overview"
 msgstr "概览"
@@ -14197,9 +14197,10 @@ msgstr "问题, 如果至少一个下层有一个问题"
 #: app/views/monitoring.problem.view.php:95 app/views/report.services.php:72
 #: app/views/report.services.php:73 app/views/report.services.php:74
 #: app/views/report.services.php:75 app/views/search.php:34
-#: app/views/search.php:123 app/views/search.php:168 app/views/search.php:208
-#: chart4.php:168 include/classes/helpers/CMenuHelper.php:39
-#: include/classes/helpers/CRoleHelper.php:326
+#: app/views/search.php:80 app/views/search.php:86 app/views/search.php:194
+#: app/views/search.php:235 app/views/search.php:241 chart4.php:168
+#: include/classes/helpers/CMenuHelper.php:39
+#: include/classes/helpers/CRoleHelper.php:376
 #: include/classes/widgets/CWidgetConfig.php:59
 #: include/classes/widgets/forms/CWidgetFormProblems.php:35
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
@@ -14253,11 +14254,11 @@ msgstr "属性"
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "提供的 URL \"%1$s\" 无效。"
 
-#: app/controllers/CControllerPopupGeneric.php:164
+#: app/controllers/CControllerPopupGeneric.php:171
 #: app/views/administration.proxy.edit.php:29
 #: app/views/administration.proxy.list.php:31
 #: include/classes/helpers/CMenuHelper.php:205
-#: include/classes/helpers/CRoleHelper.php:401
+#: include/classes/helpers/CRoleHelper.php:451
 msgid "Proxies"
 msgstr "agent代理程序"
 
@@ -14360,7 +14361,7 @@ msgid "Query fields"
 msgstr "查询字段"
 
 #: include/classes/helpers/CMenuHelper.php:240
-#: include/classes/helpers/CRoleHelper.php:408 queue.php:25
+#: include/classes/helpers/CRoleHelper.php:458 queue.php:25
 msgid "Queue"
 msgstr "队列"
 
@@ -14798,7 +14799,7 @@ msgid "Replace dependencies"
 msgstr "替换依赖关系"
 
 #: include/classes/helpers/CMenuHelper.php:138
-#: include/classes/helpers/CRoleHelper.php:297
+#: include/classes/helpers/CRoleHelper.php:347
 #: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "报表"
@@ -15112,7 +15113,7 @@ msgstr "行"
 msgid "Rows per page"
 msgstr "每页行数"
 
-#: include/classes/helpers/CRoleHelper.php:220
+#: include/classes/helpers/CRoleHelper.php:270
 msgid "Rule section was not found."
 msgstr ""
 
@@ -15518,9 +15519,9 @@ msgstr "聚合图形所有者不能为空。"
 msgid "Screen updated"
 msgstr "聚合图形已更新"
 
-#: app/controllers/CControllerPopupGeneric.php:279
+#: app/controllers/CControllerPopupGeneric.php:286
 #: include/classes/helpers/CMenuHelper.php:60
-#: include/classes/helpers/CRoleHelper.php:330
+#: include/classes/helpers/CRoleHelper.php:380
 #: include/views/conf.import.php:43
 #: include/views/monitoring.screen.constructor.list.php:28
 #: include/views/monitoring.screen.edit.php:28
@@ -15598,12 +15599,12 @@ msgstr "脚本已更新"
 #: app/views/administration.script.edit.php:30
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:235
-#: include/classes/helpers/CRoleHelper.php:407 jsLoader.php:306
+#: include/classes/helpers/CRoleHelper.php:457 jsLoader.php:306
 msgid "Scripts"
 msgstr "脚本"
 
-#: app/controllers/CControllerSearch.php:94
-#: app/partials/layout.htmlpage.aside.php:60 app/views/search.php:331
+#: app/controllers/CControllerSearch.php:100
+#: app/partials/layout.htmlpage.aside.php:60 app/views/search.php:361
 msgid "Search"
 msgstr "搜索"
 
@@ -15907,8 +15908,8 @@ msgstr "服务已更新"
 #: app/views/administration.housekeeping.edit.php:86
 #: include/classes/helpers/CMenuHelper.php:76
 #: include/classes/helpers/CMenuHelper.php:178
-#: include/classes/helpers/CRoleHelper.php:338
-#: include/classes/helpers/CRoleHelper.php:390
+#: include/classes/helpers/CRoleHelper.php:388
+#: include/classes/helpers/CRoleHelper.php:440
 #: include/views/configuration.services.edit.php:30
 #: include/views/configuration.services.edit.php:122
 #: include/views/configuration.services.list.php:27 srv_status.php:26
@@ -15920,12 +15921,13 @@ msgstr "服务"
 msgid "Services form a circular dependency."
 msgstr "服务形成了一个环."
 
-#: include/classes/core/CCookieSession.php:46
+#: include/classes/core/ZBase.php:241 include/classes/core/ZBase.php:485
 msgid "Session initialization error."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1536
-#: include/classes/api/services/CUser.php:1573
+#: include/classes/api/services/CUser.php:1510
+#: include/classes/api/services/CUser.php:1524
+#: include/classes/api/services/CUser.php:1561
 msgid "Session terminated, re-login, please."
 msgstr "会话已中断, 请重新登录."
 
@@ -15969,8 +15971,8 @@ msgstr "将 LDAP 引用设置为「关闭」失败。"
 msgid "Settings"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:209
-#: app/controllers/CControllerPopupGeneric.php:223
+#: app/controllers/CControllerPopupGeneric.php:216
+#: app/controllers/CControllerPopupGeneric.php:230
 #: app/partials/monitoring.host.filter.php:111
 #: app/partials/monitoring.problem.filter.php:111
 #: app/views/monitoring.widget.problems.view.php:62
@@ -16424,7 +16426,7 @@ msgstr "排序(0->999)"
 msgid "Sort triggers by"
 msgstr "依此排序触发器:"
 
-#: include/classes/api/CApiService.php:581
+#: include/classes/api/CApiService.php:586
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "依栏位\"%1$s\"排序是不允许的."
@@ -16443,7 +16445,7 @@ msgstr "源类型"
 msgid "Spanish (es_ES)"
 msgstr "西班牙语 (es_ES)"
 
-#: include/classes/helpers/CRoleHelper.php:171
+#: include/classes/helpers/CRoleHelper.php:221
 msgid "Specified role was not found."
 msgstr ""
 
@@ -16474,7 +16476,7 @@ msgstr "层积的"
 msgid "Staircase"
 msgstr "楼梯"
 
-#: app/controllers/CControllerPopupGeneric.php:270
+#: app/controllers/CControllerPopupGeneric.php:277
 msgid "Standard items"
 msgstr "标准检测器"
 
@@ -16504,9 +16506,9 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "静态"
 
-#: app/controllers/CControllerPopupGeneric.php:210
-#: app/controllers/CControllerPopupGeneric.php:224
-#: app/controllers/CControllerPopupGeneric.php:266
+#: app/controllers/CControllerPopupGeneric.php:217
+#: app/controllers/CControllerPopupGeneric.php:231
+#: app/controllers/CControllerPopupGeneric.php:273
 #: app/partials/monitoring.host.filter.php:118
 #: app/partials/monitoring.host.view.html.php:34
 #: app/views/administration.mediatype.list.php:48
@@ -16736,7 +16738,7 @@ msgstr "支持"
 msgid "Suppressed till: %1$s"
 msgstr "制止到：%1$s"
 
-#: app/controllers/CControllerPopupGeneric.php:250
+#: app/controllers/CControllerPopupGeneric.php:257
 #: app/views/administration.user.edit.php:76
 #: app/views/administration.user.list.php:64
 #: app/views/administration.user.list.php:102
@@ -16797,7 +16799,7 @@ msgstr "系统主机名。返回字符串"
 
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:29 include/classes/helpers/CMenuHelper.php:114
-#: include/classes/helpers/CRoleHelper.php:350
+#: include/classes/helpers/CRoleHelper.php:400
 #: include/classes/screens/CScreenServerInfo.php:38
 #: include/classes/widgets/CWidgetConfig.php:62 include/screens.inc.php:36
 msgid "System information"
@@ -16955,7 +16957,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: app/controllers/CControllerAuditLogList.php:213
-#: app/views/administration.mediatype.edit.php:276 app/views/search.php:234
+#: app/views/administration.mediatype.edit.php:276 app/views/search.php:264
 #: include/actions.inc.php:49 include/forms.inc.php:283
 #: include/forms.inc.php:677 include/views/configuration.template.edit.php:46
 #: include/views/configuration.template.edit.php:337
@@ -17049,12 +17051,12 @@ msgstr "拥有相同名称 \"%1$s\"的模板已经存在."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "拥有相同显示名称\"%1$s\"的模板已经存在."
 
-#: app/controllers/CControllerPopupGeneric.php:128
+#: app/controllers/CControllerPopupGeneric.php:135
 #: app/partials/popup.operations.php:348
-#: app/views/popup.condition.common.php:344 app/views/search.php:171
-#: app/views/search.php:192 app/views/search.php:196 app/views/search.php:197
-#: app/views/search.php:324 include/classes/helpers/CMenuHelper.php:150
-#: include/classes/helpers/CRoleHelper.php:376
+#: app/views/popup.condition.common.php:344 app/views/search.php:197
+#: app/views/search.php:215 app/views/search.php:219 app/views/search.php:354
+#: include/classes/helpers/CMenuHelper.php:150
+#: include/classes/helpers/CRoleHelper.php:426
 #: include/views/configuration.copy.elements.php:63
 #: include/views/configuration.host.edit.php:571
 #: include/views/configuration.hostgroups.list.php:65
@@ -17267,7 +17269,7 @@ msgstr "接收到的JSON不是一个有效的JSON-RPC请求."
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "请求的远程程序不存在/不可用"
 
-#: include/classes/api/services/CRole.php:763
+#: include/classes/api/services/CRole.php:848
 #, c-format
 msgid "The role \"%1$s\" is assigned to at least one user and cannot be deleted."
 msgstr ""
@@ -17752,7 +17754,7 @@ msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "触发器模板已更新"
 
-#: app/controllers/CControllerPopupGeneric.php:214 include/html.inc.php:478
+#: app/controllers/CControllerPopupGeneric.php:221 include/html.inc.php:478
 #: include/views/configuration.host.discovery.list.php:259
 #: include/views/configuration.host.edit.php:388
 #: include/views/configuration.template.edit.php:268
@@ -17794,12 +17796,12 @@ msgstr ""
 msgid "Trigger updated"
 msgstr "触发器已更新"
 
-#: app/controllers/CControllerPopupGeneric.php:200
+#: app/controllers/CControllerPopupGeneric.php:207
 #: app/partials/monitoring.problem.filter.php:83
 #: app/partials/trigoverview.table.top.php:29
 #: app/views/popup.condition.common.php:193 app/views/search.php:40
-#: app/views/search.php:75 app/views/search.php:79 app/views/search.php:234
-#: app/views/search.php:271 app/views/search.php:275 include/forms.inc.php:264
+#: app/views/search.php:134 app/views/search.php:138 app/views/search.php:264
+#: app/views/search.php:301 app/views/search.php:305 include/forms.inc.php:264
 #: include/html.inc.php:375
 #: include/views/configuration.host.discovery.list.php:176
 #: include/views/configuration.host.edit.php:279
@@ -17824,7 +17826,7 @@ msgid "Triggers deleted"
 msgstr "触发器已删除"
 
 #: include/classes/helpers/CMenuHelper.php:122
-#: include/classes/helpers/CRoleHelper.php:355
+#: include/classes/helpers/CRoleHelper.php:405
 msgid "Triggers top 100"
 msgstr "触发器 Top 100"
 
@@ -17853,8 +17855,8 @@ msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产纪录�
 msgid "Two map elements should be selected"
 msgstr "应选择两个拓扑元素"
 
-#: app/controllers/CControllerPopupGeneric.php:264
-#: app/controllers/CControllerPopupGeneric.php:327
+#: app/controllers/CControllerPopupGeneric.php:271
+#: app/controllers/CControllerPopupGeneric.php:334
 #: app/partials/monitoring.latest.view.html.php:62
 #: app/partials/popup.operations.php:209
 #: app/views/administration.image.list.php:36
@@ -17932,8 +17934,8 @@ msgstr "类型(降序)"
 msgid "Type of calculation"
 msgstr "计算方式"
 
-#: app/controllers/CControllerPopupGeneric.php:265
-#: app/controllers/CControllerPopupGeneric.php:328 include/forms.inc.php:181
+#: app/controllers/CControllerPopupGeneric.php:272
+#: app/controllers/CControllerPopupGeneric.php:335 include/forms.inc.php:181
 #: include/forms.inc.php:662 include/views/configuration.item.edit.php:642
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.massupdate.php:169
@@ -17951,7 +17953,7 @@ msgstr "信息的类型必须是“数字（符号）”或“数字（浮点）
 msgid "Types"
 msgstr "类型 "
 
-#: include/classes/api/services/CRole.php:428
+#: include/classes/api/services/CRole.php:465
 #, c-format
 msgid "UI element \"%1$s\" is not available."
 msgstr ""
@@ -18099,7 +18101,7 @@ msgstr "解锁"
 msgid "Unblock selected users?"
 msgstr "解除锁定所选的用户?"
 
-#: include/classes/core/ZBase.php:583
+#: include/classes/core/ZBase.php:588
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -18317,7 +18319,7 @@ msgstr "上"
 #: app/views/administration.user.edit.php:586
 #: app/views/administration.user.edit.php:609
 #: app/views/administration.usergroup.edit.php:221
-#: app/views/administration.userrole.edit.php:255
+#: app/views/administration.userrole.edit.php:268
 #: app/views/administration.valuemap.edit.php:110
 #: app/views/configuration.application.edit.php:64
 #: app/views/dashboard.share.edit.php:102
@@ -18497,7 +18499,7 @@ msgstr "用户 \"%1$s\" 用于 \"%2$s\" 操作。"
 msgid "User action"
 msgstr "用户动作"
 
-#: app/controllers/CControllerUserCreate.php:115
+#: app/controllers/CControllerUserCreate.php:114
 msgid "User added"
 msgstr "添加用户"
 
@@ -18591,12 +18593,12 @@ msgstr[0] ""
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "ID为\"%1$s\" 的用户组不可用。"
 
-#: app/controllers/CControllerPopupGeneric.php:228
+#: app/controllers/CControllerPopupGeneric.php:235
 #: app/views/administration.usergroup.edit.php:29
 #: app/views/administration.usergroup.list.php:31
 #: app/views/dashboard.share.edit.php:29
 #: include/classes/helpers/CMenuHelper.php:215
-#: include/classes/helpers/CRoleHelper.php:403
+#: include/classes/helpers/CRoleHelper.php:453
 #: include/views/monitoring.screen.edit.php:118
 #: include/views/monitoring.slideconf.edit.php:177
 #: include/views/monitoring.sysmap.edit.php:300
@@ -18640,9 +18642,13 @@ msgid "User profile"
 msgstr "用户基本资料"
 
 #: app/views/administration.user.list.php:103
-#: app/views/administration.userrole.edit.php:271
-#: app/views/administration.userrole.edit.php:273
+#: app/views/administration.userrole.edit.php:284
+#: app/views/administration.userrole.edit.php:286
 msgid "User role"
+msgstr ""
+
+#: app/controllers/CControllerUserroleCreate.php:128
+msgid "User role created"
 msgstr ""
 
 #: app/controllers/CControllerUserroleDelete.php:56
@@ -18650,8 +18656,7 @@ msgid "User role deleted"
 msgid_plural "User roles deleted"
 msgstr[0] ""
 
-#: app/controllers/CControllerUserroleCreate.php:163
-#: app/controllers/CControllerUserroleUpdate.php:187
+#: app/controllers/CControllerUserroleUpdate.php:149
 msgid "User role updated"
 msgstr ""
 
@@ -18660,17 +18665,17 @@ msgstr ""
 msgid "User role with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CRole.php:399
+#: include/classes/api/services/CRole.php:434
 #, c-format
 msgid "User role with name \"%1$s\" already exists."
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:378
+#: app/controllers/CControllerPopupGeneric.php:385
 #: app/views/administration.user.list.php:67
-#: app/views/administration.userrole.edit.php:28
+#: app/views/administration.userrole.edit.php:29
 #: app/views/administration.userrole.list.php:31
 #: include/classes/helpers/CMenuHelper.php:220
-#: include/classes/helpers/CRoleHelper.php:404
+#: include/classes/helpers/CRoleHelper.php:454
 msgid "User roles"
 msgstr ""
 
@@ -18695,8 +18700,8 @@ msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "聚合图形 \"%2$s\" 用户共享缺少参数 %1$s 。"
 
 #: app/views/administration.user.edit.php:360
-#: app/views/administration.userrole.edit.php:54
-#: app/views/administration.userrole.edit.php:62
+#: app/views/administration.userrole.edit.php:55
+#: app/views/administration.userrole.edit.php:63
 msgid "User type"
 msgstr "用户类型"
 
@@ -18706,7 +18711,7 @@ msgid_plural "Users unblocked"
 msgstr[0] ""
 
 #: app/controllers/CControllerUserProfileUpdate.php:120
-#: app/controllers/CControllerUserUpdate.php:127
+#: app/controllers/CControllerUserUpdate.php:126
 msgid "User updated"
 msgstr "用户已更新"
 
@@ -18746,7 +18751,7 @@ msgstr ""
 msgid "Username attribute"
 msgstr ""
 
-#: app/controllers/CControllerPopupGeneric.php:240
+#: app/controllers/CControllerPopupGeneric.php:247
 #: app/views/administration.user.edit.php:35
 #: app/views/administration.usergroup.edit.php:50
 #: app/views/administration.usergroup.list.php:193
@@ -18758,7 +18763,7 @@ msgstr ""
 #: app/views/dashboard.share.edit.php:50
 #: app/views/reports.auditlog.list.php:47
 #: include/classes/helpers/CMenuHelper.php:225
-#: include/classes/helpers/CRoleHelper.php:405
+#: include/classes/helpers/CRoleHelper.php:455
 #: include/views/monitoring.screen.edit.php:154
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:337
@@ -19168,7 +19173,7 @@ msgstr ""
 msgid "Vault authentication token"
 msgstr ""
 
-#: include/classes/core/ZBase.php:240
+#: include/classes/core/ZBase.php:228
 #: include/classes/setup/CSetupWizard.php:874 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
@@ -19279,9 +19284,10 @@ msgstr "很抱歉, 已经到了最大的组件数量."
 #: app/partials/monitoring.host.view.html.php:39
 #: app/partials/monitoring.host.view.html.php:154
 #: app/partials/monitoring.host.view.html.php:162 app/views/search.php:37
-#: app/views/search.php:43 app/views/search.php:96 app/views/search.php:100
-#: app/views/search.php:141 app/views/search.php:169 app/views/search.php:214
-#: app/views/search.php:235 app/views/search.php:303 app/views/search.php:307
+#: app/views/search.php:43 app/views/search.php:107 app/views/search.php:113
+#: app/views/search.php:158 app/views/search.php:162 app/views/search.php:195
+#: app/views/search.php:243 app/views/search.php:249 app/views/search.php:265
+#: app/views/search.php:333 app/views/search.php:337
 #: include/views/configuration.host.list.php:189
 #: include/views/configuration.host.list.php:452
 #: include/views/configuration.template.list.php:157
@@ -19705,7 +19711,7 @@ msgstr "\"%1$s\" 欢迎登入."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语言并未安装在web服务器上。"
 
-#: include/func.inc.php:1531 index_http.php:84 index_sso.php:249
+#: include/func.inc.php:1531 index_http.php:87 index_sso.php:252
 msgid "You are not logged in"
 msgstr "您还没有登录。"
 
@@ -19752,7 +19758,7 @@ msgstr ""
 msgid "You do not have permission to perform this operation."
 msgstr "您没有权限来完成此操作."
 
-#: include/classes/api/services/CRole.php:216
+#: include/classes/api/services/CRole.php:227
 msgid "You do not have permissions to create user roles."
 msgstr ""
 
@@ -21132,7 +21138,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - 周期 T 内的值之和"
 
-#: include/classes/api/services/CUser.php:1807
+#: include/classes/api/services/CUser.php:1795
 msgid "supplied credentials are not unique"
 msgstr "提供的凭据不是唯一的"
 

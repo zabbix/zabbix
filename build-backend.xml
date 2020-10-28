@@ -169,7 +169,7 @@
 	<target name="make-db-oracle" unless="${with.oracle}">
 		<!-- Build Zabbix with oracle database -->
 		<sequential>
-			<make args="--enable-server --enable-agent --enable-proxy --with-oracle --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl --with-oracle-include=/usr/include/oracle/12.1/client64 --with-oracle-lib=/usr/lib/oracle/12.1/client64/lib"/>
+			<make args="--enable-server --enable-agent --enable-proxy --with-oracle --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl --with-oracle-include=/usr/include/oracle/19.8/client64 --with-oracle-lib=/usr/lib/oracle/19.8/client64/lib"/>
 		</sequential>
 	</target>
 
@@ -315,7 +315,9 @@
 	<target name="make-dist">
 		<!-- Create & build Zabbix distribution -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
-		<exec executable="./configure" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
 			<arg line="-j5"/>
@@ -327,12 +329,13 @@
 			<arg line="dist"/>
 		</exec>
 		<apply executable="tar">
-			<arg line="-zxf"/>
+			<arg line="xzf"/>
 			<fileset dir="." includes="zabbix-*.tar.gz"/>
 		</apply>
-		<dirset dir="." includes="zabbix-*" id="dist.dir"/>
-		<property name="prop.dist.dir" refid="dist.dir"/>
-		<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true"/>
+		<move tofile="sources">
+			<dirset dir="." includes="zabbix-*"/>
+		</move>
+		<ant antfile="../build-backend.xml" dir="sources" target="build-dist" inheritAll="true" inheritRefs="true"/>
 	</target>
 
 	<target name="build" depends="make-dist"/>

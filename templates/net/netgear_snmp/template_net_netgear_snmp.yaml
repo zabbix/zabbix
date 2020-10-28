@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:34Z'
+  date: '2020-10-23T09:10:45Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -136,7 +136,6 @@ zabbix_export:
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
-              recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -299,7 +298,7 @@ zabbix_export:
               expression: |
                 {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
                 or
-                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
               name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
@@ -310,7 +309,7 @@ zabbix_export:
               expression: |
                 {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""}
                 or
-                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3'
               name: '#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
@@ -323,7 +322,7 @@ zabbix_export:
                   expression: |
                     {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
                     or
-                    {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                    {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
                   recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
       macros:
         -

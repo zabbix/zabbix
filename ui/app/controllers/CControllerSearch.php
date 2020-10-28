@@ -78,6 +78,12 @@ class CControllerSearch extends CController {
 			'total_groups_cnt' => 0,
 			'total_hosts_cnt' => 0,
 			'total_templates_cnt' => 0,
+			'allowed_ui_hosts' => $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
+			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
+			'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+			'allowed_ui_conf_templates' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			'allowed_ui_conf_host_groups' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOST_GROUPS)
 		];
 
 		if ($this->search !== '') {

@@ -107,16 +107,4 @@ class CSessionHelper {
 	public static function getAll(): array {
 		return $_SESSION;
 	}
-
-	/**
-	 * Regenerate session id.
-	 *
-	 * @static
-	 *
-	 * @return void
-	 */
-	public static function regenerateId(): void {
-		session_regenerate_id(false);
-		self::set('sessionid', self::getId());
-	}
 }

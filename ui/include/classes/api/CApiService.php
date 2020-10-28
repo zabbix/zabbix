@@ -21,6 +21,11 @@
 
 class CApiService {
 
+	/**
+	 * Authorized user data.
+	 *
+	 * @var array
+	 */
 	public static $userData;
 
 	public const ACCESS_RULES = [];
