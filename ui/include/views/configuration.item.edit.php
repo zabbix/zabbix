@@ -76,14 +76,21 @@ $form_list->addRow(
 );
 
 // Append type to form list.
-$form_list->addRow((new CLabel(_('Type'), 'label-type')),
-	(new CSelect('type'))
-		->setId('type')
-		->setFocusableElementId('label-type')
-		->setValue($data['type'])
-		->addOptions(CSelect::createOptionsFromArray($data['types']))
-		->setReadonly($readonly)
-);
+if ($readonly) {
+	$form->addVar('type', $data['type']);
+	$form_list->addRow((new CLabel(_('Type'), 'type_name')),
+		(new CTextBox('type_name', item_type2str($data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	);
+}
+else {
+	$form_list->addRow((new CLabel(_('Type'), 'label-type')),
+		(new CSelect('type'))
+			->setId('type')
+			->setFocusableElementId('label-type')
+			->setValue($data['type'])
+			->addOptions(CSelect::createOptionsFromArray($data['types']))
+	);
+}
 
 // Append key to form list.
 $key_controls = [(new CTextBox('key', $data['key'], $readonly, DB::getFieldLength('items', 'key_')))
@@ -812,27 +819,23 @@ $form_list
 	);
 
 if ($readonly) {
-	if ($data['valuemaps']) {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
-	}
-	else {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
-	}
+	$form->addVar('valuemapid', $data['valuemapid']);
+	$valuemap_select = (new CTextBox('valuemap_name',
+		!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
+		true
+	))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setId('label-valuemap');
 }
 else {
-	$valuemaps = $data['valuemaps'];
-	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
-}
+	$valuemap_select = (new CSelect('valuemapid'))
+		->setValue($data['valuemapid'])
+		->setFocusableElementId('label-valuemap')
+		->addOption(new CSelectOption(0, _('As is')));
 
-$valuemap_select = (new CSelect('valuemapid'))
-	->setId('valuemapid')
-	->setValue($data['valuemapid'])
-	->setFocusableElementId('label-valuemap')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setReadonly($readonly);
-
-foreach ($valuemaps as $valuemap) {
-	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
+	foreach ($data['valuemaps'] as $valuemap) {
+		$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
+	}
 }
 
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
@@ -920,8 +923,8 @@ else {
 		}
 	}
 
-	$form_list->addRow(new CLabel(_('Populates host inventory field'), $host_inventory_select->getFocusableElementId()),
-		$host_inventory_select, 'row_inventory_link'
+	$form_list->addRow(new CLabel(_('Populates host inventory field'), 'label-host-inventory'), $host_inventory_select,
+		'row_inventory_link'
 	);
 }
 
