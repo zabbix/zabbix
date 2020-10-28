@@ -2341,8 +2341,16 @@ INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUE
 INSERT INTO hosts (hostid, proxy_hostid, host, name, status, available, description) VALUES (99136, 20000, 'Test item host', 'Test item host', 0, 0,'Test item host for testing items');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100999, 99136, 4);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55070, 99136, 1, '127.0.0.1', 'Test1', '1', '10050', '1');
+
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55071, 99136, 2, '127.0.0.2', 'Test2', '1', '161', '1');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55071, 2, 1, '{$SNMP_COMMUNITY}');
+
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55077, 99136, 2, '127.0.0.5', 'Test5', '1', '161', '0');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55077, 1, 1, '{$SNMP_COMMUNITY}');
+
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55078, 99136, 2, '127.0.0.6', 'Test6', '1', '161', '0');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) values (55078, 3, 1, '{$SNMP_COMMUNITY}', 'test_security_name', 2, 'test_authpassphrase', 'test_privpassphrase', 1, 1, 'test_context');
+
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55072, 99136, 3, '127.0.0.3', 'Test3', '1', '623', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55073, 99136, 4, '127.0.0.4', 'Test4', '1', '12345', '1');
 

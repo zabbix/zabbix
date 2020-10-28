@@ -440,7 +440,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_BAD:
-				$message = $dialog->query('tag:output')->waitUntilPresent()->asMessage()->one();
+				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
 				$this->assertTrue($message->isBad());
 
 				// Workaround for single step which has different message.
@@ -455,7 +455,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				break;
 
 			case TEST_GOOD:
-				$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
+				$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
 				$this->assertEquals('Test item', $dialog->getTitle());
 
 				$time = $dialog->query('id:time')->one();
@@ -478,7 +478,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				];
 
 				if ($macros['expected']) {
-					foreach ($form->query('class:textarea-flexible-container')->one()->asTable()->getRows() as $row) {
+					foreach ($form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
 						 * Macro columns are represented in following way:
@@ -500,7 +500,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					$this->assertEquals($macros['expected'], $macros['actual']);
 				}
 
-				$table = $form->query('id:preprocessing-steps')->one()->waitUntilPresent()->asTable();
+				$table = $form->query('id:preprocessing-steps')->asTable()->waitUntilPresent()->one();
 
 				if ($id === null) {
 					foreach ($data['preprocessing'] as $i => $step) {
@@ -518,22 +518,22 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 	private function chooseDialogActions($data) {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
 		switch ($data['action']) {
 			case 'Test':
 				$value_string = '123';
 				$prev_value_string = '100';
 				$prev_time_string  = 'now-1s';
 
-				$form->query('id:value')->waitUntilPresent()->one()->asMultiline()->fill($value_string);
-				$prev_value = $form->query('id:prev_value')->waitUntilPresent()->one()->asMultiline();
+				$form->query('id:value')->asMultiline()->waitUntilPresent()->one()->fill($value_string);
+				$prev_value = $form->query('id:prev_value')->asMultiline()->waitUntilPresent()->one();
 				$prev_time = $form->query('id:prev_time')->waitUntilPresent()->one();
 
 				if ($prev_value->isEnabled(true) && $prev_time->isEnabled(true)) {
 					$prev_value->fill($prev_value_string);
 					$prev_time->fill($prev_time_string);
 				}
-				$form->query('id:eol')->waitUntilPresent()->one()->asSegmentedRadio()->fill('CRLF');
+				$form->query('id:eol')->asSegmentedRadio()->waitUntilPresent()->one()->fill('CRLF');
 				$dialog->query('button:Test')->one()->waitUntilVisible()->click();
 
 				// Check Zabbix server down message.

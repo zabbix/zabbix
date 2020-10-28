@@ -41,7 +41,6 @@ class testFormItemTest extends CWebTest {
 				['Type' => 'Zabbix agent (active)'],
 				['Type' => 'Simple check'],
 				['Type' => 'SNMP agent','SNMP OID' => '[IF-MIB::]ifInOctets.1'],
-				['Type' => 'SNMP agent'],
 				['Type' => 'Zabbix internal'],
 				['Type' => 'Zabbix trapper'],
 				['Type' => 'External check'],
@@ -230,6 +229,9 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'test.item.no.host.value'
 					],
+					'snmp_fields' => [
+						'version' => 'SNMPv2'
+					],
 					'host_value' => false
 				]
 			],
@@ -238,7 +240,46 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'SNMP agent',
-						'Key' => 'test.snmp'
+						'Key' => 'snmp.v2'
+					],
+					'host_interface' => '127.0.0.2 : 161',
+					'snmp_fields' => [
+						'version' => 'SNMPv2',
+						'comunity' => 'public'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.v1'
+					],
+					'host_interface' => '127.0.0.5 : 161',
+					'snmp_fields' => [
+						'version' => 'SNMPv1',
+						'comunity' => 'public'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.v3'
+					],
+					'host_interface' => '127.0.0.6 : 161',
+					'snmp_fields' => [
+						'version' => 'SNMPv3',
+						'context' => 'test_context',
+						'security' => 'test_security_name',
+						'security_level' => 'authPriv',
+						'authentication_protocol' => 'SHA',
+						'authentication_passphrase' => 'test_authpassphrase',
+						'privacy_protocol' => 'AES',
+						'privacy_passphrase' => 'test_privpassphrase'
 					]
 				]
 			],
@@ -551,7 +592,7 @@ class testFormItemTest extends CWebTest {
 	 * @param boolean	$is_host		true if host, false if template
 	 */
 	public function checkTestItem($create_link, $data, $is_host) {
-		if (!$is_host && ($data['fields']['Type'] === 'IPMI agent' || $data['fields']['Type'] === 'SNMP agent')) {
+		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
 			return;
 		}
 
@@ -559,8 +600,13 @@ class testFormItemTest extends CWebTest {
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 
 		$item_form->fill($data['fields']);
-		// Get interface ip and port separately.
+
 		if ($is_host) {
+			// If host fill interface.
+			if (CTestArrayHelper::get($data, 'host_interface')) {
+				$item_form->getField('Host interface')->fill($data['host_interface']);
+			}
+			// Get ip and port separately.
 			$host_interface = explode(' : ', $item_form->getField('Host interface')
 				->getText(), 2);
 		}
@@ -585,20 +631,47 @@ class testFormItemTest extends CWebTest {
 				$this->assertTrue($get_host_value->isEnabled());
 				$this->assertTrue($get_host_value->isChecked());
 
-				$elements = [
-					'address' => 'id:interface_address',
-					'port' => 'id:interface_port',
-					'proxy' => 'id:proxy_hostid'
-				];
+				if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
+					$elements = [
+						'address' => 'id:interface_address',
+						'port' => 'id:interface_port',
+						'proxy' => 'id:proxy_hostid',
+						'version' => 'id:interface_details_version',
+						'context' => 'id:interface_details_contextname',
+						'security' => 'id:interface_details_securityname',
+						'security_level' => 'id:interface_details_securitylevel',
+						'authentication_protocol' => 'id:interface_details_authprotocol',
+						'authentication_passphrase' => 'id:interface_details_authpassphrase',
+						'privacy_protocol' => 'id:interface_details_privprotocol',
+						'privacy_passphrase' => 'id:interface_details_privpassphrase'
+					];
+				}
+				elseif (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv1' ||
+							CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv2') {
+					$elements = [
+						'address' => 'id:interface_address',
+						'port' => 'id:interface_port',
+						'proxy' => 'id:proxy_hostid',
+						'version' => 'id:interface_details_version',
+						'comunity' => 'id:interface_details_community'
+					];
+				}
+				else {
+					$elements = [
+						'address' => 'id:interface_address',
+						'port' => 'id:interface_port',
+						'proxy' => 'id:proxy_hostid'
+					];
+				}
+
 				foreach ($elements as $name => $selector) {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
 				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN "
 					. "(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
-				// Check interface and proxy fields.
+				// Check test item form fields depending on item type.
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':
-					case 'SNMP agent':
 					case 'IPMI agent':
 						$fields_value = [
 							'address' => $is_host ? $host_interface[0] : '',
@@ -606,6 +679,55 @@ class testFormItemTest extends CWebTest {
 							'proxy' => $is_host ? $proxy : '(no proxy)'
 						];
 						$fields_state = ['address' => true, 'port' => true, 'proxy' => true];
+						break;
+
+					case 'SNMP agent':
+						if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
+							$fields_value = [
+								'address' => $is_host ? $host_interface[0] : '',
+								'port' => $is_host ? $host_interface[1] : '',
+								'proxy' => $is_host ? $proxy : '(no proxy)',
+								'version' => $is_host ? 'SNMPv3' : 'SNMPv2',
+								'context' => $is_host ? $data['snmp_fields']['context'] : '',
+								'security' => $is_host ? $data['snmp_fields']['security'] : '',
+								'security_level' => $is_host ? $data['snmp_fields']['security_level'] : 'noAuthNoPriv',
+								'authentication_protocol' => $is_host ? $data['snmp_fields']['authentication_protocol'] : 'MD5',
+								'authentication_passphrase' => $is_host ? $data['snmp_fields']['authentication_passphrase'] : '',
+								'privacy_protocol' => $is_host ? $data['snmp_fields']['privacy_protocol'] : 'DES',
+								'privacy_passphrase' => $is_host ? $data['snmp_fields']['privacy_passphrase'] : '',
+							];
+
+							$fields_state = [
+								'address' => true,
+								'port' => true,
+								'proxy' => true,
+								'version' => true,
+								'context' => true,
+								'security' => true,
+								'security_level' => true,
+								'authentication_protocol' => true,
+								'authentication_passphrase' => true,
+								'privacy_protocol' => true,
+								'privacy_passphrase' => true
+							];
+						}
+						else {
+							$fields_value = [
+								'address' => $is_host ? $host_interface[0] : '',
+								'port' => $is_host ? $host_interface[1] : '',
+								'proxy' => $is_host ? $proxy : '(no proxy)',
+								'version' => $is_host ? CTestArrayHelper::get($data, 'snmp_fields.version', 'SNMPv2') : 'SNMPv2',
+								'comunity' => $is_host ? CTestArrayHelper::get($data, 'snmp_fields.comunity', 'public') : '',
+							];
+
+							$fields_state = [
+								'address' => true,
+								'port' => true,
+								'proxy' => true,
+								'version' => true,
+								'comunity' => true
+							];
+						}
 						break;
 
 					case 'SSH agent':

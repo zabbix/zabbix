@@ -29,7 +29,7 @@ class testFormItemTestHost extends testFormItemTest {
 
 	const HOST_ID	= 99136;	// 'Test item host' monitored by 'Active proxy 1'
 	const IS_HOST	= true;
-	const LLD_ID		= 99294;	// 'Test discovery rule'
+	const LLD_ID	= 99294;	// 'Test discovery rule'
 
 	/**
 	 * Creation link forming function for items or LLD.
