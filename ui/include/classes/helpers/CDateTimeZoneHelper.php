@@ -104,7 +104,7 @@ class CDateTimeZoneHelper {
 	/**
 	 * Prepare list of time-zones sorted by offset and identifier.
 	 */
-	protected static function prepareDateTimeZones() {
+	protected static function prepareDateTimeZones(): void {
 		self::$list = DateTimeZone::listIdentifiers();
 		self::$list = array_combine(self::$list, array_map('self::getDateTimeZone', self::$list));
 		CArrayHelper::sort(self::$list, ['offset', 'timezone']);
