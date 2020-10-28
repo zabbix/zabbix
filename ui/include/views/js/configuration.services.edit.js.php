@@ -38,6 +38,10 @@
 				jQuery('#showsla').change();
 			}
 		}).change();
+
+		$('#period-type').on('change', (e) => {
+			document.forms['servicesForm'].submit();
+		});
 	});
 
 	function add_child_service(name, serviceid, trigger) {
