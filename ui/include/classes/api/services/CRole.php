@@ -398,7 +398,7 @@ class CRole extends CApiService {
 		$role_type = array_column($roles, 'type', 'roleid');
 
 		if (array_key_exists(static::$userData['roleid'], $role_type)
-				&& $role_type[static::$userData['type']] != static::$userData['type']) {
+				&& $role_type[static::$userData['roleid']] != static::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('User cannot change their user role type.'));
 		}
 
