@@ -80,7 +80,7 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 		msg_raw = duk_get_string(ctx, -1);
 
 	if (0 == duk_is_null_or_undefined(ctx, -1))
-	{ 
+	{
 		if (SUCCEED != zbx_cesu8_to_utf8(msg_raw, &msg_output))
 		{
 			msg_output = zbx_strdup(msg_output, msg_raw);
