@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-04T17:53:49Z</date>
+   <date>2020-10-20T07:24:02Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Linux block devices by Zabbix agent active</template>
          <name>Template Module Linux block devices by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -285,6 +285,7 @@
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Linux block devices by Zabbix agent active:vfs.dev.read.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Template Module Linux block devices by Zabbix agent active:vfs.dev.write.await[{#DEVNAME}].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
@@ -394,7 +395,7 @@
       <template>
          <template>Template Module Linux CPU by Zabbix agent active</template>
          <name>Template Module Linux CPU by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -693,7 +694,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
       <template>
          <template>Template Module Linux filesystems by Zabbix agent active</template>
          <name>Template Module Linux filesystems by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -817,6 +818,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
@@ -923,7 +925,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux generic by Zabbix agent active</template>
          <name>Template Module Linux generic by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1140,7 +1142,6 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Operating system description has changed</name>
                      <priority>INFO</priority>
                      <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -1288,7 +1289,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux memory by Zabbix agent active</template>
          <name>Template Module Linux memory by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1443,7 +1444,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
 &#13;
   Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1686,6 +1687,7 @@ Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net<
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&lt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}&gt;0&#13;
@@ -1854,7 +1856,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module Linux block devices by Zabbix agent active</name>

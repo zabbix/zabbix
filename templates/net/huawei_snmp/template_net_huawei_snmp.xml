@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:21Z</date>
+   <date>2020-10-20T07:20:07Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -17,7 +17,7 @@ MIBs used:&#13;
 HUAWEI-ENTITY-EXTENT-MIB&#13;
 ENTITY-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -87,6 +87,7 @@ Template tooling version used: 0.36</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Entity Discovery</name>
@@ -128,6 +129,7 @@ Template tooling version used: 0.36</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>MPU Discovery</name>
@@ -301,7 +303,6 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                           <recovery_mode>NONE</recovery_mode>
                            <name>{#ENT_NAME}: Operating system description has changed</name>
                            <priority>INFO</priority>
                            <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -335,6 +336,7 @@ Reference: http://support.huawei.com/enterprise/KnowledgebaseReadAction.action?c
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#ENT_NAME}: CPU utilization</name>
