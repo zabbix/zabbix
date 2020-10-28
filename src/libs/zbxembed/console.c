@@ -74,7 +74,10 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	int			err_index = -1;
 	duk_memory_functions	out_funcs;
 
-	msg_raw = duk_json_encode(ctx, -1);
+	if (duk_is_string(ctx, -1))
+		msg_raw = duk_get_string(ctx, -1);
+	else
+		msg_raw = duk_json_encode(ctx, -1);
 
 	if (SUCCEED != zbx_cesu8_to_utf8(msg_raw, &msg_output))
 	{
