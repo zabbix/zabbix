@@ -1007,7 +1007,9 @@ function getItemFormData(array $item = [], array $options = []) {
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 
-		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag);
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
 	}
 
 	// caption
@@ -1291,6 +1293,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
+	$have_validate_not_supported = in_array(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, array_column($preprocessing, 'type'));
 
 	foreach ($preprocessing as $step) {
 		// Create a combo box with preprocessing types.
@@ -1300,7 +1303,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			$cb_group = new COptGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
+				$enabled = (!$have_validate_not_supported || $type != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED || $type == $step['type']);
+
+				$cb_group->addItem(
+					(new CComboItem($type, $label, ($type == $step['type'])))
+						->setEnabled($enabled)
+				);
 			}
 
 			$preproc_types_cbbox->addItem($cb_group);
@@ -1448,6 +1456,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$on_fail->setEnabled(false);
 				break;
 
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				$on_fail
+					->setEnabled(false)
+					->setChecked(true);
+				break;
+
 			default:
 				$on_fail->setEnabled(!$readonly);
 
@@ -1507,6 +1521,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('preprocessing-step-test')
+							->setEnabled($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED)
 							->removeId(),
 						(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
@@ -1725,7 +1740,8 @@ function getTriggerFormData(array $data) {
 
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
-			getTriggerParentTemplates([$trigger], $flag), $flag
+			getTriggerParentTemplates([$trigger], $flag), $flag,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		if ($data['show_inherited_tags']) {

@@ -575,7 +575,7 @@ if (isset($_REQUEST['form'])) {
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
 		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests)
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		$data['agent'] = ZBX_AGENT_OTHER;
@@ -889,6 +889,7 @@ else {
 	$data['parent_templates'] = getHttpTestParentTemplates($httpTests);
 	$data['httpTests'] = $httpTests;
 	$data['httpTestsLastData'] = $httpTestsLastData;
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
 	echo (new CView('configuration.httpconf.list', $data))->getOutput();

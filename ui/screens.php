@@ -82,7 +82,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
-$data = [];
+$data = ['allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)];
 
 $options = [
 	'output' => ['screenid', 'name']

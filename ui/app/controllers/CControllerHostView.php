@@ -46,6 +46,7 @@ class CControllerHostView extends CControllerHost {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
+			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0'
 		];
 
@@ -79,7 +80,7 @@ class CControllerHostView extends CControllerHost {
 	}
 
 	protected function checkPermissions(): bool {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
 	}
 
 	protected function doAction(): void {
@@ -88,11 +89,16 @@ class CControllerHostView extends CControllerHost {
 			->read()
 			->setInput($this->cleanInput($this->getInputAll()));
 
-		foreach ($profile->getTabsWithDefaults() as $filter_tab) {
+		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
+			if ($index == $profile->selected) {
+				// Initialize multiselect data for filter_scr to allow tabfilter correctly handle unsaved state.
+				$filter_tab['filter_src']['filter_view_data'] = $this->getAdditionalData($filter_tab['filter_src']);
+			}
+
 			$filter_tabs[] = $filter_tab + ['filter_view_data' => $this->getAdditionalData($filter_tab)];
 		}
 
-		$filter = $profile->getTabFilter($profile->selected);
+		$filter = $filter_tabs[$profile->selected];
 		$refresh_curl = new CUrl('zabbix.php');
 		$filter['action'] = 'host.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);

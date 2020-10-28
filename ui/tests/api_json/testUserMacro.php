@@ -688,7 +688,7 @@ class testUserMacro extends CAPITest {
 					'macro' => '{$MACRO_ADMIN}',
 					'value' => 'admin'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.createglobal".'
 			],
 			[
 				'method' => 'usermacro.updateglobal',
@@ -697,13 +697,13 @@ class testUserMacro extends CAPITest {
 					'globalmacroid' => '13',
 					'macro' => '{$MACRO_UPDATE_ADMIN}',
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.updateglobal".'
 			],
 			[
 				'method' => 'usermacro.deleteglobal',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'globalmacro' => ['13'],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.deleteglobal".'
 			],
 			// Check zabbix user permissions to create, update and delete global macro.
 			[
@@ -713,7 +713,7 @@ class testUserMacro extends CAPITest {
 					'macro' => '{$MACRO_USER}',
 					'value' => 'USER'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.createglobal".'
 			],
 			[
 				'method' => 'usermacro.updateglobal',
@@ -722,13 +722,13 @@ class testUserMacro extends CAPITest {
 					'globalmacroid' => '14',
 					'macro' => '{$MACRO_UPDATE_USER}',
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.updateglobal".'
 			],
 			[
 				'method' => 'usermacro.deleteglobal',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'globalmacro' => ['14'],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.deleteglobal".'
 			],
 			// Check guset permissions to create, update and delete global macro.
 			[
@@ -738,7 +738,7 @@ class testUserMacro extends CAPITest {
 					'macro' => '{$MACRO_GUEST}',
 					'value' => 'GUEST'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.createglobal".'
 			],
 			[
 				'method' => 'usermacro.updateglobal',
@@ -747,13 +747,13 @@ class testUserMacro extends CAPITest {
 					'globalmacroid' => '14',
 					'macro' => '{$MACRO_UPDATE_GUEST}',
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.updateglobal".'
 			],
 			[
 				'method' => 'usermacro.deleteglobal',
 				'user' => ['user' => 'guest', 'password' => ''],
 				'globalmacro' => ['14'],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "usermacro.deleteglobal".'
 			]
 		];
 	}

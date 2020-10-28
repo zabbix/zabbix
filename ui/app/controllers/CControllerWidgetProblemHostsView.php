@@ -245,7 +245,8 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'groups' => $groups,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
 		]));
 	}
 }

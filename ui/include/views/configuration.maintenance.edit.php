@@ -67,10 +67,12 @@ foreach (array_values($data['timeperiods']) as $index => $timeperiod) {
 			new CHorList([
 				(new CSimpleButton(_('Edit')))
 					->setAttribute('data-action', 'edit')
-					->addClass(ZBX_STYLE_BTN_LINK),
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled($data['allowed_edit']),
 				(new CSimpleButton(_('Remove')))
 					->setAttribute('data-action', 'remove')
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->setEnabled($data['allowed_edit'])
 			])
 		]))->addClass(ZBX_STYLE_NOWRAP)
 	]);
@@ -84,6 +86,7 @@ $periods_container = (new CDiv($maintenance_period_table))
 		(new CSimpleButton(_('Add')))
 			->setAttribute('data-action', 'add')
 			->addClass(ZBX_STYLE_BTN_LINK)
+			->setEnabled($data['allowed_edit'])
 	);
 
 $table = (new CFormList('maintenanceFormList'))
@@ -92,6 +95,7 @@ $table = (new CFormList('maintenanceFormList'))
 		(new CTextBox('mname', $data['mname']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->setReadonly(!$data['allowed_edit'])
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'name'))
 	)
@@ -100,6 +104,7 @@ $table = (new CFormList('maintenanceFormList'))
 			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
 			->setModern(true)
+			->setReadonly(!$data['allowed_edit'])
 	)
 	// Show date and time in shorter format without seconds.
 	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
@@ -107,12 +112,14 @@ $table = (new CFormList('maintenanceFormList'))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
+			->setReadonly(!$data['allowed_edit'])
 	)
 	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
 		(new CDateSelector('active_till', $data['active_till']))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
+			->setReadonly(!$data['allowed_edit'])
 	)
 	->addRow(
 		(new CLabel(_('Periods'), $periods_container->getId()))->setAsteriskMark(), $periods_container
@@ -134,7 +141,7 @@ $tag_table = (new CTable())
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern(true)
-				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : true)
+				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : $data['allowed_edit'])
 		))->setColSpan(4)
 	);
 
@@ -165,18 +172,22 @@ foreach ($tags as $tag) {
 		$tag_table->addRow([
 			(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
 				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setReadonly(!$data['allowed_edit']),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
 				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
 				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
-				->setModern(true),
+				->setModern(true)
+				->setEnabled($data['allowed_edit']),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setReadonly(!$data['allowed_edit']),
 			(new CCol(
 				(new CButton('tags['.$i.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
+					->setEnabled($data['allowed_edit'])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		], 'form_row');
 	}
@@ -189,7 +200,7 @@ $tag_table->addRow(
 		(new CButton('tags_add', _('Add')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-add')
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : true)
+			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : $data['allowed_edit'])
 	))->setColSpan(3)
 );
 
@@ -199,6 +210,7 @@ $table
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
 			'data' => $data['groups_ms'],
+			'disabled' => !$data['allowed_edit'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -215,6 +227,7 @@ $table
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
 			'data' => $data['hosts_ms'],
+			'disabled' => !$data['allowed_edit'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -225,7 +238,9 @@ $table
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
+	);
+
+$table
 	->addRow('',
 		(new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark()
 	)
@@ -235,7 +250,9 @@ $table
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	)
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly(!$data['allowed_edit'])
 	);
 
 // Append tabs to form.
@@ -244,10 +261,11 @@ $maintenance_tab = (new CTabView())->addTab('maintenanceTab', _('Maintenance'), 
 // append buttons to form
 if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
 	$maintenance_tab->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('update', _('Update')))->setEnabled($data['allowed_edit']),
 		[
-			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')),
+			(new CSubmit('clone', _('Clone')))->setEnabled($data['allowed_edit']),
+			(new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')))
+				->setEnabled($data['allowed_edit']),
 			new CButtonCancel()
 		]
 	));

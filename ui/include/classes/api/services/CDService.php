@@ -24,6 +24,10 @@
  */
 class CDService extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'dservices';
 	protected $tableAlias = 'ds';
 	protected $sortColumns = ['dserviceid', 'dhostid', 'ip'];

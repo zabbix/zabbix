@@ -1112,21 +1112,21 @@ class testAuditLog extends CAPITest {
 				'api_request' => [
 					'userids' => '1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "auditlog.get".'
 			],
 			[
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'api_request' => [
 					'userids' => '1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "auditlog.get".'
 			],
 			[
 				'user' => ['user' => 'guest', 'password' => ''],
 				'api_request' => [
 					'userids' => '1'
 				],
-				'expected_error' => 'You do not have permission to perform this operation.'
+				'expected_error' => 'No permissions to call "auditlog.get".'
 			]
 		];
 	}

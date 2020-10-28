@@ -103,7 +103,12 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
 				'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
 				'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
-			]
+			],
+			'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+			'allowed_ack' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+					|| $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
 		]));
 	}
 

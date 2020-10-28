@@ -303,7 +303,7 @@ static int	DBpatch_5010033(void)
 
 static int	DBpatch_5010034(void)
 {
-	const ZBX_FIELD	old_field = {"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"value_str", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 	const ZBX_FIELD	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("profiles", &field, &old_field);
@@ -1492,6 +1492,212 @@ static int	DBpatch_5010051(void)
 
 	return DBadd_foreign_key("item_parameter", 1, &field);
 }
+
+static int	DBpatch_5010052(void)
+{
+	return DBdrop_field("config", "refresh_unsupported");
+}
+
+static int      DBpatch_5010053(void)
+{
+	const ZBX_TABLE table =
+		{"role", "roleid", 0,
+			{
+				{"roleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"readonly", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5010054(void)
+{
+	return DBcreate_index("role", "role_1", "name", 1);
+}
+
+static int	DBpatch_5010055(void)
+{
+	const ZBX_TABLE table =
+		{"role_rule", "role_ruleid", 0,
+			{
+				{"role_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"roleid", NULL, "role", "roleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+				{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"value_int", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"value_moduleid", NULL, "module", "moduleid", 0, ZBX_TYPE_ID, 0, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5010056(void)
+{
+	return DBcreate_index("role_rule", "role_rule_1", "roleid", 0);
+}
+
+static int	DBpatch_5010057(void)
+{
+	return DBcreate_index("role_rule", "role_rule_2", "value_moduleid", 0);
+}
+
+static int	DBpatch_5010058(void)
+{
+	int		i;
+	const char	*columns = "roleid,name,type,readonly";
+	const char	*values[] = {
+			"1,'User role',1,0",
+			"2,'Admin role',2,0",
+			"3,'Super admin role',3,1",
+			"4,'Guest role',1,0",
+			NULL
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
+	{
+		if (ZBX_DB_OK > DBexecute("insert into role (%s) values (%s)", columns, values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5010059(void)
+{
+	int		i;
+	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid";
+	const char	*values[] = {
+			"1,1,0,'ui.default_access',1,'',NULL",
+			"2,1,0,'modules.default_access',1,'',NULL",
+			"3,1,0,'api.access',1,'',NULL",
+			"4,1,0,'actions.default_access',1,'',NULL",
+			"5,2,0,'ui.default_access',1,'',NULL",
+			"6,2,0,'modules.default_access',1,'',NULL",
+			"7,2,0,'api.access',1,'',NULL",
+			"8,2,0,'actions.default_access',1,'',NULL",
+			"9,3,0,'ui.default_access',1,'',NULL",
+			"10,3,0,'modules.default_access',1,'',NULL",
+			"11,3,0,'api.access',1,'',NULL",
+			"12,3,0,'actions.default_access',1,'',NULL",
+			"13,4,0,'ui.default_access',1,'',NULL",
+			"14,4,0,'modules.default_access',1,'',NULL",
+			"15,4,0,'api.access',0,'',NULL",
+			"16,4,0,'actions.default_access',0,'',NULL",
+			NULL
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
+	{
+		if (ZBX_DB_OK > DBexecute("insert into role_rule (%s) values (%s)", columns, values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5010060(void)
+{
+	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_5010061(void)
+{
+	int	i;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 1; i <= 3; i++)
+	{
+		if (ZBX_DB_OK > DBexecute("update users set roleid=%d where type=%d", i, i))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5010062(void)
+{
+	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("users", &field);
+}
+
+static int	DBpatch_5010063(void)
+{
+	return DBdrop_field("users", "type");
+}
+
+static int	DBpatch_5010064(void)
+{
+	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("users", 1, &field);
+}
+
+static int	DBpatch_5010065(void)
+{
+	const ZBX_FIELD field = {"roleid", NULL, "role", "roleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("role_rule", 1, &field);
+}
+
+static int	DBpatch_5010066(void)
+{
+	const ZBX_FIELD field = {"value_moduleid", NULL, "module", "moduleid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("role_rule", 2, &field);
+}
+
+static int	DBpatch_5010067(void)
+{
+	int	i;
+
+	/* 1 - USER TYPE / USER ROLE */
+	/* 2 - ADMIN TYPE / ADMIN ROLE */
+	/* 3 - SUPER ADMIN TYPE / SUPER ADMIN ROLE */
+	const char	*values[] = {
+			"1",
+			"2",
+			"3",
+			NULL
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set value_id=%s,type=1,value_int=0 "
+				"where idx='web.user.filter_type' and value_int=%s", values[i], values[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	/* -1 - ANY PROFILE */
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.user.filter_type' and value_int=-1"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5010)
@@ -1550,5 +1756,21 @@ DBPATCH_ADD(5010048, 0, 1)
 DBPATCH_ADD(5010049, 0, 1)
 DBPATCH_ADD(5010050, 0, 1)
 DBPATCH_ADD(5010051, 0, 1)
+DBPATCH_ADD(5010052, 0, 1)
+DBPATCH_ADD(5010053, 0, 1)
+DBPATCH_ADD(5010054, 0, 1)
+DBPATCH_ADD(5010055, 0, 1)
+DBPATCH_ADD(5010056, 0, 1)
+DBPATCH_ADD(5010057, 0, 1)
+DBPATCH_ADD(5010058, 0, 1)
+DBPATCH_ADD(5010059, 0, 1)
+DBPATCH_ADD(5010060, 0, 1)
+DBPATCH_ADD(5010061, 0, 1)
+DBPATCH_ADD(5010062, 0, 1)
+DBPATCH_ADD(5010063, 0, 1)
+DBPATCH_ADD(5010064, 0, 1)
+DBPATCH_ADD(5010065, 0, 1)
+DBPATCH_ADD(5010066, 0, 1)
+DBPATCH_ADD(5010067, 0, 1)
 
 DBPATCH_END()

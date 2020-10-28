@@ -1,0 +1,532 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:32Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'HP Enterprise Switch SNMP'
+      name: 'HP Enterprise Switch SNMP'
+      description: |
+        Template Net HP Enterprise Switch
+        
+        MIBs used:
+        SEMI-MIB
+        NETSWITCH-MIB
+        HP-ICF-CHASSIS
+        ENTITY-SENSORS-MIB
+        ENTITY-MIB
+        STATISTICS-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'EtherLike-MIB SNMP'
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: CPU
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: Memory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      items:
+        -
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0
+          key: 'system.cpu.util[hpSwitchCpuStat.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: STATISTICS-MIB
+            The CPU utilization in percent(%).
+            Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c02597344&sp4ts.oid=51079
+          applications:
+            -
+              name: CPU
+          triggers:
+            -
+              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          name: 'Firmware version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.11.2.14.11.5.1.1.3.0
+          key: system.hw.firmware
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: NETSWITCH-MIB
+            Contains the operating code version number (also known as software or firmware).
+            For example, a software version such as A.08.01 is described as follows:
+            A    the function set available in your router
+            08   the common release number
+            01   updates to the current common release
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.11.2.36.1.1.2.9.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: SEMI-MIB'
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Entity Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: entity.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: '3'
+                formulaid: A
+          item_prototypes:
+            -
+              name: '{#ENT_NAME}: Hardware model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}'
+              key: 'system.hw.model[entPhysicalDescr.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+            -
+              name: '{#ENT_NAME}: Hardware version(revision)'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}'
+              key: 'system.hw.version[entPhysicalHardwareRev.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]'
+          key: fan.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: .+8.3.2$
+                formulaid: A
+              -
+                macro: '{#ENT_STATUS}'
+                value: (1|2|3|4)
+                formulaid: B
+          description: 'Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.2 - fans and are present'
+          item_prototypes:
+            -
+              name: '{#ENT_DESCR}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}'
+              key: 'sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: HP-ICF-CHASSIS
+                Actual status indicated by the sensor: {#ENT_DESCR}
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1'
+                  name: '{#ENT_DESCR}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+                -
+                  expression: '{count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1'
+                  name: '{#ENT_DESCR}: Fan is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit'
+                  dependencies:
+                    -
+                      name: '{#ENT_DESCR}: Fan is in critical state'
+                      expression: '{HP Enterprise Switch SNMP:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1'
+        -
+          name: 'Memory Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.1]'
+          key: memory.discovery
+          delay: 1h
+          description: 'Discovery of NETSWITCH-MIB::hpLocalMemTable, A table that contains information on all the local memory for each slot.'
+          item_prototypes:
+            -
+              name: '#{#SNMPVALUE}: Available memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.6.{#SNMPINDEX}'
+              key: 'vm.memory.available[hpLocalMemFreeBytes.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: NETSWITCH-MIB
+                The number of available (unallocated) bytes.
+              applications:
+                -
+                  name: Memory
+            -
+              name: '#{#SNMPVALUE}: Total memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.5.{#SNMPINDEX}'
+              key: 'vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: NETSWITCH-MIB
+                The number of currently installed bytes.
+              applications:
+                -
+                  name: Memory
+            -
+              name: '#{#SNMPVALUE}: Used memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.7.{#SNMPINDEX}'
+              key: 'vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: NETSWITCH-MIB
+                The number of currently allocated bytes.
+              applications:
+                -
+                  name: Memory
+            -
+              name: '#{#SNMPVALUE}: Memory utilization'
+              type: CALCULATED
+              key: 'vm.memory.util[snmp.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: 'last("vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}]")/last("vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}]")*100'
+              description: 'Memory utilization in %'
+              applications:
+                -
+                  name: Memory
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  name: '#{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+          graph_prototypes:
+            -
+              name: '#{#SNMPVALUE}: Memory usage'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'HP Enterprise Switch SNMP'
+                    key: 'vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'HP Enterprise Switch SNMP'
+                    key: 'vm.memory.available[hpLocalMemFreeBytes.{#SNMPINDEX}]'
+            -
+              name: '#{#SNMPVALUE}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'HP Enterprise Switch SNMP'
+                    key: 'vm.memory.util[snmp.{#SNMPINDEX}]'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]'
+          key: psu.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: .+8.3.1$
+                formulaid: A
+              -
+                macro: '{#ENT_STATUS}'
+                value: (1|2|3|4)
+                formulaid: B
+          description: 'Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.1 - power supplies and are present'
+          item_prototypes:
+            -
+              name: '{#ENT_DESCR}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}'
+              key: 'sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: HP-ICF-CHASSIS
+                Actual status indicated by the sensor: {#ENT_DESCR}
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1'
+                  name: '{#ENT_DESCR}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+                -
+                  expression: '{count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1'
+                  name: '{#ENT_DESCR}: Power supply is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors'
+                  dependencies:
+                    -
+                      name: '{#ENT_DESCR}: Power supply is in critical state'
+                      expression: '{HP Enterprise Switch SNMP:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1'
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]'
+          key: temp.precision0.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#SENSOR_TYPE}'
+                value: '8'
+                formulaid: B
+              -
+                macro: '{#SENSOR_PRECISION}'
+                value: '0'
+                formulaid: A
+          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter'
+          item_prototypes:
+            -
+              name: '{#SENSOR_INFO}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: ENTITY-SENSORS-MIB
+                The most recent measurement obtained by the agent for this sensor.
+                To correctly interpret the value of this object, the associated entPhySensorType,
+                entPhySensorScale, and entPhySensorPrecision objects must also be examined.
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                      expression: '{HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
+                      recovery_expression: '{HP Enterprise Switch SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temp Status Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]'
+          key: temp.status.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: .+8.3.3$
+                formulaid: A
+              -
+                macro: '{#ENT_STATUS}'
+                value: (1|2|3|4)
+                formulaid: B
+          description: 'Discovering all entities of hpicfSensorObjectId that ends with: 11.2.3.7.8.3.3 - over temp status and are present'
+          item_prototypes:
+            -
+              name: '{#ENT_DESCR}: Temperature status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.status[hpicfSensorStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: HP-ICF-CHASSIS
+                Actual status indicated by the sensor: {#ENT_DESCR}
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$FAN_CRIT_STATUS:"bad"}'
+          value: '2'
+        -
+          macro: '{$FAN_WARN_STATUS:"warning"}'
+          value: '3'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$PSU_CRIT_STATUS:"bad"}'
+          value: '2'
+        -
+          macro: '{$PSU_WARN_STATUS:"warning"}'
+          value: '3'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+  graphs:
+    -
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HP Enterprise Switch SNMP'
+            key: 'system.cpu.util[hpSwitchCpuStat.0]'
+  value_maps:
+    -
+      name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: unknown
+        -
+          value: '2'
+          newvalue: bad
+        -
+          value: '3'
+          newvalue: warning
+        -
+          value: '4'
+          newvalue: good
+        -
+          value: '5'
+          newvalue: notPresent

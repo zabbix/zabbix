@@ -50,7 +50,13 @@ class CControllerDashboardPropertiesCheck extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		if ($this->hasInput('template')) {
+			return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
+		}
+		else {
+			return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		}
 	}
 
 	protected function doAction() {

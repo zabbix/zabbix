@@ -24,6 +24,10 @@
  */
 class CAPIInfo extends CApiService {
 
+	public const ACCESS_RULES = [
+		'version' => []
+	];
+
 	/**
 	 * Get API version.
 	 *

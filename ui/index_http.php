@@ -62,13 +62,16 @@ if ($http_user) {
 	}
 
 	try {
-		$user = API::getApiService('user')->loginByAlias($http_user,
+		CWebUser::$data = API::getApiService('user')->loginByAlias($http_user,
 			(CAuthenticationHelper::get(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
-		if ($user) {
-			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
+		if (!empty(CWebUser::$data)) {
+			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+			API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+			$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 			redirect(reset($redirect));
 		}
 	}

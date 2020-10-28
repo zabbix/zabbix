@@ -2121,6 +2121,8 @@ else {
 		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
 	];
 
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();
 }

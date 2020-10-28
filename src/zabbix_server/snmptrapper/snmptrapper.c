@@ -87,7 +87,6 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	size_t			num, i;
 	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, regexp_ret;
 	zbx_uint64_t		*itemids = NULL;
-	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
 	AGENT_REQUEST		request;
 	zbx_vector_ptr_t	regexps;
@@ -97,7 +96,6 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
 	itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
-	states = (unsigned char *)zbx_malloc(states, sizeof(unsigned char) * num);
 	lastclocks = (int *)zbx_malloc(lastclocks, sizeof(int) * num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * num);
 	results = (AGENT_RESULT *)zbx_malloc(results, sizeof(AGENT_RESULT) * num);
@@ -194,7 +192,6 @@ next:
 						&results[i], ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
-				states[i] = items[i].state;
 				lastclocks[i] = ts->sec;
 				break;
 			case NOTSUPPORTED:
@@ -203,7 +200,6 @@ next:
 						ts, items[i].state, results[i].msg);
 
 				itemids[i] = items[i].itemid;
-				states[i] = items[i].state;
 				lastclocks[i] = ts->sec;
 				break;
 		}
@@ -214,11 +210,10 @@ next:
 
 	zbx_free(results);
 
-	DCrequeue_items(itemids, states, lastclocks, errcodes, num);
+	DCrequeue_items(itemids, lastclocks, errcodes, num);
 
 	zbx_free(errcodes);
 	zbx_free(lastclocks);
-	zbx_free(states);
 	zbx_free(itemids);
 
 	DCconfig_clean_items(items, NULL, num);

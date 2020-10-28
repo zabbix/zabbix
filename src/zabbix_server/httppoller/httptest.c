@@ -1004,13 +1004,8 @@ httptest_error:
 
 	if (0 > lastfailedstep)	/* update interval is invalid, delay is uninitialized */
 	{
-		zbx_config_t	cfg;
-
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				(0 == cfg.refresh_unsupported || 0 > ts.sec + cfg.refresh_unsupported ?
-				ZBX_JAN_2038 : ts.sec + cfg.refresh_unsupported), httptest->httptest.httptestid);
-		zbx_config_clean(&cfg);
+				0 > ts.sec ? ZBX_JAN_2038 : ts.sec, httptest->httptest.httptestid);
 	}
 	else if (0 > ts.sec + delay)
 	{

@@ -454,7 +454,7 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					'name' => 'API host group create as zabbix admin'
 				],
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			],
 			[
 				'method' => 'hostgroup.update',
@@ -479,7 +479,7 @@ class testHostGroup extends CAPITest {
 				'valuemap' => [
 					'name' => 'API host group create as zabbix user'
 				],
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			],
 			[
 				'method' => 'hostgroup.update',
@@ -488,7 +488,7 @@ class testHostGroup extends CAPITest {
 					'groupid' => '50005',
 					'name' => 'API host group update as zabbix user without peremissions'
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "hostgroup.update".'
 			],
 			[
 				'method' => 'hostgroup.delete',
@@ -496,7 +496,7 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					'50008'
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "hostgroup.delete".'
 			]
 		];
 	}

@@ -23,6 +23,13 @@
  * Class containing methods for operations with the main part of administration settings.
  */
 class CSettings extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getglobal' => [],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	/**
 	 * @var string
 	 */
@@ -42,7 +49,7 @@ class CSettings extends CApiService {
 		'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3', 'severity_name_4',
 		'severity_name_5', 'custom_color', 'ok_period', 'blink_period', 'problem_unack_color', 'problem_ack_color',
 		'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style',
-		'ok_ack_style', 'refresh_unsupported', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid',
+		'ok_ack_style', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid',
 		'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
@@ -135,7 +142,7 @@ class CSettings extends CApiService {
 			'severity_color_0', 'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4',
 			'severity_color_5', 'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3',
 			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
-			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'refresh_unsupported', 'default_lang',
+			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
 			'default_timezone', 'login_block', 'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_exceptions',
 			'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout',
 			'session_key'
@@ -221,7 +228,6 @@ class CSettings extends CApiService {
 			'problem_ack_style' =>				['type' => API_INT32, 'in' => '0,1'],
 			'ok_unack_style' =>					['type' => API_INT32, 'in' => '0,1'],
 			'ok_ack_style' =>					['type' => API_INT32, 'in' => '0,1'],
-			'refresh_unsupported' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [0, SEC_PER_DAY])],
 			'discovery_groupid' =>				['type' => API_ID],
 			'default_inventory_mode' =>			['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
 			'alert_usrgrpid' =>					['type' => API_ID, 'flags' => API_ALLOW_NULL],

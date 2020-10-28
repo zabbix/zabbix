@@ -32,6 +32,10 @@ $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'sysmapid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],

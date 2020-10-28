@@ -38,6 +38,9 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 						'to' => $profile->to
 					] + $tabfilter;
 				}
+				else {
+					$tabfilter['show'] = TRIGGERS_OPTION_ALL;
+				}
 
 				$data['filter_counters'][$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}

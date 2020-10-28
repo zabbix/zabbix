@@ -21,7 +21,14 @@
 
 class CApiService {
 
+	/**
+	 * Authorized user data.
+	 *
+	 * @var array
+	 */
 	public static $userData;
+
+	public const ACCESS_RULES = [];
 
 	/**
 	 * The name of the table.
@@ -1156,5 +1163,18 @@ class CApiService {
 		CAudit::addBulk(self::$userData['userid'], self::$userData['userip'], $action, $resourcetype, $objects,
 			$objects_old
 		);
+	}
+
+	/**
+	 * Check access to specific access rule.
+	 *
+	 * @static
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return bool  Returns true if user has access to specified rule, and false otherwise.
+	 */
+	protected static function checkAccess(string $rule_name): bool {
+		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));
 	}
 }

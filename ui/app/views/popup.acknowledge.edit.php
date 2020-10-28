@@ -36,6 +36,7 @@ $form_list = (new CFormList())
 		(new CTextArea('message', $data['message']))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('maxlength', DB::getFieldLength('acknowledges', 'message'))
+			->setEnabled($data['allowed_add_comments'])
 	);
 
 if (array_key_exists('history', $data)) {
@@ -72,7 +73,7 @@ $form_list
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
 				->onClick('javascript: jQuery("#severity input").attr("disabled", this.checked ? false : true)')
 				->setChecked($data['change_severity'])
-				->setEnabled($data['problem_severity_can_be_changed']),
+				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
 			(new CSeverity(['name' => 'severity', 'value' => $data['severity']], $data['change_severity']))
 		]))
 			->addClass(ZBX_STYLE_HOR_LIST)
@@ -82,6 +83,7 @@ if ($data['has_unack_events']) {
 	$form_list->addRow(_('Acknowledge'),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
+			->setEnabled($data['allowed_acknowledge'])
 	);
 }
 
@@ -89,6 +91,7 @@ if ($data['has_ack_events']) {
 	$form_list->addRow(_('Unacknowledge'),
 		(new CCheckBox('unacknowledge_problem', ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 			->onChange("$('#acknowledge_problem').prop('disabled', this.checked)")
+			->setEnabled($data['allowed_acknowledge'])
 	);
 }
 
@@ -96,7 +99,7 @@ $form_list
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))
 			->setChecked($data['close_problem'])
-			->setEnabled($data['problem_can_be_closed'])
+			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
 	)
 	->addRow('',
 		(new CDiv((new CLabel(_('At least one update operation or message must exist.')))->setAsteriskMark()))

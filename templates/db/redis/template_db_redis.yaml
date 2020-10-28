@@ -1,0 +1,3072 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:23Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: Redis
+      name: Redis
+      description: |
+        Get Redis metrics from plugin for the New Zabbix Agent (zabbix-agent2).
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/389050-discussion-thread-for-official-zabbix-template-redis
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: Redis
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Redis: Blocked clients'
+          type: DEPENDENT
+          key: redis.clients.blocked
+          delay: '0'
+          history: 7d
+          description: 'The number of connections waiting on a blocking call'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Clients.blocked_clients
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Connected clients'
+          type: DEPENDENT
+          key: redis.clients.connected
+          delay: '0'
+          history: 7d
+          description: 'The number of connected clients'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Clients.connected_clients
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Max input buffer'
+          type: DEPENDENT
+          key: redis.clients.max_input_buffer
+          delay: '0'
+          history: 7d
+          description: 'The biggest input buffer among current client connections'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var clients = JSON.parse(value).Clients
+                  return clients.client_recent_max_input_buffer || clients.client_biggest_input_buf
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Max output buffer'
+          type: DEPENDENT
+          key: redis.clients.max_output_buffer
+          delay: '0'
+          history: 7d
+          description: 'The biggest output buffer among current client connections'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var clients = JSON.parse(value).Clients
+                  return clients.client_recent_max_output_buffer || clients.client_longest_output_list
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Cluster enabled'
+          type: DEPENDENT
+          key: redis.cluster.enabled
+          delay: '0'
+          history: 7d
+          description: 'Indicate Redis cluster is enabled'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Cluster.cluster_enabled
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Max clients'
+          type: DEPENDENT
+          key: redis.config.maxclients
+          delay: '0'
+          history: 7d
+          description: |
+            Max number of connected clients at the same time.
+            Once the limit is reached Redis will close all the new connections sending an error "max number of clients reached".
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.maxclients
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: 'redis.config["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Get config'
+          key: 'redis.config["{$REDIS.CONN.URI}"]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Redis: Configuration has changed'
+              priority: INFO
+              description: 'Redis configuration has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Redis: CPU sys'
+          type: DEPENDENT
+          key: redis.cpu.sys
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'System CPU consumed by the Redis server'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.CPU.used_cpu_sys
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: CPU sys children'
+          type: DEPENDENT
+          key: redis.cpu.sys_children
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'System CPU consumed by the background processes'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.CPU.used_cpu_sys_children
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: CPU user'
+          type: DEPENDENT
+          key: redis.cpu.user
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'User CPU consumed by the Redis server'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.CPU.used_cpu_user
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: CPU user children'
+          type: DEPENDENT
+          key: redis.cpu.user_children
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'User CPU consumed by the background processes'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.CPU.used_cpu_user_children
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Get info'
+          key: 'redis.info["{$REDIS.CONN.URI}"]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'Redis: Failed to fetch info data (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 30 minutes'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Redis: Service is down'
+                  expression: '{Redis:redis.ping["{$REDIS.CONN.URI}"].last()}=0'
+        -
+          name: 'Redis: Memory fragmentation ratio'
+          type: DEPENDENT
+          key: redis.memory.fragmentation_ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            This ratio is an indication of memory mapping efficiency:
+              — Value over 1.0 indicate that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.
+              — Value under 1.0 indicate that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.
+            
+            Note: If your peak memory usage is much higher than your current memory usage, the memory fragmentation ratio may be unreliable.
+            
+            https://redis.io/topics/memory-optimization
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Memory.mem_fragmentation_ratio
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{min(15m)}>{$REDIS.MEM.FRAG_RATIO.MAX.WARN}'
+              name: 'Redis: Memory fragmentation ratio is too high (over {$REDIS.MEM.FRAG_RATIO.MAX.WARN} in 15m)'
+              priority: WARNING
+              description: |
+                This ratio is an indication of memory mapping efficiency:
+                  — Value over 1.0 indicate that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.
+                  — Value under 1.0 indicate that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.
+                
+                Note: If your peak memory usage is much higher than your current memory usage, the memory fragmentation ratio may be unreliable.
+                
+                https://redis.io/topics/memory-optimization
+        -
+          name: 'Redis: Memory used'
+          type: DEPENDENT
+          key: redis.memory.used_memory
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total number of bytes allocated by Redis using its allocator'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Memory.used_memory
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Memory used Lua'
+          type: DEPENDENT
+          key: redis.memory.used_memory_lua
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Amount of memory used by the Lua engine'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Memory.used_memory_lua
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Memory used peak'
+          type: DEPENDENT
+          key: redis.memory.used_memory_peak
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Peak memory consumed by Redis (in bytes)'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Memory.used_memory_peak
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Memory used RSS'
+          type: DEPENDENT
+          key: redis.memory.used_memory_rss
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Number of bytes that Redis allocated as seen by the operating system'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Memory.used_memory_rss
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: AOF current rewrite time sec'
+          type: DEPENDENT
+          key: redis.persistence.aof_current_rewrite_time_sec
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Duration of the on-going AOF rewrite operation if any'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis bgsave time'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.aof_current_rewrite_time_sec
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: AOF enabled'
+          type: DEPENDENT
+          key: redis.persistence.aof_enabled
+          delay: '0'
+          history: 7d
+          description: 'Flag indicating AOF logging is activated'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.aof_enabled
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: AOF last bgrewrite status'
+          type: DEPENDENT
+          key: redis.persistence.aof_last_bgrewrite_status
+          delay: '0'
+          history: 7d
+          description: 'Status of the last AOF rewrite operation'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis bgwrite status'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.aof_last_bgrewrite_status
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: AOF last rewrite time sec'
+          type: DEPENDENT
+          key: redis.persistence.aof_last_rewrite_time_sec
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Duration of the last AOF rewrite'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis bgsave time'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.aof_last_rewrite_time_sec
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: AOF last write status'
+          type: DEPENDENT
+          key: redis.persistence.aof_last_write_status
+          delay: '0'
+          history: 7d
+          description: 'Status of the last write operation to the AOF'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis bgwrite status'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.aof_last_write_status
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Redis: Last AOF write operation failed'
+              priority: WARNING
+              description: 'Detailed information about persistence: https://redis.io/topics/persistence'
+        -
+          name: 'Redis: AOF rewrite in progress'
+          type: DEPENDENT
+          key: redis.persistence.aof_rewrite_in_progress
+          delay: '0'
+          history: 7d
+          description: 'Flag indicating a AOF rewrite operation is on-going'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.aof_rewrite_in_progress
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: AOF rewrite scheduled'
+          type: DEPENDENT
+          key: redis.persistence.aof_rewrite_scheduled
+          delay: '0'
+          history: 7d
+          description: 'Flag indicating an AOF rewrite operation will be scheduled once the on-going RDB save is complete'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.aof_rewrite_scheduled
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Dump loading'
+          type: DEPENDENT
+          key: redis.persistence.loading
+          delay: '0'
+          history: 7d
+          description: 'Flag indicating if the load of a dump file is on-going'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.loading
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: RDB bgsave in progress'
+          type: DEPENDENT
+          key: redis.persistence.rdb_bgsave_in_progress
+          delay: '0'
+          history: 7d
+          description: '"1" if bgsave is in progress and "0" otherwise'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.rdb_bgsave_in_progress
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: RDB changes since last save'
+          type: DEPENDENT
+          key: redis.persistence.rdb_changes_since_last_save
+          delay: '0'
+          history: 7d
+          description: 'Number of changes since the last background save'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.rdb_changes_since_last_save
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: RDB current bgsave time sec'
+          type: DEPENDENT
+          key: redis.persistence.rdb_current_bgsave_time_sec
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Duration of the on-going RDB save operation if any'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis bgsave time'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.rdb_current_bgsave_time_sec
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: RDB last bgsave status'
+          type: DEPENDENT
+          key: redis.persistence.rdb_last_bgsave_status
+          delay: '0'
+          history: 7d
+          description: 'Status of the last RDB save operation'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis bgwrite status'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.rdb_last_bgsave_status
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Redis: Last RDB save operation failed'
+              priority: WARNING
+              description: 'Detailed information about persistence: https://redis.io/topics/persistence'
+        -
+          name: 'Redis: RDB last bgsave time sec'
+          type: DEPENDENT
+          key: redis.persistence.rdb_last_bgsave_time_sec
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Duration of the last bg_save operation'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis bgsave time'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.rdb_last_bgsave_time_sec
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: RDB last save time'
+          type: DEPENDENT
+          key: redis.persistence.rdb_last_save_time
+          delay: '0'
+          history: 7d
+          description: 'Epoch-based timestamp of last successful RDB save'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Persistence.rdb_last_save_time
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Ping'
+          key: 'redis.ping["{$REDIS.CONN.URI}"]'
+          history: 7h
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Redis: Service is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          name: 'Redis: Connected slaves'
+          type: DEPENDENT
+          key: redis.replication.connected_slaves
+          delay: '0'
+          history: 7d
+          description: 'Number of connected slaves'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Replication.connected_slaves
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{diff()}=1'
+              recovery_mode: NONE
+              name: 'Redis: Number of slaves has changed'
+              priority: INFO
+              description: 'Redis number of slaves has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Redis: Master replication offset'
+          type: DEPENDENT
+          key: redis.replication.master_repl_offset
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Replication offset reported by the master'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis repl offset'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Replication.master_repl_offset
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Replication backlog active'
+          type: DEPENDENT
+          key: redis.replication.repl_backlog_active
+          delay: '0'
+          history: 7d
+          description: 'Flag indicating replication backlog is active'
+          applications:
+            -
+              name: Redis
+          valuemap:
+            name: 'Redis flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Replication.repl_backlog_active
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Replication backlog first byte offset'
+          type: DEPENDENT
+          key: redis.replication.repl_backlog_first_byte_offset
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The master offset of the replication backlog buffer'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Replication.repl_backlog_first_byte_offset
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Replication backlog history length'
+          type: DEPENDENT
+          key: redis.replication.repl_backlog_histlen
+          delay: '0'
+          history: 7d
+          description: 'Amount of data in the backlog sync buffer'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Replication.repl_backlog_histlen
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Replication backlog size'
+          type: DEPENDENT
+          key: redis.replication.repl_backlog_size
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total size in bytes of the replication backlog buffer'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Replication.repl_backlog_size
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Replication role'
+          type: DEPENDENT
+          key: redis.replication.role
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Value is "master" if the instance is replica of no one, or "slave" if the instance is a replica of some master instance. Note that a replica can be master of another replica (chained replication).'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Replication.role
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              recovery_mode: NONE
+              name: 'Redis: Replication role has changed (new role: {ITEM.VALUE})'
+              priority: WARNING
+              description: 'Redis replication role has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Redis: Process id'
+          type: DEPENDENT
+          key: redis.server.process_id
+          delay: '0'
+          history: 7d
+          description: 'PID of the server process'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Server.process_id
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Redis mode'
+          type: DEPENDENT
+          key: redis.server.redis_mode
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The server''s mode ("standalone", "sentinel" or "cluster")'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Server.redis_mode
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Redis version'
+          type: DEPENDENT
+          key: redis.server.redis_version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the Redis server'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Server.redis_version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Redis version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Redis: TCP port'
+          type: DEPENDENT
+          key: redis.server.tcp_port
+          delay: '0'
+          history: 7d
+          description: 'TCP/IP listen port'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Server.tcp_port
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Uptime'
+          type: DEPENDENT
+          key: redis.server.uptime
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Number of seconds since Redis server start'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Server.uptime_in_seconds
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Redis: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'Redis: Slowlog entries per second'
+          key: 'redis.slowlog.count["{$REDIS.CONN.URI}"]'
+          history: 7d
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          triggers:
+            -
+              expression: '{min(5m)}>{$REDIS.SLOWLOG.COUNT.MAX.WARN}'
+              name: 'Redis: Too many entries in the slowlog (over {$REDIS.SLOWLOG.COUNT.MAX.WARN} per second in 5m)'
+              priority: INFO
+        -
+          name: 'Redis: Evicted keys'
+          type: DEPENDENT
+          key: redis.stats.evicted_keys
+          delay: '0'
+          history: 7d
+          description: 'Number of evicted keys due to maxmemory limit'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.evicted_keys
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Expired keys'
+          type: DEPENDENT
+          key: redis.stats.expired_keys
+          delay: '0'
+          history: 7d
+          description: 'Total number of key expiration events'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.expired_keys
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Instantaneous input bytes per second'
+          type: DEPENDENT
+          key: redis.stats.instantaneous_input.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The network''s read rate per second in KB/sec'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.instantaneous_input_kbps
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Instantaneous operations per sec'
+          type: DEPENDENT
+          key: redis.stats.instantaneous_ops.rate
+          delay: '0'
+          history: 7d
+          description: 'Number of commands processed per second'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.instantaneous_ops_per_sec
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Instantaneous output bytes per second'
+          type: DEPENDENT
+          key: redis.stats.instantaneous_output.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The network''s write rate per second in KB/sec'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.instantaneous_output_kbps
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Keyspace hits'
+          type: DEPENDENT
+          key: redis.stats.keyspace_hits
+          delay: '0'
+          history: 7d
+          description: 'Number of successful lookup of keys in the main dictionary'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.keyspace_hits
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Keyspace misses'
+          type: DEPENDENT
+          key: redis.stats.keyspace_misses
+          delay: '0'
+          history: 7d
+          description: 'Number of failed lookup of keys in the main dictionary'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.keyspace_misses
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Latest fork usec'
+          type: DEPENDENT
+          key: redis.stats.latest_fork_usec
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Duration of the latest fork operation in microseconds'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.latest_fork_usec
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1.0E-5'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Migrate cached sockets'
+          type: DEPENDENT
+          key: redis.stats.migrate_cached_sockets
+          delay: '0'
+          history: 7d
+          description: 'The number of sockets open for MIGRATE purposes'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.migrate_cached_sockets
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Pubsub channels'
+          type: DEPENDENT
+          key: redis.stats.pubsub_channels
+          delay: '0'
+          history: 7d
+          description: 'Global number of pub/sub channels with client subscriptions'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.pubsub_channels
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Pubsub patterns'
+          type: DEPENDENT
+          key: redis.stats.pubsub_patterns
+          delay: '0'
+          history: 7d
+          description: 'Global number of pub/sub pattern with client subscriptions'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.pubsub_patterns
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Rejected connections'
+          type: DEPENDENT
+          key: redis.stats.rejected_connections
+          delay: '0'
+          history: 7d
+          description: 'Number of connections rejected because of maxclients limit'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.rejected_connections
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          triggers:
+            -
+              expression: '{last()}>0'
+              name: 'Redis: Connections are rejected'
+              priority: HIGH
+              description: |
+                The number of connections has reached the value of "maxclients".
+                
+                https://redis.io/topics/clients
+        -
+          name: 'Redis: Sync full'
+          type: DEPENDENT
+          key: redis.stats.sync_full
+          delay: '0'
+          history: 7d
+          description: 'The number of full resyncs with replicas'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.sync_full
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Sync partial err'
+          type: DEPENDENT
+          key: redis.stats.sync_partial_err
+          delay: '0'
+          history: 7d
+          description: 'The number of denied partial resync requests'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.sync_partial_err
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Sync partial ok'
+          type: DEPENDENT
+          key: redis.stats.sync_partial_ok
+          delay: '0'
+          history: 7d
+          description: 'The number of accepted partial resync requests'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.sync_partial_ok
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Total commands processed'
+          type: DEPENDENT
+          key: redis.stats.total_commands_processed
+          delay: '0'
+          history: 7d
+          description: 'Total number of commands processed by the server'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.total_commands_processed
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Total connections received'
+          type: DEPENDENT
+          key: redis.stats.total_connections_received
+          delay: '0'
+          history: 7d
+          description: 'Total number of connections accepted by the server'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.total_connections_received
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Total net input bytes'
+          type: DEPENDENT
+          key: redis.stats.total_net_input_bytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total number of bytes read from the network'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.total_net_input_bytes
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+        -
+          name: 'Redis: Total net output bytes'
+          type: DEPENDENT
+          key: redis.stats.total_net_output_bytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total number of bytes written to the network'
+          applications:
+            -
+              name: Redis
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.total_net_output_bytes
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+      discovery_rules:
+        -
+          name: 'Process metrics discovery'
+          key: 'proc.num["{$REDIS.LLD.PROCESS_NAME}"]'
+          delay: 1h
+          description: 'Collect metrics by Zabbix agent if it exists'
+          item_prototypes:
+            -
+              name: 'Redis: CPU utilization'
+              key: 'proc.cpu.util["{$REDIS.PROCESS_NAME}{#SINGLETON}"]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Process CPU utilization percentage.'
+              applications:
+                -
+                  name: Redis
+            -
+              name: 'Redis: Memory usage (rss)'
+              key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,rss]'
+              history: 7d
+              units: B
+              description: 'Resident set size memory used by process in bytes.'
+              applications:
+                -
+                  name: Redis
+            -
+              name: 'Redis: Memory usage (vsize)'
+              key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,vsize]'
+              history: 7d
+              units: B
+              description: 'Virtual memory size used by process in bytes.'
+              applications:
+                -
+                  name: Redis
+            -
+              name: 'Redis: Number of processes running'
+              key: 'proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"]'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              trigger_prototypes:
+                -
+                  expression: '{last()}=0'
+                  name: 'Redis: Process is not running'
+                  priority: HIGH
+          graph_prototypes:
+            -
+              name: 'Redis: Memory usage{#SINGLETON}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: Redis
+                    key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,vsize]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: Redis
+                    key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,rss]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value > 0 ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
+          name: 'Keyspace discovery'
+          type: DEPENDENT
+          key: redis.keyspace.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DB}'
+                value: '{$REDIS.LLD.FILTER.DB.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DB}'
+                value: '{$REDIS.LLD.FILTER.DB.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Individual keyspace metrics'
+          item_prototypes:
+            -
+              name: 'DB {#DB}: Average TTL'
+              type: DEPENDENT
+              key: 'redis.db.avg_ttl["{#DB}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Average TTL'
+              application_prototypes:
+                -
+                  name: 'Redis: DB {#DB}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.Keyspace["{#DB}"].avg_ttl'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'DB {#DB}: Expires'
+              type: DEPENDENT
+              key: 'redis.db.expires["{#DB}"]'
+              delay: '0'
+              history: 7d
+              description: 'Number of keys with an expiration'
+              application_prototypes:
+                -
+                  name: 'Redis: DB {#DB}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.Keyspace["{#DB}"].expires'
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'DB {#DB}: Keys'
+              type: DEPENDENT
+              key: 'redis.db.keys["{#DB}"]'
+              delay: '0'
+              history: 7d
+              description: 'Total number of keys'
+              application_prototypes:
+                -
+                  name: 'Redis: DB {#DB}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.Keyspace["{#DB}"].keys'
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+          graph_prototypes:
+            -
+              name: 'DB {#DB}: Keys'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: Redis
+                    key: 'redis.db.keys["{#DB}"]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: Redis
+                    key: 'redis.db.expires["{#DB}"]'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return JSON.stringify(Object.keys(JSON.parse(value).Keyspace)
+                    .map(function (v){return {"{#DB}": v}}));
+        -
+          name: 'Version 4+ metrics discovery'
+          type: DEPENDENT
+          key: redis.metrics.v4.discovery
+          delay: '0'
+          description: 'Additional metrics for versions 4+'
+          item_prototypes:
+            -
+              name: 'Redis: Active defrag running{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.active_defrag_running[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Flag indicating if active defragmentation is active'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.active_defrag_running
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Lazyfree pending objects{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.lazyfree_pending_objects[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of objects waiting to be freed (as a result of calling UNLINK, or FLUSHDB and FLUSHALL with the ASYNC option)'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.lazyfree_pending_objects
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Max memory{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.maxmemory[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Maximum amount of memory allocated to the Redisdb system'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.maxmemory
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Max memory policy{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.maxmemory_policy[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The value of the maxmemory-policy configuration directive'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.maxmemory_policy
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Total system memory{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.total_system_memory[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The total amount of memory that the Redis host has'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.total_system_memory
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory used dataset{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.used_memory_dataset[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The size in bytes of the dataset'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.used_memory_dataset
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory used dataset %{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.used_memory_dataset_perc[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'The percentage of used_memory_dataset out of the net memory usage (used_memory minus used_memory_startup)'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.used_memory_dataset_perc
+                -
+                  type: REGEX
+                  parameters:
+                    - (.+)%
+                    - \1
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory used overhead{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.used_memory_overhead[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The sum in bytes of all overheads that the server allocated for managing its internal data structures'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.used_memory_overhead
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory used peak %{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.used_memory_peak_perc[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'The percentage of used_memory_peak out of used_memory'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.used_memory_peak_perc
+                -
+                  type: REGEX
+                  parameters:
+                    - (.+)%
+                    - \1
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory used startup{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.used_memory_startup[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Initial amount of memory consumed by Redis at startup in bytes'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.used_memory_startup
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: AOF last CoW size{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_last_cow_size[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The size in bytes of copy-on-write allocations during the last AOF rewrite operation'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_last_cow_size
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: RDB last CoW size{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.rdb_last_cow_size[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The size in bytes of copy-on-write allocations during the last RDB save operation'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.rdb_last_cow_size
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Replication second offset{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.second_repl_offset[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Offset up to which replication IDs are accepted'
+              applications:
+                -
+                  name: Redis
+              valuemap:
+                name: 'Redis repl offset'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.second_repl_offset
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Executable path{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.server.executable[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The path to the server''s executable'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Server.executable
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Active defrag hits{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.stats.active_defrag_hits[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of value reallocations performed by active the defragmentation process'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.active_defrag_hits
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Active defrag key hits{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.stats.active_defrag_key_hits[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of keys that were actively defragmented'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.active_defrag_key_hits
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Active defrag key misses{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.stats.active_defrag_key_misses[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of keys that were skipped by the active defragmentation process'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.active_defrag_key_misses
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Active defrag misses{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.stats.active_defrag_misses[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of aborted value reallocations started by the active defragmentation process'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.active_defrag_misses
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Expired stale %{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.stats.expired_stale_perc[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.expired_stale_perc
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Expired time cap reached count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.stats.expired_time_cap_reached_count[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.expired_time_cap_reached_count
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Slave expires tracked keys{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.stats.slave_expires_tracked_keys[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of keys tracked for expiry purposes (applicable only to writable replicas)'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.slave_expires_tracked_keys
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+          trigger_prototypes:
+            -
+              expression: '{Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}/{Redis:redis.memory.used_memory.last()}*100>{$REDIS.MEM.PUSED.MAX.WARN}'
+              name: 'Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)'
+              priority: WARNING
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Server.redis_version
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(parseInt(value.split(''.'')[0]) >= 4 ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
+          name: 'Version 5+ metrics discovery'
+          type: DEPENDENT
+          key: redis.metrics.v5.discovery
+          delay: '0'
+          description: 'Additional metrics for versions 5+'
+          item_prototypes:
+            -
+              name: 'Redis: Allocator active{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.allocator_active[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.allocator_active
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Allocator allocated{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.allocator_allocated[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.allocator_allocated
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Allocator fragmentation bytes{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.allocator_frag_bytes[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.allocator_frag_bytes
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Allocator fragmentation ratio{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.allocator_frag_ratio[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.allocator_frag_ratio
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Allocator resident{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.allocator_resident[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.allocator_resident
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Allocator RSS bytes{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.allocator_rss_bytes[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.allocator_rss_bytes
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Allocator RSS ratio{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.allocator_rss_ratio[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.allocator_rss_ratio
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory fragmentation bytes{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.fragmentation_bytes[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.mem_fragmentation_bytes
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory AOF buffer{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.mem_aof_buffer[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Size of the AOF buffer'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.mem_aof_buffer
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory clients normal{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.mem_clients_normal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.mem_clients_normal
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory clients slaves{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.mem_clients_slaves[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.mem_clients_slaves
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory not counted for evict{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.not_counted_for_evict[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.mem_not_counted_for_evict
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory number of cached scripts{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.number_of_cached_scripts[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.number_of_cached_scripts
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory replication backlog{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.replication_backlog[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.mem_replication_backlog
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory RSS overhead bytes{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.rss_overhead_bytes[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.rss_overhead_bytes
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory RSS overhead ratio{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.rss_overhead_ratio[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.rss_overhead_ratio
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Memory used scripts{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.memory.used_memory_scripts[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Memory.used_memory_scripts
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Server.redis_version
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(parseInt(value.split(''.'')[0]) >= 5 ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
+          name: 'AOF metrics discovery'
+          type: DEPENDENT
+          key: redis.persistence.aof.discovery
+          delay: '0'
+          description: 'If AOF is activated, additional metrics will be added'
+          item_prototypes:
+            -
+              name: 'Redis: AOF base size{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_base_size[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'AOF file size on latest startup or rewrite'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_base_size
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: AOF buffer length{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_buffer_length[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Size of the AOF buffer'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_buffer_length
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: AOF current size{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_current_size[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'AOF current file size'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_current_size
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: AOF delayed fsync{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_delayed_fsync[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Delayed fsync counter'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_delayed_fsync
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: AOF pending background I/O fsync{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_pending_bio_fsync[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of fsync pending jobs in background I/O queue'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_pending_bio_fsync
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: AOF pending rewrite{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_pending_rewrite[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Flag indicating an AOF rewrite operation will'
+              applications:
+                -
+                  name: Redis
+              valuemap:
+                name: 'Redis flag'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_pending_rewrite
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: AOF rewrite buffer length{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.persistence.aof_rewrite_buffer_length[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Size of the AOF rewrite buffer'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Persistence.aof_rewrite_buffer_length
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return JSON.stringify(JSON.parse(value).Persistence.aof_enabled === '1'
+                    ? [{'{#SINGLETON}': ''}]
+                    : []);
+        -
+          name: 'Replication metrics discovery'
+          type: DEPENDENT
+          key: redis.replication.master.discovery
+          delay: '0'
+          description: 'If the instance is the master and the slaves are connected, additional metrics are provided'
+          item_prototypes:
+            -
+              name: 'Redis slave {#SLAVE_IP}:{#SLAVE_PORT}: Replication lag in bytes'
+              type: DEPENDENT
+              key: 'redis.replication.lag_bytes["{#SLAVE_IP}:{#SLAVE_PORT}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Replication lag in bytes'
+              application_prototypes:
+                -
+                  name: 'Redis: Slave {#SLAVE_IP}:{#SLAVE_PORT}'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var repl = JSON.parse(value).Replication;
+                      var res = Object.keys(repl)
+                          .filter(function (v) {return v.match(/slave\d+/)})
+                          .filter(function (v) {return (repl[v].ip === "{#SLAVE_IP}" && repl[v].port === "{#SLAVE_PORT}")})
+                          .map(function (v) {return repl[v].offset})[0];
+                      
+                      if (res === undefined) {
+                          throw 'Slave {#SLAVE_IP}:{#SLAVE_PORT} is no longer available.';
+                      }
+                      
+                      return res;
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+          graph_prototypes:
+            -
+              name: 'Redis slave {#SLAVE_IP}:{#SLAVE_PORT}: Replication lag bytes'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: Redis
+                    key: 'redis.replication.lag_bytes["{#SLAVE_IP}:{#SLAVE_PORT}"]'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var repl = JSON.parse(value).Replication;
+                  return JSON.stringify(Object.keys(repl)
+                    .filter(function (v) {return v.match(/slave\d+/)})
+                    .map(function (v){
+                      return {"{#SLAVE_IP}": repl[v].ip, "{#SLAVE_PORT}": repl[v].port}
+                    }));
+        -
+          name: 'Slave metrics discovery'
+          type: DEPENDENT
+          key: redis.replication.slave.discovery
+          delay: '0'
+          description: 'If the instance is a replica, additional metrics are provided'
+          item_prototypes:
+            -
+              name: 'Redis: Master host{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.master_host[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Host or IP address of the master'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.master_host
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Master last I/O seconds ago{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.master_last_io_seconds_ago[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Number of seconds since the last interaction with master'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.master_last_io_seconds_ago
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$REDIS.REPL.LAG.MAX.WARN}'
+                  name: 'Redis: Replication lag with master is too high (over {$REDIS.REPL.LAG.MAX.WARN} in 5m)'
+                  priority: WARNING
+            -
+              name: 'Redis: Master link status{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.master_link_status[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Status of the link (up/down)'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.master_link_status
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Master port{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.master_port[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Master listening TCP port'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.master_port
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Master sync in progress{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.master_sync_in_progress[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Indicate the master is syncing to the replica'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.master_sync_in_progress
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Slave priority{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.slave_priority[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The priority of the instance as a candidate for failover'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.slave_priority
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Slave priority{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.slave_read_only[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Flag indicating if the replica is read-only'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.slave_read_only
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+            -
+              name: 'Redis: Slave replication offset{#SINGLETON}'
+              type: DEPENDENT
+              key: 'redis.replication.slave_repl_offset[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The replication offset of the replica instance'
+              applications:
+                -
+                  name: Redis
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Replication.slave_repl_offset
+              master_item:
+                key: 'redis.info["{$REDIS.CONN.URI}"]'
+          graph_prototypes:
+            -
+              name: 'Redis: Replication lag time{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: Redis
+                    key: 'redis.replication.master_last_io_seconds_ago[{#SINGLETON}]'
+          master_item:
+            key: 'redis.info["{$REDIS.CONN.URI}"]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return JSON.stringify(JSON.parse(value).Replication.role === 'slave'
+                    ? [{'{#SINGLETON}': ''}]
+                    : []);
+      macros:
+        -
+          macro: '{$REDIS.CLIENTS.PRC.MAX.WARN}'
+          value: '80'
+          description: 'Maximum percentage of connected clients'
+        -
+          macro: '{$REDIS.CONN.URI}'
+          value: 'tcp://localhost:6379'
+          description: 'Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it''s set), otherwise, the plugin''s default value is used: "tcp://localhost:6379"'
+        -
+          macro: '{$REDIS.LLD.FILTER.DB.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable databases'
+        -
+          macro: '{$REDIS.LLD.FILTER.DB.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered databases'
+        -
+          macro: '{$REDIS.LLD.PROCESS_NAME}'
+          value: redis-server
+          description: 'Redis server process name for LLD'
+        -
+          macro: '{$REDIS.MEM.FRAG_RATIO.MAX.WARN}'
+          value: '1.5'
+          description: 'Maximum memory fragmentation ratio'
+        -
+          macro: '{$REDIS.MEM.PUSED.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of memory used'
+        -
+          macro: '{$REDIS.PROCESS_NAME}'
+          value: redis-server
+          description: 'Redis server process name'
+        -
+          macro: '{$REDIS.REPL.LAG.MAX.WARN}'
+          value: 30s
+          description: 'Maximum replication lag in seconds'
+        -
+          macro: '{$REDIS.SLOWLOG.COUNT.MAX.WARN}'
+          value: '1'
+          description: 'Maximum number of slowlog entries per second'
+      dashboards:
+        -
+          name: 'Redis overview'
+          widgets:
+            -
+              type: GRAPH_CLASSIC
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Clients'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Keyspace'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Commands'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Expired keys'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              'y': '10'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Persistence'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '10'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Slaves'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              'y': '15'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Slowlog'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '15'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Uptime'
+                    host: Redis
+            -
+              type: GRAPH_PROTOTYPE
+              'y': '20'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: columns
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: rows
+                  value: '1'
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '2'
+                -
+                  type: GRAPH_PROTOTYPE
+                  name: graphid
+                  value:
+                    name: 'Redis: Replication lag time{#SINGLETON}'
+                    host: Redis
+        -
+          name: 'Redis performance'
+          widgets:
+            -
+              type: GRAPH_CLASSIC
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: CPU'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Network'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Memory'
+                    host: Redis
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Redis: Memory fragmentation'
+                    host: Redis
+  triggers:
+    -
+      expression: '{Redis:redis.clients.connected.min(5m)}/{Redis:redis.config.maxclients.last()}*100>{$REDIS.CLIENTS.PRC.MAX.WARN}'
+      name: 'Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)'
+      priority: WARNING
+      description: |
+        When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.
+        
+        https://redis.io/topics/clients#maximum-number-of-clients
+  graphs:
+    -
+      name: 'Redis: Clients'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.clients.connected
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: Redis
+            key: redis.clients.blocked
+    -
+      name: 'Redis: Commands'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.stats.instantaneous_ops.rate
+    -
+      name: 'Redis: CPU'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.cpu.sys
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: Redis
+            key: redis.cpu.sys_children
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: F63100
+          item:
+            host: Redis
+            key: redis.cpu.user
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: Redis
+            key: redis.cpu.user_children
+    -
+      name: 'Redis: Expired keys'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.stats.expired_keys
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: Redis
+            key: redis.stats.evicted_keys
+    -
+      name: 'Redis: Keyspace'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.stats.keyspace_hits
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: Redis
+            key: redis.stats.keyspace_misses
+    -
+      name: 'Redis: Memory'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.memory.used_memory
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: Redis
+            key: redis.memory.used_memory_rss
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: Redis
+            key: redis.memory.used_memory_peak
+    -
+      name: 'Redis: Memory fragmentation'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.memory.fragmentation_ratio
+    -
+      name: 'Redis: Network'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.stats.instantaneous_input.rate
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: Redis
+            key: redis.stats.instantaneous_output.rate
+    -
+      name: 'Redis: Persistence'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.persistence.rdb_last_bgsave_time_sec
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: Redis
+            key: redis.persistence.aof_last_rewrite_time_sec
+    -
+      name: 'Redis: Slaves'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.replication.connected_slaves
+    -
+      name: 'Redis: Slowlog'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Redis
+            key: 'redis.slowlog.count["{$REDIS.CONN.URI}"]'
+    -
+      name: 'Redis: Uptime'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: Redis
+            key: redis.server.uptime
+  value_maps:
+    -
+      name: 'Redis bgsave time'
+      mappings:
+        -
+          value: '- 1s'
+          newvalue: Inactive
+    -
+      name: 'Redis bgwrite status'
+      mappings:
+        -
+          value: '0'
+          newvalue: Error
+        -
+          value: '1'
+          newvalue: Ok
+    -
+      name: 'Redis flag'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'No'
+        -
+          value: '1'
+          newvalue: 'Yes'
+    -
+      name: 'Redis repl offset'
+      mappings:
+        -
+          value: '-1 B'
+          newvalue: Undefined
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

@@ -23,6 +23,12 @@
  * Class containing methods for operations with housekeeping parameters.
  */
 class CHousekeeping extends CApiService {
+
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	/**
 	 * @var string
 	 */

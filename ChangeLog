@@ -1,8 +1,41 @@
-Changes for 5.2.0rc1
+Changes for 5.4.0alpha1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.2.0
+
+5.2.0rc2 was released as 5.2.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.2.0rc2
+
+Bug fixes:
+A.F....... [ZBXNEXT-6148] fixed user roles and permissions (agriscenko, gcalenko, rlataria, talbergs, vmaksimovs)
+A.F....... [ZBXNEXT-5965] fixed session id generation (ashubin, rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.0rc1
+
+New features:
+A.F.....S. [ZBXNEXT-6148,ZBXNEXT-6150] implemented user roles with more granular permissions (agriscenko, arimdjonoks, gcalenko, rlataria, talbergs, vmaksimovs)
+A......... [ZBXNEXT-6270] improved storage format of the preprocessing parameters in the XML, JSON and YAML files; converted default XML templates to YAML (Ivo, Sasha)
+A.F....PS. [ZBXNEXT-6035] added pre-processing rule for overriding item errors with custom value (akozlovs, ashubin, gcalenko)
+..FG...PS. [ZBXNEXT-6220] removed "Refresh unsupported items" parameter (akozlovs, rlataria)
+.D.....PS. [ZBXNEXT-6245] added locks section to diaginfo runtime command to log adresses of the mutexes and read write locks (vso)
+A.F....PS. [ZBXNEXT-5969] added support of data collection using JavaScript (asestakovs, Ivo)
+.........T [ZBXNEXT-6232] added LTE monitoring to Mikrotik SNMP template (mchudinov)
+...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
+
+Bug fixes:
+..F....... [ZBX-18498] fixed javascript error in map widget configuration for navigation tree source (vmurzins)
+..F....... [ZBX-18396] fixed undefined offset in item test form (Ivo)
+..F....... [ZBX-18415] fixed value caching for item test dialog when opened by 'Test all steps' button (miks)
+...G...... [ZBX-17975] fixed Hostname and HostnameItem for Zabbix Agent 2 test and print execution (esneiders)
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.0beta2
@@ -168,9 +201,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.5
+
+5.0.5rc1 was released as 5.0.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.5rc1
 
 New features:
+.D.....PS. [ZBXNEXT-6245] added locks section to diaginfo runtime command to log adresses of the mutexes and read write locks (vso)
 .........T [ZBXNEXT-6232] added LTE monitoring in Template Net Mikrotik SNMP (mchudinov)
 .........T [ZBXNEXT-6189] added "Template Tel Asterisk by HTTP" (mchudinov)
 .........T [ZBXNEXT-6020] added template "Template App Ceph by Zabbix Agent2" (ychukina)
@@ -180,8 +219,13 @@ A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history c
 .........T [ZBXNEXT-6159] added "Template App PHP-FPM by HTTP" and "Template App PHP-FPM by Zabbix agent" (ychukina)
 ..F....... [ZBXNEXT-6157] reworked UI for setup to simplify db encryption configuration (rlataria)
 .........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
+...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-18396] fixed undefined offset in item test form (Ivo)
+..F....... [ZBX-18415] fixed value caching for item test dialog when opened by 'Test all steps' button (miks)
+...G...... [ZBX-17975] fixed Hostname and HostnameItem for Zabbix Agent 2 test and print execution (esneiders)
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
 ........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
 ..F....... [ZBX-18443] fixed undefined index in item prototype form when creating dependent item using wizard (Ivo)
 ..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
@@ -1956,11 +2000,15 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.26
+
+4.0.26rc1 was released as 4.0.26 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.26rc1
 
-New features:
-
 Bug fixes:
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
 ........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
 ..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
 ..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)

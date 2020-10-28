@@ -1,5 +1,33 @@
 <?php
 return [
+	'role' => [
+		'key' => 'roleid',
+		'fields' => [
+			'roleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'readonly' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
 	'users' => [
 		'key' => 'userid',
 		'fields' => [
@@ -62,12 +90,6 @@ return [
 				'length' => 32,
 				'default' => '30s',
 			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
 			'theme' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -101,6 +123,13 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 50,
 				'default' => 'default',
+			],
+			'roleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'role',
+				'ref_field' => 'roleid',
 			],
 		],
 	],
@@ -2479,12 +2508,6 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-			],
-			'refresh_unsupported' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => '10m',
 			],
 			'work_period' => [
 				'null' => false,
@@ -8545,6 +8568,54 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => '',
+			],
+		],
+	],
+	'role_rule' => [
+		'key' => 'role_ruleid',
+		'fields' => [
+			'role_ruleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'roleid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'role',
+				'ref_field' => 'roleid',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value_int' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'value_str' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value_moduleid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'module',
+				'ref_field' => 'moduleid',
 			],
 		],
 	],

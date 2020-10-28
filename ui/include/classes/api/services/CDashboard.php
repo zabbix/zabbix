@@ -24,6 +24,13 @@
  */
 class CDashboard extends CDashboardGeneral {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_DASHBOARDS],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_DASHBOARDS],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_DASHBOARDS]
+	];
+
 	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_DASHBOARD;
 
 	/**

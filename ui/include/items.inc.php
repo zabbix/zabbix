@@ -905,10 +905,11 @@ function getItemParentTemplates(array $items, $flag) {
  * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
 		return null;
 	}
@@ -919,7 +920,7 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 
 	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
-	if ($template['permission'] == PERM_READ_WRITE) {
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
 			$url = (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
@@ -952,16 +953,17 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
  * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
+function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($itemid, $parent_templates['links'])) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
 				$url = (new CUrl('host_discovery.php'))
 					->setArgument('form', 'update')
@@ -1315,11 +1317,13 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 		$value = formatHistoryValue($item['value'], $item);
 	}
 
-	return (new CCol([$value, $ack]))
+	$col = (new CCol([$value, $ack]))
 		->addClass($css)
+		->addClass(ZBX_STYLE_NOWRAP)
 		->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->addClass(ZBX_STYLE_NOWRAP);
+		->addClass(ZBX_STYLE_CURSOR_POINTER);
+
+	return $col;
 }
 
 /**
@@ -1865,6 +1869,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 		ZBX_PREPROC_ERROR_FIELD_REGEX => [
 			'group' => _('Validation'),
 			'name' => _('Check for error using regular expression')
+		],
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED => [
+			'group' => _('Validation'),
+			'name' => _('Check for not supported value')
 		],
 		ZBX_PREPROC_THROTTLE_VALUE => [
 			'group' => _('Throttling'),

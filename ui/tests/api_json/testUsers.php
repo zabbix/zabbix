@@ -32,6 +32,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'API user create without password',
+					'roleid' => 1,
 					'usrgrps' => [
 						['usrgrpid' => 7]
 					]
@@ -42,6 +43,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'passwd' => 'zabbix',
+					'roleid' => 1,
 					'usrgrps' => [
 						['usrgrpid' => 7]
 					]
@@ -51,6 +53,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => '',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 7]
@@ -61,6 +64,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'Admin',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 7]
@@ -72,6 +76,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => 'API create users with the same names',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -79,6 +84,7 @@ class testUsers extends CAPITest {
 					],
 					[
 						'alias' => 'API create users with the same names',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -90,6 +96,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						'usrgrpid' => 7
@@ -101,6 +108,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User without group parameter',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrps" is missing.'
@@ -108,6 +116,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User without group',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 					]
@@ -117,6 +126,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'Group unexpected parameter',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['userid' => '1']
@@ -127,6 +137,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty group id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '']
@@ -137,6 +148,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User group id not number',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 'abc']
@@ -147,6 +159,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User group id not valid',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '1.1']
@@ -157,6 +170,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with nonexistent group id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '123456']
@@ -167,6 +181,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with two identical user group id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7'],
@@ -175,11 +190,39 @@ class testUsers extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
+			// Roleid is missing.
+			[
+				'user' => [
+					[
+						'alias' => 'API user create 1',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "roleid" is missing.'
+			],
+			// Roleid is as a string.
+			[
+				'user' => [
+					[
+						'alias' => 'API user create 1',
+						'roleid' => 'twenty_five',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
+			],
 			// Check successfully creation of user.
 			[
 				'user' => [
 					[
 						'alias' => 'API user create 1',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -192,6 +235,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => '☺',
+						'roleid' => 1,
 						'passwd' => '☺',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -204,6 +248,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => 'УТФ Юзер',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -216,6 +261,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => 'API user create with media',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -281,6 +327,7 @@ class testUsers extends CAPITest {
 	public function testUsers_CreateUserWithMultipleEmails() {
 		$user = [
 			'alias' => 'API user create with multiple emails',
+			'roleid' => 1,
 			'passwd' => 'zabbix',
 			'usrgrps' => [
 				['usrgrpid' => 7]
@@ -500,9 +547,9 @@ class testUsers extends CAPITest {
 				'user' => [[
 					'userid' => '1',
 					'alias' => 'Try to change super-admin user type',
-					'type' => '2'
+					'roleid' => '2'
 				]],
-				'expected_error' => 'User cannot change their user type.'
+				'expected_error' => 'At least one active user must exist with role "Super Admin role".'
 			],
 			// Successfully user update.
 			[
@@ -749,6 +796,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with autologout and autologin together',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -820,36 +868,36 @@ class testUsers extends CAPITest {
 			// Check user properties, type.
 			[
 				'user' => [
-					'alias' => 'User with empty type',
+					'alias' => 'User with empty roleid',
+					'roleid' => '',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
-					],
-					'type' => ''
+					]
 				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid type',
+					'alias' => 'User with invalid roleid',
+					'roleid' => 0,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
-					],
-					'type' => '0'
+					]
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 2, 3.'
+				'expected_error' => 'User role with ID "0" is not available.'
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid type',
+					'alias' => 'User with invalid roleid',
+					'roleid' => '1.1',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
-					],
-					'type' => '1.1'
+					]
 				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
 			],
 			// Check user properties, refresh.
 			[
@@ -923,6 +971,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User without medias properties',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -934,6 +983,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty mediatypeid',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -949,6 +999,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid mediatypeid',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -964,6 +1015,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with nonexistent media type id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -981,6 +1033,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User without sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -996,6 +1049,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1012,6 +1066,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1028,6 +1083,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1044,6 +1100,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1060,6 +1117,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty second email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1076,6 +1134,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1092,6 +1151,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1108,6 +1168,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1124,6 +1185,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1140,6 +1202,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1156,6 +1219,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1172,6 +1236,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1189,6 +1254,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty active',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1206,6 +1272,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid active',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1223,6 +1290,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid active',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1241,6 +1309,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty severity',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1258,6 +1327,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid severity',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1276,6 +1346,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty period',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1293,6 +1364,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with string period',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1310,6 +1382,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid period, without comma',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1327,6 +1400,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid period, with two comma',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1344,6 +1418,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid period, 8 week days',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1361,6 +1436,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid period, zero week day',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1378,6 +1454,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1395,6 +1472,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1412,6 +1490,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1429,6 +1508,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -1447,6 +1527,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'all-parameters',
+					'roleid' => 3,
 					'passwd' => 'zabbix',
 					'usrgrps' => [['usrgrpid' => 7]],
 					'medias' => [
@@ -1464,7 +1545,6 @@ class testUsers extends CAPITest {
 					'autologout' => 0,
 					'lang' => 'en_US',
 					'refresh' => 90,
-					'type' => 3,
 					'theme' => 'dark-theme',
 					'rows_per_page' => 25,
 					'url' => 'zabbix.php?action=userprofile.edit'
@@ -1613,7 +1693,7 @@ class testUsers extends CAPITest {
 								['usrgrpid' => 7]
 							]
 						],
-				'expected_error' => 'You do not have permissions to create users.'
+				'expected_error' => 'No permissions to call "user.create".'
 			],
 			[
 				'method' => 'user.update',
@@ -1628,7 +1708,7 @@ class testUsers extends CAPITest {
 				'method' => 'user.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'user' => ['9'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "user.delete".'
 			],
 			[
 				'method' => 'user.create',
@@ -1640,7 +1720,7 @@ class testUsers extends CAPITest {
 								['usrgrpid' => 7]
 							]
 						],
-				'expected_error' => 'You do not have permissions to create users.'
+				'expected_error' => 'No permissions to call "user.create".'
 			],
 			[
 				'method' => 'user.update',
@@ -1655,7 +1735,7 @@ class testUsers extends CAPITest {
 				'method' => 'user.delete',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'user' => ['9'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "user.delete".'
 			]
 		];
 	}
@@ -1695,7 +1775,7 @@ class testUsers extends CAPITest {
 	* @dataProvider auth_data
 	*/
 	public function testUsers_Session($data) {
-		$this->checkResult($this->callRaw($data), 'Not authorised.');
+		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
 	}
 
 	public function testUsers_Logout() {
@@ -1721,7 +1801,7 @@ class testUsers extends CAPITest {
 			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
-		$this->checkResult($this->callRaw($data), 'Not authorised.');
+		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
 	}
 
 	public static function login_data() {
