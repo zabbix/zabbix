@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:24Z'
+  date: '2020-10-22T17:00:18Z'
   groups:
     -
       name: Templates/Modules
@@ -85,6 +85,24 @@ zabbix_export:
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  try {
+                      var data = JSON.parse(value);
+                  }
+                  catch (error) {
+                      throw 'Failed to parse JSON of EtherLike-MIB discovery.';
+                  }
+                  var fields = ['{#SNMPVALUE}','{#IFOPERSTATUS}','{#IFALIAS}','{#IFNAME}','{#IFDESCR}'];
+                  data.forEach(function (element) {
+                      fields.forEach(function (field) {
+                          element[field] = element[field] || '';
+                      });
+                  });
+                  return JSON.stringify(data);
   value_maps:
     -
       name: 'EtherLike-MIB::dot3StatsDuplexStatus'
