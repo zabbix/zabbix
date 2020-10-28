@@ -5639,11 +5639,10 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
-.overlay-dialogue.modal.mediatypetest-modal .overlay-dialogue-body {
+.mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body {
   overflow-x: auto; }
-  .overlay-dialogue.modal.mediatypetest-modal .overlay-dialogue-body::-webkit-scrollbar {
+  .mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
     height: 9px; }
-
 .mediatypetest-modal .logitems pre {
   white-space: nowrap; }
 .mediatypetest-modal .logtotalms {

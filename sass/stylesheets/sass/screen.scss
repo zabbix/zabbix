@@ -7210,15 +7210,17 @@ table.preprocessing-test-results {
 }
 
 // Media type test log popup
-.overlay-dialogue.modal.mediatypetest-modal .overlay-dialogue-body {
-	overflow-x: auto;
-
-	&::-webkit-scrollbar {
-		height: 9px;
-	}
-}
-
 .mediatypetest-modal {
+	&.overlay-dialogue.modal {
+		.overlay-dialogue-body {
+			overflow-x: auto;
+
+			&::-webkit-scrollbar {
+				height: 9px;
+			}
+		}
+	}
+
 	.logitems {
 		pre {
 			white-space: nowrap;
