@@ -179,6 +179,10 @@
 			jQuery('form[name="action.edit"]').submit();
 		});
 
+		$('#evaltype').on('change', () => {
+			processTypeOfCalculation();
+		});
+
 		processTypeOfCalculation();
 	});
 
