@@ -608,7 +608,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 						NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
-			ZBX_FALLTHROUGH;
+				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
 				if (MACRO_EXPAND_NO == expand_macros)
