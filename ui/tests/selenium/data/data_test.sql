@@ -2349,7 +2349,7 @@ INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VA
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55077, 1, 1, '{$SNMP_COMMUNITY}');
 
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55078, 99136, 2, '127.0.0.6', 'Test6', '1', '161', '0');
-INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) values (55078, 3, 1, '{$SNMP_COMMUNITY}', 'test_security_name', 2, 'test_authpassphrase', 'test_privpassphrase', 1, 1, 'test_context');
+INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) values (55078, 3, 1, '{$SNMP_COMMUNITY}', 'test_security_name', 2, '{$TEST}', 'test_privpassphrase', 1, 1, 'test_context');
 
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55072, 99136, 3, '127.0.0.3', 'Test3', '1', '623', '1');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (55073, 99136, 4, '127.0.0.4', 'Test4', '1', '12345', '1');

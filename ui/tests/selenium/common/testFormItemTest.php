@@ -277,7 +277,7 @@ class testFormItemTest extends CWebTest {
 						'security' => 'test_security_name',
 						'security_level' => 'authPriv',
 						'authentication_protocol' => 'SHA',
-						'authentication_passphrase' => 'test_authpassphrase',
+						'authentication_passphrase' => '{$TEST}',
 						'privacy_protocol' => 'AES',
 						'privacy_passphrase' => 'test_privpassphrase'
 					]
