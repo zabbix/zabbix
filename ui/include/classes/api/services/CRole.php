@@ -358,12 +358,12 @@ class CRole extends CApiService {
 			'rules' =>			['type' => API_OBJECT, 'fields' => [
 				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1']
+					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED],
 				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => '0,1']
+					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'modules.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED],
 				'api.access' =>				['type' => API_INT32, 'in' => CRoleHelper::API_ACCESS_DISABLED.','.CRoleHelper::API_ACCESS_ENABLED],
@@ -371,7 +371,7 @@ class CRole extends CApiService {
 				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1']
+					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'actions.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED]
 			]]
@@ -451,15 +451,19 @@ class CRole extends CApiService {
 		$moduleids = [];
 
 		foreach ($roles as $role) {
-			if (array_key_exists('rules', $role) && (array_key_exists(CRoleHelper::UI_DEFAULT_ACCESS, $role['rules'])
-					|| array_key_exists(CRoleHelper::SECTION_UI, $role['rules']))) {
+			if (!array_key_exists('rules', $role)) {
+				continue;
+			}
+
+			if (array_key_exists(CRoleHelper::UI_DEFAULT_ACCESS, $role['rules'])
+					|| array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])) {
 				$ui_rules = [];
-				$default_access = 1;
+				$default_access = CRoleHelper::DEFAULT_ACCESS_ENABLED;
 
 				if (array_key_exists(CRoleHelper::UI_DEFAULT_ACCESS, $role['rules'])) {
 					$default_access = $role['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
 				}
-				else if (array_key_exists('roleid', $role)) {
+				elseif (array_key_exists('roleid', $role)) {
 					$default_access = $db_roles[$role['roleid']]['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
 				}
 
@@ -485,10 +489,6 @@ class CRole extends CApiService {
 				if (!in_array(1, $ui_rules)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
 				}
-			}
-
-			if (!array_key_exists('rules', $role)) {
-				continue;
 			}
 
 			if (array_key_exists(CRoleHelper::SECTION_MODULES, $role['rules'])) {
