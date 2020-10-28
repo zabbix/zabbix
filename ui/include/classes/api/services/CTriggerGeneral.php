@@ -989,6 +989,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException if validation failed.
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
+		$db_triggers = [];
 		if (!$triggers) {
 			return;
 		}
