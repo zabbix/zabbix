@@ -260,7 +260,6 @@ $form_list
 			->setFocusableElementId('label-request-method')
 			->setId('request_method')
 			->setValue($data['request_method'])
-			->setReadonly($readonly)
 			->addOptions(CSelect::createOptionsFromArray([
 				HTTPCHECK_REQUEST_GET => 'GET',
 				HTTPCHECK_REQUEST_POST => 'POST',
@@ -617,20 +616,28 @@ $form_list
 	);
 
 // Append value type to form list.
-$form_list->addRow((new CLabel(_('Type of information'), 'label-value-type')),
-(new CSelect('value_type'))
-	->setId('value_type')
-	->setFocusableElementId('label-value-type')
-	->setValue($data['value_type'])
-	->addOptions(CSelect::createOptionsFromArray([
-		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-		ITEM_VALUE_TYPE_STR => _('Character'),
-		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
-	]))
-	->setReadonly($readonly)
-);
+if ($readonly) {
+	$form->addVar('value_type', $data['value_type']);
+	$form_list->addRow((new CLabel(_('Type of information'), 'value_type_name')),
+		(new CTextBox('value_type_name', itemValueTypeString($data['value_type']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	);
+}
+else {
+	$form_list->addRow((new CLabel(_('Type of information'), 'label-value-type')),
+	(new CSelect('value_type'))
+		->setId('value_type')
+		->setFocusableElementId('label-value-type')
+		->setValue($data['value_type'])
+		->addOptions(CSelect::createOptionsFromArray([
+			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+			ITEM_VALUE_TYPE_STR => _('Character'),
+			ITEM_VALUE_TYPE_LOG => _('Log'),
+			ITEM_VALUE_TYPE_TEXT => _('Text')
+		]))
+	);
+}
 
 $form_list
 	->addRow(_('Units'),
@@ -726,27 +733,24 @@ $form_list
 
 // Append valuemap to form list.
 if ($readonly) {
-	if ($data['valuemaps']) {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
-	}
-	else {
-		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
-	}
+	$form->addVar('valuemapid', $data['valuemapid']);
+	$valuemap_select = (new CTextBox('valuemap_name',
+		!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
+		true
+	))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setId('label-valuemap');
 }
 else {
-	$valuemaps = $data['valuemaps'];
-	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
-}
+	$valuemap_select = (new CSelect('valuemapid'))
+		->setId('valuemapid')
+		->setValue($data['valuemapid'])
+		->setFocusableElementId('label-valuemap')
+		->addOption(new CSelectOption(0, _('As is')));
 
-$valuemap_select = (new CSelect('valuemapid'))
-	->setId('valuemapid')
-	->setValue($data['valuemapid'])
-	->setFocusableElementId('label-valuemap')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setReadonly($readonly);
-
-foreach ($valuemaps as $valuemap) {
-	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
+	foreach ($data['valuemaps'] as $valuemap) {
+		$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
+	}
 }
 
 $form_list
