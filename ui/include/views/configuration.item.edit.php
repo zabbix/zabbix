@@ -873,25 +873,25 @@ if ($discovered_item) {
 		}
 	}
 
-	$applicationComboBox = new CListBox('applications_names[]', $data['applications'], 6);
+	$application_list_box = new CListBox('applications_names[]', $data['applications'], 6);
 	foreach ($data['db_applications'] as $application) {
-		$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
+		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
 	}
-	$applicationComboBox->setEnabled(!$discovered_item);
+	$application_list_box->setEnabled(!$discovered_item);
 }
 else {
 	$form_list->addRow(new CLabel(_('New application'), 'new_application'), (new CSpan(
 		(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	))->addClass(ZBX_STYLE_FORM_NEW_GROUP));
 
-	$applicationComboBox = new CListBox('applications[]', $data['applications'], 6);
-	$applicationComboBox->addItem(0, '-'._('None').'-');
+	$application_list_box = new CListBox('applications[]', $data['applications'], 6);
+	$application_list_box->addItem(0, '-'._('None').'-');
 	foreach ($data['db_applications'] as $application) {
-		$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
+		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
 	}
 }
 
-$form_list->addRow(_('Applications'), $applicationComboBox);
+$form_list->addRow(_('Applications'), $application_list_box);
 
 // Append populate host to form list.
 if ($discovered_item) {
