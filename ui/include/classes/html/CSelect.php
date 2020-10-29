@@ -167,9 +167,7 @@ class CSelect extends CTag {
 	 * @return self
 	 */
 	public function onChange($onchange): self {
-		$this->setAttribute('onchange', $onchange);
-
-		return $this;
+		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
 	}
 
 	/**
