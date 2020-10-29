@@ -28,7 +28,7 @@ class CWidgetFormClock extends CWidgetForm {
 		parent::__construct($data, $templateid, WIDGET_CLOCK);
 
 		// Time type field.
-		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), [
+		$field_time_type = (new CWidgetFieldSelect('time_type', _('Time type'), [
 			TIME_TYPE_LOCAL => _('Local time'),
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')

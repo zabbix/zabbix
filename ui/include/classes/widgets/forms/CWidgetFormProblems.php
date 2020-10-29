@@ -196,7 +196,7 @@ class CWidgetFormProblems extends CWidgetForm {
 		];
 
 		// Sort entries by.
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
+		$field_sort = (new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity').' ('._('descending').')',
