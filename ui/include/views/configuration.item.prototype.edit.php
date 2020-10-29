@@ -763,13 +763,13 @@ $form_list
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	);
 
-$applicationComboBox = new CListBox('applications[]', $data['applications'], 6);
-$applicationComboBox->addItem(0, '-'._('None').'-');
+$application_list_box = new CListBox('applications[]', $data['applications'], 6);
+$application_list_box->addItem(0, '-'._('None').'-');
 foreach ($data['db_applications'] as $application) {
-	$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
+	$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
 }
 $form_list
-	->addRow(_('Applications'), $applicationComboBox)
+	->addRow(_('Applications'), $application_list_box)
 	// Append application prototypes to form list.
 	->addRow(new CLabel(_('New application prototype'), 'new_application_prototype'),
 		(new CSpan(
