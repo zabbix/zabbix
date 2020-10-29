@@ -19,12 +19,12 @@
 **/
 
 
-class CWidgetFieldComboBox extends CWidgetField {
+class CWidgetFieldSelect extends CWidgetField {
 
 	private $values;
 
 	/**
-	 * Combo box widget field. Can use both, string and integer type keys.
+	 * CSelect widget field. Can use both, string and integer type keys.
 	 *
 	 * @param string $name    Field name in form
 	 * @param string $label   Label for the field in form

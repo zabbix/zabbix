@@ -40,7 +40,7 @@ class CWidgetHelper {
 	 * @param string $type
 	 * @param int $view_mode (ZBX_WIDGET_VIEW_MODE_NORMAL|ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 	 * @param array $known_widget_types
-	 * @param CWidgetFieldComboBox $field_rf_rate
+	 * @param CWidgetFieldSelect $field_rf_rate
 	 *
 	 * @return CFormList
 	 */
@@ -94,7 +94,7 @@ class CWidgetHelper {
 	 * @return CLabel
 	 */
 	public static function getLabel($field) {
-		if ($field instanceof CWidgetFieldComboBox) {
+		if ($field instanceof CWidgetFieldSelect) {
 			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
 				->setAsteriskMark(self::isAriaRequired($field));
 		}
@@ -104,7 +104,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldComboBox $field
+	 * @param CWidgetFieldSelect $field
 	 *
 	 * @return CSelect
 	 */
