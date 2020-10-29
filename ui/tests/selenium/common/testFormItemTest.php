@@ -483,6 +483,19 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.discard.unchanged.with.heartbeat'
+					],
+					'host_value' => false,
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.interface.trailing.spaces'
 					],
 					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    '],
@@ -526,7 +539,20 @@ class testFormItemTest extends CWebTest {
 					]
 				]
 			],
-						[
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.discard.unchanged'
+					],
+					'host_value' => false,
+					'preprocessing' => [
+						['type' => 'Discard unchanged']
+					]
+				]
+			],
+			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
@@ -543,8 +569,34 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.simple.change'
+					],
+					'host_value' => false,
+					'preprocessing' => [
+						['type' => 'Simple change']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.preproc.change.per.second'
 					],
+					'preprocessing' => [
+						['type' => 'Change per second']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.change.per.second'
+					],
+					'host_value' => false,
 					'preprocessing' => [
 						['type' => 'Change per second']
 					]
@@ -918,7 +970,7 @@ class testFormItemTest extends CWebTest {
 		$this->assertTrue($test_form->query('id:prev_value')->asMultiline()
 				->one()->isEnabled($checked && $prev_enabled));
 		$this->assertTrue($test_form->query('id:prev_time')
-				->one()->isEnabled($checked && $prev_enabled));
+				->one()->isEnabled($prev_enabled));
 
 		$this->assertFalse($test_form->query('id:time')->one()->isEnabled());
 		$this->assertTrue($test_form->query('id:eol')->one()->isEnabled());
