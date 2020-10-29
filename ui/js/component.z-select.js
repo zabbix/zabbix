@@ -38,7 +38,6 @@ class ZSelect extends HTMLElement {
 		this._list = document.createElement('ul');
 
 		this._events = {};
-		this.onchange = () => {};
 
 		this._is_connected = false;
 	}
@@ -58,7 +57,7 @@ class ZSelect extends HTMLElement {
 	 * @return {array}
 	 */
 	static get observedAttributes() {
-		return ['name', 'value', 'disabled', 'readonly', 'width', 'onchange'];
+		return ['name', 'value', 'disabled', 'readonly', 'width'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -97,10 +96,6 @@ class ZSelect extends HTMLElement {
 			case 'width':
 				this._button.style.width = `${new_value}px`;
 				this._list.style.width = `${new_value}px`;
-				break;
-
-			case 'onchange':
-				this.onchange = new Function('e', new_value);
 				break;
 		}
 	}
