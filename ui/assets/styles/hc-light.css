@@ -904,7 +904,9 @@ z-select,
       white-space: pre-wrap;
       user-select: none;
       float: none;
-      margin-right: 0px; }
+      margin-right: 0px;
+      min-height: 24px;
+      box-sizing: border-box; }
       z-select .list li.hover,
       .z-select .list li.hover {
         background-color: #f4f4f4; }
