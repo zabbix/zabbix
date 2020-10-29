@@ -84,7 +84,7 @@ if (!$readonly) {
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
 			]).
-				',{itemtype: jQuery("#type option:selected").val()}), null, this);'
+				',{itemtype: jQuery("#type").val()}), null, this);'
 		);
 
 }
