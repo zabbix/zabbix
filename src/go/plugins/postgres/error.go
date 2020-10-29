@@ -41,7 +41,7 @@ const (
 	errorFourthParamEmptyCustomQueryName = zabbixError("The key requires custom query name as fourth parameter")
 	errorFourthParamLenCustomQueryName   = zabbixError("Expected custon query name as fourth parameter for the key, got empty string")
 	errorUnknownSession                  = zabbixError("Unknown session")
-	errorTimeout                         = zabbixError("timeout exceeded")
+	errorTimeout                         = zabbixError("Timeout exceeded")
 )
 
 // formatZabbixError formats a given error text. It capitalizes the first letter and adds a dot to the end.

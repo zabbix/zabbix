@@ -66,7 +66,7 @@ func (conn *PostgresConn) QueryRow(ctx context.Context, query string, args ...in
 	row = conn.postgresPool.QueryRow(ctx, query, args...)
 
 	if ctxErr := ctx.Err(); ctxErr != nil {
-		return row, errorTimeout
+		return row, ctxErr
 	}
 
 	return
@@ -89,7 +89,7 @@ func (conn *PostgresConn) Query(ctx context.Context, query string, args ...inter
 	rows, err = conn.postgresPool.Query(ctx, query, args...)
 
 	if ctxErr := ctx.Err(); ctxErr != nil {
-		return rows, errorTimeout
+		return rows, ctxErr
 	}
 	return
 }

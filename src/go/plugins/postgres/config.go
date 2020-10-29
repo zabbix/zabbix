@@ -57,7 +57,7 @@ type PluginOptions struct {
 	CallTimeout int `conf:"optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
-	KeepAlive int64 `conf:"optional,range=60:900,default=300"`
+	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]*Session `conf:"optional"`
