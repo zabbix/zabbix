@@ -38,7 +38,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		'Show technical errors' => false,
 		'Max history display period' => '24h',
 		'Time filter default period' => '1h',
-		'Max period' => '2y'
+		'Max period for time selector' => '2y'
 	];
 
 	private $db_default = [
@@ -67,7 +67,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		'Show technical errors' => true,
 		'Max history display period' => '24h',
 		'Time filter default period' => '1h',
-		'Max period' => '2y'
+		'Max period for time selector' => '2y'
 	];
 
 	/**
@@ -140,7 +140,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal valid time in seconds with 's'.
 						'Max history display period' => '86400s',
 						'Time filter default period' => '60s',
-						'Max period' => '31536000s'
+						'Max period for time selector' => '31536000s'
 					],
 					'db' => [
 						'default_lang' => 'en_US',
@@ -167,7 +167,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal valid time in seconds without 's'.
 						'Max history display period' => '86400',
 						'Time filter default period' => '60',
-						'Max period' => '31536000'
+						'Max period for time selector' => '31536000'
 					],
 					'db' => [
 						'work_period' => '1-5,09:00-18:00;5-7,12:00-16:00',
@@ -185,7 +185,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal valid time in minutes.
 						'Max history display period' => '1440m',
 						'Time filter default period' => '1m',
-						'Max period' => '525600m'
+						'Max period for time selector' => '525600m'
 					],
 					'db' => [
 						'history_period' => '1440m',
@@ -201,7 +201,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						// Minimal valid time in hours.
 						'Max history display period' => '24h',
-						'Max period' => '8760h'
+						'Max period for time selector' => '8760h'
 					],
 					'db' => [
 						'history_period' => '24h',
@@ -216,7 +216,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						// Minimal valid time in days.
 						'Max history display period' => '1d',
-						'Max period' => '365d'
+						'Max period for time selector' => '365d'
 					],
 					'db' => [
 						'history_period' => '1d',
@@ -230,7 +230,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						// Minimal valid time in weeks.
-						'Max period' => '53w'
+						'Max period for time selector' => '53w'
 					],
 					'db' => [
 						'max_period' => '53w'
@@ -243,7 +243,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						// Minimal valid time in Months.
-						'Max period' => '13M'
+						'Max period for time selector' => '13M'
 					],
 					'db' => [
 						'max_period' => '13M'
@@ -256,7 +256,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						// Minimal valid time in years.
-						'Max period' => '1y'
+						'Max period for time selector' => '1y'
 					],
 					'db' => [
 						'max_period' => '1y'
@@ -271,7 +271,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal valid time in seconds with 's'.
 						'Max history display period' => '604800s',
 						'Time filter default period' => '315360000s',
-						'Max period' => '315360000s'
+						'Max period for time selector' => '315360000s'
 					],
 					'db' => [
 						'history_period' => '604800s',
@@ -290,7 +290,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal valid time in seconds without 's'.
 						'Max history display period' => '604800',
 						'Time filter default period' => '315360000',
-						'Max period' => '315360000'
+						'Max period for time selector' => '315360000'
 					],
 					'db' => [
 						'default_timezone' => 'Europe/Riga',
@@ -309,7 +309,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal valid time in minutes.
 						'Max history display period' => '10080m',
 						'Time filter default period' => '5256000m',
-						'Max period' => '5256000m'
+						'Max period for time selector' => '5256000m'
 					],
 					'db' => [
 						'history_period' => '10080m',
@@ -326,7 +326,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal valid time in days.
 						'Max history display period' => '7d',
 						'Time filter default period' => '3650d',
-						'Max period' => '3650d'
+						'Max period for time selector' => '3650d'
 					],
 					'db' => [
 						'history_period' => '7d',
@@ -343,7 +343,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal valid time in weeks.
 						'Max history display period' => '7d',
 						'Time filter default period' => '3650d',
-						'Max period' => '3650d'
+						'Max period for time selector' => '3650d'
 					],
 					'db' => [
 						'history_period' => '7d',
@@ -359,7 +359,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						// Maximal valid time in Months.
 						'Time filter default period' => '121M',
-						'Max period' => '121M'
+						'Max period for time selector' => '121M'
 					],
 					'db' => [
 						'period_default' => '121M',
@@ -380,7 +380,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Working time' => '{$WORKING_HOURS}',
 						// Maximal valid time in years.
 						'Time filter default period' => '10y',
-						'Max period' => '10y'
+						'Max period for time selector' => '10y'
 					],
 					'db' => [
 						'default_timezone' => 'UTC',
@@ -405,7 +405,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Working time' => '0',
 						'Max history display period' => '0',
 						'Time filter default period' => '0',
-						'Max period' => '0'
+						'Max period for time selector' => '0'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -429,7 +429,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Working time' => '',
 						'Max history display period' => '',
 						'Time filter default period' => '',
-						'Max period' => ''
+						'Max period for time selector' => ''
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -452,7 +452,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal invalid time in seconds with "s".
 						'Max history display period' => '86399s',
 						'Time filter default period' => '59s',
-						'Max period' => '31535999s'
+						'Max period for time selector' => '31535999s'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -471,7 +471,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal invalid time in seconds without "s".
 						'Max history display period' => '86399',
 						'Time filter default period' => '59',
-						'Max period' => '31535999'
+						'Max period for time selector' => '31535999'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -488,7 +488,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal invalid time in minutes.
 						'Max history display period' => '1439m',
 						'Time filter default period' => '0m',
-						'Max period' => '525599m'
+						'Max period for time selector' => '525599m'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -505,7 +505,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal invalid time in hours.
 						'Max history display period' => '23h',
 						'Time filter default period' => '0h',
-						'Max period' => '8759h'
+						'Max period for time selector' => '8759h'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -522,7 +522,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal invalid time in weeks.
 						'Max history display period' => '0w',
 						'Time filter default period' => '0w',
-						'Max period' => '52w'
+						'Max period for time selector' => '52w'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -539,7 +539,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Minimal invalid time in Month.
 						'Max history display period' => '0M',
 						'Time filter default period' => '0M',
-						'Max period' => '12M'
+						'Max period for time selector' => '12M'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -555,7 +555,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						// Minimal invalid time in years.
 						'Time filter default period' => '0y',
-						'Max period' => '0y'
+						'Max period for time selector' => '0y'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -571,7 +571,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal invalid time in seconds without 's'.
 						'Max history display period' => '604801',
 						'Time filter default period' => '315360001',
-						'Max period' => '315360001'
+						'Max period for time selector' => '315360001'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -588,7 +588,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal invalid time in seconds with 's'.
 						'Max history display period' => '604801s',
 						'Time filter default period' => '315360001s',
-						'Max period' => '315360001s'
+						'Max period for time selector' => '315360001s'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -605,7 +605,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal invalid time in minutes.
 						'Max history display period' => '10081m',
 						'Time filter default period' => '5256001m',
-						'Max period' => '5256001m'
+						'Max period for time selector' => '5256001m'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -623,7 +623,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal invalid time in hours.
 						'Max history display period' => '169h',
 						'Time filter default period' => '87601h',
-						'Max period' => '87601h'
+						'Max period for time selector' => '87601h'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -640,7 +640,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal invalid time in days.
 						'Max history display period' => '8d',
 						'Time filter default period' => '3651d',
-						'Max period' => '3651d'
+						'Max period for time selector' => '3651d'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -657,7 +657,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						// Maximal invalid time in weeks.
 						'Max history display period' => '2w',
 						'Time filter default period' => '522w',
-						'Max period' => '522w'
+						'Max period for time selector' => '522w'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -673,7 +673,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						// Maximal invalid time in months.
 						'Time filter default period' => '122M',
-						'Max period' => '122M'
+						'Max period for time selector' => '122M'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -688,7 +688,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						// Maximal invalid time in years.
 						'Time filter default period' => '11y',
-						'Max period' => '11y'
+						'Max period for time selector' => '11y'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -703,7 +703,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Max history display period' => '99999999999999999999999999999999',
 						'Time filter default period' => '99999999999999999999999999999999',
-						'Max period' => '99999999999999999999999999999999'
+						'Max period for time selector' => '99999999999999999999999999999999'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
@@ -718,11 +718,11 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Time filter default period' => '10y',
-						'Max period' => '5y'
+						'Max period for time selector' => '5y'
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
-						'Incorrect value for field "period_default": time filter default period exceeds the max period.'
+						'Incorrect value for field "period_default": time filter default period exceeds the Max period for time selector.'
 					]
 				]
 			],
