@@ -110,7 +110,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']),
 
 // Sort entries by.
 $form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
-	CWidgetHelper::getComboBox($fields['sort_triggers'])
+	CWidgetHelper::getSelect($fields['sort_triggers'])
 );
 
 // Show timeline.
