@@ -58,10 +58,10 @@ zabbix_export:
                 payload,
                 params = JSON.parse(value),
                 endpoint = 'https://connect.signl4.com/webhook/',
-                request = new CurlHttpRequest();
+                request = new HttpRequest();
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                request.SetProxy(params.HTTPProxy);
+                request.setProxy(params.HTTPProxy);
             }
         
             if (typeof params.teamsecret === 'string' && params.teamsecret.trim() !== '') {
@@ -108,24 +108,24 @@ zabbix_export:
         	}
         
             payload = JSON.stringify(params);
-            Zabbix.Log(4, '[ SIGNL4 Webhook ] Sending request: ' + payload);
+            Zabbix.log(4, '[ SIGNL4 Webhook ] Sending request: ' + payload);
         
-            request.AddHeader('Content-Type: application/json');
-            response = request.Post(endpoint, 'payload=' + payload);
+            request.addHeader('Content-Type: application/json');
+            response = request.post(endpoint, 'payload=' + payload);
         
-            Zabbix.Log(4, '[ SIGNL4 Webhook ] Received response with status code ' +
-                    request.Status() + '\n' + response
+            Zabbix.log(4, '[ SIGNL4 Webhook ] Received response with status code ' +
+                    request.status() + '\n' + response
             );
         
-            if (request.Status() !== 201) {
-                throw 'Request failed with status code ' + request.Status() +
+            if (request.status() !== 201) {
+                throw 'Request failed with status code ' + request.status() +
                         '. Check debug log for more information.';
             }
         
             return 'OK';
         }
         catch (error) {
-            Zabbix.Log(4, '[ SIGNL4 Webhook ] ERROR: ' + error);
+            Zabbix.log(4, '[ SIGNL4 Webhook ] ERROR: ' + error);
         
             throw 'Sending failed: ' + error;
         }

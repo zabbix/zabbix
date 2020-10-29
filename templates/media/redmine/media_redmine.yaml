@@ -111,7 +111,7 @@ zabbix_export:
                             });
                     }
                     else {
-                        Zabbix.Log(4, '[ Redmine Webhook ] Failed to retrieve field schema.');
+                        Zabbix.log(4, '[ Redmine Webhook ] Failed to retrieve field schema.');
                     }
                 }
         
@@ -128,53 +128,53 @@ zabbix_export:
         
                 var response,
                     url = Redmine.params.url + query,
-                    request = new CurlHttpRequest();
+                    request = new HttpRequest();
         
                 if (typeof Redmine.HTTPProxy === 'string' && Redmine.HTTPProxy.trim() !== '') {
-                    request.SetProxy(Redmine.HTTPProxy);
+                    request.setProxy(Redmine.HTTPProxy);
                 }
         
-                request.AddHeader('Content-Type: application/json');
-                request.AddHeader('X-Redmine-API-Key: ' + Redmine.params.access_key);
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('X-Redmine-API-Key: ' + Redmine.params.access_key);
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[ Redmine Webhook ] Sending request: ' +
+                Zabbix.log(4, '[ Redmine Webhook ] Sending request: ' +
                     url + ((typeof data === 'string') ? (' ' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[ Redmine Webhook ] Received response with status code ' + request.Status() + ': ' + response);
+                Zabbix.log(4, '[ Redmine Webhook ] Received response with status code ' + request.status() + ': ' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[ Redmine Webhook ] Failed to parse response received from Redmine');
+                        Zabbix.log(4, '[ Redmine Webhook ] Failed to parse response received from Redmine');
                         response = null;
                     }
                 }
         
-                if (request.Status() < 200 || request.Status() >= 300) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.status() < 200 || request.status() >= 300) {
+                    var message = 'Request failed with status code ' + request.status();
         
                     if (response !== null && typeof response.errors !== 'undefined'
                         && Object.keys(response.errors).length > 0) {
@@ -189,7 +189,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.Status(),
+                    status: request.status(),
                     response: response
                 };
             },
@@ -209,7 +209,7 @@ zabbix_export:
                     }
                 }
                 else {
-                    Zabbix.Log(4, '[ Redmine Webhook ] Failed to retrieve project data.');
+                    Zabbix.log(4, '[ Redmine Webhook ] Failed to retrieve project data.');
                 }
         
                 if (typeof project_id === 'undefined') {
@@ -371,7 +371,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[ Redmine Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ Redmine Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

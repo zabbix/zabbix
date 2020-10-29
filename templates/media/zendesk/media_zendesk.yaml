@@ -126,7 +126,7 @@ zabbix_export:
                         }
                     }
                     else {
-                        Zabbix.Log(4, '[Zendesk Webhook] Failed to retrieve field schema.');
+                        Zabbix.log(4, '[Zendesk Webhook] Failed to retrieve field schema.');
                     }
                 }
         
@@ -142,51 +142,51 @@ zabbix_export:
         
                 var response,
                     url = Zendesk.params.url + query,
-                    request = new CurlHttpRequest();
+                    request = new HttpRequest();
         
                 if (typeof Zendesk.HTTPProxy === 'string' && Zendesk.HTTPProxy.trim() !== '') {
-                    request.SetProxy(Zendesk.HTTPProxy);
+                    request.setProxy(Zendesk.HTTPProxy);
                 }
         
-                request.AddHeader('Content-Type: application/json');
-                request.AddHeader('Authorization: Basic ' + btoa(Zendesk.params.token));
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Basic ' + btoa(Zendesk.params.token));
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[Zendesk Webhook] Sending request: ' + url + ((typeof data === 'string') ? (' ' + data) : ''));
+                Zabbix.log(4, '[Zendesk Webhook] Sending request: ' + url + ((typeof data === 'string') ? (' ' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[Zendesk Webhook] Received response with status code ' + request.Status() + '. ' + response);
+                Zabbix.log(4, '[Zendesk Webhook] Received response with status code ' + request.status() + '. ' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[Zendesk Webhook] Failed to parse response received from Zendesk.');
+                        Zabbix.log(4, '[Zendesk Webhook] Failed to parse response received from Zendesk.');
                     }
                 }
         
-                if (request.Status() < 200 || request.Status() >= 300) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.status() < 200 || request.status() >= 300) {
+                    var message = 'Request failed with status code ' + request.status();
         
                     if (response !== null && typeof response.error !== 'undefined'
                         && Object.keys(response.error).length > 0) {
@@ -203,7 +203,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.Status(),
+                    status: request.status(),
                     response: response
                 };
             },
@@ -383,7 +383,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[Zendesk Webhook] ERROR: ' + error);
+            Zabbix.log(3, '[Zendesk Webhook] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

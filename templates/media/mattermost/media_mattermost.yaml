@@ -156,13 +156,13 @@ zabbix_export:
                 .trim()
                 .split('/#');
         
-            var resp = JSON.parse(req.Get(
+            var resp = JSON.parse(req.get(
                 Mattermost.channel_byname.format(team_chan[0], team_chan[1]),
                 JSON.stringify(fields)
             )
             );
         
-            if (req.Status() != 200) {
+            if (req.status() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -170,7 +170,7 @@ zabbix_export:
         }
         
         function getDirectChannel(send_to) {
-            Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
                 arguments.callee.name,
                 JSON.stringify(arguments)
             ));
@@ -181,18 +181,18 @@ zabbix_export:
                 bot = getBotUser(),
                 user = getUserByName(teamUser[1]);
         
-            var resp = JSON.parse(req.Post(
+            var resp = JSON.parse(req.post(
                 Mattermost.direct_channel,
                 JSON.stringify([bot.id, user.id])
             )
             );
         
-            Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
                 arguments.callee.name,
                 JSON.stringify(resp)
             ));
         
-            if (req.Status() != 201) {
+            if (req.status() != 201) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -202,23 +202,23 @@ zabbix_export:
         }
         
         function getChannelByID(channelID) {
-            Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
                 arguments.callee.name,
                 JSON.stringify(arguments)
             ));
         
-            var resp = JSON.parse(req.Get(
+            var resp = JSON.parse(req.get(
                 Mattermost.get_channel.format(channelID),
                 JSON.stringify(fields)
             )
             );
         
-            Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
                 arguments.callee.name,
                 JSON.stringify(resp)
             ));
         
-            if (req.Status() != 200) {
+            if (req.status() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -226,23 +226,23 @@ zabbix_export:
         }
         
         function getBotUser() {
-            Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
                 arguments.callee.name,
                 JSON.stringify(arguments)
             ));
         
-            var resp = JSON.parse(req.Get(
+            var resp = JSON.parse(req.get(
                 Mattermost.bot_user,
                 JSON.stringify(fields)
             )
             );
         
-            Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
                 arguments.callee.name,
                 JSON.stringify(resp)
             ));
         
-            if (req.Status() != 200) {
+            if (req.status() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -250,23 +250,23 @@ zabbix_export:
         }
         
         function getUserByName(userName) {
-            Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
                 arguments.callee.name,
                 JSON.stringify(arguments)
             ));
         
-            var resp = JSON.parse(req.Get(
+            var resp = JSON.parse(req.get(
                 Mattermost.user_byname.format(userName),
                 JSON.stringify(fields)
             )
             );
         
-            Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
                 arguments.callee.name,
                 JSON.stringify(resp)
             ));
         
-            if (req.Status() != 200) {
+            if (req.status() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -274,23 +274,23 @@ zabbix_export:
         }
         
         function getTeamByID(teamID) {
-            Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
                 arguments.callee.name,
                 JSON.stringify(arguments)
             ));
         
-            var resp = JSON.parse(req.Get(
+            var resp = JSON.parse(req.get(
                 Mattermost.get_team.format(teamID),
                 JSON.stringify(fields)
             )
             );
         
-            Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
                 arguments.callee.name,
                 JSON.stringify(resp)
             ));
         
-            if (req.Status() != 200) {
+            if (req.status() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -350,13 +350,13 @@ zabbix_export:
                     )
                 ];
         
-                var resp = JSON.parse(req.Post(
+                var resp = JSON.parse(req.post(
                     Mattermost.post_message,
                     JSON.stringify(fields)
                 )
                 );
         
-                if (req.Status() != 201) {
+                if (req.status() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -384,12 +384,12 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(
+                resp = JSON.parse(req.post(
                     Mattermost.post_message, JSON.stringify(fields)
                 )
                 );
         
-                if (req.Status() != 201) {
+                if (req.status() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -408,13 +408,13 @@ zabbix_export:
         
                 var post_id = getTagValue(params.event_tags, 'mattermost_post_id');
         
-                resp = JSON.parse(req.Put(
+                resp = JSON.parse(req.put(
                     Mattermost.chat_update.format(post_id),
                     JSON.stringify(fields)
                 )
                 );
         
-                if (req.Status() != 200) {
+                if (req.status() != 200) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
             }
@@ -441,9 +441,9 @@ zabbix_export:
                     )
                 ];
         
-                var resp = JSON.parse(req.Post(Mattermost.post_message, JSON.stringify(fields)));
+                var resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
         
-                if (req.Status() != 201) {
+                if (req.status() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -466,9 +466,9 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Mattermost.post_message, JSON.stringify(fields)));
+                resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
         
-                if (req.Status() != 201) {
+                if (req.status() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -483,9 +483,9 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Mattermost.post_message, JSON.stringify(fields)));
+                resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
         
-                if (req.Status() != 201) {
+                if (req.status() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
             }
@@ -651,16 +651,16 @@ zabbix_export:
         
             validateParams(params);
         
-            var req = new CurlHttpRequest(),
+            var req = new HttpRequest(),
                 fields = {},
                 result = {tags: {}};
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.SetProxy(params.HTTPProxy);
+                req.setProxy(params.HTTPProxy);
             }
         
-            req.AddHeader('Content-Type: application/json; charset=utf-8');
-            req.AddHeader('Authorization: Bearer ' + params.bot_token);
+            req.addHeader('Content-Type: application/json; charset=utf-8');
+            req.addHeader('Authorization: Bearer ' + params.bot_token);
         
             params.mattermost_url = params.mattermost_url.replace(/\/+$/, '');
             params.zabbix_url = params.zabbix_url.replace(/\/+$/, '');
@@ -694,7 +694,7 @@ zabbix_export:
             }
         }
         catch (error) {
-            Zabbix.Log(4, '[ Mattermost Webhook ] Mattermost notification failed: ' + error);
+            Zabbix.log(4, '[ Mattermost Webhook ] Mattermost notification failed: ' + error);
             throw 'Mattermost notification failed: ' + error;
         }
       process_tags: 'YES'

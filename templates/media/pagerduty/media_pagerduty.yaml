@@ -64,7 +64,7 @@ zabbix_export:
         try {
         
             var params = JSON.parse(value),
-                req = new CurlHttpRequest(),
+                req = new HttpRequest(),
                 fields = {},
                 resp = '';
         
@@ -83,7 +83,7 @@ zabbix_export:
             }
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.SetProxy(params.HTTPProxy);
+                req.setProxy(params.HTTPProxy);
             }
         
             if (isNaN(parseInt(params.eventid)) || params.eventid < 1) {
@@ -122,7 +122,7 @@ zabbix_export:
         
         
         
-            req.AddHeader('Content-Type: application/json');
+            req.addHeader('Content-Type: application/json');
         
             fields.routing_key = params.token;
             fields.dedup_key = params.eventid;
@@ -166,11 +166,11 @@ zabbix_export:
             else
                 throw 'incorrect values. Update message without ack will not be sent.';
         
-            Zabbix.Log(4, '[PagerDuty Webhook] Sending request:' + JSON.stringify(fields));
-            resp = req.Post('https://events.pagerduty.com/v2/enqueue',
+            Zabbix.log(4, '[PagerDuty Webhook] Sending request:' + JSON.stringify(fields));
+            resp = req.post('https://events.pagerduty.com/v2/enqueue',
                 JSON.stringify(fields)
             );
-            Zabbix.Log(4, '[PagerDuty Webhook] Receiving response:' + resp);
+            Zabbix.log(4, '[PagerDuty Webhook] Receiving response:' + resp);
         
             try {
                 resp = JSON.parse(resp);
@@ -179,7 +179,7 @@ zabbix_export:
                 throw 'incorrect response. PagerDuty returned a non-JSON object.';
             }
         
-            if (req.Status() != 202) {
+            if (req.status() != 202) {
                 if (typeof resp === 'object' && typeof resp.errors === 'object' && typeof resp.errors[0] === 'string') {
                     throw resp.errors[0];
                 }
@@ -195,7 +195,7 @@ zabbix_export:
             return 'OK';
         }
         catch (error) {
-            Zabbix.Log(3, '[PagerDuty Webhook] Notification failed : ' + error);
+            Zabbix.log(3, '[PagerDuty Webhook] Notification failed : ' + error);
             throw 'PagerDuty notification failed : ' + error;
         }
       description: |

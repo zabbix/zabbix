@@ -73,7 +73,7 @@ zabbix_export:
       script: |
         try {
             var params = JSON.parse(value),
-                request = new CurlHttpRequest(),
+                request = new HttpRequest(),
                 data,
                 response,
                 severities = [
@@ -89,7 +89,7 @@ zabbix_export:
                 priority;
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                request.SetProxy(params.HTTPProxy);
+                request.setProxy(params.HTTPProxy);
             }
         
             if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
@@ -153,24 +153,24 @@ zabbix_export:
             }
         
             data = JSON.stringify(data);
-            Zabbix.Log(4, '[ Pushover Webhook ] Sending request: ' + params.endpoint + '\n' + data);
+            Zabbix.log(4, '[ Pushover Webhook ] Sending request: ' + params.endpoint + '\n' + data);
         
-            request.AddHeader('Content-Type: application/json');
-            response = request.Post(params.endpoint, data);
+            request.addHeader('Content-Type: application/json');
+            response = request.post(params.endpoint, data);
         
-            Zabbix.Log(4, '[ Pushover Webhook ] Received response with status code ' + request.Status() + '\n' + response);
+            Zabbix.log(4, '[ Pushover Webhook ] Received response with status code ' + request.status() + '\n' + response);
         
             if (response !== null) {
                 try {
                     response = JSON.parse(response);
                 }
                 catch (error) {
-                    Zabbix.Log(4, '[ Pushover Webhook ] Failed to parse response received from Pushover');
+                    Zabbix.log(4, '[ Pushover Webhook ] Failed to parse response received from Pushover');
                     response = null;
                 }
             }
         
-            if (request.Status() != 200 || response === null || typeof response !== 'object' || response.status !== 1) {
+            if (request.status() != 200 || response === null || typeof response !== 'object' || response.status !== 1) {
                 if (response !== null && typeof response === 'object' && typeof response.errors === 'object'
                         && typeof response.errors[0] === 'string') {
                     throw response.errors[0];
@@ -183,7 +183,7 @@ zabbix_export:
             return 'OK';
         }
         catch (error) {
-            Zabbix.Log(4, '[ Pushover Webhook ] Pushover notification failed: ' + error);
+            Zabbix.log(4, '[ Pushover Webhook ] Pushover notification failed: ' + error);
             throw 'Pushover notification failed: ' + error;
         }
       description: |

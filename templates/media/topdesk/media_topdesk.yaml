@@ -101,52 +101,52 @@ zabbix_export:
         
                 var response,
                     url = Media.params.api + query,
-                    request = new CurlHttpRequest();
+                    request = new HttpRequest();
         
-                request.AddHeader('Content-Type: application/json');
-                request.AddHeader('Accept: application/json');
-                request.AddHeader('Authorization: ' + Media.params.token);
-                request.SetProxy(Media.HTTPProxy);
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Accept: application/json');
+                request.addHeader('Authorization: ' + Media.params.token);
+                request.setProxy(Media.HTTPProxy);
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Sending request: ' +
+                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Sending request: ' +
                     url + ((typeof data === 'string') ? ('\n' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Received response with status code ' +
-                    request.Status() + '\n' + response);
+                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Received response with status code ' +
+                    request.status() + '\n' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Failed to parse response.');
+                        Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Failed to parse response.');
                         response = null;
                     }
                 }
         
-                if (request.Status() < 200 || request.Status() >= 300) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.status() < 200 || request.status() >= 300) {
+                    var message = 'Request failed with status code ' + request.status();
         
                     if (response !== null) {
                         if (typeof response.errors === 'object' && Object.keys(response.errors).length > 0) {
@@ -164,7 +164,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.Status(),
+                    status: request.status(),
                     response: response
                 };
             }
@@ -260,7 +260,7 @@ zabbix_export:
             if ((params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0)
                     || (params.event_source == 3 && params.event_value == 1)
                     || params.event_source == 1 || params.event_source == 2) {
-                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket creating.');
+                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket creating.');
                 fields.caller = {dynamicName: 'Zabbix'};
                 fields.briefDescription = params.alert_subject;
                 fields.request = params.alert_message.replace(/\n/g, '<br>');
@@ -290,7 +290,7 @@ zabbix_export:
                     throw 'Internal event recovery actions are not supported.';
                 }
         
-                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');
+                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');
                 fields.action = params.alert_message.replace(/\n/g, '<br>');
         
                 resp = Media.request('put', 'tas/api/incidents/number/' + Media.params.issue_key, fields);
@@ -303,7 +303,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[ ' + Media.name + ' Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ ' + Media.name + ' Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

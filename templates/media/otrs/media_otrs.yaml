@@ -110,45 +110,45 @@ zabbix_export:
                 });
         
                 var response,
-                    request = new CurlHttpRequest(),
+                    request = new HttpRequest(),
                     url = OTRS.params.url + query +
                         '?UserLogin=' + encodeURIComponent(OTRS.params.auth_user) +
                         '&Password=' + encodeURIComponent(OTRS.params.auth_password);
         
                 if (typeof OTRS.HTTPProxy !== 'undefined' && OTRS.HTTPProxy.trim() !== '') {
-                    request.SetProxy(OTRS.HTTPProxy);
+                    request.setProxy(OTRS.HTTPProxy);
                 }
         
-                request.AddHeader('Content-Type: application/json');
+                request.addHeader('Content-Type: application/json');
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[ OTRS Webhook ] Sending request: ' +
+                Zabbix.log(4, '[ OTRS Webhook ] Sending request: ' +
                     url + ((typeof data === 'string') ? (' ' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[ OTRS Webhook ] Received response with status code ' + request.Status() + ': ' + response);
+                Zabbix.log(4, '[ OTRS Webhook ] Received response with status code ' + request.status() + ': ' + response);
         
-                if (request.Status() < 200 || request.Status() >= 300) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.status() < 200 || request.status() >= 300) {
+                    var message = 'Request failed with status code ' + request.status();
         
                     message += ': ' + response;
                     throw message + ' Check debug log for more information.';
@@ -159,7 +159,7 @@ zabbix_export:
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[ OTRS Webhook ] Failed to parse response received from OTRS');
+                        Zabbix.log(4, '[ OTRS Webhook ] Failed to parse response received from OTRS');
                         response = null;
                     }
                 }
@@ -171,7 +171,7 @@ zabbix_export:
         
         
                 return {
-                    status: request.Status(),
+                    status: request.status(),
                     response: response
                 };
             },
@@ -332,7 +332,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[ OTRS Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ OTRS Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

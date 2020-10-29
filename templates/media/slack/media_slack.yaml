@@ -131,11 +131,11 @@ zabbix_export:
         }
         
         function getPermalink(channelId, messageTimestamp) {
-            var req = new CurlHttpRequest();
+            var req = new HttpRequest();
         
-            req.AddHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');
+            req.addHeader('Content-Type: application/x-www-form-urlencoded; charset=utf-8');
         
-            var resp = JSON.parse(req.Get(
+            var resp = JSON.parse(req.get(
                 '{0}?token={1}&channel={2}&message_ts={3}'.format(
                     Slack.getPermalink,
                     params.bot_token,
@@ -144,7 +144,7 @@ zabbix_export:
                 )
             ));
         
-            if (req.Status != 200 && !resp.ok) {
+            if (req.status != 200 && !resp.ok) {
                 throw resp.error;
             }
         
@@ -199,9 +199,9 @@ zabbix_export:
                     )
                 ];
         
-                var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
+                var resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.status != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -222,8 +222,8 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
-                if (req.Status != 200 && !resp.ok) {
+                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
+                if (req.status != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -241,8 +241,8 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Slack.chatUpdate, JSON.stringify(fields)));
-                if (req.Status != 200 && !resp.ok) {
+                resp = JSON.parse(req.post(Slack.chatUpdate, JSON.stringify(fields)));
+                if (req.status != 200 && !resp.ok) {
                     throw resp.error;
                 }
             }
@@ -264,9 +264,9 @@ zabbix_export:
                     )
                 ];
         
-                var resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
+                var resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.status != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -285,9 +285,9 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
+                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.status != 200 && !resp.ok) {
                     throw resp.error;
                 }
         
@@ -302,9 +302,9 @@ zabbix_export:
                     )
                 ];
         
-                resp = JSON.parse(req.Post(Slack.postMessage, JSON.stringify(fields)));
+                resp = JSON.parse(req.post(Slack.postMessage, JSON.stringify(fields)));
         
-                if (req.Status != 200 && !resp.ok) {
+                if (req.status != 200 && !resp.ok) {
                     throw resp.error;
                 }
             }
@@ -473,15 +473,15 @@ zabbix_export:
         
             validateParams(params);
         
-            var req = new CurlHttpRequest(),
+            var req = new HttpRequest(),
                 result = {tags: {}};
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.SetProxy(params.HTTPProxy);
+                req.setProxy(params.HTTPProxy);
             }
         
-            req.AddHeader('Content-Type: application/json; charset=utf-8');
-            req.AddHeader('Authorization: Bearer ' + params.bot_token);
+            req.addHeader('Content-Type: application/json; charset=utf-8');
+            req.addHeader('Authorization: Bearer ' + params.bot_token);
         
             var slack_endpoint = 'https://slack.com/api/';
         
@@ -506,7 +506,7 @@ zabbix_export:
             }
         }
         catch (error) {
-            Zabbix.Log(4, '[ Slack Webhook ] Slack notification failed : ' + error);
+            Zabbix.log(4, '[ Slack Webhook ] Slack notification failed : ' + error);
             throw 'Slack notification failed : ' + error;
         }
       process_tags: 'YES'
