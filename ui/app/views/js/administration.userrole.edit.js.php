@@ -114,6 +114,7 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		const ui_manager = new UserRoleUiManager(<?php echo (bool) $this->data['readonly']; ?>);
 		const type_elem = document.querySelector('.js-userrole-usertype');
+		const clone_btn = document.getElementById('clone');
 
 		if (!type_elem) {
 			return false;
@@ -147,6 +148,21 @@
 			.addEventListener('change', (event) => {
 				ui_manager.disableApiSection();
 			});
+
+		if (clone_btn !== null) {
+			clone_btn.addEventListener('click', (event) => {
+				document
+					.querySelectorAll('#roleid, #delete, #clone')
+					.forEach((element) => { element.remove(); });
+
+				const update_btn = document.querySelector('#update');
+				update_btn.innerHTML = <?= json_encode(_('Add')) ?>;
+				update_btn.setAttribute('value', 'userrole.create');
+				update_btn.setAttribute('id', 'add');
+
+				document.querySelector('#name').focus();
+			});
+		}
 
 		ui_manager.disableUiCheckbox();
 	});
