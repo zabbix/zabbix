@@ -188,18 +188,13 @@ $hostList->addRow(_('Description'),
 );
 
 // Proxy
-if ($data['readonly']) {
-	$proxy = (new CTextBox(null,
-		($data['proxy_hostid'] == 0) ? _('(no proxy)') : $data['proxies'][$data['proxy_hostid']], true)
-	)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-	$hostList->addVar('proxy_hostid', $data['proxy_hostid']);
-}
-else {
-	$proxy = new CComboBox('proxy_hostid', $data['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']);
-	$proxy->setEnabled(true);
-}
-
-$hostList->addRow(_('Monitored by proxy'), $proxy);
+$hostList->addRow(new CLabel(_('Monitored by proxy'), 'label-proxy'),
+	(new CSelect('proxy_hostid'))
+		->setValue($data['proxy_hostid'])
+		->setFocusableElementId('label-proxy')
+		->setReadonly($data['readonly'])
+		->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
+);
 
 $hostList->addRow(_('Enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))->setChecked($data['status'] == HOST_STATUS_MONITORED)
