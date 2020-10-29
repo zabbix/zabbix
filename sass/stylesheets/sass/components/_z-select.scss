@@ -64,6 +64,8 @@ z-select,
 			user-select: none;
 			float: none;
 			margin-right: 0px;
+			min-height: 24px;
+			box-sizing: border-box;
 
 			&.hover {
 				background-color: $action-hover-color;
