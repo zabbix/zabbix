@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -48,7 +49,7 @@ func (p *Plugin) walHandler(ctx context.Context, conn PostgresClient, key string
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&walJSON)
@@ -58,7 +59,7 @@ func (p *Plugin) walHandler(ctx context.Context, conn PostgresClient, key string
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return walJSON, nil

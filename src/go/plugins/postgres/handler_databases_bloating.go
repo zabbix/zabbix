@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -45,7 +46,7 @@ func (p *Plugin) databasesBloatingHandler(ctx context.Context, conn PostgresClie
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&countBloating)
@@ -55,7 +56,7 @@ func (p *Plugin) databasesBloatingHandler(ctx context.Context, conn PostgresClie
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return countBloating, nil

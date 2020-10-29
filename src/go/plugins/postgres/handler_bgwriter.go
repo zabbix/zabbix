@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -57,7 +58,7 @@ func (p *Plugin) bgwriterHandler(ctx context.Context, conn PostgresClient, key s
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&bgwriterJSON)
@@ -67,7 +68,7 @@ func (p *Plugin) bgwriterHandler(ctx context.Context, conn PostgresClient, key s
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return bgwriterJSON, nil

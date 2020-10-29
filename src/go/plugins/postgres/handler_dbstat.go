@@ -24,6 +24,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -105,7 +106,7 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&statJSON)
@@ -115,7 +116,7 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return statJSON, nil

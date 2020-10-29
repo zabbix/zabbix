@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -53,7 +54,7 @@ func (p *Plugin) databasesSizeHandler(ctx context.Context, conn PostgresClient, 
 	row, err = conn.QueryRow(ctx, query, params[0])
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&countSize)
@@ -63,7 +64,7 @@ func (p *Plugin) databasesSizeHandler(ctx context.Context, conn PostgresClient, 
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	return countSize, nil
 }

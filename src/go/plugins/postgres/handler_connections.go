@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -54,7 +55,7 @@ func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, ke
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&connectionsJSON)
@@ -64,7 +65,7 @@ func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, ke
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return connectionsJSON, nil

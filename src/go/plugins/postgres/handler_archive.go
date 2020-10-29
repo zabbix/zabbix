@@ -26,7 +26,6 @@ import (
 )
 
 const (
-	//keyPostgresCountArchive = "pgsql.archive"
 	keyPostgresSizeArchive = "pgsql.archive"
 )
 

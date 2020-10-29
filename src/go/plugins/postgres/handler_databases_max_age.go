@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -52,7 +53,7 @@ func (p *Plugin) databasesAgeHandler(ctx context.Context, conn PostgresClient, k
 	row, err = conn.QueryRow(ctx, query, params[0])
 	if err != nil {
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&countAge)
@@ -62,7 +63,7 @@ func (p *Plugin) databasesAgeHandler(ctx context.Context, conn PostgresClient, k
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	return countAge, nil
 }

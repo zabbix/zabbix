@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -44,8 +45,7 @@ func (p *Plugin) autovacuumHandler(ctx context.Context, conn PostgresClient, key
 
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&countAutovacuumWorkers)
@@ -55,7 +55,7 @@ func (p *Plugin) autovacuumHandler(ctx context.Context, conn PostgresClient, key
 			return nil, errorEmptyResult
 		}
 		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return countAutovacuumWorkers, nil
