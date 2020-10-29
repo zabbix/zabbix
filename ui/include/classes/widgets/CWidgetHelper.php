@@ -72,7 +72,7 @@ class CWidgetHelper {
 			);
 
 		if ($field_rf_rate !== null) {
-			$form_list->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
+			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
 		}
 
 		return $form_list;
@@ -113,12 +113,14 @@ class CWidgetHelper {
 	 *
 	 * @return CComboBox
 	 */
-	public static function getComboBox($field) {
-		$combo_box = (new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
-			->setAriaRequired(self::isAriaRequired($field))
-			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
-
-		return $combo_box;
+	public static function getSelect($field) {
+		return (new CSelect($field->getName()))
+			->setId($field->getName())
+			->setFocusableElementId('label-'.$field->getName())
+			->setValue($field->getValue())
+			->addOptions(CSelect::createOptionsFromArray($field->getValues()))
+			->setDisabled($field->getFlags() & CWidgetField::FLAG_DISABLED)
+			->setAriaRequired(self::isAriaRequired($field));
 	}
 
 	/**
@@ -364,8 +366,10 @@ class CWidgetHelper {
 	 *
 	 * @return CComboBox
 	 */
-	public static function getEmptyComboBox($field) {
-		return (new CComboBox($field->getName(), [], $field->getAction(), []))
+	public static function getEmptySelect($field) {
+		return (new CSelect($field->getName()))
+			->setFocusableElementId('label-'.$field->getName())
+			->setId($field->getName())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
 	}

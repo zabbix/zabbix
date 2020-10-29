@@ -35,7 +35,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 $scripts = [];
 
 // Time type.
-$form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getComboBox($fields['time_type']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getSelect($fields['time_type']));
 
 // Item.
 if (array_key_exists('itemid', $fields)) {
