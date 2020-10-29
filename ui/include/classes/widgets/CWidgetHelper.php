@@ -346,7 +346,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Creates CComboBox field without values, to later fill it by JS script.
+	 * Creates select field without values, to later fill it by JS script.
 	 *
 	 * @param CWidgetFieldWidgetListComboBox $field
 	 *
