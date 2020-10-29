@@ -99,12 +99,17 @@ class CWidgetHelper {
 	 * @return CLabel
 	 */
 	public static function getLabel($field) {
+		if ($field instanceof CWidgetFieldSelect) {
+			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
+				->setAsteriskMark(self::isAriaRequired($field));
+		}
+
 		return (new CLabel($field->getLabel(), $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field));
 	}
 
 	/**
-	 * @param CWidgetFieldComboBox $field
+	 * @param CWidgetFieldSelect $field
 	 *
 	 * @return CComboBox
 	 */

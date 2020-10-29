@@ -153,7 +153,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_lefty_max->getName()] = $field_lefty_max;
 
 		// Specify the type of units on left Y axis.
-		$field_lefty_units = (new CWidgetFieldComboBox('lefty_units', _('Units'), [
+		$field_lefty_units = (new CWidgetFieldSelect('lefty_units', _('Units'), [
 			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
@@ -228,7 +228,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_righty_max->getName()] = $field_righty_max;
 
 		// Specify the type of units on right Y axis.
-		$field_righty_units = (new CWidgetFieldComboBox('righty_units', _('Units'), [
+		$field_righty_units = (new CWidgetFieldSelect('righty_units', _('Units'), [
 			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
