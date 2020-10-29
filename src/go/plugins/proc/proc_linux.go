@@ -29,7 +29,6 @@ import "C"
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os/user"
 	"regexp"
@@ -473,11 +472,6 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 		}
 	}
 
-	files, err := ioutil.ReadDir("/proc")
-	if err != nil {
-		return nil, errors.New("Failed to read proc directory.")
-	}
-
 	var count int
 	var memSize, value float64
 	var found bool
@@ -505,24 +499,14 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 		return nil, fmt.Errorf("Failed to obtain processes: %s", err.Error())
 	}
 
-	for _, file := range files {
-		if !file.IsDir() {
+	for _, proc := range processes {
+		if !p.validFile(proc, name, userID, cmdRgx) {
 			continue
 		}
 
-		pid := file.Name()
-		_, err := strconv.Atoi(pid)
+		data, err := readAll("/proc/" + strconv.FormatInt(proc.pid, 10) + "/status")
 		if err != nil {
-			continue
-		}
-
-		if !p.validFile(processes, pid, name, userID, cmdRgx) {
-			continue
-		}
-
-		data, err := readAll("/proc/" + pid + "/status")
-		if err != nil {
-			return nil, fmt.Errorf("Failed to read status file for pid '%s': %s", pid, err.Error())
+			return nil, fmt.Errorf("Failed to read status file for pid '%d': %s", proc.pid, err.Error())
 		}
 
 		switch memtype {
@@ -667,39 +651,20 @@ func getTypeString(t string) (string, error) {
 	}
 }
 
-func (p *PluginExport) validFile(processes []*procInfo, pid, name string, uid int64, cmdRgx *regexp.Regexp) bool {
-	var arg0, cmd, procName string
-	var procUID int64
-	procID, err := strconv.ParseInt(pid, 10, 64)
-	if err != nil {
-		p.Logger.Tracef(
-			"failed to convert process id '%s' to uint64", pid)
+func (p *PluginExport) validFile(proc *procInfo, name string, uid int64, cmdRgx *regexp.Regexp) bool {
+	if proc == nil {
 		return false
 	}
 
-	for _, proc := range processes {
-		if proc == nil {
-			continue
-		}
-
-		if procID == proc.pid {
-			arg0 = proc.arg0
-			cmd = proc.cmdline
-			procName = proc.name
-			procUID = proc.userid
-			break
-		}
-	}
-
-	if !checkProcessName(arg0, procName, name) {
+	if !checkProcessName(proc.arg0, proc.name, name) {
 		return false
 	}
 
-	if !checkUserInfo(uid, procUID) {
+	if !checkUserInfo(uid, proc.userid) {
 		return false
 	}
 
-	if !checkProccom(cmd, cmdRgx) {
+	if !checkProccom(proc.cmdline, cmdRgx) {
 		return false
 	}
 
