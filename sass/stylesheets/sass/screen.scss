@@ -4946,16 +4946,6 @@ a.red {
 	}
 }
 
-select.red {
-	@extend .red;
-}
-
-select {
-	option.red {
-		@extend .red;
-	}
-}
-
 .orange {
 	color: $orange;
 }

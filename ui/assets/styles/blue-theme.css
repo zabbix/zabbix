@@ -4224,7 +4224,7 @@ z-select[disabled] button,
 a.green:hover, a.green:focus {
   color: #0275b8; }
 
-.red, a.red, select.red, select option.red {
+.red, a.red {
   color: #e33734; }
 
 a.red:hover, a.red:focus {
