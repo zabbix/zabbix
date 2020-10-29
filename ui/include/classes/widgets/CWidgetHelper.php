@@ -70,7 +70,7 @@ class CWidgetHelper {
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
-			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
+			->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
 	}
 
 	/**
@@ -108,7 +108,7 @@ class CWidgetHelper {
 	 *
 	 * @return CSelect
 	 */
-	public static function getComboBox($field) {
+	public static function getSelect($field) {
 		return (new CSelect($field->getName()))
 			->setId($field->getName())
 			->setFocusableElementId('label-'.$field->getName())
@@ -365,7 +365,7 @@ class CWidgetHelper {
 	 *
 	 * @return CSelect
 	 */
-	public static function getEmptyComboBox($field) {
+	public static function getEmptySelect($field) {
 		return (new CSelect($field->getName()))
 			->setFocusableElementId('label-'.$field->getName())
 			->setId($field->getName())

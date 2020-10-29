@@ -28,7 +28,7 @@ class CWidgetFieldSelect extends CWidgetField {
 	 *
 	 * @param string $name    Field name in form
 	 * @param string $label   Label for the field in form
-	 * @param array  $values  Key/value pairs of combo box values. Key - saved in DB. Value - visible to user.
+	 * @param array  $values  Key/value pairs of select option values. Key - saved in DB. Value - visible to user.
 	 */
 	public function __construct($name, $label, $values) {
 		parent::__construct($name, $label);

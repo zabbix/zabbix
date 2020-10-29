@@ -32,7 +32,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 
 // Sort entries by.
 $form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
-	CWidgetHelper::getComboBox($fields['sort_triggers'])
+	CWidgetHelper::getSelect($fields['sort_triggers'])
 );
 
 // Show lines.
