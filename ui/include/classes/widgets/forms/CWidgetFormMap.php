@@ -53,7 +53,7 @@ class CWidgetFormMap extends CWidgetForm {
 
 		if ($field_source_type->getValue() === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			// Select filter widget field.
-			$field_filter_widget = (new CWidgetFieldWidgetListComboBox('filter_widget_reference', _('Filter'),
+			$field_filter_widget = (new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'),
 				'type', 'navtree'
 			))
 				->setDefault('')
