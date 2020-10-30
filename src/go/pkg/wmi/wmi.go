@@ -50,9 +50,9 @@ type valueResult struct {
 	data interface{}
 }
 
-func clearQuals(quals *ole.VARIANT) {
+func clearOle(quals *ole.VARIANT) {
 	if err := quals.Clear(); err != nil {
-		log.Errf("cannot clear qualifier: %s", err)
+		log.Errf("cannot clear OLE: %s", err)
 	}
 }
 
@@ -61,7 +61,7 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 	if err != nil {
 		return false, err
 	}
-	defer clearQuals(rawQuals)
+	defer clearOle(rawQuals)
 
 	quals := rawQuals.ToIDispatch()
 	defer quals.Release()
@@ -78,7 +78,7 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 		if err != nil {
 			return
 		}
-		defer clearQuals(qualsName)
+		defer clearOle(qualsName)
 
 		if qualsName.Value().(string) == "key" {
 			isKeyProperty = true
@@ -109,7 +109,7 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 		if err != nil {
 			return
 		}
-		defer clearQuals(rawProps)
+		defer clearOle(rawProps)
 
 		props := rawProps.ToIDispatch()
 		defer props.Release()
@@ -122,13 +122,13 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 			if err != nil {
 				return
 			}
-			defer clearQuals(propsName)
+			defer clearOle(propsName)
 
 			propsVal, err := oleutil.GetProperty(propsCol, "Value")
 			if err != nil {
 				return
 			}
-			defer clearQuals(propsVal)
+			defer clearOle(propsVal)
 
 			isKeyProperty, err := isPropertyKeyProperty(propsCol)
 			if err != nil {
