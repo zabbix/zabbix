@@ -51,8 +51,7 @@ type valueResult struct {
 }
 
 func clearQuals(quals *ole.VARIANT) {
-	err := quals.Clear()
-	if err != nil {
+	if err := quals.Clear(); err != nil {
 		log.Errf("cannot clear qualifier: %s", err)
 	}
 }
@@ -83,17 +82,15 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 
 		if qualsName.Value().(string) == "key" {
 			isKeyProperty = true
-
 			return stopErrorCol
 		}
-
 		return
 	})
 	if _, ok := oleErr.(stopError); !ok {
 		return false, oleErr
 	}
 
-	return isKeyProperty, err
+	return isKeyProperty, nil
 }
 
 // Key Qualifier ('Name', 'DeviceID', 'Tag' etc.) is always appended to results which are sorted alphabetically,
@@ -134,7 +131,6 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 			defer clearQuals(propsVal)
 
 			isKeyProperty, err := isPropertyKeyProperty(propsCol)
-
 			if err != nil {
 				return
 			}
@@ -142,17 +138,15 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 			if !isKeyProperty {
 				r.data = propsVal.Value()
 				return stopErrorCol
-			} else {
-				// remember key field value in the case it was the only selected column
-				propertyKeyFieldValue = propsVal.Value()
 			}
+			// remember key field value in the case it was the only selected column
+			propertyKeyFieldValue = propsVal.Value()
 			return
 		})
 
 		if err == nil {
 			return stopErrorRow
 		}
-
 		return
 	})
 	if stop, ok := oleErr.(stopError); !ok {
@@ -278,7 +272,7 @@ func QueryValue(namespace string, query string) (value interface{}, err error) {
 	return r.data, nil
 }
 
-// QueryValue returns the result set returned by the query in a slice of maps, containing
+// QueryTable returns the result set returned by the query in a slice of maps, containing
 // field name, value pairs. The field values can be either nil (null value) or pointer of
 // the value in string format.
 func QueryTable(namespace string, query string) (table []map[string]interface{}, err error) {
