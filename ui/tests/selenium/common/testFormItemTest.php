@@ -679,7 +679,7 @@ class testFormItemTest extends CWebTest {
 				$test_form = $this->query('id:preprocessing-test-form')
 					->waitUntilPresent()->one()->waitUntilReady();
 				// Check "Get value from host" checkbox.
-				$get_host_value = $test_form->query('id:get_value')->one()->asCheckbox();
+				$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 				$this->assertTrue($get_host_value->isEnabled());
 				$this->assertTrue($get_host_value->isChecked());
 
@@ -698,8 +698,7 @@ class testFormItemTest extends CWebTest {
 						'privacy_passphrase' => 'id:interface_details_privpassphrase'
 					];
 				}
-				elseif (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv1' ||
-							CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv2') {
+				elseif (in_array(CTestArrayHelper::get($data, 'snmp_fields.version'), ['SNMPv1', 'SNMPv2'])) {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
@@ -735,19 +734,36 @@ class testFormItemTest extends CWebTest {
 
 					case 'SNMP agent':
 						if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
-							$fields_value = [
-								'address' => $is_host ? $host_interface[0] : '',
-								'port' => $is_host ? $host_interface[1] : '',
-								'proxy' => $is_host ? $proxy : '(no proxy)',
-								'version' => $is_host ? 'SNMPv3' : 'SNMPv2',
-								'context' => $is_host ? $data['snmp_fields']['context'] : '',
-								'security' => $is_host ? $data['snmp_fields']['security'] : '',
-								'security_level' => $is_host ? $data['snmp_fields']['security_level'] : 'noAuthNoPriv',
-								'authentication_protocol' => $is_host ? $data['snmp_fields']['authentication_protocol'] : 'MD5',
-								'authentication_passphrase' => $is_host ? $data['snmp_fields']['authentication_passphrase'] : '',
-								'privacy_protocol' => $is_host ? $data['snmp_fields']['privacy_protocol'] : 'DES',
-								'privacy_passphrase' => $is_host ? $data['snmp_fields']['privacy_passphrase'] : '',
-							];
+							if ($is_host) {
+								$fields_value = [
+									'address' => $host_interface[0],
+									'port' => $host_interface[1],
+									'proxy' => $proxy,
+									'version' => 'SNMPv3',
+									'context' => $data['snmp_fields']['context'],
+									'security' => $data['snmp_fields']['security'],
+									'security_level' => $data['snmp_fields']['security_level'],
+									'authentication_protocol' => $data['snmp_fields']['authentication_protocol'],
+									'authentication_passphrase' => $data['snmp_fields']['authentication_passphrase'],
+									'privacy_protocol' => $data['snmp_fields']['privacy_protocol'],
+									'privacy_passphrase' => $data['snmp_fields']['privacy_passphrase'],
+								];
+							}
+							else {
+								$fields_value = [
+									'address' => '',
+									'port' => '',
+									'proxy' => '(no proxy)',
+									'version' => 'SNMPv2',
+									'context' => '',
+									'security' => '',
+									'security_level' => 'noAuthNoPriv',
+									'authentication_protocol' => 'MD5',
+									'authentication_passphrase' => '',
+									'privacy_protocol' => 'DES',
+									'privacy_passphrase' => '',
+								];
+							}
 
 							$fields_state = [
 								'address' => true,
@@ -891,7 +907,7 @@ class testFormItemTest extends CWebTest {
 				}
 
 				if ($macros['expected']){
-					foreach ($test_form->query('class:textarea-flexible-container')->one()->asTable()->getRows() as $row) {
+					foreach ($test_form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
 						 * Macro columns are represented in following way:
@@ -914,8 +930,7 @@ class testFormItemTest extends CWebTest {
 
 				// Compare preprocessing from data with steps from test table.
 				if (CTestArrayHelper::get($data, 'preprocessing')) {
-					$preprocessing_table = $test_form->query('id:preprocessing-steps')->one()
-						->asTable();
+					$preprocessing_table = $test_form->query('id:preprocessing-steps')->asTable()->one();
 
 					foreach ($data['preprocessing'] as $i => $step) {
 						$this->assertEquals(($i+1).': '.$step['type'],
@@ -942,7 +957,7 @@ class testFormItemTest extends CWebTest {
 	private function checkValueFields($data) {
 		$test_form = $this->query('id:preprocessing-test-form')
 			->waitUntilPresent()->one()->waitUntilReady();
-		$get_host_value = $test_form->query('id:get_value')->one()->asCheckbox();
+		$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 
 		$checked = $get_host_value->isChecked();
 		$prev_enabled = false;
