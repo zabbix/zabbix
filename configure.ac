@@ -697,6 +697,19 @@ AC_DEFINE(HAVE_THREAD_LOCAL,1,[Define to 1 if compiler keyword '__thread' suppor
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no)
 HAVE_THREAD_LOCAL="no")
+
+AC_MSG_CHECKING(for field updates in struct vminfo_t)
+AC_TRY_COMPILE([
+#include <sys/sysinfo.h>
+],
+[
+	vminfo_t vminfo;
+	vminfo.updates;
+],
+AC_DEFINE(HAVE_VMINFO_T_UPDATES,1,[Define to 1 if 'vminfo.updates' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
