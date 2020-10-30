@@ -220,7 +220,7 @@ else {
 
 	// Make filter fields.
 	if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-		// Sanitize $data['filter']['groups'] and prepare "Template group" combo box.
+		// Sanitize $data['filter']['groups'] and prepare "Template group" select options.
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
 			'templated_hosts' => true,
@@ -234,7 +234,7 @@ else {
 			$data['filter']['groups'] = 0;
 		}
 
-		// Sanitize $data['filter']['hostids'] and prepare "Template" combo box.
+		// Sanitize $data['filter']['hostids'] and prepare "Template" select options.
 		$templates = API::Template()->get([
 			'output' => ['name'],
 			'groupids' => $data['filter']['groups'] ? [$data['filter']['groups']] : null,
@@ -256,7 +256,7 @@ else {
 			$select_filter_hostid->addOption(new CSelectOption($templateid, $template['name']));
 		}
 
-		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" combo box.
+		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" select options.
 		$triggers = API::Trigger()->get([
 			'output' => ['description'],
 			'selectHosts' => ['name'],
@@ -304,7 +304,7 @@ else {
 			$tpl_triggerids[$triggerid] = true;
 		}
 
-		// Sanitize $data['filter']['hostgroupid'] and prepare "Host Group" combo box.
+		// Sanitize $data['filter']['hostgroupid'] and prepare "Host Group" select options.
 		$host_groups = API::HostGroup()->get([
 			'output' => ['name'],
 			'monitored_hosts' => true,

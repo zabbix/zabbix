@@ -2053,7 +2053,7 @@ class testDiscoveryRule extends CAPITest {
 							}
 						}
 
-						// If "lld_macro_pathid" is not given, compare by "itemid" and "lld_macro" (unique combo).
+						// If "lld_macro_pathid" is not given, compare by "itemid" and "lld_macro" (unique combination).
 						if (!array_key_exists('lld_macro_pathid', $lld_macro_path)) {
 							// Keys "lld_macro" and "path" should exist at this point.
 							if ($old_lld_macro_paths) {
