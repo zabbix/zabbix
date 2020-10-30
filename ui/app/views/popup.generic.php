@@ -113,6 +113,7 @@ if ($data['popup_type'] === 'help_items') {
 	$types_select = (new CSelect('itemtype'))
 		->setId('itemtype')
 		->setFocusableElementId('label-itemtype')
+		->setAttribute('autofocus', 'autofocus')
 		->setValue($options['itemtype']);
 
 	$output['script_inline'] .= '$("#itemtype").on("change", (e) => {'.
