@@ -569,26 +569,26 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList, TAB_INDICATOR_LINKED_
  * IPMI
  */
 if ($data['readonly']) {
-	$cmbIPMIAuthtype = [
+	$ipmi_authtype_select = [
 		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_authtype', $data['ipmi_authtype'])
 	];
-	$cmbIPMIPrivilege = [
+	$ipmi_privilege_select = [
 		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['ipmi_privilege']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_privilege', $data['ipmi_privilege'])
 	];
 }
 else {
-	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
-	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
+	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
+	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
 }
 
 $divTabs->addTab('ipmiTab', _('IPMI'),
 	(new CFormList())
-		->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype)
-		->addRow(_('Privilege level'), $cmbIPMIPrivilege)
+		->addRow(_('Authentication algorithm'), $ipmi_authtype_select)
+		->addRow(_('Privilege level'), $ipmi_privilege_select)
 		->addRow(_('Username'),
 			(new CTextBox('ipmi_username', $data['ipmi_username'], $data['readonly']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
