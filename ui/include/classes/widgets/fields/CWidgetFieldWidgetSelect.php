@@ -19,13 +19,13 @@
 **/
 
 
-class CWidgetFieldWidgetListComboBox extends CWidgetField {
+class CWidgetFieldWidgetSelect extends CWidgetField {
 
 	private $search_by_key;
 	private $search_by_value;
 
 	/**
-	 * Field that creates ComboBox with widgets of current dashboard, filtered by given key of widget array.
+	 * Field that creates a select of widgets in current dashboard, filtered by given key of widget array.
 	 *
 	 * @param string $name             Name of field in config form and widget['fields'] array.
 	 * @param string $label            Field label in config form.
@@ -63,7 +63,7 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	}
 
 	/**
-	 * JS code, that should be executed, to fill ComboBox with values and select current one.
+	 * JS code, that should be executed, to fill the select element with values and select current one.
 	 *
 	 * @return string
 	 */
