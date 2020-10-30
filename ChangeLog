@@ -1809,6 +1809,10 @@ Changes for 4.0.27rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.26
