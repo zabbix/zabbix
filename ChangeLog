@@ -1,8 +1,22 @@
 Changes for 5.4.0alpha1
 
 New features:
+........S. [ZBXNEXT-6247] improved LLD rule processing after reconnecting to proxy (viktors)
+.........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18538] fixed API role.update rules validation (gcalenko)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts (Ivo)
+...G...... [ZBX-18505] fixed build failing to compile for Zabbix agent 2 on ARM/v7 and ARM/v6 (esneiders)
+.......PS. [ZBX-18546] fixed "Something impossible" bug in server and proxy when diaginfo is requested (Andris)
+.........T [ZBX-18380] changed trigger of the net.if.speed item in the Windows network module template (mchudinov)
+.........T [ZBX-18494] removed recovery mode NONE in trigger "Operating system description has changed" (mchudinov)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
+.........T [ZBX-18531] fixed template "Ceph by Zabbix Agent2" pool discovery (ychukina)
+.........T [ZBX-18476] changed Fan, Temperature, Voltage LLD rules in Template Net Arista (mchudinov)
+.........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.1rc1
