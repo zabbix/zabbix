@@ -3484,10 +3484,6 @@ ZABBIX.apps.map = (function($) {
 				this.domNode.toggle(false);
 				this.active = false;
 				$(':checkbox', this.domNode).prop('checked', false).prop("disabled", false);
-				$('select', this.domNode).each(function() {
-					var select = $(this);
-					select.val($('option:first', select).val());
-				});
 				$('textarea, input[type=text]', this.domNode).val('');
 				$('.input-color-picker input', this.domNode).change();
 				this.actionProcessor.process();
