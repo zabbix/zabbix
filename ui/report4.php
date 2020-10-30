@@ -115,18 +115,18 @@ else {
 		]);
 
 	if ($period != 'yearly') {
-		$cmb_year = (new CSelect('year'))
+		$year_select = (new CSelect('year'))
 			->setValue($year)
 			->setFocusableElementId('year');
 
 		for ($y = $minYear; $y <= date('Y'); $y++) {
-			$cmb_year->addOption(new CSelectOption($y, $y));
+			$year_select->addOption(new CSelectOption($y, $y));
 		}
 
 		$controls->addItem([
-			new CLabel(_('Year'), $cmb_year->getFocusableElementId()),
+			new CLabel(_('Year'), $year_select->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmb_year
+			$year_select
 		]);
 	}
 
