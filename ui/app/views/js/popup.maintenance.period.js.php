@@ -62,7 +62,7 @@ function submitMaintenancePeriod(overlay) {
 		elements;
 
 	$container.trimValues(['#start_date']);
-	elements = jQuery('input:visible,select:visible,input[type=hidden]', $container).serialize();
+	elements = jQuery('input:visible,input[type=hidden]', $container).serialize();
 
 	overlay.setLoading();
 	overlay.xhr = sendAjaxData('zabbix.php', {
