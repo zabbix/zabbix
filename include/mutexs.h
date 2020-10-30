@@ -47,6 +47,7 @@ typedef enum
 #ifdef HAVE_VMINFO_T_UPDATES
 	ZBX_MUTEX_KSTAT,
 #endif
+	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }
 zbx_mutex_name_t;
