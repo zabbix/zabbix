@@ -120,7 +120,7 @@ class CListBox extends CTag {
 	}
 
 	/**
-	 * Set with of the combo box.
+	 * Set with of the element.
 	 *
 	 * @param int $value  Width in pixels of the element.
 	 *
