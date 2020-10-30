@@ -147,13 +147,13 @@ switch ($data['type']) {
 		require_once dirname(__FILE__).'/../../include/actions.inc.php';
 
 		// Collect all operators options.
-		$combobox_options = [];
+		$operator_opts_by_cond = [];
 		$action_condition_options = [];
 		foreach ($data['allowed_conditions'] as $type) {
 			$action_condition_options[$type] = condition_type2str($type);
 
 			foreach (get_operators_by_conditiontype($type) as $value) {
-				$combobox_options[$type][$value] = condition_operator2str($value);
+				$operator_opts_by_cond[$type][$value] = condition_operator2str($value);
 			}
 		}
 
@@ -172,7 +172,7 @@ switch ($data['type']) {
 			// Trigger form elements.
 			case CONDITION_TYPE_TRIGGER:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_TRIGGER] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_TRIGGER] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -204,7 +204,7 @@ switch ($data['type']) {
 			// Trigger severity form elements.
 			case CONDITION_TYPE_TRIGGER_SEVERITY:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_TRIGGER_SEVERITY] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_TRIGGER_SEVERITY] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -218,7 +218,7 @@ switch ($data['type']) {
 			// Host form elements.
 			case CONDITION_TYPE_HOST:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_HOST] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_HOST] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -249,7 +249,7 @@ switch ($data['type']) {
 			// Host group form elements.
 			case CONDITION_TYPE_HOST_GROUP:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_HOST_GROUP] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_HOST_GROUP] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -280,7 +280,7 @@ switch ($data['type']) {
 			// Problem is suppressed form elements.
 			case CONDITION_TYPE_SUPPRESSED:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_NO))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_SUPPRESSED] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_SUPPRESSED] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -290,7 +290,7 @@ switch ($data['type']) {
 			// Tag form elements.
 			case CONDITION_TYPE_EVENT_TAG:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_EVENT_TAG] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_EVENT_TAG] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -305,7 +305,7 @@ switch ($data['type']) {
 			// Tag value form elements.
 			case CONDITION_TYPE_EVENT_TAG_VALUE:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_EVENT_TAG_VALUE] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_EVENT_TAG_VALUE] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 				$new_condition_value2 = (new CTextAreaFlexible('value2'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -323,7 +323,7 @@ switch ($data['type']) {
 			// Template form elements.
 			case CONDITION_TYPE_TEMPLATE:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_TEMPLATE] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_TEMPLATE] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -355,7 +355,7 @@ switch ($data['type']) {
 			// Time period form elements.
 			case CONDITION_TYPE_TIME_PERIOD:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_IN))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_TIME_PERIOD] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_TIME_PERIOD] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -370,7 +370,7 @@ switch ($data['type']) {
 			// Discovery host ip form elements.
 			case CONDITION_TYPE_DHOST_IP:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_DHOST_IP] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_DHOST_IP] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -385,7 +385,7 @@ switch ($data['type']) {
 			// Discovery check form elements.
 			case CONDITION_TYPE_DCHECK:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_DCHECK] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_DCHECK] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -420,7 +420,7 @@ switch ($data['type']) {
 				$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 					->setModern(true)
 					->addValue(
-						$combobox_options[CONDITION_TYPE_DOBJECT][CONDITION_OPERATOR_EQUAL],
+						$operator_opts_by_cond[CONDITION_TYPE_DOBJECT][CONDITION_OPERATOR_EQUAL],
 						CONDITION_OPERATOR_EQUAL
 					);
 				$new_condition_value = (new CRadioButtonList('value', EVENT_OBJECT_DHOST))
@@ -436,7 +436,7 @@ switch ($data['type']) {
 			// Discovery rule form elements.
 			case CONDITION_TYPE_DRULE:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_DRULE] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_DRULE] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -468,7 +468,7 @@ switch ($data['type']) {
 				$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 					->setModern(true)
 					->addValue(
-						$combobox_options[CONDITION_TYPE_DSTATUS][CONDITION_OPERATOR_EQUAL],
+						$operator_opts_by_cond[CONDITION_TYPE_DSTATUS][CONDITION_OPERATOR_EQUAL],
 						CONDITION_OPERATOR_EQUAL
 					);
 				$new_condition_value = (new CRadioButtonList('value', DOBJECT_STATUS_UP))
@@ -486,7 +486,7 @@ switch ($data['type']) {
 			// Proxy form elements.
 			case CONDITION_TYPE_PROXY:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_PROXY] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_PROXY] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -518,7 +518,7 @@ switch ($data['type']) {
 			// Application form elements.
 			case CONDITION_TYPE_APPLICATION:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[$condition_type] as $key => $value) {
+				foreach ($operator_opts_by_cond[$condition_type] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -540,7 +540,7 @@ switch ($data['type']) {
 					->addRow(new CLabel(_('Operator'), 'label-operator'), (new CSelect('operator'))
 						->setValue(CONDITION_OPERATOR_EQUAL)
 						->setFocusableElementId('label-operator')
-						->addOptions(CSelect::createOptionsFromArray($combobox_options[CONDITION_TYPE_DVALUE]))
+						->addOptions(CSelect::createOptionsFromArray($operator_opts_by_cond[CONDITION_TYPE_DVALUE]))
 					)
 					->addRow(_('Value'), $new_condition_value);
 				break;
@@ -548,7 +548,7 @@ switch ($data['type']) {
 			// Service port form elements.
 			case CONDITION_TYPE_DSERVICE_PORT:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_DSERVICE_PORT] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_DSERVICE_PORT] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -562,7 +562,7 @@ switch ($data['type']) {
 			// Service type form elements.
 			case CONDITION_TYPE_DSERVICE_TYPE:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_DSERVICE_TYPE] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_DSERVICE_TYPE] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 
@@ -580,7 +580,7 @@ switch ($data['type']) {
 			// Discovery uptime|downtime form elements.
 			case CONDITION_TYPE_DUPTIME:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_MORE_EQUAL))->setModern(true);
-				foreach ($combobox_options[CONDITION_TYPE_DUPTIME] as $key => $value) {
+				foreach ($operator_opts_by_cond[CONDITION_TYPE_DUPTIME] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 				$new_condition_value = (new CNumericBox('value', 600, 15))->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
@@ -597,7 +597,7 @@ switch ($data['type']) {
 			// Host metadata form elements.
 			case CONDITION_TYPE_HOST_METADATA:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_LIKE))->setModern(true);
-				foreach ($combobox_options[$condition_type] as $key => $value) {
+				foreach ($operator_opts_by_cond[$condition_type] as $key => $value) {
 					$operator->addValue($value, $key);
 				}
 				$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -613,7 +613,7 @@ switch ($data['type']) {
 			case CONDITION_TYPE_EVENT_TYPE:
 				$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 					->setModern(true)
-					->addValue($combobox_options[CONDITION_TYPE_EVENT_TYPE][CONDITION_OPERATOR_EQUAL],
+					->addValue($operator_opts_by_cond[CONDITION_TYPE_EVENT_TYPE][CONDITION_OPERATOR_EQUAL],
 						CONDITION_OPERATOR_EQUAL
 					);
 
@@ -630,10 +630,10 @@ switch ($data['type']) {
 	case ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION:
 		require_once dirname(__FILE__).'/../../include/actions.inc.php';
 
-		// Collect all options for combobox.
-		$combobox_options = [];
+		// Collect all options for select.
+		$condition_options = [];
 		foreach ($data['allowed_conditions'] as $type) {
-			$combobox_options[$type] = condition_type2str($type);
+			$condition_options[$type] = condition_type2str($type);
 		}
 
 		// Type select.
@@ -641,7 +641,7 @@ switch ($data['type']) {
 			->setFocusableElementId('label-condition-type')
 			->setValue($condition_type)
 			->setId('condition-type')
-			->addOptions(CSelect::createOptionsFromArray($combobox_options))
+			->addOptions(CSelect::createOptionsFromArray($condition_options))
 		);
 
 		$inline_js .= '$(() => $("#condition-type").on("change",'
