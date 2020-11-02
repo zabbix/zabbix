@@ -53,9 +53,12 @@ $form_grid->addItem([
 if ($data['readonly']) {
 	$form_grid->addItem([
 		(new CLabel(_('User type'), 'type')),
-		(new CFormField(
-			(new CTextBox('type', user_type2str()[$data['type']]))->setAttribute('readonly', true)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		(new CFormField([
+			(new CTextBox('type', user_type2str()[$data['type']]))
+				->setId('type_readonly')
+				->setAttribute('readonly', true),
+			new CVar('type', $data['type'])
+		]))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	]);
 }
 else {
