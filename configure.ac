@@ -99,28 +99,20 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #endif
 ])
 
-AC_DEFUN([AC_C_COMPILE_FLAGS],[
+AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
+checked_werror_cpp_CFLAGS=""
 saved_CFLAGS="$CFLAGS"
-current_test_CFLAGS="$CFLAGS"
-result_checked_CFLAGS=""
-for ac_flag in $1
-do
- AC_MSG_CHECKING(whether compiler supports $ac_flag)
- CFLAGS="$current_test_CFLAGS $ac_flag"
- AC_TRY_COMPILE(,[
+CFLAGS="$CFLAGS -Werror=cpp"
+AC_TRY_COMPILE(,[
   void f() {};
- ],[
-  result_checked_CFLAGS="$optional_CFLAGS $ac_flag"
-  current_test_CFLAGS="$CFLAGS"
-  AC_MSG_RESULT(yes)
- ],AC_MSG_RESULT(no))
-done
+],checked_werror_cpp_CFLAGS="-Werror=cpp"
+  AC_MSG_RESULT(yes),
+  AC_MSG_RESULT(no)
+)
 CFLAGS="$saved_CFLAGS"
-])
 
-AC_C_COMPILE_FLAGS("-Werror=cpp")
 saved_CFLAGS="$CFLAGS"
-CFLAGS="$result_checked_CFLAGS $CFLAGS"
+CFLAGS="$checked_werror_cpp_CFLAGS $CFLAGS"
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
