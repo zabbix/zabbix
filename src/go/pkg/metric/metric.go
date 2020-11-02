@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -75,7 +76,8 @@ func NewConnParam(name string) *Param {
 	return newParam(name, kindConn, optional, nil)
 }
 
-// WithSession transforms a connection typed parameter to a dual purpose parameter which can be either a connection parameter or session name.
+// WithSession transforms a connection typed parameter to a dual purpose parameter which can be either
+// a connection parameter or session name.
 // Returns a pointer.
 func (p *Param) WithSession() *Param {
 	if p.kind != kindConn {
@@ -90,7 +92,7 @@ func (p *Param) WithSession() *Param {
 // WithDefault sets the default value for a parameter.
 // It panics if a default value is specified for a required parameter.
 func (p *Param) WithDefault(value string) *Param {
-	if p.required == required {
+	if p.required {
 		panic("default value cannot be applied to a required parameter")
 	}
 
@@ -157,6 +159,7 @@ func New(description string, params []*Param, varParam bool) *Metric {
 			if i-connParamIdx > 1 {
 				panic("parameters describing a connection must be placed in a row")
 			}
+
 			connParamIdx = i
 		}
 
@@ -194,6 +197,7 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 	v := reflect.ValueOf(session)
 	for i := 0; i < v.NumField(); i++ {
 		var p *Param = nil
+
 		val := v.Field(i).String()
 
 		for j := range metricParams {

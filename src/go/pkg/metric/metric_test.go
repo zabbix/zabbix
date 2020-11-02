@@ -22,6 +22,7 @@ package metric
 import (
 	"reflect"
 	"testing"
+
 	"zabbix.com/pkg/conf"
 )
 
