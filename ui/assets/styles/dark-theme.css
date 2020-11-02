@@ -877,6 +877,9 @@ footer {
 z-select,
 .z-select {
   display: inline-block; }
+  z-select:focus,
+  .z-select:focus {
+    outline: none; }
   z-select button.focusable,
   .z-select button.focusable {
     position: relative;
