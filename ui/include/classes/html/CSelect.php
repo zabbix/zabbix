@@ -206,6 +206,12 @@ class CSelect extends CTag {
 		$this->setAttribute('name', $this->name);
 		$this->setAttribute('data-options', json_encode($this->toArray()));
 
+		/*
+		 * This attribute makes element "focusable", it match by jQuery(':focusable') queries and also browser would be
+		 * able to evaluate "autofocus" attribute correctly.
+		 */
+		$this->setAttribute('tabindex', '-1');
+
 		return parent::toString($destroy);
 	}
 }

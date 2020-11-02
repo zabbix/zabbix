@@ -572,6 +572,10 @@ class ZSelect extends HTMLElement {
 				document.activeElement !== this._button && this._button.focus();
 			},
 
+			focus: (e) => {
+				this._button.focus();
+			},
+
 			button_blur: () => {
 				if (this._button.readOnly) {
 					return;
@@ -636,6 +640,8 @@ class ZSelect extends HTMLElement {
 		this._list.addEventListener('mouseup', this._events.list_mouseup);
 		this._list.addEventListener('mousemove', this._events.list_mousemove);
 
+		this.addEventListener('focus', this._events.focus);
+
 		window.addEventListener('resize', this._events.window_resize);
 	}
 
@@ -650,6 +656,8 @@ class ZSelect extends HTMLElement {
 		this._list.removeEventListener('mousedown', this._events.list_mousedown);
 		this._list.removeEventListener('mouseup', this._events.list_mouseup);
 		this._list.removeEventListener('mousemove', this._events.list_mousemove);
+
+		this.removeEventListener('focus', this._events.focus);
 
 		window.removeEventListener('resize', this._events.window_resize);
 	}
