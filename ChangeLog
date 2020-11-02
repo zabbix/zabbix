@@ -239,6 +239,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.6rc1
 
 New features:
+.........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
 ........S. [ZBXNEXT-6247] improved LLD rule processing after reconnecting to proxy (viktors)
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
