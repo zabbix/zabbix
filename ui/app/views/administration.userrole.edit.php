@@ -55,9 +55,10 @@ if ($data['readonly'] || $data['is_own_role']) {
 		(new CLabel(_('User type'), 'type')),
 		(new CFormField([
 			(new CTextBox('type', user_type2str()[$data['type']]))->setAttribute('readonly', true),
-			(new CVar('type', $data['type'])),
+			new CVar('type', $data['type']),
+			' ',
 			$data['is_own_role']
-				? (new CDiv(_('User cannot change their user role type.')))->addClass(ZBX_STYLE_RED)
+				? new CSpan(_('User cannot change the user type of own role.'))
 				: null
 		]))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	]);
