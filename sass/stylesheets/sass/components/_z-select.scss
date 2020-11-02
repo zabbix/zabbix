@@ -2,6 +2,10 @@ z-select,
 .z-select {
 	display: inline-block;
 
+	&:focus {
+		outline: none;
+	}
+
 	button.focusable {
 		position: relative;
 		height: 24px;
