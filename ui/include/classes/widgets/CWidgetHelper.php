@@ -77,7 +77,11 @@ class CWidgetHelper {
 
 
 		if ($field_rf_rate !== null) {
-			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
+			$form_list
+				->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate))
+				->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
+					->setOnDocumentReady()
+				);
 		}
 
 		return $form_list;
