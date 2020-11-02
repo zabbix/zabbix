@@ -131,10 +131,10 @@ zabbix_export:
                               throw 'Get request returned error ' + error + '. Check debug log for more information.';
                           }
                           Zabbix.log(4, '[ Asterisk ] Received response with status code ' +
-                              Ami.api_request.status() + '\n' + response);
+                              Ami.api_request.getStatus() + '\n' + response);
                   
-                          if (Ami.api_request.status() !== 200) {
-                              var message = 'Request failed with status code ' + Ami.api_request.status();
+                          if (Ami.api_request.getStatus() !== 200) {
+                              var message = 'Request failed with status code ' + Ami.api_request.getStatus();
                               if (response !== null) {
                                   if (typeof response.message === 'string') {
                                       message += ': ' + response.message;
@@ -157,7 +157,7 @@ zabbix_export:
                           }
                   
                           return {
-                              status: Ami.api_request.status(),
+                              status: Ami.api_request.getStatus(),
                               body: response
                           };
                       }

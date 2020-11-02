@@ -133,7 +133,7 @@ zabbix_export:
                 }
         
                 Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Received response with status code ' +
-                    request.status() + '\n' + response);
+                    request.getStatus() + '\n' + response);
         
                 if (response !== null) {
                     try {
@@ -145,8 +145,8 @@ zabbix_export:
                     }
                 }
         
-                if (request.status() < 200 || request.status() >= 300) {
-                    var message = 'Request failed with status code ' + request.status();
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     if (response !== null) {
                         if (typeof response.errors === 'object' && Object.keys(response.errors).length > 0) {
@@ -164,7 +164,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.status(),
+                    status: request.getStatus(),
                     response: response
                 };
             }

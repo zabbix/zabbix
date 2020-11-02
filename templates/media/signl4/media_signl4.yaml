@@ -114,11 +114,11 @@ zabbix_export:
             response = request.post(endpoint, 'payload=' + payload);
         
             Zabbix.log(4, '[ SIGNL4 Webhook ] Received response with status code ' +
-                    request.status() + '\n' + response
+                    request.getStatus() + '\n' + response
             );
         
-            if (request.status() !== 201) {
-                throw 'Request failed with status code ' + request.status() +
+            if (request.getStatus() !== 201) {
+                throw 'Request failed with status code ' + request.getStatus() +
                         '. Check debug log for more information.';
             }
         

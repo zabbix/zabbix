@@ -179,7 +179,7 @@ zabbix_export:
                 throw 'incorrect response. PagerDuty returned a non-JSON object.';
             }
         
-            if (req.status() != 202) {
+            if (req.getStatus() != 202) {
                 if (typeof resp === 'object' && typeof resp.errors === 'object' && typeof resp.errors[0] === 'string') {
                     throw resp.errors[0];
                 }

@@ -139,7 +139,7 @@ zabbix_export:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.log(4, '[ SolarWinds SD Webhook ] Received response with status code ' + request.status() +
+                Zabbix.log(4, '[ SolarWinds SD Webhook ] Received response with status code ' + request.getStatus() +
                     '\n' + response);
         
                 if (response !== null) {
@@ -152,8 +152,8 @@ zabbix_export:
                     }
                 }
         
-                if (request.status() < 200 || request.status() >= 300) {
-                    var message = 'Request failed with status code ' + request.status();
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     if (response !== null && typeof response.error !== 'undefined'
                         && Object.keys(response.error).length > 0) {
@@ -171,7 +171,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.status(),
+                    status: request.getStatus(),
                     response: response
                 };
             },

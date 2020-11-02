@@ -158,7 +158,7 @@ zabbix_export:
             request.addHeader('Content-Type: application/json');
             response = request.post(params.endpoint, data);
         
-            Zabbix.log(4, '[ Pushover Webhook ] Received response with status code ' + request.status() + '\n' + response);
+            Zabbix.log(4, '[ Pushover Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
         
             if (response !== null) {
                 try {
@@ -170,7 +170,7 @@ zabbix_export:
                 }
             }
         
-            if (request.status() != 200 || response === null || typeof response !== 'object' || response.status !== 1) {
+            if (request.getStatus() != 200 || response === null || typeof response !== 'object' || response.status !== 1) {
                 if (response !== null && typeof response === 'object' && typeof response.errors === 'object'
                         && typeof response.errors[0] === 'string') {
                     throw response.errors[0];

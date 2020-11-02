@@ -174,12 +174,12 @@ zabbix_export:
                 throw 'incorrect response. iLert returned a non-JSON object.';
             }
         
-            if (req.status() == 200) {
+            if (req.getStatus() == 200) {
                 result.tags.__ilert_incident_url = incidentViewURL;
                 return JSON.stringify(result);
             }
         
-            if (req.status() == 400 && typeof resp === 'object' && typeof resp.code === 'string') {
+            if (req.getStatus() == 400 && typeof resp === 'object' && typeof resp.code === 'string') {
                 if (resp.code === 'NO_OPEN_INCIDENT_WITH_KEY') {
                   return JSON.stringify(result);
                 }

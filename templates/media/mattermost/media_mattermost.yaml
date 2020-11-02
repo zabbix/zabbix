@@ -162,7 +162,7 @@ zabbix_export:
             )
             );
         
-            if (req.status() != 200) {
+            if (req.getStatus() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -192,7 +192,7 @@ zabbix_export:
                 JSON.stringify(resp)
             ));
         
-            if (req.status() != 201) {
+            if (req.getStatus() != 201) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -218,7 +218,7 @@ zabbix_export:
                 JSON.stringify(resp)
             ));
         
-            if (req.status() != 200) {
+            if (req.getStatus() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -242,7 +242,7 @@ zabbix_export:
                 JSON.stringify(resp)
             ));
         
-            if (req.status() != 200) {
+            if (req.getStatus() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -266,7 +266,7 @@ zabbix_export:
                 JSON.stringify(resp)
             ));
         
-            if (req.status() != 200) {
+            if (req.getStatus() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -290,7 +290,7 @@ zabbix_export:
                 JSON.stringify(resp)
             ));
         
-            if (req.status() != 200) {
+            if (req.getStatus() != 200) {
                 throw '[{0}] {1}'.format(resp.status_code, resp.message);
             }
         
@@ -356,7 +356,7 @@ zabbix_export:
                 )
                 );
         
-                if (req.status() != 201) {
+                if (req.getStatus() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -389,7 +389,7 @@ zabbix_export:
                 )
                 );
         
-                if (req.status() != 201) {
+                if (req.getStatus() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -414,7 +414,7 @@ zabbix_export:
                 )
                 );
         
-                if (req.status() != 200) {
+                if (req.getStatus() != 200) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
             }
@@ -443,7 +443,7 @@ zabbix_export:
         
                 var resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
         
-                if (req.status() != 201) {
+                if (req.getStatus() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -468,7 +468,7 @@ zabbix_export:
         
                 resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
         
-                if (req.status() != 201) {
+                if (req.getStatus() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
         
@@ -485,7 +485,7 @@ zabbix_export:
         
                 resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
         
-                if (req.status() != 201) {
+                if (req.getStatus() != 201) {
                     throw '[{0}] {1}'.format(resp.status_code, resp.message);
                 }
             }

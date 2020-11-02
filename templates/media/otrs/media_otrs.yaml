@@ -145,10 +145,10 @@ zabbix_export:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.log(4, '[ OTRS Webhook ] Received response with status code ' + request.status() + ': ' + response);
+                Zabbix.log(4, '[ OTRS Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
         
-                if (request.status() < 200 || request.status() >= 300) {
-                    var message = 'Request failed with status code ' + request.status();
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     message += ': ' + response;
                     throw message + ' Check debug log for more information.';
@@ -171,7 +171,7 @@ zabbix_export:
         
         
                 return {
-                    status: request.status(),
+                    status: request.getStatus(),
                     response: response
                 };
             },

@@ -217,7 +217,7 @@ zabbix_export:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.log(4, '[ Jira Webhook ] Received response with status code ' + request.status() + '\n' + response);
+                Zabbix.log(4, '[ Jira Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
         
                 if (response !== null) {
                     try {
@@ -229,8 +229,8 @@ zabbix_export:
                     }
                 }
         
-                if (request.status() < 200 || request.status() >= 300) {
-                    var message = 'Request failed with status code ' + request.status();
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     if (response !== null && typeof response.errors !== 'undefined'
                         && Object.keys(response.errors).length > 0) {
@@ -245,7 +245,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.status(),
+                    status: request.getStatus(),
                     response: response
                 };
             },

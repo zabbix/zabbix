@@ -56,7 +56,7 @@ zabbix_export:
                 Zabbix.log(4, '[Telegram Webhook] URL: ' + url.replace(Telegram.token, '<TOKEN>'));
                 Zabbix.log(4, '[Telegram Webhook] params: ' + data);
                 response = request.post(url, data);
-                Zabbix.log(4, '[Telegram Webhook] HTTP code: ' + request.status());
+                Zabbix.log(4, '[Telegram Webhook] HTTP code: ' + request.getStatus());
         
                 try {
                     response = JSON.parse(response);
@@ -65,7 +65,7 @@ zabbix_export:
                     response = null;
                 }
         
-                if (request.status() !== 200 || typeof response.ok !== 'boolean' || response.ok !== true) {
+                if (request.getStatus() !== 200 || typeof response.ok !== 'boolean' || response.ok !== true) {
                     if (typeof response.description === 'string') {
                         throw response.description;
                     }
