@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-29T13:17:39Z</date>
+   <date>2020-11-02T09:08:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -92,7 +92,7 @@ Template tooling version used: 0.38</description>
                      <value_type>CHAR</value_type>
                      <username>{$TOMCAT.USER}</username>
                      <password>{$TOMCAT.PASSWORD}</password>
-                     <description>Bytes received rate by processor {#JMXNAME}</description>
+                     <description>Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Tomcat: ProtocolHandler {#JMXVALUE}</name>
@@ -210,7 +210,7 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#JMXNAME}: Request processing time</name>
+                     <name>{#JMXNAME}: Requests processing time</name>
                      <type>JMX</type>
                      <key>jmx[{#JMXOBJ},processingTime]</key>
                      <history>7d</history>
@@ -315,7 +315,7 @@ Template tooling version used: 0.38</description>
                      <description>Active sessions of the application.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Tomcat: Contexts on {#JMXHOST}</name>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -330,7 +330,7 @@ Template tooling version used: 0.38</description>
                      <description>Maximum number of active sessions so far.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Tomcat: Contexts on {#JMXHOST}</name>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -346,7 +346,7 @@ Template tooling version used: 0.38</description>
                      <description>The maximum number of active Sessions allowed, or -1 for no limit.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Tomcat: Contexts on {#JMXHOST}</name>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -361,7 +361,7 @@ Template tooling version used: 0.38</description>
                      <description>Rate of sessions we rejected due to maxActive being reached.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Tomcat: Contexts on {#JMXHOST}</name>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -382,7 +382,7 @@ Template tooling version used: 0.38</description>
                      <description>Rate of sessions created by this application per second.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Tomcat: Contexts on {#JMXHOST}</name>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>

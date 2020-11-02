@@ -61,8 +61,8 @@ There are no template links in this template.
 |Tomcat |{#JMXNAME}: Bytes sent per second |<p>Bytes sent rate by processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},bytesSent]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Tomcat |{#JMXNAME}: Errors per second |<p>Error rate of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},errorCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Tomcat |{#JMXNAME}: Requests per second |<p>Rate of requests served by request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},requestCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Tomcat |{#JMXNAME}: Request processing time |<p>The total time to process all incoming requests of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},processingTime]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
-|Tomcat |{#JMXVALUE}: Gzip compression status |<p>Bytes received rate by processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},compression]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Tomcat |{#JMXNAME}: Requests processing time |<p>The total time to process all incoming requests of request processor {#JMXNAME}</p> |JMX |jmx[{#JMXOBJ},processingTime]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.001`</p> |
+|Tomcat |{#JMXVALUE}: Gzip compression status |<p>Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.</p> |JMX |jmx[{#JMXOBJ},compression]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Tomcat |{#JMXNAME}: Threads count |<p>Amount of threads the thread pool has right now, both busy and free.</p> |JMX |jmx[{#JMXOBJ},currentThreadCount]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Tomcat |{#JMXNAME}: Threads limit |<p>Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.</p> |JMX |jmx[{#JMXOBJ},maxThreads]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Tomcat |{#JMXNAME}: Threads busy |<p>Number of the requests that are being currently handled.</p> |JMX |jmx[{#JMXOBJ},currentThreadsBusy] |
