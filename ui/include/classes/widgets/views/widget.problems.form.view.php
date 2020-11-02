@@ -121,6 +121,19 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper
 
 $form->addItem($form_list);
 
+$sort_with_enabled_show_timeline = [
+	SCREEN_SORT_TRIGGERS_TIME_DESC => true,
+	SCREEN_SORT_TRIGGERS_TIME_ASC => true
+];
+
+$scripts[] = '$("#sort_triggers").on("change", (e) => {'.
+		'var sort_with_enabled_show_timeline = '.json_encode($sort_with_enabled_show_timeline).';'.
+		'$("#show_timeline")'.
+			'.filter(":disabled").prop("checked", true).end()'.
+			'.prop("disabled", !sort_with_enabled_show_timeline[e.target.value])'.
+			'.filter(":disabled").prop("checked", false);'.
+	'});';
+
 return [
 	'form' => $form,
 	'scripts' => $scripts,

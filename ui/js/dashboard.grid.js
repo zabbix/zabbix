@@ -4395,34 +4395,4 @@
 			$.error('Invalid method "' +  method + '".');
 		}
 	}
-
-	$(() => {
-		const SVG_GRAPH_AXIS_UNITS_STATIC = 1;
-		const SCREEN_SORT_TRIGGERS_TIME_DESC = 4;
-		const SCREEN_SORT_TRIGGERS_TIME_ASC = 3;
-		const sort_with_enabled_show_timeline = {
-			[SCREEN_SORT_TRIGGERS_TIME_DESC]: true,
-			[SCREEN_SORT_TRIGGERS_TIME_ASC]: true
-		};
-
-		const $body = $(document.body);
-
-		$body.on('change', '.overlay-dialogue-body z-select#type', updateWidgetConfigDialogue);
-		$body.on('change', '.overlay-dialogue-body z-select#lefty_units', (e) => {
-			$("#lefty_static_units").prop('disabled', e.target.value != SVG_GRAPH_AXIS_UNITS_STATIC);
-		});
-		$body.on('change', '.overlay-dialogue-body z-select#righty_units', (e) => {
-			$("#righty_static_units").prop('disabled', e.target.value != SVG_GRAPH_AXIS_UNITS_STATIC);
-		});
-		$body.on('change', '.overlay-dialogue-body z-select#time_type', updateWidgetConfigDialogue);
-		$body.on('change', '.overlay-dialogue-body z-select[id$="aggregate_function"]', (e) => {
-			changeDataSetAggregateFunction(e.target);
-		});
-		$body.on('change', '.overlay-dialogue-body z-select#sort_triggers', (e) => {
-			$('#show_timeline')
-				.filter(':disabled').prop('checked', true).end()
-				.prop('disabled', !sort_with_enabled_show_timeline[e.target.value])
-				.filter(':disabled').prop('checked', false);
-		});
-	});
 }(jQuery));

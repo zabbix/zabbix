@@ -70,7 +70,10 @@ class CWidgetHelper {
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
-			->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
+			->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate))
+			->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
+				->setOnDocumentReady()
+			);
 	}
 
 	/**
@@ -1364,6 +1367,9 @@ class CWidgetHelper {
 				'update: function() {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 				'}'.
+			'});'.
+			'$("z-select[id$=\"aggregate_function\"]").on("change", (e) => {'.
+				'changeDataSetAggregateFunction(e.target);'.
 			'});'
 		];
 

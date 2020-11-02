@@ -44,6 +44,8 @@ if (array_key_exists('itemid', $fields)) {
 	$scripts[] = $field_itemid->getPostJS();
 }
 
+$scripts[] = '$("#time_type").on("change", updateWidgetConfigDialogue);';
+
 $form->addItem($form_list);
 
 return [
