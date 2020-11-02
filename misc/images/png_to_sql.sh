@@ -40,7 +40,7 @@ for imagefile in $pngdir/*.png; do
 	rm -rf tmp_b64
 
 	# ----- MySQL
-	echo "INSERT INTO 'images' ('imageid','imagetype','name','image') VALUES ($imagesdone,1,'$imagename',0x$image_data);" >> "$imagefile_mysql"
+	echo "INSERT INTO \`images\` (\`imageid\`,\`imagetype\`,\`name\`,\`image\`) VALUES ($imagesdone,1,'$imagename',0x$image_data);" >> "$imagefile_mysql"
 	# ----- PostgreSQL
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$image_data','hex'));" >> "$imagefile_pgsql"
 	# ----- Oracle
