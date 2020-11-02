@@ -22,10 +22,12 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 Changes for 5.2.1rc1
 
 New features:
+.........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
 ........S. [ZBXNEXT-6247] improved LLD rule processing after reconnecting to proxy (viktors)
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+...G...... [ZBX-18591] fixed active Zabbix Agent v2 5.0 doesn't work with Server v5.2.0 (akozlovs)
 ...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
 A......... [ZBX-18538] fixed API role.update rules validation (gcalenko)
 A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
