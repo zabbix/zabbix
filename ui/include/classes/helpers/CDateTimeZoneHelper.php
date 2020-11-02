@@ -98,7 +98,7 @@ class CDateTimeZoneHelper {
 
 		return array_key_exists($system_timezone, $timezones_list)
 			? $label.': '.$timezones_list[$system_timezone]['formatted']
-			: $label;
+			: $label.' (UTC)';
 	}
 
 	/**
