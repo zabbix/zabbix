@@ -1643,7 +1643,7 @@
 			return;
 		}
 
-		if (rf_rate === undefined) {
+		if (typeof rf_rate === 'undefined') {
 			rf_rate = widget['rf_rate'];
 		}
 
