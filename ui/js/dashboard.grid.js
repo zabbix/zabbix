@@ -1644,7 +1644,7 @@
 		}
 
 		if (typeof rf_rate === 'undefined') {
-			rf_rate = widget['rf_rate'];
+			rf_rate = parseInt(widget['rf_rate']);
 		}
 
 		if (rf_rate) {
