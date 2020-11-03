@@ -25,12 +25,7 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
-func (p *Plugin) exportVmMemorySize(params []string) (result interface{}, err error) {
-	var mode string
-	if len(params) > 0 {
-		mode = params[0]
-	}
-
+func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error) {
 	if mode == "cached" {
 		pinfo, err := win32.GetPerformanceInfo()
 		if err != nil {
