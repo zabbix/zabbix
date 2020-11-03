@@ -1643,11 +1643,11 @@
 			return;
 		}
 
-		if (typeof rf_rate === 'undefined') {
-			rf_rate = parseInt(widget['rf_rate']);
+		if (rf_rate === undefined) {
+			rf_rate = widget['rf_rate'];
 		}
 
-		if (rf_rate) {
+		if (rf_rate > 0) {
 			widget['rf_timeoutid'] = setTimeout(function() {
 				// Do not update widget if displaying static hintbox.
 				var active = widget['content_body'].find('[data-expanded="true"]');
