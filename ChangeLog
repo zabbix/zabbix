@@ -6,6 +6,7 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-18601] fixed dashboard widget to be updated continuously when 'No refresh' interval is specified (miks)
 ...G...... [ZBX-18591] fixed active Zabbix Agent v2 5.0 doesn't work with Server v5.2.0 (akozlovs)
 ...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
 A......... [ZBX-18538] fixed API role.update rules validation (gcalenko)
