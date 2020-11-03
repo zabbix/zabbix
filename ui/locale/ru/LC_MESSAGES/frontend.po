@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-30 20:04+0200\n"
-"PO-Revision-Date: 2020-10-29 15:36+0300\n"
+"PO-Revision-Date: 2020-11-02 22:22+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1603978608.000000\n"
+"X-POOTLE-MTIME: 1604348543.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -7519,7 +7519,7 @@ msgstr "Значение аппаратного сенсора. Возвраща
 
 #: include/classes/setup/CSetupWizard.php:323
 msgid "HashiCorp Vault"
-msgstr ""
+msgstr "HashiCorp Vault"
 
 #: app/views/popup.httpstep.php:133 app/views/popup.httpstep.php:161
 #: include/views/configuration.host.discovery.edit.php:298
