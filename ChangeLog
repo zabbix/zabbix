@@ -22,6 +22,12 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 .........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
 
 --------------------------------------------------------------------------------
+Changes for 5.2.1rc2
+
+Bug fixes:
+..F....... [ZBX-18601] fixed dashboard widget to be updated continuously when 'No refresh' interval is specified (miks)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.1rc1
 
 New features:
