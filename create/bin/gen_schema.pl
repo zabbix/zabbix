@@ -622,8 +622,8 @@ BEGIN
 		RAISE EXCEPTION 'PostgreSQL version could not be determined, aborting';
 	END IF;
 
-	SELECT substring(current_postgres_version_full, '^(\d+).') INTO current_postgres_version_major;
-	SELECT substring(current_postgres_version_full, '^\d+.(\d+)') INTO current_postgres_version_minor;
+	SELECT substring(current_postgres_version_full, '^(\\d+).') INTO current_postgres_version_major;
+	SELECT substring(current_postgres_version_full, '^\\d+.(\\d+)') INTO current_postgres_version_minor;
 
 	IF (current_postgres_version_major < minimum_postgres_version_major  OR
 			(current_postgres_version_major = minimum_postgres_version_major AND
@@ -651,8 +651,8 @@ BEGIN
 		RAISE WARNING 'TimescaleDB extension is already installed';
 	END IF;
 
-	SELECT substring(current_timescaledb_version_full, '^(\d+).') INTO current_timescaledb_version_major;
-	SELECT substring(current_timescaledb_version_full, '^\d+.(\d+)') INTO current_timescaledb_version_minor;
+	SELECT substring(current_timescaledb_version_full, '^(\\d+).') INTO current_timescaledb_version_major;
+	SELECT substring(current_timescaledb_version_full, '^\\d+.(\\d+)') INTO current_timescaledb_version_minor;
 
 	IF (current_timescaledb_version_major < minimum_timescaledb_version_major  OR
 			(current_timescaledb_version_major = minimum_timescaledb_version_major AND
