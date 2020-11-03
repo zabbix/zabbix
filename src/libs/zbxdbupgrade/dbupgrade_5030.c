@@ -29,10 +29,10 @@
 
 extern unsigned char	program_type;
 
-/*static int	DBpatch_5030000(void)
+static int	DBpatch_5030000(void)
 {
-	*** put the first upgrade patch here ***
-}*/
+	return DBdrop_field("config", "compression_availability");
+}
 
 #endif
 
@@ -40,6 +40,6 @@ DBPATCH_START(5030)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(5030000, 0, 1)*/
+DBPATCH_ADD(5030000, 0, 1)
 
 DBPATCH_END()

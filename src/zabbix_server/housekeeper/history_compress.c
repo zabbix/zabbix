@@ -314,6 +314,5 @@ void	hk_history_compression_update(zbx_config_db_t *cfg)
 
 	compression_status_cache = cfg->history_compression_status;
 	compress_older_cache = cfg->history_compress_older;
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

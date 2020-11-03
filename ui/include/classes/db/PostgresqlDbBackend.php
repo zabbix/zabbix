@@ -266,9 +266,8 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public static function isCompressed(array $tables): bool {
-		// Compression is available for TimescaleDB 1.5 and greater.
-		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) != ZBX_DB_EXTENSION_TIMESCALEDB
-				|| CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_AVAILABILITY) != 1) {
+		// Compression must be available TimescaleDB.
+		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) != ZBX_DB_EXTENSION_TIMESCALEDB) {
 			return false;
 		}
 

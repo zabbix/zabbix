@@ -862,10 +862,7 @@ void	DBcheck_capabilities(void)
 
 #define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
 #define MIN_TIMESCALEDB_VERSION			10500
-	int	compression_available = OFF;
-
-	int		timescaledb_major, timescaledb_minor, timescaledb_patch, timescaledb_version_full;
-	int	postgresql_version;
+	int		postgresql_version, timescaledb_major, timescaledb_minor, timescaledb_patch, timescaledb_version_full;
 	DB_RESULT	result;
 	DB_ROW		row;
 
