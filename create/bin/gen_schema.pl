@@ -594,7 +594,81 @@ sub process_row
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
-sub timescaledb
+sub timescaledb_create_extension
+{
+	print<<EOF
+DO \$\$
+DECLARE
+        minimum_postgres_version_major          INTEGER;
+        minimum_postgres_version_minor          INTEGER;
+        current_postgres_version_major          INTEGER;
+        current_postgres_version_minor          INTEGER;
+        current_postgres_version_full           VARCHAR;
+
+        minimum_timescaledb_version_major       INTEGER;
+        minimum_timescaledb_version_minor       INTEGER;
+        current_timescaledb_version_major       INTEGER;
+        current_timescaledb_version_minor       INTEGER;
+        current_timescaledb_version_full        VARCHAR;
+BEGIN
+        SELECT 10 INTO minimum_postgres_version_major;
+        SELECT 2 INTO minimum_postgres_version_minor;
+        SELECT 1 INTO minimum_timescaledb_version_major;
+        SELECT 5 INTO minimum_timescaledb_version_minor;
+
+        SHOW server_version INTO current_postgres_version_full;
+
+        IF NOT found THEN
+                RAISE EXCEPTION 'PostgreSQL version could not be determined, aborting';
+        END IF;
+
+        SELECT substring(current_postgres_version_full, '^(\d+).') INTO current_postgres_version_major;
+        SELECT substring(current_postgres_version_full, '^\d+.(\d+)') INTO current_postgres_version_minor;
+
+        IF (current_postgres_version_major < minimum_postgres_version_major  OR
+                        (current_postgres_version_major = minimum_postgres_version_major AND
+                        current_postgres_version_minor < minimum_postgres_version_minor)) THEN
+                        RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
+                                        current_postgres_version_full, minimum_postgres_version_major,
+                                        minimum_postgres_version_minor;
+        ELSE
+                        RAISE NOTICE 'PostgreSQL version % is valid.', current_postgres_version_full;
+        END IF;
+
+        SELECT extversion INTO current_timescaledb_version_full FROM pg_extension WHERE extname = 'timescaledb';
+
+        IF NOT found THEN
+                CREATE EXTENSION IF NOT EXISTS timescaledb $ENV{ZBX_TIMESCALEDB_SCHEMA} CASCADE;
+                RAISE NOTICE 'TimescaleDB extension does not exist, installing...';
+                SELECT extversion INTO current_timescaledb_version_full FROM pg_extension WHERE extname = 'timescaledb';
+
+                IF NOT found THEN
+                        RAISE EXCEPTION 'TimescaleDB extension could not be installed';
+                END IF;
+
+                RAISE NOTICE 'TimescaleDB extension was installed';
+        ELSE
+                RAISE WARNING 'TimescaleDB extension is already installed';
+        END IF;
+
+        SELECT substring(current_timescaledb_version_full, '^(\d+).') INTO current_timescaledb_version_major;
+        SELECT substring(current_timescaledb_version_full, '^\d+.(\d+)') INTO current_timescaledb_version_minor;
+	
+        IF (current_timescaledb_version_major < minimum_timescaledb_version_major  OR
+                        (current_timescaledb_version_major = minimum_timescaledb_version_major AND
+                        current_timescaledb_version_minor < minimum_timescaledb_version_minor)) THEN
+                        RAISE EXCEPTION 'TimescaleDB version % is UNSUPPORTED! Minimum is %.%.0 !', current_timescaledb_version_full,
+                                        minimum_timescaledb_version_major, minimum_timescaledb_version_minor;
+        ELSE
+                        RAISE NOTICE 'TimescaleDB version % is valid.', current_timescaledb_version_full;
+        END IF;
+END \$\$;
+EOF
+	;
+	exit;
+}
+
+sub timescaledb_configure
 {
 	for ("history", "history_uint", "history_log", "history_text", "history_str")
 	{
@@ -684,13 +758,14 @@ sub main
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
 
-	if ($format eq 'c')			{ %output = %c; }
-	elsif ($format eq 'mysql')		{ %output = %mysql; }
-	elsif ($format eq 'oracle')		{ %output = %oracle; }
-	elsif ($format eq 'postgresql')		{ %output = %postgresql; }
-	elsif ($format eq 'sqlite3')		{ %output = %sqlite3; }
-	elsif ($format eq 'timescaledb')	{ timescaledb(); }
-	else					{ usage(); }
+	if ($format eq 'c')					{ %output = %c; }
+	elsif ($format eq 'mysql')				{ %output = %mysql; }
+	elsif ($format eq 'oracle')				{ %output = %oracle; }
+	elsif ($format eq 'postgresql')				{ %output = %postgresql; }
+	elsif ($format eq 'sqlite3')				{ %output = %sqlite3; }
+	elsif ($format eq 'timescaledb_create_extension')	{ timescaledb_create_extension(); }
+	elsif ($format eq 'timescaledb_configure')		{ timescaledb_configure(); }
+	else							{ usage(); }
 
 	process();
 

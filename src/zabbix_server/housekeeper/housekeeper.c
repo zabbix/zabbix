@@ -560,7 +560,7 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  ******************************************************************************/
 static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
-	int		keep_from, history_seconds;
+	int		history_seconds;
 	DB_RESULT	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
@@ -569,28 +569,33 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 
 	if (0 == history_seconds)
 	{
-		keep_from = now + SEC_PER_YEAR;
+		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s delete all", __func__, rule->table);
+
+		result = DBselect("SELECT drop_chunks(newer_than => 0 , table_name => '%s')", rule->table);
 	}
 	else
 	{
+		int	keep_from;
+
 		if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
-			return;
+			goto out;
 		}
 
 		keep_from = now - history_seconds;
+	
+		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
+
+		result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
-
-	result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
 
 	if (NULL == result)
 		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
 	else
 		DBfree_result(result);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return;

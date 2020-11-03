@@ -868,16 +868,21 @@ void	DBcheck_capabilities(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	if (FAIL == DBfield_exists("db_extension", "config"))
+		goto out;
+
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
 	if (NULL == (row = DBfetch(result)))
 		goto clean;
 
-	if (0 != zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+	if (0 != zbx_strcmp_null(row[0], ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 		goto clean;
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER GREATE, timescale->%s<-", row[0]);
 
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
 	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > (postgresql_version = zbx_dbms_get_version()))

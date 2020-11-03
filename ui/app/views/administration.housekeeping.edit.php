@@ -163,7 +163,7 @@ $house_keeper_tab = (new CFormList())
 			->addRow(
 				new CLabel(_('Enable compression'), 'compression_status'),
 				(new CCheckBox('compression_status'))
-					->setChecked($data['compression_status'] == 1))
+					->setChecked($data['compression_status'] == 1)
 			)
 			->addRow(
 				(new CLabel(_('Compress records older than'), 'compress_older'))
