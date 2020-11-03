@@ -42,7 +42,7 @@ if (!hasRequest('form_refresh')) {
 }
 
 $frmHost = (new CForm())
-	->setId('hostPrototypeForm')
+	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
@@ -72,43 +72,58 @@ $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid'
 	->setAttribute('maxlength', 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
+$interface_header = renderInterfaceHeaders();
+
+$agent_interfaces = (new CDiv())
+	->setId('agentInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'agent');
+
+$snmp_interfaces = (new CDiv())
+	->setId('SNMPInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
+	->setAttribute('data-type', 'snmp');
+
+$jmx_interfaces = (new CDiv())
+	->setId('JMXInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'jmx');
+
+$ipmi_interfaces = (new CDiv())
+	->setId('IPMIInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'ipmi');
+
+$hostList->addRow(new CLabel(_('Interfaces')),
+	[
+		(new CRadioButtonList('custom_interfaces', (int) $hostPrototype['custom_interfaces']))
+			->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
+			->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
+			->setModern(true)
+			->setReadonly($hostPrototype['templateid'] != 0),
+		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
+			->setId('interfaces-table'),
+		new CDiv(
+			(new CButton('interface-add', _('Add')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->setMenuPopup([
+					'type' => 'submenu',
+					'data' => [
+						'submenu' => getAddNewInterfaceSubmenu()
+					]
+				])
+				->setAttribute('aria-label', _('Add new interface'))
+				->addStyle(($hostPrototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM)
+					? null
+					: 'display: none'
+				)
+				->setEnabled($hostPrototype['templateid'] == 0)
+		)
+	]
+);
+
 // Display inherited parameters only for hosts prototypes on hosts.
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
-	$existingInterfaceTypes = [];
-	foreach ($parentHost['interfaces'] as $interface) {
-		$existingInterfaceTypes[$interface['type']] = true;
-	}
-
-	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode(array_values($parentHost['interfaces'])).');');
-	zbx_add_post_js('hostInterfaceManager.render();');
-	zbx_add_post_js('HostInterfaceManager.disableEdit();');
-
-	$interface_header = renderInterfaceHeaders();
-
-	$agent_interfaces = (new CDiv())
-		->setId('agentInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'agent');
-
-	$snmp_interfaces = (new CDiv())
-		->setId('SNMPInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
-		->setAttribute('data-type', 'snmp');
-
-	$jmx_interfaces = (new CDiv())
-		->setId('JMXInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'jmx');
-
-	$ipmi_interfaces = (new CDiv())
-		->setId('IPMIInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'ipmi');
-
-	$hostList->addRow(new CLabel(_('Interfaces')),
-		[new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces])]
-	);
-
 	// proxy
 	$proxyTb = (new CTextBox('proxy_hostid',
 		$parentHost['proxy_hostid'] != 0 ? $this->data['proxy']['host'] : _('(no proxy)'), true
@@ -178,20 +193,22 @@ $buttonRow = (new CRow())
 $customGroupTable->addRow($buttonRow);
 $groupList->addRow(_('Group prototypes'), (new CDiv($customGroupTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
-$divTabs->addTab('groupTab', _('Groups'), $groupList);
+$divTabs->addTab('groupTab', _('Groups'), $groupList, TAB_INDICATOR_GROUPS);
 
 // templates
 $tmplList = new CFormList();
 
 if ($hostPrototype['templateid']) {
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-		if (array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				'templates.php?form=update&templateid='.$template['templateid']
 			))->setTarget('_blank');
@@ -213,13 +230,15 @@ else {
 	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-		if (array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				'templates.php?form=update&templateid='.$template['templateid']
 			))->setTarget('_blank');
@@ -273,7 +292,7 @@ else {
 		);
 }
 
-$divTabs->addTab('templateTab', _('Templates'), $tmplList);
+$divTabs->addTab('templateTab', _('Templates'), $tmplList, TAB_INDICATOR_LINKED_TEMPLATE);
 
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -298,6 +317,14 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 }
 
+// tags
+$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+		'source' => 'host_prototype',
+		'tags' => $data['tags'],
+		'readonly' => $data['readonly']
+	]), TAB_INDICATOR_TAGS
+);
+
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 $divTabs->addTab('macroTab', _('Macros'),
@@ -311,7 +338,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 			'macros' => $data['macros'],
 			'parent_hostid' => $data['parent_host']['hostid'],
 			'readonly' => $data['readonly']
-		]), 'macros_container')
+		]), 'macros_container'),
+	TAB_INDICATOR_MACROS
 );
 
 $inventoryFormList = (new CFormList('inventorylist'))
@@ -324,7 +352,7 @@ $inventoryFormList = (new CFormList('inventorylist'))
 			->setModern(true)
 	);
 
-$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList, TAB_INDICATOR_INVENTORY);
 
 // Encryption form list.
 $encryption_form_list = (new CFormList('encryption'))
@@ -373,7 +401,7 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setAttribute('disabled', 'disabled')
 	);
 
-$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_INDICATOR_ENCRYPTION);
 
 /*
  * footer

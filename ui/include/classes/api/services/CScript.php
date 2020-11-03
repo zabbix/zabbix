@@ -24,6 +24,15 @@
  */
 class CScript extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getscriptsbyhosts' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'execute' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EXECUTE_SCRIPTS]
+	];
+
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['scriptid', 'name'];
@@ -187,7 +196,7 @@ class CScript extends CApiService {
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
-		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($db_script = DBfetch($result)) {
 			if ($options['countOutput']) {
@@ -632,7 +641,10 @@ class CScript extends CApiService {
 		}
 
 		// execute script
-		$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SCRIPT_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+		$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
 		$result = $zabbix_server->executeScript($data['scriptid'], $data['hostid'], self::$userData['sessionid']);
 
 		if ($result !== false) {

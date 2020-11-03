@@ -28,8 +28,8 @@ $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'
 	->display();
 
 $buttons = [
-	(new CButton('back', _('Go to dashboard')))
-		->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"'
+	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+		->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"'
 )];
 
 echo '<body lang="'.CWebUser::getLang().'">';

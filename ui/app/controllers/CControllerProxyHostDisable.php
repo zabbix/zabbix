@@ -36,7 +36,7 @@ class CControllerProxyHostDisable extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)) {
 			return false;
 		}
 
@@ -74,10 +74,10 @@ class CControllerProxyHostDisable extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Host disabled', 'Hosts disabled', $updated));
+			CMessageHelper::setSuccessTitle(_n('Host disabled', 'Hosts disabled', $updated));
 		}
 		else {
-			$response->setMessageError(_n('Cannot disable host', 'Cannot disable hosts', $updated));
+			CMessageHelper::setErrorTitle(_n('Cannot disable host', 'Cannot disable hosts', $updated));
 		}
 		$this->setResponse($response);
 	}

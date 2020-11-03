@@ -40,12 +40,10 @@ class CControllerValuemapList extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {
-		$config = select_config();
-
 		$sortfield = getRequest('sort', CProfile::get('web.valuemap.list.sort', 'name'));
 		$sortorder = getRequest('sortorder', CProfile::get('web.valuemap.list.sortorder', ZBX_SORT_UP));
 
@@ -58,11 +56,12 @@ class CControllerValuemapList extends CController {
 			'uncheck' => $this->hasInput('uncheck')
 		];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['valuemaps'] = API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
 			'selectMappings' => ['value', 'newvalue'],
 			'sortfield' => $sortfield,
-			'limit' => $config['search_limit'] + 1
+			'limit' => $limit
 		]);
 
 		// data sort and pager

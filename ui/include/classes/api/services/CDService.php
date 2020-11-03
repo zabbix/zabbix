@@ -24,6 +24,10 @@
  */
 class CDService extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'dservices';
 	protected $tableAlias = 'ds';
 	protected $sortColumns = ['dserviceid', 'dhostid', 'ip'];
@@ -160,7 +164,7 @@ class CDService extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dservice = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

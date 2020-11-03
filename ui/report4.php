@@ -85,45 +85,50 @@ else {
 		$minYear = date('Y');
 	}
 
-	$controls = new CList();
+	$select_media_type = (new CSelect('media_type'))
+		->setValue($media_type)
+		->setFocusableElementId('media-type')
+		->onChange('$(this).closest("form").submit()')
+		->addOption(new CSelectOption(0, _('all')))
+		->addOptions(CSelect::createOptionsFromArray($media_types));
 
-	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
-	$cmbMedia->addItem(0, _('all'));
+	$select_period = (new CSelect('period'))
+		->setValue($period)
+		->setFocusableElementId('period')
+		->onChange('$(this).closest("form").submit()')
+		->addOptions(CSelect::createOptionsFromArray([
+			'daily' => _('Daily'),
+			'weekly' => _('Weekly'),
+			'monthly' => _('Monthly'),
+			'yearly' => _('Yearly')
+		]));
 
-	foreach ($media_types as $media_type_id => $name) {
-		$cmbMedia->addItem($media_type_id, $name);
-
-		// we won't need other media types in the future, if only one was selected
-		if ($media_type > 0 && $media_type != $media_type_id) {
-			unset($media_types[$media_type_id]);
-		}
-	}
-	$controls
+	$controls = (new CList())
 		->addItem([
-			new CLabel(_('Media type'), 'media_type'),
+			new CLabel(_('Media type'), $select_media_type->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmbMedia
+			$select_media_type
 		])
 		->addItem([
-			new CLabel(_('Period'), 'period'),
+			new CLabel(_('Period'), $select_period->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			new CComboBox('period', $period, 'submit()', [
-				'daily' => _('Daily'),
-				'weekly' => _('Weekly'),
-				'monthly' => _('Monthly'),
-				'yearly' => _('Yearly')
-			])
+			$select_period
 		]);
 
 	if ($period != 'yearly') {
-		$cmbYear = new CComboBox('year', $year, 'submit();');
+		$cmb_year = (new CSelect('year'))
+			->setValue($year)
+			->setFocusableElementId('year')
+			->onChange('$(this).closest("form").submit()');
+
 		for ($y = $minYear; $y <= date('Y'); $y++) {
-			$cmbYear->addItem($y, $y);
+			$cmb_year->addOption(new CSelectOption($y, $y));
 		}
+
 		$controls->addItem([
-			new CLabel(_('Year'), 'year'),
+			new CLabel(_('Year'), $cmb_year->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmbYear
+			$cmb_year
 		]);
 	}
 
@@ -150,6 +155,7 @@ else {
 	}
 
 	$intervals = [];
+
 	switch ($period) {
 		case 'yearly':
 			$minTime = mktime(0, 0, 0, 1, 1, $minYear);
@@ -225,6 +231,11 @@ else {
 	CArrayHelper::sort($alerts, ['clock']);
 
 	$table->setHeader($header);
+
+	if ($media_type > 0) {
+		$media_types = [$media_type => $media_types[$media_type]];
+	}
+
 	foreach ($intervals as $from => $till) {
 		// interval start
 		$row = [zbx_date2str($dateFormat, $from)];
@@ -279,9 +290,10 @@ else {
 	$widget->addItem($table);
 
 	if ($media_type == 0) {
+		$allowed_ui_media_types = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 		$links = [];
 		foreach ($media_types as $id => $name) {
-			$links[] = (CWebUser::getType() < USER_TYPE_SUPER_ADMIN)
+			$links[] = !$allowed_ui_media_types
 				? $name
 				: new CLink($name, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
 			$links[] = SPACE.'/'.SPACE;

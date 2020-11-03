@@ -38,7 +38,7 @@ class API {
 	/**
 	 * Sets the API wrapper.
 	 *
-	 * @param CApiWrapper $wrapper
+	 * @param CApiWrapper|null $wrapper
 	 */
 	public static function setWrapper(CApiWrapper $wrapper = null) {
 		self::$wrapper = $wrapper;
@@ -56,7 +56,7 @@ class API {
 	/**
 	 * Returns the API wrapper.
 	 *
-	 * @return CApiWrapper
+	 * @return CApiWrapper|null
 	 */
 	public static function getWrapper() {
 		return self::$wrapper;
@@ -127,6 +127,13 @@ class API {
 	 */
 	public static function AuditLog() {
 		return self::getApi('auditlog');
+	}
+
+	/**
+	 * @return CAuthentication
+	 */
+	public static function Authentication() {
+		return self::getApi('authentication');
 	}
 
 	/**
@@ -256,6 +263,13 @@ class API {
 	}
 
 	/**
+	 * @return CHousekeeping
+	 */
+	public static function Housekeeping() {
+		return self::getApi('housekeeping');
+	}
+
+	/**
 	 * @return CImage
 	 */
 	public static function Image() {
@@ -326,10 +340,10 @@ class API {
 	}
 
 	/**
-	 * @return CService
+	 * @return CRole
 	 */
-	public static function Service() {
-		return self::getApi('service');
+	public static function Role() {
+		return self::getApi('role');
 	}
 
 	/**
@@ -354,6 +368,20 @@ class API {
 	}
 
 	/**
+	 * @return CService
+	 */
+	public static function Service() {
+		return self::getApi('service');
+	}
+
+	/**
+	 * @return CSettings
+	 */
+	public static function Settings() {
+		return self::getApi('settings');
+	}
+
+	/**
 	 * @return CTask
 	 */
 	public static function Task() {
@@ -368,17 +396,10 @@ class API {
 	}
 
 	/**
-	 * @return CTemplateScreen
+	 * @return CTemplateDashboard
 	 */
-	public static function TemplateScreen() {
-		return self::getApi('templatescreen');
-	}
-
-	/**
-	 * @return CTemplateScreenItem
-	 */
-	public static function TemplateScreenItem() {
-		return self::getApi('templatescreenitem');
+	public static function TemplateDashboard() {
+		return self::getApi('templatedashboard');
 	}
 
 	/**

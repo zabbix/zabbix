@@ -20,6 +20,7 @@
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxhttp.h"
 #include "zbxembed.h"
 #include "httprequest.h"
 #include "embed.h"
@@ -27,30 +28,50 @@
 
 #ifdef HAVE_LIBCURL
 
+extern char	*CONFIG_SOURCE_IP;
+
 typedef struct
 {
 	CURL			*handle;
 	struct curl_slist	*headers;
 	char			*data;
+	char			*headers_in;
 	size_t			data_alloc;
 	size_t			data_offset;
+	size_t			headers_in_alloc;
+	size_t			headers_in_offset;
 	unsigned char		custom_header;
 }
 zbx_es_httprequest_t;
 
+/* ZBX_CURL_SETOPT() macro is a code snippet to make code shorter and facilitate resource deallocation */
+/* in case of error. Be careful with using ZBX_CURL_SETOPT(), duk_push_error_object() and duk_error()  */
+/* in functions - it is easy to get memory leaks because duk_error() causes longjmp().                 */
+/* Note that the caller of ZBX_CURL_SETOPT() must define variable 'int err_index' and label 'out'.     */
 #define ZBX_CURL_SETOPT(ctx, handle, opt, value, err)							\
 	if (CURLE_OK != (err = curl_easy_setopt(handle, opt, value)))					\
 	{												\
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot set cURL option " #opt ": %s.",	\
-				curl_easy_strerror(err));						\
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,					\
+				"cannot set cURL option " #opt ": %s.", curl_easy_strerror(err));	\
+		goto out;										\
 	}
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	size_t				r_size = size * nmemb;
+	size_t			r_size = size * nmemb;
 	zbx_es_httprequest_t	*request = (zbx_es_httprequest_t *)userdata;
 
 	zbx_strncpy_alloc(&request->data, &request->data_alloc, &request->data_offset, (const char *)ptr, r_size);
+
+	return r_size;
+}
+
+static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	size_t			r_size = size * nmemb;
+	zbx_es_httprequest_t	*request = (zbx_es_httprequest_t *)userdata;
+
+	zbx_strncpy_alloc(&request->headers_in, &request->headers_in_alloc, &request->headers_in_offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -94,6 +115,7 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 		if (NULL != request->handle)
 			curl_easy_cleanup(request->handle);
 		zbx_free(request->data);
+		zbx_free(request->headers_in);
 		zbx_free(request);
 
 		duk_push_pointer(ctx, NULL);
@@ -115,13 +137,16 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
 	zbx_es_env_t		*env;
+	int			err_index = -1;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
 
 	duk_push_global_stash(ctx);
+
 	if (1 != duk_get_prop_string(ctx, -1, "\xff""\xff""zbx_env"))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
 	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
 	duk_pop(ctx);
 
@@ -131,7 +156,10 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	memset(request, 0, sizeof(zbx_es_httprequest_t));
 
 	if (NULL == (request->handle = curl_easy_init()))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot initialize cURL library");
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot initialize cURL library");
+		goto out;
+	}
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_COOKIEFILE, "", err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_FOLLOWLOCATION, 1L, err);
@@ -141,12 +169,24 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYPEER, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT, (long)env->timeout, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP, err);
 
 	duk_push_pointer(ctx, request);
 	duk_put_prop_string(ctx, -2, "\xff""\xff""d");
 
 	duk_push_c_function(ctx, es_httprequest_dtor, 1);
 	duk_set_finalizer(ctx, -2);
+out:
+	if (-1 != err_index)
+	{
+		if (NULL != request->handle)
+			curl_easy_cleanup(request->handle);
+		zbx_free(request);
+
+		return duk_throw(ctx);
+	}
 
 	return 0;
 }
@@ -163,17 +203,25 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
 	char			*utf8 = NULL;
+	int			err_index = -1;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &utf8))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert header to utf8");
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert header to utf8");
+		goto out;
+	}
 
 	request->headers = curl_slist_append(request->headers, utf8);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	request->custom_header = 1;
+out:
 	zbx_free(utf8);
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
 
 	return 0;
 }
@@ -190,7 +238,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	curl_slist_free_all(request->headers);
 	request->headers = NULL;
@@ -214,11 +262,11 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	zbx_es_httprequest_t	*request;
 	char			*url = NULL, *contents = NULL;
 	CURLcode		err;
-	duk_ret_t		ret;
+	int			err_index = -1;
 
 	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
 	{
-		ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert URL to utf8");
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert URL to utf8");
 		goto out;
 	}
 
@@ -226,14 +274,15 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	{
 		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &contents))
 		{
-			ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert request contents to utf8");
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
+					"cannot convert request contents to utf8");
 			goto out;
 		}
 	}
 
 	if (NULL == (request = es_httprequest(ctx)))
 	{
-		ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 		goto out;
 	}
 
@@ -263,20 +312,24 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
 
 	request->data_offset = 0;
+	request->headers_in_offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(request->handle)))
 	{
-		ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot get URL: %s.", curl_easy_strerror(err));
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot get URL: %s.",
+				curl_easy_strerror(err));
 		goto out;
 	}
 
 	duk_push_string(ctx, request->data);
-	ret = 1;
 out:
 	zbx_free(url);
 	zbx_free(contents);
 
-	return ret;
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	return 1;
 }
 
 /******************************************************************************
@@ -338,11 +391,15 @@ static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
+	int			err_index = -1;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_to_string(ctx, 0), err);
+out:
+	if (-1 != err_index)
+		return duk_throw(ctx);
 
 	return 1;
 }
@@ -361,12 +418,70 @@ static duk_ret_t	es_httprequest_status(duk_context *ctx)
 	CURLcode		err;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	if (CURLE_OK != (err = curl_easy_getinfo(request->handle, CURLINFO_RESPONSE_CODE, &response_code)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain request status: %s", curl_easy_strerror(err));
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot obtain request status: %s", curl_easy_strerror(err));
 
 	duk_push_number(ctx, (duk_double_t)response_code);
+
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_obj_put_http_header                                           *
+ *                                                                            *
+ * Purpose: puts http header <field>: <value> as object property/value        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the duktape context                              *
+ *             idx    - [IN] the object index on duktape stack                *
+ *             header - [IN] the http header to parse and put                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	es_put_header(duk_context *ctx, int idx, char *header)
+{
+	char	*value;
+
+	if (NULL == (value = strchr(header, ':')))
+		return;
+
+	*value++ = '\0';
+	while (' ' == *value || '\t' == *value)
+		value++;
+
+	duk_push_string(ctx, value);
+
+	/* duk_put_prop_string() throws error on failure, no need to check return code */
+	(void)duk_put_prop_string(ctx, idx, header);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_get_headers                                       *
+ *                                                                            *
+ * Purpose: CurlHttpRequest.GetHeaders method                                 *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
+{
+	zbx_es_httprequest_t	*request;
+	duk_idx_t		idx;
+	char			*ptr, *header;
+
+	if (NULL == (request = es_httprequest(ctx)))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+
+	idx = duk_push_object(ctx);
+
+	if (0 == request->headers_in_offset)
+		return 1;
+
+	for (ptr = request->headers_in; NULL != (header = zbx_http_parse_header(&ptr)); )
+	{
+		es_put_header(ctx, idx, header);
+		zbx_free(header);
+	}
 
 	return 1;
 }
@@ -380,6 +495,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"Delete", es_httprequest_delete, 2},
 	{"Status", es_httprequest_status, 0},
 	{"SetProxy", es_httprequest_set_proxy, 1},
+	{"GetHeaders", es_httprequest_get_headers, 0},
 	{NULL, NULL, 0}
 };
 
@@ -388,9 +504,9 @@ static const duk_function_list_entry	httprequest_methods[] = {
 static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
 	if (!duk_is_constructor_call(ctx))
-		return DUK_RET_TYPE_ERROR;
+		return DUK_RET_EVAL_ERROR;
 
-	return duk_error(ctx, DUK_RET_TYPE_ERROR, "missing cURL library");
+	return duk_error(ctx, DUK_RET_EVAL_ERROR, "missing cURL library");
 }
 
 static const duk_function_list_entry	httprequest_methods[] = {

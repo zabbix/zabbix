@@ -29,6 +29,63 @@ extern char	*CONFIG_SSL_CA_LOCATION;
 extern char	*CONFIG_SSL_CERT_LOCATION;
 extern char	*CONFIG_SSL_KEY_LOCATION;
 
+size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	size_t			r_size = size * nmemb;
+	zbx_http_response_t	*response;
+
+	response = (zbx_http_response_t*)userdata;
+	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
+
+	return r_size;
+}
+
+size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	ZBX_UNUSED(ptr);
+	ZBX_UNUSED(userdata);
+
+	return size * nmemb;
+}
+
+int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header,
+		zbx_http_response_t *body, void *header_cb, void *body_cb, char *errbuf, char **error)
+{
+	CURLcode	err;
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, header_cb)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set header function: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERDATA, header)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set header callback: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, body_cb)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set write function: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, body)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set write callback: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set error buffer: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		char **error)
@@ -157,6 +214,9 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 				curlauth = CURLAUTH_GSSNEGOTIATE;
 #endif
 				break;
+			case HTTPTEST_AUTH_DIGEST:
+				curlauth = CURLAUTH_DIGEST;
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
@@ -181,7 +241,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 	return SUCCEED;
 }
 
-char	*zbx_http_get_header(char **headers)
+char	*zbx_http_parse_header(char **headers)
 {
 	while ('\0' != **headers)
 	{
@@ -214,6 +274,97 @@ char	*zbx_http_get_header(char **headers)
 	}
 
 	return NULL;
+}
+
+int	zbx_http_get(const char *url, const char *header, long timeout, char **out, long *response_code, char **error)
+{
+	CURL			*easyhandle;
+	CURLcode		err;
+	char			errbuf[CURL_ERROR_SIZE];
+	int			ret = FAIL;
+	struct curl_slist	*headers_slist = NULL;
+	zbx_http_response_t	body = {0}, response_header = {0};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() URL '%s'", __func__, url);
+
+	if (NULL == (easyhandle = curl_easy_init()))
+	{
+		*error = zbx_strdup(NULL, "Cannot initialize cURL library");
+		goto clean;
+	}
+
+	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &response_header, &body, zbx_curl_ignore_cb,
+			zbx_curl_write_cb, errbuf, error))
+	{
+		goto clean;
+	}
+
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, "", "", "", 1, 1, error))
+		goto clean;
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot set user agent: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, "")))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot set proxy: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, timeout)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot specify timeout: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
+			(headers_slist = curl_slist_append(headers_slist, header)))))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
+	*errbuf = '\0';
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot perform request: %s", '\0' == *errbuf ? curl_easy_strerror(err) :
+				errbuf);
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, response_code)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot get the response code: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (NULL != body.data)
+	{
+		*out = body.data;
+		body.data = NULL;
+	}
+
+	else
+		*out = zbx_strdup(NULL, "");
+
+	ret = SUCCEED;
+clean:
+	curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
+	curl_easy_cleanup(easyhandle);
+	zbx_free(body.data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 #endif

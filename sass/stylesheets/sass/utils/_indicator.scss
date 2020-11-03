@@ -1,0 +1,20 @@
+[data-indicator="count"][data-indicator-value]:not([data-indicator-value="0"]) {
+	&::after {
+		content: attr(data-indicator-value);
+		margin-left: .4em;
+		color: $indicator-count-color;
+		font-size: $font-h3-size;
+	}
+}
+
+[data-indicator="mark"][data-indicator-value]:not([data-indicator-value="0"]) {
+	&::after {
+		content: '';
+		display: inline-block;
+		margin-left: .4em;
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: $indicator-mark-color;
+	}
+}

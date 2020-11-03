@@ -23,6 +23,9 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
+		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -32,23 +35,24 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'surname' =>		'db users.surname',
 			'password1' =>		'required|string',
 			'password2' =>		'required|string',
-			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>	'required|array_id|not_empty',
-			'user_medias' =>	'array',
+			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
+			'timezone' =>		'db users.timezone|in '.implode(',', $timezones),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout|not_empty',
 			'url' =>			'db users.url',
 			'refresh' =>		'required|db users.refresh|not_empty',
 			'rows_per_page' =>	'required|db users.rows_per_page',
+			'roleid' =>			'required|db users.roleid',
 			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword()) {
+		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
 			$error = self::VALIDATION_ERROR;
 			$ret = false;
 		}
@@ -58,7 +62,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot add user'));
+					CMessageHelper::setErrorTitle(_('Cannot add user'));
 					$this->setResponse($response);
 					break;
 
@@ -72,14 +76,14 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS);
 	}
 
 	protected function doAction() {
 		$user = [];
 
 		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
-			'rows_per_page', 'lang', 'type'
+			'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups'), 'usrgrpid');
 
@@ -87,10 +91,10 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['user_medias'] = [];
+		$user['medias'] = [];
 
-		foreach ($this->getInput('user_medias', []) as $media) {
-			$user['user_medias'][] = [
+		foreach ($this->getInput('medias', []) as $media) {
+			$user['medias'][] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'sendto' => $media['sendto'],
 				'active' => $media['active'],
@@ -107,14 +111,14 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				->setArgument('page', CPagerHelper::loadPage('user.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('User added'));
+			CMessageHelper::setSuccessTitle(_('User added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'user.edit')
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot add user'));
+			CMessageHelper::setErrorTitle(_('Cannot add user'));
 		}
 		$this->setResponse($response);
 	}

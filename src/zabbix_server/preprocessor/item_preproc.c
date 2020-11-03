@@ -183,6 +183,20 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_validate_notsupport                                 *
+ *                                                                            *
+ * Purpose: executes during notsupported item preprocessing                   *
+ *                                                                            *
+ * Return value: FAIL - for further error handling                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_validate_notsupport(void)
+{
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: item_preproc_multiplier                                          *
  *                                                                            *
  * Purpose: execute custom multiplier preprocessing operation                 *
@@ -2182,6 +2196,9 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			break;
 		case ZBX_PREPROC_STR_REPLACE:
 			ret = item_preproc_str_replace(value, op->params, error);
+			break;
+		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+			ret = item_preproc_validate_notsupport();
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");

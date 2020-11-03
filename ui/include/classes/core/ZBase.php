@@ -59,6 +59,13 @@ class ZBase {
 	private $component_registry;
 
 	/**
+	 * Application mode.
+	 *
+	 * @var string
+	 */
+	private $mode;
+
+	/**
 	 * @var CModuleManager
 	 */
 	private $module_manager;
@@ -121,14 +128,13 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
-		require_once 'include/menu.inc.php';
 		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
 		require_once 'include/validate.inc.php';
-		require_once 'include/profiles.inc.php';
 		require_once 'include/locales.inc.php';
 		require_once 'include/db.inc.php';
+		require_once 'vendor/autoload.php';
 
 		// page specific includes
 		require_once 'include/actions.inc.php';
@@ -156,9 +162,11 @@ class ZBase {
 	 *
 	 * @param string $mode  Application initialization mode.
 	 *
-	 * @throws DBException
+	 * @throws Exception
 	 */
 	public function run($mode) {
+		$this->mode = $mode;
+
 		$this->init();
 
 		$this->setMaintenanceMode();
@@ -170,8 +178,13 @@ class ZBase {
 			case self::EXEC_MODE_DEFAULT:
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
 				$this->authenticateUser();
-				$this->initLocales(CWebUser::$data);
+
+				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
+					$this->initLocales(CWebUser::$data['lang']);
+				}
+
 				$this->initMessages();
 				$this->setLayoutModeByUrl();
 				$this->initComponents();
@@ -192,13 +205,12 @@ class ZBase {
 				CProfiler::getInstance()->start();
 
 				$this->processRequest($router);
-
 				break;
 
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->initLocales(['lang' => 'en_gb']);
+				$this->initLocales('en_gb');
 				break;
 
 			case self::EXEC_MODE_SETUP:
@@ -207,11 +219,42 @@ class ZBase {
 					$this->loadConfigFile();
 					$this->initDB();
 					$this->authenticateUser();
-					$this->initLocales(CWebUser::$data);
+					$this->initLocales(CWebUser::$data['lang']);
+					$this->initComponents();
 				}
-				catch (ConfigFileException $e) {}
+				catch (ConfigFileException $e) {
+					if ($e->getCode() == CConfigFile::CONFIG_VAULT_ERROR) {
+						echo (new CView('general.warning', [
+							'header' => _('Vault connection failed.'),
+							'messages' => [$e->getMessage()],
+							'theme' => ZBX_DEFAULT_THEME
+						]))->getOutput();
+
+						session_write_close();
+						exit;
+					}
+					else {
+						$session = new CCookieSession();
+						$sessionid = $session->extractSessionId() ?: CEncryptHelper::generateKey();
+
+						if (!$session->session_start($sessionid)) {
+							throw new Exception(_('Session initialization error.'));
+						}
+
+						CSessionHelper::set('sessionid', $sessionid);
+					}
+				}
 				break;
 		}
+	}
+
+	/**
+	 * Returns the application mode.
+	 *
+	 * @return string
+	 */
+	public static function getMode(): string {
+		return self::getInstance()->mode;
 	}
 
 	/**
@@ -360,6 +403,8 @@ class ZBase {
 	protected function initDB() {
 		$error = null;
 		if (!DBconnect($error)) {
+			CDataCacheHelper::clearValues(['db_username', 'db_password']);
+
 			throw new DBException($error);
 		}
 	}
@@ -367,19 +412,18 @@ class ZBase {
 	/**
 	 * Initialize translations.
 	 *
-	 * @param array  $user_data          Array of user data.
-	 * @param string $user_data['lang']  Language.
+	 * @param string $lang  Language.
 	 */
-	protected function initLocales(array $user_data) {
+	public function initLocales(string $lang): void {
 		init_mbstrings();
 
-		$defaultLocales = [
+		$default_locales = [
 			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
 		];
 
 		if (function_exists('bindtextdomain')) {
 			// initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants($user_data['lang']);
+			$locales = zbx_locale_variants($lang);
 			$locale_found = false;
 			foreach ($locales as $locale) {
 				// since LC_MESSAGES may be unavailable on some systems, try to set all of the locales
@@ -395,8 +439,9 @@ class ZBase {
 				}
 			}
 
-			if (!$locale_found && $user_data['lang'] != 'en_GB' && $user_data['lang'] != 'en_gb') {
-				error('Locale for language "'.$user_data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
+			if (!$locale_found && $lang !== 'en_GB' && $lang !== 'en_gb') {
+				setlocale(LC_ALL, $default_locales);
+				error('Locale for language "'.$lang.'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
@@ -404,7 +449,7 @@ class ZBase {
 		}
 
 		// reset the LC_NUMERIC locale so that PHP would always use a point instead of a comma for decimal numbers
-		setlocale(LC_NUMERIC, $defaultLocales);
+		setlocale(LC_NUMERIC, $default_locales);
 
 		// should be after locale initialization
 		require_once 'include/translateDefines.inc.php';
@@ -414,28 +459,38 @@ class ZBase {
 	 * Set messages received in cookies.
 	 */
 	private function initMessages(): void {
-		foreach (['messageOk', 'messageError'] as $message_type) {
-			if (array_key_exists($message_type, $_COOKIE)) {
-				CSession::setValue($message_type, $_COOKIE[$message_type]);
-				zbx_setcookie($message_type, null, 1);
-			}
+		if (CCookieHelper::has('system-message-ok')) {
+			CMessageHelper::setSuccessTitle(CCookieHelper::get('system-message-ok'));
+			CCookieHelper::unset('system-message-ok');
+		}
+		if (CCookieHelper::has('system-message-error')) {
+			CMessageHelper::setErrorTitle(CCookieHelper::get('system-message-error'));
+			CCookieHelper::unset('system-message-error');
 		}
 	}
 
 	/**
 	 * Authenticate user.
+	 *
+	 * @throws Exception
 	 */
-	protected function authenticateUser() {
-		$sessionid = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
+	protected function authenticateUser(): void {
+		$session = new CEncryptedCookieSession();
 
-		if (!$sessionid) {
+		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
 			CWebUser::setDefault();
 		}
 
-		// set the authentication token for the API
-		API::getWrapper()->auth = $sessionid;
+		if (!$session->session_start(CWebUser::$data['sessionid'])) {
+			throw new Exception(_('Session initialization error.'));
+		}
 
-		// enable debug mode in the API
+		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+
+		// Set the authentication token for the API.
+		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
 	}
 
@@ -444,7 +499,7 @@ class ZBase {
 	 *
 	 * @param CRouter $router  CRouter class instance.
 	 */
-	private function processRequest(CRouter $router) {
+	private function processRequest(CRouter $router): void {
 		$action_name = $router->getAction();
 		$action_class = $router->getController();
 
@@ -495,52 +550,37 @@ class ZBase {
 				'theme' => ZBX_DEFAULT_THEME
 			]))->getOutput();
 
-			exit;
+			session_write_close();
+			exit();
 		}
 	}
 
-	private function processResponseFinal(CRouter $router, CAction $action) {
+	private function processResponseFinal(CRouter $router, CAction $action): void {
 		$response = $action->getResponse();
 
 		// Controller returned redirect to another page?
 		if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
-			if ($response->getMessageOk() !== null) {
-				CSession::setValue('messageOk', $response->getMessageOk());
-			}
-			if ($response->getMessageError() !== null) {
-				CSession::setValue('messageError', $response->getMessageError());
-			}
-			global $ZBX_MESSAGES;
-			if (isset($ZBX_MESSAGES)) {
-				CSession::setValue('messages', $ZBX_MESSAGES);
-			}
-			if ($response->getFormData() !== null) {
-				CSession::setValue('formData', $response->getFormData());
-			}
 
-			redirect($response->getLocation());
+			filter_messages();
+
+			$response->redirect();
 		}
 		// Controller returned fatal error?
 		elseif ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
 
-			global $ZBX_MESSAGES;
-			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
-			foreach ($messages as $message) {
-				$response->addMessage($message['message']);
-			}
+			filter_messages();
 
-			$response->addMessage('Controller: '.$router->getAction());
+			CMessageHelper::addError('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
 				if ($key !== 'sid') {
-					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
+					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
-			CSession::setValue('messages', $response->getMessages());
 
-			redirect('zabbix.php?action=system.warning');
+			$response->redirect();
 		}
 		// Action has layout?
 		if ($router->getLayout() !== null) {
@@ -560,7 +600,11 @@ class ZBase {
 				'javascript' => [
 					'files' => []
 				],
-				'web_layout_mode' => ZBX_LAYOUT_NORMAL
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
+				'config' => [
+					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
+					'x_frame_options' => CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS)
+				]
 			];
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
@@ -581,7 +625,8 @@ class ZBase {
 			echo (new CView($router->getLayout(), $layout_data))->getOutput();
 		}
 
-		exit;
+		session_write_close();
+		exit();
 	}
 
 	/**
@@ -601,18 +646,18 @@ class ZBase {
 	 */
 	private function initComponents() {
 		$this->component_registry->register('router', new CRouter());
-		$this->component_registry->register('menu.main', getMainMenu());
-		$this->component_registry->register('menu.user', getUserMenu());
+		$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
+		$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
 	}
 
 	/**
-	 * Initialize module manager and load all enabled modules.
+	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
 	private function initModuleManager() {
 		$this->module_manager = new CModuleManager($this->rootDir.'/modules');
 
 		$db_modules = API::getApiService('module')->get([
-			'output' => ['id', 'relative_path', 'config'],
+			'output' => ['moduleid', 'id', 'relative_path', 'config'],
 			'filter' => ['status' => MODULE_STATUS_ENABLED],
 			'sortfield' => 'relative_path'
 		], false);
@@ -620,6 +665,10 @@ class ZBase {
 		$modules_missing = [];
 
 		foreach ($db_modules as $db_module) {
+			if (!CWebUser::checkAccess(CRoleHelper::MODULES_MODULE.$db_module['moduleid'])) {
+				continue;
+			}
+
 			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['id'],
 				$db_module['config']
 			);

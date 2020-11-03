@@ -30,6 +30,7 @@ class CTabView extends CDiv {
 	protected $headers = [];
 	protected $footer = null;
 	protected $selectedTab = null;
+	protected $indicators = [];
 
 	/**
 	 * Script for tab change event.
@@ -60,7 +61,7 @@ class CTabView extends CDiv {
 
 	public function setSelected($selected) {
 		if ($selected == 0) {
-			zbx_unsetcookie('tab');
+			CCookieHelper::unset('tab');
 		}
 
 		$this->selectedTab = $selected;
@@ -91,10 +92,14 @@ class CTabView extends CDiv {
 		return $this;
 	}
 
-	public function addTab($id, $header, $body) {
+	public function addTab($id, $header, $body, $indicator_type = false) {
 		$this->headers[$id] = $header;
 		$this->tabs[$id] = new CDiv($body);
 		$this->tabs[$id]->setId(zbx_formatDomId($id));
+
+		if ($indicator_type) {
+			$this->indicators[$id] = $indicator_type;
+		}
 		return $this;
 	}
 
@@ -110,7 +115,7 @@ class CTabView extends CDiv {
 			$this->addItem($tab);
 		}
 		else {
-			$visible_tab = (int) get_cookie('tab', (int) $this->selectedTab);
+			$visible_tab = CCookieHelper::has('tab') ? (int) CCookieHelper::get('tab') : (int) $this->selectedTab;
 			foreach (array_values($this->tabs) as $index => $tab) {
 				if ($visible_tab == $index) {
 					$tab->setAttribute('aria-hidden', 'false');
@@ -128,6 +133,11 @@ class CTabView extends CDiv {
 			foreach ($this->headers as $id => $header) {
 				$tabLink = (new CLink($header, '#'.$id))
 					->setId('tab_'.$id);
+
+				if (array_key_exists($id, $this->indicators)) {
+					$tabLink->setAttribute('js-indicator', $this->indicators[$id]);
+				}
+
 				$headersList->addItem($tabLink);
 			}
 
@@ -135,6 +145,7 @@ class CTabView extends CDiv {
 			$this->addItem($this->tabs);
 
 			zbx_add_post_js($this->makeJavascript());
+			zbx_add_post_js('try { new TabIndicators(); } catch(e) { }');
 		}
 
 		$this->addItem($this->footer);

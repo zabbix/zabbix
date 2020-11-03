@@ -21,7 +21,14 @@
 
 class CApiService {
 
+	/**
+	 * Authorized user data.
+	 *
+	 * @var array
+	 */
 	public static $userData;
+
+	public const ACCESS_RULES = [];
 
 	/**
 	 * The name of the table.
@@ -373,7 +380,7 @@ class CApiService {
 	protected function createSelectQuery($tableName, array $options) {
 		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
 
-		return $this->createSelectQueryFromParts($sqlParts);
+		return self::createSelectQueryFromParts($sqlParts);
 	}
 
 	/**
@@ -411,23 +418,52 @@ class CApiService {
 	}
 
 	/**
+	 * Returns DISTINCT modifier for sql statements with multiple joins.
+	 *
+	 * @param array $sql_parts  An SQL parts array.
+	 *
+	 * @return string
+	 */
+	protected static function dbDistinct(array $sql_parts) {
+		$count = count($sql_parts['from']);
+
+		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {
+			foreach ($sql_parts['left_join'] as $left_join) {
+				$r_table = DB::getSchema($left_join['table']);
+
+				// Increase count when table linked by non-unique column.
+				if ($left_join['using'] !== $r_table['key']) {
+					$count++;
+					break;
+				}
+			}
+		}
+
+		return ($count > 1 ? ' DISTINCT' : '');
+	}
+
+	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
 	 *
 	 * @param array $sqlParts	An SQL parts array
 	 *
 	 * @return string			The resulting SQL query
 	 */
-	protected function createSelectQueryFromParts(array $sqlParts) {
+	protected static function createSelectQueryFromParts(array $sqlParts) {
 		$sql_left_join = '';
 		if (array_key_exists('left_join', $sqlParts)) {
-			foreach ($sqlParts['left_join'] as $join) {
-				$sql_left_join .= ' LEFT JOIN '.$join['from'].' ON '.$join['on'];
+			$l_table = DB::getSchema($sqlParts['left_table']['table']);
+
+			foreach ($sqlParts['left_join'] as $left_join) {
+				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].
+					' ON '.$sqlParts['left_table']['alias'].'.'.$l_table['key'].
+					'='.$left_join['alias'].'.'.$left_join['using'];
 			}
 
 			// Moving a left table to the end.
-			$left_table = $sqlParts['from'][$sqlParts['left_table']];
-			unset($sqlParts['from'][$sqlParts['left_table']]);
-			$sqlParts['from'][$sqlParts['left_table']] = $left_table;
+			$table_id = $sqlParts['left_table']['table'].' '.$sqlParts['left_table']['alias'];
+			unset($sqlParts['from'][array_search($table_id, $sqlParts['from'])]);
+			$sqlParts['from'][] = $table_id;
 		}
 
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
@@ -436,7 +472,7 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		return 'SELECT'.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+		return 'SELECT'.self::dbDistinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
 				$sql_left_join.
 				$sqlWhere.
@@ -1127,5 +1163,18 @@ class CApiService {
 		CAudit::addBulk(self::$userData['userid'], self::$userData['userip'], $action, $resourcetype, $objects,
 			$objects_old
 		);
+	}
+
+	/**
+	 * Check access to specific access rule.
+	 *
+	 * @static
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return bool  Returns true if user has access to specified rule, and false otherwise.
+	 */
+	protected static function checkAccess(string $rule_name): bool {
+		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));
 	}
 }

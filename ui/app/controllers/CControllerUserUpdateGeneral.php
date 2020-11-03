@@ -40,10 +40,10 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 * @return int
 	 */
 	private static function hasInternalAuth($usrgrps) {
-		$config = select_config();
-		$system_gui_access = ($config['authentication_type'] == ZBX_AUTH_INTERNAL)
-			? GROUP_GUI_ACCESS_INTERNAL
-			: GROUP_GUI_ACCESS_LDAP;
+		$system_gui_access =
+			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
+				? GROUP_GUI_ACCESS_INTERNAL
+				: GROUP_GUI_ACCESS_LDAP;
 
 		foreach($usrgrps as $usrgrp) {
 			$gui_access = ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM)
@@ -98,6 +98,29 @@ abstract class CControllerUserUpdateGeneral extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Password'), _('cannot be empty')));
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate user role from user input.
+	 *
+	 * @return bool
+	 */
+	protected function validateUserRole(): bool {
+		if (!$this->hasInput('roleid')) {
+			error(_s('Field "%1$s" is mandatory.', 'roleid'));
+
+			return false;
+		}
+
+		$role = API::Role()->get(['output' => [], 'roleids' => [$this->getInput('roleid')]]);
+
+		if (!$role) {
+			error(_('No permissions to referred object or it does not exist!'));
+
+			return false;
 		}
 
 		return true;

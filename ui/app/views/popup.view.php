@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+(new CWidget())->show();
+
 (new CScriptTag(
 	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).', null, null);'.
 

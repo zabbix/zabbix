@@ -32,6 +32,10 @@ $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'sysmapid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
@@ -116,7 +120,7 @@ if (isset($_REQUEST['favobj'])) {
 				DBend(false);
 				$msg = [$e->getMessage()];
 
-				foreach (clear_messages() as $errMsg) {
+				foreach (get_and_clear_messages() as $errMsg) {
 					$msg[] = $errMsg['type'].': '.$errMsg['message'];
 				}
 
@@ -126,7 +130,8 @@ if (isset($_REQUEST['favobj'])) {
 			}
 
 			@ob_flush();
-			exit;
+			session_write_close();
+			exit();
 		}
 		elseif (getRequest('action') === 'expand') {
 			$values = [];
@@ -165,14 +170,14 @@ if (isset($_REQUEST['favobj'])) {
 			ksort($return);
 
 			echo json_encode($return);
-			exit;
+			session_write_close();
+			exit();
 		}
 	}
 }
 
 if ($page['type'] != PAGE_TYPE_HTML) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 /*

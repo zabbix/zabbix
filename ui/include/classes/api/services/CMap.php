@@ -24,6 +24,13 @@
  */
 class CMap extends CMapElement {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS]
+	];
+
 	protected $tableName = 'sysmaps';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['name', 'width', 'height'];
@@ -219,7 +226,7 @@ class CMap extends CMapElement {
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sysmaps = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		$sysmaps = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 
 		while ($sysmap = DBfetch($sysmaps)) {
 			$result[$sysmap['sysmapid']] = $sysmap;

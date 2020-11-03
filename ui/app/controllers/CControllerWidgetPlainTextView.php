@@ -44,79 +44,94 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 		$items = [];
 		$histories = [];
 
-		if ($fields['itemids']) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
-				'selectHosts' => ['name'],
-				'itemids' => $fields['itemids'],
-				'webitems' => true,
-				'preservekeys' => true
-			]);
+		// Editing template dashboard?
+		if ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD && !$this->hasInput('dynamic_hostid')) {
+			$error = _('No data.');
+		}
+		else {
+			$is_template_dashboard = ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD);
+			$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
-			$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
-
-			$keys = [];
-			foreach ($items as $item) {
-				$keys[$item['key_']] = true;
-			}
-
-			if ($items && $fields['dynamic'] && $dynamic_hostid) {
+			if ($fields['itemids']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
-					'filter' => [
-						'hostid' => $dynamic_hostid,
-						'key_' => array_keys($keys)
-					],
+					'itemids' => $fields['itemids'],
 					'webitems' => true,
 					'preservekeys' => true
 				]);
-			}
-		}
 
-		if (!$items) {
-			$error = _('No permissions to referred object or it does not exist!');
-		}
-		else {
-			// macros
-			$items = CMacrosResolverHelper::resolveItemNames($items);
+				$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-			$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
-
-			if ($histories) {
-				$histories = call_user_func_array('array_merge', $histories);
-
-				foreach ($histories as &$history) {
-					$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
-					$history['value'] = $fields['show_as_html']
-						? new CJsScript($history['value'])
-						: new CPre($history['value']);
+				$keys = [];
+				foreach ($items as $item) {
+					$keys[$item['key_']] = true;
 				}
-				unset($history);
-			}
 
-			CArrayHelper::sort($histories, [
-				['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-				['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-			]);
-
-			$host_name = '';
-			foreach ($items as $item) {
-				if ($host_name === '') {
-					$host_name = $item['hosts'][0]['name'];
-				}
-				elseif ($host_name !== $item['hosts'][0]['name']) {
-					$same_host = false;
+				if ($items && $is_dynamic_item && $dynamic_hostid) {
+					$items = API::Item()->get([
+						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+						'selectHosts' => ['name'],
+						'filter' => [
+							'hostid' => $dynamic_hostid,
+							'key_' => array_keys($keys)
+						],
+						'webitems' => true,
+						'preservekeys' => true
+					]);
 				}
 			}
 
-			$items_count = count($items);
-			if ($items_count == 1) {
-				$item = reset($items);
-				$dynamic_widget_name = $host_name.NAME_DELIMITER.$item['name_expanded'];
+			if (!$items) {
+				$error = _('No permissions to referred object or it does not exist!');
 			}
-			elseif ($same_host && $items_count > 1) {
-				$dynamic_widget_name = $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
+			else {
+				// macros
+				$items = CMacrosResolverHelper::resolveItemNames($items);
+
+				$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
+
+				if ($histories) {
+					$histories = call_user_func_array('array_merge', $histories);
+
+					foreach ($histories as &$history) {
+						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
+						$history['value'] = $fields['show_as_html']
+							? new CJsScript($history['value'])
+							: new CPre($history['value']);
+					}
+					unset($history);
+				}
+
+				CArrayHelper::sort($histories, [
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				]);
+
+				$host_name = '';
+
+				foreach ($items as $item) {
+					if ($host_name === '') {
+						$host_name = $item['hosts'][0]['name'];
+					}
+					elseif ($host_name !== $item['hosts'][0]['name']) {
+						$same_host = false;
+					}
+				}
+
+				$items_count = count($items);
+
+				if ($items_count == 1) {
+					$item = reset($items);
+					$dynamic_widget_name = $is_template_dashboard
+						? $item['name_expanded']
+						: $host_name.NAME_DELIMITER.$item['name_expanded'];
+				}
+				elseif ($same_host && $items_count > 1) {
+					$dynamic_widget_name = $is_template_dashboard
+						? _n('%1$s item', '%1$s items', $items_count)
+						: $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
+				}
 			}
 		}
 

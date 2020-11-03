@@ -24,6 +24,13 @@
  */
 class CDRule extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	protected $tableName = 'drules';
 	protected $tableAlias = 'dr';
 	protected $sortColumns = ['druleid', 'name'];
@@ -139,7 +146,7 @@ class CDRule extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($drule = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

@@ -24,6 +24,10 @@
  */
 class CProblem extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'problem';
 	protected $tableAlias = 'p';
 	protected $sortColumns = ['eventid'];
@@ -287,8 +291,7 @@ class CProblem extends CApiService {
 
 		// recent
 		if ($options['recent'] !== null && $options['recent']) {
-			$config = select_config();
-			$ok_events_from = time() - timeUnitToSeconds($config['ok_period']);
+			$ok_events_from = time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD));
 
 			$sqlParts['where'][] = '(p.r_eventid IS NULL OR p.r_clock>'.$ok_events_from.')';
 		}
@@ -333,7 +336,7 @@ class CProblem extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $event['rowscount'];

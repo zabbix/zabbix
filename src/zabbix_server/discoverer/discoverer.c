@@ -32,6 +32,7 @@
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 #include "zbxcrypto.h"
+#include "../events.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, program_type;
@@ -249,7 +250,8 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 					item.snmp_oid = strdup(dcheck->key_);
 
 					substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, &item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
+							NULL, NULL, NULL, &item.snmp_community, MACRO_TYPE_COMMON,
+							NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
 
@@ -267,16 +269,16 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
 
 						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, &item.snmpv3_securityname,
+								NULL, NULL, NULL, NULL, &item.snmpv3_securityname,
 								MACRO_TYPE_COMMON, NULL, 0);
 						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, &item.snmpv3_authpassphrase,
+								NULL, NULL, NULL, NULL, &item.snmpv3_authpassphrase,
 								MACRO_TYPE_COMMON, NULL, 0);
 						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, &item.snmpv3_privpassphrase,
+								NULL, NULL, NULL, NULL, &item.snmpv3_privpassphrase,
 								MACRO_TYPE_COMMON, NULL, 0);
 						substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-								NULL, NULL, NULL, &item.snmpv3_contextname,
+								NULL, NULL, NULL, NULL, &item.snmpv3_contextname,
 								MACRO_TYPE_COMMON, NULL, 0);
 					}
 
@@ -313,7 +315,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 				memset(&host, 0, sizeof(host));
 				host.addr = strdup(ip);
 
-				if (SUCCEED != do_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
+				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
 					ret = FAIL;
 
 				zbx_free(host.addr);
@@ -611,7 +613,11 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			{
 				discovery_update_host(&dhost, host_status, now);
+				zbx_process_events(NULL, NULL);
+				zbx_clean_events();
+			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule->druleid, ip, dns, host_status, now);
 
@@ -781,25 +787,19 @@ static int	process_discovery(void)
 		ZBX_STR2UINT64(druleid, row[0]);
 
 		delay_str = zbx_strdup(delay_str, row[5]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &delay_str,
 				MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 		{
-			zbx_config_t	cfg;
-
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					row[2], delay_str);
-
-			zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 			now = (int)time(NULL);
 
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
-					(0 == cfg.refresh_unsupported || 0 > now + cfg.refresh_unsupported ?
-					ZBX_JAN_2038 : now + cfg.refresh_unsupported), druleid);
+					0 > now ? ZBX_JAN_2038 : now, druleid);
 
-			zbx_config_clean(&cfg);
 			continue;
 		}
 
@@ -919,7 +919,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #ifdef HAVE_NETSNMP
 		if (1 == snmp_cache_reload_requested)
 		{
-			zbx_clear_cache_snmp();
+			zbx_clear_cache_snmp(process_type, process_num);
 			snmp_cache_reload_requested = 0;
 		}
 #endif

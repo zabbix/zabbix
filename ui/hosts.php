@@ -26,7 +26,7 @@ $page['title'] = _('Configuration of hosts');
 $page['file'] = 'hosts.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.cviewswitcher.js', 'class.cverticalaccordion.js',
-	'inputsecret.js', 'macrovalue.js'
+	'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js'
 ];
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -55,9 +55,7 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-									'isset({add}) || isset({update})'
-								],
+	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mass_update_tags' =>		[T_ZBX_INT, O_OPT, null,
@@ -329,7 +327,7 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		$interfaceid = 1;
 		foreach ($_REQUEST['interfaces'] as &$interface) {
 			$interface['interfaceid'] = (string) $interfaceid++;
-			unset($interface['locked'], $interface['items']);
+			unset($interface['items']);
 		}
 		unset($interface);
 	}
@@ -349,7 +347,7 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		$msg = [
 			'type' => 'error',
 			'message' => _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
-			'src' => ''
+			'source' => ''
 		];
 
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
@@ -745,16 +743,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$interfaces = getRequest('interfaces', []);
 
 			foreach ($interfaces as $key => $interface) {
-				if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
-					unset($interface[$key]);
-					continue;
-				}
-
-				// Proccess SNMP interface fields.
+				// Process SNMP interface fields.
 				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 					if (!array_key_exists('details', $interface)) {
-						unset($interface[$key]);
-						continue;
+						$interface['details'] = [];
 					}
 
 					$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
@@ -772,7 +764,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$mainInterfaces = getRequest('mainInterfaces', []);
 			foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
-				if (array_key_exists($type, $mainInterfaces)) {
+				if (array_key_exists($type, $mainInterfaces) && array_key_exists($mainInterfaces[$type], $interfaces)) {
 					$interfaces[$mainInterfaces[$type]]['main'] = INTERFACE_PRIMARY;
 				}
 			}
@@ -847,8 +839,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			else {
 				throw new Exception();
 			}
-
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostId, $host['host'], null, null, null);
 		}
 		else {
 			$host['hostid'] = $hostId;
@@ -856,16 +846,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if (!API::Host()->update($host)) {
 				throw new Exception();
 			}
-
-			$dbHostNew = API::Host()->get([
-				'output' => API_OUTPUT_EXTEND,
-				'hostids' => $hostId,
-				'editable' => true
-			]);
-			$dbHostNew = reset($dbHostNew);
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $dbHostNew['hostid'], $dbHostNew['host'], 'hosts',
-				$dbHost, $dbHostNew);
 		}
 
 		// full clone
@@ -1001,13 +981,14 @@ elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('
 		'templated_hosts' => true,
 		'output' => ['hostid']
 	]);
-	$actHosts = zbx_objectValues($actHosts, 'hostid');
 
 	if ($actHosts) {
-		DBstart();
+		foreach ($actHosts as &$host) {
+			$host['status'] = $status;
+		}
+		unset($host);
 
-		$result = updateHostStatus($actHosts, $status);
-		$result = DBend($result);
+		$result = (bool) API::Host()->update($actHosts);
 
 		if ($result) {
 			uncheckTableRows();
@@ -1029,8 +1010,6 @@ elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('
 /*
  * Display
  */
-$config = select_config();
-
 if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || hasRequest('masssave'))) {
 	$data = [
 		'hosts' => getRequest('hosts'),
@@ -1136,7 +1115,7 @@ elseif (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 
 		// Host inventory
-		'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
+		'inventory_mode' => getRequest('inventory_mode', CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE)),
 		'host_inventory' => getRequest('host_inventory', []),
 		'inventory_items' => [],
 
@@ -1178,7 +1157,7 @@ elseif (hasRequest('form')) {
 			$data['visiblename'] = $dbHost['name'];
 			$data['interfaces'] = API::HostInterface()->get([
 				'output' => API_OUTPUT_EXTEND,
-				'selectItems' => ['type'],
+				'selectItems' => ['itemid'],
 				'hostids' => [$data['hostid']],
 				'sortfield' => 'interfaceid'
 			]);
@@ -1204,21 +1183,6 @@ elseif (hasRequest('form')) {
 
 			// Interfaces
 			foreach ($data['interfaces'] as &$interface) {
-				if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$interface['locked'] = true;
-				}
-				else {
-					// check if interface has items that require specific interface type, if so type cannot be changed
-					$interface['locked'] = false;
-					foreach ($interface['items'] as $item) {
-						$type = itemTypeInterface($item['type']);
-						if ($type !== false && $type != INTERFACE_TYPE_ANY) {
-							$interface['locked'] = true;
-							break;
-						}
-					}
-				}
-
 				$interface['items'] = (bool) $interface['items'];
 			}
 			unset($interface);
@@ -1432,6 +1396,8 @@ elseif (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['add_templates']))
 	];
 
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
 	$hostView = new CView('configuration.host.edit', $data);
 }
 else {
@@ -1446,7 +1412,6 @@ else {
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groups'],
-			'real_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['groupid' => 'id'])
@@ -1486,6 +1451,7 @@ else {
 	}
 
 	// Select hosts.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$hosts = API::Host()->get([
 		'output' => ['hostid', $sortField],
 		'evaltype' => $filter['evaltype'],
@@ -1494,7 +1460,7 @@ else {
 		'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1,
+		'limit' => $limit,
 		'search' => [
 			'name' => ($filter['host'] === '') ? null : $filter['host'],
 			'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
@@ -1629,7 +1595,6 @@ else {
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
-		'config' => $config,
 		'templates' => $templates,
 		'maintenances' => $db_maintenances,
 		'writable_templates' => $writable_templates,
@@ -1637,7 +1602,11 @@ else {
 		'proxies_ms' => $proxies_ms,
 		'profileIdx' => 'web.hosts.filter',
 		'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		],
+		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 	];
 
 	$hostView = new CView('configuration.host.list', $data);

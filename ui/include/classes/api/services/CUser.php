@@ -24,6 +24,16 @@
  */
 class CUser extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'checkauthentication' => [],
+		'login' => [],
+		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'alias'];
@@ -74,6 +84,7 @@ class CUser extends CApiService {
 			'selectUsrgrps'				=> null,
 			'selectMedias'				=> null,
 			'selectMediatypes'			=> null,
+			'selectRole'				=> null,
 			'getAccess'					=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
@@ -168,7 +179,7 @@ class CUser extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
@@ -232,7 +243,7 @@ class CUser extends CApiService {
 		$ins_users = [];
 
 		foreach ($users as $user) {
-			unset($user['usrgrps'], $user['user_medias']);
+			unset($user['usrgrps'], $user['medias']);
 			$ins_users[] = $user;
 		}
 		$userids = DB::insert('users', $ins_users);
@@ -260,7 +271,8 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to create users.'));
 		}
 
-		$locales = array_keys(getLocales());
+		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
@@ -271,15 +283,23 @@ class CUser extends CApiService {
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', $locales)],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
+			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'fields' => [
+				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
+				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
+				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
+				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
+			]],
+			'medias' =>			['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
@@ -287,11 +307,21 @@ class CUser extends CApiService {
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		foreach ($users as &$user) {
+			if (array_key_exists('user_medias', $user)) {
+				if (array_key_exists('medias', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'user_medias'));
+				}
+
+				$user['medias'] = $user['user_medias'];
+				unset($user['user_medias']);
+			}
+
 			$user = $this->checkLoginOptions($user);
 
 			/*
@@ -306,6 +336,7 @@ class CUser extends CApiService {
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
+		$this->checkRoles(array_column($users, 'roleid'));
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -327,7 +358,9 @@ class CUser extends CApiService {
 			$upd_user = [];
 
 			// strings
-			$field_names = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme'];
+			$field_names = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme',
+				'timezone'
+			];
 			foreach ($field_names as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] !== $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
@@ -335,7 +368,7 @@ class CUser extends CApiService {
 			}
 
 			// integers
-			foreach (['autologin', 'type', 'rows_per_page'] as $field_name) {
+			foreach (['autologin', 'rows_per_page', 'roleid'] as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] != $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
 				}
@@ -368,7 +401,8 @@ class CUser extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
-		$locales = array_keys(getLocales());
+		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
@@ -380,15 +414,23 @@ class CUser extends CApiService {
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', $locales)],
-			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
+			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
+			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
+			'roleid' =>			['type' => API_ID],
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
+			'medias' =>	['type' => API_OBJECTS, 'fields' => [
+				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
+				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
+				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
+				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
+			]],
+			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
@@ -410,15 +452,35 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'theme', 'type', 'refresh', 'rows_per_page'
+				'refresh', 'theme', 'rows_per_page', 'timezone', 'roleid'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
 		]);
 
+		// Get readonly super admin role ID and name.
+		$db_roles = DBfetchArray(DBselect(
+			'SELECT roleid,name'.
+			' FROM role'.
+			' WHERE type='.USER_TYPE_SUPER_ADMIN.
+				' AND readonly=1'
+		));
+		$readonly_superadmin_role = $db_roles[0];
+
+		$superadminids_to_update = [];
 		$aliases = [];
+		$check_roleids = [];
 
 		foreach ($users as &$user) {
+			if (array_key_exists('user_medias', $user)) {
+				if (array_key_exists('medias', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'user_medias'));
+				}
+
+				$user['medias'] = $user['user_medias'];
+				unset($user['user_medias']);
+			}
+
 			if (!array_key_exists($user['userid'], $db_users)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
@@ -444,13 +506,59 @@ class CUser extends CApiService {
 
 				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
+
+			if ($db_user['alias'] == ZBX_GUEST_USER) {
+				if (array_key_exists('lang', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set language for user "guest".'));
+				}
+				if (array_key_exists('theme', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set theme for user "guest".'));
+				}
+			}
+
+			if (array_key_exists('roleid', $user) && $user['roleid'] != $db_user['roleid']) {
+				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
+					$superadminids_to_update[] = $user['userid'];
+				}
+
+				$check_roleids[] = $user['roleid'];
+			}
 		}
 		unset($user);
+
+		// Check that at least one active user will remain with readonly super admin role.
+		if ($superadminids_to_update) {
+			$db_superadmins = DBselect(
+				'SELECT NULL'.
+				' FROM users u'.
+				' WHERE u.roleid='.$readonly_superadmin_role['roleid'].
+					' AND '.dbConditionId('u.userid', $superadminids_to_update, true).
+					' AND EXISTS('.
+						'SELECT NULL'.
+						' FROM usrgrp g,users_groups ug'.
+						' WHERE g.usrgrpid=ug.usrgrpid'.
+							' AND ug.userid=u.userid'.
+						' GROUP BY ug.userid'.
+						' HAVING MAX(g.gui_access)<'.GROUP_GUI_ACCESS_DISABLED.
+							' AND MAX(g.users_status)='.GROUP_STATUS_ENABLED.
+					')'.
+				' LIMIT 1'
+			);
+
+			if (!DBfetch($db_superadmins)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('At least one active user must exist with role "%1$s".', $readonly_superadmin_role['name'])
+				);
+			}
+		}
 
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
+		if ($check_roleids) {
+			$this->checkRoles($check_roleids);
+		}
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -547,8 +655,29 @@ class CUser extends CApiService {
 	 */
 	private function checkLanguages(array $languages) {
 		foreach ($languages as $lang) {
-			if ($lang !== 'en_GB' && !setlocale(LC_MONETARY, zbx_locale_variants($lang))) {
+			if ($lang !== LANG_DEFAULT && !setlocale(LC_MONETARY, zbx_locale_variants($lang))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Language "%1$s" is not supported.', $lang));
+			}
+		}
+	}
+
+	/**
+	 * Check for valid user roles.
+	 *
+	 * @param array $roleids
+	 *
+	 * @throws APIException
+	 */
+	private function checkRoles(array $roleids): void {
+		$db_roles = DB::select('role', [
+			'output' => ['roleid'],
+			'roleids' => $roleids,
+			'preservekeys' => true
+		]);
+
+		foreach ($roleids as $roleid) {
+			if (!array_key_exists($roleid, $db_roles)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User role with ID "%1$s" is not available.', $roleid));
 			}
 		}
 	}
@@ -564,10 +693,10 @@ class CUser extends CApiService {
 	 * @return bool
 	 */
 	private static function hasInternalAuth($user, $db_usrgrps) {
-		$config = select_config();
-		$system_gui_access = ($config['authentication_type'] == ZBX_AUTH_INTERNAL)
-			? GROUP_GUI_ACCESS_INTERNAL
-			: GROUP_GUI_ACCESS_LDAP;
+		$system_gui_access =
+			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
+				? GROUP_GUI_ACCESS_INTERNAL
+				: GROUP_GUI_ACCESS_LDAP;
 
 		foreach($user['usrgrps'] as $usrgrp) {
 			$gui_access = (int) $db_usrgrps[$usrgrp['usrgrpid']]['gui_access'];
@@ -585,7 +714,7 @@ class CUser extends CApiService {
 	 * Check for valid media types.
 	 *
 	 * @param array $users                               Array of users.
-	 * @param array $users[]['user_medias']  (optional)  Array of user medias.
+	 * @param array $users[]['medias']       (optional)  Array of user medias.
 	 *
 	 * @throws APIException if user media type does not exist.
 	 *
@@ -595,8 +724,8 @@ class CUser extends CApiService {
 		$mediatypeids = [];
 
 		foreach ($users as $user) {
-			if (array_key_exists('user_medias', $user)) {
-				foreach ($user['user_medias'] as $media) {
+			if (array_key_exists('medias', $user)) {
+				foreach ($user['medias'] as $media) {
 					$mediatypeids[$media['mediatypeid']] = true;
 				}
 			}
@@ -630,8 +759,8 @@ class CUser extends CApiService {
 	 * only e-mail media types.
 	 *
 	 * @param array         $users                                    Array of users.
-	 * @param string        $users[]['user_medias'][]['mediatypeid']  Media type ID.
-	 * @param array|string  $users[]['user_medias'][]['sendto']       Address where to send the alert.
+	 * @param string        $users[]['medias'][]['mediatypeid']       Media type ID.
+	 * @param array|string  $users[]['medias'][]['sendto']            Address where to send the alert.
 	 * @param array         $db_mediatypes                            List of available media types.
 	 *
 	 * @throws APIException if e-mail is not valid or exceeds maximum DB field length.
@@ -650,8 +779,8 @@ class CUser extends CApiService {
 			$email_validator = new CEmailValidator();
 
 			foreach ($users as $user) {
-				if (array_key_exists('user_medias', $user)) {
-					foreach ($user['user_medias'] as $media) {
+				if (array_key_exists('medias', $user)) {
+					foreach ($user['medias'] as $media) {
 						/*
 						 * For non-email media types only one value allowed. Since value is normalized, need to validate
 						 * if array contains only one item. If there are more than one string, error message is
@@ -717,8 +846,8 @@ class CUser extends CApiService {
 	private function checkHimself(array $users) {
 		foreach ($users as $user) {
 			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
-				if (array_key_exists('type', $user)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their user type.'));
+				if (array_key_exists('roleid', $user) && $user['roleid'] != self::$userData['roleid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their role.'));
 				}
 
 				if (array_key_exists('usrgrps', $user)) {
@@ -857,27 +986,27 @@ class CUser extends CApiService {
 	 * @param string $method
 	 */
 	private function updateMedias(array $users, $method) {
-		$medias = [];
+		$users_medias = [];
 
 		foreach ($users as $user) {
-			if (array_key_exists('user_medias', $user)) {
-				$medias[$user['userid']] = [];
+			if (array_key_exists('medias', $user)) {
+				$users_medias[$user['userid']] = [];
 
-				foreach ($user['user_medias'] as $media) {
+				foreach ($user['medias'] as $media) {
 					$media['sendto'] = implode("\n", $media['sendto']);
-					$medias[$user['userid']][] = $media;
+					$users_medias[$user['userid']][] = $media;
 				}
 			}
 		}
 
-		if (!$medias) {
+		if (!$users_medias) {
 			return;
 		}
 
 		$db_medias = ($method === 'update')
 			? DB::select('media', [
 				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
-				'filter' => ['userid' => array_keys($medias)]
+				'filter' => ['userid' => array_keys($users_medias)]
 			])
 			: [];
 
@@ -886,12 +1015,12 @@ class CUser extends CApiService {
 		$del_mediaids = [];
 
 		foreach ($db_medias as $db_media) {
-			$index = $this->getSimilarMedia($medias[$db_media['userid']], $db_media['mediatypeid'],
+			$index = $this->getSimilarMedia($users_medias[$db_media['userid']], $db_media['mediatypeid'],
 				$db_media['sendto']
 			);
 
 			if ($index != -1) {
-				$media = $medias[$db_media['userid']][$index];
+				$media = $users_medias[$db_media['userid']][$index];
 
 				$upd_media = [];
 
@@ -912,15 +1041,15 @@ class CUser extends CApiService {
 					];
 				}
 
-				unset($medias[$db_media['userid']][$index]);
+				unset($users_medias[$db_media['userid']][$index]);
 			}
 			else {
 				$del_mediaids[] = $db_media['mediaid'];
 			}
 		}
 
-		foreach ($medias as $userid => $user_medias) {
-			foreach ($user_medias as $media) {
+		foreach ($users_medias as $userid => $medias) {
+			foreach ($medias as $media) {
 				$ins_medias[] = ['userid' => $userid] + $media;
 			}
 		}
@@ -969,11 +1098,22 @@ class CUser extends CApiService {
 		}
 
 		$db_users = $this->get([
-			'output' => ['userid', 'alias'],
+			'output' => ['userid', 'alias', 'roleid'],
 			'userids' => $userids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		// Get readonly super admin role ID and name.
+		$db_roles = DBfetchArray(DBselect(
+			'SELECT roleid,name'.
+			' FROM role'.
+			' WHERE type='.USER_TYPE_SUPER_ADMIN.
+				' AND readonly=1'
+		));
+		$readonly_superadmin_role = $db_roles[0];
+
+		$superadminids_to_delete = [];
 
 		foreach ($userids as $userid) {
 			if (!array_key_exists($userid, $db_users)) {
@@ -991,6 +1131,36 @@ class CUser extends CApiService {
 			if ($db_user['alias'] == ZBX_GUEST_USER) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER)
+				);
+			}
+
+			if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
+				$superadminids_to_delete[] = $userid;
+			}
+		}
+
+		// Check that at least one user will remain with readonly super admin role.
+		if ($superadminids_to_delete) {
+			$db_superadmins = DBselect(
+				'SELECT NULL'.
+				' FROM users u'.
+				' WHERE u.roleid='.$readonly_superadmin_role['roleid'].
+					' AND '.dbConditionId('u.userid', $superadminids_to_delete, true).
+					' AND EXISTS('.
+						'SELECT NULL'.
+						' FROM usrgrp g,users_groups ug'.
+						' WHERE g.usrgrpid=ug.usrgrpid'.
+							' AND ug.userid=u.userid'.
+						' GROUP BY ug.userid'.
+						' HAVING MAX(g.gui_access)<'.GROUP_GUI_ACCESS_DISABLED.
+							' AND MAX(g.users_status)='.GROUP_STATUS_ENABLED.
+					')'.
+				' LIMIT 1'
+			);
+
+			if (!DBfetch($db_superadmins)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('At least one active user must exist with role "%1$s".', $readonly_superadmin_role['name'])
 				);
 			}
 		}
@@ -1082,13 +1252,20 @@ class CUser extends CApiService {
 	 * @return bool
 	 */
 	protected function ldapLogin(array $user) {
-		$config = select_config();
 		$cnf = [];
+		$auth_params = [
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_CONFIGURED,
+			CAuthenticationHelper::LDAP_HOST,
+			CAuthenticationHelper::LDAP_PORT,
+			CAuthenticationHelper::LDAP_BASE_DN,
+			CAuthenticationHelper::LDAP_BIND_DN,
+			CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE,
+			CAuthenticationHelper::LDAP_BIND_PASSWORD
+		];
 
-		foreach ($config as $id => $value) {
-			if (strpos($id, 'ldap_') !== false) {
-				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-			}
+		foreach ($auth_params as $param) {
+			$cnf[str_replace('ldap_', '', $param)] = CAuthenticationHelper::get($param);
 		}
 
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
@@ -1163,20 +1340,21 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$config = select_config();
 		$group_to_auth_map = [
-			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
+			GROUP_GUI_ACCESS_SYSTEM => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE),
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
+			GROUP_GUI_ACCESS_DISABLED => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		];
 
-		$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
-			$config['authentication_type'], true
+		$db_user = $this->findByAlias($user['user'],
+			(CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
 		);
 
-		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			$sec_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
+		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
+			$sec_left = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
+				- (time() - $db_user['attempt_clock']);
 
 			if ($sec_left > 0) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -1220,9 +1398,10 @@ class CUser extends CApiService {
 				$db_user['userip']
 			);
 
-			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
+					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', ZBX_LOGIN_BLOCK)
+					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)))
 				);
 			}
 
@@ -1231,7 +1410,7 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user = self::createSession($user['user'], $db_user);
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1286,7 +1465,7 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-		$db_user = self::createSession($alias, $db_user);
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1303,7 +1482,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function checkAuthentication(array $session) {
+	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
 			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
@@ -1335,16 +1514,18 @@ class CUser extends CApiService {
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page'
+				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
 			],
 			'userids' => $db_session['userid']
 		]);
 
+		// If user not exists.
 		if (!$db_users) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
 		$db_user = $db_users[0];
+		$db_user['type'] = $this->getUserType($db_user['roleid']);
 
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
@@ -1352,6 +1533,16 @@ class CUser extends CApiService {
 		$db_user['debug_mode'] = $usrgrps['debug_mode'];
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
+
+		if ($db_user['lang'] === LANG_DEFAULT) {
+			$db_user['lang'] = CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG);
+		}
+		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
+			$db_user['timezone'] = CSettingsHelper::get(CSettingsHelper::DEFAULT_TIMEZONE);
+		}
+		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
+			date_default_timezone_set($db_user['timezone']);
+		}
 
 		$autologout = timeUnitToSeconds($db_user['autologout']);
 
@@ -1410,6 +1601,17 @@ class CUser extends CApiService {
 		}
 
 		return $usrgrps;
+	}
+
+	/**
+	 * Returns user type.
+	 *
+	 * @param string $roleid
+	 *
+	 * @return int
+	 */
+	private function getUserType(string $roleid): int {
+		return DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type')[0];
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -1477,19 +1679,43 @@ class CUser extends CApiService {
 			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 
+		// adding user role
+		if ($options['selectRole'] !== null && $options['selectRole'] !== API_OUTPUT_COUNT) {
+			if ($options['selectRole'] === API_OUTPUT_EXTEND) {
+				$options['selectRole'] = ['roleid', 'name', 'type', 'readonly'];
+			}
+
+			$db_roles = DBselect(
+				'SELECT u.userid'.($options['selectRole'] ? ',r.'.implode(',r.', $options['selectRole']) : '').
+				' FROM users u,role r'.
+				' WHERE u.roleid=r.roleid'.
+				' AND '.dbConditionInt('u.userid', $userIds)
+			);
+
+			foreach ($result as $userid => $user) {
+				$result[$userid]['role'] = [];
+			}
+
+			while ($db_role = DBfetch($db_roles)) {
+				$userid = $db_role['userid'];
+				unset($db_role['userid']);
+
+				$result[$userid]['role'] = $db_role;
+			}
+		}
+
 		return $result;
 	}
 
 	/**
 	 * Initialize session for user. Returns user data array with valid sessionid.
 	 *
-	 * @param string $alias    User alias value.
 	 * @param array  $db_user  User data from database.
 	 *
 	 * @return array
 	 */
-	private static function createSession($alias, $db_user) {
-		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
+	private static function createSession(array $db_user): array {
+		$db_user['sessionid'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
@@ -1528,8 +1754,8 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
 			GROUP_GUI_ACCESS_DISABLED => $default_auth
 		];
-		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
+		$fields = ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
 		];
 
 		if ($case_sensitive) {
@@ -1571,6 +1797,8 @@ class CUser extends CApiService {
 		}
 
 		$db_user = reset($db_users);
+		$db_user['type'] = $this->getUserType($db_user['roleid']);
+
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
 		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
@@ -1580,6 +1808,16 @@ class CUser extends CApiService {
 		$db_user['debug_mode'] = $usrgrps['debug_mode'];
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
+
+		if ($db_user['lang'] === LANG_DEFAULT) {
+			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
+		}
+		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
+			$db_user['timezone'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_TIMEZONE);
+		}
+		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
+			date_default_timezone_set($db_user['timezone']);
+		}
 
 		return $db_user;
 	}

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'class.calendar.js', 'multiselect.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'class.calendar.js', 'multiselect.js', 'class.tab-indicators.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -96,6 +96,12 @@ if (hasRequest('action') && (!hasRequest('maintenanceids') || !is_array(getReque
 	access_deny();
 }
 
+$allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
+
+if (!$allowed_edit && hasRequest('form') && getRequest('form') !== 'update') {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 /*
  * Actions
  */
@@ -104,6 +110,10 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	if (hasRequest('update')) {
 		$messageSuccess = _('Maintenance updated');
 		$messageFailed = _('Cannot update maintenance');
@@ -188,6 +198,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdelete') {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$maintenanceids = getRequest('maintenanceid', []);
 	if (hasRequest('maintenanceids')) {
 		$maintenanceids = getRequest('maintenanceids');
@@ -217,6 +231,7 @@ elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdel
  */
 $data = [
 	'form' => getRequest('form'),
+	'allowed_edit' => $allowed_edit
 ];
 
 if (!empty($data['form'])) {
@@ -341,14 +356,13 @@ else {
 		$filter_groupids = getSubGroups($filter_groupids);
 	}
 
-	$config = select_config();
-
 	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
 		'profileIdx' => 'web.maintenance.filter',
-		'active_tab' => CProfile::get('web.maintenance.filter.active', 1)
+		'active_tab' => CProfile::get('web.maintenance.filter.active', 1),
+		'allowed_edit' => $allowed_edit
 	];
 
 	// Get list of maintenances.
@@ -361,7 +375,7 @@ else {
 		'editable' => true,
 		'sortfield' => $sortField,
 		'sortorder' => $sortOrder,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	$data['maintenances'] = API::Maintenance()->get($options);

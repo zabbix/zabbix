@@ -87,7 +87,9 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($data['items'] as $item) {
 	// description
 	$description = [];
-	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
@@ -148,7 +150,7 @@ foreach ($data['items'] as $item) {
 
 		$trigger_description = [];
 		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
-			ZBX_FLAG_DISCOVERY_NORMAL
+			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 		);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
@@ -178,7 +180,7 @@ foreach ($data['items'] as $item) {
 		}
 
 		$triggerHintTable->addRow([
-			getSeverityCell($trigger['priority'], $data['config']),
+			getSeverityCell($trigger['priority']),
 			$trigger_description,
 			(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
@@ -213,7 +215,8 @@ foreach ($data['items'] as $item) {
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
+			|| $item['type'] == ITEM_TYPE_DEPENDENT
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -239,7 +242,8 @@ foreach ($data['items'] as $item) {
 
 $massclearhistory = [
 	'name' => _('Clear history'),
-	'confirm' => _('Delete history of selected items?')
+	'confirm' => _('Delete history of selected items?'),
+	'disabled' => $data['is_template']
 ];
 
 if ($data['config']['compression_status']) {
@@ -254,7 +258,7 @@ $itemForm->addItem([
 		[
 			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
 			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
-			'item.masscheck_now' => ['name' => _('Execute now')],
+			'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
 			'item.massclearhistory' => $massclearhistory,
 			'item.masscopyto' => ['name' => _('Copy')],
 			'item.massupdateform' => ['name' => _('Mass update')],

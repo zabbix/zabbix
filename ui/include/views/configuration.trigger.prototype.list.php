@@ -72,7 +72,7 @@ foreach ($this->data['triggers'] as $trigger) {
 	// description
 	$description = [];
 	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
-		ZBX_FLAG_DISCOVERY_PROTOTYPE
+		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
 	);
 
 	$description[] = new CLink(
@@ -162,7 +162,7 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	$triggersTable->addRow([
 		$checkBox,
-		getSeverityCell($trigger['priority'], $this->data['config']),
+		getSeverityCell($trigger['priority']),
 		$description,
 		$trigger['opdata'],
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),

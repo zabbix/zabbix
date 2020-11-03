@@ -26,9 +26,11 @@
 // indicator of sort field
 $sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
-$url_details = (new CUrl('tr_events.php'))
-	->setArgument('triggerid', '')
-	->setArgument('eventid', '');
+$url_details = $data['allowed_ui_problems']
+	? (new CUrl('tr_events.php'))
+		->setArgument('triggerid', '')
+		->setArgument('eventid', '')
+	: null;
 
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
@@ -96,14 +98,19 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$value_clock = $in_closing ? time() : $problem['clock'];
 	}
 
-	$url_details
-		->setArgument('triggerid', $problem['objectid'])
-		->setArgument('eventid', $problem['eventid']);
-
 	$cell_clock = ($problem['clock'] >= $today)
 		? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
-	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+
+	if ($url_details !== null) {
+		$url_details
+			->setArgument('triggerid', $problem['objectid'])
+			->setArgument('eventid', $problem['eventid']);
+		$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+	}
+	else {
+		$cell_clock = new CCol($cell_clock);
+	}
 
 	$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 
@@ -112,7 +119,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			$cell_r_clock = ($problem['r_clock'] >= $today)
 				? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
 				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
-			$cell_r_clock = (new CCol(new CLink($cell_r_clock, $url_details)))
+			$cell_r_clock = (new CCol($url_details !== null ? new CLink($cell_r_clock, $url_details) : $cell_r_clock))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_RIGHT);
 		}
@@ -182,16 +189,24 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
+	$allowed = [
+		'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+		'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+				|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+				|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+				|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+	];
+
 	$problem_link = [
 		(new CLinkAction($problem['name']))
 			->setHint(
 				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-					'triggerid' => $trigger['triggerid']], $eventid, $show_timeline, $data['fields']['show_tags'],
+					'triggerid' => $trigger['triggerid']], $eventid, $allowed, $show_timeline, $data['fields']['show_tags'],
 					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
 				)
 			)
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
-				$problem['name'], getSeverityName($problem['severity'], $data['config'])
+				$problem['name'], getSeverityName($problem['severity'])
 			))
 	];
 
@@ -207,14 +222,17 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$description->addClass($description_style);
 	}
 
-	if (!$show_recovery_data && $data['config'][$is_acknowledged ? 'problem_ack_style' : 'problem_unack_style']) {
+	if (!$show_recovery_data
+			&& (($is_acknowledged && $data['config']['problem_ack_style'])
+				|| (!$is_acknowledged && $data['config']['problem_unack_style']))) {
 		// blinking
 		$duration = time() - $problem['clock'];
+		$blink_period = timeUnitToSeconds($data['config']['blink_period']);
 
-		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
+		if ($blink_period != 0 && $duration < $blink_period) {
 			$description
 				->addClass('blink')
-				->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration)
+				->setAttribute('data-time-to-blink', $blink_period - $duration)
 				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
@@ -242,10 +260,14 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	}
 
 	// Create acknowledge link.
-	$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-		->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-		->addClass(ZBX_STYLE_LINK_ALT)
-		->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+	$problem_update_link = $data['allowed_ack']
+		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+		: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+			$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+		);
 
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,
@@ -258,7 +280,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			->addClass(ZBX_STYLE_NOWRAP),
 		$problem_update_link,
 		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
-			$data['data']['users'], $data['config']
+			$data['data']['users']
 		),
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));

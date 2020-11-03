@@ -1,0 +1,1508 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-21T12:49:04Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Ceph by Zabbix Agent2'
+      name: 'Ceph by Zabbix Agent2'
+      description: |
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410059-discussion-thread-for-official-zabbix-template-ceph
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: Ceph
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Ceph: Get df'
+          key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Ceph: Minimum Mon release version'
+          type: DEPENDENT
+          key: ceph.min_mon_release_name
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: min_mon_release_name
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.min_mon_release_name
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Ceph version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Ceph: Number of Monitors'
+          type: DEPENDENT
+          key: ceph.num_mon
+          delay: '0'
+          history: 7d
+          description: 'Number of Monitors configured in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.num_mon
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of OSDs'
+          type: DEPENDENT
+          key: ceph.num_osd
+          delay: '0'
+          history: 7d
+          description: 'Number of known storage daemons in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.num_osd
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of OSDs in state: IN'
+          type: DEPENDENT
+          key: ceph.num_osd_in
+          delay: '0'
+          history: 7d
+          description: 'Total number of participating storage daemons in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.num_osd_in
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of OSDs in state: UP'
+          type: DEPENDENT
+          key: ceph.num_osd_up
+          delay: '0'
+          history: 7d
+          description: 'Total number of online storage daemons in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.num_osd_up
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups'
+          type: DEPENDENT
+          key: ceph.num_pg
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.num_pg
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in Temporary state'
+          type: DEPENDENT
+          key: ceph.num_pg_temp
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in pg_temp state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.num_pg_temp
+          master_item:
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Pools'
+          type: DEPENDENT
+          key: ceph.num_pools
+          delay: '0'
+          history: 7d
+          description: 'Total number of pools in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.num_pools
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Get OSD dump'
+          key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Ceph: Get OSD stats'
+          key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Ceph: Ceph backfill full ratio'
+          type: DEPENDENT
+          key: ceph.osd_backfillfull_ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Backfill full ratio setting of Ceph cluster as configured on OSDMap'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_backfillfull_ratio
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD avg fill'
+          type: DEPENDENT
+          key: ceph.osd_fill.avg
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Average fill of OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_fill.avg
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD max fill'
+          type: DEPENDENT
+          key: ceph.osd_fill.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage fill of maximum filled OSD'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_fill.max
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD min fill'
+          type: DEPENDENT
+          key: ceph.osd_fill.min
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage fill of minimum filled OSD'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_fill.min
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph full ratio'
+          type: DEPENDENT
+          key: ceph.osd_full_ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Full ratio setting of Ceph cluster as configured on OSDMap'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_full_ratio
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD Apply latency Avg'
+          type: DEPENDENT
+          key: ceph.osd_latency_apply.avg
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Average apply latency of OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_latency_apply.avg
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD Apply latency Max'
+          type: DEPENDENT
+          key: ceph.osd_latency_apply.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Maximum apply latency of OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_latency_apply.max
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD Apply latency Min'
+          type: DEPENDENT
+          key: ceph.osd_latency_apply.min
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Miniumum apply latency of OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_latency_apply.min
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD Commit latency Avg'
+          type: DEPENDENT
+          key: ceph.osd_latency_commit.avg
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Average commit latency of OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_latency_commit.avg
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD Commit latency Max'
+          type: DEPENDENT
+          key: ceph.osd_latency_commit.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Maximum commit latency of OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_latency_commit.max
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD Commit latency Min'
+          type: DEPENDENT
+          key: ceph.osd_latency_commit.min
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Minimum commit latency of OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_latency_commit.min
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph nearfull ratio'
+          type: DEPENDENT
+          key: ceph.osd_nearfull_ratio
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Near full ratio setting of Ceph cluster as configured on OSDMap'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_nearfull_ratio
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD avg PGs'
+          type: DEPENDENT
+          key: ceph.osd_pgs.avg
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Average amount of PGs on OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_pgs.avg
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD max PGs'
+          type: DEPENDENT
+          key: ceph.osd_pgs.max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum amount of PGs on OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_pgs.max
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph OSD min PGs'
+          type: DEPENDENT
+          key: ceph.osd_pgs.min
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Minimum amount of PGs on OSDs'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.osd_pgs.min
+          master_item:
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Overall cluster status'
+          type: DEPENDENT
+          key: ceph.overall_status
+          delay: '0'
+          history: 7d
+          description: 'Overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR'
+          applications:
+            -
+              name: Ceph
+          valuemap:
+            name: 'Ceph cluster status'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.overall_status
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          triggers:
+            -
+              expression: '{last()}=2'
+              name: 'Ceph: Cluster in ERROR state'
+              priority: AVERAGE
+              manual_close: 'YES'
+            -
+              expression: '{last()}=1'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{last()}=0'
+              name: 'Ceph: Cluster in WARNING state'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Ceph: Cluster in ERROR state'
+                  expression: '{Ceph by Zabbix Agent2:ceph.overall_status.last()}=2'
+        -
+          name: 'Ceph: Number of Placement Groups in Active state'
+          type: DEPENDENT
+          key: ceph.pg_states.active
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in active state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.active
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in Backfilling state'
+          type: DEPENDENT
+          key: ceph.pg_states.backfilling
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in backfilling state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.backfilling
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in backfill_toofull state'
+          type: DEPENDENT
+          key: ceph.pg_states.backfill_toofull
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in backfill_toofull state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.backfill_toofull
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in backfill_wait state'
+          type: DEPENDENT
+          key: ceph.pg_states.backfill_wait
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in backfill_wait state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.backfill_wait
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in Clean state'
+          type: DEPENDENT
+          key: ceph.pg_states.clean
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in clean state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.clean
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in degraded state'
+          type: DEPENDENT
+          key: ceph.pg_states.degraded
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in degraded state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.degraded
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in inconsistent state'
+          type: DEPENDENT
+          key: ceph.pg_states.inconsistent
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in inconsistent state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.inconsistent
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in Peering state'
+          type: DEPENDENT
+          key: ceph.pg_states.peering
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in peering state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.peering
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in recovering state'
+          type: DEPENDENT
+          key: ceph.pg_states.recovering
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in recovering state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.recovering
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in recovery_wait state'
+          type: DEPENDENT
+          key: ceph.pg_states.recovery_wait
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in recovery_wait state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.recovery_wait
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in remapped state'
+          type: DEPENDENT
+          key: ceph.pg_states.remapped
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in remapped state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.remapped
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in Scrubbing state'
+          type: DEPENDENT
+          key: ceph.pg_states.scrubbing
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in scrubbing state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.scrubbing
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in Undersized state'
+          type: DEPENDENT
+          key: ceph.pg_states.undersized
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in undersized state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.undersized
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Number of Placement Groups in Unknown state'
+          type: DEPENDENT
+          key: ceph.pg_states.unknown
+          delay: '0'
+          history: 7d
+          description: 'Total number of Placement Groups in unknown state'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pg_states.unknown
+          master_item:
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ping'
+          key: 'ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          history: 7d
+          applications:
+            -
+              name: Ceph
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Ceph: Can not connect to cluster'
+              priority: AVERAGE
+              description: 'Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).'
+        -
+          name: 'Ceph: Ceph Read bandwidth'
+          type: DEPENDENT
+          key: ceph.rd_bytes.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Global read Bytes per second'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.rd_bytes
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph Read operations per sec'
+          type: DEPENDENT
+          key: ceph.rd_ops.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ops
+          description: 'Global read operations per second'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.rd_ops
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Get overall cluster status'
+          key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'Ceph: Total bytes available'
+          type: DEPENDENT
+          key: ceph.total_avail_bytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total bytes available in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_avail_bytes
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Total bytes'
+          type: DEPENDENT
+          key: ceph.total_bytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total (RAW) capacity of Ceph cluster in bytes'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_bytes
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Total number of objects'
+          type: DEPENDENT
+          key: ceph.total_objects
+          delay: '0'
+          history: 7d
+          description: 'Total number of objects in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_objects
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Total bytes used'
+          type: DEPENDENT
+          key: ceph.total_used_bytes
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'Total bytes used in Ceph cluster'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.total_used_bytes
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph Write bandwidth'
+          type: DEPENDENT
+          key: ceph.wr_bytes.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'Global write Bytes per second'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.wr_bytes
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+        -
+          name: 'Ceph: Ceph Write operations per sec'
+          type: DEPENDENT
+          key: ceph.wr_ops.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ops
+          description: 'Global write operations per second'
+          applications:
+            -
+              name: Ceph
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.wr_ops
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+      discovery_rules:
+        -
+          name: OSD
+          key: 'ceph.osd.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          delay: 1h
+          item_prototypes:
+            -
+              name: 'Ceph: [osd.{#OSDNAME}] OSD fill'
+              type: DEPENDENT
+              key: 'ceph.osd[{#OSDNAME},fill]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.osds.{#OSDNAME}.osd_fill'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [osd.{#OSDNAME}] OSD in'
+              type: DEPENDENT
+              key: 'ceph.osd[{#OSDNAME},in]'
+              delay: '0'
+              history: 7d
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.osds.{#OSDNAME}.in'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [osd.{#OSDNAME}] OSD latency apply'
+              type: DEPENDENT
+              key: 'ceph.osd[{#OSDNAME},latency_apply]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to flush an update to disks.'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.osds.{#OSDNAME}.osd_latency_apply'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [osd.{#OSDNAME}] OSD latency commit'
+              type: DEPENDENT
+              key: 'ceph.osd[{#OSDNAME},latency_commit]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to commit an operation to the journal.'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.osds.{#OSDNAME}.osd_latency_commit'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [osd.{#OSDNAME}] OSD PGs'
+              type: DEPENDENT
+              key: 'ceph.osd[{#OSDNAME},num_pgs]'
+              delay: '0'
+              history: 7d
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.osds.{#OSDNAME}.num_pgs'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [osd.{#OSDNAME}] OSD up'
+              type: DEPENDENT
+              key: 'ceph.osd[{#OSDNAME},up]'
+              delay: '0'
+              history: 7d
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.osds.{#OSDNAME}.up'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+              trigger_prototypes:
+                -
+                  expression: '{last()} = 0'
+                  name: 'Ceph: OSD osd.{#OSDNAME} is down'
+                  priority: AVERAGE
+                  description: |
+                    OSD osd.{#OSDNAME} is marked "down" in the osdmap.
+                    The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.
+          trigger_prototypes:
+            -
+              expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_nearfull_ratio.last()}*100'
+              name: 'Ceph: Ceph OSD osd.{#OSDNAME} is near full'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Ceph: OSD osd.{#OSDNAME} is full'
+                  expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100'
+            -
+              expression: '{Ceph by Zabbix Agent2:ceph.osd[{#OSDNAME},fill].min(15m)} > {Ceph by Zabbix Agent2:ceph.osd_full_ratio.last()}*100'
+              name: 'Ceph: OSD osd.{#OSDNAME} is full'
+              priority: AVERAGE
+          graph_prototypes:
+            -
+              name: 'Ceph: [osd.{#OSDNAME}] OSD latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.osd[{#OSDNAME},latency_apply]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.osd[{#OSDNAME},latency_commit]'
+        -
+          name: Pool
+          key: 'ceph.pool.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          delay: 1h
+          item_prototypes:
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool Used'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",bytes_used]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total bytes used in pool.'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].bytes_used'
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Max available'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",max_avail]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The maximum available space in the given pool.'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].max_avail'
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool objects'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",objects]'
+              delay: '0'
+              history: 7d
+              description: 'Number of objects in the pool.'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].objects'
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool Percent Used'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",percent_used]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              description: 'Percentage of storage used per pool'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].percent_used'
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool Read bandwidth'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Per-pool read Bytes/second'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].rd_bytes'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool Read operations'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ops
+              description: 'Per-pool read operations/second'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].rd_ops'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool RAW Used'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",stored_raw]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Bytes used in pool including copies made.'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].stored_raw'
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool Write bandwidth'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Per-pool write Bytes/second'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].wr_bytes'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool Write operations'
+              type: DEPENDENT
+              key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ops
+              description: 'Per-pool write operations/second'
+              application_prototypes:
+                -
+                  name: 'Ceph CRUSH [{#CRUSHRULE}] Pool'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.pools["{#POOLNAME}"].wr_ops'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          graph_prototypes:
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool bandwidth'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool I/O'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
+            -
+              name: 'Ceph: [{#POOLNAME}] Pool Usage'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.pool["{#POOLNAME}",bytes_used]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.pool["{#POOLNAME}",max_avail]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Ceph by Zabbix Agent2'
+                    key: 'ceph.pool["{#POOLNAME}",stored_raw]'
+      macros:
+        -
+          macro: '{$CEPH.API.KEY}'
+          value: zabbix_pass
+        -
+          macro: '{$CEPH.CONNSTRING}'
+          value: 'https://localhost:8003'
+        -
+          macro: '{$CEPH.USER}'
+          value: zabbix
+  graphs:
+    -
+      name: 'Ceph: Cluster bandwidth'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.rd_bytes.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.wr_bytes.rate
+    -
+      name: 'Ceph: Cluster I/O'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.wr_ops.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.rd_ops.rate
+    -
+      name: 'Ceph: Free space'
+      type: STACKED
+      graph_items:
+        -
+          drawtype: FILLED_REGION
+          color: 1A7C11
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.total_used_bytes
+        -
+          sortorder: '1'
+          drawtype: FILLED_REGION
+          color: 2774A4
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.total_avail_bytes
+    -
+      name: 'Ceph: Overall OSD latency'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_latency_commit.avg
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_latency_commit.max
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_latency_commit.min
+        -
+          sortorder: '3'
+          drawtype: BOLD_LINE
+          color: A54F10
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_latency_apply.avg
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_latency_apply.max
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_latency_apply.min
+    -
+      name: 'Ceph: Overall OSD utilization'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_fill.avg
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_fill.max
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Ceph by Zabbix Agent2'
+            key: ceph.osd_fill.min
+  value_maps:
+    -
+      name: 'Ceph cluster status'
+      mappings:
+        -
+          value: '0'
+          newvalue: HEALTH_OK
+        -
+          value: '1'
+          newvalue: HEALTH_WARN
+        -
+          value: '2'
+          newvalue: HEALTH_ERR
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

@@ -39,7 +39,7 @@ class CPage {
 	/**
 	 * Page defaults.
 	 */
-	const DEFAULT_PAGE_WIDTH = 1280;
+	const DEFAULT_PAGE_WIDTH = 1440;
 	const DEFAULT_PAGE_HEIGHT = 1024;
 
 	/**
@@ -114,7 +114,7 @@ class CPage {
 		$this->resetViewport();
 
 		if (self::$cookie !== null) {
-			$session_id = $this->driver->manage()->getCookieNamed('zbx_sessionid');
+			$session_id = $this->driver->manage()->getCookieNamed('zbx_session');
 
 			if ($session_id === null || !array_key_exists('value', $session_id)
 					|| $session_id['value'] !== self::$cookie['value']) {
@@ -177,12 +177,22 @@ class CPage {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
-		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
+		if (self::$cookie !== null) {
+			$cookie = json_decode(base64_decode(urldecode(self::$cookie['value'])), true);
+		}
+
+		if (self::$cookie === null || $sessionid !== $cookie['sessionid']) {
+			$data = ['sessionid' => $sessionid];
+
+			$config = CDBHelper::getRow('select session_key from config where configid=1');
+			$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
+
+			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
-				'name' => 'zbx_sessionid',
-				'value' => $sessionid,
+				'name' => 'zbx_session',
+				'value' => base64_encode(json_encode($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
-				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
+				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
 			$this->driver->get(PHPUNIT_URL);
@@ -199,7 +209,7 @@ class CPage {
 	public function logout() {
 		try {
 			$session = (self::$cookie === null)
-					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_sessionid'), 'value')
+					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_session'), 'value')
 					: self::$cookie['value'];
 
 			if ($session !== null) {
@@ -210,7 +220,7 @@ class CPage {
 			self::$cookie = null;
 		}
 		catch (\Exception $e) {
-			// Code is not missing here.
+			throw new \Exception('Cannot logout user: '.$e->getTraceAsString());
 		}
 	}
 
@@ -528,5 +538,20 @@ class CPage {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Allows to login with user credentials.
+	 *
+	 * @param string $alias     Username on login screen
+	 * @param string $password  Password on login screen
+	 */
+	public function userLogin($alias, $password) {
+		$this->logout();
+		$this->open('index.php');
+		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
+		$this->query('id:password')->one()->fill($password);
+		$this->query('id:enter')->one()->click();
+		$this->waitUntilReady();
 	}
 }

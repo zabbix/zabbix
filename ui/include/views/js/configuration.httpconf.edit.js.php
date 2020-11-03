@@ -117,7 +117,7 @@
 		window.httpconf.steps = new Steps($('#stepTab'), <?= json_encode(array_values($data['steps'])) ?>);
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
 
-		window.httpconf.$form = $('#httpForm').on('submit', function(e) {
+		window.httpconf.$form = $('#http-form').on('submit', function(e) {
 			var hidden_form = this.querySelector('#hidden-form');
 
 			hidden_form && hidden_form.remove();

@@ -40,7 +40,7 @@ class CControllerIconMapDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
@@ -58,14 +58,14 @@ class CControllerIconMapDelete extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'iconmap.list')
 			);
-			$response->setMessageOk(_('Icon map deleted'));
+			CMessageHelper::setSuccessTitle(_('Icon map deleted'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'iconmap.edit')
 				->setArgument('iconmapid', $this->getInput('iconmapid'))
 			);
-			$response->setMessageError(_('Cannot delete icon map'));
+			CMessageHelper::setErrorTitle(_('Cannot delete icon map'));
 		}
 
 		$this->setResponse($response);

@@ -1,9 +1,9 @@
 
-# Template App IIS by Zabbix agent active
+# IIS by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.<br>
 Your server must have the following roles:
 ```text
@@ -18,6 +18,8 @@ This template was tested on:
 - Zabbix, version 5.0
 
 ## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 1\. [Import](https://www.zabbix.com/documentation/current/manual/xml_export_import/templates) the template ([template_app_iis_agent.xml](template_app_iis_agent.xml) or [template_app_iis_agent_active.xml](template_app_iis_agent_active.xml)) into Zabbix.
 
@@ -120,6 +122,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide feedback, discuss the template or ask for help with it at
-[ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services).
+You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services).
 

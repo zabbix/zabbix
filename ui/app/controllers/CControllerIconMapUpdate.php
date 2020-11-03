@@ -37,7 +37,7 @@ class CControllerIconMapUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() == USER_TYPE_SUPER_ADMIN) {
+		if ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return (bool) API::IconMap()->get([
 				'output' => [],
 				'iconmapids' => (array) $this->getInput('iconmapid')
@@ -62,7 +62,7 @@ class CControllerIconMapUpdate extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'iconmap.list')
 			);
-			$response->setMessageOk(_('Icon map updated'));
+			CMessageHelper::setSuccessTitle(_('Icon map updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -74,7 +74,7 @@ class CControllerIconMapUpdate extends CController {
 				$form_data['iconmap']['mappings'] = [];
 			}
 			$response->setFormData($form_data);
-			$response->setMessageError(_('Cannot update icon map'));
+			CMessageHelper::setErrorTitle(_('Cannot update icon map'));
 		}
 
 		$this->setResponse($response);

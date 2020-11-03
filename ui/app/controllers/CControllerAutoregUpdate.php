@@ -38,7 +38,7 @@ class CControllerAutoregUpdate extends CController {
 						->getUrl()
 					);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update configuration'));
+					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -51,7 +51,7 @@ class CControllerAutoregUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {
@@ -66,11 +66,11 @@ class CControllerAutoregUpdate extends CController {
 		);
 
 		if ($result) {
-			$response->setMessageOk(_('Configuration updated'));
+			CMessageHelper::setSuccessTitle(_('Configuration updated'));
 		}
 		else {
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 		}
 
 		$this->setResponse($response);

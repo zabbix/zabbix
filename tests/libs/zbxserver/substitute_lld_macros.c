@@ -96,6 +96,8 @@ static int	get_flags(const char *path)
 			flags |= ZBX_MACRO_SIMPLE;
 		else if (0 == strcmp(flag, "ZBX_MACRO_FUNC"))
 			flags |= ZBX_MACRO_FUNC;
+		else if (0 == strcmp(flag, "ZBX_TOKEN_EXPRESSION_MACRO"))
+			flags |= ZBX_TOKEN_EXPRESSION_MACRO;
 
 		flags_num++;
 	}

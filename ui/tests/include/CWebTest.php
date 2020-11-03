@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/CTest.php';
 require_once dirname(__FILE__).'/web/CPage.php';
 require_once dirname(__FILE__).'/helpers/CXPathHelper.php';
 require_once dirname(__FILE__).'/helpers/CImageHelper.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CMessageHelper.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
@@ -36,7 +37,7 @@ class CWebTest extends CTest {
 
 	// Network throttling emulation modes.
 	const NETWORK_THROTTLING_NONE		= 'none';
-	const NETWORK_THROTTLING_OFFLINE		= 'offline';
+	const NETWORK_THROTTLING_OFFLINE	= 'offline';
 	const NETWORK_THROTTLING_SLOW		= 'slow';
 	const NETWORK_THROTTLING_FAST		= 'fast';
 
@@ -296,6 +297,15 @@ class CWebTest extends CTest {
 	}
 
 	/**
+	 * Check page header
+	 *
+	 * @param string $header	page header to be compared
+	 */
+	public function assertPageHeader($header) {
+		$this->assertEquals($header, $this->query('xpath://h1[@id="page-title-general"]')->one()->getText());
+	}
+
+	/**
 	 * Get instance of web page used in this test.
 	 *
 	 * @return CPage
@@ -460,6 +470,11 @@ class CWebTest extends CTest {
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) === false) {
 				$this->fail($message."\n".'Cannot save current screenshot.');
+			}
+
+			if ($compare['ref'] !== null
+					&& file_put_contents(PHPUNIT_SCREENSHOT_DIR.'src_'.$name, $compare['ref']) === false) {
+				$this->fail($message."\n".'Cannot save reference screenshot.');
 			}
 
 			if ($compare['diff'] !== null) {

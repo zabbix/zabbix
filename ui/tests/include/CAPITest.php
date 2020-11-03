@@ -42,7 +42,7 @@ class CAPITest extends CTest {
 	public function checkResult($response, $error = null) {
 		// Check response data.
 		if ($error === null || $error === false) {
-			$this->assertArrayHasKey('result', $response);
+			$this->assertArrayHasKey('result', $response, json_encode($response, JSON_PRETTY_PRINT));
 			$this->assertArrayNotHasKey('error', $response);
 		}
 		else {

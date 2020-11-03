@@ -26,7 +26,6 @@
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
 <div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="interface_row_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
-	<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
@@ -51,8 +50,8 @@
 	</div>
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_USEIP ?>">
 		<?= (new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))
-				->addValue(_('IP'), INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
-				->addValue(_('DNS'), INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
+				->addValue('IP', INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
+				->addValue('DNS', INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
 				->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_USEIP.' '.ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setModern(true)
 		?>
@@ -74,7 +73,7 @@
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_BODY ?>">
 		<?= (new CFormList('snmp_details_#{iface.interfaceid}'))
 				->cleanItems()
-				->addRow((new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'))->setAsteriskMark(),
+				->addRow(new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'),
 					new CComboBox('interfaces[#{iface.interfaceid}][details][version]', SNMP_V2C, null, [SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]),
 					'row_snmp_version_#{iface.interfaceid}'
 				)
@@ -166,6 +165,13 @@
 				<?= INTERFACE_TYPE_IPMI ?>: '<?= _('IPMI') ?>'
 			};
 
+			this.allow_empty_message = true;
+			this.$noInterfacesMsg = jQuery('<div class="<?= ZBX_STYLE_GREY ?>"></div>')
+				.text('<?= _('No interfaces are defined.') ?>')
+				.addClass('<?= ZBX_STYLE_GREY ?>')
+				.css('padding', '5px 0px')
+				.insertAfter(jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER ?>'));
+
 			// Variables.
 			this.interfaces = {};
 
@@ -184,7 +190,13 @@
 
 			Object
 				.entries(new_data)
-				.forEach(([_, value]) => this.interfaces[value.interfaceid] = value);
+				.forEach(([_, value]) => {
+					if (!('interfaceid' in value)) {
+						value.interfaceid = this.generateId();
+					}
+
+					this.interfaces[value.interfaceid] = value;
+				});
 
 			return this;
 		}
@@ -194,6 +206,10 @@
 		 */
 		get data() {
 			return this.interfaces;
+		}
+
+		setAllowEmptyMessage(value) {
+			this.allow_empty_message = value;
 		}
 
 		setSnmpFields(elem, iface) {
@@ -328,8 +344,7 @@
 
 		renderRow(iface) {
 			const container = document.querySelector(this.CONTAINER_IDS[iface.type]);
-			const disabled = (iface.items > 0);
-			const locked = (iface.locked > 0);
+			const disabled = (typeof iface.items !== 'undefined' && iface.items > 0);
 
 			iface.type_name = this.INTERFACE_NAMES[iface.type];
 
@@ -381,6 +396,7 @@
 			delete this.data[id];
 
 			this.resetMainInterfaces();
+			this.renderLayout();
 
 			return true;
 		}
@@ -395,6 +411,7 @@
 			this.renderRow(new_data);
 
 			this.resetMainInterfaces();
+			this.renderLayout();
 
 			if (new_data.type == <?= INTERFACE_TYPE_SNMP ?>) {
 				const elem = document.getElementById(`interface_row_${new_data.interfaceid}`);
@@ -499,6 +516,7 @@
 			}
 
 			this.resetMainInterfaces();
+			this.renderLayout();
 
 			// Add accordion functionality to SNMP interfaces.
 			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>])
@@ -514,37 +532,62 @@
 			return true;
 		}
 
-		static disableEdit() {
-			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')].map((row) => {
-				[...row.querySelectorAll('input')].map((el) => {
-					el.removeAttribute('name');
+		renderLayout() {
+			if (Object.keys(this.data).length > 0) {
+				jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER ?>').show();
+				this.$noInterfacesMsg.hide();
+			}
+			else {
+				jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER ?>').hide();
+				this.$noInterfacesMsg.toggle(this.allow_empty_message);
+			}
+		}
 
-					if (el.matches('[type=text]')) {
+		/**
+		 * Converts form field to readonly.
+		 *
+		 * @param {Element} el  Native JavaScript element for form field.
+		 */
+		static setReadonly(el) {
+			const tag_name = el.tagName;
+
+			if (tag_name === 'INPUT') {
+				const type = el.getAttribute('type');
+
+				switch (type) {
+					case 'text':
 						el.readOnly = true;
-					}
-
-					if (el.matches('[type=radio], [type=checkbox]')) {
+						break;
+					case 'radio':
+					case 'checkbox':
+						const {checked, name, value} = el;
 						el.disabled = true;
-					}
+
+						if (checked) {
+							const input = document.createElement('input');
+							input.type = 'hidden';
+							input.name = name;
+							input.value = value;
+
+							el.insertAdjacentElement('beforebegin', input);
+						}
+
+						break;
+				}
+			}
+			else if (tag_name === 'SELECT') {
+				el.setAttribute('readonly', 'readonly');
+				el.setAttribute('tabindex', -1);
+			}
+		}
+
+		static makeReadonly() {
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')].map((row) => {
+				[...row.querySelectorAll('input, select')].map((el) => {
+					this.setReadonly(el);
 				});
 
 				[...row.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')].map((el) => el.remove());
-
-				// Change select to input.
-				[...row.querySelectorAll('select')].map((el) => {
-					const index = el.selectedIndex;
-					const value = el.options[index].text;
-
-					// Create new input[type=text].
-					const input = document.createElement('input');
-					input.type = 'text';
-					input.id = el.id;
-					input.readOnly = true;
-					input.value = value;
-
-					// Replace select with created input.
-					el.replaceWith(input);
-				});
 			});
 
 			return true;
@@ -610,7 +653,7 @@
 		jQuery('input[name=tls_connect]').trigger('change');
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		jQuery('#hostsForm').submit(function() {
+		jQuery('#hosts-form').submit(function() {
 			var tls_accept = 0x00;
 
 			if (jQuery('#tls_in_none').is(':checked')) {

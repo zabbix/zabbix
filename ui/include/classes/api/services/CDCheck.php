@@ -24,6 +24,10 @@
  */
 class CDCheck extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'dchecks';
 	protected $tableAlias = 'dc';
 	protected $sortColumns = ['dcheckid', 'druleid'];
@@ -121,7 +125,7 @@ class CDCheck extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dcheck = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

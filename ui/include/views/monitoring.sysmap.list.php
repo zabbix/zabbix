@@ -29,10 +29,11 @@ $widget = (new CWidget())
 		(new CForm('get'))
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(new CSubmit('form', _('Create map')))
+				->addItem((new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit']))
 				->addItem(
 					(new CButton('form', _('Import')))
 						->onClick('redirect("map.import.php?rules_preset=map")')
+						->setEnabled($data['allowed_edit'])
 						->removeId()
 				)
 		)))->setAttribute('aria-label', _('Content controls'))
@@ -71,8 +72,12 @@ foreach ($this->data['maps'] as $map) {
 	$user_type = CWebUser::getType();
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $map['editable']) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
-		$action = new CLink(_('Properties'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid']);
-		$constructor = new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid']);
+		$action = $data['allowed_edit']
+			? new CLink(_('Properties'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'])
+			: _('Properties');
+		$constructor = $data['allowed_edit']
+			? new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid'])
+			: _('Constructor');
 	}
 	else {
 		$checkbox = (new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']))
@@ -94,15 +99,16 @@ $sysmapForm->addItem([
 	$sysmapTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'maps', [
-		'map.export' => ['name' => _('Export'), 'redirect' =>
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'export.sysmaps.xml')
-				->setArgument('backurl', (new CUrl('sysmaps.php'))
-					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-					->getUrl())
-				->getUrl()
+		'map.export' => [
+			'content' => new CButtonExport('export.sysmaps',
+				(new CUrl('sysmaps.php'))
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
 		],
-		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?')]
+		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?'),
+			'disabled' => $data['allowed_edit'] ? null : 'disabled'
+		]
 	])
 ]);
 

@@ -57,6 +57,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.fs.size[/,free]`,
 		`vfs.fs.inode[/,free]`,
 		`vfs.fs.discovery`,
+		`vfs.fs.get`,
 		`vfs.dev.write[sda,operations]`,
 		`net.tcp.listen[80]`,
 		`net.udp.listen[68]`,
@@ -93,10 +94,11 @@ func checkMetrics(s scheduler.Scheduler) {
 		`net.tcp.service.perf[ssh,127.0.0.1,22]`,
 		`net.udp.service[ntp,127.0.0.1,123]`,
 		`net.udp.service.perf[ntp,127.0.0.1,123]`,
+		`modbus.get[tcp://localhost]`,
 		`system.hostname`,
 	}
 
 	for _, metric := range metrics {
-		_ = checkMetric(s, metric)
+		checkMetric(s, metric)
 	}
 }

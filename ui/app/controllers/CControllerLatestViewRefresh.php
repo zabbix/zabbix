@@ -47,6 +47,13 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			// Hosts must have been selected as well if filtering items with data only.
+			if (!$this->getInput('filter_hostids', []) && !$this->getInput('filter_show_without_data', 0)) {
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -55,7 +62,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA);
 	}
 
 	protected function doAction() {
@@ -77,7 +84,10 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 		// data sort and pager
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
-		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_curl);
+		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
+
+		$this->extendData($prepared_data, $filter['show_without_data']);
+		$this->addCollapsedDataFromProfile($prepared_data);
 
 		// display
 		$data = [
@@ -85,7 +95,13 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
 			'view_curl' => $view_curl,
-			'paging' => $paging
+			'paging' => $paging,
+			'config' => [
+				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
+				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
+			]
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

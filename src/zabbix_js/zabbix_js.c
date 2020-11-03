@@ -103,6 +103,12 @@ char	*CONFIG_TLS_CIPHER_CMD		= NULL;
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
 
+
+char	*CONFIG_SOURCE_IP 		= NULL;
+char	*CONFIG_SSL_CA_LOCATION		= NULL;
+char	*CONFIG_SSL_CERT_LOCATION	= NULL;
+char	*CONFIG_SSL_KEY_LOCATION	= NULL;
+
 static char	*read_file(const char *filename, char **error)
 {
 	char	buffer[4096];
@@ -151,6 +157,7 @@ static char	*execute_script(const char *script, const char *param, int timeout, 
 	if (FAIL == zbx_es_init_env(&es, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
+		zbx_free(errmsg);
 		return NULL;
 	}
 
@@ -160,12 +167,14 @@ static char	*execute_script(const char *script, const char *param, int timeout, 
 	if (FAIL == zbx_es_compile(&es, script, &code, &size, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
+		zbx_free(errmsg);
 		goto out;
 	}
 
 	if (FAIL == zbx_es_execute(&es, script, code, size, param, &result, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
+		zbx_free(errmsg);
 		goto out;
 	}
 out:

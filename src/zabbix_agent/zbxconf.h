@@ -23,7 +23,7 @@
 #include "cfg.h"
 
 extern char	*CONFIG_HOSTS_ALLOWED;
-extern char	*CONFIG_HOSTNAME;
+extern char	*CONFIG_HOSTNAMES;
 extern char	*CONFIG_HOSTNAME_ITEM;
 extern char	*CONFIG_HOST_METADATA;
 extern char	*CONFIG_HOST_METADATA_ITEM;

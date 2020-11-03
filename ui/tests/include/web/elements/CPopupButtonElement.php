@@ -69,7 +69,7 @@ class CPopupButtonElement extends CElement {
 			return $menu;
 		}
 
-		$this->click();
+		$this->click(true);
 
 		return $query->waitUntilVisible()->one();
 	}

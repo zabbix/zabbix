@@ -587,7 +587,7 @@ jQuery(function($) {
 									'class': 'dialogue-widget-save',
 									'isSubmit': true,
 									'action': function(overlay) {
-										var form = $('#widget_dialogue_form'),
+										var form = $('#widget-dialogue-form'),
 											url = new Curl('zabbix.php');
 
 										url.setArgument('action', 'widget.navtree.item.update');
@@ -1267,6 +1267,14 @@ jQuery(function($) {
 					});
 				},
 
+				// onWidgetCopy trigger method
+				onWidgetCopy: function() {
+					var $this = $(this);
+					return this.each(function() {
+						updateWidgetFields($this);
+					});
+				},
+
 				// onEditStart trigger method
 				onEditStart: function() {
 					var $this = $(this);
@@ -1314,7 +1322,9 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var	triggers = ['onEditStart', 'beforeDashboardSave','beforeConfigLoad', 'onDashboardReady'];
+						var	triggers = ['onEditStart', 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
+							'onDashboardReady'
+						];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-container").dashboardGrid("addAction", trigger,

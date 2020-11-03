@@ -233,6 +233,7 @@ jQuery(function($) {
 	 */
 	function isServerRequestRequired(type) {
 		switch (type) {
+			case 'dashboard':
 			case 'dropdown':
 			case 'submenu':
 				return false;
@@ -255,8 +256,7 @@ jQuery(function($) {
 				return {
 					of: $obj,
 					my: 'left top',
-					at: 'left top+24',
-					collision: 'none'
+					at: 'left bottom'
 				};
 
 			case 'submenu':

@@ -1313,4 +1313,3 @@ int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hosti
 
 	return zbx_tm_task_result_wait(taskid, info);
 }
-

@@ -32,6 +32,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'API user create without password',
+					'roleid' => 1,
 					'usrgrps' => [
 						['usrgrpid' => 7]
 					]
@@ -42,6 +43,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'passwd' => 'zabbix',
+					'roleid' => 1,
 					'usrgrps' => [
 						['usrgrpid' => 7]
 					]
@@ -51,6 +53,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => '',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 7]
@@ -61,6 +64,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'Admin',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 7]
@@ -72,6 +76,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => 'API create users with the same names',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -79,6 +84,7 @@ class testUsers extends CAPITest {
 					],
 					[
 						'alias' => 'API create users with the same names',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -90,6 +96,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						'usrgrpid' => 7
@@ -101,6 +108,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User without group parameter',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrps" is missing.'
@@ -108,6 +116,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User without group',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 					]
@@ -117,6 +126,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'Group unexpected parameter',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['userid' => '1']
@@ -127,6 +137,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty group id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '']
@@ -137,6 +148,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User group id not number',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => 'abc']
@@ -147,6 +159,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User group id not valid',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '1.1']
@@ -157,6 +170,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with nonexistent group id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '123456']
@@ -167,6 +181,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with two identical user group id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7'],
@@ -175,11 +190,39 @@ class testUsers extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
+			// Roleid is missing.
+			[
+				'user' => [
+					[
+						'alias' => 'API user create 1',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "roleid" is missing.'
+			],
+			// Roleid is as a string.
+			[
+				'user' => [
+					[
+						'alias' => 'API user create 1',
+						'roleid' => 'twenty_five',
+						'passwd' => 'zabbix',
+						'usrgrps' => [
+							['usrgrpid' => 7]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
+			],
 			// Check successfully creation of user.
 			[
 				'user' => [
 					[
 						'alias' => 'API user create 1',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -192,6 +235,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => '☺',
+						'roleid' => 1,
 						'passwd' => '☺',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -204,6 +248,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => 'УТФ Юзер',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
@@ -216,11 +261,12 @@ class testUsers extends CAPITest {
 				'user' => [
 					[
 						'alias' => 'API user create with media',
+						'roleid' => 1,
 						'passwd' => 'zabbix',
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						],
-						'user_medias' => [
+						'medias' => [
 							[
 								'mediatypeid' => '1',
 								'sendto' => 'api@zabbix.com',
@@ -248,7 +294,7 @@ class testUsers extends CAPITest {
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
 				$this->assertEquals($dbRowUser['autologout'], '15m');
-				$this->assertEquals($dbRowUser['lang'], 'en_GB');
+				$this->assertEquals($dbRowUser['lang'], 'default');
 				$this->assertEquals($dbRowUser['refresh'], '30s');
 				$this->assertEquals($dbRowUser['rows_per_page'], 50);
 				$this->assertEquals($dbRowUser['theme'], 'default');
@@ -258,11 +304,11 @@ class testUsers extends CAPITest {
 						' and usrgrpid='.zbx_dbstr($user[$key]['usrgrps'][0]['usrgrpid']))
 				);
 
-				if (array_key_exists('user_medias', $user[$key])) {
+				if (array_key_exists('medias', $user[$key])) {
 					$dbResultMedia = DBSelect('select * from media where userid='.$id);
 					$dbRowMedia = DBFetch($dbResultMedia);
-					$this->assertEquals($dbRowMedia['mediatypeid'], $user[$key]['user_medias'][0]['mediatypeid']);
-					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['user_medias'][0]['sendto']);
+					$this->assertEquals($dbRowMedia['mediatypeid'], $user[$key]['medias'][0]['mediatypeid']);
+					$this->assertEquals($dbRowMedia['sendto'], $user[$key]['medias'][0]['sendto']);
 					$this->assertEquals($dbRowMedia['active'], 0);
 					$this->assertEquals($dbRowMedia['severity'], 63);
 					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
@@ -281,11 +327,12 @@ class testUsers extends CAPITest {
 	public function testUsers_CreateUserWithMultipleEmails() {
 		$user = [
 			'alias' => 'API user create with multiple emails',
+			'roleid' => 1,
 			'passwd' => 'zabbix',
 			'usrgrps' => [
 				['usrgrpid' => 7]
 			],
-			'user_medias' => [
+			'medias' => [
 				[
 					'mediatypeid' => '1',
 					'sendto' => ["api1@zabbix.com","Api test <api2@zabbix.com>","АПИ test ☺æų <api2@zabbix.com>"],
@@ -299,7 +346,7 @@ class testUsers extends CAPITest {
 
 		$dbResultMedia = DBSelect('select * from media where userid='.zbx_dbstr($id));
 		$dbRowMedia = DBFetch($dbResultMedia);
-		$diff = array_diff($user['user_medias'][0]['sendto'], explode("\n", $dbRowMedia['sendto']));
+		$diff = array_diff($user['medias'][0]['sendto'], explode("\n", $dbRowMedia['sendto']));
 		$this->assertEquals(0, count($diff));
 	}
 
@@ -500,9 +547,9 @@ class testUsers extends CAPITest {
 				'user' => [[
 					'userid' => '1',
 					'alias' => 'Try to change super-admin user type',
-					'type' => '2'
+					'roleid' => '2'
 				]],
-				'expected_error' => 'User cannot change their user type.'
+				'expected_error' => 'At least one active user must exist with role "Super Admin role".'
 			],
 			// Successfully user update.
 			[
@@ -540,7 +587,7 @@ class testUsers extends CAPITest {
 						'usrgrps' => [
 							['usrgrpid' => 7]
 						],
-						'user_medias' => [
+						'medias' => [
 							[
 								'mediatypeid' => '1',
 								'sendto' => 'api@zabbix.com',
@@ -586,11 +633,11 @@ class testUsers extends CAPITest {
 						' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
 				);
 
-				if (array_key_exists('user_medias', $users[$key])) {
+				if (array_key_exists('medias', $users[$key])) {
 					$dbResultMedia = DBSelect('select * from media where userid='.zbx_dbstr($id));
 					$dbRowMedia = DBFetch($dbResultMedia);
-					$this->assertEquals($dbRowMedia['mediatypeid'], $users[$key]['user_medias'][0]['mediatypeid']);
-					$this->assertEquals($dbRowMedia['sendto'], $users[$key]['user_medias'][0]['sendto']);
+					$this->assertEquals($dbRowMedia['mediatypeid'], $users[$key]['medias'][0]['mediatypeid']);
+					$this->assertEquals($dbRowMedia['sendto'], $users[$key]['medias'][0]['sendto']);
 					$this->assertEquals($dbRowMedia['active'], 0);
 					$this->assertEquals($dbRowMedia['severity'], 63);
 					$this->assertEquals($dbRowMedia['period'], '1-7,00:00-24:00');
@@ -749,6 +796,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with autologout and autologin together',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
@@ -779,7 +827,7 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value must be one of en_GB, en_US, bg_BG, ca_ES, zh_CN, '
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of default, en_GB, en_US, bg_BG, ca_ES, zh_CN, '
 				. 'zh_TW, cs_CZ, nl_NL, fi_FI, fr_FR, ka_GE, de_DE, el_GR, he_IL, hu_HU, id_ID, it_IT, ko_KR, ja_JP, lv_LV, '
 				. 'lt_LT, nb_NO, fa_IR, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sk_SK, es_ES, sv_SE, tr_TR, uk_UA, vi_VN.'
 			],
@@ -820,36 +868,36 @@ class testUsers extends CAPITest {
 			// Check user properties, type.
 			[
 				'user' => [
-					'alias' => 'User with empty type',
+					'alias' => 'User with empty roleid',
+					'roleid' => '',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
-					],
-					'type' => ''
+					]
 				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid type',
+					'alias' => 'User with invalid roleid',
+					'roleid' => 0,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
-					],
-					'type' => '0'
+					]
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 1, 2, 3.'
+				'expected_error' => 'User role with ID "0" is not available.'
 			],
 			[
 				'user' => [
-					'alias' => 'User with invalid type',
+					'alias' => 'User with invalid roleid',
+					'roleid' => '1.1',
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
-					],
-					'type' => '1.1'
+					]
 				],
-				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
 			],
 			// Check user properties, refresh.
 			[
@@ -922,53 +970,57 @@ class testUsers extends CAPITest {
 			// Check user media, mediatypeid.
 			[
 				'user' => [
-					'alias' => 'User without user_medias properties',
+					'alias' => 'User without medias properties',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [[ ]],
+					'medias' => [[ ]],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1": the parameter "mediatypeid" is missing.'
+				'expected_error' => 'Invalid parameter "/1/medias/1": the parameter "mediatypeid" is missing.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with empty mediatypeid',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => ''
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/mediatypeid": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/mediatypeid": a number is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid mediatypeid',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1.1'
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/mediatypeid": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/mediatypeid": a number is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with nonexistent media type id',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1234',
 							'sendto' => 'api@zabbix.com'
@@ -981,26 +1033,28 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User without sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1'
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1": the parameter "sendto" is missing.'
+				'expected_error' => 'Invalid parameter "/1/medias/1": the parameter "sendto" is missing.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ''
@@ -1012,43 +1066,46 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => [[]]
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto/1": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": a character string is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => []
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/sendto": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto": cannot be empty.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with empty sendto',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => [""]
@@ -1060,11 +1117,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty second email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["test1@zabbix.com",""]
@@ -1076,11 +1134,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["test1zabbix.com"]
@@ -1092,11 +1151,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["test1@zabbixcom"]
@@ -1108,11 +1168,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["test1@@zabbix.com"]
@@ -1124,11 +1185,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["test1 test2@zabbix.com"]
@@ -1140,11 +1202,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["<test1@zabbix.com> test2"]
@@ -1156,11 +1219,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["test1@zabbix.com, a,b"]
@@ -1172,11 +1236,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with invalid email',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => ["test1@zabbix.com,test2@zabbix.com"]
@@ -1189,11 +1254,12 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					'alias' => 'User with empty active',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 							'mediatypeid' => '1',
 							'sendto' => 'api@zabbix.com',
@@ -1201,16 +1267,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/active": an integer is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid active',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1218,16 +1285,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/active": an integer is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid active',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1235,17 +1303,18 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": value must be one of 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/active": value must be one of 0, 1.'
 			],
 			// Check user media, severity.
 			[
 				'user' => [
 					'alias' => 'User with empty severity',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1253,16 +1322,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/severity": an integer is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid severity',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1270,17 +1340,18 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": value must be one of 0-63.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/severity": value must be one of 0-63.'
 			],
 			// Check user media, period.
 			[
 				'user' => [
 					'alias' => 'User with empty period',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1288,16 +1359,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": cannot be empty.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with string period',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1305,16 +1377,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid period, without comma',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1322,16 +1395,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid period, with two comma',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1339,16 +1413,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid period, 8 week days',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1356,16 +1431,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid period, zero week day',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1373,16 +1449,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1390,16 +1467,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1407,16 +1485,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1424,16 +1503,17 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			[
 				'user' => [
 					'alias' => 'User with invalid time',
+					'roleid' => 1,
 					'passwd' => 'zabbix',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
-					'user_medias' => [
+					'medias' => [
 						[
 						'mediatypeid' => '1',
 						'sendto' => 'api@zabbix.com',
@@ -1441,15 +1521,16 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/period": a time period is expected.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/period": a time period is expected.'
 			],
 			// Successfully user update and create with all parameters.
 			[
 				'user' => [
 					'alias' => 'all-parameters',
+					'roleid' => 3,
 					'passwd' => 'zabbix',
 					'usrgrps' => [['usrgrpid' => 7]],
-					'user_medias' => [
+					'medias' => [
 							[
 								'mediatypeid' => '1',
 								'sendto' => 'apicreate@zabbix.com',
@@ -1464,7 +1545,6 @@ class testUsers extends CAPITest {
 					'autologout' => 0,
 					'lang' => 'en_US',
 					'refresh' => 90,
-					'type' => 3,
 					'theme' => 'dark-theme',
 					'rows_per_page' => 25,
 					'url' => 'zabbix.php?action=userprofile.edit'
@@ -1511,11 +1591,11 @@ class testUsers extends CAPITest {
 				);
 
 				$dbRowMedia = DBFetch($dbResultMedia);
-				$this->assertEquals($dbRowMedia['mediatypeid'], $user['user_medias'][0]['mediatypeid']);
-				$this->assertEquals($dbRowMedia['sendto'], $user['user_medias'][0]['sendto']);
-				$this->assertEquals($dbRowMedia['active'], $user['user_medias'][0]['active']);
-				$this->assertEquals($dbRowMedia['severity'], $user['user_medias'][0]['severity']);
-				$this->assertEquals($dbRowMedia['period'], $user['user_medias'][0]['period']);
+				$this->assertEquals($dbRowMedia['mediatypeid'], $user['medias'][0]['mediatypeid']);
+				$this->assertEquals($dbRowMedia['sendto'], $user['medias'][0]['sendto']);
+				$this->assertEquals($dbRowMedia['active'], $user['medias'][0]['active']);
+				$this->assertEquals($dbRowMedia['severity'], $user['medias'][0]['severity']);
+				$this->assertEquals($dbRowMedia['period'], $user['medias'][0]['period']);
 			}
 			else {
 				$this->assertEquals(0, CDBHelper::getCount('select * from users where alias='.zbx_dbstr($user['alias'])));
@@ -1613,7 +1693,7 @@ class testUsers extends CAPITest {
 								['usrgrpid' => 7]
 							]
 						],
-				'expected_error' => 'You do not have permissions to create users.'
+				'expected_error' => 'No permissions to call "user.create".'
 			],
 			[
 				'method' => 'user.update',
@@ -1628,7 +1708,7 @@ class testUsers extends CAPITest {
 				'method' => 'user.delete',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'user' => ['9'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "user.delete".'
 			],
 			[
 				'method' => 'user.create',
@@ -1640,7 +1720,7 @@ class testUsers extends CAPITest {
 								['usrgrpid' => 7]
 							]
 						],
-				'expected_error' => 'You do not have permissions to create users.'
+				'expected_error' => 'No permissions to call "user.create".'
 			],
 			[
 				'method' => 'user.update',
@@ -1655,7 +1735,7 @@ class testUsers extends CAPITest {
 				'method' => 'user.delete',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'user' => ['9'],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "user.delete".'
 			]
 		];
 	}

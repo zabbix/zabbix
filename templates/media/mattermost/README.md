@@ -68,8 +68,8 @@ This guide describes how to integrate your Zabbix 4.4 installation with Mattermo
 
 The **Send to** field can contain several variants of values:
 
-- Channel name in **team\_name/#channel\_name** format
-- Channel name in **team\_name/@user\_name** format for direct messages
+- Channel name in **`team_name/#channel_name`** format
+- Channel name in **`team_name/@user_name`** format for direct messages
 - Identifier of the channel (for example: **fqzj8ysn8frxu8m9hcjna5uqmc**)
 
 [![](images/thumb.2.png?raw=true)](images/2.png)

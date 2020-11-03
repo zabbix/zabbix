@@ -34,22 +34,47 @@ $web_layout_mode = $this->getLayoutMode();
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create dashboard'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'dashboard.view')
-					->setArgument('new', '1')
-					->getUrl()
-			))
-		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-		))
-		->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CRedirectButton(_('Create dashboard'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->setArgument('new', '1')
+							->getUrl()
+					))->setEnabled($data['allowed_edit'])
+				)
+				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+			)
+		)->setAttribute('aria-label', _('Content controls'))
 	);
+
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
+	$widget
+		->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')))
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			),
+			(new CFormList())->addRow(_('Show'),
+				(new CRadioButtonList('filter_show', (int) $data['filter']['show']))
+					->addValue(_('All'), DASHBOARD_FILTER_SHOW_ALL)
+					->addValue(_('Created by me'), DASHBOARD_FILTER_SHOW_MY)
+					->setModern(true)
+			)
+		])
+		->addVar('action', 'dashboard.list')
+	);
+}
 
 $form = (new CForm())->setName('dashboardForm');
 
+// Create dashboard table.
 $table = (new CTableInfo())
+	->addClass(ZBX_STYLE_DASHBOARD_LIST)
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_dashboards'))
@@ -58,23 +83,34 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
-				->getUrl()
-		)
+				->getUrl())
 	]);
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->setArgument('dashboardid', '');
-
 foreach ($data['dashboards'] as $dashboard) {
+	$tags = [];
+
+	if ($dashboard['userid'] == CWebUser::$data['userid']) {
+		$tags[] = (new CSpan(_('My')))->addClass(ZBX_STYLE_STATUS_GREEN);
+
+		if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
+				|| count($dashboard['userGroups']) > 0) {
+			$tags[] = ' ';
+			$tags[] = (new CSpan(_('Shared')))->addClass(ZBX_STYLE_STATUS_YELLOW);
+		}
+	}
+
 	$table->addRow([
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
-		new CLink($dashboard['name'],
-			$url
-				->setArgument('dashboardid', $dashboard['dashboardid'])
-				->getUrl()
-		)
+		(new CDiv([
+			new CLink($dashboard['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('dashboardid', $dashboard['dashboardid'])
+					->getUrl()
+			),
+			$tags ? new CDiv($tags) : null
+		]))->addClass(ZBX_STYLE_DASHBOARD_LIST_ITEM)
 	]);
 }
 
@@ -82,7 +118,11 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
-		'dashboard.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected dashboards?')]
+		'dashboard.delete' => [
+			'name' => _('Delete'),
+			'confirm' => _('Delete selected dashboards?'),
+			'disabled' => !$data['allowed_edit']
+		]
 	], 'dashboard')
 ]);
 

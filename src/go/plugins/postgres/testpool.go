@@ -42,7 +42,7 @@ func сreateConnection() error {
 	connString := "postgresql://postgres:postgres@localhost:5432/postgres"
 	newConn, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
-		log.Critf("[сreateConnection] cannot get Postgres version: %s", err.Error())
+		log.Critf("[сreateConnection] cannot create connection to Postgres: %s", err.Error())
 		return err
 	}
 	versionPG, err := GetPostgresVersion(newConn)
@@ -52,9 +52,9 @@ func сreateConnection() error {
 	}
 	version, err := strconv.Atoi(versionPG)
 	if err != nil {
-		log.Critf("[сreateConnection] invalkid Postgres version: %s", err.Error())
+		log.Critf("[сreateConnection] invalid Postgres version: %s", err.Error())
 		return err
 	}
-	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version}
+	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version, connString: connString, timeout: 30}
 	return nil
 }

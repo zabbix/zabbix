@@ -36,7 +36,7 @@ class CControllerMediatypeDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
 			return false;
 		}
 
@@ -63,10 +63,10 @@ class CControllerMediatypeDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Media type deleted', 'Media types deleted', $deleted));
+			CMessageHelper::setSuccessTitle(_n('Media type deleted', 'Media types deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete media type', 'Cannot delete media types', $deleted));
+			CMessageHelper::setErrorTitle(_n('Cannot delete media type', 'Cannot delete media types', $deleted));
 		}
 		$this->setResponse($response);
 	}

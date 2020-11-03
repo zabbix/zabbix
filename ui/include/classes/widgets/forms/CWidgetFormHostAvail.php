@@ -24,8 +24,8 @@
  */
 class CWidgetFormHostAvail extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_HOST_AVAIL);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_HOST_AVAIL);
 
 		// Host groups.
 		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));

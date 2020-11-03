@@ -39,7 +39,7 @@ class CControllerUsergroupMassUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS);
 	}
 
 	protected function doAction() {
@@ -63,10 +63,10 @@ class CControllerUsergroupMassUpdate extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('User group updated', 'User groups updated', $updated));
+			CMessageHelper::setSuccessTitle(_n('User group updated', 'User groups updated', $updated));
 		}
 		else {
-			$response->setMessageError(_n('Cannot update user group', 'Cannot update user groups', $updated));
+			CMessageHelper::setErrorTitle(_n('Cannot update user group', 'Cannot update user groups', $updated));
 		}
 
 		$this->setResponse($response);

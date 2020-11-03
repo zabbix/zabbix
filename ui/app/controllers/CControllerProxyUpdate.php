@@ -55,7 +55,7 @@ class CControllerProxyUpdate extends CController {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update proxy'));
+					CMessageHelper::setErrorTitle(_('Cannot update proxy'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -68,7 +68,7 @@ class CControllerProxyUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)) {
 			return false;
 		}
 
@@ -112,7 +112,7 @@ class CControllerProxyUpdate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Proxy updated'));
+			CMessageHelper::setSuccessTitle(_('Proxy updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -120,7 +120,7 @@ class CControllerProxyUpdate extends CController {
 				->setArgument('proxyid', $this->getInput('proxyid'))
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update proxy'));
+			CMessageHelper::setErrorTitle(_('Cannot update proxy'));
 		}
 		$this->setResponse($response);
 	}

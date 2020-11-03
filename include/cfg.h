@@ -20,6 +20,8 @@
 #ifndef ZABBIX_CFG_H
 #define ZABBIX_CFG_H
 
+#include "zbxalgo.h"
+
 #define	TYPE_INT		0
 #define	TYPE_STRING		1
 #define	TYPE_MULTISTRING	2
@@ -65,7 +67,7 @@ int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int
 int	check_cfg_feature_int(const char *parameter, int value, const char *feature);
 int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
 
-typedef int	(*add_serveractive_host_f)(const char *host, unsigned short port);
-void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb);
+typedef int	(*add_serveractive_host_f)(const char *host, unsigned short port, zbx_vector_str_t *hostnames);
+void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb, zbx_vector_str_t *hostnames);
 
 #endif

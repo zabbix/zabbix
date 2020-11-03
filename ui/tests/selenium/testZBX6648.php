@@ -69,7 +69,7 @@ class testZBX6648 extends CLegacyWebTest {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
+		$this->zbxTestClickButtonMultiselect('triggerids_0');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 
 		switch ($zbx_data['triggers']) {

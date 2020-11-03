@@ -76,7 +76,7 @@ class testMultiselect extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->query('button:Create dashboard')->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->one()->waitUntilReady();
 		$this->assertEquals('Dashboard properties', $dialog->getTitle());
 		$dialog->close();
 		$dashboard = CDashboardElement::find()->one();

@@ -24,6 +24,16 @@
  */
 abstract class CHostGeneral extends CHostBase {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	/**
 	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
 	 *
@@ -424,8 +434,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!empty($items[ZBX_FLAG_DISCOVERY_RULE])) {
 			if ($clear) {
-				$result = API::DiscoveryRule()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_RULE]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear discovery rules'));
+				CDiscoveryRuleManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_RULE]));
 			}
 			else{
 				DB::update('items', [
@@ -974,73 +983,6 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
-	 *
-	 * @param array  $hosts
-	 * @param int    $hosts[]['hostid']
-	 * @param int    $hosts[]['templateid']
-	 * @param array  $hosts[]['tags']
-	 * @param string $hosts[]['tags'][]['tag']
-	 * @param string $hosts[]['tags'][]['value']
-	 * @param string $id_field
-	 */
-	protected function updateTags(array $hosts, $id_field) {
-		$hostids = [];
-		foreach ($hosts as $host) {
-			if (array_key_exists('tags', $host)) {
-				$hostids[] = $host[$id_field];
-			}
-		}
-
-		if (!$hostids) {
-			return;
-		}
-
-		$options = [
-			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
-			'filter' => ['hostid' => $hostids]
-		];
-
-		$db_tags = DBselect(DB::makeSql('host_tag', $options));
-		$db_hosts = [];
-		$del_hosttagids = [];
-
-		while ($db_tag = DBfetch($db_tags)) {
-			$db_hosts[$db_tag['hostid']]['tags'][] = $db_tag;
-			$del_hosttagids[$db_tag['hosttagid']] = true;
-		}
-
-		$ins_tags = [];
-		foreach ($hosts as $host) {
-			foreach ($host['tags'] as $tag) {
-				$tag += ['value' => ''];
-
-				if (array_key_exists($host[$id_field], $db_hosts)) {
-					foreach ($db_hosts[$host[$id_field]]['tags'] as $db_tag) {
-						if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
-							unset($del_hosttagids[$db_tag['hosttagid']]);
-							$tag = null;
-							break;
-						}
-					}
-				}
-
-				if ($tag !== null) {
-					$ins_tags[] = ['hostid' => $host[$id_field]] + $tag;
-				}
-			}
-		}
-
-		if ($del_hosttagids) {
-			DB::delete('host_tag', ['hosttagid' => array_keys($del_hosttagids)]);
-		}
-
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
-		}
-	}
-
-	/**
 	 * Validates tags.
 	 *
 	 * @param array  $host
@@ -1054,7 +996,7 @@ abstract class CHostGeneral extends CHostBase {
 	protected function validateTags(array $host) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+			'tags'		=> ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
 				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]]

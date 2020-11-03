@@ -89,8 +89,8 @@ foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFA
 					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
 					->removeId(),
 				(new CRadioButtonList('useip['.$interface['interfaceid'].']', (int) $interface['useip']))
-					->addValue(_('IP'), INTERFACE_USE_IP)
-					->addValue(_('DNS'), INTERFACE_USE_DNS)
+					->addValue('IP', INTERFACE_USE_IP)
+					->addValue('DNS', INTERFACE_USE_DNS)
 					->setModern(true)
 					->setEnabled(false),
 				(new CTextBox('port', $interface['port'], true, 64))
@@ -132,42 +132,56 @@ if ($data['host']['description'] !== '') {
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		new CLink(_('Web'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'web.view')
-			->setArgument('filter_hostids[]', $data['host']['hostid'])
-			->setArgument('filter_set', '1')
-		),
-		new CLink(_('Latest data'),
-			(new CUrl('zabbix.php'))
+		$data['allowed_ui_hosts']
+			? new CLink(_('Web'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('filter_hostids[]', $data['host']['hostid'])
+				->setArgument('filter_set', '1')
+			)
+			: _('Web'),
+		$data['allowed_ui_latest_data']
+			? new CLink(_('Latest data'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
 				->setArgument('filter_show_details', '1')
 				->setArgument('filter_set', '1')
-		),
-		new CLink(_('Problems'),
-			(new CUrl('zabbix.php'))
+			)
+			: _('Latest data'),
+		$data['allowed_ui_problems']
+			? new CLink(_('Problems'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_hostids[]', $data['host']['hostid'])
-				->setArgument('filter_set', '1')
-		),
-		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'charts.view')
-				->setArgument('view_as', HISTORY_GRAPH)
-				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-				->setArgument('filter_hostids', [$data['host']['hostid']])
-		),
-		new CLink(_('Screens'), (new CUrl('host_screen.php'))->setArgument('hostid', $data['host']['hostid']))
+				->setArgument('filter_name', '')
+				->setArgument('hostids', [$data['host']['hostid']])
+			)
+			: _('Problems'),
+		$data['allowed_ui_hosts']
+			? new CLink(_('Graphs'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'charts.view')
+					->setArgument('filter_set', '1')
+					->setArgument('view_as', HISTORY_GRAPH)
+					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+					->setArgument('filter_hostids', [$data['host']['hostid']])
+			)
+			: _('Graphs'),
+		$data['allowed_ui_hosts']
+			? new CLink(_('Dashboards'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.dashboard.view')
+				->setArgument('hostid', $data['host']['hostid'])
+			)
+			: _('Dashboards')
 	])
 );
 
 // configuration
-if ($data['rwHost']) {
+if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 	$hostLink = new CLink(_('Host'), (new CUrl('hosts.php'))
 		->setArgument('form', 'update')
 		->setArgument('hostid', $data['host']['hostid'])
 	);
 	$applicationsLink = new CLink(_('Applications'),
-		(new CUrl('applications.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'application.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);

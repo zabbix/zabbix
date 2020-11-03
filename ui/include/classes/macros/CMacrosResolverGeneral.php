@@ -152,23 +152,28 @@ class CMacrosResolverGeneral {
 		}
 
 		if ($extract_macros) {
-			$macro_parser = new CMacroParser($types['macros']);
+			$macro_parser = new CMacroParser(['macros' => $types['macros']]);
 		}
 
 		if ($extract_macros_n) {
-			$macro_n_parser = new CMacroParser($types['macros_n'], ['ref_type' => CMacroParser::REFERENCE_NUMERIC]);
+			$macro_n_parser = new CMacroParser([
+				'macros' => $types['macros_n'],
+				'ref_type' => CMacroParser::REFERENCE_NUMERIC
+			]);
 		}
 
 		if ($extract_macros_an) {
-			$macro_an_parser = new CMacroParser($types['macros_an'],
-				['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]
-			);
+			$macro_an_parser = new CMacroParser([
+				'macros' => $types['macros_an'],
+				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
+			]);
 		}
 
 		if ($extract_macro_funcs_n) {
-			$macro_func_n_parser = new CMacroFunctionParser($types['macro_funcs_n'],
-				['ref_type' => CMacroParser::REFERENCE_NUMERIC]
-			);
+			$macro_func_n_parser = new CMacroFunctionParser([
+				'macros' => $types['macro_funcs_n'],
+				'ref_type' => CMacroParser::REFERENCE_NUMERIC
+			]);
 		}
 
 		if ($extract_references) {
@@ -271,7 +276,7 @@ class CMacrosResolverGeneral {
 			$macros['macros'] = [];
 
 			foreach ($types['macros'] as $key => $macro_patterns) {
-				$types['macros'][$key] = new CMacroParser($macro_patterns);
+				$types['macros'][$key] = new CMacroParser(['macros' => $macro_patterns]);
 				$macros['macros'][$key] = [];
 			}
 		}
@@ -280,9 +285,10 @@ class CMacrosResolverGeneral {
 			$macros['macros_n'] = [];
 
 			foreach ($types['macros_n'] as $key => $macro_patterns) {
-				$types['macros_n'][$key] = new CMacroParser($macro_patterns,
-					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
-				);
+				$types['macros_n'][$key] = new CMacroParser([
+					'macros' => $macro_patterns,
+					'ref_type' => CMacroParser::REFERENCE_NUMERIC
+				]);
 				$macros['macros_n'][$key] = [];
 			}
 		}
@@ -291,9 +297,10 @@ class CMacrosResolverGeneral {
 			$macros['macros_an'] = [];
 
 			foreach ($types['macros_an'] as $key => $macro_patterns) {
-				$types['macros_an'][$key] = new CMacroParser($macro_patterns,
-					['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]
-				);
+				$types['macros_an'][$key] = new CMacroParser([
+					'macros' => $macro_patterns,
+					'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
+				]);
 				$macros['macros_an'][$key] = [];
 			}
 		}
@@ -302,9 +309,10 @@ class CMacrosResolverGeneral {
 			$macros['macro_funcs_n'] = [];
 
 			foreach ($types['macro_funcs_n'] as $key => $macro_patterns) {
-				$types['macro_funcs_n'][$key] = new CMacroFunctionParser($macro_patterns,
-					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
-				);
+				$types['macro_funcs_n'][$key] = new CMacroFunctionParser([
+					'macros' => $macro_patterns,
+					'ref_type' => CMacroParser::REFERENCE_NUMERIC
+				]);
 				$macros['macro_funcs_n'][$key] = [];
 			}
 		}
@@ -442,7 +450,7 @@ class CMacrosResolverGeneral {
 	/**
 	 * Returns the list of the item key parameters.
 	 *
-	 * @param string $params_raw
+	 * @param array $params_raw
 	 *
 	 * @return array
 	 */
@@ -636,7 +644,7 @@ class CMacrosResolverGeneral {
 		$functionids = [];
 
 		$functionid_parser = new CFunctionIdParser();
-		$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 		$user_macro_parser = new CUserMacroParser();
 
 		for ($pos = 0, $i = 1; isset($expression[$pos]); $pos++) {
@@ -782,7 +790,9 @@ class CMacrosResolverGeneral {
 						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':
-						$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
+						$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
+							CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+						));
 
 						if (array_key_exists($function['itemid'], $history)) {
 							$clock = $history[$function['itemid']][0]['clock'];
@@ -864,6 +874,76 @@ class CMacrosResolverGeneral {
 								->addClass('hint-item')
 								->setAttribute('data-hintbox', '1')
 						]);
+					}
+
+					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
+				}
+			}
+		}
+
+		return $macro_values;
+	}
+
+	protected function getItemLogMacros(array $macros, array $macro_values) {
+		if (!$macros) {
+			return $macro_values;
+		}
+
+		$functions = DBfetchArray(DBselect(
+			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
+			' FROM functions f'.
+				' JOIN items i ON f.itemid=i.itemid'.
+				' JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE '.dbConditionInt('f.functionid', array_keys($macros)).
+			' AND i.value_type='.ITEM_VALUE_TYPE_LOG
+		));
+
+		if (!$functions) {
+			return $macro_values;
+		}
+
+		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+
+		foreach ($functions as $function) {
+			foreach ($macros[$function['functionid']] as $m => $tokens) {
+				$value = UNRESOLVED_MACRO_STRING;
+
+				$history = Manager::History()->getLastValues([$function], 1,
+					CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+				);
+				if (!array_key_exists($function['itemid'], $history)) {
+					continue;
+				}
+
+				switch ($m) {
+					case 'ITEM.LOG.DATE':
+						$value = date('Y.m.d', $history[$function['itemid']][0]['timestamp']);
+						break;
+					case 'ITEM.LOG.TIME':
+						$value = date('H:i:s', $history[$function['itemid']][0]['timestamp']);;
+						break;
+					case 'ITEM.LOG.AGE':
+						$value = zbx_date2age($history[$function['itemid']][0]['timestamp']);
+						break;
+					case 'ITEM.LOG.SOURCE':
+						$value = $history[$function['itemid']][0]['source'];
+						break;
+					case 'ITEM.LOG.SEVERITY':
+						$value = getSeverityName($history[$function['itemid']][0]['severity']);
+						break;
+					case 'ITEM.LOG.NSEVERITY':
+						$value = $history[$function['itemid']][0]['severity'];
+						break;
+					case 'ITEM.LOG.EVENTID':
+						$value = $history[$function['itemid']][0]['logeventid'];
+						break;
+				}
+
+				foreach ($tokens as $token) {
+					$macro_value = UNRESOLVED_MACRO_STRING;
+
+					if ($value !== null) {
+						$macro_value = formatHistoryValue($value, $function);
 					}
 
 					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
@@ -1270,7 +1350,9 @@ class CMacrosResolverGeneral {
 	 * @return string
 	 */
 	public static function getMacroValue(array $macro): string {
-		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_SECRET_MASK : $macro['value'];
+		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET || $macro['type'] == ZBX_MACRO_TYPE_VAULT)
+			? ZBX_SECRET_MASK
+			: $macro['value'];
 	}
 
 	/**

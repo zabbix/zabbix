@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.tab-indicators.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -43,6 +43,7 @@ $fields = [
 	'copy_mode' =>								[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),		null],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
+	'event_name' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'opdata' =>									[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Expression')],
 	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
@@ -251,6 +252,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 	$description = getRequest('description', '');
+	$event_name = getRequest('event_name', '');
 	$opdata = getRequest('opdata', '');
 	$expression = getRequest('expression', '');
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
@@ -267,6 +269,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('add')) {
 		$trigger = [
 			'description' => $description,
+			'event_name' => $event_name,
 			'opdata' => $opdata,
 			'expression' => $expression,
 			'recovery_mode' => $recovery_mode,
@@ -302,7 +305,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
 				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
-				'opdata'
+				'opdata', 'event_name'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -321,6 +324,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_trigger['templateid'] == 0) {
 				if ($db_trigger['description'] !== $description) {
 					$trigger['description'] = $description;
+				}
+				if ($db_trigger['event_name'] !== $event_name) {
+					$trigger['event_name'] = $event_name;
 				}
 				if ($db_trigger['opdata'] !== $opdata) {
 					$trigger['opdata'] = $opdata;
@@ -509,7 +515,9 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 			}
 		}
 
-		$result = (bool) API::Trigger()->update($triggers_to_update);
+		if ($triggers_to_update) {
+			$result = (bool) API::Trigger()->update($triggers_to_update);
+		}
 	}
 
 	if ($result) {
@@ -615,8 +623,6 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
 }
 
-$config = select_config();
-
 /*
  * Display
  */
@@ -629,7 +635,6 @@ if ((getRequest('action') === 'trigger.massupdateform' || hasRequest('massupdate
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
-		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => null,
@@ -642,6 +647,7 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
 		'recovery_mode' => getRequest('recovery_mode', 0),
 		'description' => getRequest('description', ''),
+		'event_name' => getRequest('event_name', ''),
 		'opdata' => getRequest('opdata', ''),
 		'type' => getRequest('type', 0),
 		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
@@ -777,7 +783,7 @@ else {
 		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null,
 		'preservekeys' => true,
 		'sortfield' => $sort,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	if ($sort === 'status') {
@@ -879,6 +885,10 @@ else {
 			}
 
 			foreach (array_column($item['triggers'], 'triggerid') as $triggerid) {
+				if (!array_key_exists($triggerid, $triggers)) {
+					continue;
+				}
+
 				if (!array_key_exists('ts_delete', $triggers[$triggerid]['triggerDiscovery'])) {
 					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = $ts_delete;
 				}
@@ -1006,7 +1016,6 @@ else {
 	$checkbox_hash = crc32(implode('', $filter_hostids));
 
 	$data = [
-		'config' => $config,
 		'triggers' => $triggers,
 		'profileIdx' => 'web.triggers.filter',
 		'active_tab' => $active_tab,
@@ -1031,7 +1040,8 @@ else {
 		'parent_templates' => getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL),
 		'paging' => $paging,
 		'dep_triggers' => $dep_triggers,
-		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags)
+		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags),
+		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 	];
 
 	// render view

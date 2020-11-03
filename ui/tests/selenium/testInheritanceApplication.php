@@ -45,7 +45,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 	 * Select host or template to open applications page.
 	 */
 	private function openApplicationsPage($host) {
-		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_rst=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$filter->getField('Hosts')->clear()->fill($host);
 		$filter->submit();
@@ -107,13 +107,14 @@ class testInheritanceApplication extends CLegacyWebTest {
 		// Add application.
 		$this->openApplicationsPage(CTestArrayHelper::get($data, 'template', $data['host']));
 		$this->zbxTestContentControlButtonClickText('Create application');
-		$this->zbxTestInputTypeWait('appname', $data['application']);
+		$this->zbxTestInputTypeWait('name', $data['application']);
 		$this->zbxTestClick('add');
 
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application added');
 
 			// Check created application on host.
+			$this->page->waitUntilReady();
 			$filter = $this->query('name:zbx_filter')->asForm()->one();
 			$filter->getField('Hosts')->fill($data['host']);
 			$filter->submit();
@@ -181,8 +182,8 @@ class testInheritanceApplication extends CLegacyWebTest {
 		// Open template page and update application name.
 		$this->openApplicationsPage($this->template, 'Templates');
 		$this->zbxTestClickLinkTextWait($application);
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('appname'));
-		$this->zbxTestInputType('appname', $new_name);
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('name'));
+		$this->zbxTestInputType('name', $new_name);
 		$this->zbxTestClickWait('update');
 
 		// Check updated application name on template.
@@ -257,6 +258,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//tbody//td[text()=": '.$data['application'].'"]');
 
 			// Check application on host.
+			$this->page->waitUntilReady();
 			$filter = $this->query('name:zbx_filter')->asForm()->one();
 			$filter->getField('Hosts')->clear()->fill($data['host']);
 			$filter->submit();

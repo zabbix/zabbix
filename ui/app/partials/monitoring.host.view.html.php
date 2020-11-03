@@ -21,10 +21,6 @@
 
 $form = (new CForm())->setName('host_view');
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'host.view')
-	->getUrl();
-
 $table = (new CTableInfo());
 
 $view_url = $data['view_curl']->getUrl();
@@ -39,26 +35,33 @@ $table->setHeader([
 	(new CColHeader(_('Latest data'))),
 	(new CColHeader(_('Problems'))),
 	(new CColHeader(_('Graphs'))),
-	(new CColHeader(_('Screens'))),
+	(new CColHeader(_('Dashboards'))),
 	(new CColHeader(_('Web')))
 ]);
+
+$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 
 	$interface = null;
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		$host_interfaces = array_filter($host['interfaces'], function($host_interface) use($interface_type) {
-			return $host_interface['type'] == $interface_type;
-		});
-		if ($host_interfaces) {
-			$interface = reset($host_interfaces);
-			break;
+	if ($host['interfaces']) {
+		foreach ($interface_types as $interface_type) {
+			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
+				return ($host_interface['type'] == $interface_type);
+			});
+			if ($host_interfaces) {
+				$interface = reset($host_interfaces);
+				break;
+			}
 		}
 	}
 
-	$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-	$host_interface .= $interface['port'] ? NAME_DELIMITER.$interface['port'] : '';
+	$host_interface = '';
+	if ($interface !== null) {
+		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
+		$host_interface .= $interface['port'] ? NAME_DELIMITER.$interface['port'] : '';
+	}
 
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
 
@@ -73,7 +76,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			$problems_div->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(getSeverityStatusStyle($severity))
-				->setAttribute('title', getSeverityName($severity, $data['config']))
+				->setAttribute('title', getSeverityName($severity))
 			);
 		}
 	}
@@ -104,39 +107,48 @@ foreach ($data['hosts'] as $hostid => $host) {
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),
 		[
-			new CLink(_('Latest data'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'latest.view')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$host['hostid']])
-			)
+			$data['allowed_ui_latest_data']
+				? new CLink(_('Latest data'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'latest.view')
+						->setArgument('filter_set', '1')
+						->setArgument('filter_hostids', [$host['hostid']])
+				)
+				: _('Latest data')
 		],
 		[
-			new CLink(_('Problems'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_severities', $data['filter']['severities'])
-					->setArgument('filter_hostids', [$host['hostid']])
-			),
+			$data['allowed_ui_problems']
+				? new CLink(_('Problems'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('severities', $data['filter']['severities'])
+						->setArgument('hostids', [$host['hostid']])
+				)
+				: _('Problems'),
 			CViewHelper::showNum($total_problem_count)
 		],
 		$host['graphs']
 			? [
-				new CLink(_('Graphs'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'charts.view')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', (array) $host['hostid'])
+				new CLink(_('Graphs'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'charts.view')
+						->setArgument('filter_set', '1')
+						->setArgument('filter_hostids', (array) $host['hostid'])
 				),
 				CViewHelper::showNum($host['graphs'])
 			]
 			: (new CSpan(_('Graphs')))->addClass(ZBX_STYLE_DISABLED),
-		$host['screens']
+		$host['dashboards']
 			? [
-				new CLink(_('Screens'), (new CUrl('host_screen.php'))->setArgument('hostid', $host['hostid'])),
-				CViewHelper::showNum($host['screens'])
+				new CLink(_('Dashboards'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'host.dashboard.view')
+						->setArgument('hostid', $host['hostid'])
+				),
+				CViewHelper::showNum($host['dashboards'])
 			]
-			: (new CSpan(_('Screens')))->addClass(ZBX_STYLE_DISABLED),
+			: (new CSpan(_('Dashboards')))->addClass(ZBX_STYLE_DISABLED),
 		$host['httpTests']
 			? [
 				new CLink(_('Web'),

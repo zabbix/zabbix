@@ -68,7 +68,7 @@ $filter = [
 ];
 
 $ms_groups = [];
-$filter_groupids = $filter['groups'] ? getSubGroups($filter['groups'], $ms_groups, ['real_hosts' => true]) : null;
+$filter_groupids = $filter['groups'] ? getSubGroups($filter['groups'], $ms_groups) : null;
 
 if (count($ms_groups) != count($filter['groups'])) {
 	show_error_message(_('No permissions to referred object or it does not exist!'));
@@ -122,22 +122,30 @@ if ($filter['groupby'] !== '') {
 
 	order_result($report, $sortField, $sortOrder);
 
+	$allowed_ui_inventory = CWebUser::checkAccess(CRoleHelper::UI_INVENTORY_HOSTS);
 	foreach ($report as $rep) {
 		$table->addRow([
 			zbx_str2links($rep['inventory_field']),
-			new CLink($rep['host_count'],
-				(new CUrl('hostinventories.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_exact', '1')
-					->setArgument('filter_groups', array_keys($ms_groups))
-					->setArgument('filter_field', $filter['groupby'])
-					->setArgument('filter_field_value', $rep['inventory_field'])
-			)
+			$allowed_ui_inventory
+				? new CLink($rep['host_count'],
+					(new CUrl('hostinventories.php'))
+						->setArgument('filter_set', '1')
+						->setArgument('filter_exact', '1')
+						->setArgument('filter_groups', array_keys($ms_groups))
+						->setArgument('filter_field', $filter['groupby'])
+						->setArgument('filter_field_value', $rep['inventory_field'])
+				)
+				: $rep['host_count']
 		]);
 	}
 }
 
-$grouping_options = array_merge(['' => _('not selected')], $inventories);
+$select_groupby = (new CSelect('filter_groupby'))
+	->setValue($filter['groupby'])
+	->setFocusableElementId('groupby')
+	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+	->addOption(new CSelectOption('', _('not selected')))
+	->addOptions(CSelect::createOptionsFromArray($inventories));
 
 (new CWidget())
 	->setTitle(_('Host inventory overview'))
@@ -159,16 +167,13 @@ $grouping_options = array_merge(['' => _('not selected')], $inventories);
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groups_',
-									'real_hosts' => 1
+									'real_hosts' => 1,
+									'enrich_parent_groups' => true
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
-					->addRow(
-						new CLabel(_('Grouping by'), 'groupby'),
-						(new CComboBox('filter_groupby', $filter['groupby'], null, $grouping_options))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					)
+					->addRow(new CLabel(_('Grouping by'), $select_groupby->getFocusableElementId()), $select_groupby)
 			])
 	)
 	->addItem($table)

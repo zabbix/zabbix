@@ -48,13 +48,13 @@
 #define MACRO_TYPE_HTTP_XML		0x00400000
 #define MACRO_TYPE_ALLOWED_HOSTS	0x00800000
 #define MACRO_TYPE_ITEM_TAG		0x01000000
+#define MACRO_TYPE_EVENT_NAME		0x02000000	/* event name in trigger configuration */
+#define MACRO_TYPE_EXPRESSION		0x04000000	/* macros in expression macro */
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
-
-char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 
 int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
@@ -64,11 +64,13 @@ int	evaluate_function(char **value, DC_ITEM *item, const char *function, const c
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen);
+		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
+		int maxerrlen);
 
 int	substitute_simple_macros_unmasked(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, char **data, int macro_type, char *error, int maxerrlen);
+		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
+		int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 
@@ -102,7 +104,7 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
+void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);

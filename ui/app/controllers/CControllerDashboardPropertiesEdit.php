@@ -27,18 +27,24 @@ class CControllerDashboardPropertiesEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' =>		'db dashboard.dashboardid',
-			'name'		  =>		'string',
-			'userid'	  =>		'db users.userid',
-			'new'		  =>		'in 1'
+			'template' => 'in 1',
+			'userid' => 'db users.userid',
+			'name' => 'required|db dashboard.name'
 		];
 
 		$ret = $this->validateInput($fields);
 
+		if (!$this->hasInput('template') && !$this->hasInput('userid')) {
+			error(_s('Field "%1$s" is mandatory.', 'userid'));
+
+			$ret = false;
+		}
+
 		if (!$ret) {
-			$errors = json_encode(['errors' => [getMessages()->toString()]]);
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => $errors]))->disableView()
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
 			);
 		}
 
@@ -46,62 +52,35 @@ class CControllerDashboardPropertiesEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		if ($this->hasInput('template')) {
+			return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
+		}
+		else {
+			return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		}
 	}
 
 	protected function doAction() {
-		if ($this->hasInput('new')) {
-			$dashboard = CControllerDashboardView::getNewDashboard();
-		}
-		elseif ($this->hasInput('dashboardid')) {
-			$dashboards = API::Dashboard()->get([
-				'output' => ['name', 'dashboardid', 'userid'],
-				'dashboardids' => $this->getInput('dashboardid'),
-				'editable' => true,
-				'preservekeys' => true
-			]);
+		$data = [
+			'dashboard' => [
+				'template' => $this->hasInput('template'),
+				'name' => $this->getInput('name')
+			],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
 
-			$dashboard = reset($dashboards);
-		}
-		else {
-			$dashboard = false;
-		}
+		if (!$this->hasInput('template')) {
+			$userid = $this->getInput('userid');
 
-		if ($dashboard !== false) {
-			if ($this->hasInput('userid') && $this->getInput('userid') == 0) {
-				$user = null;
-			}
-			elseif ($this->hasInput('userid')) {
-				$user = CControllerDashboardView::getOwnerData($this->getInput('userid'));
-			}
-			elseif (array_key_exists('userid', $dashboard)) {
-				$user = CControllerDashboardView::getOwnerData($dashboard['userid']);
-			}
-			elseif (array_key_exists('owner', $dashboard)) {
-				$user = $dashboard['owner'];
-			}
-
-			// Prepare data for view.
-			$data = [
-				'dashboard' => [
-					'name' => $this->getInput('name', $dashboard['name']),
-					'dashboardid' => $dashboard['dashboardid'],
-					'owner' => $user
-				],
-				'user' => [
-					'debug_mode' => $this->getDebugMode()
-				]
+			$data['dashboard']['owner'] = [
+				'id' => $userid,
+				'name' => CDashboardHelper::getOwnerName($userid)
 			];
-
-			$this->setResponse(new CControllerResponseData($data));
 		}
-		else {
-			error(_('No permissions to referred object or it does not exist!'));
 
-			$errors = json_encode(['errors' => [getMessages()->toString()]]);
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => $errors]))->disableView()
-			);
-		}
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

@@ -55,6 +55,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`zabbix.stats[127.0.0.1,10051]`,
 		`vfs.fs.size[c:,free]`,
 		`vfs.fs.discovery`,
+		`vfs.fs.get`,
 		`net.tcp.listen[80]`,
 		`net.if.in[MS TCP Loopback interface,bytes]`,
 		`net.if.out[MS TCP Loopback interface,bytes]`,
@@ -85,9 +86,10 @@ func checkMetrics(s scheduler.Scheduler) {
 		`net.tcp.service.perf[ssh,127.0.0.1,22]`,
 		`net.udp.service[ntp,127.0.0.1,123]`,
 		`net.udp.service.perf[ntp,127.0.0.1,123]`,
-		`system.hostname`,
 		`perf_instance.discovery[Processor]`,
 		`perf_instance_en.discovery[Processor]`,
+		`modbus.get[tcp://localhost]`,
+		`system.hostname`,
 	}
 
 	for _, metric := range metrics {

@@ -16,17 +16,21 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "base/typography";
 @import "base/common";
 
+@import "utils/indicator";
 @import "utils/scrollable";
 
 @import "layout/grid";
 @import "layout/header";
 @import "layout/footer";
 @import "layout/sidebar";
+@import "layout/form-grid";
 
 @import "components/form-search";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
+@import "components/tabfilter";
+@import "components/z-select";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -340,6 +344,12 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 
 	+ .filter-space {
 		margin-top: -29px;
+	}
+}
+
+form {
+	&.is-loading {
+		position: relative;
 	}
 }
 
@@ -2543,16 +2553,18 @@ $icon-widget-btn: (
 	opacity: .5;
 	transition: opacity .2s ease-out;
 
-	&:hover {
-		@extend %btn-widget-hover-active;
-	}
-
-	&:focus {
-		@extend %btn-widget-hover-active;
-	}
-
+	&:hover,
+	&:focus,
 	&:active {
 		@extend %btn-widget-hover-active;
+	}
+
+	&[disabled],
+	&[disabled]:hover,
+	&[disabled]:focus,
+	&[disabled]:active {
+		background-color: transparent;
+		opacity: .25;
 	}
 }
 
@@ -2782,6 +2794,11 @@ $form-icon-btn: (
 		margin-bottom: 40px;
 		justify-content: flex-start;
 	}
+
+	#tls_encryption_hint {
+		font-style: italic;
+		color: $font-alt-color;
+	}
 }
 
 .setup-left {
@@ -2818,15 +2835,6 @@ $form-icon-btn: (
 		border: 0;
 	}
 
-	.table-forms-td-left {
-		text-align: left;
-		width: auto;
-	}
-
-	.table-forms-td-right {
-		width: 100%;
-	}
-
 	h1 {
 		margin: 25% 0 .4em;
 	}
@@ -2835,10 +2843,8 @@ $form-icon-btn: (
 }
 
 .setup-title {
+	margin: 109px 0 16px 0;
 	color: $font-alt-color;
-	height: 345px;
-	display: table-cell;
-	vertical-align: middle;
 	font-size: $font-setup-title;
 	line-height: $setup-title-line-height;
 
@@ -3043,10 +3049,8 @@ $form-icon-btn: (
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 
-	/*
-	 * For floating headers to appear over other widgets.
-	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-	 */
+	// For floating headers to appear over other widgets.
+	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
 	z-index: 3;
 
 	h4 {
@@ -3123,15 +3127,6 @@ $form-icon-btn: (
 	}
 }
 
-.widget-placeholder {
-	.dashbrd-grid-widget-container {
-		.dashbrd-grid-widget-content {
-			margin-top: 0;
-			height: 100%;
-		}
-	}
-}
-
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	top: .25rem;
@@ -3161,6 +3156,7 @@ $form-icon-btn: (
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+				z-index: 5;
 			}
 		}
 	}
@@ -3325,6 +3321,8 @@ $form-icon-btn: (
 	}
 
 	&.dashbrd-grid-iterator-focus {
+		z-index: 5;
+
 		.dashbrd-grid-iterator-head {
 			margin-top: -2rem;
 			height: 2rem;
@@ -4091,19 +4089,11 @@ $form-icon-btn: (
 		}
 	}
 
-	.hintbox-scrollable {
-		overflow: auto;
-		width: 100%;
-		max-height: calc(100vh - 190px);
-		max-width: 45vw;
-		white-space: nowrap;
-		@extend %webkit-scrollbar;
-	}
-
-	.hintbox-description {
+	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
 		max-width: 800px;
+		overflow-wrap: break-word;
 		@extend %webkit-scrollbar;
 	}
 
@@ -5105,7 +5095,6 @@ a.link-action {
 %status {
 	padding: 2px 3px 1px;
 	font-size: $font-h3-size;
-	text-transform: $font-transform;
 	text-align: center;
 	min-width: .7em;
 	line-height: 1em;
@@ -5210,6 +5199,14 @@ a.link-action {
 	&:last-child {
 		margin: 0;
 	}
+
+	&.green-bg {
+		color: darken($alt-green, 45%);
+	}
+
+	&.yellow-bg {
+		color: darken($alt-yellow, 45%);
+	}
 }
 
 .green-bg {
@@ -5218,6 +5215,10 @@ a.link-action {
 
 .red-bg {
 	background-color: $alt-red;
+}
+
+.yellow-bg {
+	background-color: $alt-yellow;
 }
 
 // Severity statuses.
@@ -5553,7 +5554,7 @@ a.overlay-close-btn {
 			animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear;
 		}
 
-		.delayed-15s {
+		&.delayed-15s {
 			&::before,
 			&::after {
 				animation-delay: 15s;
@@ -5603,7 +5604,9 @@ span {
 
 		&:before {
 			top: 42px;
+			right: 1px;
 			bottom: 42px;
+			left: 1px;
 		}
 	}
 }
@@ -5710,12 +5713,12 @@ $browser-logos: (
 }
 
 %cursor-drag {
-	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: move; // fallback if grab cursor is unsupported
 	cursor: grab;
 }
 
 %cursor-dragging {
-	cursor: move; /* fallback if grabbing cursor is unsupported */
+	cursor: move; // fallback if grabbing cursor is unsupported
 	cursor: grabbing;
 }
 
@@ -5794,10 +5797,6 @@ main {
 
 	&.is-loading {
 		min-height: 64px;
-
-		img {
-			opacity: 0;
-		}
 	}
 }
 
@@ -6804,17 +6803,6 @@ $range-input-width: 31px;
 	font-size: 0;
 }
 
-.item-test-popup-value-row,
-.preproc-test-popup-value-row {
-	display: flex;
-
-	label {
-		padding: 0 10px;
-		margin-left: auto;
-		line-height: 24px;
-	}
-}
-
 table.preprocessing-test-results {
 	td {
 		vertical-align: top !important;
@@ -7056,6 +7044,103 @@ table.preprocessing-test-results {
 	}
 }
 
+.icon-invisible.menu-popup-item,
+.icon-invisible.btn-dropdown-toggle {
+	width: 100%;
+
+	&::before {
+		background: url($sprite-path) no-repeat -87px -800px;
+	}
+
+	&:not(.highlighted):enabled {
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::before {
+				background-position: -399px -800px;
+			}
+		}
+	}
+}
+.icon-invisible.btn-dropdown-toggle {
+	margin: 0;
+}
+
+.btn-split {
+	display: inline-block;
+	position: relative;
+	margin-right: 10px;
+
+	li {
+		display: inline-block;
+
+		button {
+			margin: 0 -1px 0 0;
+			border-radius: 0;
+		}
+
+		&:first-child button {
+			border-radius: 2px 0 0 2px;
+		}
+
+		&:last-child button {
+			border-radius: 0 2px 2px 0;
+		}
+
+		&:only-child button {
+			border-radius: 2px;
+		}
+	}
+}
+
+.btn-toggle-chevron {
+	position: relative;
+
+	&[aria-expanded="true"] {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 8px;
+		top: calc(50% - 3px);
+		width: 5px;
+		height: 5px;
+		border-top: 1px solid $btn-alt-font-color;
+		border-right: 1px solid $btn-alt-font-color;
+		transform: rotate(135deg) translate(-1px,1px);
+		transition: transform .3s;
+	}
+
+	&[disabled] {
+		&::after {
+			border-top-color: $btn-disabled-font-color;
+			border-right-color: $btn-disabled-font-color;
+		}
+	}
+
+	&:enabled {
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				transform: rotate(315deg) translate(-1px,1px);
+			}
+		}
+
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				border-top-color:  $btn-font-color;
+				border-right-color: $btn-font-color;
+			}
+		}
+	}
+}
+
 .btn-dropdown-toggle {
 	white-space: nowrap;
 	overflow: hidden;
@@ -7073,12 +7158,17 @@ table.preprocessing-test-results {
 			height: 22px;
 			content: '';
 		}
+
+		&::after {
+			top: 6px;
+			right: 2px;
+		}
 	}
 
 	&::after {
 		position: absolute;
-		top: 6px;
-		right: 2px;
+		top: 7px;
+		right: 6px;
 		width: 10px;
 		height: 10px;
 		content: '';
@@ -7238,4 +7328,89 @@ table.preprocessing-test-results {
 	.logtotalms {
 		margin-bottom: 10px;
 	}
+}
+
+// Table column styles
+#itemsTable {
+	.table-col-handle { width: 26px; }
+	.table-col-no { width: 20px; }
+	.table-col-name-normal { width: 285px; }
+	.table-col-name { width: 365px; }
+	.table-col-type { width: 85px; }
+	.table-col-function { width: 85px; }
+	.table-col-draw-style { width: 85px; }
+	.table-col-y-axis-side { width: 85px; }
+	.table-col-colour { width: 105px; }
+	.table-col-action { width: 55px; }
+}
+
+z-select,
+.z-select {
+	&.z-select-host-interface {
+		.description:not(:empty) {
+			display: block;
+			margin-top: 5px;
+			color: $input-placeholder-color;
+		}
+
+		&[disabled],
+		li[disabled] {
+			.description:not(:empty) {
+				color: $form-disabled-font-color;
+			}
+		}
+	}
+}
+
+// Dashboard list table.
+.dashboard-list {
+	.dashboard-list-item {
+		display: flex;
+		justify-content: space-between;
+		height: 18px;
+
+		.status-green {
+			background-color: $dashboard-my-bg-color;
+			border-color: $dashboard-my-bg-color;
+		}
+
+		.status-yellow {
+			background-color: $dashboard-shared-bg-color;
+			border-color: $dashboard-shared-bg-color;
+		}
+	}
+}
+
+.multiselect-description-container {
+	display: flex;
+	align-items: center;
+
+	> .multiselect-control {
+		margin-right: 5px;
+	}
+}
+
+// Users permissions tab.
+.rules-status-container {
+	> span {
+		text-transform: none;
+		margin: 3px 3px 3px 0;
+
+		&:last-of-type {
+			margin-right: 0;
+		}
+	}
+
+	> .status-green:not(:last-of-type) {
+		border-right: 1px solid darken(desaturate($alt-green, 10%), 20%);
+	}
+
+	> .status-grey:not(:last-of-type) {
+		border-right: 1px solid $form-disabled-border-color;
+	}
+}
+
+// Used in form lists to separate input elements on sections.
+.input-section-header {
+	padding-top: 10px;
 }

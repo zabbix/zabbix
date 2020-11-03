@@ -229,28 +229,27 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
 	return array_keys($db_groups);
 }
 
-/*
+/**
  * Creates a hintbox suitable for Problem hosts widget.
  *
- * @param array  $hosts                                                   Array of problematic hosts.
- * @param array  $data                                                    Array of host data, filter settings and
- *                                                                        severity configuration.
- * @param array  $data['config']                                          Severities configuration array.
- * @param array  $data['filter']['severities']                            Array of severities.
- * @param string $data['hosts_data'][<hostid>]['host']                    Host name.
- * @param int    $data['hosts_data'][<hostid>]['severities'][<severity>]  Severity count.
- * @param CUrl   $url                                                     URL that leads to problems view having hostid
- *                                                                        in its filter.
+ * @param array      $hosts                                                   Array of problematic hosts.
+ * @param array      $data                                                    Array of host data, filter settings and
+ *                                                                            severity configuration.
+ * @param array      $data['filter']['severities']                            Array of severities.
+ * @param string     $data['hosts_data'][<hostid>]['host']                    Host name.
+ * @param int        $data['hosts_data'][<hostid>]['severities'][<severity>]  Severity count.
+ * @param CUrl|null  $url                                                     URL that leads to problems view having
+ *                                                                            hostid in its filter.
  *
  * @return CTableInfo
  */
-function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
+function makeProblemHostsHintBox(array $hosts, array $data, ?CUrl $url) {
 	// Set trigger severities as table header, ordered starting from highest severity.
 	$header = [_('Host')];
 
 	foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
 		if (in_array($severity, $data['filter']['severities'])) {
-			$header[] = getSeverityName($severity, $data['config']);
+			$header[] = getSeverityName($severity);
 		}
 	}
 
@@ -275,8 +274,13 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 
 	foreach ($hosts as $hostid => $host) {
 		$host_data = $data['hosts_data'][$hostid];
-		$url->setArgument('filter_hostids', [$hostid]);
-		$host_name = new CLink($host_data['host'], $url->getUrl());
+		if ($url !== null) {
+			$url->setArgument('hostids', [$hostid]);
+			$host_name = new CLink($host_data['host'], $url->getUrl());
+		}
+		else {
+			$host_name = $host_data['host'];
+		}
 
 		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			if (array_key_exists($host_data['maintenanceid'], $db_maintenances)) {
@@ -322,11 +326,10 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
  * @param array  $groups
  * @param string $groups[<groupid>]['groupid']
  * @param string $groups[<groupid>]['name']
- * @param array  $options                        HostGroup API call parameters.
  *
  * @return array
  */
-function enrichParentGroups(array $groups, array $options = []) {
+function enrichParentGroups(array $groups) {
 	$parents = [];
 	foreach ($groups as $group) {
 		$parent = explode('/', $group['name']);
@@ -344,18 +347,13 @@ function enrichParentGroups(array $groups, array $options = []) {
 	}
 
 	if ($parents) {
-		if (!array_key_exists('output', $options)) {
-			$options['output'] = ['groupid', 'name'];
-		}
-
-		if (!array_key_exists('filter', $options)) {
-			$options['filter'] = [];
-		}
-
-		$options['filter']['name'] = array_keys($parents);
-
-		$options['preservekeys'] = true;
-		$groups += API::HostGroup()->get($options);
+		$groups += API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'filter' => [
+				'name' => array_keys($parents)
+			],
+			'preservekeys' => true
+		]);
 	}
 
 	return $groups;

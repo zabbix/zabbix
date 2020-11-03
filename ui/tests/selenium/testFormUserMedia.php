@@ -146,7 +146,7 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => 'Invalid email address "Mr Person person@zabbix.com".'
 				]
 			],
-			// Email address without the recepient specified - just the domain.
+			// Email address without the recipient specified - just the domain.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -333,7 +333,7 @@ class testFormUserMedia extends CWebTest {
 				$media_form->submit();
 				$this->page->waitUntilReady();
 				$user_form->invalidate();
-				$this->assertEquals($user_form->getField('Media')->getRows()->count(), $i + 2);
+				$this->assertEquals($user_form->getField('Media')->asTable()->getRows()->count(), $i + 2);
 			}
 		}
 		else {
@@ -356,7 +356,7 @@ class testFormUserMedia extends CWebTest {
 		$user_form->selectTab('Media');
 
 		// Edit selected media
-		$edit_row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
+		$edit_row = $this->query('xpath://tr[@id="medias_0"]')->asTableRow()->one();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
 		$this->setMediaValues($data);
@@ -425,7 +425,7 @@ class testFormUserMedia extends CWebTest {
 		$this->removeEmailFromList('3@zabbix.com');
 		$this->checkEmailNotPresent('3@zabbix.com');
 		// Edit the media - remove email 2@zabbix.com and check that it's removed.
-		$media_list = $user_form->getField('Media')->waitUntilVisible();
+		$media_list = $user_form->getField('Media')->asTable()->waitUntilVisible();
 		$row = $media_list->getRow(0);
 		$row->query('button:Edit')->one()->click();
 		$this->removeEmailFromList('2@zabbix.com');
@@ -448,6 +448,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'SMS',
 						'Send to' => '+371 74661x'
 					],
+					'role' => 'Super Admin role',
 					'expected_message' => 'User added'
 				]
 			],
@@ -485,6 +486,10 @@ class testFormUserMedia extends CWebTest {
 			$this->page->query('button:Create user')->one()->click();
 			$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 			$user_form->fill($data['user_fields']);
+
+			$user_form->selectTab('Permissions');
+			$user_form->fill(['Role' => $data['role']]);
+
 		}
 		else {
 			$this->query('link', $data['username'])->waitUntilVisible()->one()->click();
@@ -523,7 +528,7 @@ class testFormUserMedia extends CWebTest {
 			$user = CTestArrayHelper::get($data, 'user_fields.Alias', false) ? $data['user_fields']['Alias'] : $data['username'];
 			$this->query('link', $user)->waitUntilVisible()->one()->click();
 			$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
-			$media_field = $user_form->getField('Media');
+			$media_field = $user_form->getField('Media')->asTable();
 			$this->assertTrue($media_field->getRows()->count() === 1);
 			$row = $media_field->getRow(0);
 			// Verify the values of "Type" and "Send to" for the created and updated media.
@@ -544,14 +549,14 @@ class testFormUserMedia extends CWebTest {
 	private function checkEmailNotPresent($email) {
 		// Check that the removed email is not present in 'Send to' field.
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
-		$row = $user_form->getField('Media')->getRow(0);
+		$row = $user_form->getField('Media')->asTable()->getRow(0);
 		$this->assertNotContains($email, $row->getColumn('Send to')->getText());
 	}
 
 	private function setMediaValues($data) {
 		$media_form = $this->query('id:media_form')->waitUntilVisible()->asForm()->one();
 		$media_form->fill($data['fields']);
-		// Check that there is posibility to add only multiple emails to media.
+		// Check that there is possibility to add only multiple emails to media.
 		$clickable = ($data['fields']['Type'] === 'Email');
 		$this->assertEquals($clickable, $media_form->query('id:email_send_to_add')->one()->isClickable());
 		$this->assertEquals($clickable, $media_form->query('button:Remove')->one()->isClickable());
@@ -568,13 +573,13 @@ class testFormUserMedia extends CWebTest {
 	private function checkMediaConfiguration($data, $original_period = '1-7,00:00-24:00', $edit_send_to = true) {
 		// Check media type.
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
-		$media_field = $user_form->getField('Media');
+		$media_field = $user_form->getField('Media')->asTable();
 		if (!$edit_send_to) {
 			$this->assertTrue($media_field->getRows()->count() === 1);
 			$row = $media_field->getRow(0);
 		}
 		else {
-			$row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
+			$row = $this->query('xpath://tr[@id="medias_0"]')->asTableRow()->one();
 		}
 		$this->assertEquals($row->getColumn('Type')->getText(), $data['fields']['Type']);
 

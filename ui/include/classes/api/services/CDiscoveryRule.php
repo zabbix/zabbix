@@ -24,6 +24,14 @@
  */
 class CDiscoveryRule extends CItemGeneral {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'copy' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
@@ -262,7 +270,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!$options['countOutput']) {
 				$result[$item['itemid']] = $item;
@@ -282,6 +290,10 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($result) {
+			if (self::dbDistinct($sqlParts)) {
+				$result = $this->addNclobFieldValues($options, $result);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 
@@ -495,6 +507,17 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['headers'] = '';
 			}
 
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
+						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
+					$item['params'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$item['timeout'] = $defaults['timeout'];
+				}
+			}
+
 			// Option 'Convert to JSON' is not supported for discovery rule.
 			unset($item['output_format']);
 		}
@@ -511,98 +534,50 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
-	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $ruleids, $nopermissions = false) {
-		if (empty($ruleids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	public function delete(array $ruleids) {
+		$this->validateDelete($ruleids);
+
+		CDiscoveryRuleManager::delete($ruleids);
+
+		return ['ruleids' => $ruleids];
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $ruleids   [IN/OUT]
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array &$ruleids) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $ruleids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$ruleids = array_keys(array_flip($ruleids));
-
-		$delRules = $this->get([
-			'output' => API_OUTPUT_EXTEND,
+		$db_rules = $this->get([
+			'output' => ['templateid'],
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		// TODO: remove $nopermissions hack
-		if (!$nopermissions) {
-			foreach ($ruleids as $ruleid) {
-				if (!isset($delRules[$ruleid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
-				if ($delRules[$ruleid]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
-				}
-			}
-		}
-
-		// get child discovery rules
-		$parentItemids = $ruleids;
-		$childTuleids = [];
-		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = [];
-			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
-				$childTuleids[$dbItem['itemid']] = $dbItem['itemid'];
-			}
-		} while (!empty($parentItemids));
-
-		$delRulesChildren = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'itemids' => $childTuleids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
-		$delRules = array_merge($delRules, $delRulesChildren);
-		$ruleids = array_merge($ruleids, $childTuleids);
-
-		$iprototypeids = [];
-		$dbItems = DBselect(
-			'SELECT i.itemid'.
-			' FROM item_discovery id,items i'.
-			' WHERE i.itemid=id.itemid'.
-				' AND '.dbConditionInt('parent_itemid', $ruleids)
-		);
-		while ($item = DBfetch($dbItems)) {
-			$iprototypeids[$item['itemid']] = $item['itemid'];
-		}
-		if ($iprototypeids) {
-			CItemPrototypeManager::delete($iprototypeids);
-		}
-
-		// delete host prototypes
-		$hostPrototypeIds = DBfetchColumn(DBselect(
-			'SELECT hd.hostid'.
-			' FROM host_discovery hd'.
-			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
-		), 'hostid');
-		if ($hostPrototypeIds) {
-			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
-			}
-		}
-
-		// delete LLD rules
-		DB::delete('items', ['itemid' => $ruleids]);
-
-		$insert = [];
 		foreach ($ruleids as $ruleid) {
-			$insert[] = [
-				'tablename' => 'events',
-				'field' => 'lldruleid',
-				'value' => $ruleid
-			];
-		}
-		DB::insertBatch('housekeeper', $insert);
+			if (!array_key_exists($ruleid, $db_rules)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
-		return ['ruleids' => $ruleids];
+			$db_rule = $db_rules[$ruleid];
+
+			if ($db_rule['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
+			}
+		}
 	}
 
 	/**
@@ -745,7 +720,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata', 'discover'
+				'opdata', 'discover', 'event_name'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
@@ -953,8 +928,11 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::insert('item_rtdata', $items_rtdata, false);
 
 		$conditions = [];
+		$itemids = [];
+
 		foreach ($items as $key => &$item) {
 			$item['itemid'] = $create_items[$key]['itemid'];
+			$itemids[$key] = $item['itemid'];
 
 			// conditions
 			if (isset($item['filter'])) {
@@ -993,8 +971,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
-
 		$this->createOverrides($items);
 	}
 
@@ -1043,7 +1021,9 @@ class CDiscoveryRule extends CItemGeneral {
 								$ovrd_conditions[] = [
 									'macro' => $condition['macro'],
 									'value' => $condition['value'],
-									'formulaid' => $condition['formulaid'],
+									'formulaid' => array_key_exists('formulaid', $condition)
+										? $condition['formulaid']
+										: '',
 									'operator' => array_key_exists('operator', $condition)
 										? $condition['operator']
 										: DB::getDefault('lld_override_condition', 'operator'),
@@ -1215,6 +1195,17 @@ class CDiscoveryRule extends CItemGeneral {
 													'lld_override_operationid' =>
 														$operation['lld_override_operationid'],
 													'templateid' => $template['templateid']
+												];
+											}
+										}
+
+										if (array_key_exists('optag', $operation)) {
+											foreach ($operation['optag'] as $tag) {
+												$optag[] = [
+													'lld_override_operationid' =>
+														$operation['lld_override_operationid'],
+													'tag' => $tag['tag'],
+													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
 												];
 											}
 										}
@@ -1444,6 +1435,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
+		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
 
 		// Delete old overrides and replace with new ones if any.
@@ -1724,7 +1716,7 @@ class CDiscoveryRule extends CItemGeneral {
 									break;
 
 								case OPERATION_OBJECT_HOST_PROTOTYPE:
-									foreach (['opperiod', 'ophistory', 'optrends', 'opseverity', 'optag'] as $field) {
+									foreach (['opperiod', 'ophistory', 'optrends', 'opseverity'] as $field) {
 										if (array_key_exists($field, $operation)) {
 											self::exception(ZBX_API_ERROR_PARAMETERS,
 												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
@@ -1736,11 +1728,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 									if (!array_key_exists('opstatus', $operation)
 											&& !array_key_exists('optemplate', $operation)
+											&& !array_key_exists('optag', $operation)
 											&& !array_key_exists('opinventory', $operation)
 											&& !array_key_exists('opdiscover', $operation)) {
 										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 											$opr_path, _s('value must be one of %1$s',
-												'opstatus, opdiscover, optemplate, opinventory'
+												'opstatus, opdiscover, optemplate, optag, opinventory'
 											)
 										));
 									}
@@ -2061,11 +2054,11 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
 			'itemids' => $discoveryid,
-			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt',
-				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'mtime', 'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url',
-				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt', 'valuemapid', 'params',
+				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags',
+				'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url', 'query_fields',
+				'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
 			],
@@ -2202,7 +2195,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-				'allow_traps', 'discover'
+				'allow_traps', 'discover', 'parameters'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -2497,9 +2490,10 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get([
 			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover'],
+			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover', 'custom_interfaces'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
+			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectTemplates' => ['templateid'],
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'preservekeys' => true
@@ -2540,12 +2534,12 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($this->outputIsRequested('state', $options['output'])
-				|| $this->outputIsRequested('error', $options['output'])
+		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
+				|| $this->outputIsRequested('error', $options['output'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
-			$sqlParts['left_table'] = $tableName;
+			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		if (!$options['countOutput']) {
@@ -2967,9 +2961,14 @@ class CDiscoveryRule extends CItemGeneral {
 						'output' => ['lld_override_operationid', 'severity'],
 						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
 					]);
+				}
+
+				if ($trigger_prototype_objectids || $host_prototype_objectids) {
 					$optag = DB::select('lld_override_optag', [
 						'output' => ['lld_override_operationid', 'tag', 'value'],
-						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
+						'filter' => ['lld_override_operationid' => array_keys(
+							$trigger_prototype_objectids + $host_prototype_objectids
+						)]
 					]);
 				}
 
@@ -3025,7 +3024,9 @@ class CDiscoveryRule extends CItemGeneral {
 								$operation['opseverity']['severity'] = $row['severity'];
 							}
 						}
+					}
 
+					if ($trigger_prototype_objectids || $host_prototype_objectids) {
 						foreach ($optag as $row) {
 							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
 								$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];

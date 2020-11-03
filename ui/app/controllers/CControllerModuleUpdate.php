@@ -50,7 +50,7 @@ class CControllerModuleUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
@@ -138,25 +138,31 @@ class CControllerModuleUpdate extends CController {
 		}
 
 		if ($result) {
-			if ($set_status == MODULE_STATUS_ENABLED) {
-				$response->setMessageOk(_n('Module enabled: %1$s.', 'Modules enabled: %1$s.',
+			if ($this->getAction() === 'module.update') {
+				CMessageHelper::setSuccessTitle(_s('Module updated: %1$s.', $db_modules_update_names[0]));
+			}
+			elseif ($set_status == MODULE_STATUS_ENABLED) {
+				CMessageHelper::setSuccessTitle(_n('Module enabled: %1$s.', 'Modules enabled: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 			else {
-				$response->setMessageOk(_n('Module disabled: %1$s.', 'Modules disabled: %1$s.',
+				CMessageHelper::setSuccessTitle(_n('Module disabled: %1$s.', 'Modules disabled: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 		}
 		else {
-			if ($set_status == MODULE_STATUS_ENABLED) {
-				$response->setMessageError(_n('Cannot enable module: %1$s.', 'Cannot enable modules: %1$s.',
+			if ($this->getAction() === 'module.update') {
+				CMessageHelper::setErrorTitle(_s('Cannot update module: %1$s.', $db_modules_update_names[0]));
+			}
+			elseif ($set_status == MODULE_STATUS_ENABLED) {
+				CMessageHelper::setErrorTitle(_n('Cannot enable module: %1$s.', 'Cannot enable modules: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 			else {
-				$response->setMessageError(_n('Cannot disable module: %1$s.', 'Cannot disable modules: %1$s.',
+				CMessageHelper::setErrorTitle(_n('Cannot disable module: %1$s.', 'Cannot disable modules: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}

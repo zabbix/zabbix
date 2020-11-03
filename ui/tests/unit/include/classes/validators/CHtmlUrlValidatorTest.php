@@ -20,8 +20,25 @@
 
 
 class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
+	public function setUp() {
+		$settings = $this->createMock(CSettings::class);
+		$settings->method('get')
+			->will($this->returnValue([
+				CSettingsHelper::VALIDATE_URI_SCHEMES => '1',
+				CSettingsHelper::URI_VALID_SCHEMES => 'http,https,ftp,file,mailto,tel,ssh'
+			]));
 
-	// Expected results are defined assuming that VALIDATE_URI_SCHEMES is enabled (set to be true).
+		$instances_map = [
+			['settings', $settings]
+		];
+		$api_service_factory = $this->createMock(CApiServiceFactory::class);
+		$api_service_factory->method('getObject')
+			->will($this->returnValueMap($instances_map));
+
+		API::setApiServiceFactory($api_service_factory);
+	}
+
+	// Expected results are defined assuming that CSettingsHelper::VALIDATE_URI_SCHEMES is enabled (set to be 1).
 	public function providerValidateURL() {
 		return [
 			// Valid URLs.
@@ -102,14 +119,14 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 			// Invalid URLs.
 			['http:?abc',												[],															false], // Scheme with no host.
 			['http:/',													[],															false], // Special case where single "/" is not allowed in path.
-			['http://',													[],															false], // url_parse() returs false.
-			['http:///',												[],															false], // url_parse() returs false.
+			['http://',													[],															false], // url_parse() returns false.
+			['http:///',												[],															false], // url_parse() returns false.
 			['http:',													[],															false], // Scheme with no host.
 			['http://?',												[],															false], // url_parse() returns false.
 			['javascript:alert(]',										[],															false], // Invalid scheme.
 			['protocol://{$INVALID!MACRO}',								[],															false], // Invalid scheme. Also macro is not valid, but that's secondary.
 			['',														[],															false], // Cannot be empty.
-			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returs false.
+			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returns false.
 			['vbscript:msgbox(]',										[],															false], // Invalid scheme.
 			['notexist://localhost',									[],															false] // Invalid scheme.
 		];

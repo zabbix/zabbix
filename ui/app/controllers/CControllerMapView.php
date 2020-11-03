@@ -44,7 +44,7 @@ class CControllerMapView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_MAPS)) {
 			return false;
 		}
 
@@ -115,10 +115,9 @@ class CControllerMapView extends CController {
 			'editable' => true
 		]);
 
-		$config = select_config();
 		$severities_dropdown = [];
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = getSeverityName($severity, $config);
+			$severity_name = getSeverityName($severity);
 
 			$severities_dropdown[$severity] = ($severity == $map['severity_min'])
 				? $severity_name.' ('._('default').')'
@@ -128,7 +127,8 @@ class CControllerMapView extends CController {
 		$response = new CControllerResponseData([
 			'map' => $map,
 			'severity_min' => $severity_min,
-			'severities' => $severities_dropdown
+			'severities' => $severities_dropdown,
+			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
 		]);
 
 		$response->setTitle(_('Network maps'));

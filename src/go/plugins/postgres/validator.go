@@ -24,10 +24,9 @@ import (
 )
 
 func validateHost(host string) (err error) {
-	return
-}
-
-func validateUser(user string) (err error) {
+	if len(host) == 0 {
+		return errors.New("Hostname cannot be empty")
+	}
 	return
 }
 

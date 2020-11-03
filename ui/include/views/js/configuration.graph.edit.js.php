@@ -24,151 +24,324 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="itemTpl">
-<tr id="items_#{number}" class="sortable">
-	<!-- icon + hidden -->
-	<?php if ($readonly): ?>
-		<td>
-	<?php else: ?>
-		<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-			<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-			<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-	<?php endif ?>
-		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
-		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-		<?php endif ?>
-	</td>
-
-	<!-- row number -->
-	<td>
-		<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
-	</td>
-
-	<!-- name -->
-	<td>
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_NORMAL ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
 		<?php if ($readonly): ?>
-			<span id="items_#{number}_name">#{name}</span>
+			<td>
 		<?php else: ?>
-			<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
-	</td>
-
-	<!-- type -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-		<td>
-			<select id="items_#{number}_type" name="items[#{number}][type]">
-				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
-				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
-			</select>
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
 		</td>
-	<?php endif ?>
 
-	<!-- function -->
-	<td>
-		<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
-		<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-			<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
-			<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
-			<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-			<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
-		<?php else: ?>
-			<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
 			<?php endif ?>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
+				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
 				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
 				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-		<?php endif ?>
-		</select>
-	</td>
+			</select>
+		</td>
 
-	<!-- drawtype -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
+		<!-- drawtype -->
 		<td>
-			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]">
+			<select name="drawtype">
 			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
 				<option value="<?= $drawtype ?>"><?= graph_item_drawtype2str($drawtype) ?></option>
 			<?php endforeach ?>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-	<?php endif ?>
 
-	<!-- yaxisside -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED): ?>
+		<!-- yaxisside -->
 		<td>
-			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]">
+			<select name="yaxisside">
 				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
-	<?php endif ?>
-	<td>
-		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
-	</td>
-	<?php if (!$readonly): ?>
-		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+
+		<td>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
 		</td>
-	<?php endif ?>
-</tr>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
 </script>
+
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_STACKED ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
+		<?php if ($readonly): ?>
+			<td>
+		<?php else: ?>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+		<?php endif ?>
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
+		</td>
+
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<?php endif ?>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
+				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
+			</select>
+		</td>
+
+		<!-- yaxisside -->
+		<td>
+			<select name="yaxisside">
+				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
+				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
+			</select>
+		</td>
+
+		<td>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
+		</td>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_PIE ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
+		<?php if ($readonly): ?>
+			<td>
+		<?php else: ?>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+		<?php endif ?>
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
+		</td>
+
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<?php endif ?>
+		</td>
+
+		<!-- type -->
+		<td>
+			<select name="type">
+				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
+				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
+			</select>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
+				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
+				<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
+			</select>
+		</td>
+
+		<td>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
+		</td>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="tmpl-item-row-<?= GRAPH_TYPE_EXPLODED ?>">
+	<tr id="items_#{number}" class="sortable">
+		<!-- icon + hidden -->
+		<?php if ($readonly): ?>
+			<td>
+		<?php else: ?>
+			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+		<?php endif ?>
+			<input type="hidden" id="items_#{number}_gitemid" name="gitemid" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_itemid" name="itemid" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="sortorder" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="flags" value="#{flags}">
+			<input type="hidden" id="items_#{number}_type" name="type" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="drawtype" value="#{drawtype}">
+			<input type="hidden" id="items_#{number}_yaxisside" name="yaxisside" value="#{yaxisside}">
+		</td>
+
+		<!-- row number -->
+		<td>
+			<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
+		</td>
+
+		<!-- name -->
+		<td>
+			<?php if ($readonly): ?>
+				<span id="items_#{number}_name">#{name}</span>
+			<?php else: ?>
+				<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<?php endif ?>
+		</td>
+
+		<!-- type -->
+		<td>
+			<select name="type">
+				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
+				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
+			</select>
+		</td>
+
+		<!-- function -->
+		<td>
+			<select id="items_#{number}_calc_fnc" name="calc_fnc">
+				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
+				<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
+			</select>
+		</td>
+
+		<td>
+			<?= (new CColor('color', '#{color}', 'color_#{number}'))->appendColorPickerJs(false) ?>
+		</td>
+
+		<?php if (!$readonly): ?>
+			<td class="<?= ZBX_STYLE_NOWRAP ?>">
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+			</td>
+		<?php endif ?>
+	</tr>
+</script>
+
 <script type="text/javascript">
 	colorPalette.setThemeColors(<?= json_encode(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
+	var graphs = JSON.parse('<?= json_encode([
+		'graphtype' =>  $data['graphtype'],
+		'readonly' => $readonly,
+		'hostid' => $data['hostid'],
+		'is_template' => $data['is_template'],
+		'normal_only' => $data['normal_only'],
+		'parent_discoveryid' => $data['parent_discoveryid'],
+		'CALC_FNC_AVG' => CALC_FNC_AVG,
+		'ZBX_FLAG_DISCOVERY_PROTOTYPE' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		'ZBX_STYLE_DRAG_ICON' => ZBX_STYLE_DRAG_ICON,
+		'GRAPH_YAXIS_TYPE_CALCULATED' => GRAPH_YAXIS_TYPE_CALCULATED,
+		'GRAPH_YAXIS_TYPE_FIXED' => GRAPH_YAXIS_TYPE_FIXED,
+		'GRAPH_TYPE_NORMAL' => GRAPH_TYPE_NORMAL,
+		'GRAPH_TYPE_PIE' => GRAPH_TYPE_PIE,
+		'GRAPH_TYPE_EXPLODED' => GRAPH_TYPE_EXPLODED
+	]) ?>');
 
-	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
+	function loadItem(number, gitemid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = {
 				number: number,
 				number_nr: number + 1,
 				gitemid: gitemid,
-				graphid: graphid,
 				itemid: itemid,
-				type: type,
 				calc_fnc: calc_fnc,
-				drawtype: drawtype,
-				yaxisside: yaxisside,
 				color: color,
 				sortorder: number,
 				flags: flags,
 				name: name
 			},
-			itemTpl = new Template(jQuery('#itemTpl').html()),
-			row = jQuery(itemTpl.evaluate(item));
+			itemTpl = new Template(jQuery('#tmpl-item-row-' + graphs.graphtype).html()),
+			$row = jQuery(itemTpl.evaluate(item));
 
-		jQuery('#itemButtonsRow').before(row);
+		$row.find('[name="type"]').val(type);
+		$row.find('[name="drawtype"]').val(drawtype);
+		$row.find('[name="yaxisside"]').val(yaxisside);
 
-		var items_calc_fnc = jQuery('#items_' + number + '_calc_fnc');
-
-		items_calc_fnc.val(calc_fnc);
-		if (items_calc_fnc[0].selectedIndex < 0) {
-			items_calc_fnc[0].selectedIndex = 0;
+		var $calc_fnc = $row.find('[name="calc_fnc"]');
+		$calc_fnc.val(calc_fnc);
+		if ($calc_fnc[0].selectedIndex < 0) {
+			$calc_fnc[0].selectedIndex = 0;
 		}
-		jQuery('#items_' + number + '_type').val(type);
-		jQuery('#items_' + number + '_drawtype').val(drawtype);
-		jQuery('#items_' + number + '_yaxisside').val(yaxisside);
-		row.find('.input-color-picker input').colorpicker();
+
+		jQuery('#itemButtonsRow').before($row);
+		$row.find('.input-color-picker input').colorpicker();
 
 		colorPalette.incrementNextColor();
 
-		<?php if (!$readonly): ?>
-			rewriteNameLinks();
-		<?php endif ?>
+		!graphs.readonly && rewriteNameLinks();
 	}
 
 	function addPopupValues(list) {
 		if (!isset('object', list) || list.object != 'itemid') {
 			return false;
 		}
-		var itemTpl = new Template(jQuery('#itemTpl').html()),
-			row;
+		var itemTpl = new Template(jQuery('#tmpl-item-row-' + graphs.graphtype).html()),
+			$row;
 
 		for (var i = 0; i < list.values.length; i++) {
 			var number = jQuery('#itemsTable tr.sortable').length,
@@ -176,9 +349,7 @@
 					number: number,
 					number_nr: number + 1,
 					gitemid: null,
-					graphid: <?= $this->data['graphid'] ?>,
 					itemid: list.values[i].itemid,
-					type: null,
 					calc_fnc: null,
 					drawtype: 0,
 					yaxisside: 0,
@@ -187,28 +358,25 @@
 					color: colorPalette.getNextColor(),
 					name: list.values[i].name
 				};
-			row = jQuery(itemTpl.evaluate(item));
+			$row = jQuery(itemTpl.evaluate(item));
 
-			jQuery('#itemButtonsRow').before(row);
-			jQuery('#items_' + item['number'] + '_calc_fnc').val(<?= CALC_FNC_AVG ?>);
-			row.find('.input-color-picker input').colorpicker();
+			$row.find('[name="calc_fnc"]').val(graphs.CALC_FNC_AVG);
+			jQuery('#itemButtonsRow').before($row);
+			$row.find('.input-color-picker input').colorpicker();
 		}
 
-		<?php if (!$readonly): ?>
+		if (!graphs.readonly) {
 			activateSortable();
 			rewriteNameLinks();
-		<?php endif ?>
+		}
 	}
 
 	function getOnlyHostParam() {
-		<?php if ($data['is_template']): ?>
-			return {'only_hostid':'<?= $data['hostid'] ?>'};
-		<?php else: ?>
-			return {'real_hosts':'1', 'hostid':'<?= $data['hostid'] ?>'};
-		<?php endif ?>
+		return graphs.is_template
+			? {only_hostid: graphs.hostid}
+			: {real_hosts: '1', hostid: graphs.hostid};
 	}
 
-<?php if (!$readonly): ?>
 	function rewriteNameLinks() {
 		var size = jQuery('#itemsTable tr.sortable').length;
 
@@ -223,28 +391,29 @@
 				with_webitems: 1,
 				writeonly: 1
 			};
-			if (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
+			if (jQuery('#items_' + i + '_flags').val() == graphs.ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				popup_options['srctbl'] = 'item_prototypes',
 				popup_options['srcfld3'] = 'flags',
 				popup_options['dstfld3'] = 'items_' + i + '_flags',
-				popup_options['parent_discoveryid'] = '<?= $data['parent_discoveryid'] ?>';
+				popup_options['parent_discoveryid'] = graphs.parent_discoveryid;
 			}
 			else {
 				popup_options['srctbl'] = 'items';
 			}
-			<?php if ($data['normal_only'] !== ''): ?>
+
+			if (graphs.normal_only !== '') {
 				popup_options['normal_only'] = '1';
-			<?php endif ?>
-			<?php if (!$data['parent_discoveryid'] && $data['hostid']): ?>
-				popup_options['hostid'] = '<?= $data['hostid'] ?>';
-			<?php endif ?>
+			}
+
+			if (!graphs.parent_discoveryid && graphs.hostid) {
+				popup_options['hostid'] = graphs.hostid;
+			}
 
 			var nameLink = 'PopUp("popup.generic",'
 				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()), null, this);';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}
-<?php endif ?>
 
 	function removeItem(obj) {
 		var number = jQuery(obj).data('remove');
@@ -253,9 +422,7 @@
 		jQuery('#items_' + number).remove();
 
 		recalculateSortOrder();
-		<?php if (!$readonly): ?>
-			activateSortable();
-		<?php endif ?>
+		!graphs.readonly && activateSortable();
 	}
 
 	function recalculateSortOrder() {
@@ -288,7 +455,6 @@
 				part2 = part2.substring(part2.indexOf('_') + 1);
 
 				obj.attr('id', part1 + '_' + i + '_' + part2);
-				obj.attr('name', part1 + '[' + i + '][' + part2 + ']');
 
 				// set sortorder
 				if (part2 === 'sortorder') {
@@ -317,42 +483,25 @@
 			i++;
 		});
 
-		<?php if (!$readonly): ?>
-			rewriteNameLinks();
-		<?php endif ?>
+		!graphs.readonly && rewriteNameLinks();
 	}
 
-<?php if (!$readonly): ?>
 	function initSortable() {
-		var itemsTable = jQuery('#itemsTable'),
-			itemsTableWidth = itemsTable.width(),
-			itemsTableColumns = jQuery('#itemsTable .header td'),
-			itemsTableColumnWidths = [];
-
-		itemsTableColumns.each(function() {
-			itemsTableColumnWidths[itemsTableColumnWidths.length] = jQuery(this).width();
-		});
-
-		itemsTable.sortable({
+		$('#itemsTable').sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			containment: 'parent',
 			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			handle: 'div.' + graphs.ZBX_STYLE_DRAG_ICON,
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function() {
-				// force not to change table width
-				itemsTable.width(itemsTableWidth);
-			},
 			helper: function(e, ui) {
-				ui.children().each(function(i) {
-					var td = jQuery(this);
-
-					td.width(itemsTableColumnWidths[i]);
-				});
+				for (let td of ui.find('>td')) {
+					let $td = $(td);
+					$td.attr('width', $td.width())
+				}
 
 				// when dragging element on safari, it jumps out of the table
 				if (SF) {
@@ -360,11 +509,10 @@
 					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
-				itemsTableColumns.each(function(i) {
-					jQuery(this).width(itemsTableColumnWidths[i]);
-				});
-
 				return ui;
+			},
+			stop: function(e, ui) {
+				ui.item.find('>td').removeAttr('width');
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
@@ -375,7 +523,6 @@
 	function activateSortable() {
 		jQuery('#itemsTable').sortable({disabled: (jQuery('#itemsTable tr.sortable').length < 2)});
 	}
-<?php endif ?>
 
 	jQuery(function($) {
 		$('#tabs').on('tabsactivate', function(event, ui) {
@@ -394,31 +541,33 @@
 				src.setArgument('graphtype', $('#graphtype').val());
 				src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
 
-				<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-				src.setPath('chart7.php');
-				src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
-
-				<?php else: ?>
-				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-				src.setArgument('percent_left', $('#percent_left').val());
-				src.setArgument('percent_right', $('#percent_right').val());
-				<?php endif ?>
-
-				src.setArgument('ymin_type', $('#ymin_type').val());
-				src.setArgument('ymax_type', $('#ymax_type').val());
-				src.setArgument('yaxismin', $('#yaxismin').val());
-				src.setArgument('yaxismax', $('#yaxismax').val());
-				src.setArgument('ymin_itemid', $('#ymin_itemid').val());
-				src.setArgument('ymax_itemid', $('#ymax_itemid').val());
-				src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
-				src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
-
-				<?php endif ?>
-
-				$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
-					if (!$.isEmptyObject(value) && value.name != null) {
-						src.setArgument(value.name, value.value);
+				if (graphs.graphtype == graphs.GRAPH_TYPE_PIE || graphs.graphtype == graphs.GRAPH_TYPE_EXPLODED) {
+					src.setPath('chart7.php');
+					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
+				}
+				else {
+					if (graphs.graphtype == graphs.GRAPH_TYPE_NORMAL) {
+						src.setArgument('percent_left', $('#percent_left').val());
+						src.setArgument('percent_right', $('#percent_right').val());
 					}
+					src.setArgument('ymin_type', $('#ymin_type').val());
+					src.setArgument('ymax_type', $('#ymax_type').val());
+					src.setArgument('yaxismin', $('#yaxismin').val());
+					src.setArgument('yaxismax', $('#yaxismax').val());
+					src.setArgument('ymin_itemid', $('#ymin_itemid').val());
+					src.setArgument('ymax_itemid', $('#ymax_itemid').val());
+					src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
+					src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
+				}
+
+				$('#itemsTable tr.sortable').each(function(i, node) {
+					var short_fmt = [];
+					$(node).find('*[name]').each(function(_, input) {
+						if (!$.isEmptyObject(input) && input.name != null) {
+							short_fmt.push((input.name).substr(0, 2) + ':' + input.value);
+						}
+					});
+					src.setArgument('i[' + i + ']', short_fmt.join(','));
 				});
 
 				var image = $('img', preview_chart);
@@ -438,7 +587,7 @@
 			}
 		});
 
-		<?php if ($readonly): ?>
+		if (graphs.readonly) {
 			$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
 			$('select', '#itemsTable').prop('disabled', true);
 
@@ -448,18 +597,18 @@
 				$('#items_' + i + '_color').removeAttr('onchange');
 				$('#lbl_items_' + i + '_color').removeAttr('onclick');
 			}
-		<?php endif ?>
+		}
 
 		// Y axis min clean unused fields
 		$('#ymin_type').change(function() {
 			switch ($(this).val()) {
-				case '<?= GRAPH_YAXIS_TYPE_CALCULATED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_CALCULATED:
 					$('#yaxismin').val('');
 					$('#ymin_name').val('');
 					$('#ymin_itemid').val('0');
 					break;
 
-				case '<?= GRAPH_YAXIS_TYPE_FIXED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_FIXED:
 					$('#ymin_name').val('');
 					$('#ymin_itemid').val('0');
 					break;
@@ -474,13 +623,13 @@
 		// Y axis max clean unused fields
 		$('#ymax_type').change(function() {
 			switch ($(this).val()) {
-				case '<?= GRAPH_YAXIS_TYPE_CALCULATED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_CALCULATED:
 					$('#yaxismax').val('');
 					$('#ymax_name').val('');
 					$('#ymax_itemid').val('0');
 					break;
 
-				case '<?= GRAPH_YAXIS_TYPE_FIXED ?>':
+				case graphs.GRAPH_YAXIS_TYPE_FIXED:
 					$('#ymax_name').val('');
 					$('#ymax_itemid').val('0');
 					break;
@@ -492,8 +641,30 @@
 			$('form[name="graphForm"]').submit();
 		});
 
-		<?php if (!$readonly): ?>
-			initSortable();
-		<?php endif ?>
+		var $form = $('form[name="graphForm"]');
+		$form.on('submit', function(e) {
+			$form
+				.find('tr.sortable[id^="items_"]')
+				.each(function(i, node) {
+					var item = {};
+
+					$(node)
+						.find('input, select')
+						.each(function(_, node) {
+							item[node.name] = node.value;
+						})
+						.remove();
+
+					item.sortorder = i + 1;
+
+					$form.append($('<input />', {
+						type: 'hidden',
+						name: 'items[' + i + ']',
+						value: JSON.stringify(item)
+					}));
+				})
+		});
+
+		!graphs.readonly && initSortable();
 	});
 </script>

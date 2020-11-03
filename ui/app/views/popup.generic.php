@@ -172,6 +172,8 @@ switch ($data['popup_type']) {
 	case 'applications':
 	case 'application_prototypes':
 	case 'drules':
+	case 'roles':
+	case 'api_methods':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -242,18 +244,8 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$item['usrgrpid'].']', $item['usrgrpid'])
 				: null;
 
-			if ($data['multiselect']) {
-				$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
-			}
-			else {
-				$values = [
-					$options['dstfld1'] => $item[$options['srcfld1']],
-					$options['dstfld2'] => $item[$options['srcfld2']]
-				];
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-						zbx_jsvalue($values).', '.$options['parentid'].');';
-			}
+			$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
+				zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
 
 			$name = (new CLink($item['name'], 'javascript: void(0);'))
 						->setId('spanid'.$item['usrgrpid'])
@@ -318,7 +310,7 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				$check_box,
 				$description,
-				getSeverityCell($trigger['priority'], $options['config']),
+				getSeverityCell($trigger['priority']),
 				(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 			]);
@@ -369,7 +361,7 @@ switch ($data['popup_type']) {
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
 			$action = get_window_opener($options['dstfld1'], $item[$options['srcfld1']]);
-			$action .= 'updateItemTestBtn();';
+			$action .= 'updateItemFormElements();';
 			$action .= $options['srcfld2']
 				? get_window_opener($options['dstfld2'], $item[$options['srcfld2']])
 				: '';
@@ -644,8 +636,8 @@ if ($data['multiselect'] && $form !== null) {
 }
 
 // Types require results returned as array.
-$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
+$types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
+	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

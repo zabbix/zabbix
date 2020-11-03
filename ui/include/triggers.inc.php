@@ -98,24 +98,23 @@ function getSeverityStyle($severity, $type = true) {
  * Get trigger severity name by given state and configuration.
  *
  * @param int   $severity  Trigger severity.
- * @param array $config    Array with configuration parameters containing severity names.
  *
  * @return string
  */
-function getSeverityName($severity, array $config) {
+function getSeverityName($severity) {
 	switch ($severity) {
 		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-			return _($config['severity_name_0']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0));
 		case TRIGGER_SEVERITY_INFORMATION:
-			return _($config['severity_name_1']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_1));
 		case TRIGGER_SEVERITY_WARNING:
-			return _($config['severity_name_2']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_2));
 		case TRIGGER_SEVERITY_AVERAGE:
-			return _($config['severity_name_3']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_3));
 		case TRIGGER_SEVERITY_HIGH:
-			return _($config['severity_name_4']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_4));
 		case TRIGGER_SEVERITY_DISASTER:
-			return _($config['severity_name_5']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_5));
 		default:
 			return _('Unknown');
 	}
@@ -125,29 +124,28 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 	if ($value == TRIGGER_VALUE_FALSE) {
 		return 'AAFFAA';
 	}
-	$config = select_config();
 
 	switch ($severity) {
 		case TRIGGER_SEVERITY_DISASTER:
-			$color = $config['severity_color_5'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_5);
 			break;
 		case TRIGGER_SEVERITY_HIGH:
-			$color = $config['severity_color_4'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_4);
 			break;
 		case TRIGGER_SEVERITY_AVERAGE:
-			$color = $config['severity_color_3'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_3);
 			break;
 		case TRIGGER_SEVERITY_WARNING:
-			$color = $config['severity_color_2'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_2);
 			break;
 		case TRIGGER_SEVERITY_INFORMATION:
-			$color = $config['severity_color_1'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_1);
 			break;
 		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-			$color = $config['severity_color_0'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_0);
 			break;
 		default:
-			$color = $config['severity_color_0'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_0);
 	}
 
 	return $color;
@@ -163,11 +161,10 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  */
 function getSeverities($min = TRIGGER_SEVERITY_NOT_CLASSIFIED, $max = TRIGGER_SEVERITY_COUNT - 1) {
 	$severities = [];
-	$config = select_config();
 
 	foreach (range($min, $max) as $severity) {
 		$severities[] = [
-			'name' => getSeverityName($severity, $config),
+			'name' => getSeverityName($severity),
 			'value' => $severity,
 			'style' => getSeverityStyle($severity)
 		];
@@ -180,17 +177,15 @@ function getSeverities($min = TRIGGER_SEVERITY_NOT_CLASSIFIED, $max = TRIGGER_SE
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
  * @param int         $severity       Trigger, Event or Problem severity.
- * @param array|null  $config         Array of configuration parameters to get trigger severity name; can be omitted
- *                                    if $text is not null.
  * @param string|null $text           Trigger severity name.
  * @param bool        $force_normal   True to return 'normal' class, false to return corresponding severity class.
  * @param bool        $return_as_div  True to return severity cell as DIV element.
  *
  * @return CDiv|CCol
  */
-function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false, $return_as_div = false) {
+function getSeverityCell($severity, $text = null, $force_normal = false, $return_as_div = false) {
 	if ($text === null) {
-		$text = CHtml::encode(getSeverityName($severity, $config));
+		$text = CHtml::encode(getSeverityName($severity));
 	}
 
 	if ($force_normal) {
@@ -211,27 +206,25 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
  * @param bool $isAcknowledged
  */
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
-	$config = select_config();
-
 	$color_class = null;
 	$blinks = null;
 
 	// Color class for text and blinking depends on trigger value and whether event is acknowledged.
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
 		$color_class = ZBX_STYLE_PROBLEM_UNACK_FG;
-		$blinks = $config['problem_unack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE);
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_TRUE && $isAcknowledged) {
 		$color_class = ZBX_STYLE_PROBLEM_ACK_FG;
-		$blinks = $config['problem_ack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE);
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && !$isAcknowledged) {
 		$color_class = ZBX_STYLE_OK_UNACK_FG;
-		$blinks = $config['ok_unack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::OK_UNACK_STYLE);
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && $isAcknowledged) {
 		$color_class = ZBX_STYLE_OK_ACK_FG;
-		$blinks = $config['ok_ack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::OK_ACK_STYLE);
 	}
 
 	if ($color_class != null && $blinks != null) {
@@ -239,11 +232,11 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;
-		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+		$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
 
-		if ($blinks && $timeSinceLastChange < $config['blink_period']) {
+		if ($blinks && $timeSinceLastChange < $blink_period) {
 			$object->addClass('blink'); // elements with this class will blink
-			$object->setAttribute('data-time-to-blink', $config['blink_period'] - $timeSinceLastChange);
+			$object->setAttribute('data-time-to-blink', $blink_period - $timeSinceLastChange);
 		}
 	}
 	else {
@@ -355,7 +348,8 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name'
 		],
 		'selectDependencies' => ['triggerid'],
 		'selectTags' => ['tag', 'value'],
@@ -431,6 +425,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 			// The dependencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
+				'event_name' => $srcTrigger['event_name'],
 				'opdata' => $srcTrigger['opdata'],
 				'expression' => $srcTrigger['expression'],
 				'url' => $srcTrigger['url'],
@@ -598,7 +593,7 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 
 	$function_macro_parser = new CFunctionMacroParser();
 	$user_macro_parser = new CUserMacroParser();
-	$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+	$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 	$lld_macro_parser = new CLLDMacroParser();
 	$lld_macro_function_parser = new CLLDMacroFunctionParser();
 
@@ -784,8 +779,8 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	$triggers_by_name = [];
 	$hosts_by_name = [];
 
-	$limit = ZBX_MAX_TABLE_COLUMNS;
-	$axis_limit = ZBX_MAX_TABLE_COLUMNS;
+	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+	$axis_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
 
 	do {
 		if (!$exhausted_hosts) {
@@ -982,13 +977,12 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 	$eventid = 0;
-	$config = select_config();
-	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+	$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
 	$duration = time() - $trigger['lastchange'];
 
-	if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
+	if ($blink_period > 0 && $duration < $blink_period) {
 		$column->addClass('blink');
-		$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
+		$column->setAttribute('data-time-to-blink', $blink_period - $duration);
 		$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 	}
 
@@ -1145,13 +1139,11 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 		return 0;
 	}
 
-	$config = select_config();
-
 	$options = [
 		'monitored' => true,
 		'countOutput' => true,
 		'filter' => [],
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	if ($ack) {
@@ -1188,8 +1180,6 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 function make_trigger_details($trigger, $eventid) {
 	$hostNames = [];
 
-	$config = select_config();
-
 	$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
 
 	$hosts = API::Host()->get([
@@ -1220,7 +1210,7 @@ function make_trigger_details($trigger, $eventid) {
 		])
 		->addRow([
 			_('Severity'),
-			getSeverityCell($trigger['priority'], $config)
+			getSeverityCell($trigger['priority'])
 		]);
 
 	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [
@@ -1940,7 +1930,13 @@ function get_item_function_info($expr) {
 		'strlen' => $rules['string_as_uint'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],
-		'timeleft' => $rules['numeric_as_float']
+		'timeleft' => $rules['numeric_as_float'],
+		'trendavg' => $rules['numeric'],
+		'trendcount' => $rules['numeric'],
+		'trenddelta' => $rules['numeric'],
+		'trendmax' => $rules['numeric'],
+		'trendmin' => $rules['numeric'],
+		'trendsum' => $rules['numeric']
 	];
 
 	$expr_data = new CTriggerExpression();
@@ -2363,10 +2359,11 @@ function getTriggerParentTemplates(array $triggers, $flag) {
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
+function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($triggerid, $parent_templates['links'])) {
 		return null;
 	}
@@ -2385,7 +2382,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
 	$list = [];
 
 	foreach ($templates as $template) {
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
@@ -2419,10 +2416,11 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
+function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($triggerid, $parent_templates['links'])) {
@@ -2441,7 +2439,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
 		}
 
 		foreach ($templates as $template) {
-			if ($template['permission'] == PERM_READ_WRITE) {
+			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$url = (new CUrl('trigger_prototypes.php'))
 						->setArgument('form', 'update')

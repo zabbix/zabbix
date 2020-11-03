@@ -1,9 +1,9 @@
 
-# Template Net Extreme EXOS SNMP
+# Extreme EXOS SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -30,9 +30,9 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module EtherLike-MIB SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|EtherLike-MIB SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -73,7 +73,7 @@ No specific Zabbix configuration is required.
 |#{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[{#SNMPVALUE}].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 |PSU {#SNMPVALUE}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[extremePowerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1` |AVERAGE | |
 |Device: Temperature is above warning threshold: >{$TEMP_WARN:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}>{$TEMP_WARN:""}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}<{$TEMP_WARN:""}-3` |WARNING |<p>**Depends on**:</p><p>- Device: Temperature is above critical threshold: >{$TEMP_CRIT:""}</p> |
-|Device: Temperature is above critical threshold: >{$TEMP_CRIT:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}>{$TEMP_CRIT:""} or {Template Net Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last(0)}={$TEMP_CRIT_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}<{$TEMP_CRIT:""}-3` |HIGH | |
+|Device: Temperature is above critical threshold: >{$TEMP_CRIT:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}>{$TEMP_CRIT:""} or {Extreme EXOS SNMP:sensor.temp.status[extremeOverTemperatureAlarm.0].last()}={$TEMP_CRIT_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].max(5m)}<{$TEMP_CRIT:""}-3` |HIGH | |
 |Device: Temperature is too low: <{$TEMP_CRIT_LOW:""} |<p>-</p> |`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].avg(5m)}<{$TEMP_CRIT_LOW:""}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[extremeCurrentTemperature.0].min(5m)}>{$TEMP_CRIT_LOW:""}+3` |AVERAGE | |
 
 ## Feedback

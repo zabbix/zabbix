@@ -434,7 +434,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 
 #define SELECTED_CONFIG_FIELD_COUNT	33	/* number of columns in the following DBselect() */
 
-	if (NULL == (result = DBselect("select refresh_unsupported,discovery_groupid,snmptrap_logging,"
+	if (NULL == (result = DBselect("select discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5,"
 				"hk_events_mode,hk_events_trigger,hk_events_internal,"
@@ -442,7 +442,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
 				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept,"
-				"compression_status,compression_availability,compress_older,instanceid"
+				"compression_status,compression_availability,compress_older,instanceid,default_timezone"
 			" from config"
 			" order by configid")))	/* if you change number of columns in DBselect(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
@@ -1386,6 +1386,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
 	ZBX_DC_HTTPITEM		*httpitem;
+	ZBX_DC_SCRIPTITEM	*scriptitem;
 	unsigned char		value_type, type;
 	int			history_sec, trends_sec;
 
@@ -1458,6 +1459,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			trends_sec = dbsync_env.cache->config->hk.trends;
 
 		if (numitem->trends != (0 != trends_sec))
+			return FAIL;
+
+		if (numitem->trends_sec != trends_sec)
 			return FAIL;
 
 		if (FAIL == dbsync_compare_str(dbrow[26], numitem->units))
@@ -1577,6 +1581,21 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 	else if (NULL != telnetitem)
+		return FAIL;
+
+	scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&dbsync_env.cache->scriptitems, &item->itemid);
+	if (ITEM_TYPE_SCRIPT == item->type)
+	{
+		if (NULL == scriptitem)
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[14], scriptitem->timeout))
+			return FAIL;
+
+		if (FAIL == dbsync_compare_str(dbrow[11], scriptitem->script))
+			return FAIL;
+	}
+	else if (NULL != scriptitem)
 		return FAIL;
 
 	simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&dbsync_env.cache->simpleitems, &item->itemid);
@@ -1735,11 +1754,14 @@ static char	**dbsync_item_preproc_row(char **row)
 #define ZBX_DBSYNC_ITEM_COLUMN_DELAY	0x01
 #define ZBX_DBSYNC_ITEM_COLUMN_HISTORY	0x02
 #define ZBX_DBSYNC_ITEM_COLUMN_TRENDS	0x04
+#define ZBX_DBSYNC_ITEM_COLUMN_CALCITEM	0x08
 
 	zbx_uint64_t	hostid;
-	unsigned char	flags = 0;
+	unsigned char	flags = 0, type;
 
 	/* return the original row if user macros are not used in target columns */
+
+	ZBX_STR2UCHAR(type, row[3]);
 
 	if (SUCCEED == dbsync_check_row_macros(row, 8))
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_DELAY;
@@ -1750,6 +1772,9 @@ static char	**dbsync_item_preproc_row(char **row)
 	if (SUCCEED == dbsync_check_row_macros(row, 24))
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_TRENDS;
 
+	if (ITEM_TYPE_CALCULATED == type && SUCCEED == dbsync_check_row_macros(row, 11))
+		flags |= ZBX_DBSYNC_ITEM_COLUMN_CALCITEM;
+
 	if (0 == flags)
 		return row;
 
@@ -1759,13 +1784,16 @@ static char	**dbsync_item_preproc_row(char **row)
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
-		row[8] = zbx_dc_expand_user_macros(row[8], &hostid, 1);
+		row[8] = dc_expand_user_macros(row[8], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_HISTORY))
-		row[22] = zbx_dc_expand_user_macros(row[22], &hostid, 1);
+		row[22] = dc_expand_user_macros(row[22], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_TRENDS))
-		row[23] = zbx_dc_expand_user_macros(row[23], &hostid, 1);
+		row[23] = dc_expand_user_macros(row[23], &hostid, 1);
+
+	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_CALCITEM))
+		row[11] = dc_expand_user_macros_in_calcitem(row[11], hostid);
 
 	return row;
 
@@ -2067,6 +2095,9 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 	if (FAIL == dbsync_compare_str(dbrow[14], trigger->opdata))
 		return FAIL;
 
+	if (FAIL == dbsync_compare_str(dbrow[15], trigger->event_name))
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -2111,15 +2142,15 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	get_functionids(&functionids, row[2]);
 	get_functionids(&functionids, row[11]);
 
-	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
+	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
-		row[2] = zbx_dc_expand_user_macros_in_expression(row[2], hostids.values, hostids.values_num);
+		row[2] = dc_expand_user_macros_in_expression(row[2], hostids.values, hostids.values_num);
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
-		row[11] = zbx_dc_expand_user_macros_in_expression(row[11], hostids.values, hostids.values_num);
+		row[11] = dc_expand_user_macros_in_expression(row[11], hostids.values, hostids.values_num);
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);
@@ -2152,7 +2183,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
 				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression,"
-				"t.correlation_mode,t.correlation_tag,opdata"
+				"t.correlation_mode,t.correlation_tag,opdata,event_name"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -2165,7 +2196,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 15, dbsync_trigger_preproc_row);
+	dbsync_prepare(sync, 16, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -2328,6 +2359,36 @@ static int	dbsync_compare_function(const ZBX_DC_FUNCTION *function, const DB_ROW
 
 /******************************************************************************
  *                                                                            *
+ * Function: dbsync_function_preproc_row                                      *
+ *                                                                            *
+ * Purpose: applies necessary preprocessing before row is compared/used       *
+ *                                                                            *
+ * Parameter: row - [IN] the row to preprocess                                *
+ *                                                                            *
+ * Return value: the preprocessed row                                         *
+ *                                                                            *
+ * Comments: The row preprocessing can be used to expand user macros in       *
+ *           some columns.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static char	**dbsync_function_preproc_row(char **row)
+{
+	zbx_uint64_t	hostid;
+
+	/* return the original row if user macros are not used in target columns */
+	if (SUCCEED == dbsync_check_row_macros(row, 3))
+	{
+		/* get associated host identifier */
+		ZBX_STR2UINT64(hostid, row[5]);
+
+		row[3] = dc_expand_user_macros_in_func_params(row[3], hostid);
+	}
+
+	return row;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dbsync_compare_functions                                     *
  *                                                                            *
  * Purpose: compares functions table with cached configuration data           *
@@ -2346,9 +2407,10 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		rowid;
 	ZBX_DC_FUNCTION		*function;
+	char			**row;
 
 	if (NULL == (result = DBselect(
-			"select i.itemid,f.functionid,f.name,f.parameter,t.triggerid"
+			"select i.itemid,f.functionid,f.name,f.parameter,t.triggerid,i.hostid"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -2361,7 +2423,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 5, NULL);
+	dbsync_prepare(sync, 6, dbsync_function_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -2379,13 +2441,15 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(rowid, dbrow[1]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
+		row = dbsync_preproc_row(sync, dbrow);
+
 		if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&dbsync_env.cache->functions, &rowid)))
 			tag = ZBX_DBSYNC_ROW_ADD;
-		else if (FAIL == dbsync_compare_function(function, dbrow))
+		else if (FAIL == dbsync_compare_function(function, row))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
+			dbsync_add_row(sync, rowid, tag, row);
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->functions, &iter);
@@ -3473,10 +3537,10 @@ static char	**dbsync_item_pp_preproc_row(char **row)
 		ZBX_STR2UINT64(hostid, row[5]);
 
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM))
-			row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1);
+			row[3] = dc_expand_user_macros(row[3], &hostid, 1);
 
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM))
-			row[7] = zbx_dc_expand_user_macros(row[7], &hostid, 1);
+			row[7] = dc_expand_user_macros(row[7], &hostid, 1);
 	}
 
 	return row;
@@ -3550,11 +3614,11 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 			" where pp.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and (h.proxy_hostid is null"
-					" or i.type in (%d,%d,%d))"
+					" or i.type in (%d,%d,%d,%d))"
 				" and h.status in (%d,%d)"
 				" and i.flags<>%d"
 			" order by pp.itemid",
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED,
+			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
@@ -3578,8 +3642,14 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		unsigned char	type;
 
 		ZBX_STR2UCHAR(type, dbrow[8]);
-		if (SUCCEED != DBis_null(dbrow[10]) && SUCCEED != is_item_processed_by_server(type, dbrow[9]))
+
+		/* Sync preproccessing for all dependent items as they can depend on item processed by Zabbx server, */
+		/* avoid syncing preprocessing for internal items monitored by Zabbix proxy                          */
+		if (type != ITEM_TYPE_DEPENDENT && SUCCEED != DBis_null(dbrow[10]) &&
+				SUCCEED != is_item_processed_by_server(type, dbrow[9]))
+		{
 			continue;
+		}
 
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
@@ -3599,6 +3669,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->preprocops, &iter);
+
 	while (NULL != (preproc = (zbx_dc_preproc_op_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL == zbx_hashset_search(&ids, &preproc->item_preprocid))
@@ -3637,6 +3708,118 @@ static int	dbsync_compare_maintenance(const zbx_dc_maintenance_t *maintenance, c
 
 	if (FAIL == dbsync_compare_uchar(dbrow[4], maintenance->tags_evaltype))
 		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dbsync_compare_itemscript_param                                  *
+ *                                                                            *
+ * Purpose: compares item script params table row with cached configuration   *
+ *          data                                                              *
+ *                                                                            *
+ * Parameter: script - [IN] the cached item script                            *
+ *            dbrow  - [IN] the database row                                  *
+ *                                                                            *
+ * Return value: SUCCEED - the row matches configuration data                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbsync_compare_itemscript_param(const zbx_dc_scriptitem_param_t *scriptitem_param, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_uint64(dbrow[1], scriptitem_param->itemid))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[2], scriptitem_param->name))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[3], scriptitem_param->value))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_compare_item_script_param                             *
+ *                                                                            *
+ * Purpose: compares item_parameter table with cached configuration data      *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
+{
+	DB_ROW				dbrow;
+	DB_RESULT			result;
+	zbx_hashset_t			ids;
+	zbx_hashset_iter_t		iter;
+	zbx_uint64_t			rowid;
+	zbx_dc_scriptitem_param_t	*itemscript_params;
+	char				**row;
+
+	if (NULL == (result = DBselect(
+			"select p.item_parameterid,p.itemid,p.name,p.value,i.hostid"
+			" from item_parameter p,items i,hosts h"
+			" where p.itemid=i.itemid"
+				" and i.hostid=h.hostid"
+				" and h.status in (%d,%d)"
+				" and i.flags<>%d"
+			" order by p.itemid",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 5, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	zbx_hashset_create(&ids, dbsync_env.cache->itemscript_params.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(rowid, dbrow[0]);
+		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+
+		row = dbsync_preproc_row(sync, dbrow);
+
+		if (NULL == (itemscript_params = (zbx_dc_scriptitem_param_t *)
+				zbx_hashset_search(&dbsync_env.cache->itemscript_params, &rowid)))
+		{
+			tag = ZBX_DBSYNC_ROW_ADD;
+		}
+		else if (FAIL == dbsync_compare_itemscript_param(itemscript_params, row))
+		{
+			tag = ZBX_DBSYNC_ROW_UPDATE;
+		}
+
+		if (ZBX_DBSYNC_ROW_NONE != tag)
+			dbsync_add_row(sync, rowid, tag, row);
+	}
+
+	zbx_hashset_iter_reset(&dbsync_env.cache->itemscript_params, &iter);
+
+	while (NULL != (itemscript_params = (zbx_dc_scriptitem_param_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == zbx_hashset_search(&ids, &itemscript_params->item_script_paramid))
+			dbsync_add_row(sync, itemscript_params->item_script_paramid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+	}
+
+	zbx_hashset_destroy(&ids);
+	DBfree_result(result);
 
 	return SUCCEED;
 }

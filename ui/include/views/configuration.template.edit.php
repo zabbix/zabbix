@@ -49,7 +49,7 @@ if ($data['templateid'] != 0) {
 	$frm_title .= SPACE.' ['.$data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
-	->setId('templatesForm')
+	->setId('templates-form')
 	->setName('templatesForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
@@ -290,24 +290,23 @@ if ($data['form'] === 'full_clone') {
 		}
 	}
 
-	// screens
-	$screens = API::TemplateScreen()->get([
-		'inherited' => false,
+	// Dashboards
+	$dashboards = API::TemplateDashboard()->get([
+		'output' => ['dashboardid', 'name'],
 		'templateids' => $data['templateid'],
-		'output' => ['screenid', 'name'],
 	]);
-	if (!empty($screens)) {
-		$screensList = [];
-		foreach ($screens as $screen) {
-			$screensList[$screen['screenid']] = $screen['name'];
+	if (!empty($dashboards)) {
+		$dashboardList = [];
+		foreach ($dashboards as $dashboard) {
+			$dashboardList[$dashboard['dashboardid']] = $dashboard['name'];
 		}
-		order_result($screensList);
+		order_result($dashboardList);
 
-		$listBox = (new CListBox('screens', null, 8))
+		$listBox = (new CListBox('dashboards', null, 8))
 			->setAttribute('disabled', 'disabled')
-			->addItems($screensList);
+			->addItems($dashboardList);
 
-		$templateList->addRow(_('Screens'), $listBox);
+		$templateList->addRow(_('Dashboards'), $listBox);
 	}
 
 	// web scenarios
@@ -343,6 +342,7 @@ $tmplList = new CFormList();
 $disableids = [];
 
 $linkedTemplateTable = (new CTable())
+	->setId('linked-template')
 	->setHeader([_('Name'), _('Action')])
 	->addStyle('width: 100%;');
 
@@ -411,14 +411,15 @@ $tmplList
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
-$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
+$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList, TAB_INDICATOR_LINKED_TEMPLATE);
 
 // tags
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-	'source' => 'template',
-	'tags' => $data['tags'],
-	'readonly' => $data['readonly']
-]));
+		'source' => 'template',
+		'tags' => $data['tags'],
+		'readonly' => $data['readonly']
+	]), TAB_INDICATOR_TAGS
+);
 
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
@@ -432,7 +433,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 		->addRow(null, new CPartial($tmpl, [
 			'macros' => $data['macros'],
 			'readonly' => $data['readonly']
-		]), 'macros_container')
+		]), 'macros_container'),
+	TAB_INDICATOR_MACROS
 );
 
 // footer

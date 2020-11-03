@@ -37,11 +37,13 @@ else {
 
 	foreach ($data['drules'] as $drule) {
 		$table->addRow([
-			new CLink($drule['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'discovery.view')
-				->setArgument('filter_set', 1)
-				->setArgument('filter_druleids', [$drule['druleid']])
-			),
+			$data['allowed_ui_discovery']
+				? new CLink($drule['name'], (new CUrl('zabbix.php'))
+					->setArgument('action', 'discovery.view')
+					->setArgument('filter_set', 1)
+					->setArgument('filter_druleids', [$drule['druleid']])
+				)
+				: $drule['name'],
 			($drule['up'] != 0) ? (new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN) : '',
 			($drule['down'] != 0) ? (new CSpan($drule['down']))->addClass(ZBX_STYLE_RED) : ''
 		]);

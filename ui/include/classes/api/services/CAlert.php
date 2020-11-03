@@ -24,6 +24,12 @@
  */
 class CAlert extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => [
+			'min_user_type' => USER_TYPE_ZABBIX_USER
+		]
+	];
+
 	protected $tableName = 'alerts';
 	protected $tableAlias = 'a';
 	protected $sortColumns = ['alertid', 'clock', 'eventid', 'status', 'sendto', 'mediatypeid'];
@@ -322,7 +328,7 @@ class CAlert extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($alert = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $alert['rowscount'];

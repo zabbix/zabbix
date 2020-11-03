@@ -215,7 +215,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	// description
 	$description = [];
 	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
-		ZBX_FLAG_DISCOVERY_NORMAL
+		ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 	);
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
@@ -317,7 +317,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	$triggers_table->addRow([
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
-		getSeverityCell($trigger['priority'], $data['config']),
+		getSeverityCell($trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
 		$description,

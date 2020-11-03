@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[5.2.0alpha1])
+AC_INIT([Zabbix],[5.4.0alpha1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -98,6 +98,21 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #  include <net/if.h>
 #endif
 ])
+
+AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
+checked_werror_cpp_CFLAGS=""
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Werror=cpp"
+AC_TRY_COMPILE(,[
+  void f() {};
+],checked_werror_cpp_CFLAGS="-Werror=cpp"
+  AC_MSG_RESULT(yes),
+  AC_MSG_RESULT(no)
+)
+CFLAGS="$saved_CFLAGS"
+
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$checked_werror_cpp_CFLAGS $CFLAGS"
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -106,6 +121,8 @@ AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #  include <sys/param.h>
 #endif
 ])
+CFLAGS="$saved_CFLAGS"
+
 AC_CHECK_HEADERS(sys/swap.h, [], [], [
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
@@ -692,6 +709,19 @@ AC_DEFINE(HAVE_THREAD_LOCAL,1,[Define to 1 if compiler keyword '__thread' suppor
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no)
 HAVE_THREAD_LOCAL="no")
+
+AC_MSG_CHECKING(for field updates in struct vminfo_t)
+AC_TRY_COMPILE([
+#include <sys/sysinfo.h>
+],
+[
+	vminfo_t vminfo;
+	vminfo.updates;
+],
+AC_DEFINE(HAVE_VMINFO_T_UPDATES,1,[Define to 1 if 'vminfo.updates' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -981,6 +1011,9 @@ AC_REPLACE_FUNCS(getloadavg)
 AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
+AC_CHECK_FUNCS(setenv)
+AC_CHECK_FUNCS(tzset)
+AC_CHECK_FUNCS(unsetenv)
 AC_CHECK_FUNCS(sigqueue)
 AC_CHECK_FUNCS(round)
 
@@ -1355,6 +1388,7 @@ have_ipmi="no"
 have_ipv6="no"
 have_ssh="no"
 have_tls="no"
+have_libmodbus="no"
 
 
 if test "x$ipv6" = "xyes"; then
@@ -1726,11 +1760,26 @@ SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 ZBXJS_LDFLAGS="$ZLIB_LDFLAGS $TLS_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $TLS_LIBS"
 
+dnl Check for libmodbus [by default - skip]
+if test "x$agent" = "xyes"; then
+	LIBMODBUS_CHECK_CONFIG([3.0.0])
+	if test "x$want_libmodbus" = "xyes"; then
+		if test "x$found_libmodbus" = "xyes"; then
+			have_libmodbus="yes"
+		fi
+	fi
+	LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
+	CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
+	LIBS="$LIBS $LIBMODBUS_LIBS"
+fi
+AM_CONDITIONAL(HAVE_LIBMODBUS, [test "x$have_libmodbus" = "xyes"])
+
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
 	if test "x$GO" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
 	fi
+	AC_DEFINE(ZBX_BUILD_AGENT2,1,[Define to 1 if Agent2 is being built.])
 fi
 
 if test "x$java" = "xyes"; then
@@ -1993,6 +2042,9 @@ AC_OUTPUT([
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
+	src/libs/zbxvault/Makefile
+	src/libs/zbxdiag/Makefile
+	src/libs/zbxtrends/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
@@ -2105,6 +2157,10 @@ if test "x$SSH_CFLAGS" != "x"; then
 	echo "    libssh:                ${SSH_CFLAGS}"
 fi
 
+if test "x$LIBMODBUS_CFLAGS" != "x"; then
+	echo "    libmodbus:                ${LIBMODBUS_CFLAGS}"
+fi
+
 if test "x$TLS_CFLAGS" != "x"; then
 	echo "    TLS:                   ${TLS_CFLAGS}"
 fi
@@ -2183,6 +2239,7 @@ if test "x$agent" != "xno"; then
 
 echo "  Agent details:
     TLS:                   ${have_tls}
+    Modbus:                ${have_libmodbus}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}
     Configuration file:    ${AGENT_CONFIG_FILE}

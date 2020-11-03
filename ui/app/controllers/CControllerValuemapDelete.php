@@ -40,7 +40,7 @@ class CControllerValuemapDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
@@ -64,10 +64,10 @@ class CControllerValuemapDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Value map deleted', 'Value maps deleted', count($valuemapids)));
+			CMessageHelper::setSuccessTitle(_n('Value map deleted', 'Value maps deleted', count($valuemapids)));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete value map', 'Cannot delete value maps', count($valuemapids)));
+			CMessageHelper::setErrorTitle(_n('Cannot delete value map', 'Cannot delete value maps', count($valuemapids)));
 		}
 
 		$this->setResponse($response);

@@ -41,7 +41,8 @@ $filter = (new CFilter(new CUrl('httpconf.php')))
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'with_hosts_and_templates' => 1,
-							'editable' => 1
+							'editable' => 1,
+							'enrich_parent_groups' => true
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -125,7 +126,7 @@ $httpTests = $this->data['httpTests'];
 
 foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
-	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates']);
+	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
 	$name[] = new CLink(CHtml::encode($httpTest['name']),
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')

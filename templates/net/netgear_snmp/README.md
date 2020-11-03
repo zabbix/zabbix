@@ -1,9 +1,9 @@
 
-# Template Net Netgear Fastpath SNMP
+# Netgear Fastpath SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 https://kb.netgear.com/24352/MIBs-for-Smart-switches
 
 This template was tested on:
@@ -36,8 +36,8 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -73,8 +73,8 @@ No specific Zabbix configuration is required.
 |Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`{TEMPLATE_NAME:system.hw.serialnumber.diff()}=1 and {TEMPLATE_NAME:system.hw.serialnumber.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[memoryUsedPercentage.0].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 |#{#SNMPVALUE}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"failed"},eq)}=1` |AVERAGE | |
-|#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""} or {Template Net Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3` |WARNING |<p>**Depends on**:</p><p>- #{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}</p> |
-|#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""} or {Template Net Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3` |HIGH | |
+|#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""} or {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3` |WARNING |<p>**Depends on**:</p><p>- #{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}</p> |
+|#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""} or {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3` |HIGH | |
 |#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""} |<p>-</p> |`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}<{$TEMP_CRIT_LOW:""}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].min(5m)}>{$TEMP_CRIT_LOW:""}+3` |AVERAGE | |
 
 ## Feedback

@@ -98,6 +98,7 @@ $filter_column1 = (new CFormList())
 $filter_type_visibility = [];
 $cmb_type = new CComboBox('filter_type', $data['filter']['type'], null, [-1 => _('all')]);
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
+zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
 
 $lld_types = item_type2str();
 unset($lld_types[ITEM_TYPE_AGGREGATE], $lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED],
@@ -109,6 +110,7 @@ $cmb_type->addItems($lld_types);
 foreach ($lld_types as $type => $name) {
 	if ($type != ITEM_TYPE_TRAPPER) {
 		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay_row');
+		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay');
 	}
 	if ($type == ITEM_TYPE_SNMP) {
 		zbx_subarray_push($filter_type_visibility, $type, 'filter_snmp_oid_row');
@@ -186,7 +188,9 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
-	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE);
+	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
@@ -231,7 +235,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
-			|| $discovery['type'] == ITEM_TYPE_DEPENDENT) {
+			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+				&& strncmp($discovery['key_'], 'mqtt.get', 8) === 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
@@ -263,12 +268,14 @@ foreach ($data['discoveries'] as $discovery) {
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
-		[
-			new CLink(_('Host prototypes'),
-				(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $discovery['itemid'])
-			),
-			CViewHelper::showNum($discovery['hostPrototypes'])
-		],
+		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+			? [
+				new CLink(_('Host prototypes'),
+					(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $discovery['itemid'])
+				),
+				CViewHelper::showNum($discovery['hostPrototypes'])
+			]
+			: '',
 		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
@@ -289,7 +296,7 @@ $discoveryForm->addItem([
 			'discoveryrule.massdisable' => ['name' => _('Disable'),
 				'confirm' =>_('Disable selected discovery rules?')
 			],
-			'discoveryrule.masscheck_now' => ['name' => _('Execute now')],
+			'discoveryrule.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
 			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
 			]

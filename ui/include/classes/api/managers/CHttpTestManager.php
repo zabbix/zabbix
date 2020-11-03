@@ -1282,7 +1282,7 @@ class CHttpTestManager {
 	 * - lastfailedstep - number of the last failed step
 	 * - error          - error message
 	 *
-	 * If a HTTP test has not been executed in last ZBX_HISTORY_PERIOD, no value will be returned.
+	 * If a HTTP test has not been executed in last CSettingsHelper::HISTORY_PERIOD, no value will be returned.
 	 *
 	 * @param array $httpTestIds
 	 *
@@ -1297,7 +1297,9 @@ class CHttpTestManager {
 				' AND '.dbConditionInt('hti.httptestid', $httpTestIds)
 		));
 
-		$history = Manager::History()->getLastValues($httpItems, 1, ZBX_HISTORY_PERIOD);
+		$history = Manager::History()->getLastValues($httpItems, 1, timeUnitToSeconds(CSettingsHelper::get(
+			CSettingsHelper::HISTORY_PERIOD
+		)));
 
 		$data = [];
 

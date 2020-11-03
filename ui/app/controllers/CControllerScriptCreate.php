@@ -44,7 +44,7 @@ class CControllerScriptCreate extends CController {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=script.edit');
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot add script'));
+					CMessageHelper::setErrorTitle(_('Cannot add script'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -57,7 +57,7 @@ class CControllerScriptCreate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS);
 	}
 
 	protected function doAction() {
@@ -87,14 +87,14 @@ class CControllerScriptCreate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('script.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Script added'));
+			CMessageHelper::setSuccessTitle(_('Script added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'script.edit')
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot add script'));
+			CMessageHelper::setErrorTitle(_('Cannot add script'));
 		}
 		$this->setResponse($response);
 	}

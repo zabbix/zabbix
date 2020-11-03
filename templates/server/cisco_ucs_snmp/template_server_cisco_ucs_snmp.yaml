@@ -1,0 +1,1133 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:40Z'
+  groups:
+    -
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      template: 'Cisco UCS SNMP'
+      name: 'Cisco UCS SNMP'
+      description: |
+        Template Server Cisco UCS
+        
+        MIBs used:
+        CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+        CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB
+        CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
+        CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      applications:
+        -
+          name: 'Disk arrays'
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: 'Physical disks'
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+        -
+          name: 'Virtual disks'
+      discovery_rules:
+        -
+          name: 'Array Controller Cache Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISKARRAY_CACHE_LOCATION},1.3.6.1.4.1.9.9.719.1.45.11.1.2]'
+          key: array.cache.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerTable.'
+          item_prototypes:
+            -
+              name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.11.1.9.{#SNMPINDEX}'
+              key: 'system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}]'
+              history: 1w
+              trends: 0d
+              description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
+              applications:
+                -
+                  name: 'Disk arrays'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1'
+                  name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults'
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS},ne)}=1'
+                  name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!'
+                      expression: '{Cisco UCS SNMP:system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1'
+        -
+          name: 'Array Controller Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISKARRAY_LOCATION},1.3.6.1.4.1.9.9.719.1.45.1.1.2]'
+          key: array.discovery
+          delay: 1h
+          description: 'Scanning table of Array controllers: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerTable.'
+          item_prototypes:
+            -
+              name: '{#DISKARRAY_LOCATION}: Disk array controller model'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.1.1.5.{#SNMPINDEX}'
+              key: 'system.hw.diskarray.model[cucsStorageControllerModel.{#SNMPINDEX}]'
+              delay: 1d
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
+              applications:
+                -
+                  name: 'Disk arrays'
+            -
+              name: '{#DISKARRAY_LOCATION}: Disk array controller status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.1.1.6.{#SNMPINDEX}'
+              key: 'system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}]'
+              history: 1w
+              trends: 0d
+              description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
+              applications:
+                -
+                  name: 'Disk arrays'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1'
+                  name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for faults'
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_WARN_STATUS:"degraded"},eq)}=1'
+                  name: '{#DISKARRAY_LOCATION}: Disk array controller is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
+                      expression: '{Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1'
+                -
+                  expression: '{count(#1,{$DISK_ARRAY_OK_STATUS:"operable"},ne)}=1'
+                  name: '{#DISKARRAY_LOCATION}: Disk array controller is not in optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for faults'
+                  dependencies:
+                    -
+                      name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
+                      expression: '{Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1'
+                    -
+                      name: '{#DISKARRAY_LOCATION}: Disk array controller is in warning state'
+                      expression: '{Cisco UCS SNMP:system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_WARN_STATUS:"degraded"},eq)}=1'
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#FAN_LOCATION},1.3.6.1.4.1.9.9.719.1.15.12.1.2]'
+          key: fan.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#FAN_LOCATION}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.15.12.1.9.{#SNMPINDEX}'
+              key: 'sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
+                Cisco UCS equipment:Fan:operState managed object property
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS:"inoperable"},eq)}=1'
+                  name: '{#FAN_LOCATION}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+                -
+                  expression: '{count(#1,{$FAN_WARN_STATUS:"degraded"},eq)}=1'
+                  name: '{#FAN_LOCATION}: Fan is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit'
+                  dependencies:
+                    -
+                      name: '{#FAN_LOCATION}: Fan is in critical state'
+                      expression: '{Cisco UCS SNMP:sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"inoperable"},eq)}=1'
+        -
+          name: 'Physical Disk Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DISK_LOCATION},1.3.6.1.4.1.9.9.719.1.45.4.1.2]'
+          key: physicalDisk.discovery
+          delay: 1h
+          description: 'Scanning table of physical drive entries CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalDiskTable.'
+          item_prototypes:
+            -
+              name: '{#DISK_LOCATION}: Physical disk media type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.7.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.media_type[cucsStorageLocalDiskModel.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:model managed object property. Actually returns 'HDD' or 'SSD'
+              applications:
+                -
+                  name: 'Physical disks'
+            -
+              name: '{#DISK_LOCATION}: Physical disk model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.12.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.model[cucsStorageLocalDiskSerial.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:serial managed object property. Actually returns part number code
+              applications:
+                -
+                  name: 'Physical disks'
+            -
+              name: '{#DISK_LOCATION}: Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.13.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.size[cucsStorageLocalDiskSize.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: 0d
+              units: B
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:size managed object property. In MB.
+              applications:
+                -
+                  name: 'Physical disks'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+            -
+              name: '{#DISK_LOCATION}: Physical disk status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.18.{#SNMPINDEX}'
+              key: 'system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}]'
+              delay: 3m
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalDisk:diskState managed object property.
+              applications:
+                -
+                  name: 'Physical disks'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$DISK_CRIT_STATUS:"bad"},eq)}=1 or {count(#1,{$DISK_CRIT_STATUS:"predictiveFailure"},eq)}=1'
+                  name: '{#DISK_LOCATION}: Physical disk error'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check physical disk for warnings or errors'
+                  dependencies:
+                    -
+                      name: '{#DISK_LOCATION}: Physical disk failed'
+                      expression: '{Cisco UCS SNMP:system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1'
+                -
+                  expression: '{count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1'
+                  name: '{#DISK_LOCATION}: Physical disk failed'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check physical disk for warnings or errors'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#PSU_LOCATION},1.3.6.1.4.1.9.9.719.1.15.56.1.2]'
+          key: psu.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#PSU_LOCATION}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.15.56.1.7.{#SNMPINDEX}'
+              key: 'sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
+                Cisco UCS equipment:Psu:operState managed object property
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS:"inoperable"},eq)}=1'
+                  name: '{#PSU_LOCATION}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+                -
+                  expression: '{count(#1,{$PSU_WARN_STATUS:"degraded"},eq)}=1'
+                  name: '{#PSU_LOCATION}: Power supply is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors'
+                  dependencies:
+                    -
+                      name: '{#PSU_LOCATION}: Power supply is in critical state'
+                      expression: '{Cisco UCS SNMP:sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"inoperable"},eq)}=1'
+        -
+          name: 'Temperature CPU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_LOCATION},1.3.6.1.4.1.9.9.719.1.41.2.1.2]'
+          key: temp.cpu.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#SENSOR_LOCATION}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.41.2.1.10.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB
+                Cisco UCS processor:EnvStats:temperature managed object property
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+                  name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"CPU"}-3'
+                  name: '{#SENSOR_LOCATION}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                      expression: '{Cisco UCS SNMP:sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: '{Cisco UCS SNMP:sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  name: '{#SENSOR_LOCATION}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_LOCATION},1.3.6.1.4.1.9.9.719.1.9.44.1.2]'
+          key: temp.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#SENSOR_LOCATION}.IOH: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.13.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                      expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                      recovery_expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  name: '{#SENSOR_LOCATION}.IOH: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+            -
+              name: '{#SENSOR_LOCATION}.Ambient: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                      expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                      recovery_expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  name: '{#SENSOR_LOCATION}.Ambient: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+            -
+              name: '{#SENSOR_LOCATION}.Front: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.8.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                      expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                      recovery_expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  name: '{#SENSOR_LOCATION}.Front: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+            -
+              name: '{#SENSOR_LOCATION}.Rear: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.44.1.21.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Ambient"}-3'
+                  name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
+                      expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}'
+                      recovery_expression: '{Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  name: '{#SENSOR_LOCATION}.Rear: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          name: 'Unit Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#UNIT_LOCATION},1.3.6.1.4.1.9.9.719.1.9.35.1.2]'
+          key: unit.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#UNIT_LOCATION}: Hardware model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.32.{#SNMPINDEX}'
+              key: 'system.hw.model[cucsComputeRackUnitModel.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnit:model managed object property
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+            -
+              name: '{#UNIT_LOCATION}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.47.{#SNMPINDEX}'
+              key: 'system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnit:serial managed object property
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#UNIT_LOCATION}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              name: '{#UNIT_LOCATION}: Overall system health status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.42.{#SNMPINDEX}'
+              key: 'system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}]'
+              delay: 30s
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+                Cisco UCS compute:RackUnit:operState managed object property
+              applications:
+                -
+                  name: Status
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$HEALTH_CRIT_STATUS:"computeFailed"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"configFailure"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"unconfigFailure"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"inoperable"},eq)}=1'
+                  name: '{#UNIT_LOCATION}: System status is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Please check the device for errors'
+                -
+                  expression: '{count(#1,{$HEALTH_WARN_STATUS:"testFailed"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"thermalProblem"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"powerProblem"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"voltageProblem"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"diagnosticsFailed"},eq)}=1'
+                  name: '{#UNIT_LOCATION}: System status is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the device for warnings'
+                  dependencies:
+                    -
+                      name: '{#UNIT_LOCATION}: System status is in critical state'
+                      expression: '{Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"computeFailed"},eq)}=1 or {Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"configFailure"},eq)}=1 or {Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"unconfigFailure"},eq)}=1 or {Cisco UCS SNMP:system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}].count(#1,{$HEALTH_CRIT_STATUS:"inoperable"},eq)}=1'
+        -
+          name: 'Virtual Disk Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#VDISK_LOCATION},1.3.6.1.4.1.9.9.719.1.45.8.1.2]'
+          key: virtualdisk.discovery
+          delay: 1h
+          description: 'CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalLunTable'
+          item_prototypes:
+            -
+              name: '{#VDISK_LOCATION}: Layout type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.8.1.14.{#SNMPINDEX}'
+              key: 'system.hw.virtualdisk.layout[cucsStorageLocalLunType.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalLun:type managed object property
+              applications:
+                -
+                  name: 'Virtual disks'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+            -
+              name: '{#VDISK_LOCATION}: Disk size'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.8.1.13.{#SNMPINDEX}'
+              key: 'system.hw.virtualdisk.size[cucsStorageLocalLunSize.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: 0d
+              units: B
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalLun:size managed object property in MB.
+              applications:
+                -
+                  name: 'Virtual disks'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+            -
+              name: '{#VDISK_LOCATION}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.8.1.10.{#SNMPINDEX}'
+              key: 'system.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              description: |
+                MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
+                Cisco UCS storage:LocalLun:presence managed object property
+              applications:
+                -
+                  name: 'Virtual disks'
+              valuemap:
+                name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$VDISK_OK_STATUS:"equipped"},ne)}=1'
+                  name: '{#VDISK_LOCATION}: Virtual disk is not in OK state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check virtual disk for warnings or errors'
+      macros:
+        -
+          macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}'
+          value: '2'
+        -
+          macro: '{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}'
+          value: '1'
+        -
+          macro: '{$DISK_ARRAY_CRIT_STATUS:"inoperable"}'
+          value: '2'
+        -
+          macro: '{$DISK_ARRAY_OK_STATUS:"operable"}'
+          value: '1'
+        -
+          macro: '{$DISK_ARRAY_WARN_STATUS:"degraded"}'
+          value: '3'
+        -
+          macro: '{$DISK_CRIT_STATUS:"bad"}'
+          value: '16'
+        -
+          macro: '{$DISK_CRIT_STATUS:"predictiveFailure"}'
+          value: '11'
+        -
+          macro: '{$DISK_FAIL_STATUS:"failed"}'
+          value: '9'
+        -
+          macro: '{$FAN_CRIT_STATUS:"inoperable"}'
+          value: '2'
+        -
+          macro: '{$FAN_WARN_STATUS:"degraded"}'
+          value: '3'
+        -
+          macro: '{$HEALTH_CRIT_STATUS:"computeFailed"}'
+          value: '30'
+        -
+          macro: '{$HEALTH_CRIT_STATUS:"configFailure"}'
+          value: '33'
+        -
+          macro: '{$HEALTH_CRIT_STATUS:"inoperable"}'
+          value: '60'
+        -
+          macro: '{$HEALTH_CRIT_STATUS:"unconfigFailure"}'
+          value: '34'
+        -
+          macro: '{$HEALTH_WARN_STATUS:"diagnosticsFailed"}'
+          value: '204'
+        -
+          macro: '{$HEALTH_WARN_STATUS:"powerProblem"}'
+          value: '62'
+        -
+          macro: '{$HEALTH_WARN_STATUS:"testFailed"}'
+          value: '35'
+        -
+          macro: '{$HEALTH_WARN_STATUS:"thermalProblem"}'
+          value: '60'
+        -
+          macro: '{$HEALTH_WARN_STATUS:"voltageProblem"}'
+          value: '62'
+        -
+          macro: '{$PSU_CRIT_STATUS:"inoperable"}'
+          value: '2'
+        -
+          macro: '{$PSU_WARN_STATUS:"degraded"}'
+          value: '3'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT:"Ambient"}'
+          value: '35'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN:"Ambient"}'
+          value: '30'
+        -
+          macro: '{$VDISK_OK_STATUS:"equipped"}'
+          value: '10'
+  value_maps:
+    -
+      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
+      mappings:
+        -
+          value: '0'
+          newvalue: unknown
+        -
+          value: '1'
+          newvalue: operable
+        -
+          value: '2'
+          newvalue: inoperable
+        -
+          value: '3'
+          newvalue: degraded
+        -
+          value: '4'
+          newvalue: poweredOff
+        -
+          value: '5'
+          newvalue: powerProblem
+        -
+          value: '6'
+          newvalue: removed
+        -
+          value: '7'
+          newvalue: voltageProblem
+        -
+          value: '8'
+          newvalue: thermalProblem
+        -
+          value: '9'
+          newvalue: performanceProblem
+        -
+          value: '10'
+          newvalue: accessibilityProblem
+        -
+          value: '11'
+          newvalue: identityUnestablishable
+        -
+          value: '12'
+          newvalue: biosPostTimeout
+        -
+          value: '13'
+          newvalue: disabled
+        -
+          value: '14'
+          newvalue: malformedFru
+        -
+          value: '15'
+          newvalue: backplanePortProblem
+        -
+          value: '16'
+          newvalue: chassisIntrusion
+        -
+          value: '51'
+          newvalue: fabricConnProblem
+        -
+          value: '52'
+          newvalue: fabricUnsupportedConn
+        -
+          value: '81'
+          newvalue: config
+        -
+          value: '82'
+          newvalue: equipmentProblem
+        -
+          value: '83'
+          newvalue: decomissioning
+        -
+          value: '84'
+          newvalue: chassisLimitExceeded
+        -
+          value: '100'
+          newvalue: notSupported
+        -
+          value: '101'
+          newvalue: discovery
+        -
+          value: '102'
+          newvalue: discoveryFailed
+        -
+          value: '103'
+          newvalue: identify
+        -
+          value: '104'
+          newvalue: postFailure
+        -
+          value: '105'
+          newvalue: upgradeProblem
+        -
+          value: '106'
+          newvalue: peerCommProblem
+        -
+          value: '107'
+          newvalue: autoUpgrade
+        -
+          value: '108'
+          newvalue: linkActivateBlocked
+    -
+      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence'
+      mappings:
+        -
+          value: '0'
+          newvalue: unknown
+        -
+          value: '1'
+          newvalue: empty
+        -
+          value: '10'
+          newvalue: equipped
+        -
+          value: '11'
+          newvalue: missing
+        -
+          value: '12'
+          newvalue: mismatch
+        -
+          value: '13'
+          newvalue: equippedNotPrimary
+        -
+          value: '14'
+          newvalue: equippedSlave
+        -
+          value: '15'
+          newvalue: mismatchSlave
+        -
+          value: '16'
+          newvalue: missingSlave
+        -
+          value: '20'
+          newvalue: equippedIdentityUnestablishable
+        -
+          value: '21'
+          newvalue: mismatchIdentityUnestablishable
+        -
+          value: '22'
+          newvalue: equippedWithMalformedFru
+        -
+          value: '30'
+          newvalue: inaccessible
+        -
+          value: '40'
+          newvalue: unauthorized
+        -
+          value: '100'
+          newvalue: notSupported
+        -
+          value: '101'
+          newvalue: equippedUnsupported
+        -
+          value: '102'
+          newvalue: equippedDiscNotStarted
+        -
+          value: '103'
+          newvalue: equippedDiscInProgress
+        -
+          value: '104'
+          newvalue: equippedDiscError
+        -
+          value: '105'
+          newvalue: equippedDiscUnknown
+    -
+      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState'
+      mappings:
+        -
+          value: '0'
+          newvalue: indeterminate
+        -
+          value: '1'
+          newvalue: unassociated
+        -
+          value: '10'
+          newvalue: ok
+        -
+          value: '11'
+          newvalue: discovery
+        -
+          value: '12'
+          newvalue: config
+        -
+          value: '13'
+          newvalue: unconfig
+        -
+          value: '14'
+          newvalue: powerOff
+        -
+          value: '15'
+          newvalue: restart
+        -
+          value: '20'
+          newvalue: maintenance
+        -
+          value: '21'
+          newvalue: test
+        -
+          value: '29'
+          newvalue: computeMismatch
+        -
+          value: '30'
+          newvalue: computeFailed
+        -
+          value: '31'
+          newvalue: degraded
+        -
+          value: '32'
+          newvalue: discoveryFailed
+        -
+          value: '33'
+          newvalue: configFailure
+        -
+          value: '34'
+          newvalue: unconfigFailed
+        -
+          value: '35'
+          newvalue: testFailed
+        -
+          value: '36'
+          newvalue: maintenanceFailed
+        -
+          value: '40'
+          newvalue: removed
+        -
+          value: '41'
+          newvalue: disabled
+        -
+          value: '50'
+          newvalue: inaccessible
+        -
+          value: '60'
+          newvalue: thermalProblem
+        -
+          value: '61'
+          newvalue: powerProblem
+        -
+          value: '62'
+          newvalue: voltageProblem
+        -
+          value: '63'
+          newvalue: inoperable
+        -
+          value: '101'
+          newvalue: decomissioning
+        -
+          value: '201'
+          newvalue: biosRestore
+        -
+          value: '202'
+          newvalue: cmosReset
+        -
+          value: '203'
+          newvalue: diagnostics
+        -
+          value: '204'
+          newvalue: diagnosticsFailed
+        -
+          value: '210'
+          newvalue: pendingReboot
+        -
+          value: '211'
+          newvalue: pendingReassociation
+        -
+          value: '212'
+          newvalue: svnicNotPresent
+    -
+      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType'
+      mappings:
+        -
+          value: '0'
+          newvalue: unspecified
+        -
+          value: '1'
+          newvalue: simple
+        -
+          value: '2'
+          newvalue: mirror
+        -
+          value: '3'
+          newvalue: stripe
+        -
+          value: '4'
+          newvalue: raid
+        -
+          value: '5'
+          newvalue: stripeParity
+        -
+          value: '6'
+          newvalue: stripeDualParity
+        -
+          value: '7'
+          newvalue: mirrorStripe
+        -
+          value: '8'
+          newvalue: stripeParityStripe
+        -
+          value: '9'
+          newvalue: stripeDualParityStripe
+    -
+      name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus'
+      mappings:
+        -
+          value: '0'
+          newvalue: unknown
+        -
+          value: '1'
+          newvalue: online
+        -
+          value: '2'
+          newvalue: unconfiguredGood
+        -
+          value: '3'
+          newvalue: globalHotSpare
+        -
+          value: '4'
+          newvalue: dedicatedHotSpare
+        -
+          value: '5'
+          newvalue: jbod
+        -
+          value: '6'
+          newvalue: offline
+        -
+          value: '7'
+          newvalue: rebuilding
+        -
+          value: '8'
+          newvalue: copyback
+        -
+          value: '9'
+          newvalue: failed
+        -
+          value: '10'
+          newvalue: unconfiguredBad
+        -
+          value: '11'
+          newvalue: predictiveFailure
+        -
+          value: '12'
+          newvalue: disabledForRemoval
+        -
+          value: '13'
+          newvalue: foreignConfiguration
+        -
+          value: '14'
+          newvalue: zeroing
+        -
+          value: '15'
+          newvalue: good
+        -
+          value: '16'
+          newvalue: bad
+        -
+          value: '17'
+          newvalue: lockedForeignConfiguration

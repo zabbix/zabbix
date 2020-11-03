@@ -34,17 +34,8 @@ class CScreenSystemStatus extends CScreenBase {
 		// rewrite page file
 		$page['file'] = $this->pageFile;
 
-		$config = select_config();
-		$severity_config = [
-			'severity_name_0' => $config['severity_name_0'],
-			'severity_name_1' => $config['severity_name_1'],
-			'severity_name_2' => $config['severity_name_2'],
-			'severity_name_3' => $config['severity_name_3'],
-			'severity_name_4' => $config['severity_name_4'],
-			'severity_name_5' => $config['severity_name_5']
-		];
 		$data = getSystemStatusData([]);
-		$table = makeSystemStatus([], $data, $severity_config, $this->pageFile.'?screenid='.$this->screenid);
+		$table = makeSystemStatus([], $data);
 
 		$footer = (new CList())
 			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))

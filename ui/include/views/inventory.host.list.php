@@ -50,7 +50,8 @@ $widget->addItem(
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groups_',
-								'real_hosts' => 1
+								'real_hosts' => 1,
+								'enrich_parent_groups' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

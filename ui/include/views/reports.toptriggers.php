@@ -28,7 +28,7 @@ $filterForm = new CFilter(new CUrl('toptriggers.php'));
 $severities = [];
 foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $severity) {
 	$severities[] = [
-		'name' => getSeverityName($severity, $data['config']),
+		'name' => getSeverityName($severity),
 		'value' => $severity
 	];
 }
@@ -96,7 +96,7 @@ foreach ($data['triggers'] as $trigger) {
 	$table->addRow([
 		$hostName,
 		$triggerDescription,
-		getSeverityCell($trigger['priority'], $data['config']),
+		getSeverityCell($trigger['priority']),
 		$trigger['cnt_event']
 	]);
 }
@@ -106,8 +106,7 @@ $obj_data = [
 	'domid' => 'toptriggers',
 	'loadSBox' => 0,
 	'loadImage' => 0,
-	'dynamic' => 0,
-	'mainObject' => 1
+	'dynamic' => 0
 ];
 zbx_add_post_js('timeControl.addObject("toptriggers", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');');
 zbx_add_post_js('timeControl.processObjects();');

@@ -24,6 +24,16 @@
  */
 class CHostInterface extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'replacehostinterfaces' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	protected $tableName = 'interface';
 	protected $tableAlias = 'hi';
 	protected $sortColumns = ['interfaceid', 'dns', 'ip'];
@@ -155,15 +165,13 @@ class CHostInterface extends CApiService {
 		}
 
 		if ($this->outputIsRequested('details', $options['output'])) {
-			$sqlParts['left_join']['interface_snmp'] = ['from' => 'interface_snmp his',
-				'on' => 'his.interfaceid=hi.interfaceid'
-			];
-			$sqlParts['left_table'] = 'interface';
+			$sqlParts['left_join'][] = ['alias' => 'his', 'table' => 'interface_snmp', 'using' => 'interfaceid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($interface = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -321,15 +329,15 @@ class CHostInterface extends CApiService {
 				}
 			}
 
-			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
+			if ($interface['ip'] === '' && $interface['dns'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS cannot be empty for host interface.'));
 			}
 
-			if ($interface['useip'] == INTERFACE_USE_IP && zbx_empty($interface['ip'])) {
+			if ($interface['useip'] == INTERFACE_USE_IP && $interface['ip'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS "%1$s" cannot have empty IP address.', $interface['dns']));
 			}
 
-			if ($interface['useip'] == INTERFACE_USE_DNS && zbx_empty($interface['dns'])) {
+			if ($interface['useip'] == INTERFACE_USE_DNS && $interface['dns'] === '') {
 				if ($dbHosts && !empty($dbHosts[$interface['hostid']]['host'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
@@ -527,7 +535,7 @@ class CHostInterface extends CApiService {
 				$interface['type'] = INTERFACE_TYPE_SNMP;
 			}
 
-			// Merge details with db values or set only vaules from db.
+			// Merge details with db values or set only values from db.
 			$interface['details'] = array_key_exists('details', $interface)
 				? $interface['details'] + $db_interfaces[$interfaceid]['details']
 				: $db_interfaces[$interfaceid]['details'];
@@ -616,8 +624,13 @@ class CHostInterface extends CApiService {
 	}
 
 	protected function validateMassRemove(array $data) {
-		// check permissions
+		// Check permissions.
 		$this->checkHostPermissions($data['hostids']);
+
+		// Check interfaces.
+		$this->checkValidator($data['hostids'], new CHostNormalValidator([
+			'message' => _('Cannot delete interface for discovered host "%1$s".')
+		]));
 
 		// check interfaces
 		foreach ($data['interfaces'] as $interface) {
@@ -625,22 +638,24 @@ class CHostInterface extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$this->checkDns($interface);
-			$this->checkIp($interface);
-			$this->checkPort($interface);
+			$filter = [
+				'hostid' => $data['hostids'],
+				'ip' => $interface['ip'],
+				'dns' => $interface['dns'],
+				'port' => $interface['port']
+			];
+
+			if (array_key_exists('bulk', $interface)) {
+				$filter['bulk'] = $interface['bulk'];
+			}
 
 			// check main interfaces
 			$interfacesToRemove = API::getApiService()->select($this->tableName(), [
 				'output' => ['interfaceid'],
-				'filter' => [
-					'hostid' => $data['hostids'],
-					'ip' => $interface['ip'],
-					'dns' => $interface['dns'],
-					'port' => $interface['port']
-				]
+				'filter' => $filter
 			]);
 			if ($interfacesToRemove) {
-				$this->checkMainInterfacesOnDelete(zbx_objectValues($interfacesToRemove, 'interfaceid'));
+				$this->checkMainInterfacesOnDelete(array_column($interfacesToRemove, 'interfaceid'));
 			}
 		}
 	}
@@ -834,9 +849,9 @@ class CHostInterface extends CApiService {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts
 	 *
-	 * @param array $hostIds	an array of host IDs
+	 * @param array $hostids	an array of host IDs
 	 */
-	protected function checkHostPermissions(array $hostIds) {
+	protected function checkHostPermissions(array $hostids) {
 		if ($hostids) {
 			$hostids = array_unique($hostids);
 
@@ -855,21 +870,31 @@ class CHostInterface extends CApiService {
 	}
 
 	private function checkHostInterfaces(array $interfaces, $hostid) {
-		$interfacesWithMissingData = [];
+		$interfaces_with_missing_data = [];
 
 		foreach ($interfaces as $interface) {
-			if (!isset($interface['type'], $interface['main'])) {
-				$interfacesWithMissingData[] = $interface['interfaceid'];
+			if (array_key_exists('interfaceid', $interface)) {
+				if (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+					$interfaces_with_missing_data[$interface['interfaceid']] = true;
+				}
+			}
+			elseif (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 		}
 
-		if ($interfacesWithMissingData) {
+		if ($interfaces_with_missing_data) {
 			$dbInterfaces = API::HostInterface()->get([
-				'interfaceids' => $interfacesWithMissingData,
 				'output' => ['main', 'type'],
+				'interfaceids' => array_keys($interfaces_with_missing_data),
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
+			if (count($interfaces_with_missing_data) != count($dbInterfaces)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		foreach ($interfaces as $id => $interface) {

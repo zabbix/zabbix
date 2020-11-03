@@ -60,21 +60,21 @@ class CTestArrayHelper {
 	}
 
 	/**
-	 * Sort array by multiple fields.
+	 * Sort array by multiple fields. This function assigns new keys to the elements in $array.
 	 *
 	 * @static
 	 *
-	 * @param array $array  array to sort passed by reference
-	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
+	 * @param array $array   The input array.
+	 * @param array $fields  Fields to sort, can be either string with field name or array with 'field' and 'order' keys.
 	 */
-	public static function sort(array &$array, array $fields) {
-		foreach ($fields as $fid => $field) {
-			if (!is_array($field)) {
-				$fields[$fid] = ['field' => $field, 'order' => ZBX_SORT_UP];
+	public static function usort(array &$array, array $fields) {
+		foreach ($fields as $i => $field) {
+			if (is_string($field)) {
+				$fields[$i] = ['field' => $field, 'order' => ZBX_SORT_UP];
 			}
 		}
 
-		uasort($array, function($a, $b) use ($fields) {
+		usort($array, function($a, $b) use ($fields) {
 			foreach ($fields as $field) {
 				$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
 

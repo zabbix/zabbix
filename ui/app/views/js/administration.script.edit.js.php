@@ -89,9 +89,9 @@
 		});
 
 		// host group selection
-		jQuery('#hgstype')
+		jQuery('#hgstype-select')
 			.change(function() {
-				if (jQuery('#hgstype').val() == 1) {
+				if (jQuery('#hgstype-select').val() == 1) {
 					jQuery('#hostGroupSelection').show();
 				}
 				else {

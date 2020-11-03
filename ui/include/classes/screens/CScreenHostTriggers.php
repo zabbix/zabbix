@@ -160,13 +160,6 @@ class CScreenHostTriggers extends CScreenBase {
 	 * @param string  $filter['sortorder']  Sort order.
 	 */
 	protected function getProblemsListTable(array $filter) {
-		$config = select_config();
-
-		// If no hostids and groupids defined show recent problems.
-		if ($filter['hostids'] === null && $filter['groupids'] === null) {
-			$filter['show'] = TRIGGERS_OPTION_RECENT_PROBLEM;
-		}
-
 		$filter = $filter + [
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'show_timeline' => 0,
@@ -176,7 +169,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'sort_order' => ZBX_SORT_DOWN
 		];
 
-		$data = CScreenProblem::getData($filter, $config, true, true);
+		$data = CScreenProblem::getData($filter, true, true);
 
 		$header = [
 			'hostname' => _('Host'),
@@ -193,16 +186,13 @@ class CScreenHostTriggers extends CScreenBase {
 				(new CDiv())->addClass(($sort_order === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP)
 			];
 
-			$data = CScreenProblem::sortData($data, $config, $sort_field === 'hostname' ? 'host' : $sort_field,
+			$data = CScreenProblem::sortData($data, $sort_field === 'hostname' ? 'host' : $sort_field,
 				$sort_order
 			);
 		}
 
-		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
-			min($filter['limit'], count($data['problems'])),
-			(count($data['problems']) > $config['search_limit']) ? '+' : '',
-			min($config['search_limit'], count($data['problems']))
-		);
+		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown', min($filter['limit'], count($data['problems'])), (count($data['problems']) > $search_limit) ? '+' : '', min($search_limit, count($data['problems'])));
 		$data['problems'] = array_slice($data['problems'], 0, $filter['limit'], true);
 		$data = CScreenProblem::makeData($data, $filter, true, true);
 
@@ -248,36 +238,51 @@ class CScreenHostTriggers extends CScreenBase {
 				}
 			}
 
+			$allowed = [
+				'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			];
+
 			// Clock.
-			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids[]', $trigger['triggerid'])
-					->setArgument('filter_set', '1')
-			);
+			$clock = $allowed['ui_problems']
+				? new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('triggerids', [$trigger['triggerid']])
+				)
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 
 			// Create acknowledge link.
 			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+			$problem_update_link = $allowed['ack']
+				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+				);
 
 			$table->addRow([
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-							'triggerid' => $trigger['triggerid']], $problem['eventid']
+						->setHint(make_popup_eventlist(
+							['comments' => $problem['comments'], 'url' => $problem['url'],
+								'triggerid' => $trigger['triggerid']],
+							$problem['eventid'],
+							$allowed
 						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),
 				makeInformationList($info_icons),
 				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
-					$config
-				)
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'])
 			]);
 		}
 

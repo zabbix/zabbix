@@ -170,8 +170,8 @@ class CScreenGraph extends CScreenBase {
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$src
-				->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
-				->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
+				->setArgument('from', 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT))
+				->setArgument('to', 'now');
 		}
 		else {
 			$src
@@ -198,13 +198,15 @@ class CScreenGraph extends CScreenBase {
 			);
 		}
 
-		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault) {
+		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) || !$isDefault
+				|| !CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS)) {
 			$item = new CDiv();
 		}
 		elseif ($this->mode == SCREEN_MODE_PREVIEW) {
 			$item = new CLink(null, (new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
 				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_set', '1')
 				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 				->setArgument('filter_graphids', [$resourceId])
 				->setArgument('from', $this->timeline['from'])

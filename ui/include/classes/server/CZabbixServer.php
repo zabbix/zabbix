@@ -77,6 +77,13 @@ class CZabbixServer {
 	protected $port;
 
 	/**
+	 * Request connect timeout.
+	 *
+	 * @var int
+	 */
+	protected $connect_timeout;
+
+	/**
 	 * Request timeout.
 	 *
 	 * @var int
@@ -121,12 +128,14 @@ class CZabbixServer {
 	 *
 	 * @param string $host
 	 * @param int $port
+	 * @param int $connect_timeout
 	 * @param int $timeout
 	 * @param int $totalBytesLimit
 	 */
-	public function __construct($host, $port, $timeout, $totalBytesLimit) {
+	public function __construct($host, $port, $connect_timeout, $timeout, $totalBytesLimit) {
 		$this->host = $host;
 		$this->port = $port;
+		$this->connect_timeout = $connect_timeout;
 		$this->timeout = $timeout;
 		$this->totalBytesLimit = $totalBytesLimit;
 	}
@@ -527,7 +536,7 @@ class CZabbixServer {
 				return false;
 			}
 
-			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, ZBX_CONNECT_TIMEOUT)) {
+			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->connect_timeout)) {
 				switch ($errorMsg) {
 					case 'Connection refused':
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);

@@ -24,6 +24,12 @@
  */
 class CControllerTimeSelectorUpdate extends CController {
 
+	public static $profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.charts.filter', 'web.httpdetails.filter',
+		'web.problem.filter', 'web.auditlog.filter', 'web.slides.filter', 'web.auditacts.filter',
+		'web.item.graph.filter', 'web.toptriggers.filter', 'web.avail_report.filter', CControllerHost::FILTER_IDX,
+		CControllerProblem::FILTER_IDX
+	];
+
 	/**
 	 * @var CRangeTimeParser
 	 */
@@ -38,14 +44,9 @@ class CControllerTimeSelectorUpdate extends CController {
 	}
 
 	protected function checkInput() {
-		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.charts.filter', 'web.httpdetails.filter',
-			'web.problem.filter', 'web.auditlog.filter', 'web.slides.filter', 'web.auditacts.filter',
-			'web.item.graph.filter', 'web.toptriggers.filter', 'web.avail_report.filter'
-		];
-
 		$fields = [
 			'method' => 'required|in increment,zoomout,decrement,rangechange,rangeoffset',
-			'idx' => 'required|in '.implode(',', $profiles),
+			'idx' => 'required|in '.implode(',', static::$profiles),
 			'idx2' => 'required|id',
 			'from' => 'required|string',
 			'to' => 'required|string',
@@ -61,10 +62,10 @@ class CControllerTimeSelectorUpdate extends CController {
 			 * throw a JS alert() with current message in timeSelectorEventHandler() in gtlc.js.
 			 */
 
-			global $ZBX_MESSAGES;
+			$messages = CMessageHelper::getMessages();
 
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => json_encode(['error' => $ZBX_MESSAGES[0]['message']])
+				'main_block' => json_encode(['error' => $messages[0]['message']])
 			]));
 
 			return $ret;
@@ -100,10 +101,16 @@ class CControllerTimeSelectorUpdate extends CController {
 			$value[$field] = $this->getInput($field);
 			$this->range_time_parser->parse($value[$field]);
 			$date_type[$field] = $this->range_time_parser->getTimeType();
-			$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			$ts[$field] = $this->range_time_parser
+				->getDateTime($field === 'from')
+				->getTimestamp();
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
+		$this->range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+		$max_period = 1 + $ts['now'] - $this->range_time_parser
+			->getDateTime(true)
+			->getTimestamp();
 
 		switch ($method) {
 			case 'decrement':
@@ -147,8 +154,8 @@ class CControllerTimeSelectorUpdate extends CController {
 				$ts['from'] -= $left_offset;
 				$ts['to'] += $right_offset;
 
-				if ($ts['to'] - $ts['from'] + 1 > ZBX_MAX_PERIOD) {
-					$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD + 1;
+				if ($ts['to'] - $ts['from'] + 1 > $max_period) {
+					$ts['from'] = $ts['to'] - $max_period + 1;
 				}
 
 				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME);
@@ -195,10 +202,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			'to' => $value['to'],
 			'to_ts' => $ts['to'],
 			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME),
-			'can_zoomout' => ($ts['to'] - $ts['from'] + 1 < ZBX_MAX_PERIOD),
-			'can_decrement' => ($ts['from'] > 0),
-			'can_increment' => ($ts['to'] < $ts['now'] - ZBX_MIN_PERIOD)
-		])]));
+		] + getTimeselectorActions($value['from'], $value['to']))]));
 	}
 
 	/**
@@ -209,6 +213,7 @@ class CControllerTimeSelectorUpdate extends CController {
 	protected function validateInputDateRange() {
 		$this->data['error'] = [];
 		$ts = [];
+		$ts['now'] = time();
 
 		foreach (['from', 'to'] as $field) {
 			$value = $this->getInput($field);
@@ -217,7 +222,9 @@ class CControllerTimeSelectorUpdate extends CController {
 				$this->data['error'][$field] = _('Invalid date.');
 			}
 			else {
-				$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+				$ts[$field] = $this->range_time_parser
+					->getDateTime($field === 'from')
+					->getTimestamp();
 			}
 		}
 
@@ -231,15 +238,19 @@ class CControllerTimeSelectorUpdate extends CController {
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
+		$this->range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+		$max_period = 1 + $ts['now'] - $this->range_time_parser
+			->getDateTime(true)
+			->getTimestamp();
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$this->data['error']['from'] = _n('Minimum time period to display is %1$s minute.',
 				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			);
 		}
-		elseif ($period > ZBX_MAX_PERIOD) {
+		elseif ($period > $max_period) {
 			$this->data['error']['from'] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
+				'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
 			);
 		}
 

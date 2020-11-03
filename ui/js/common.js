@@ -18,6 +18,21 @@
 **/
 
 
+const KEY_ARROW_DOWN = 40;
+const KEY_ARROW_LEFT = 37;
+const KEY_ARROW_RIGHT = 39;
+const KEY_ARROW_UP = 38;
+const KEY_BACKSPACE = 8;
+const KEY_DELETE = 46;
+const KEY_ENTER = 13;
+const KEY_ESCAPE = 27;
+const KEY_TAB = 9;
+const KEY_PAGE_UP = 33;
+const KEY_PAGE_DOWN = 34;
+const KEY_END = 35;
+const KEY_HOME = 36;
+const KEY_SPACE = 32;
+
 /**
  * jQuery based publish/subscribe handler.
  *
@@ -326,8 +341,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr',
 				'popup.triggerwizard'
 			],
-			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.action.recovery',
-				'popup.action.acknowledge', 'popup.action.operation', 'popup.condition.operations',
+			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
 				'popup.mediatype.message'
 			],
@@ -656,7 +670,7 @@ function addSelectedValues(object, parentid) {
  */
 function add_media(formname, media, mediatypeid, sendto, period, active, severity) {
 	var form = window.document.forms[formname];
-	var media_name = (media > -1) ? 'user_medias[' + media + ']' : 'new_media';
+	var media_name = (media > -1) ? 'medias[' + media + ']' : 'new_media';
 
 	window.create_var(form, media_name + '[mediatypeid]', mediatypeid);
 	if (typeof sendto === "object") {

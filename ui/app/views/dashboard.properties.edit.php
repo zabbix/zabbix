@@ -25,54 +25,63 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->setName('dashboard_properties_form');
+	->setName('dashboard_properties_form')
+	->addItem(getMessages());
 
-$multiselect = (new CMultiSelect([
-	'name' => 'userid',
-	'object_name' => 'users',
-	'data' => [$data['dashboard']['owner']],
-	'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
-	'multiple' => false,
-	'popup' => [
-		'parameters' => [
-			'srctbl' => 'users',
-			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'userid'
+$form_list = new CFormList();
+
+$script_inline = '';
+
+if (!$data['dashboard']['template']) {
+	$owner_select = (new CMultiSelect([
+		'name' => 'userid',
+		'object_name' => 'users',
+		'data' => [$data['dashboard']['owner']],
+		'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
+		'multiple' => false,
+		'popup' => [
+			'parameters' => [
+				'srctbl' => 'users',
+				'srcfld1' => 'userid',
+				'srcfld2' => 'fullname',
+				'dstfrm' => $form->getName(),
+				'dstfld1' => 'userid'
+			]
 		]
-	]
-]))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAriaRequired();
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired();
 
-$form
-	->addItem(getMessages())
-	->addItem(new CInput('hidden', 'dashboardid', $data['dashboard']['dashboardid']))
-	->addItem((new CFormList())
-		->addRow((new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(), $multiselect)
-		->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-			(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired()
-				->setAttribute('autofocus', 'autofocus')
-		)
-		->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
-	);
+	$form_list->addRow((new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(), $owner_select);
+
+	$script_inline .= $owner_select->getPostJS();
+}
+
+$form_list->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+	(new CTextBox('name', $data['dashboard']['name'], false, DB::getFieldLength('dashboard', 'name')))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAriaRequired()
+		->setAttribute('autofocus', 'autofocus')
+);
+
+$form->addItem($form_list);
 
 $output = [
 	'header' => _('Dashboard properties'),
-	'script_inline' => $multiselect->getPostJS(),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => _('Apply'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return dashbrdApplyProperties(overlay);'
+			'action' => 'dashboard.applyProperties(overlay);'
 		]
 	]
 ];
+
+if ($script_inline !== '') {
+	$output['script_inline'] = $script_inline;
+}
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

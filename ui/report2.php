@@ -31,17 +31,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'mode' =>			[T_ZBX_INT,			O_OPT,	P_SYS,			IN(implode(',', [AVAILABILITY_REPORT_BY_HOST, AVAILABILITY_REPORT_BY_TEMPLATE])),	null],
-	'hostgroupid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'tpl_triggerid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'triggerid' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_NZERO,	DB_ID,		null],
+	'mode' =>				[T_ZBX_INT,			O_OPT,	P_SYS,			IN(implode(',', [AVAILABILITY_REPORT_BY_HOST, AVAILABILITY_REPORT_BY_TEMPLATE])),	null],
+	'hostgroupid' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
+	'tpl_triggerid' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
+	'triggerid' =>			[T_ZBX_INT,			O_OPT,	P_SYS|P_NZERO,	DB_ID,		null],
 	// filter
-	'filter_groups' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_hostids' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_rst'=>		[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'filter_set' =>		[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
-	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
+	'filter_groups' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
+	'filter_hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
+	'filter_templateid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
+	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
+	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
+	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
+	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -59,7 +60,7 @@ if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	if (getRequest('filter_groups') && !isReadableHostGroups([getRequest('filter_groups')])) {
 		access_deny();
 	}
-	if (getRequest('filter_hostids') && !isReadableTemplates([getRequest('filter_hostids')])) {
+	if (getRequest('filter_templateid') && !isReadableTemplates([getRequest('filter_templateid')])) {
 		access_deny();
 	}
 	if (getRequest('tpl_triggerid')) {
@@ -93,7 +94,7 @@ $key_prefix = 'web.avail_report.'.$report_mode;
 if (hasRequest('filter_set')) {
 	if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		CProfile::update($key_prefix.'.groupid', getRequest('filter_groups', 0), PROFILE_TYPE_ID);
-		CProfile::update($key_prefix.'.hostid', getRequest('filter_hostids', 0), PROFILE_TYPE_ID);
+		CProfile::update($key_prefix.'.hostid', getRequest('filter_templateid', 0), PROFILE_TYPE_ID);
 		CProfile::update($key_prefix.'.tpl_triggerid', getRequest('tpl_triggerid', 0), PROFILE_TYPE_ID);
 		CProfile::update($key_prefix.'.hostgroupid', getRequest('hostgroupid', 0), PROFILE_TYPE_ID);
 	}
@@ -121,7 +122,7 @@ $data['filter'] = ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE)
 		// 'Template group' field.
 		'groups' => getRequest('filter_groups', CProfile::get($key_prefix.'.groupid', 0)),
 		// 'Template' field.
-		'hostids' => getRequest('filter_hostids', CProfile::get($key_prefix.'.hostid', 0)),
+		'hostids' => getRequest('filter_templateid', CProfile::get($key_prefix.'.hostid', 0)),
 		// 'Template trigger' field.
 		'tpl_triggerid' => getRequest('tpl_triggerid', CProfile::get($key_prefix.'.tpl_triggerid', 0)),
 		// 'Host group' field.
@@ -142,8 +143,6 @@ $timeselector_options = [
 	'to' => getRequest('to')
 ];
 updateTimeSelectorPeriod($timeselector_options);
-
-$config = select_config();
 
 /*
  * Header
@@ -187,17 +186,22 @@ else {
 	/**
 	 * Report list view (both data presentation modes).
 	 */
+
+	$select_mode = (new CSelect('mode'))
+		->setValue($report_mode)
+		->setFocusableElementId('mode')
+		->onChange('$(this).closest("form").submit()')
+		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_HOST, _('By host')))
+		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template')));
+
 	$reportWidget->setControls((new CForm('get'))
 		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
 			->addItem([
-				new CLabel(_('Mode'), 'mode'),
+				new CLabel(_('Mode'), $select_mode->getFocusableElementId()),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('mode', $report_mode, 'submit()', [
-					AVAILABILITY_REPORT_BY_HOST => _('By host'),
-					AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
-				])
+				$select_mode
 			])
 	));
 
@@ -240,11 +244,14 @@ else {
 			$data['filter']['hostids'] = 0;
 		}
 
-		$filter_hostid_combobox = (new CComboBox('filter_hostids', $data['filter']['hostids'], 'javascript: submit();'))
-			->addItem(0, _('all'));
+		$select_filter_hostid = (new CSelect('filter_templateid'))
+			->setValue($data['filter']['hostids'])
+			->setFocusableElementId('filter-templateid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($templates as $templateid => $template) {
-			$filter_hostid_combobox->addItem($templateid, $template['name']);
+			$select_filter_hostid->addOption(new CSelectOption($templateid, $template['name']));
 		}
 
 		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" combo box.
@@ -281,15 +288,17 @@ else {
 			$data['filter']['tpl_triggerid'] = 0;
 		}
 
-		$tpl_triggerid_combobox = (new CComboBox('tpl_triggerid', $data['filter']['tpl_triggerid'], 'javascript: submit()'))
-			->addItem(0, _('all'));
+		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
+			->setValue($data['filter']['tpl_triggerid'])
+			->setFocusableElementId('tpl-triggerid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		$tpl_triggerids = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
-			$tpl_triggerid_combobox->addItem($triggerid,
-				(($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description']
-			);
+			$label = (($data['filter']['hostids'] == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description'];
+			$select_tpl_triggerid->addOption(new CSelectOption($triggerid, $label));
 
 			$tpl_triggerids[$triggerid] = true;
 		}
@@ -307,11 +316,14 @@ else {
 			$data['filter']['hostgroupid'] = 0;
 		}
 
-		$hostgroupid_combobox = (new CComboBox('hostgroupid', $data['filter']['hostgroupid'], 'javascript: submit()'))
-			->addItem(0, _('all'));
+		$select_hostgroupid = (new CSelect('hostgroupid'))
+			->setValue($data['filter']['hostgroupid'])
+			->setFocusableElementId('hostgroupid')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($host_groups as $groupid => $group) {
-			$hostgroupid_combobox->addItem($groupid, $group['name']);
+			$select_hostgroupid->addOption(new CSelectOption($groupid, $group['name']));
 		}
 
 		$hostgroupids = [];
@@ -345,6 +357,7 @@ else {
 
 		if ($templated_triggers_all) {
 			// Select monitored host triggers, derived from templates and belonging to the requested groups.
+			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 			$triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'expression', 'value'],
 				'selectHosts' => ['name'],
@@ -352,7 +365,7 @@ else {
 				'monitored' => true,
 				'groupids' => ($data['filter']['hostgroupid'] == 0) ? null : array_keys($hostgroupids),
 				'filter' => ['templateid' => array_keys($templated_triggers_all)],
-				'limit' => $config['search_limit'] + 1
+				'limit' => $limit
 			]);
 		}
 		else {
@@ -360,19 +373,34 @@ else {
 			$triggers = [];
 		}
 
-		$filter_groupid_combobox = (new CComboBox('filter_groups', $data['filter']['groups'], 'javascript: submit();'))
+		$select_filter_groupid = (new CSelect('filter_groups'))
 			->setAttribute('autofocus', 'autofocus')
-			->addItem(0, _('all'));
+			->setValue($data['filter']['groups'])
+			->setFocusableElementId('filter-groups')
+			->onChange('$(this).closest("form").submit()')
+			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($groups as $groupid => $group) {
-			$filter_groupid_combobox->addItem($groupid, $group['name']);
+			$select_filter_groupid->addOption(new CSelectOption($groupid, $group['name']));
 		}
 
 		$filter_column
-			->addRow(_('Template group'), $filter_groupid_combobox)
-			->addRow(_('Template'), $filter_hostid_combobox)
-			->addRow(_('Template trigger'), $tpl_triggerid_combobox)
-			->addRow(_('Host group'), $hostgroupid_combobox)
+			->addRow(
+				new CLabel(_('Template group'), $select_filter_groupid->getFocusableElementId()),
+				$select_filter_groupid
+			)
+			->addRow(
+				new CLabel(_('Template'), $select_filter_hostid->getFocusableElementId()),
+				$select_filter_hostid
+			)
+			->addRow(
+				new CLabel(_('Template trigger'), $select_tpl_triggerid->getFocusableElementId()),
+				$select_tpl_triggerid
+			)
+			->addRow(
+				new CLabel(_('Host group'), $select_hostgroupid->getFocusableElementId()),
+				$select_hostgroupid
+			)
 			->addVar('filter_set', '1');
 	}
 	// Report by host.
@@ -382,7 +410,6 @@ else {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $data['filter']['groups'],
-				'with_triggers' => true,
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
@@ -406,6 +433,7 @@ else {
 		// Select monitored host triggers, derived from templates and belonging to the requested groups.
 		$groups = enrichParentGroups($data['filter']['groups']);
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description', 'expression', 'value'],
 			'selectHosts' => ['name'],
@@ -413,7 +441,7 @@ else {
 			'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null,
 			'expandDescription' => true,
 			'monitored' => true,
-			'limit' => $config['search_limit'] + 1
+			'limit' => $limit
 		]);
 
 		$filter_column
@@ -430,7 +458,8 @@ else {
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'with_triggers' => true,
-							'real_hosts' => 1
+							'real_hosts' => 1,
+							'enrich_parent_groups' => true
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -485,31 +514,38 @@ else {
 	$page_num = getRequest('page', 1);
 	CPagerHelper::savePage($page['file'], $page_num);
 	$paging = CPagerHelper::paginate($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
+	$allowed_ui_problems = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
 			$data['filter']['timeline']['to_ts']
 		);
 
+		$url = (new CUrl('report2.php'))->setArgument('triggerid', $trigger['triggerid']);
+		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+			$url->setArgument('filter_templateid', $data['filter']['hostids']);
+		}
+		else {
+			$url->setArgument('filter_hostids', $trigger['hosts'][0]['hostid']);
+		}
+
 		$triggerTable->addRow([
 			$trigger['host_name'],
-			new CLink($trigger['description'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids', [$trigger['triggerid']])
-					->setArgument('filter_set', '1')
-			),
+			$allowed_ui_problems
+				? new CLink($trigger['description'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('triggerids', [$trigger['triggerid']])
+				)
+				: $trigger['description'],
 			($availability['true'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
 			($availability['false'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
-			new CLink(_('Show'),
-				(new CUrl('report2.php'))
-					->setArgument('filter_hostids', $trigger['hosts'][0]['hostid'])
-					->setArgument('triggerid', $trigger['triggerid'])
-			)
+			new CLink(_('Show'), $url)
 		]);
 	}
 
@@ -518,8 +554,7 @@ else {
 		'domid' => 'avail_report',
 		'loadSBox' => 0,
 		'loadImage' => 0,
-		'dynamic' => 0,
-		'mainObject' => 1
+		'dynamic' => 0
 	];
 	zbx_add_post_js(
 		'timeControl.addObject("avail_report", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');'

@@ -419,6 +419,53 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_localtime                                                    *
+ *                                                                            *
+ * Purpose: get broken-down representation of the time in specified time zone *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *             tz   - [IN] time zone                                          *
+ *                                                                            *
+ * Return value: broken-down representation of the time in specified time zone*
+ *                                                                            *
+ ******************************************************************************/
+struct tm	*zbx_localtime(const time_t *time, const char *tz)
+{
+#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
+		!defined(_WINDOWS) && !defined(__MINGW32__)
+	char		*old_tz;
+	struct tm	*tm;
+
+	if (NULL == tz || 0 == strcmp(tz, "system"))
+		return localtime(time);
+
+	if (NULL != (old_tz = getenv("TZ")))
+		old_tz = zbx_strdup(NULL, old_tz);
+
+	setenv("TZ", tz, 1);
+
+	tzset();
+	tm = localtime(time);
+
+	if (NULL != old_tz)
+	{
+		setenv("TZ", old_tz, 1);
+		zbx_free(old_tz);
+	}
+	else
+		unsetenv("TZ");
+
+	tzset();
+
+	return tm;
+#else
+	ZBX_UNUSED(tz);
+	return localtime(time);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_utc_time                                                     *
  *                                                                            *
  * Purpose: get UTC time from time from broken down time elements             *
@@ -947,14 +994,14 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
  * Comments:   !!! Don't forget to sync code with PHP !!!                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_time_period(const char *period, time_t time, int *res)
+int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res)
 {
 	int			res_total = FAIL;
 	const char		*next;
 	struct tm		*tm;
 	zbx_time_period_t	tp;
 
-	tm = localtime(&time);
+	tm = zbx_localtime(&time, tz);
 
 	next = strchr(period, ';');
 	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : (int)(next - period))))
@@ -3510,17 +3557,22 @@ int	is_discovery_macro(const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_time_function                                                 *
+ * Function: zbx_get_function_type                                            *
  *                                                                            *
- * Return value:  SUCCEED - given function is time-based                      *
- *                FAIL - otherwise                                            *
+ * Purpose: Returns function type based on its name                           *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Return value:  Function type.                                              *
  *                                                                            *
  ******************************************************************************/
-int	is_time_function(const char *func)
+zbx_function_type_t	zbx_get_function_type(const char *func)
 {
-	return str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ',');
+	if (0 == strncmp(func, "trend", 5))
+		return ZBX_FUNCTION_TYPE_TRENDS;
+
+	if (SUCCEED == str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ','))
+		return ZBX_FUNCTION_TYPE_TIMER;
+
+	return ZBX_FUNCTION_TYPE_HISTORY;
 }
 
 /******************************************************************************
@@ -3582,6 +3634,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_SCRIPT:
 			return INTERFACE_TYPE_ANY;
 		default:
 			return INTERFACE_TYPE_UNKNOWN;
@@ -3766,6 +3819,39 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	return token;
 }
 
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/******************************************************************************
+ *                                                                            *
+ * Function: update_resolver_conf                                             *
+ *                                                                            *
+ * Purpose: react to "/etc/resolv.conf" update                                *
+ *                                                                            *
+ * Comments: it is intended to call this function in the end of each process  *
+ *           main loop. The purpose of calling it at the end (instead of the  *
+ *           beginning of main loop) is to let the first initialization of    *
+ *           libc resolver proceed internally.                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	update_resolver_conf(void)
+{
+#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
+
+	static time_t	mtime = 0;
+	zbx_stat_t	buf;
+
+	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
+	{
+		mtime = buf.st_mtime;
+
+		if (0 != res_init())
+			zabbix_log(LOG_LEVEL_WARNING, "update_resolver_conf(): res_init() failed");
+	}
+
+#undef ZBX_RESOLV_CONF_FILE
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_update_env                                                   *
@@ -3786,7 +3872,7 @@ void	zbx_update_env(double time_now)
 		time_update = time_now;
 		zbx_handle_log();
 #if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();
+		update_resolver_conf();
 #endif
 	}
 }
@@ -3798,27 +3884,20 @@ void	zbx_update_env(double time_now)
  * Purpose: calculate item nextcheck for zabix agent type items               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
-		int refresh_unsupported, int *nextcheck, char **error)
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
+		int *nextcheck, char **error)
 {
-	if (ITEM_STATE_NORMAL == state)
-	{
-		int			simple_interval;
-		zbx_custom_interval_t	*custom_intervals;
+	int			simple_interval;
+	zbx_custom_interval_t	*custom_intervals;
 
-		if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, error))
-		{
-			*nextcheck = ZBX_JAN_2038;
-			return FAIL;
-		}
-
-		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
-		zbx_custom_interval_free(custom_intervals);
-	}
-	else	/* for items notsupported for other reasons use refresh_unsupported interval */
+	if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, error))
 	{
-		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, refresh_unsupported, NULL, now);
+		*nextcheck = ZBX_JAN_2038;
+		return FAIL;
 	}
+
+	*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
+	zbx_custom_interval_free(custom_intervals);
 
 	return SUCCEED;
 }

@@ -23,9 +23,16 @@
  * @var CView $this
  */
 
-$item = ($data['url']['error'] !== null)
-	? (new CTableInfo())->setNoDataMessage($data['url']['error'])
-	: (new CIFrame($data['url']['url'], '100%', '100%', 'auto'))->addClass(ZBX_STYLE_WIDGET_URL);
+if ($data['url']['error'] !== null) {
+	$item = (new CTableInfo())->setNoDataMessage($data['url']['error']);
+}
+else {
+	$item = (new CIFrame($data['url']['url'], '100%', '100%', 'auto'))->addClass(ZBX_STYLE_WIDGET_URL);
+
+	if ($data['config']['iframe_sandboxing_enabled'] == 1) {
+		$item->setAttribute('sandbox', $data['config']['iframe_sandboxing_exceptions']);
+	}
+}
 
 $output = [
 	'header' => $data['name'],

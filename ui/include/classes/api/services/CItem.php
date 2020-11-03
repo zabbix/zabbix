@@ -41,7 +41,8 @@ class CItem extends CItemGeneral {
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
 		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
 	];
 
 	public function __construct() {
@@ -389,7 +390,7 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!$options['countOutput']) {
 				$result[$item['itemid']] = $item;
@@ -408,8 +409,11 @@ class CItem extends CItemGeneral {
 			return $result;
 		}
 
-		// add other related objects
 		if ($result) {
+			if (self::dbDistinct($sqlParts)) {
+				$result = $this->addNclobFieldValues($options, $result);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type'], $options['output']);
 		}
@@ -550,6 +554,7 @@ class CItem extends CItemGeneral {
 			DB::insertBatch('items_applications', $item_applications);
 		}
 
+		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
 	}
 
@@ -589,6 +594,7 @@ class CItem extends CItemGeneral {
 			DB::insertBatch('items_applications', $itemApplications);
 		}
 
+		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
 	}
 
@@ -692,6 +698,17 @@ class CItem extends CItemGeneral {
 			else {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
+			}
+
+			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
+				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
+						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
+					$item['params'] = '';
+				}
+
+				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$item['timeout'] = $defaults['timeout'];
+				}
 			}
 		}
 		unset($item);
@@ -1164,7 +1181,9 @@ class CItem extends CItemGeneral {
 			$requestedOutput['prevvalue'] = true;
 		}
 		if ($requestedOutput) {
-			$history = Manager::History()->getLastValues($result, 2, ZBX_HISTORY_PERIOD);
+			$history = Manager::History()->getLastValues($result, 2, timeUnitToSeconds(CSettingsHelper::get(
+				CSettingsHelper::HISTORY_PERIOD
+			)));
 			foreach ($result as &$item) {
 				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
 				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
@@ -1193,12 +1212,12 @@ class CItem extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($this->outputIsRequested('state', $options['output'])
-				|| $this->outputIsRequested('error', $options['output'])
+		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
+				|| $this->outputIsRequested('error', $options['output'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
-			$sqlParts['left_table'] = $tableName;
+			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		if (!$options['countOutput']) {

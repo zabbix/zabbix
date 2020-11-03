@@ -57,13 +57,16 @@ $hostTable = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Templates'),
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
+		_('Tags')
 	]);
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
 	$name = [];
-	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates']);
+	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
+		$data['allowed_ui_conf_templates']
+	);
 	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
@@ -82,7 +85,8 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		foreach ($hostPrototype['templates'] as $template) {
 			$caption = [];
 
-			if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+			if ($data['allowed_ui_conf_templates']
+					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
 				$caption[] = (new CLink($template['name'],
 					'templates.php?form=update&templateid='.$template['templateid']
 				))
@@ -159,7 +163,8 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		$name,
 		$hostTemplates,
 		$status,
-		$discover
+		$discover,
+		$data['tags'][$hostPrototype['hostid']]
 	]);
 }
 

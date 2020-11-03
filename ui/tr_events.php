@@ -141,15 +141,6 @@ else {
 	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
 }
 
-$config = select_config();
-$severity_config = [
-	'severity_name_0' => $config['severity_name_0'],
-	'severity_name_1' => $config['severity_name_1'],
-	'severity_name_2' => $config['severity_name_2'],
-	'severity_name_3' => $config['severity_name_3'],
-	'severity_name_4' => $config['severity_name_4'],
-	'severity_name_5' => $config['severity_name_5']
-];
 $actions = getEventDetailsActions($event);
 $users = API::User()->get([
 	'output' => ['alias', 'name', 'surname'],
@@ -162,6 +153,14 @@ $mediatypes = API::Mediatype()->get([
 	'preservekeys' => true
 ]);
 
+$allowed = [
+	'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
+];
+
 /*
  * Display
  */
@@ -169,17 +168,17 @@ $event_tab = (new CDiv([
 	new CDiv([
 		(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['eventid'])))
 			->setHeader(_('Trigger details')),
-		(new CUiWidget(WIDGET_HAT_EVENTDETAILS, make_event_details($event)))
+		(new CUiWidget(WIDGET_HAT_EVENTDETAILS, make_event_details($event, $allowed)))
 			->setHeader(_('Event details'))
 	]),
 	new CDiv([
 		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONS,
-			makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
+			makeEventDetailsActionsTable($actions, $users, $mediatypes)
 		))
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
 			->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state')
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID),
-		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event)))
+		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event, $allowed)))
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
 			->setHeader(_('Event list [previous 20]'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state')
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FLUID)

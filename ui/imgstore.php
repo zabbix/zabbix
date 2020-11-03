@@ -113,12 +113,12 @@ elseif (isset($_REQUEST['iconid'])) {
 elseif (isset($_REQUEST['imageid'])) {
 	$imageid = getRequest('imageid', 0);
 
-	if (CSession::keyExists('image_id')) {
-		$image_data = CSession::getValue('image_id');
+	if (CSessionHelper::has('image_id')) {
+		$image_data = CSessionHelper::get('image_id');
 		if (array_key_exists($imageid, $image_data)) {
 			echo $image_data[$imageid];
 			unset($image_data[$imageid]);
-			CSession::setValue('image_id', $image_data);
+			CSessionHelper::set('image_id', $image_data);
 		}
 	}
 }

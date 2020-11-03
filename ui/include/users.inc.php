@@ -27,10 +27,8 @@
  * @return string
  */
 function getUserTheme($userData) {
-	$config = select_config();
-
-	if (isset($config['default_theme'])) {
-		$css = $config['default_theme'];
+	if (null !== CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_THEME)) {
+		$css = CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME);
 	}
 	if (isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT) {
 		$css = $userData['theme'];
@@ -51,9 +49,9 @@ function getUserTheme($userData) {
  */
 function user_type2str($userType = null) {
 	$userTypes = [
-		USER_TYPE_ZABBIX_USER => _('Zabbix User'),
-		USER_TYPE_ZABBIX_ADMIN => _('Zabbix Admin'),
-		USER_TYPE_SUPER_ADMIN => _('Zabbix Super Admin')
+		USER_TYPE_ZABBIX_USER => _('User'),
+		USER_TYPE_ZABBIX_ADMIN => _('Admin'),
+		USER_TYPE_SUPER_ADMIN => _('Super admin')
 	];
 
 	if ($userType === null) {

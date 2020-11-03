@@ -27,8 +27,6 @@ class CScreenEvents extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$config = select_config();
-
 		$table = (new CTableInfo())->setHeader([_('Time'), _('Recovery time'), _('Host'), _('Description'), _('Value'),
 			_('Severity')
 		]);
@@ -131,12 +129,14 @@ class CScreenEvents extends CScreenBase {
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				($event['r_eventid'] == 0) ? '' : zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['r_clock']),
 				$host['name'],
-				new CLink(
-					$event['name'],
-					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
-				),
+				CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+					? new CLink(
+						$event['name'],
+						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
+					)
+					: $event['name'],
 				$statusSpan,
-				getSeverityCell($event['severity'], $config)
+				getSeverityCell($event['severity'])
 			]);
 		}
 

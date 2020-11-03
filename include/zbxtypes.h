@@ -20,12 +20,20 @@
 #ifndef ZABBIX_TYPES_H
 #define ZABBIX_TYPES_H
 
+#include "sysinc.h"
+
 #if defined(_WINDOWS)
 #	define ZBX_THREAD_LOCAL __declspec(thread)
 #else
-#	if defined(HAVE_THREAD_LOCAL) && (defined(__GNUC__) || defined(__clang__) || defined(__MINGW32__))
-#		define ZBX_THREAD_LOCAL __thread
-#	else
+/* for non windows build thread local storage is required only for agent2 */
+#	if defined(ZBX_BUILD_AGENT2)
+#		if defined(HAVE_THREAD_LOCAL) && (defined(__GNUC__) || defined(__clang__) || defined(__MINGW32__))
+#			define ZBX_THREAD_LOCAL __thread
+#		else
+#			error "C compiler is not compatible with agent2 assembly"
+#		endif
+#	endif
+#	if !defined(ZBX_THREAD_LOCAL)
 #		define ZBX_THREAD_LOCAL
 #	endif
 #endif
@@ -205,5 +213,9 @@ zbx_uint128_t;
 
 /* macro to test if a signed value has been assigned to unsigned type (char, short, int, long long) */
 #define ZBX_IS_TOP_BIT_SET(x)	(0 != ((__UINT64_C(1) << ((sizeof(x) << 3) - 1)) & (x)))
+
+#if defined(_WINDOWS)
+	#define localtime_r(x, y)	localtime_s(y, x)
+#endif
 
 #endif

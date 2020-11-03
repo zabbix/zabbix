@@ -54,7 +54,7 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
@@ -103,7 +103,7 @@ class CControllerModuleEdit extends CController {
 				->setArgument('action', 'module.list')
 				->setArgument('page', CPagerHelper::loadPage('module.list', null))
 			);
-			$response->setMessageError(_s('Cannot load module at: %1$s.', $this->module['relative_path']));
+			CMessageHelper::setErrorTitle(_s('Cannot load module at: %1$s.', $this->module['relative_path']));
 			$this->setResponse($response);
 		}
 	}

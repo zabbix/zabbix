@@ -46,7 +46,7 @@ class CControllerWebView extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
 	}
 
 	protected function doAction() {
@@ -77,8 +77,6 @@ class CControllerWebView extends CController {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['name', 'groupid'],
 				'groupids' => $data['filter']['groupids'],
-				'with_httptests' => true,
-				'real_hosts' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];

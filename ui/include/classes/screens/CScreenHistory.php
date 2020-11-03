@@ -159,12 +159,10 @@ class CScreenHistory extends CScreenBase {
 				$options['limit'] = 500;
 			}
 			else {
-				$config = select_config();
-
 				$options += [
 					'time_from' => $this->timeline['from_ts'],
 					'time_till' => $this->timeline['to_ts'],
-					'limit' => $config['search_limit']
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				];
 			}
 
@@ -549,7 +547,6 @@ class CScreenHistory extends CScreenBase {
 			}
 			else {
 				$timeControlData['id'] = $this->getDataId();
-				$timeControlData['mainObject'] = 1;
 			}
 
 			if ($this->mode == SCREEN_MODE_JS) {

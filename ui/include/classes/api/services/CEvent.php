@@ -24,6 +24,11 @@
  */
 class CEvent extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'acknowledge' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
@@ -475,7 +480,7 @@ class CEvent extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -763,11 +768,36 @@ class CEvent extends CApiService {
 		}
 
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
+		$has_ack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
 		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
 		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
+		$has_unack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
 
-		if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) &&
-				($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)) {
+		// Check access rules.
+		if ($has_close_action && !self::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_('no permissions to close problems')
+			));
+		}
+		if ($has_message_action && !self::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_('no permissions to add problem comments')
+			));
+		}
+		if ($has_severity_action && !self::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_('no permissions to change problem severity')
+			));
+		}
+		if (($has_ack_action || $has_unack_action) && !self::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				$has_ack_action
+					? _('no permissions to acknowledge problems')
+					: _('no permissions to unacknowledge problems')
+			));
+		}
+
+		if ($has_ack_action && $has_unack_action) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
 				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
 					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
@@ -900,31 +930,26 @@ class CEvent extends CApiService {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput']) {
+			// Select fields from event_recovery table using LEFT JOIN.
 			if ($this->outputIsRequested('r_eventid', $options['output'])) {
-				// Select fields from event_recovery table using LEFT JOIN.
-
 				$sqlParts['select']['r_eventid'] = 'er1.r_eventid';
-				$sqlParts['left_join'][] = ['from' => 'event_recovery er1', 'on' => 'er1.eventid=e.eventid'];
-				$sqlParts['left_table'] = 'e';
+				$sqlParts['left_join'][] = ['alias' => 'er1', 'table' => 'event_recovery', 'using' => 'eventid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 
-			if ($this->outputIsRequested('c_eventid', $options['output'])
-					|| $this->outputIsRequested('correlationid', $options['output'])
-					|| $this->outputIsRequested('userid', $options['output'])) {
-				// Select fields from event_recovery table using LEFT JOIN.
+			// Select fields from event_recovery table using LEFT JOIN.
+			$left_join = false;
 
-				if ($this->outputIsRequested('c_eventid', $options['output'])) {
-					$sqlParts['select']['c_eventid'] = 'er2.c_eventid';
+			foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
+				if ($this->outputIsRequested($field, $options['output'])) {
+					$sqlParts['select'][$field] = 'er2.'.$field;
+					$left_join = true;
 				}
-				if ($this->outputIsRequested('correlationid', $options['output'])) {
-					$sqlParts['select']['correlationid'] = 'er2.correlationid';
-				}
-				if ($this->outputIsRequested('userid', $options['output'])) {
-					$sqlParts['select']['userid'] = 'er2.userid';
-				}
+			}
 
-				$sqlParts['left_join'][] = ['from' => 'event_recovery er2', 'on' => 'er2.r_eventid=e.eventid'];
-				$sqlParts['left_table'] = 'e';
+			if ($left_join) {
+				$sqlParts['left_join'][] = ['alias' => 'er2', 'table' => 'event_recovery', 'using' => 'r_eventid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 
 			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
@@ -1061,7 +1086,7 @@ class CEvent extends CApiService {
 				]);
 				$sqlParts['order'][] = 'a.clock DESC';
 
-				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
+				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 
 				// if the user data is requested via extended output or specified fields, join the users table
 				$userFields = ['alias', 'name', 'surname'];
