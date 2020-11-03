@@ -1,3 +1,9 @@
+Changes for 5.2.1rc2
+
+Bug fixes:
+..F....... [ZBX-18601] fixed dashboard widget to be updated continuously when 'No refresh' interval is specified (miks)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.1rc1
 
 New features:
