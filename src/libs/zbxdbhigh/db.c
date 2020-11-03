@@ -839,38 +839,63 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 void	DBcheck_capabilities(void)
 {
 #ifdef HAVE_POSTGRESQL
+
+#define MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB	100002
+#define MIN_TIMESCALEDB_VERSION			10500
 	int	compression_available = OFF;
+
+	int		timescaledb_major, timescaledb_minor, timescaledb_patch, timescaledb_version_full;
+	int	postgresql_version;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	if (NULL == (result = DBselect("select db_extension from config")))
+		goto out;
+
+	if (NULL == (row = DBfetch(result)))
+		goto clean;
+
+	if (0 != zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+		goto clean;
+
+	DBfree_result(result);
+
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
-	if (100002 <= zbx_dbms_get_version())
+	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > (postgresql_version = zbx_dbms_get_version()))
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
-		int		major, minor, patch, version;
+		zabbix_log(LOG_LEVEL_CRIT, "Postgresql version %d is not supported with TimescaleDB, minimum is %d",
+				postgresql_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
 
-		if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
-			goto out;
+		DBclose();
+		exit(EXIT_FAILURE);
+	}
 
-		if (NULL == (row = DBfetch(result)))
-			goto clean;
+	if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
+		goto out;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
+	if (NULL == (row = DBfetch(result)))
+		goto clean;
 
-		sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch);
-		version = major * 10000;
-		version += minor * 100;
-		version += patch;
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
 
-		if (10500 <= version)
-			compression_available = ON;
+	sscanf((const char*)row[0], "%d.%d.%d", &timescaledb_major, &timescaledb_minor, &timescaledb_patch);
+	timescaledb_version_full = timescaledb_major * 10000;
+	timescaledb_version_full += timescaledb_minor * 100;
+	timescaledb_version_full += timescaledb_patch;
+
+	if (MIN_TIMESCALEDB_VERSION > timescaledb_version_full)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
+				timescaledb_version_full, MIN_TIMESCALEDB_VERSION);
+		DBfree_result(result);
+		DBclose();
+		exit(EXIT_FAILURE);
+	}
 clean:
 		DBfree_result(result);
-	}
 out:
-	DBexecute("update config set compression_availability=%d", compression_available);
-
 	DBclose();
 #endif
 }

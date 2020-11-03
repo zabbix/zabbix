@@ -84,8 +84,7 @@ class CControllerHousekeepingEdit extends CController {
 			'hk_trends'					=> $this->getInput('hk_trends',					$config['hk_trends']),
 			'compression_status'		=> $this->getInput('compression_status',		$config['compression_status']),
 			'compress_older'			=> $this->getInput('compress_older',			$config['compress_older']),
-			'db_extension'				=> $config['db_extension'],
-			'compression_availability'	=> $config['compression_availability']
+			'db_extension'				=> $config['db_extension']
 		];
 
 		$response = new CControllerResponseData($data);

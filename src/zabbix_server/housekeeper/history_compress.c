@@ -234,7 +234,7 @@ void	hk_history_compression_init(void)
 	compression_status_cache = cfg.db.history_compression_status;
 	compress_older_cache = cfg.db.history_compress_older;
 
-	if (ON == cfg.db.history_compression_availability)
+	if (0 == zbx_strcmp_null(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
 		/* surpress notice logs during DB initialization */
 		result = DBselect("show client_min_messages");
@@ -297,9 +297,6 @@ void	hk_history_compression_init(void)
 void	hk_history_compression_update(zbx_config_db_t *cfg)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (OFF == cfg->history_compression_availability)
-		goto out;
 
 	if (ON == cfg->history_compression_status)
 	{

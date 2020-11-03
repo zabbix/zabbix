@@ -1124,6 +1124,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	DBcheck_capabilities();
+
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 	DBcheck_character_set();
@@ -1132,8 +1134,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_ENABLED;
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
-
-	DBcheck_capabilities();
 
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
