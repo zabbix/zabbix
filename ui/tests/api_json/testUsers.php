@@ -549,7 +549,7 @@ class testUsers extends CAPITest {
 					'alias' => 'Try to change super-admin user type',
 					'roleid' => '2'
 				]],
-				'expected_error' => 'At least one active user must exist with role "Super Admin role".'
+				'expected_error' => 'At least one active user must exist with role "Super admin role".'
 			],
 			// Successfully user update.
 			[
