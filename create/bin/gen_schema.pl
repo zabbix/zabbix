@@ -625,7 +625,7 @@ BEGIN
 	SELECT substring(current_postgres_version_full, '^(\\d+).') INTO current_postgres_version_major;
 	SELECT substring(current_postgres_version_full, '^\\d+.(\\d+)') INTO current_postgres_version_minor;
 
-	IF (current_postgres_version_major < minimum_postgres_version_major  OR
+	IF (current_postgres_version_major < minimum_postgres_version_major OR
 			(current_postgres_version_major = minimum_postgres_version_major AND
 			current_postgres_version_minor < minimum_postgres_version_minor)) THEN
 			RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
@@ -654,11 +654,12 @@ BEGIN
 	SELECT substring(current_timescaledb_version_full, '^(\\d+).') INTO current_timescaledb_version_major;
 	SELECT substring(current_timescaledb_version_full, '^\\d+.(\\d+)') INTO current_timescaledb_version_minor;
 
-	IF (current_timescaledb_version_major < minimum_timescaledb_version_major  OR
+	IF (current_timescaledb_version_major < minimum_timescaledb_version_major OR
 			(current_timescaledb_version_major = minimum_timescaledb_version_major AND
 			current_timescaledb_version_minor < minimum_timescaledb_version_minor)) THEN
-		RAISE EXCEPTION 'TimescaleDB version % is UNSUPPORTED! Minimum is %.%.0 !', current_timescaledb_version_full,
-				minimum_timescaledb_version_major, minimum_timescaledb_version_minor;
+		RAISE EXCEPTION 'TimescaleDB version % is UNSUPPORTED! Minimum is %.%.0 !',
+				current_timescaledb_version_full, minimum_timescaledb_version_major,
+				minimum_timescaledb_version_minor;
 	ELSE
 		RAISE NOTICE 'TimescaleDB version % is valid.', current_timescaledb_version_full;
 	END IF;
@@ -695,7 +696,7 @@ EOF
 
 sub usage
 {
-	print "Usage: $0 [c|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
+	print "Usage: $0 [c|mysql|oracle|postgresql|sqlite3|timescaledb_create_extension|timescaledb_configure]\n";
 	print "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
