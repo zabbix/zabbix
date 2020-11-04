@@ -346,7 +346,7 @@ if ($data['action'] === 'user.edit') {
 		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(),
 			(new CDiv([
 				$role_multiselect,
-				new CDiv(_('User cannot change their role.'))
+				new CDiv(_('User cannot change own role.'))
 			]))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('multiselect-description-container')
