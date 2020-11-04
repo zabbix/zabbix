@@ -724,11 +724,20 @@ class testFormItemTest extends CWebTest {
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':
 					case 'IPMI agent':
-						$fields_value = [
-							'address' => $is_host ? $host_interface[0] : '',
-							'port' => $is_host ? $host_interface[1] : '',
-							'proxy' => $is_host ? $proxy : '(no proxy)'
-						];
+						if ($is_host) {
+							$fields_value = [
+								'address' => $host_interface[0],
+								'port' => $host_interface[1],
+								'proxy' => $proxy
+							];
+						}
+						else {
+							$fields_value = [
+								'address' => '',
+								'port' => '',
+								'proxy' => '(no proxy)'
+							];
+						}
 						$fields_state = ['address' => true, 'port' => true, 'proxy' => true];
 						break;
 
@@ -780,13 +789,24 @@ class testFormItemTest extends CWebTest {
 							];
 						}
 						else {
-							$fields_value = [
-								'address' => $is_host ? $host_interface[0] : '',
-								'port' => $is_host ? $host_interface[1] : '',
-								'proxy' => $is_host ? $proxy : '(no proxy)',
-								'version' => $is_host ? CTestArrayHelper::get($data, 'snmp_fields.version', 'SNMPv2') : 'SNMPv2',
-								'comunity' => $is_host ? CTestArrayHelper::get($data, 'snmp_fields.comunity', 'public') : '',
-							];
+							if ($is_host) {
+								$fields_value = [
+									'address' => $host_interface[0],
+									'port' => $host_interface[1],
+									'proxy' => $proxy,
+									'version' => CTestArrayHelper::get($data, 'snmp_fields.version', 'SNMPv2'),
+									'comunity' => CTestArrayHelper::get($data, 'snmp_fields.comunity', 'public')
+								];
+							}
+							else {
+								$fields_value = [
+									'address' => '',
+									'port' => '',
+									'proxy' => '(no proxy)',
+									'version' => 'SNMPv2',
+									'comunity' => ''
+								];
+							}
 
 							$fields_state = [
 								'address' => true,
