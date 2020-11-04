@@ -421,7 +421,22 @@ class testFormItemPreprocessingTest extends CWebTest {
 		$this->checkTestOverlay($data, 'button:Test all steps', $prev_enabled);
 	}
 
-	private function openPreprocessing($data) {
+	/**
+	 * Check that adding two 'Check for not supported value'
+	 * preprocessing steps is impossible.
+	 */
+	public function testFormItemPreprocessingTest_TestRepeatedNotSupported() {
+		$this->openPreprocessing();
+		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
+		$this->query('id:param_add')->one()->click();
+
+		$this->assertTrue($this->query('xpath://select[@id="preprocessing_0_type"]'.
+				'//option[text()="Check for not supported value"]')->one()->isEnabled());
+		$this->assertFalse($this->query('xpath://select[@id="preprocessing_1_type"]'.
+				'//option[text()="Check for not supported value"]')->one()->isEnabled());
+	}
+
+	private function openPreprocessing($data = null) {
 		$this->page->login()->open('items.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key';
