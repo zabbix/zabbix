@@ -17,27 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_EMBED_H
-#define ZABBIX_EMBED_H
+#ifndef ZABBIX_CONSOLE_H
+#define ZABBIX_CONSOLE_H
 
-#include "common.h"
-#include "duktape.h"
+int	zbx_es_init_console(zbx_es_t *es, char **error);
 
-#define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
-
-struct zbx_es_env
-{
-	duk_context	*ctx;
-	size_t		total_alloc;
-	zbx_timespec_t	start_time;
-
-	char		*error;
-	int		rt_error_num;
-	int		fatal_error;
-	int		timeout;
-	struct zbx_json	*json;
-
-	jmp_buf		loc;
-};
-
-#endif /* ZABBIX_EMBED_H */
+#endif
