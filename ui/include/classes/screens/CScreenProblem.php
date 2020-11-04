@@ -1138,7 +1138,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'popup.acknowledge.edit' => ['name' => _('Mass update')]
+				'popup.acknowledge.edit' => ['name' => _('Mass update'), 'disabled' => !$this->data['allowed_ack']]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);

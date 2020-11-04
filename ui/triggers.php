@@ -515,7 +515,9 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 			}
 		}
 
-		$result = (bool) API::Trigger()->update($triggers_to_update);
+		if ($triggers_to_update) {
+			$result = (bool) API::Trigger()->update($triggers_to_update);
+		}
 	}
 
 	if ($result) {

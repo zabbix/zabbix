@@ -56,7 +56,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'host_group' => 'Zabbix servers'
 					],
 					'date' => [
-						'from' => '2018-10-23 00:00',
+						'from' => '2020-10-23 00:00',
 						'to' => 'now/d'
 					],
 					'result' => [
@@ -83,7 +83,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'host' => 'ЗАББИКС Сервер'
 					],
 					'date' => [
-						'from' => '2018-10-23 14:00'
+						'from' => '2020-10-23 17:00'
 					],
 					'result' => [
 						'Test trigger with tag'
@@ -109,8 +109,8 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'host' => 'ЗАББИКС Сервер'
 					],
 					'date' => [
-						'from' => '2018-10-22 01:01',
-						'to' => '2018-10-24 01:01'
+						'from' => '2020-10-22 04:01',
+						'to' => '2020-10-24 04:01'
 					],
 					'result' => [
 						'Test trigger to check tag filter on problem page',
@@ -125,7 +125,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'host' => 'ЗАББИКС Сервер'
 					],
 					'date' => [
-						'from' => '2019-08-18 00:00',
+						'from' => '2020-10-26 00:00',
 						'to' => 'now/d'
 					]
 				]
@@ -133,8 +133,8 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			[
 				[
 					'date' => [
-						'from' => '2018-10-23 12:35',
-						'to' => '2018-10-23 12:36'
+						'from' => '2020-10-23 15:35',
+						'to' => '2020-10-23 15:36'
 					],
 					'result' => [
 						'Trigger for tag permissions MySQL'
@@ -151,7 +151,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						]
 					],
 					'date' => [
-						'from' => '2018-10-22 00:00'
+						'from' => '2020-10-22 00:00'
 					],
 					'result' => [
 						'Test trigger to check tag filter on problem page'
@@ -167,15 +167,15 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						]
 					],
 					'date' => [
-						'from' => '2018-10-22 00:00'
+						'from' => '2020-10-22 00:00'
 					]
 				]
 			],
 			[
 				[
 					'date' => [
-						'from' => '2018-10-23 12:33',
-						'to' => '2018-10-23 12:36'
+						'from' => '2020-10-23 15:33',
+						'to' => '2020-10-23 15:36'
 					],
 					'result' => [
 						'Test trigger to check tag filter on problem page',
