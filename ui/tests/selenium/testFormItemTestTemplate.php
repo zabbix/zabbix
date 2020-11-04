@@ -27,7 +27,7 @@ class testFormItemTestTemplate extends testFormItemTest {
 
 	const TEMPLATE_ID	= 99137;	//'Test Item Template'
 	const IS_HOST		= false;
-	const LLD_ID			= 99349;	// 'Test discovery rule'
+	const LLD_ID		= 99349;	// 'Test discovery rule'
 
 	/**
 	 * Creation link forming function for items or LLD.
