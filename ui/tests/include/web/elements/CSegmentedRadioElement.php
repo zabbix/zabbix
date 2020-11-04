@@ -42,7 +42,13 @@ class CSegmentedRadioElement extends CElement {
 	 * @return string
 	 */
 	public function getText() {
-		return $this->query('xpath:.//input[@checked="checked"]/../label')->one()->getText();
+		foreach ($this->query('xpath:.//input[@type="radio"]')->all() as $radio) {
+			if ($radio->isSelected()) {
+				return $radio->parents('tag:li')->query('tag:label')->one()->getText();
+			}
+		}
+
+		return null;
 	}
 
 	/**

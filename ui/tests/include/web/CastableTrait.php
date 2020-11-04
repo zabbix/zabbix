@@ -275,4 +275,15 @@ trait CastableTrait {
 	public function asInputGroup($options = []) {
 		return $this->cast(CInputGroupElement::class, $options);
 	}
+
+	/**
+	 * Cast object to Interface element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CInterfaceElement
+	 */
+	public function asInterfaceElement($options = []) {
+		return $this->cast(CInterfaceElement::class, $options);
+	}
 }
