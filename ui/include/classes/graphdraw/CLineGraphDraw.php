@@ -993,6 +993,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$element_size = imageTextSize(7, 90, 'WWW');
 
 		$position = 0;
+		$position_from = $element_size['width'] * 1.5;
+		$position_to = $this->sizeX - $element_size['width'] * 1.5;
 		$dt = [];
 		$modifier = [];
 		$format = [];
@@ -1066,25 +1068,25 @@ class CLineGraphDraw extends CGraphDraw {
 			$prev_month = (int) $dt_start->format('m');
 		}
 
+		$mirror_till = 0;
+
 		while (true) {
 			$dt['sub']->modify($modifier['sub']);
 
-			if ($align['sub'] != 0) {
+			if ($align['sub'] < 0 && abs($align['sub']) < $interval['sub']) {
 				$dt['sub']->modify($align['sub'].' second');
-				$align['sub'] = 0;
 			}
 
-			$align['sub'] = self::getDSTAlign($dt['sub'], $interval['sub']);
+			$align['sub'] = self::getDSTAlign($dt['sub']);
 
 			if ($dt['main'] < $dt['sub']) {
 				$dt['main']->modify($modifier['main']);
 
-				if ($align['main'] != 0) {
+				if ($align['main'] < 0 && abs($align['main']) < $interval['main']) {
 					$dt['main']->modify($align['main'].' second');
-					$align['main'] = 0;
 				}
 
-				$align['main'] = self::getDSTAlign($dt['main'], $interval['main']);
+				$align['main'] = self::getDSTAlign($dt['main']);
 			}
 
 			if ($interval['main'] == SEC_PER_MONTH) {
@@ -1101,18 +1103,35 @@ class CLineGraphDraw extends CGraphDraw {
 			$delta_x = ($time - $prev_time) * $this->sizeX / $this->period;
 			$position += $delta_x;
 
+			// When clock were turned forward (DST ended) empty gap on the X axis should be mirrored.
+			if ($align['sub'] > 0) {
+				$mirror_till = $time + $align['sub'];
+				$mirror_offset = $align['sub'] * $this->sizeX / $this->period;
+			}
+
 			// First element too-close check.
-			if ($prev_time != $this->stime || $delta_x > $element_size['width'] * 1.5) {
+			if ($prev_time != $this->stime || $position > $position_from) {
 				// Last element too-close check.
-				if ($position > $this->sizeX - $element_size['width'] * 1.5) {
+				if ($position > $position_to && ($mirror_till == 0 || $time >= $mirror_till)) {
 					break;
 				}
 
-				if ($draw_main) {
-					$this->drawMainPeriod($dt['sub']->format($format['main']), $position);
+				if ($position <= $position_to) {
+					if ($draw_main) {
+						$this->drawMainPeriod($dt['sub']->format($format['main']), $position);
+					}
+					else {
+						$this->drawSubPeriod($dt['sub']->format($format['sub']), $position);
+					}
 				}
-				else {
-					$this->drawSubPeriod($dt['sub']->format($format['sub']), $position);
+
+				if ($mirror_till != 0 && $time < $mirror_till) {
+					if ($draw_main) {
+						$this->drawMainPeriod($dt['sub']->format($format['main']), $position - $mirror_offset);
+					}
+					else {
+						$this->drawSubPeriod($dt['sub']->format($format['sub']), $position - $mirror_offset);
+					}
 				}
 			}
 
@@ -1121,22 +1140,19 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	/*
-	 * Returns the offset if $dt is the starting point for daylight saving time.
+	 * Returns the offset if $dt is the starting or ending point for daylight saving time.
 	 *
-	 * @param DateTime $dt        Current time.
-	 * @param int      $interval  Interval between points.
+	 * @param DateTime $dt  Current time.
 	 *
 	 * @return int
 	 */
-	private static function getDSTAlign($dt, $interval) {
+	private static function getDSTAlign($dt) {
 		$ts = $dt->getTimestamp();
 		$transitions = $dt->getTimezone()->getTransitions($ts - 1, $ts + 1);
 
-		if (count($transitions) == 2 && $ts == $transitions[1]['ts'] && $transitions[0]['isdst'] === false) {
+		if (count($transitions) == 2 && $ts == $transitions[1]['ts']) {
 			$dst_offset = $transitions[0]['offset'] - $transitions[1]['offset'];
-			if (abs($dst_offset) < $interval) {
-				return $dst_offset;
-			}
+			return $dst_offset;
 		}
 
 		return 0;
