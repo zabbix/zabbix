@@ -853,7 +853,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  *                                                                            *
  * Function: DBcheck_capabilities                                             *
  *                                                                            *
- * Purpose: checks DBMS for optional features and adjusting configuration     *
+ * Purpose: checks DBMS for optional features and exit if is not suitable     *
  *                                                                            *
  ******************************************************************************/
 void	DBcheck_capabilities(void)
