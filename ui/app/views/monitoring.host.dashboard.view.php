@@ -65,7 +65,7 @@ $widget = (new CWidget())
 					)
 			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-	))->setAttribute('aria-label', _('Content controls'))->setAttribute('aria-label', _('Content controls')))
+	))->setAttribute('aria-label', _('Content controls')))
 	->setBreadcrumbs(
 		(new CList())
 			->setAttribute('role', 'navigation')
