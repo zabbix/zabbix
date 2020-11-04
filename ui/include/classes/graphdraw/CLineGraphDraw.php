@@ -1054,12 +1054,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$modifier[$type] = '+ '.$seconds.' second';
 				$format[$type] = _('H:i:s');
 			}
-		}
 
-		// It is necessary to align the X axis after the jump from winter to summer time.
-		$prev_dst = (bool) $dt['sub']->format('I');
-		$dst_offset = $dt['sub']->getOffset();
-		$do_align = false;
+			// It is necessary to align the X axis after the jump from winter to summer time.
+			$align[$type] = 0;
+		}
 
 		$prev_time = $this->stime;
 		if ($interval['main'] == SEC_PER_MONTH) {
@@ -1071,28 +1069,22 @@ class CLineGraphDraw extends CGraphDraw {
 		while (true) {
 			$dt['sub']->modify($modifier['sub']);
 
-			if (SEC_PER_HOUR < $interval['sub'] && $interval['sub'] < SEC_PER_DAY) {
-				if ($do_align) {
-					$hours = $interval['sub'] / SEC_PER_HOUR;
-					$hour = (int) $dt['sub']->format('H');
-					if ($hour % $hours) {
-						$dt['sub']->modify($dst_offset.' second');
-					}
-
-					$do_align = false;
-				}
-
-				$dst = (bool) $dt['sub']->format('I');
-
-				if ($dst && $prev_dst != $dst) {
-					$dst_offset -= $dt['sub']->getOffset();
-					$do_align = $interval['sub'] > abs($dst_offset);
-					$prev_dst = $dst;
-				}
+			if ($align['sub'] != 0) {
+				$dt['sub']->modify($align['sub'].' second');
+				$align['sub'] = 0;
 			}
+
+			$align['sub'] = self::getDSTAlign($dt['sub'], $interval['sub']);
 
 			if ($dt['main'] < $dt['sub']) {
 				$dt['main']->modify($modifier['main']);
+
+				if ($align['main'] != 0) {
+					$dt['main']->modify($align['main'].' second');
+					$align['main'] = 0;
+				}
+
+				$align['main'] = self::getDSTAlign($dt['main'], $interval['main']);
 			}
 
 			if ($interval['main'] == SEC_PER_MONTH) {
@@ -1104,8 +1096,8 @@ class CLineGraphDraw extends CGraphDraw {
 			else {
 				$draw_main = ($dt['main'] == $dt['sub']);
 			}
-			$time = $dt['sub']->format('U');
 
+			$time = $dt['sub']->getTimestamp();
 			$delta_x = ($time - $prev_time) * $this->sizeX / $this->period;
 			$position += $delta_x;
 
@@ -1126,6 +1118,28 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$prev_time = $time;
 		}
+	}
+
+	/*
+	 * Returns the offset if $dt is the starting point for daylight saving time.
+	 *
+	 * @param DateTime $dt        Current time.
+	 * @param int      $interval  Interval between points.
+	 *
+	 * @return int
+	 */
+	private static function getDSTAlign($dt, $interval) {
+		$ts = $dt->getTimestamp();
+		$transitions = $dt->getTimezone()->getTransitions($ts - 1, $ts + 1);
+
+		if (count($transitions) == 2 && $ts == $transitions[1]['ts'] && $transitions[0]['isdst'] === false) {
+			$dst_offset = $transitions[0]['offset'] - $transitions[1]['offset'];
+			if (abs($dst_offset) < $interval) {
+				return $dst_offset;
+			}
+		}
+
+		return 0;
 	}
 
 	private function drawVerticalScale() {
