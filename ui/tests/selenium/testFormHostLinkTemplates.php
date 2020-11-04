@@ -58,7 +58,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	}
 
 	/**
-	 * @depends testFormHostTemplatesLinking_TemplateLink
+	 * @depends testFormHostLinkTemplates_TemplateLink
 	 */
 	public function testFormHostLinkTemplates_TemplateUnlink() {
 		// Unlink a template from a host from host properties page
@@ -112,7 +112,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		COverlayDialogElement::find()->one()->setDataContext('Templates');
-		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');
+		$this->query('link:Template OS Linux by Zabbix agent')->waitUntilVisible()->one()->forceClick();
 
 		$this->zbxTestTextPresent('Template OS Linux by Zabbix agent');
 		$this->zbxTestClickWait('update');
@@ -122,7 +122,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	}
 
 	/**
-	 * @depends testFormHostTemplatesLinking_TemplateLinkUpdate
+	 * @depends testFormHostLinkTemplates_TemplateLinkUpdate
 	 */
 	public function testFormHostLinkTemplates_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page

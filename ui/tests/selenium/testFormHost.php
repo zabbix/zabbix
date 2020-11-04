@@ -180,7 +180,9 @@ class testFormHost extends CWebTest {
 						'key_' => 'jmx[object_name,attribute_name]',
 						'type' => ITEM_TYPE_JMX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'delay' => '1s'
+						'delay' => '1s',
+						'username' => '',
+						'password' => ''
 					]
 				]
 			]
@@ -1504,14 +1506,14 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'host_fields' => [
-						'Host name' => microtime(true).' clone without interface changes'
+						'Host name' => microtime().' clone without interface changes'
 					]
 				]
 			],
 			[
 				[
 					'host_fields' => [
-						'Host name' => microtime(true).' clone with interface changes'
+						'Host name' => microtime().' clone with interface changes'
 					],
 					'interfaces' => [
 						[
