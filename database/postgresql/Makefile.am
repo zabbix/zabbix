@@ -1,5 +1,6 @@
 if DBSCHEMA
 DATABASE = postgresql
+DB_EXTENSION = timescaledb
 TIMESCALEDB_CREATE_EXTENSION = timescaledb_create_extension
 TIMESCALEDB_CONFIGURE = timescaledb_configure
 
@@ -13,7 +14,8 @@ $(TIMESCALEDB_CREATE_EXTENSION).sql:
 	$(top_srcdir)/create/bin/gen_schema.pl $(TIMESCALEDB_CREATE_EXTENSION) > $(TIMESCALEDB_CREATE_EXTENSION).sql
 
 $(TIMESCALEDB_CONFIGURE).sql:
-	$(top_srcdir)/create/bin/gen_schema.pl $(TIMESCALEDB_CONFIGURE) > $(TIMESCALEDB_CONFIGURE).sql
+	$(top_srcdir)/create/bin/gen_schema.pl $(TIMESCALEDB_CONFIGURE) > $(TIMESCALEDB_CONFIGURE).sql && \
+	rm -f $(DB_EXTENSION).sql
 endif
 
 EXTRA_DIST = \
