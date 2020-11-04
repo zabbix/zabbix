@@ -868,7 +868,7 @@ void	DBcheck_capabilities(void)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	if (FAIL == DBfield_exists("db_extension", "config"))
+	if (FAIL == DBfield_exists("config", "db_extension"))
 		goto out;
 
 	if (NULL == (result = DBselect("select db_extension from config")))
