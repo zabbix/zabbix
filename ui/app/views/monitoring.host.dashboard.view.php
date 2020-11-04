@@ -48,7 +48,7 @@ $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
-	->setTitle($data['dashboard']['name'].' '._('on').' '.$data['host']['name'])
+	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CTag('nav', true,
 		(new CList())
@@ -65,7 +65,18 @@ $widget = (new CWidget())
 					)
 			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-	))->setAttribute('aria-label', _('Content controls')));
+	))->setAttribute('aria-label', _('Content controls'))->setAttribute('aria-label', _('Content controls')))
+	->setBreadcrumbs(
+		(new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
+			->addItem(new CPartial('monitoring.host.dashboard.breadcrumbs', [
+				'host' => $data['host'],
+				'dashboard' => $data['dashboard'],
+			]))
+			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+	);
 
 if ($data['time_selector'] !== null) {
 	$widget->addItem(
