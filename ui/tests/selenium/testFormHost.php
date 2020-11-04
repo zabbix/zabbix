@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup !hosts, interface
+ * @backup hosts
  * @on-before prepareUpdateData
  */
 class testFormHost extends CWebTest {
@@ -1078,19 +1078,19 @@ class testFormHost extends CWebTest {
 					'interfaces' => [
 						[
 							'action' => USER_ACTION_ADD,
-							'type' => 'Agent',
+							'type' => 'Agent'
 						],
 						[
 							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
+							'type' => 'SNMP'
 						],
 						[
 							'action' => USER_ACTION_ADD,
-							'type' => 'JMX',
+							'type' => 'JMX'
 						],
 						[
 							'action' => USER_ACTION_ADD,
-							'type' => 'IPMI',
+							'type' => 'IPMI'
 						]
 					]
 				]
@@ -1145,15 +1145,15 @@ class testFormHost extends CWebTest {
 					'interfaces' => [
 						[
 							'action' => USER_ACTION_REMOVE,
-							'index' => 0,
+							'index' => 0
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
-							'index' => 0,
+							'index' => 0
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
-							'index' => 1,
+							'index' => 1
 						]
 					]
 				]
@@ -1198,15 +1198,15 @@ class testFormHost extends CWebTest {
 							'index' => 2,
 							'ip' => '',
 							'dns' => 'zabbix.com',
-							'Connect to' => 'DNS',
+							'Connect to' => 'DNS'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 3,
 							'ip' => '',
 							'dns' => 'zabbix.com',
-							'Connect to' => 'DNS',
-						],
+							'Connect to' => 'DNS'
+						]
 					]
 				]
 			],
@@ -1275,7 +1275,7 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * @backup !hosts, !hosts_groups, !interface, !interface_snmp
+	 * @backup hosts
 	 *
 	 * @dataProvider getUpdateData
 	 */
