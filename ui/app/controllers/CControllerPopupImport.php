@@ -47,7 +47,7 @@ class CControllerPopupImport extends CController {
 	protected function checkPermissions() {
 		$user_type = $this->getUserType();
 
-		switch ($this->getInput('rules_preset')) {
+		switch ($this->getInput('rules_preset', '')) {
 			case 'map' :
 				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
 
@@ -59,6 +59,9 @@ class CControllerPopupImport extends CController {
 			case 'mediatype':
 			case 'valuemap':
 				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
+
+			default:
+				return false;
 		}
 	}
 
@@ -194,6 +197,7 @@ class CControllerPopupImport extends CController {
 			$this->setResponse(new CControllerResponseData([
 				'title' => _('Import'),
 				'rules' => $rules,
+				'rules_preset' => $this->getInput('rules_preset'),
 				'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
 				'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
 				'user' => [
