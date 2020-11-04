@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-08T15:20:34Z</date>
+   <date>2020-10-20T07:21:03Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -175,7 +175,6 @@ Software version.</description>
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Operating system description has changed</name>
                      <priority>INFO</priority>
                      <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
