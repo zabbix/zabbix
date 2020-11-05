@@ -700,16 +700,16 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
 				continue;
 			}
 
-			if (!array_key_exists($trigger_name, $triggers_by_name)) {
-				$triggers_by_name[$trigger_name] = [];
-			}
+			if (count($triggers_by_name) < ZBX_MAX_TABLE_COLUMNS) {
+				if (!array_key_exists($trigger_name, $triggers_by_name)) {
+					$triggers_by_name[$trigger_name] = [];
+				}
 
-			if (count($triggers_by_name) >= ZBX_MAX_TABLE_COLUMNS) {
-				$exceeded_trigs = true;
-				break 2;
+				$triggers_by_name[$trigger_name][$host['hostid']] = $trigger['triggerid'];
 			}
 			else {
-				$triggers_by_name[$trigger_name][$host['hostid']] = $trigger['triggerid'];
+				$exceeded_trigs = true;
+				break 2;
 			}
 		}
 	}
