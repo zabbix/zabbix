@@ -86,12 +86,16 @@ foreach ($this->data['groups'] as $group) {
 			$hostsOutput[] = ', ';
 		}
 
-		$url = (new CUrl('templates.php'))
-			->setArgument('form', 'update')
-			->setArgument('templateid', $template['templateid']);
-		$hostsOutput[] = (new CLink($template['name'], $url))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
+		if ($data['allowed_ui_conf_templates']) {
+			$hostsOutput[] = (new CLink($template['name'], (new CUrl('templates.php'))
+				->setArgument('form', 'update')
+				->setArgument('templateid', $template['templateid'])))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$hostsOutput[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+		}
 	}
 
 	if ($group['templates'] && $group['hosts']) {
@@ -114,12 +118,18 @@ foreach ($this->data['groups'] as $group) {
 			$hostsOutput[] = ', ';
 		}
 
-		$url = (new CUrl('hosts.php'))
-			->setArgument('form', 'update')
-			->setArgument('hostid', $host['hostid']);
-		$hostsOutput[] = (new CLink($host['name'], $url))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass($host['status'] == HOST_STATUS_MONITORED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+		if ($data['allowed_ui_conf_hosts']) {
+			$host_output = (new CLink($host['name'], (new CUrl('hosts.php'))
+				->setArgument('form', 'update')
+				->setArgument('hostid', $host['hostid'])
+			))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$host_output = new CSpan($host['name']);
+		}
+
+		$host_output->addClass($host['status'] == HOST_STATUS_MONITORED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+		$hostsOutput[] = $host_output;
 	}
 
 	$hostCount = $this->data['groupCounts'][$group['groupid']]['hosts'];
@@ -128,8 +138,16 @@ foreach ($this->data['groups'] as $group) {
 	// name
 	$name = [];
 	if ($group['discoveryRule']) {
-		$name[] = (new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid']))
-			->addClass(ZBX_STYLE_ORANGE);
+		if ($data['allowed_ui_conf_hosts']) {
+			$lld_name = (new CLink($group['discoveryRule']['name'],
+				(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+			));
+		}
+		else {
+			$lld_name = new CSpan($group['discoveryRule']['name']);
+		}
+
+		$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
@@ -143,14 +161,23 @@ foreach ($this->data['groups'] as $group) {
 	$hostGroupTable->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[new CLink(_('Hosts'), (new CUrl('hosts.php'))
-			->setArgument('filter_set', '1')
-			->setArgument('filter_groups', [$group['groupid']])
-		), CViewHelper::showNum($hostCount)],
-		[new CLink(_('Templates'), (new CUrl('templates.php'))
-			->setArgument('filter_set', '1')
-			->setArgument('filter_groups', [$group['groupid']])
-		), CViewHelper::showNum($templateCount)
+		[
+			$data['allowed_ui_conf_hosts']
+				? new CLink(_('Hosts'), (new CUrl('hosts.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_groups', [$group['groupid']])
+				)
+				: _('Hosts'),
+			CViewHelper::showNum($hostCount)
+		],
+		[
+			$data['allowed_ui_conf_templates']
+				? new CLink(_('Templates'), (new CUrl('templates.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_groups', [$group['groupid']])
+				)
+				: _('Templates'),
+			CViewHelper::showNum($templateCount)
 		],
 		empty($hostsOutput) ? '' : $hostsOutput,
 		makeInformationList($info_icons)

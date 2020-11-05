@@ -58,6 +58,7 @@
 #include "zbxipcservice.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
+#include "zbxvault.h"
 #include "zbxdiag.h"
 
 
@@ -96,7 +97,7 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
 	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
-	"                                 section (historycache, preprocessing) or",
+	"                                 section (historycache, preprocessing, locks) or",
 	"                                 everything if section is not specified",
 	"",
 	"      Log level control targets:",
@@ -227,6 +228,9 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULTURL		= NULL;
+char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -514,6 +518,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
+
+	if (NULL == CONFIG_VAULTURL)
+		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
 }
 
 /******************************************************************************
@@ -588,6 +595,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
 #endif
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_VMWARE_FORKS, "VMware support"));
@@ -746,6 +755,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"DBUser",			&CONFIG_DBUSER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -973,7 +988,8 @@ static void	zbx_main_sigusr_handler(int flags)
 		int	scope = ZBX_RTC_GET_SCOPE(flags);
 
 		if (ZBX_DIAGINFO_ALL == scope)
-			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) |	(1 << ZBX_DIAGINFO_PREPROCESSING);
+			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) |
+			(1 << ZBX_DIAGINFO_LOCKS);
 		else
 			zbx_diaginfo_scope = 1 << scope;
 	}
@@ -1110,6 +1126,20 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (0 != CONFIG_VMWARE_FORKS && SUCCEED != zbx_vmware_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_init_token_from_env(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_init_db_credentials(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

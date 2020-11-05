@@ -83,9 +83,15 @@ Ignored if housekeeper is being currently executed.
 .RE
 .RS 4
 .TP 4
+.B secrets_reload
+Reload secrets from Vault.
+Ignored if configuration cache or secrets are being currently loaded.
+.RE
+.RS 4
+.TP 4
 \fBdiaginfo\fR[=\fIsection\fR]
 Log internal diagnostic information of the specified section. Section can be \fIhistorycache\fR, \fIpreprocessing\fR,
-\fIalerting\fR, \fIlld\fR, \fIvaluecache\fR.
+\fIalerting\fR, \fIlld\fR, \fIvaluecache\fR, \fIlocks\fR.
 By default diagnostic information of all sections is logged.
 .RE
 .RS 4

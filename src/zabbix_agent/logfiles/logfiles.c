@@ -41,7 +41,8 @@
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
 extern int	CONFIG_MAX_LINES_PER_SECOND;
-extern char	*CONFIG_HOSTNAME;
+
+extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -92,7 +93,7 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s part1:'%s' part2:'%s'", __func__, zbx_result_string(ret),
-			*part1, *part2);
+			ZBX_NULL2STR(*part1), ZBX_NULL2STR(*part2));
 
 	return ret;
 }
@@ -227,7 +228,7 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s directory:'%s' filename_regexp:'%s'", __func__,
-			zbx_result_string(ret), *directory, *filename_regexp);
+			zbx_result_string(ret), ZBX_NULL2STR(*directory), ZBX_NULL2STR(*filename_regexp));
 
 	return ret;
 }

@@ -1,0 +1,334 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:49Z'
+  media_types:
+    -
+      name: 'MS Teams'
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_date
+          value: '{EVENT.DATE}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_opdata
+          value: '{EVENT.OPDATA}'
+        -
+          name: event_recovery_date
+          value: '{EVENT.RECOVERY.DATE}'
+        -
+          name: event_recovery_time
+          value: '{EVENT.RECOVERY.TIME}'
+        -
+          name: event_severity
+          value: '{EVENT.SEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_status
+          value: '{EVENT.STATUS}'
+        -
+          name: event_tags
+          value: '{EVENT.TAGS}'
+        -
+          name: event_time
+          value: '{EVENT.TIME}'
+        -
+          name: event_update_action
+          value: '{EVENT.UPDATE.ACTION}'
+        -
+          name: event_update_date
+          value: '{EVENT.UPDATE.DATE}'
+        -
+          name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_update_time
+          value: '{EVENT.UPDATE.TIME}'
+        -
+          name: event_update_user
+          value: '{USER.FULLNAME}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: host_ip
+          value: '{HOST.IP}'
+        -
+          name: host_name
+          value: '{HOST.NAME}'
+        -
+          name: teams_endpoint
+          value: '<PLACE WEBHOOK URL HERE>'
+        -
+          name: trigger_description
+          value: '{TRIGGER.DESCRIPTION}'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: use_default_message
+          value: 'false'
+        -
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
+      script: |
+        var SEVERITY_COLORS = [
+            '#97AAB3', // Not classified.
+            '#7499FF', // Information.
+            '#FFC859', // Warning.
+            '#FFA059', // Average.
+            '#E97659', // High.
+            '#E45959', // Disaster.
+            '#009900', // Resolved.
+            '#000000'  // Default.
+        ];
+        
+        try {
+            var params = JSON.parse(value);
+        
+            if (!params.teams_endpoint) {
+                throw 'Cannot get teams_endpoint';
+            }
+            else if (!params.teams_endpoint.startsWith('https://outlook.office.com/webhook/')) {
+                throw 'Invalid MS Teams webhook URL: ' + params.teams_endpoint;
+            }
+        
+            params.zabbix_url = (params.zabbix_url.endsWith('/'))
+                ? params.zabbix_url.slice(0, -1) : params.zabbix_url;
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            }
+        
+            // Set "use_default_message" to true for non trigger-based events.
+            if (params.event_source !== '0') {
+                params.use_default_message = 'true';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: "' + params.event_value + '".\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: "' + params.event_update_status + '".\nMust be 0 or 1.';
+            }
+        
+            if (params.event_value == 0) {
+                params.event_nseverity = '6';
+            }
+        
+            if (!SEVERITY_COLORS[params.event_nseverity]) {
+                params.event_nseverity = '7';
+            }
+        
+            var request = new HttpRequest(),
+                facts = [],
+                body = {
+                    themeColor: SEVERITY_COLORS[params.event_nseverity].replace('#', ''),
+                    summary: 'Zabbix',
+                    sections: [
+                        {
+                            markdown: 'false',
+                            activityTitle: params.alert_subject,
+                            activitySubtitle: 'On ' + params.host_name + ' [' + params.host_ip + ']',
+                            text: (params.use_default_message.toLowerCase() == 'true')
+                                ? params.alert_message
+                                : params.trigger_description
+                        }
+                    ],
+                    potentialAction: [
+                        {
+                            '@type': 'OpenUri',
+                            name: (params.event_source === '0')
+                                ? 'Event Info'
+                                : 'Zabbix Home',
+                            targets: [
+                                {
+                                    os: 'default',
+                                    uri: (params.event_source === '0')
+                                        ? params.zabbix_url + '/tr_events.php?triggerid=' +
+                                            params.trigger_id + '&eventid=' + params.event_id
+                                        : params.zabbix_url
+                                }
+                            ]
+                        }
+                    ]
+                };
+        
+            if (params.use_default_message.toLowerCase() !== 'true') {
+                // Problem message.
+                if (params.event_value === '1' && params.event_update_status === '0') {
+                    facts.push({
+                        name: 'Event time',
+                        value: params.event_time + ' ' + params.event_date
+                    });
+                }
+                // Update message.
+                else if (params.event_update_status === '1') {
+                    body.sections[0].text = params.event_update_user + ' ' + params.event_update_action + '.';
+        
+                    if (params.event_update_message) {
+                        body.sections[0].text += '<br>Message:<br>' + params.event_update_message;
+                    }
+        
+                    facts.push({
+                        name: 'Event update time',
+                        value: params.event_update_time + ' ' + params.event_update_date
+                    });
+                }
+                // Resolved message.
+                else {
+                    facts.push({
+                        name: 'Recovery time',
+                        value: params.event_recovery_time + ' ' + params.event_recovery_date
+                    });
+                }
+        
+                if (params.event_severity && params.event_severity !== '{EVENT.SEVERITY}') {
+                    facts.push({
+                        name: 'Severity',
+                        value: params.event_severity
+                    });
+                }
+        
+        
+                if (params.event_opdata && params.event_opdata !== '{EVENT.OPDATA}') {
+                    facts.push({
+                        name: 'Operational data',
+                        value: params.event_opdata
+                    });
+                }
+        
+                if (params.event_tags && params.event_tags !== '{EVENT.TAGS}') {
+                    facts.push({
+                        name: 'Event tags',
+                        value: params.event_tags
+                    });
+                }
+        
+                Object.keys(params)
+                    .forEach(function (key) {
+                        if (key.startsWith('fact_') && params[key] !== '') {
+                            facts.push({
+                                name: key.substring(5),
+                                value: params[key]
+                            });
+                        }
+                        else if (key.startsWith('openUri_') && params[key] !== '' && !params[key].startsWith('{')) {
+                            body.potentialAction.push({
+                                '@type': 'OpenUri',
+                                name: key.substring(8),
+                                targets: [
+                                    {
+                                        os: 'default',
+                                        uri: params[key]
+                                    }
+                                ]
+                            });
+                        }
+                    });
+                body.sections[0].facts = facts;
+            }
+        
+            body.sections[0].text = body.sections[0].text.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        
+            request.addHeader('Content-Type: application/json');
+        
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy !== '') {
+                request.setProxy(params.HTTPProxy);
+            }
+        
+            Zabbix.log(4, '[ MS Teams Webhook ] JSON: ' + JSON.stringify(body));
+        
+            var response = request.post(params.teams_endpoint, JSON.stringify(body));
+        
+            Zabbix.log(4, '[ MS Teams Webhook ] Response: ' + response);
+        
+            if (response === '1') {
+                return 'OK';
+            }
+            else {
+                Zabbix.log(4, '[ MS Teams Webhook ] FAILED with response: ' + response);
+                throw response;
+            }
+        }
+        catch (error) {
+            Zabbix.log(3, '[ MS Teams Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      message_templates:
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved: {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.

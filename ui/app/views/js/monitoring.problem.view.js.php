@@ -22,81 +22,160 @@
 /**
  * @var CView $this
  */
-?>
 
-<script type="text/x-jquery-tmpl" id="filter-inventory-row">
-	<?= (new CRow([
-			new CComboBox('filter_inventory[#{rowNum}][field]', null, null, $data['filter']['inventories']),
-			(new CTextBox('filter_inventory[#{rowNum}][value]'))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_inventory[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
+if (array_key_exists('filter_options', $data)) { ?>
+	<script type="text/javascript">
+	$(function() {
+		var options = <?= json_encode($data['filter_options']) ?>,
+			filter = new CTabFilter($('#monitoring_problem_filter')[0], options),
+			refresh_interval = <?= $data['refresh_interval'] ?>,
+			refresh_url = '<?= $data['refresh_url'] ?>',
+			refresh_timer,
+			filter_item,
+			filter_counter_fetch,
+			active_filter = filter._active_item,
+			global_timerange = {
+				from: options.timeselector.from,
+				to: options.timeselector.to
+			};
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= (new CRow([
-			(new CTextBox('filter_tags[#{rowNum}][tag]'))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('filter_tags[#{rowNum}][value]'))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
+		/**
+		 * Update on filter changes.
+		 */
+		filter.on(TABFILTER_EVENT_URLSET, () => {
+			let url = new Curl();
 
-<script type="text/javascript">
-	jQuery(function($) {
-		$(function() {
-			$('#filter-inventory').dynamicRows({template: '#filter-inventory-row'});
-			$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
+			url.setArgument('action', 'problem.view.csv');
+			$('#export_csv').attr('data-url', url.getUrl());
+			refreshResults();
+			refreshCounters();
+
+			if (active_filter !== filter._active_item) {
+				active_filter = filter._active_item;
+				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+				chkbxRange.clearSelectedOnFilterChange();
+			}
 		});
 
-		$('#filter_show').change(function() {
-			var	filter_show = jQuery('input[name=filter_show]:checked').val();
+		/**
+		 * Update filter item counter when filter settings updated.
+		 */
+		filter.on(TABFILTER_EVENT_UPDATE, (ev) => {
+			if (!filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
+				return;
+			}
 
-			$('#filter_age').closest('li').toggle(filter_show == <?= TRIGGERS_OPTION_RECENT_PROBLEM ?>
-				|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>);
+			if (filter_counter_fetch) {
+				filter_counter_fetch.abort();
+			}
+
+			filter_counter_fetch = new AbortController();
+			filter_item = filter._active_item;
+
+			fetch(refresh_url, {
+				method: 'POST',
+				signal: filter_counter_fetch.signal,
+				body: new URLSearchParams({filter_counters: 1, counter_index: filter_item._index})
+			})
+				.then(response => response.json())
+				.then(response => {
+					filter_item.updateCounter(response.filter_counters.pop());
+				});
 		});
 
-		$('#filter_show').trigger('change');
+		/**
+		 * Refresh results table via window.flickerfreeScreen.refresh call.
+		 */
+		function refreshResults() {
+			let url = new Curl(),
+				screen = window.flickerfreeScreen.screens['problem'],
+				data = $.extend(<?= json_encode($data['filter_defaults']) ?>,
+					global_timerange, url.getArgumentsObject()
+				);
 
-		$('#filter_compact_view').change(function() {
-			if ($(this).is(':checked')) {
-				$('#filter_show_timeline, #filter_details').prop('disabled', true);
-				$('input[name=filter_show_opdata]').prop('disabled', true);
-				$('#filter_highlight_row').prop('disabled', false);
+			data.inventory = data.inventory
+				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')
+				: data.inventory;
+			data.tags = data.tags
+				? data.tags.filter(tag => !(tag.tag === '' && tag.value === ''))
+				: data.tags;
+			data.severities = data.severities
+				? data.severities.filter((value, key) => value == key)
+				: data.severities;
+
+			// Modify filter data of flickerfreeScreen object with id 'problem'.
+			if (data.page === null) {
+				delete data.page;
+			}
+
+			if (data.filter_custom_time) {
+				screen.timeline.from = data.from;
+				screen.timeline.to = data.to;
 			}
 			else {
-				$('#filter_show_timeline, #filter_details').prop('disabled', false);
-				$('input[name=filter_show_opdata]').prop('disabled', false);
-				$('#filter_highlight_row').prop('disabled', true);
+				screen.timeline.from = global_timerange.from;
+				screen.timeline.to = global_timerange.to;
+			}
+
+			screen.data.filter = data;
+			screen.data.sort = data.sort;
+			screen.data.sortorder = data.sortorder;
+
+			// Close all opened hint boxes otherwise flicker free screen will not refresh it content.
+			for (var i = overlays_stack.length - 1; i >= 0; i--) {
+				let hintbox = overlays_stack.getById(overlays_stack.stack[i]);
+
+				if (hintbox.type === 'hintbox') {
+					hintBox.hideHint(hintbox.element, true);
+					removeFromOverlaysStack(overlays_stack.stack[i]);
+				}
+			}
+
+			window.flickerfreeScreen.refresh(screen.id);
+		}
+
+		function refreshCounters() {
+			clearTimeout(refresh_timer);
+
+			fetch(refresh_url, {
+				method: 'POST',
+				body: new URLSearchParams({filter_counters: 1})
+			})
+				.then(response => response.json())
+				.then(response => {
+					if (response.filter_counters) {
+						filter.updateCounters(response.filter_counters);
+					}
+
+					if (refresh_interval > 0) {
+						refresh_timer = setTimeout(refreshCounters, refresh_interval);
+					}
+				})
+				.catch(() => {
+					/**
+					 * On error restart refresh timer.
+					 * If refresh interval is set to 0 (no refresh) schedule initialization request after 5 sec.
+					 */
+					refresh_timer = setTimeout(refreshCounters, refresh_interval > 0 ? refresh_interval : 5000);
+				});
+		}
+
+		refreshCounters();
+
+		// Keep timeselector changes in global_timerange.
+		$.subscribe('timeselector.rangeupdate', (e, data) => {
+			if (data.idx === '<?= CControllerProblem::FILTER_IDX ?>') {
+				global_timerange.from = data.from;
+				global_timerange.to = data.to;
 			}
 		});
-
-		$('#filter_show_tags').change(function() {
-			var disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
-			$('#filter_tag_priority').prop('disabled', disabled);
-			$('#filter_tag_name_format input').prop('disabled', disabled);
-		});
-
+	});
+	</script>
+<?php
+}
+?>
+<script type="text/javascript">
+	jQuery(function($) {
 		$(document).on({
 			mouseenter: function() {
 				if ($(this)[0].scrollWidth > $(this)[0].offsetWidth) {

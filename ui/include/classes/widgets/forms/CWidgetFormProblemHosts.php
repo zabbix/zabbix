@@ -24,8 +24,8 @@
  */
 class CWidgetFormProblemHosts extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_PROBLEM_HOSTS);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_PROBLEM_HOSTS);
 
 		$this->data = self::convertDottedKeys($this->data);
 

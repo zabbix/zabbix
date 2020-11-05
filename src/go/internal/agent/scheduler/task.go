@@ -194,7 +194,7 @@ func (t *exporterTask) perform(s Scheduler) {
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	var nextcheck time.Time
-	nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
+	nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now)
 	if err != nil {
 		return
 	}

@@ -30,6 +30,10 @@ function getMenuPopupHistory(options) {
 	var items = [],
 		url = new Curl('history.php', false);
 
+	if (!options.allowed_ui_latest_data) {
+		return [];
+	}
+
 	url.setArgument('itemids[]', options.itemid);
 
 	// latest graphs
@@ -73,23 +77,28 @@ function getMenuPopupHistory(options) {
 /**
  * Get menu popup host section data.
  *
- * @param {string} options['hostid']             Host ID.
- * @param {array}  options['scripts']            Host scripts (optional).
- * @param {string} options[]['name']             Script name.
- * @param {string} options[]['scriptid']         Script ID.
- * @param {string} options[]['confirmation']     Confirmation text.
- * @param {bool}   options['showGraphs']         Link to Monitoring->Hosts->Graphs page.
- * @param {bool}   options['showScreens']        Link to Monitoring->Screen page.
- * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
- * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
- * @param {bool}   options['hasGoTo']            "Go to" block in popup.
- * @param {array}  options['severities']         (optional)
- * @param {bool}   options['show_suppressed']    (optional)
- * @param {array}  options['urls']               (optional)
+ * @param {string} options['hostid']                  Host ID.
+ * @param {array}  options['scripts']                 Host scripts (optional).
+ * @param {string} options[]['name']                  Script name.
+ * @param {string} options[]['scriptid']              Script ID.
+ * @param {string} options[]['confirmation']          Confirmation text.
+ * @param {bool}   options['showGraphs']              Link to Monitoring->Hosts->Graphs page.
+ * @param {bool}   options['showDashboards']          Link to Monitoring->Hosts->Dashboards page.
+ * @param {bool}   options['showWeb']		          Link to Monitoring->Hosts->Web page.
+ * @param {bool}   options['showTriggers']            Link to Monitoring->Problems page.
+ * @param {bool}   options['hasGoTo']                 "Go to" block in popup.
+ * @param {array}  options['severities']              (optional)
+ * @param {bool}   options['show_suppressed']         (optional)
+ * @param {array}  options['urls']                    (optional)
  * @param {string} options['url'][]['label']
  * @param {string} options['url'][]['url']
- * @param {string} options['filter_application'] (optional) Application name for filter by application.
- * @param {object} trigger_elmnt                 UI element which triggered opening of overlay dialogue.
+ * @param {string} options['filter_application']      (optional) Application name for filter by application.
+ * @param {bool}   options['allowed_ui_inventory']    Whether user has access to inventory hosts page.
+ * @param {bool}   options['allowed_ui_latest_data']  Whether user has access to latest data page.
+ * @param {bool}   options['allowed_ui_problems']     Whether user has access to problems page.
+ * @param {bool}   options['allowed_ui_hosts']        Whether user has access to monitoring hosts pages.
+ * @param {bool}   options['allowed_ui_conf_hosts']   Whether user has access to configuration hosts page.
+ * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -110,8 +119,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs = {
 				label: t('Graphs')
 			},
-			screens = {
-				label: t('Screens')
+			dashboards = {
+				label: t('Dashboards')
 			},
 			web = {
 				label: t('Web')
@@ -138,17 +147,18 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		else {
 			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
-			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('filter_name', '');
+			url.setArgument('hostids[]', options.hostid);
 			if (typeof options.severities !== 'undefined') {
-				url.setArgument('filter_severities[]', options.severities);
+				url.setArgument('severities[]', options.severities);
 			}
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-				url.setArgument('filter_show_suppressed', '1');
+				url.setArgument('show_suppressed', '1');
 			}
 			if (typeof options.filter_application !== 'undefined') {
-				url.setArgument('filter_application', options.filter_application);
+				url.setArgument('application', options.filter_application);
 			}
-			url.setArgument('filter_set', '1');
+
 			problems.url = url.getUrl();
 		}
 
@@ -166,14 +176,15 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs.url = graphs_url.getUrl();
 		}
 
-		if (!options.showScreens) {
-			screens.disabled = true;
+		if (!options.showDashboards) {
+			dashboards.disabled = true;
 		}
 		else {
-			var screens_url = new Curl('host_screen.php', false);
+			var dashboards_url = new Curl('zabbix.php', false);
 
-			screens_url.setArgument('hostid', options.hostid);
-			screens.url = screens_url.getUrl();
+			dashboards_url.setArgument('action', 'host.dashboard.view')
+			dashboards_url.setArgument('hostid', options.hostid)
+			dashboards.url = dashboards_url.getUrl();
 		}
 
 		if (!options.showWeb) {
@@ -187,16 +198,27 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			web.url = web_url.getUrl();
 		}
 
-		var items = [
-			host_inventory,
-			latest_data,
-			problems,
-			graphs,
-			screens,
-			web
-		];
+		var items = [];
 
-		if (options.showConfig) {
+		if (options.allowed_ui_inventory) {
+			items.push(host_inventory);
+		}
+
+		if (options.allowed_ui_latest_data) {
+			items.push(latest_data);
+		}
+
+		if (options.allowed_ui_problems) {
+			items.push(problems);
+		}
+
+		if (options.allowed_ui_hosts) {
+			items.push(graphs);
+			items.push(dashboards);
+			items.push(web);
+		}
+
+		if (options.allowed_ui_conf_hosts) {
 			var config = {
 				label: t('Configuration')
 			};
@@ -214,10 +236,12 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			items.push(config);
 		}
 
-		sections.push({
-			label: t('Host'),
-			items: items
-		});
+		if (items.length) {
+			sections.push({
+				label: t('Host'),
+				items: items
+			});
+		}
 	}
 
 	// urls
@@ -260,6 +284,10 @@ function getMenuPopupMapElementSubmap(options) {
 			', "' + options.widget_uniqueid + '");', false);
 	}
 	else {
+		if (!options.allowed_ui_maps) {
+			return [];
+		}
+
 		submap_url = new Curl('zabbix.php', false);
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
@@ -301,21 +329,25 @@ function getMenuPopupMapElementSubmap(options) {
  * @return array
  */
 function getMenuPopupMapElementGroup(options) {
+	if (!options.allowed_ui_problems) {
+		return [];
+	}
+
 	var sections = [],
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_groupids[]', options.groupid);
+	problems_url.setArgument('filter_name', '');
+	problems_url.setArgument('groupids[]', options.groupid);
 	if (typeof options.severities !== 'undefined') {
-		problems_url.setArgument('filter_severities[]', options.severities);
+		problems_url.setArgument('severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-		problems_url.setArgument('filter_show_suppressed', '1');
+		problems_url.setArgument('show_suppressed', '1');
 	}
 	if (typeof options.filter_application !== 'undefined') {
-		problems_url.setArgument('filter_application', options.filter_application);
+		problems_url.setArgument('application', options.filter_application);
 	}
-	problems_url.setArgument('filter_set', '1');
 
 	sections.push({
 		label: t('Go to'),
@@ -349,18 +381,22 @@ function getMenuPopupMapElementGroup(options) {
  * @return array
  */
 function getMenuPopupMapElementTrigger(options) {
+	if (!options.allowed_ui_problems) {
+		return [];
+	}
+
 	var sections = [],
 		problems_url = new Curl('zabbix.php', false);
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_triggerids[]', options.triggerids);
+	problems_url.setArgument('filter_name', '');
+	problems_url.setArgument('triggerids[]', options.triggerids);
 	if (typeof options.severities !== 'undefined') {
-		problems_url.setArgument('filter_severities[]', options.severities);
+		problems_url.setArgument('severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-		problems_url.setArgument('filter_show_suppressed', '1');
+		problems_url.setArgument('show_suppressed', '1');
 	}
-	problems_url.setArgument('filter_set', '1');
 
 	sections.push({
 		label: t('Go to'),
@@ -551,28 +587,33 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	var $dashboard = jQuery('.dashbrd-grid-container'),
+		dashboard_data = $dashboard.dashboardGrid('getDashboardData'),
 		editMode = $dashboard.dashboardGrid('isEditMode'),
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
-		widget_actions = [];
+		widget_actions = [],
+		menu;
 
 	options.widgetid = widgetid;
-	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
+	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
 
-	widget_actions.push({
-		label: t('S_COPY'),
-		clickCallback: function() {
-			jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
-			jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
-			jQuery('#dashbrd-paste-widget').attr('disabled', false);
-		}
-	});
+	// Do not show "Copy" action for host dashboards.
+	if ($dashboard.data('dashboardGrid')['options']['allowed_edit']
+			&& (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null)) {
+		widget_actions.push({
+			label: t('S_COPY'),
+			clickCallback: function() {
+				jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			}
+		});
+	}
 
 	if (editMode) {
 		widget_actions.push({
 			label: t('S_PASTE'),
-			disabled: !$dashboard.dashboardGrid('isWidgetCopied'),
+			disabled: ($dashboard.dashboardGrid('getCopiedWidget') === null),
 			clickCallback: function() {
 				$dashboard.dashboardGrid('pasteWidget', widget, widget.pos);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
@@ -651,10 +692,10 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 			{
 				label: t('Sharing'),
 				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
 					var popup_options = {'dashboardid': options.dashboardid};
 					PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
-
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 				},
 				disabled: !options.editable
 			},
@@ -668,12 +709,8 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 			},
 			{
 				label: t('Delete'),
-				url: 'javascript:void(0)',
 				clickCallback: function () {
-					var	obj = jQuery(this);
-
-					// hide menu
-					obj.closest('.menu-popup').hide();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
 					if (!confirm(t('Delete dashboard?'))) {
 						return false;
@@ -707,27 +744,29 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	var sections = [],
 		items = [];
 
-	// events
-	var events = {
-		label: t('Problems')
-	};
+	if (options.allowed_ui_problems) {
+		// events
+		var events = {
+			label: t('Problems')
+		};
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_triggerids[]', options.triggerid);
-		url.setArgument('filter_set', '1');
+		url.setArgument('filter_name', '');
+		url.setArgument('triggerids[]', options.triggerid);
 
-		events.url = url.getUrl();
-	}
-	else {
-		events.disabled = true;
-	}
+			events.url = url.getUrl();
+		}
+		else {
+			events.disabled = true;
+		}
 
-	items[items.length] = events;
+		items[items.length] = events;
+	}
 
 	// acknowledge
-	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
+	if (options.allowed_ack && typeof options.acknowledge !== 'undefined' && options.acknowledge) {
 		items[items.length] = {
 			label: t('Acknowledge'),
 			clickCallback: function() {
@@ -739,7 +778,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	}
 
 	// configuration
-	if (typeof options.configuration !== 'undefined' && options.configuration) {
+	if (options.allowed_ui_conf_hosts) {
 		var url = new Curl('triggers.php', false);
 
 		url.setArgument('form', 'update');
@@ -751,10 +790,12 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
-	sections[sections.length] = {
-		label: t('S_TRIGGER'),
-		items: items
-	};
+	if (items.length) {
+		sections[sections.length] = {
+			label: t('S_TRIGGER'),
+			items: items
+		};
+	}
 
 	// urls
 	if ('urls' in options) {
@@ -765,7 +806,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	}
 
 	// items
-	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
+	if (options.allowed_ui_latest_data && typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {
@@ -1570,6 +1611,12 @@ jQuery(function($) {
 
 		if (options.class) {
 			link.addClass(options.class);
+		}
+
+		if ('dataAttributes' in options) {
+			$.each(options.dataAttributes, function(key, value) {
+				link.attr((key.substr(0, 5) === 'data-') ? key : 'data-' + key, value);
+			});
 		}
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {

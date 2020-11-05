@@ -790,7 +790,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			zbx_timespec(&ts);
 			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags, NULL, &ts,
 					state, error);
-			DCrequeue_items(&items[i].itemid, &state, &ts.sec, &errcode, 1);
+			DCrequeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
 			zbx_free(error);
 			continue;
 		}
@@ -963,7 +963,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 	zbx_free(value);
 
 	/* put back the item in configuration cache IPMI poller queue */
-	DCrequeue_items(&itemid, &state, &ts.sec, &errcode, 1);
+	DCrequeue_items(&itemid, &ts.sec, &errcode, 1);
 
 	ipmi_poller_free_request(poller);
 	ipmi_manager_process_poller_queue(manager, poller, now);

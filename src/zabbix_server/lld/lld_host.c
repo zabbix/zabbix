@@ -107,6 +107,7 @@ typedef struct
 		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
 #define ZBX_FLAG_LLD_INTERFACE_REMOVE		__UINT64_C(0x00000080)	/* interfaces which should be deleted */
 #define ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE	__UINT64_C(0x00000100)	/* snmp data which should be deleted */
+#define ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS	__UINT64_C(0x00000200)	/* there is snmp data */
 	zbx_uint64_t	flags;
 	union _data
 	{
@@ -122,7 +123,7 @@ static void	lld_interface_free(zbx_lld_interface_t *interface)
 	zbx_free(interface->dns);
 	zbx_free(interface->ip);
 
-	if (INTERFACE_TYPE_SNMP == interface->type)
+	if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 	{
 		zbx_free(interface->data.snmp->community);
 		zbx_free(interface->data.snmp->securityname);
@@ -165,6 +166,7 @@ typedef struct
 #define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field should be updated */
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
@@ -173,12 +175,13 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS | ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT | ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT | ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY |	\
-		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK)
+		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK | ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES)
 	zbx_uint64_t		flags;
 	const struct zbx_json_parse	*jp_row;
 	char			inventory_mode;
 	char			inventory_mode_orig;
 	unsigned char		status;
+	unsigned char		custom_interfaces;
 }
 zbx_lld_host_t;
 
@@ -350,7 +353,8 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 	result = DBselect(
 			"select hd.hostid,hd.host,hd.lastcheck,hd.ts_delete,h.host,h.name,h.proxy_hostid,"
 				"h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,hi.inventory_mode,"
-				"h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
+				"h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,"
+				"h.custom_interfaces"
 			" from host_discovery hd"
 				" join hosts h"
 					" on hd.hostid=h.hostid"
@@ -372,6 +376,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->name = zbx_strdup(NULL, row[5]);
 		host->name_orig = NULL;
 		host->flags = 0x00;
+		ZBX_STR2UCHAR(host->custom_interfaces, row[18]);
 
 		ZBX_DBROW2UINT64(db_proxy_hostid, row[6]);
 		if (db_proxy_hostid != proxy_hostid)
@@ -703,7 +708,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros,
-		char **info)
+		char **info, unsigned char custom_iface)
 {
 	char			*buffer = NULL;
 	int			i;
@@ -744,6 +749,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		host->status = status_proto;
 		host->inventory_mode = inventory_mode_proto;
+		host->custom_interfaces = custom_iface;
 
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
@@ -786,6 +792,12 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		}
 
 		host->inventory_mode = inventory_mode_proto;
+
+		if (host->custom_interfaces != custom_iface)
+		{
+			host->custom_interfaces = custom_iface;
+			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES;
+		}
 
 		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, &tmp_tags,
 				NULL, &discover_proto);
@@ -2556,10 +2568,11 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				upd_interfaces++;
 			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
-			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
+
+			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 
-			if (INTERFACE_TYPE_SNMP == interface->type)
+			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 			{
 				if (0 == interface->interfaceid)
 					interface->data.snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE;
@@ -2621,7 +2634,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "proxy_hostid", "ipmi_authtype",
 				"ipmi_privilege", "ipmi_username", "ipmi_password", "status", "flags", "tls_connect",
-				"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", NULL);
+				"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk",
+				"custom_interfaces", NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host", NULL);
 	}
@@ -2686,7 +2700,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_db_insert_add_values(&db_insert, host->hostid, host->host, host->name, proxy_hostid,
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
-					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk);
+					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
+					host->custom_interfaces);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 
@@ -2805,8 +2820,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk='%s'", d, value_esc);
+					d = ",";
 
 					zbx_free(value_esc);
+				}
+				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+							"%scustom_interfaces=%d", d, (int)host->custom_interfaces);
 				}
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 						host->hostid);
@@ -2895,7 +2916,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
 			}
 
-			if (INTERFACE_TYPE_SNMP == interface->type)
+			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS))
 			{
 				if (0 != (interface->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_CREATE))
 				{
@@ -3410,26 +3431,42 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
  *                                                                            *
  * Function: lld_interfaces_get                                               *
  *                                                                            *
- * Purpose: retrieves list of interfaces from the lld rule's host             *
+ * Purpose: retrieves either the list of interfaces from the lld rule's host  *
+ *          or the list of custom interfaces defined for the host prototype   *
  *                                                                            *
  ******************************************************************************/
-static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interfaces)
+static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, unsigned char custom_interfaces)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_lld_interface_t	*interface;
 
-	result = DBselect(
-			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,"
-			"s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
-			"s.authprotocol,s.privprotocol,s.contextname"
-			" from interface hi"
-			" inner join items i"
-				" on hi.hostid=i.hostid "
-			" left join interface_snmp s"
-				" on hi.interfaceid=s.interfaceid"
-			" where i.itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+	if (ZBX_HOST_PROT_INTERFACES_INHERIT == custom_interfaces)
+	{
+		result = DBselect(
+				"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,"
+				"s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
+				"s.authprotocol,s.privprotocol,s.contextname"
+				" from interface hi"
+				" inner join items i"
+					" on hi.hostid=i.hostid "
+				" left join interface_snmp s"
+					" on hi.interfaceid=s.interfaceid"
+				" where i.itemid=" ZBX_FS_UI64,
+				id);
+	}
+	else
+	{
+		result = DBselect(
+				"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,"
+				"s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
+				"s.authprotocol,s.privprotocol,s.contextname"
+				" from interface hi"
+				" left join interface_snmp s"
+					" on hi.interfaceid=s.interfaceid"
+				" where hi.hostid=" ZBX_FS_UI64,
+				id);
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -3459,9 +3496,13 @@ static void	lld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interf
 			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
 			snmp->contextname = zbx_strdup(NULL, row[16]);
 			interface->data.snmp = snmp;
+			interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 		}
 		else
+		{
 			interface->data.snmp = NULL;
+			interface->flags = 0x00;
+		}
 
 		zbx_vector_ptr_append(interfaces, interface);
 	}
@@ -3548,13 +3589,13 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 
 			if (snmp->version != snmp_type)
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_TYPE;
-			if (snmp->bulk!= bulk)
+			if (snmp->bulk != bulk)
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK;
 			if (0 != strcmp(snmp->community, community))
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_COMMUNITY;
 			if (0 != strcmp(snmp->securityname, securityname))
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECNAME;
-			if (snmp->securitylevel!= securitylevel)
+			if (snmp->securitylevel != securitylevel)
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_SECLEVEL;
 			if (0 != strcmp(snmp->authpassphrase, authpassphrase))
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS;
@@ -3580,9 +3621,11 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
  *                               should be present on the each                *
  *                               discovered host                              *
  *             hosts      - [IN/OUT] sorted list of hosts                     *
+ *             lld_macros - [IN] list of LLD macros                           *
  *                                                                            *
  ******************************************************************************/
-static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts)
+static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts,
+		const zbx_vector_ptr_t *lld_macros)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -3604,6 +3647,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			continue;
 
 		zbx_vector_ptr_reserve(&host->interfaces, interfaces->values_num);
+
 		for (j = 0; j < interfaces->values_num; j++)
 		{
 			interface = (zbx_lld_interface_t *)interfaces->values[j];
@@ -3618,7 +3662,10 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->ip = zbx_strdup(NULL, interface->ip);
 			new_interface->dns = zbx_strdup(NULL, interface->dns);
 			new_interface->port = zbx_strdup(NULL, interface->port);
-			new_interface->flags = 0x00;
+
+			substitute_lld_macros(&new_interface->ip, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&new_interface->dns, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&new_interface->port, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -3635,11 +3682,25 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 				snmp->authprotocol = interface->data.snmp->authprotocol;
 				snmp->privprotocol = interface->data.snmp->privprotocol;
 				snmp->contextname = zbx_strdup(NULL, interface->data.snmp->contextname);
-				snmp->flags = 0x00;
+				new_interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 				new_interface->data.snmp = snmp;
+
+				substitute_lld_macros(&snmp->community, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->securityname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->authpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->privpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->contextname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
 			}
 			else
+			{
+				new_interface->flags = 0x00;
 				new_interface->data.snmp = NULL;
+			}
 
 			zbx_vector_ptr_append(&host->interfaces, new_interface);
 		}
@@ -3827,7 +3888,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 								zbx_interface_type_string(interface->type_orig),
 								host->host);
 
-						/* return an original interface type and drop the correspond flag */
+						/* return an original interface type and drop the corresponding flag */
 						interface->type = interface->type_orig;
 						interface->flags &= ~ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE;
 					}
@@ -3890,7 +3951,7 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 							" the interface is used by items.\n",
 							zbx_interface_type_string(interface->type), host->host);
 
-					/* drop the correspond flag */
+					/* drop the corresponding flag */
 					interface->flags &= ~ZBX_FLAG_LLD_INTERFACE_REMOVE;
 
 					if (SUCCEED == another_main_interface_exists(&host->interfaces, interface))
@@ -3988,11 +4049,11 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_vector_ptr_create(&hostmacros);
 	zbx_vector_db_tag_ptr_create(&tags);
 
-	lld_interfaces_get(lld_ruleid, &interfaces);
+	lld_interfaces_get(lld_ruleid, &interfaces, 0);
 	lld_masterhostmacros_get(lld_ruleid, &masterhostmacros);
 
 	result = DBselect(
-			"select h.hostid,h.host,h.name,h.status,h.discover,hi.inventory_mode"
+			"select h.hostid,h.host,h.name,h.status,h.discover,hi.inventory_mode,h.custom_interfaces"
 			" from hosts h,host_discovery hd"
 				" left join host_inventory hi"
 					" on hd.hostid=hi.hostid"
@@ -4002,17 +4063,20 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	parent_hostid;
-		const char	*host_proto, *name_proto;
-		zbx_lld_host_t	*host;
-		unsigned char	status, discover;
-		int		i;
+		zbx_uint64_t		parent_hostid;
+		const char		*host_proto, *name_proto;
+		zbx_lld_host_t		*host;
+		unsigned char		status, discover, use_custom_interfaces;
+		int			i;
+		zbx_vector_ptr_t	interfaces_custom;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
 		host_proto = row[1];
 		name_proto = row[2];
 		ZBX_STR2UCHAR(status, row[3]);
 		ZBX_STR2UCHAR(discover, row[4]);
+		ZBX_STR2UCHAR(use_custom_interfaces, row[6]);
+
 		if (SUCCEED == DBis_null(row[5]))
 			inventory_mode_proto = HOST_INVENTORY_DISABLED;
 		else
@@ -4037,7 +4101,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-					status, discover, &tags, lld_row, lld_macro_paths, error)))
+					status, discover, &tags, lld_row, lld_macro_paths, error, use_custom_interfaces)))
 			{
 				continue;
 			}
@@ -4050,7 +4114,15 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		lld_groups_validate(&groups, error);
 		lld_hosts_validate(&hosts, error);
 
-		lld_interfaces_make(&interfaces, &hosts);
+		if (ZBX_HOST_PROT_INTERFACES_CUSTOM == use_custom_interfaces)
+		{
+			zbx_vector_ptr_create(&interfaces_custom);
+			lld_interfaces_get(parent_hostid, &interfaces_custom, 1);
+			lld_interfaces_make(&interfaces_custom, &hosts, lld_macro_paths);
+		}
+		else
+			lld_interfaces_make(&interfaces, &hosts, lld_macro_paths);
+
 		lld_interfaces_validate(&hosts, error);
 
 		lld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
@@ -4077,6 +4149,12 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		zbx_vector_uint64_clear(&groupids);
 		zbx_vector_uint64_clear(&del_hostgroupids);
+
+		if (ZBX_HOST_PROT_INTERFACES_CUSTOM == use_custom_interfaces)
+		{
+			zbx_vector_ptr_clear_ext(&interfaces_custom, (zbx_clean_func_t)lld_interface_free);
+			zbx_vector_ptr_destroy(&interfaces_custom);
+		}
 	}
 	DBfree_result(result);
 

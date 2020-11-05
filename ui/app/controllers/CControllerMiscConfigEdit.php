@@ -27,7 +27,6 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'refresh_unsupported' =>			'db config.refresh_unsupported',
 			'discovery_groupid' =>				'db config.discovery_groupid',
 			'default_inventory_mode' =>			'db config.default_inventory_mode',
 			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
@@ -56,14 +55,11 @@ class CControllerMiscConfigEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {
 		$data = [
-			'refresh_unsupported' => $this->getInput('refresh_unsupported', CSettingsHelper::get(
-				CSettingsHelper::REFRESH_UNSUPPORTED
-			)),
 			'discovery_groupid' => $this->getInput('discovery_groupid', CSettingsHelper::get(
 				CSettingsHelper::DISCOVERY_GROUPID
 			)),

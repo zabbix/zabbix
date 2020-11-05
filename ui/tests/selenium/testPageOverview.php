@@ -610,7 +610,7 @@ class testPageOverview extends CLegacyWebTest {
 				[
 					'type' => 'Trigger overview',
 					'links' => [
-						'zabbix.php?action=problem.view&filter_triggerids',
+						'zabbix.php?action=problem.view&filter_name=&triggerids',
 						'triggers.php?form=update&triggerid',
 						'action=showgraph&itemid'
 					],
@@ -677,7 +677,7 @@ class testPageOverview extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title']");
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 
-			$this->webDriver->executeScript('arguments[0].click();', [$this->webDriver->findElement(WebDriverBy::className('btn-min'))]);
+			$this->query('class:btn-min')->one()->forceClick();
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-kiosk')]"));
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');

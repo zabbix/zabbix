@@ -1,9 +1,9 @@
 
-# Template Module Windows CPU by Zabbix agent active
+# Windows CPU by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -49,17 +49,17 @@ There are no template links in this template.
 |High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:system.cpu.util.min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
 |CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m) |<p>"The CPU Interrupt Time in the last 5 minutes exceeds {$CPU.INTERRUPT.CRIT.MAX}%."</p><p>The Processor Information\% Interrupt Time is the time the processor spends receiving and servicing </p><p>hardware interrupts during sample intervals. This value is an indirect indicator of the activity of </p><p>devices that generate interrupts, such as the system clock, the mouse, disk drivers, data communication </p><p>lines, network interface cards and other peripheral devices. This is an easy way to identify a potential </p><p>hardware failure. This should never be higher than 20%.</p> |`{TEMPLATE_NAME:perf_counter_en["\Processor Information(_total)\% Interrupt Time"].min(5m)}>{$CPU.INTERRUPT.CRIT.MAX}` |WARNING |<p>**Depends on**:</p><p>- High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</p> |
 |CPU privileged time is too high (over {$CPU.PRIV.CRIT.MAX}% for 5m) |<p>The CPU privileged time in the last 5 minutes exceeds {$CPU.PRIV.CRIT.MAX}%.</p> |`{TEMPLATE_NAME:perf_counter_en["\Processor Information(_total)\% Privileged Time"].min(5m)}>{$CPU.PRIV.CRIT.MAX}` |WARNING |<p>**Depends on**:</p><p>- CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)</p><p>- High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</p> |
-|CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m) |<p>The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.</p> |`{TEMPLATE_NAME:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Template Module Windows CPU by Zabbix agent active:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 > {$CPU.QUEUE.CRIT.MAX}` |WARNING |<p>**Depends on**:</p><p>- High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</p> |
+|CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m) |<p>The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.</p> |`{TEMPLATE_NAME:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Windows CPU by Zabbix agent active:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 > {$CPU.QUEUE.CRIT.MAX}` |WARNING |<p>**Depends on**:</p><p>- High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Windows memory by Zabbix agent active
+# Windows memory by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -107,7 +107,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util.min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free) |<p>This trigger is ignored, if there is no swap configured</p> |`{TEMPLATE_NAME:system.swap.pfree.min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p> |
+|High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free) |<p>This trigger is ignored, if there is no swap configured</p> |`{TEMPLATE_NAME:system.swap.pfree.min(5m)}<{$SWAP.PFREE.MIN.WARN} and {Windows memory by Zabbix agent active:system.swap.size[,total].last()}>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p> |
 |Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m) |<p>The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.</p> |`{TEMPLATE_NAME:perf_counter_en["\Memory\Free System Page Table Entries"].max(5m)}<{$MEM.PAGE_TABLE_CRIT.MIN}` |WARNING |<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p> |
 |The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m) |<p>The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</p> |`{TEMPLATE_NAME:perf_counter_en["\Memory\Pages/sec"].min(5m)}>{$MEM.PAGE_SEC.CRIT.MAX}` |WARNING |<p>**Depends on**:</p><p>- High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)</p> |
 
@@ -115,11 +115,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Windows filesystems by Zabbix agent active
+# Windows filesystems by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -164,18 +164,18 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})<5G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
-|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})<10G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p> |
+|{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 5G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and (({Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})<5G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |AVERAGE |<p>Manual close: YES</p> |
+|{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%) |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than 10G.</p><p> - The disk will be full in less than 24 hours.</p> |`{TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].last()}>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and (({Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})<10G or {TEMPLATE_NAME:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}<1d)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Windows physical disks by Zabbix agent active
+# Windows physical disks by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -222,11 +222,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Windows generic by Zabbix agent active
+# Windows generic by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -273,11 +273,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Windows network by Zabbix agent active
+# Windows network by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -309,7 +309,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interfaces discovery |<p>Discovery of installed network interfaces.</p> |DEPENDENT |net.if.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `output = JSON.parse(value).map(function(net){     return {         "{#IFNAME}": net.Name,         "{#IFDESCR}": net.Description,         "{#IFALIAS}" : net.NetConnectionID     }}) return JSON.stringify({"data": output})`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- C: {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- D: {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- E: {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- F: {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- G: {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- H: {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p> |
+|Network interfaces discovery |<p>Discovery of installed network interfaces.</p> |DEPENDENT |net.if.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- C: {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- D: {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- E: {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- F: {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- G: {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- H: {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -321,29 +321,29 @@ There are no template links in this template.
 |Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded |<p>The number of outgoing packets dropped on the network interface.</p> |ZABBIX_ACTIVE |net.if.out["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors |<p>The number of incoming packets with errors on the network interface.</p> |ZABBIX_ACTIVE |net.if.in["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors |<p>The number of outgoing packets with errors on the network interface.</p> |ZABBIX_ACTIVE |net.if.out["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Speed |<p>Estimated bandwidth of the network interface if any.</p> |DEPENDENT |net.if.speed["{#IFNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#IFNAME}")].Speed.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- JAVASCRIPT: `return (value=='9223372036854775807' ? 0 : value) `</p> |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Interface type |<p>The type of the network interface.</p> |DEPENDENT |net.if.type["{#IFNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#IFNAME}")].AdapterTypeId.first()`</p> |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Operational status |<p>The operational status of the network interface.</p> |DEPENDENT |net.if.status["{#IFNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#IFNAME}")].NetConnectionStatus.first()`</p> |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Speed |<p>Estimated bandwidth of the network interface if any.</p> |DEPENDENT |net.if.speed["{#IFNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#IFNAME}")].Speed.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- JAVASCRIPT: `return (value=='9223372036854775807' ? 0 : value) `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Interface type |<p>The type of the network interface.</p> |DEPENDENT |net.if.type["{#IFNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#IFNAME}")].AdapterTypeId.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Operational status |<p>The operational status of the network interface.</p> |DEPENDENT |net.if.status["{#IFNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#IFNAME}")].NetConnectionStatus.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Zabbix_raw_items |Network interfaces WMI get |<p>Raw data of win32_networkadapter.</p> |ZABBIX_ACTIVE |wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% ) |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`({TEMPLATE_NAME:net.if.in["{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} or {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}) and {Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}>0`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.in["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
-|Interface {#IFNAME}({#IFALIAS}): High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m) |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"} or {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`{TEMPLATE_NAME:net.if.speed["{#IFNAME}"].change()}<0 and {TEMPLATE_NAME:net.if.speed["{#IFNAME}"].last()}>0 and ( {Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=6 or {Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=7 or {Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=11 or {Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=62 or {Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=69 or {Template Module Windows network by Zabbix agent active:net.if.type["{#IFNAME}"].last()}=117 ) and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}<>2)`<p>Recovery expression:</p>`({TEMPLATE_NAME:net.if.speed["{#IFNAME}"].change()}>0 and {TEMPLATE_NAME:net.if.speed["{#IFNAME}"].prev()}>0) or ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
+|Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% ) |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`({TEMPLATE_NAME:net.if.in["{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} or {Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}) and {Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}>0`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.in["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()} and {Windows network by Zabbix agent active:net.if.out["{#IFNAME}"].avg(15m)}<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Windows network by Zabbix agent active:net.if.speed["{#IFNAME}"].last()}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
+|Interface {#IFNAME}({#IFALIAS}): High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m) |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"} or {Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and {Windows network by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
+|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`{TEMPLATE_NAME:net.if.speed["{#IFNAME}"].change()}<0 and {TEMPLATE_NAME:net.if.speed["{#IFNAME}"].last()}>0 and {Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
 |Interface {#IFNAME}({#IFALIAS}): Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:\"{#IFNAME}\"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important.</p><p>    No new trigger will be fired if this interface is down.</p><p>3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status is different from Connected(2).</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and ({TEMPLATE_NAME:net.if.status["{#IFNAME}"].last()}<>2 and {TEMPLATE_NAME:net.if.status["{#IFNAME}"].diff()}=1)`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.status["{#IFNAME}"].last()}=2 or {$IFCONTROL:"{#IFNAME}"}=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Windows services by Zabbix agent active
+# Windows services by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 Special version of services template that is required for Windows OS.
 
 ## Setup
@@ -389,11 +389,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template OS Windows by Zabbix agent active
+# Windows by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 New official Windows template. Requires agent of Zabbix 4.4 and newer.
 
 
@@ -416,14 +416,14 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Windows CPU by Zabbix agent active |
-|Template Module Windows filesystems by Zabbix agent active |
-|Template Module Windows generic by Zabbix agent active |
-|Template Module Windows memory by Zabbix agent active |
-|Template Module Windows network by Zabbix agent active |
-|Template Module Windows physical disks by Zabbix agent active |
-|Template Module Windows services by Zabbix agent active |
-|Template Module Zabbix agent |
+|Windows CPU by Zabbix agent active |
+|Windows filesystems by Zabbix agent active |
+|Windows generic by Zabbix agent active |
+|Windows memory by Zabbix agent active |
+|Windows network by Zabbix agent active |
+|Windows physical disks by Zabbix agent active |
+|Windows services by Zabbix agent active |
+|Zabbix agent |
 
 ## Discovery rules
 

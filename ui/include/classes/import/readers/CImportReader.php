@@ -22,7 +22,7 @@
 abstract class CImportReader {
 
 	/**
-	 * convert string with data in format supported by reader to php array.
+	 * Convert string with data in format supported by reader to php array.
 	 *
 	 * @abstract
 	 *

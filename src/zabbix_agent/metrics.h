@@ -49,7 +49,6 @@ typedef struct
 	unsigned char		skip_old_data;	/* for processing [event]log metrics */
 	unsigned char		flags;
 	unsigned char		state;
-	unsigned char		refresh_unsupported;	/* re-check notsupported item */
 	int			big_rec;	/* for logfile reading: 0 - normal record, 1 - long unfinished record */
 	int			use_ino;	/* 0 - do not use inodes (on FAT, FAT32) */
 						/* 1 - use inodes (up to 64-bit) (various UNIX file systems, NTFS) */

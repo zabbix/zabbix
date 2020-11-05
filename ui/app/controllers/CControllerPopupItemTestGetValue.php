@@ -46,12 +46,14 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
+			'script'				=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
 			'privatekey'			=> 'string',
 			'publickey'				=> 'string',
 			'query_fields'			=> 'array',
+			'parameters'			=> 'array',
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'snmp_oid'				=> 'string',
@@ -73,7 +75,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', 0));
+			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->item_type = $this->getInput('item_type');
 			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
@@ -109,15 +111,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			$interface = $this->getInput('interface', []);
 
 			if (array_key_exists($this->item_type, $this->items_require_interface)) {
-				if ($this->items_require_interface[$this->item_type]['address']
-						&& (!array_key_exists('address', $interface) || $interface['address'] === '')) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
-					$ret = false;
-				}
-
-				if ($this->items_require_interface[$this->item_type]['port']
-						&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+				if (!$this->validateInterface($interface)) {
 					$ret = false;
 				}
 			}
@@ -146,7 +140,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		// Get post data for particular item type.
 		$data = $this->getItemTestProperties($this->getInputAll());
 
-		// Apply efective macros values to properties.
+		// Apply effective macros values to properties.
 		$data = $this->resolveItemPropertyMacros($data);
 
 		if ($this->item_type != ITEM_TYPE_AGGREGATE && $this->item_type != ITEM_TYPE_CALCULATED) {
@@ -158,6 +152,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_ap' => 'params',
 			'params_es' => 'params',
 			'params_f' => 'params',
+			'script' => 'params',
 			'http_username' => 'username',
 			'http_password' => 'password',
 			'http_authtype' => 'authtype',
@@ -170,6 +165,10 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		if (array_key_exists('query_fields', $data)) {
 			$data['query_fields'] = $this->transformQueryFields($data['query_fields']);
+		}
+
+		if (array_key_exists('parameters', $data)) {
+			$data['parameters'] = $this->transformParametersFields($data['parameters']);
 		}
 
 		// Only non-empty fields need to be sent to server.

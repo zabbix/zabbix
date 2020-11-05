@@ -48,6 +48,7 @@ type Connector struct {
 	clientID    uint64
 	input       chan interface{}
 	address     string
+	hostname    string
 	localAddr   net.Addr
 	lastError   error
 	resultCache resultcache.ResultCache
@@ -67,11 +68,10 @@ type activeChecksRequest struct {
 }
 
 type activeChecksResponse struct {
-	Response           string               `json:"response"`
-	Info               string               `json:"info"`
-	Data               []*plugin.Request    `json:"data"`
-	RefreshUnsupported *int                 `json:"refresh_unsupported"`
-	Expressions        []*glexpr.Expression `json:"regexp"`
+	Response string            `json:"response"`
+	Info     string            `json:"info"`
+	Data     []*plugin.Request `json:"data"`
+	Expressions []*glexpr.Expression `json:"regexp"`
 }
 
 type agentDataResponse struct {
@@ -125,7 +125,7 @@ func (c *Connector) refreshActiveChecks() {
 
 	a := activeChecksRequest{
 		Request: "active checks",
-		Host:    c.options.Hostname,
+		Host:    c.hostname,
 		Version: version.Short(),
 	}
 
@@ -166,8 +166,8 @@ func (c *Connector) refreshActiveChecks() {
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("[%d] active check configuration update from [%s] started to fail (%s)", c.clientID,
-				c.address, err)
+			log.Warningf("[%d] active check configuration update from [%s %s] started to fail (%s)", c.clientID,
+				c.address, c.hostname, err)
 			c.lastError = err
 		}
 		return
@@ -192,19 +192,13 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
 		}
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), 0, []*glexpr.Expression{}, []*plugin.Request{})
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), []*glexpr.Expression{}, []*plugin.Request{})
 		return
 	}
 
 	if response.Data == nil {
 		log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 			c.address)
-		return
-	}
-
-	if response.RefreshUnsupported == nil {
-		log.Errf("[%d] cannot parse list of active checks from [%s]: refresh_unsupported tag is missing",
-			c.clientID, c.address)
 		return
 	}
 
@@ -284,7 +278,7 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), *response.RefreshUnsupported, response.Expressions, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), response.Expressions, response.Data)
 }
 
 func (c *Connector) run() {
@@ -329,10 +323,11 @@ func (c *Connector) updateOptions(options *agent.AgentOptions) {
 	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
-func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOptions) (connector *Connector, err error) {
+func New(taskManager scheduler.Scheduler, address string, hostname string, options *agent.AgentOptions) (connector *Connector, err error) {
 	c := &Connector{
 		taskManager: taskManager,
 		address:     address,
+		hostname:    hostname,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
 	}
@@ -344,6 +339,7 @@ func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOp
 
 	ac := &activeConnection{
 		address:   address,
+		hostname:  hostname,
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
 	}
@@ -396,4 +392,8 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 	}
 
 	return value, nil
+}
+
+func (c *Connector) ClientID() uint64 {
+	return c.clientID
 }

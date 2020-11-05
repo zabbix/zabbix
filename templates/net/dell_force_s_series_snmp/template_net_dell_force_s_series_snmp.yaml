@@ -1,0 +1,390 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-23T09:02:56Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'Dell Force S-Series SNMP'
+      name: 'Dell Force S-Series SNMP'
+      description: |
+        Template Dell Force S-Series
+        
+        MIBs used:
+        F10-S-SERIES-CHASSIS-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'EtherLike-MIB SNMP'
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: CPU
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: Memory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      discovery_rules:
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.4.1.1]'
+          key: fan.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: 'Fan {#SNMPVALUE}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.4.1.2.{#SNMPINDEX}'
+              key: 'sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                The status of the fan tray {#SNMPVALUE}.
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  name: 'Fan {#SNMPVALUE}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+                -
+                  expression: '{count(#1,{$FAN_OK_STATUS},ne)}=1'
+                  name: 'Fan {#SNMPVALUE}: Fan is not in normal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Please check the fan unit'
+                  dependencies:
+                    -
+                      name: 'Fan {#SNMPVALUE}: Fan is in critical state'
+                      expression: '{Dell Force S-Series SNMP:sensor.fan.status[chSysFanTrayOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+        -
+          name: 'CPU and Memory and Flash Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.9.1.1]'
+          key: module.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '#{#SNMPINDEX}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.9.1.3.{#SNMPINDEX}'
+              key: 'system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                CPU utilization in percentage for last 1 minute.
+              applications:
+                -
+                  name: CPU
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+            -
+              name: '#{#SNMPINDEX}: Memory utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.9.1.5.{#SNMPINDEX}'
+              key: 'vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                Total memory usage in percentage.
+              applications:
+                -
+                  name: Memory
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  name: '#{#SNMPINDEX}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+          graph_prototypes:
+            -
+              name: '#{#SNMPINDEX}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Dell Force S-Series SNMP'
+                    key: 'system.cpu.util[chStackUnitCpuUtil1Min.{#SNMPINDEX}]'
+            -
+              name: '#{#SNMPINDEX}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Dell Force S-Series SNMP'
+                    key: 'vm.memory.util[chStackUnitMemUsageUtil.{#SNMPINDEX}]'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.3.1.1]'
+          key: psu.discovery
+          delay: 1h
+          description: 'A list of power supply residents in the S-series chassis.'
+          item_prototypes:
+            -
+              name: 'PSU {#SNMPVALUE}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.3.1.2.{#SNMPINDEX}'
+              key: 'sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                The status of the power supply {#SNMPVALUE}
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+                -
+                  expression: '{count(#1,{$PSU_OK_STATUS},ne)}=1'
+                  name: 'PSU {#SNMPVALUE}: Power supply is not in normal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Please check the power supply unit for errors'
+                  dependencies:
+                    -
+                      name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
+                      expression: '{Dell Force S-Series SNMP:sensor.psu.status[chSysPowerSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+        -
+          name: 'Stack Unit Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.6027.3.10.1.2.2.1.2]'
+          key: stack.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: 'Device {#SNMPVALUE}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                The temperature of the unit.
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  name: 'Device {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  name: 'Device {#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'Device {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                      expression: '{Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
+                      recovery_expression: '{Dell Force S-Series SNMP:sensor.temp.value[chStackUnitTemp.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: 'Device {#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+            -
+              name: '#{#SNMPVALUE}: Hardware model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.7.{#SNMPINDEX}'
+              key: 'system.hw.model[chStackUnitModelID.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                The plugged-in model ID for this unit.
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+            -
+              name: '#{#SNMPVALUE}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.12.{#SNMPINDEX}'
+              key: 'system.hw.serialnumber[chStackUnitSerialNumber.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                The unit's serial number.
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '#{#SNMPVALUE}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              name: '#{#SNMPVALUE}: Hardware version(revision)'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.21.{#SNMPINDEX}'
+              key: 'system.hw.version[chStackUnitProductRev.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                The unit manufacturer's product revision
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+            -
+              name: '#{#SNMPVALUE}: Operating system'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.6027.3.10.1.2.2.1.10.{#SNMPINDEX}'
+              key: 'system.sw.os[chStackUnitCodeVersion.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: F10-S-SERIES-CHASSIS-MIB
+                Current code version of this unit.
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '#{#SNMPVALUE}: Operating system description has changed'
+                  priority: INFO
+                  description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+                  manual_close: 'YES'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$FAN_CRIT_STATUS}'
+          value: '2'
+        -
+          macro: '{$FAN_OK_STATUS}'
+          value: '1'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$PSU_CRIT_STATUS}'
+          value: '2'
+        -
+          macro: '{$PSU_OK_STATUS}'
+          value: '1'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '65'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '55'
+  value_maps:
+    -
+      name: 'F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: up
+        -
+          value: '2'
+          newvalue: down
+        -
+          value: '3'
+          newvalue: absent
+    -
+      name: 'F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: up
+        -
+          value: '2'
+          newvalue: down
+        -
+          value: '3'
+          newvalue: absent

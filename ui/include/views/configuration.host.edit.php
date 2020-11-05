@@ -148,13 +148,9 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 }
 // Interfaces for discovered hosts.
 else {
-	$existingInterfaceTypes = [];
-	foreach ($data['interfaces'] as $interface) {
-		$existingInterfaceTypes[$interface['type']] = true;
-	}
 	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode($data['interfaces']).');');
 	zbx_add_post_js('hostInterfaceManager.render();');
-	zbx_add_post_js('HostInterfaceManager.disableEdit();');
+	zbx_add_post_js('HostInterfaceManager.makeReadonly();');
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 
@@ -475,7 +471,8 @@ if ($data['readonly']) {
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				(new CUrl('templates.php'))
 					->setArgument('form','update')
@@ -507,7 +504,8 @@ else {
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				'templates.php?form=update&templateid='.$template['templateid']
 			))->setTarget('_blank');

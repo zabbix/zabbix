@@ -191,6 +191,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	else {
 		$serviceSla = $slaData[$service['serviceid']];
 		$slaValues = reset($serviceSla['sla']);
+		$allowed_ui_problems = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 
 		// caption
 		// remember the selected time period when following the bar link
@@ -214,12 +215,14 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			$caption = [
 				$caption,
 				' - ',
-				new CLink($trigger['description'],
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'problem.view')
-						->setArgument('filter_triggerids[]', $trigger['triggerid'])
-						->setArgument('filter_set', '1')
-				)
+				$allowed_ui_problems
+					? new CLink($trigger['description'],
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'problem.view')
+							->setArgument('filter_name', '')
+							->setArgument('triggerids', [$trigger['triggerid']])
+					)
+					: $trigger['description']
 			];
 		}
 
@@ -229,12 +232,14 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			if ($reason) {
 				$reason[] = ', ';
 			}
-			$reason[] = new CLink($problemTrigger['description'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'problem.view')
-					->setArgument('filter_triggerids[]', $problemTrigger['triggerid'])
-					->setArgument('filter_set', '1')
-			);
+			$reason[] = $allowed_ui_problems
+				? new CLink($problemTrigger['description'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->setArgument('filter_name', '')
+						->setArgument('triggerids', [$problemTrigger['triggerid']])
+				)
+				: $problemTrigger['description'];
 		}
 
 		// sla

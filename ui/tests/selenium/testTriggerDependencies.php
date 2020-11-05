@@ -43,12 +43,12 @@ class testTriggerDependencies extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 		$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
 		$host->fill([
-			'values' => 'Template OS FreeBSD',
+			'values' => 'FreeBSD',
 			'context' => 'Templates'
 		]);
-		$this->zbxTestClickLinkTextWait('/etc/passwd has been changed on Template OS FreeBSD');
+		$this->zbxTestClickLinkTextWait('/etc/passwd has been changed on FreeBSD');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
-		$this->zbxTestTextPresent('Template OS FreeBSD: /etc/passwd has been changed on {HOST.NAME}');
+		$this->zbxTestTextPresent('FreeBSD: /etc/passwd has been changed on {HOST.NAME}');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent($expected);
 	}

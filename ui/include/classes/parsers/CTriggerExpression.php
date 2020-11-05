@@ -29,6 +29,11 @@ class CTriggerExpression {
 	const STATE_AFTER_CLOSE_BRACE = 6;
 	const STATE_AFTER_CONSTANT = 7;
 
+	// Error type constants.
+	const ERROR_LEVEL = 1;
+	const ERROR_UNEXPECTED_ENDING = 2;
+	const ERROR_UNPARSED_CONTENT = 3;
+
 	/**
 	 * Shows a validity of trigger expression
 	 *
@@ -42,6 +47,20 @@ class CTriggerExpression {
 	 * @var string
 	 */
 	public $error;
+
+	/**
+	 * Type of parsing error, on of self::ERROR_* constant or 0 when no errors.
+	 *
+	 * @var int
+	 */
+	public $error_type;
+
+	/**
+	 * In case of error contain failed position in expression string. Contain -1 when no errors.
+	 *
+	 * @var int
+	 */
+	public $error_pos;
 
 	/**
 	 * An array of trigger functions like {Zabbix server:agent.ping.last(0)}
@@ -62,6 +81,7 @@ class CTriggerExpression {
 	 *   'collapsed_expression' => true  Short trigger expression.
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
 	 *   'calculated' => false           Parse calculated item formula instead of trigger expression.
+	 *   'host_macro'                    Array of macro supported as host name part in function.
 	 *
 	 * @var array
 	 */
@@ -69,7 +89,8 @@ class CTriggerExpression {
 		'lldmacros' => true,
 		'allow_func_only' => false,
 		'collapsed_expression' => false,
-		'calculated' => false
+		'calculated' => false,
+		'host_macro' => []
 	];
 
 	/**
@@ -183,6 +204,7 @@ class CTriggerExpression {
 	 * @param bool  $options['allow_func_only']
 	 * @param bool  $options['collapsed_expression']
 	 * @param bool  $options['calculated']
+	 * @param bool  $options['host_macro']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
@@ -190,12 +212,12 @@ class CTriggerExpression {
 		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
 		$this->notOperatorParser = new CSetParser(['not']);
-		$this->macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$this->macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 		if ($this->options['collapsed_expression']) {
 			$this->functionid_parser = new CFunctionIdParser();
 		}
 		else {
-			$this->function_macro_parser = new CFunctionMacroParser();
+			$this->function_macro_parser = new CFunctionMacroParser(['host_macro' => $this->options['host_macro']]);
 		}
 		$this->function_parser = new CFunctionParser();
 		$this->lld_macro_parser = new CLLDMacroParser();
@@ -236,6 +258,8 @@ class CTriggerExpression {
 		$this->result = new CTriggerExprParserResult();
 		$this->isValid = true;
 		$this->error = '';
+		$this->error_type = 0;
+		$this->error_pos = -1;
 		$this->expressions = [];
 
 		$this->pos = 0;
@@ -496,12 +520,21 @@ class CTriggerExpression {
 			$this->isValid = false;
 		}
 
-		if ($level != 0 || isset($this->expression[$this->pos])
-				|| ($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)) {
+		$errors = array_filter([
+			($level != 0) ? self::ERROR_LEVEL : 0,
+			($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)
+				? self::ERROR_UNEXPECTED_ENDING : 0,
+			isset($this->expression[$this->pos]) ? self::ERROR_UNPARSED_CONTENT : 0
+		]);
+		$error = reset($errors);
+
+		if ($error) {
 			$exp_part = substr($this->expression, ($this->pos == 0) ? 0 : $this->pos - 1);
 			$this->error = $this->options['calculated']
 				? _s('incorrect calculated item formula starting from "%1$s"', $exp_part)
 				: _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".', $exp_part);
+			$this->error_type = $error;
+			$this->error_pos = $this->pos;
 			$this->isValid = false;
 
 			return false;
@@ -840,7 +873,7 @@ class CTriggerExpression {
 
 			if ($allow_macros) {
 				$user_macro_parser = new CUserMacroParser();
-				$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+				$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 				$lld_macro_parser = new CLLDMacroParser();
 				$lld_macro_function_parser = new CLLDMacroFunctionParser;
 

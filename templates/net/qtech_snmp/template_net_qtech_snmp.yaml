@@ -1,0 +1,389 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-23T09:11:40Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'QTech QSW SNMP'
+      name: 'QTech QSW SNMP'
+      description: |
+        Template Net QTech QSW
+        
+        MIBs used:
+        QTECH-MIB
+        ENTITY-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'EtherLike-MIB SNMP'
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: CPU
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: Memory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      items:
+        -
+          name: Temperature
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.27514.100.1.11.9.0
+          key: 'sensor.temp.value[switchTemperature.0]'
+          delay: 3m
+          value_type: FLOAT
+          units: °C
+          description: |
+            MIB: QTECH-MIB
+            Temperature readings of testpoint: __RESOURCE__
+          applications:
+            -
+              name: Temperature
+          triggers:
+            -
+              expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+              name: 'Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+            -
+              expression: '{avg(5m)}>{$TEMP_WARN:""}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+              name: 'Temperature is above warning threshold: >{$TEMP_WARN:""}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              dependencies:
+                -
+                  name: 'Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  expression: '{QTech QSW SNMP:sensor.temp.value[switchTemperature.0].avg(5m)}>{$TEMP_CRIT:""}'
+                  recovery_expression: '{QTech QSW SNMP:sensor.temp.value[switchTemperature.0].max(5m)}<{$TEMP_CRIT:""}-3'
+            -
+              expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+              name: 'Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+        -
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.27514.100.1.11.10.0
+          key: 'system.cpu.util[switchCpuUsage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: QTECH-MIB
+            CPU utilization in %
+          applications:
+            -
+              name: CPU
+          triggers:
+            -
+              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          name: 'Firmware version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.9.1
+          key: system.hw.firmware
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB'
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.1
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB'
+          inventory_link: MODEL
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB'
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Hardware version(revision)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.8.1
+          key: system.hw.version
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB'
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.27514.100.1.3.0
+          key: 'system.sw.os[sysSoftwareVersion.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: QTECH-MIB'
+          inventory_link: OS
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Operating system description has changed'
+              priority: INFO
+              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Total memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.27514.100.1.11.6.0
+          key: 'vm.memory.total[switchMemorySize.0]'
+          history: 7d
+          units: B
+          description: |
+            MIB: QTECH-MIB
+            Total memory in Bytes
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Used memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.27514.100.1.11.7.0
+          key: 'vm.memory.used[switchMemoryBusy.0]'
+          history: 7d
+          units: B
+          description: |
+            MIB: QTECH-MIB
+            Used memory in Bytes
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Memory utilization'
+          type: CALCULATED
+          key: 'vm.memory.util[vm.memory.util.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last("vm.memory.used[switchMemoryBusy.0]")/last("vm.memory.total[switchMemorySize.0]")*100'
+          description: 'Memory utilization in %'
+          applications:
+            -
+              name: Memory
+          triggers:
+            -
+              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+      discovery_rules:
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.27514.100.1.12.1.3]'
+          key: fan.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#SNMPINDEX}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.27514.100.1.12.1.3.{#SNMPINDEX}'
+              key: 'sensor.fan.status[sysFanStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: 'MIB: QTECH-MIB'
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'QTECH-MIB::sysFanStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  name: '{#SNMPINDEX}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.27514.100.1.7.1.5]'
+          key: psu.discovery
+          delay: 1h
+          item_prototypes:
+            -
+              name: '{#SNMPINDEX}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.27514.100.1.7.1.5.{#SNMPINDEX}'
+              key: 'sensor.psu.status[sysPowerStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: 'MIB: QTECH-MIB'
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'QTECH-MIB::sysPowerStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  name: '{#SNMPINDEX}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$FAN_CRIT_STATUS}'
+          value: '1'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$PSU_CRIT_STATUS}'
+          value: '1'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '75'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '65'
+  graphs:
+    -
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'QTech QSW SNMP'
+            key: 'system.cpu.util[switchCpuUsage.0]'
+    -
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'QTech QSW SNMP'
+            key: 'vm.memory.util[vm.memory.util.0]'
+  value_maps:
+    -
+      name: 'QTECH-MIB::sysFanStatus'
+      mappings:
+        -
+          value: '0'
+          newvalue: normal
+        -
+          value: '1'
+          newvalue: abnormal
+    -
+      name: 'QTECH-MIB::sysPowerStatus'
+      mappings:
+        -
+          value: '0'
+          newvalue: normal
+        -
+          value: '1'
+          newvalue: abnormal
+        -
+          value: '2'
+          newvalue: 'not available'

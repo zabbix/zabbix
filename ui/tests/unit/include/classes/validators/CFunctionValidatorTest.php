@@ -21,7 +21,7 @@
 
 class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
-	private static function parameterSecNumPeriod_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+	private static function parameterSecNum_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
 		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT];
 
@@ -223,7 +223,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
-	private static function parameterPeriod_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+	private static function parameterSec_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
 		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT];
 
@@ -691,6 +691,43 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
+	/**
+	 * Tests for trend functions: 'trendavg', 'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum'.
+	 */
+	private static function trendFunctionsTestData() {
+		$types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+			ITEM_VALUE_TYPE_TEXT
+		];
+		$functions = ['trendavg', 'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum'];
+		$supported_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
+		$test_data = [];
+
+		foreach ($functions as $function) {
+			foreach ($types as $value_type) {
+				$supported_type = ($function === 'trendcount' || in_array($value_type, $supported_types));
+
+				$test_data = array_merge($test_data, [
+					[$function, ['1M', 'now/M'], $value_type, [], true && $supported_type],
+					[$function, ['1M', 'now/M-1w+1d/M'], $value_type, [], true && $supported_type],
+					[$function, ['1y', '{$MACRO}'], $value_type, [], true && $supported_type],
+					[$function, ['{$MACRO}', 'now/M'], $value_type, [], true && $supported_type],
+					[$function, ['{$MACRO}', '{$MACRO}'], $value_type, [], true && $supported_type],
+					[$function, ['1y', '{#MACRO}'], $value_type, ['lldmacros' => true], true && $supported_type],
+					[$function, ['{#MACRO}', 'now/M'], $value_type, ['lldmacros' => true], true && $supported_type],
+					[$function, ['{#MACRO}', '{#MACRO}'], $value_type, ['lldmacros' => true], true && $supported_type],
+					[$function, [], $value_type, [], false],
+					[$function, ['', ''], $value_type, [], false],
+					[$function, ['1y', 'now/M'], $value_type, [], false],
+					[$function, ['1M', 'now/w-1w+1d/M'], $value_type, [], false],
+					[$function, ['1M', 'now/M-1w+1d/w'], $value_type, [], false],
+					[$function, ['${MACRO}1y', '{$MACRO}now/y'], $value_type, [], false],
+				]);
+			}
+		}
+
+		return $test_data;
+	}
+
 	public static function provider() {
 		$valueTypesAny = [
 			ITEM_VALUE_TYPE_FLOAT => true,
@@ -747,7 +784,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			self::parameterString_TestCases('time', $valueTypesAny),
 
 			// avg() - (sec or #num, time_shift) [float, int]
-			self::parameterSecNumPeriod_TestCases('avg', $valueTypesNum),
+			self::parameterSecNum_TestCases('avg', $valueTypesNum),
 			self::parameterTimeShift_TestCases('avg', $valueTypesNum, ['#1', ''], 1),
 
 			// band() - (sec or #num, mask, time_shift) [int]
@@ -756,13 +793,13 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			self::parameterTimeShift_TestCases('band', $valueTypesInt, ['#1', '0', ''], 2),
 
 			// count() - (sec or #num, pattern, operator, time_shift) [float, int, str, text, log]
-			self::parameterSecNumPeriod_TestCases('count', $valueTypesAny),
+			self::parameterSecNum_TestCases('count', $valueTypesAny),
 //			TODO Pattern
 			self::parameterOperator_TestCases('count', $valueTypesAny, ['#1', '', ''], 2),
 			self::parameterTimeShift_TestCases('count', $valueTypesAny, ['#1', '', '', ''], 3),
 
 			// delta() - (sec or #num, time_shift) [float, int]
-			self::parameterSecNumPeriod_TestCases('delta', $valueTypesNum),
+			self::parameterSecNum_TestCases('delta', $valueTypesNum),
 			self::parameterTimeShift_TestCases('delta', $valueTypesNum, ['#1', ''], 1),
 
 			// last() - (sec or #num, time_shift) [float, int, str, text, log]
@@ -770,15 +807,15 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			self::parameterTimeShift_TestCases('last', $valueTypesAny, ['#1', ''], 1),
 
 			// max() - (sec or #num, time_shift) [float, int]
-			self::parameterSecNumPeriod_TestCases('max', $valueTypesNum),
+			self::parameterSecNum_TestCases('max', $valueTypesNum),
 			self::parameterTimeShift_TestCases('max', $valueTypesNum, ['#1', ''], 1),
 
 			// min() - (sec or #num, time_shift) [float, int]
-			self::parameterSecNumPeriod_TestCases('min', $valueTypesNum),
+			self::parameterSecNum_TestCases('min', $valueTypesNum),
 			self::parameterTimeShift_TestCases('min', $valueTypesNum, ['#1', ''], 1),
 
 			// percentile() - (sec or #num, time_shift, float) [float, int]
-			self::parameterSecNumPeriod_TestCases('percentile', $valueTypesNum, ['#1', '', '50']),
+			self::parameterSecNum_TestCases('percentile', $valueTypesNum, ['#1', '', '50']),
 			self::parameterTimeShift_TestCases('percentile', $valueTypesNum, ['#1', '', '50'], 1),
 			self::parameterPercent_TestCases('percentile', $valueTypesNum, ['#1', '', '50'], 2),
 
@@ -787,18 +824,18 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			self::parameterTimeShift_TestCases('strlen', $valueTypesStr, ['#1', ''], 1),
 
 			// sum() - (sec or #num, time_shift) [float, int]
-			self::parameterSecNumPeriod_TestCases('sum', $valueTypesNum),
+			self::parameterSecNum_TestCases('sum', $valueTypesNum),
 			self::parameterTimeShift_TestCases('sum', $valueTypesNum, ['#1', ''], 1),
 
 			// fuzzytime() - (sec) [float, int]
 			self::parameterTimeShift_TestCases('fuzzytime', $valueTypesNum),
 
 			// nodata() - (sec) [float, int, str, text, log]
-			self::parameterPeriod_TestCases('nodata', $valueTypesAny),
+			self::parameterSec_TestCases('nodata', $valueTypesAny),
 
 			// iregexp() - (string, sec or #num) [str, text, log]
 			self::parameterString_TestCases('iregexp', $valueTypesStr),
-			self::parameterSecNumPeriod_TestCases('iregexp', $valueTypesStr, ['', ''], 1),
+			self::parameterSecNum_TestCases('iregexp', $valueTypesStr, ['', ''], 1),
 
 			// logeventid() - (string) [log]
 			self::parameterString_TestCases('logeventid', $valueTypesLog),
@@ -808,11 +845,14 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 			// regexp() - (string, sec or #num) [str, text, log]
 			self::parameterString_TestCases('regexp', $valueTypesStr),
-			self::parameterSecNumPeriod_TestCases('regexp', $valueTypesStr, ['', ''], 1),
+			self::parameterSecNum_TestCases('regexp', $valueTypesStr, ['', ''], 1),
 
 			// str() - (string, sec or #num) [str, text, log]
 			self::parameterString_TestCases('str', $valueTypesStr),
-			self::parameterSecNumPeriod_TestCases('str', $valueTypesStr, ['', ''], 1)
+			self::parameterSecNum_TestCases('str', $valueTypesStr, ['', ''], 1),
+
+			// 'trendavg', 'trendcount', 'trenddelta', 'trendmax', 'trendmin', 'trendsum'
+			self::trendFunctionsTestData()
 		);
 	}
 

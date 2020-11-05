@@ -69,7 +69,7 @@ class CConfigurationImport {
 			'groups' => ['createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
-			'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'applications' => ['createMissing' => false, 'deleteMissing' => false],
 			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -106,9 +106,9 @@ class CConfigurationImport {
 		$options['process_templates'] = (
 			!$options['templates']['updateExisting']
 			&& ($object_options
-				|| $options['templateScreens']['updateExisting']
-				|| $options['templateScreens']['createMissing']
-				|| $options['templateScreens']['deleteMissing']
+				|| $options['templateDashboards']['updateExisting']
+				|| $options['templateDashboards']['createMissing']
+				|| $options['templateDashboards']['deleteMissing']
 			)
 		);
 		$options['process_hosts'] = (!$options['hosts']['updateExisting'] && $object_options);
@@ -152,7 +152,7 @@ class CConfigurationImport {
 		$this->processGraphs();
 		$this->processImages();
 		$this->processMaps();
-		$this->processTemplateScreens();
+		$this->processTemplateDashboards();
 		$this->processScreens();
 		$this->processMediaTypes();
 
@@ -181,7 +181,7 @@ class CConfigurationImport {
 		$iconMapsRefs = [];
 		$mapsRefs = [];
 		$screensRefs = [];
-		$templateScreensRefs = [];
+		$templateDashboardsRefs = [];
 		$macrosRefs = [];
 		$proxyRefs = [];
 		$hostPrototypesRefs = [];
@@ -471,33 +471,28 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedTemplateScreens() as $screens) {
-			foreach ($screens as $screen) {
-				$templateScreensRefs[$screen['name']] = $screen['name'];
+		foreach ($this->getFormattedTemplateDashboards() as $dashboards) {
+			foreach ($dashboards as $dashboard) {
+				$templateDashboardsRefs[$dashboard['name']] = $dashboard['name'];
 
-				if (!empty($screen['screenitems'])) {
-					foreach ($screen['screenitems'] as $screenItem) {
-						$resource = $screenItem['resource'];
+				if ($dashboard['widgets']) {
+					foreach ($dashboard['widgets'] as $widget) {
+						foreach ($widget['fields'] as $field) {
+							$value = $field['value'];
 
-						switch ($screenItem['resourcetype']) {
-							case SCREEN_RESOURCE_GRAPH:
-							case SCREEN_RESOURCE_LLD_GRAPH:
-								$hostsRefs[$resource['host']] = $resource['host'];
-								$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
-								break;
-
-							case SCREEN_RESOURCE_CLOCK:
-								if ($screenItem['style'] != TIME_TYPE_HOST) {
+							switch ($field['type']) {
+								case ZBX_WIDGET_FIELD_TYPE_ITEM:
+								case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+									$hostsRefs[$value['host']] = $value['host'];
+									$itemsRefs[$value['host']][$value['key']] = $value['key'];
 									break;
-								}
-								// break; is not missing here
 
-							case SCREEN_RESOURCE_SIMPLE_GRAPH:
-							case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
-							case SCREEN_RESOURCE_PLAIN_TEXT:
-								$hostsRefs[$resource['host']] = $resource['host'];
-								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
-								break;
+								case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+								case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+									$hostsRefs[$value['host']] = $value['host'];
+									$graphsRefs[$value['host']][$value['name']] = $value['name'];
+									break;
+							}
 						}
 					}
 				}
@@ -533,7 +528,7 @@ class CConfigurationImport {
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
 		$this->referencer->addScreens($screensRefs);
-		$this->referencer->addTemplateScreens($templateScreensRefs);
+		$this->referencer->addTemplateDashboards($templateDashboardsRefs);
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
 		$this->referencer->addHostPrototypes($hostPrototypesRefs);
@@ -816,6 +811,12 @@ class CConfigurationImport {
 					$item['query_fields'] = $query_fields;
 				}
 
+				foreach ($item['preprocessing'] as &$preprocessing_step) {
+					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					unset($preprocessing_step['parameters']);
+				}
+				unset($preprocessing_step);
+
 				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
 
 				if ($itemsId) {
@@ -1041,6 +1042,12 @@ class CConfigurationImport {
 					unset($override);
 				}
 
+				foreach ($item['preprocessing'] as &$preprocessing_step) {
+					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					unset($preprocessing_step['parameters']);
+				}
+				unset($preprocessing_step);
+
 				if ($itemId) {
 					$item['itemid'] = $itemId;
 					$itemsToUpdate[] = $item;
@@ -1202,6 +1209,12 @@ class CConfigurationImport {
 					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);
 					$prototype['rule'] = ['hostid' => $hostId, 'key' => $item['key_']];
 					$prototype['ruleid'] = $this->referencer->resolveItem($hostId, $item['key_']);
+
+					foreach ($prototype['preprocessing'] as &$preprocessing_step) {
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+						unset($preprocessing_step['parameters']);
+					}
+					unset($preprocessing_step);
 
 					if ($prototypeId) {
 						if (!array_key_exists($level, $prototypes_to_update)) {
@@ -1869,18 +1882,18 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Import template screens.
+	 * Import template dashboards.
 	 */
-	protected function processTemplateScreens() {
-		if ($this->options['templateScreens']['updateExisting']
-				|| $this->options['templateScreens']['createMissing']
-				|| $this->options['templateScreens']['deleteMissing']) {
-			$screens = $this->getFormattedTemplateScreens();
-			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer,
+	protected function processTemplateDashboards() {
+		if ($this->options['templateDashboards']['updateExisting']
+				|| $this->options['templateDashboards']['createMissing']
+				|| $this->options['templateDashboards']['deleteMissing']) {
+			$dashboards = $this->getFormattedTemplateDashboards();
+			$dashboardImporter = new CTemplateDashboardImporter($this->options, $this->referencer,
 				$this->importedObjectContainer
 			);
-			$screenImporter->delete($screens);
-			$screenImporter->import($screens);
+			$dashboardImporter->delete($dashboards);
+			$dashboardImporter->import($dashboards);
 		}
 	}
 
@@ -2601,12 +2614,12 @@ class CConfigurationImport {
 	 *
 	 * @return array
 	 */
-	protected function getFormattedTemplateScreens() {
-		if (!isset($this->formattedData['templateScreens'])) {
-				$this->formattedData['templateScreens'] = $this->adapter->getTemplateScreens();
+	protected function getFormattedTemplateDashboards() {
+		if (!isset($this->formattedData['templateDashboards'])) {
+				$this->formattedData['templateDashboards'] = $this->adapter->getTemplateDashboards();
 		}
 
-		return $this->formattedData['templateScreens'];
+		return $this->formattedData['templateDashboards'];
 	}
 
 	/**

@@ -629,7 +629,7 @@ class testApplication extends CAPITest {
 						'name' => 'API host application create as zabbix user',
 						'hostid' => '10084'
 					],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "application.create".'
 			],
 			[
 				'method' => 'application.update',
@@ -638,7 +638,7 @@ class testApplication extends CAPITest {
 					'applicationid' => '376',
 					'name' => 'API application update as zabbix user',
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "application.update".'
 			],
 			[
 				'method' => 'application.delete',
@@ -646,7 +646,7 @@ class testApplication extends CAPITest {
 				'application' => [
 					'376'
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'No permissions to call "application.delete".'
 			]
 		];
 	}

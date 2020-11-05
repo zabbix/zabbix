@@ -1,0 +1,177 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:52Z'
+  media_types:
+    -
+      name: Telegram
+      type: WEBHOOK
+      parameters:
+        -
+          name: Message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: ParseMode
+          value: ''
+        -
+          name: Subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: To
+          value: '{ALERT.SENDTO}'
+        -
+          name: Token
+          value: '<PLACE YOUR TOKEN>'
+      script: |
+        var Telegram = {
+            token: null,
+            to: null,
+            message: null,
+            proxy: null,
+            parse_mode: null,
+        
+            sendMessage: function() {
+                var params = {
+                    chat_id: Telegram.to,
+                    text: Telegram.message,
+                    disable_web_page_preview: true,
+                    disable_notification: false
+                },
+                data,
+                response,
+                request = new HttpRequest(),
+                url = 'https://api.telegram.org/bot' + Telegram.token + '/sendMessage';
+        
+                if (Telegram.parse_mode !== null) {
+                    params['parse_mode'] = Telegram.parse_mode;
+                }
+        
+                if (Telegram.proxy) {
+                    request.setProxy(Telegram.proxy);
+                }
+        
+                request.addHeader('Content-Type: application/json');
+                data = JSON.stringify(params);
+        
+                // Remove replace() function if you want to see the exposed token in the log file.
+                Zabbix.log(4, '[Telegram Webhook] URL: ' + url.replace(Telegram.token, '<TOKEN>'));
+                Zabbix.log(4, '[Telegram Webhook] params: ' + data);
+                response = request.post(url, data);
+                Zabbix.log(4, '[Telegram Webhook] HTTP code: ' + request.getStatus());
+        
+                try {
+                    response = JSON.parse(response);
+                }
+                catch (error) {
+                    response = null;
+                }
+        
+                if (request.getStatus() !== 200 || typeof response.ok !== 'boolean' || response.ok !== true) {
+                    if (typeof response.description === 'string') {
+                        throw response.description;
+                    }
+                    else {
+                        throw 'Unknown error. Check debug log for more information.'
+                    }
+                }
+            }
+        }
+        
+        try {
+            var params = JSON.parse(value);
+        
+            if (typeof params.Token === 'undefined') {
+                throw 'Incorrect value is given for parameter "Token": parameter is missing';
+            }
+        
+            Telegram.token = params.Token;
+        
+            if (params.HTTPProxy) {
+                Telegram.proxy = params.HTTPProxy;
+            } 
+        
+            if (['Markdown', 'HTML', 'MarkdownV2'].indexOf(params.ParseMode) !== -1) {
+                Telegram.parse_mode = params.ParseMode;
+            }
+        
+            Telegram.to = params.To;
+            Telegram.message = params.Subject + '\n' + params.Message;
+            Telegram.sendMessage();
+        
+            return 'OK';
+        }
+        catch (error) {
+            Zabbix.log(4, '[Telegram Webhook] notification failed: ' + error);
+            throw 'Sending failed: ' + error + '.';
+        }
+      timeout: 10s
+      description: |
+        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/telegram
+        
+        1. Register bot: send "/newbot" to @BotFather and follow instructions
+        2. Copy and paste the obtained token into the "Token" field above
+        3. If you want to send personal notifications, you need to get chat id of the user you want to send messages to:
+            3.1. Send "/getid" to "@myidbot" in Telegram messenger
+            3.2. Copy returned chat id and save it in the "Telegram Webhook" media for the user
+            3.3. Ask the user to send "/start" to your bot (Telegram bot won't send anything to the user without it)
+        4. If you want to send group notifications, you need to get group id of the group you want to send messages to:
+            4.1. Add "@myidbot" to your group
+            4.2. Send "/getgroupid@myidbot" in your group
+            4.3. Copy returned group id save it in the "Telegram Webhook" media for the user you created for  group notifications
+            4.4. Send "/start@your_bot_name_here" in your group (Telegram bot won't send anything to the group without it)
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

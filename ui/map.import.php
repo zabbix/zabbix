@@ -35,11 +35,16 @@ $fields = [
 check_fields($fields);
 
 $data = [
+	'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+	'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
+];
+
+$data += [
 	'rules' => [
 		'groups' => ['createMissing' => false],
 		'hosts' => ['updateExisting' => false, 'createMissing' => false],
 		'templates' => ['updateExisting' => false, 'createMissing' => false],
-		'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
 		'applications' => ['createMissing' => false, 'deleteMissing' => false],
 		'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -48,7 +53,7 @@ $data = [
 		'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'screens' => ['updateExisting' => false, 'createMissing' => false],
-		'maps' => ['updateExisting' => true, 'createMissing' => true],
+		'maps' => ['updateExisting' => $data['allowed_edit_maps'], 'createMissing' => $data['allowed_edit_maps']],
 		'images' => ['updateExisting' => false, 'createMissing' => true],
 		'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]

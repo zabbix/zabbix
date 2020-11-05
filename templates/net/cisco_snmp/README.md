@@ -1,9 +1,9 @@
 
-# Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP
+# Cisco CISCO-MEMORY-POOL-MIB SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -47,11 +47,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Cisco CISCO-PROCESS-MIB SNMP
+# Cisco CISCO-PROCESS-MIB SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -93,11 +93,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP
+# Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -139,11 +139,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Cisco OLD-CISCO-CPU-MIB SNMP
+# Cisco OLD-CISCO-CPU-MIB SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -182,11 +182,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Cisco Inventory SNMP
+# Cisco Inventory SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -228,11 +228,11 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Module Cisco CISCO-ENVMON-MIB SNMP
+# Cisco CISCO-ENVMON-MIB SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -292,19 +292,19 @@ There are no template links in this template.
 |{#SENSOR_INFO}: Fan is in warning state |<p>Please check the fan unit</p> |`{TEMPLATE_NAME:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1 or {TEMPLATE_NAME:sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"notFunctioning"},eq)}=1` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Fan is in critical state</p> |
 |{#SENSOR_INFO}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {TEMPLATE_NAME:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"shutdown"},eq)}=1` |AVERAGE | |
 |{#SENSOR_INFO}: Power supply is in warning state |<p>Please check the power supply unit for errors</p> |`{TEMPLATE_NAME:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1 or {TEMPLATE_NAME:sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"notFunctioning"},eq)}=1` |WARNING |<p>**Depends on**:</p><p>- {#SENSOR_INFO}: Power supply is in critical state</p> |
-|{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"{#SNMPVALUE}"} or {Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"{#SNMPVALUE}"}-3` |WARNING |<p>**Depends on**:</p><p>- {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}</p> |
-|{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"{#SNMPVALUE}"} or {Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS} or {Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"{#SNMPVALUE}"}-3` |HIGH | |
+|{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"{#SNMPVALUE}"} or {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"{#SNMPVALUE}"}-3` |WARNING |<p>**Depends on**:</p><p>- {#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}</p> |
+|{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"} |<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p> |`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"{#SNMPVALUE}"} or {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS} or {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"{#SNMPVALUE}"}-3` |HIGH | |
 |{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"} |<p>-</p> |`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].min(5m)}>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3` |AVERAGE | |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Net Cisco IOS SNMP
+# Cisco IOS SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -319,13 +319,13 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Cisco CISCO-ENVMON-MIB SNMP |
-|Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP |
-|Template Module Cisco CISCO-PROCESS-MIB SNMP |
-|Template Module Cisco Inventory SNMP |
-|Template Module EtherLike-MIB SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|Cisco CISCO-ENVMON-MIB SNMP |
+|Cisco CISCO-MEMORY-POOL-MIB SNMP |
+|Cisco CISCO-PROCESS-MIB SNMP |
+|Cisco Inventory SNMP |
+|EtherLike-MIB SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -350,11 +350,11 @@ Please report any issues with the template at https://support.zabbix.com
   - Version: IOS for example: 12.1(22)EA11, 15.4(3)M2
   - Device: C2911, C7600
 
-# Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP
+# Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -369,12 +369,12 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Cisco CISCO-ENVMON-MIB SNMP |
-|Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP |
-|Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP |
-|Template Module Cisco Inventory SNMP |
-|Template Module Generic SNMP |
-|Template Module Interfaces SNMP |
+|Cisco CISCO-ENVMON-MIB SNMP |
+|Cisco CISCO-MEMORY-POOL-MIB SNMP |
+|Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP |
+|Cisco Inventory SNMP |
+|Generic SNMP |
+|Interfaces SNMP |
 
 ## Discovery rules
 
@@ -393,11 +393,11 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# Template Net Cisco IOS prior to 12.0_3_T SNMP
+# Cisco IOS prior to 12.0_3_T SNMP
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.2 and higher  
 
 ## Setup
 
@@ -412,11 +412,11 @@ No specific Zabbix configuration is required.
 
 |Name|
 |----|
-|Template Module Cisco CISCO-ENVMON-MIB SNMP |
-|Template Module Cisco CISCO-MEMORY-POOL-MIB SNMP |
-|Template Module Cisco Inventory SNMP |
-|Template Module Cisco OLD-CISCO-CPU-MIB SNMP |
-|Template Module Generic SNMP |
+|Cisco CISCO-ENVMON-MIB SNMP |
+|Cisco CISCO-MEMORY-POOL-MIB SNMP |
+|Cisco Inventory SNMP |
+|Cisco OLD-CISCO-CPU-MIB SNMP |
+|Generic SNMP |
 
 ## Discovery rules
 

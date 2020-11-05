@@ -53,7 +53,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'new_media' =>			'array',
 			'enable_media' =>		'int32',
 			'disable_media' =>		'int32',
-			'type' =>				'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'roleid' =>				'db users.roleid',
 			'form_refresh' =>		'int32'
 		];
 
@@ -67,17 +67,18 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)) {
 			return false;
 		}
 
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'type', 'timezone'
+					'rows_per_page', 'url', 'roleid', 'timezone'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 				'selectUsrgrps' => ['usrgrpid'],
+				'selectRole' => ['name', 'type'],
 				'userids' => $this->getInput('userid'),
 				'editable' => true
 			]);
@@ -112,7 +113,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'url' => '',
 			'medias' => [],
 			'new_media' => [],
-			'type' => $db_defaults['type'],
+			'roleid' => '',
+			'role' => [],
+			'user_type' => '',
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
@@ -138,16 +141,22 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['rows_per_page'] = $this->user['rows_per_page'];
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
-			$data['type'] = $this->user['type'];
 			$data['db_user']['alias'] = $this->user['alias'];
+
+			if (!$this->getInput('form_refresh', 0)) {
+				$data['roleid'] = $this->user['roleid'];
+				$data['user_type'] = $this->user['role']['type'];
+				$data['role'] = [['id' => $data['roleid'], 'name' => $this->user['role']['name']]];
+			}
 		}
 		else {
 			$data['change_password'] = true;
+			$data['roleid'] = $this->getInput('roleid', '');
 		}
 
 		// Overwrite with input variables.
 		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'timezone', 'theme',
-			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'type'
+			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'roleid'
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
@@ -165,7 +174,19 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
-		if ($data['type'] == USER_TYPE_SUPER_ADMIN) {
+		if ($data['form_refresh'] && $this->hasInput('roleid')) {
+			$roles = API::Role()->get([
+				'output' => ['name', 'type'],
+				'roleids' => $data['roleid']
+			]);
+
+			if ($roles) {
+				$data['role'] = [['id' => $data['roleid'], 'name' => $roles[0]['name']]];
+				$data['user_type'] = $roles[0]['type'];
+			}
+		}
+
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			$data['groups_rights'] = [
 				'0' => [
 					'permission' => PERM_READ_WRITE,
@@ -177,6 +198,12 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		else {
 			$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($user_groups));
 		}
+
+		$data['modules'] = API::Module()->get([
+			'output' => ['id'],
+			'filter' => ['status' => MODULE_STATUS_ENABLED],
+			'preservekeys' => true
+		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

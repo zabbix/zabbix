@@ -490,7 +490,9 @@ jQuery(function($) {
 		});
 	}
 
-	checkDisableTimeSelectorUI();
+	if (!$container.data('disable-initial-check')) {
+		checkDisableTimeSelectorUI();
+	}
 });
 
 /**
@@ -529,9 +531,7 @@ var timeControl = {
 			src: location.href,
 			dynamic: 1,
 			loadSBox: 0,
-			loadImage: 0,
-			mainObject: 0, // object on changing will reflect on all others
-			onDashboard: 0 // object is on dashboard
+			loadImage: 0
 		}, objData);
 
 		var _this = this;
@@ -591,7 +591,6 @@ var timeControl = {
 						this.refreshImage(id);
 					}
 				}
-
 			}
 		}
 	},

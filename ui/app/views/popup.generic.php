@@ -172,6 +172,8 @@ switch ($data['popup_type']) {
 	case 'applications':
 	case 'application_prototypes':
 	case 'drules':
+	case 'roles':
+	case 'api_methods':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -359,7 +361,7 @@ switch ($data['popup_type']) {
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
 			$action = get_window_opener($options['dstfld1'], $item[$options['srcfld1']]);
-			$action .= 'updateItemTestBtn();';
+			$action .= 'updateItemFormElements();';
 			$action .= $options['srcfld2']
 				? get_window_opener($options['dstfld2'], $item[$options['srcfld2']])
 				: '';
@@ -635,7 +637,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
+	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

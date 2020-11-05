@@ -286,7 +286,6 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	switch (data_type = atoi(row[2]))
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
-			ZBX_FALLTHROUGH;
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			ret = tm_execute_data_json(data_type, row[1], &info);
 			break;
@@ -447,7 +446,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 #ifdef HAVE_NETSNMP
 		if (1 == snmp_cache_reload_requested)
 		{
-			zbx_clear_cache_snmp();
+			zbx_clear_cache_snmp(process_type, process_num);
 			snmp_cache_reload_requested = 0;
 		}
 #endif

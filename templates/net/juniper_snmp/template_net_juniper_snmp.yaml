@@ -1,0 +1,425 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-23T09:08:22Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'Juniper SNMP'
+      name: 'Juniper SNMP'
+      description: |
+        Template Net Juniper
+        
+        MIBs used:
+        JUNIPER-ALARM-MIB
+        JUNIPER-MIB
+        SNMPv2-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'EtherLike-MIB SNMP'
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: CPU
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: Memory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      items:
+        -
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2636.3.1.2.0
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: JUNIPER-MIB
+            The name, model, or detailed description of the box,indicating which product the box is about, for example 'M40'.
+          inventory_link: MODEL
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2636.3.1.3.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: JUNIPER-MIB
+            The serial number of this subject, blank if unknown or unavailable.
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Overall system health status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2636.3.4.2.3.1.0
+          key: 'system.status[jnxRedAlarmState.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          description: |
+            MIB: JUNIPER-ALARM-MIB
+            The red alarm indication on the craft interface panel.
+            The red alarm is on when there is some system
+            failure or power supply failure or the system
+            is experiencing a hardware malfunction or some
+            threshold is being exceeded.
+            
+            This red alarm state could be turned off by the
+            ACO/LT (Alarm Cut Off / Lamp Test) button on the
+            front panel module.
+          applications:
+            -
+              name: Status
+          valuemap:
+            name: 'JUNIPER-ALARM-MIB::jnxRedAlarmState'
+          triggers:
+            -
+              expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
+              name: 'System status is in critical state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check the device for errors'
+        -
+          name: 'Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.sw.os[sysDescr.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: SNMPv2-MIB'
+          inventory_link: OS
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'kernel (JUNOS [0-9a-zA-Z\.\-]+)'
+                - \1
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Operating system description has changed'
+              priority: INFO
+              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'CPU and Memory Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5]'
+          key: jnxOperatingTable.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: 'Routing Engine.*'
+                formulaid: A
+          description: |
+            Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory
+            http://kb.juniper.net/InfoCenter/index?page=content&id=KB17526&actp=search. Filter limits results to Routing Engines
+          item_prototypes:
+            -
+              name: '{#SNMPVALUE}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2636.3.1.13.1.8.{#SNMPINDEX}'
+              key: 'system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: JUNIPER-MIB
+                The CPU utilization in percentage of this subject. Zero if unavailable or inapplicable.
+                Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
+              applications:
+                -
+                  name: CPU
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  name: '{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+            -
+              name: '{#SNMPVALUE}: Memory utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2636.3.1.13.1.11.{#SNMPINDEX}'
+              key: 'vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: JUNIPER-MIB
+                The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.
+                Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf
+              applications:
+                -
+                  name: Memory
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  name: '{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+          graph_prototypes:
+            -
+              name: '{#SNMPVALUE}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Juniper SNMP'
+                    key: 'system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}]'
+            -
+              name: '{#SNMPVALUE}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Juniper SNMP'
+                    key: 'vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}]'
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5.4]'
+          key: jnxOperatingTable.discovery.fans
+          delay: 1h
+          description: 'Scanning JUNIPER-MIB::jnxOperatingTable for Fans'
+          item_prototypes:
+            -
+              name: '{#SNMPVALUE}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2636.3.1.13.1.6.4.{#SNMPINDEX}'
+              key: 'sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: 'MIB: JUNIPER-MIB'
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  name: '{#SNMPVALUE}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5.2]'
+          key: jnxOperatingTable.discovery.psu
+          delay: 1h
+          description: 'Scanning JUNIPER-MIB::jnxOperatingTable for Power Supplies'
+          item_prototypes:
+            -
+              name: '{#SNMPVALUE}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2636.3.1.13.1.6.2.{#SNMPINDEX}'
+              key: 'sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: JUNIPER-MIB
+                If they are using DC power supplies there is a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.
+                This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  name: '{#SNMPVALUE}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+        -
+          name: 'Temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.7,{#SENSOR_INFO},1.3.6.1.4.1.2636.3.1.13.1.5]'
+          key: jnxOperatingTable.discovery.temp
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '[^0]+'
+                formulaid: A
+          description: |
+            Scanning JUNIPER-MIB::jnxOperatingTable for Temperature
+            http://kb.juniper.net/InfoCenter/index?page=content&id=KB17526&actp=search. Filter limits results to Routing Engines
+          item_prototypes:
+            -
+              name: '{#SENSOR_INFO}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2636.3.1.13.1.7.{#SNMPINDEX}'
+              key: 'sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: JUNIPER-MIB
+                The temperature in Celsius (degrees C) of {#SENSOR_INFO}
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                      expression: '{Juniper SNMP:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
+                      recovery_expression: '{Juniper SNMP:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$FAN_CRIT_STATUS}'
+          value: '6'
+        -
+          macro: '{$HEALTH_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$PSU_CRIT_STATUS}'
+          value: '6'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT:"Routing Engine"}'
+          value: '80'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN:"Routing Engine"}'
+          value: '70'
+  value_maps:
+    -
+      name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
+      mappings:
+        -
+          value: '1'
+          newvalue: unknown
+        -
+          value: '2'
+          newvalue: running
+        -
+          value: '3'
+          newvalue: ready
+        -
+          value: '4'
+          newvalue: reset
+        -
+          value: '5'
+          newvalue: runningAtFullSpeed
+        -
+          value: '6'
+          newvalue: 'down or off'
+        -
+          value: '7'
+          newvalue: standby
+    -
+      name: 'JUNIPER-ALARM-MIB::jnxRedAlarmState'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: 'off'
+        -
+          value: '3'
+          newvalue: 'on - RedAlarm'

@@ -113,13 +113,15 @@ class CScreenSimpleGraph extends CScreenBase {
 			$item = new CDiv();
 		}
 		elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-			$item = new CLink(null, (new CUrl('history.php'))
-				->setArgument('action', HISTORY_GRAPH)
-				->setArgument('itemids', [$resourceid])
-				->setArgument('from', $this->timeline['from'])
-				->setArgument('to', $this->timeline['to'])
-				->getUrl()
-			);
+			$item = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
+				? new CLink(null, (new CUrl('history.php'))
+					->setArgument('action', HISTORY_GRAPH)
+					->setArgument('itemids', [$resourceid])
+					->setArgument('from', $this->timeline['from'])
+					->setArgument('to', $this->timeline['to'])
+					->getUrl()
+				)
+				: new CSpan(null);
 		}
 		$item->setId($containerid);
 

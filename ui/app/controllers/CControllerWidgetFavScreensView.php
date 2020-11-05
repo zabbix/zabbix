@@ -75,11 +75,14 @@ class CControllerWidgetFavScreensView extends CControllerWidget {
 		CArrayHelper::sort($screens, ['label']);
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAV_SCREENS]),
+			'name' => $this->getInput('name',
+				CWidgetConfig::getKnownWidgetTypes($this->getContext())[WIDGET_FAV_SCREENS]
+			),
 			'screens' => $screens,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed_ui_screens' => $this->checkAccess(CRoleHelper::UI_MONITORING_SCREENS)
 		]));
 	}
 }

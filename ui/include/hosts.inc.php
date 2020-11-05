@@ -667,10 +667,11 @@ function getTopLevelTemplates($applicationid, array $parent_templates) {
  *
  * @param string $applicationid
  * @param array  $parent_templates  The list of the templates, prepared by getApplicationParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeApplicationTemplatePrefix($applicationid, array $parent_templates) {
+function makeApplicationTemplatePrefix($applicationid, array $parent_templates, bool $provide_links) {
 	if (!array_key_exists($applicationid, $parent_templates['links'])) {
 		return null;
 	}
@@ -681,7 +682,7 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 	$list = [];
 
 	foreach ($templates as $template) {
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = (new CLink(CHtml::encode($template['name']),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'application.list')
@@ -814,10 +815,11 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
  *
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates) {
+function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates, bool $provide_links) {
 	if (!array_key_exists($host_prototypeid, $parent_templates['links'])) {
 		return null;
 	}
@@ -828,7 +830,7 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 
 	$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
 
-	if ($template['permission'] == PERM_READ_WRITE) {
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$name = (new CLink(CHtml::encode($template['name']),
 			(new CUrl('host_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
@@ -846,16 +848,17 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
  *
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates) {
+function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($host_prototypeid, $parent_templates['links'])) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
 
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = new CLink(CHtml::encode($template['name']),
 				(new CUrl('host_prototypes.php'))
 					->setArgument('form', 'update')
@@ -994,7 +997,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 	foreach ($db_global_macros as $db_global_macro) {
 		$all_macros[$db_global_macro['macro']] = true;
 		$global_macros[$db_global_macro['macro']] = [
-			'value' => CMacrosResolverGeneral::getMacroValue($db_global_macro),
+			'value' => getMacroConfigValue($db_global_macro),
 			'description' => $db_global_macro['description'],
 			'type' => $db_global_macro['type']
 		];
@@ -1032,7 +1035,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 			foreach ($db_template['macros'] as $dbMacro) {
 				if (array_key_exists($dbMacro['macro'], $all_macros)) {
 					$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-						'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+						'value' => getMacroConfigValue($dbMacro),
 						'description' => $dbMacro['description'],
 						'type' => $dbMacro['type']
 					];
@@ -1045,7 +1048,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 					if ($tpl_context === null) {
 						$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-							'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+							'value' => getMacroConfigValue($dbMacro),
 							'description' => $dbMacro['description'],
 							'type' => $dbMacro['type']
 						];
@@ -1067,7 +1070,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 								);
 
 								$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-									'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+									'value' => getMacroConfigValue($dbMacro),
 									'description' => $dbMacro['description'],
 									'type' => $dbMacro['type']
 								];
@@ -1080,7 +1083,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 						if (!$match_found) {
 							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-								'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+								'value' => getMacroConfigValue($dbMacro),
 								'description' => $dbMacro['description'],
 								'type' => $dbMacro['type']
 							];
@@ -1123,7 +1126,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 		if (array_key_exists($macro, $parent_host_macros)) {
 			$inherited_macro['parent_host'] = [
-				'value' => CMacrosResolverGeneral::getMacroValue($parent_host_macros[$macro]),
+				'value' => getMacroConfigValue($parent_host_macros[$macro]),
 				'description' => $parent_host_macros[$macro]['description'],
 				'type' => $parent_host_macros[$macro]['type']
 			];
@@ -1454,4 +1457,28 @@ function renderInterfaceHeaders() {
 					)
 				])
 		);
+}
+
+function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
+	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
+	$dashboard_fields = array_keys(array_flip($dashboard_fields));
+
+	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
+
+	return API::TemplateDashboard()->get([
+		'output' => $dashboard_fields,
+		'templateids' => $templateids,
+		'preservekeys' => true
+	]);
+}
+
+/**
+ * Return macro value to display in the list of inherited macros.
+ *
+ * @param array $macro
+ *
+ * @return string
+ */
+function getMacroConfigValue(array $macro): string {
+	return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_SECRET_MASK : $macro['value'];
 }

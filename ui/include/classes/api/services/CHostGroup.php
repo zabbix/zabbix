@@ -24,6 +24,16 @@
  */
 class CHostGroup extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	protected $tableName = 'hstgrp';
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['groupid', 'name'];

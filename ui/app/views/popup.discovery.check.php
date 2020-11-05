@@ -36,11 +36,23 @@ if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
 
+$select_type = (new CSelect('type'))
+	->setId('type-select')
+	->setValue($data['params']['type'])
+	->setFocusableElementId('type')
+	->addOptions(CSelect::createOptionsFromArray($discovery_ckeck_types));
+
+$select_snmpv3_securitylevel = (new CSelect('snmpv3_securitylevel'))
+	->setId('snmpv3-securitylevel')
+	->setValue($data['params']['snmpv3_securitylevel'])
+	->setFocusableElementId('snmpv3-securitylevel-button')
+	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv'))
+	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv'))
+	->addOption(new CSelectOption(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv'));
+
 $form_list = (new CFormList())
 	->cleanItems()
-	->addRow(new CLabel(_('Check type'), 'type'),
-		(new CComboBox('type', $data['params']['type'], '', $discovery_ckeck_types))
-	)
+	->addRow(new CLabel(_('Check type'), $select_type->getFocusableElementId()), $select_type)
 	->addRow((new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
 		(new CTextBox('ports', $data['params']['ports']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -77,12 +89,8 @@ $form_list = (new CFormList())
 			->setAttribute('maxlength', 64),
 		'row_dcheck_snmpv3_securityname'
 	)
-	->addRow(new CLabel(_('Security level'), 'snmpv3_securitylevel'),
-		new CComboBox('snmpv3_securitylevel', $data['params']['snmpv3_securitylevel'], null, [
-			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-		]),
+	->addRow(new CLabel(_('Security level'), $select_snmpv3_securitylevel->getFocusableElementId()),
+		$select_snmpv3_securitylevel,
 		'row_dcheck_snmpv3_securitylevel'
 	)
 	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),

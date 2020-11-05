@@ -24,6 +24,13 @@
  */
 class CModule extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+	];
+
 	protected $tableName = 'module';
 	protected $tableAlias = 'md';
 	protected $sortColumns = ['moduleid', 'relative_path'];

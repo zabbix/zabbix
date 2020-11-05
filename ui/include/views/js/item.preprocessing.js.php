@@ -226,6 +226,22 @@
 			}
 		}
 
+		/**
+		 * Allow only one option with value "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED" to be enabled.
+		 */
+		function updateTypeOptionsAvailability() {
+			const type_selects = $('[name^="preprocessing["][name$="[type]"] option[value="<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>"]');
+
+			if (type_selects.filter(':selected').length) {
+				type_selects
+					.not(':selected')
+					.prop('disabled', true);
+			}
+			else {
+				type_selects.prop('disabled', false);
+			}
+		}
+
 		var $preprocessing = $('#preprocessing'),
 			step_index = $preprocessing.find('li.sortable').length;
 
@@ -265,6 +281,7 @@
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
+				updateTypeOptionsAvailability();
 				step_index++;
 			})
 			.on('click', '#preproc_test_all', function() {
@@ -297,6 +314,8 @@
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
+
+				updateTypeOptionsAvailability();
 			})
 			.on('change', 'select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
@@ -318,12 +337,24 @@
 							.prop('checked', false)
 							.prop('disabled', true)
 							.trigger('change');
+						$row.find('[name*="[test]"]').prop('disabled', false);
+						break;
+
+					case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
+						$on_fail
+							.prop('checked', true)
+							.prop('disabled', true)
+							.trigger('change');
+						$row.find('[name*="[test]"]').prop('disabled', true);
 						break;
 
 					default:
 						$on_fail.prop('disabled', false);
+						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
+
+				updateTypeOptionsAvailability();
 			})
 			.on('change', 'input[type="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());

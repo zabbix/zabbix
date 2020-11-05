@@ -1,0 +1,390 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:53Z'
+  media_types:
+    -
+      name: Zammad
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_tags
+          value: '{EVENT.TAGSJSON}'
+        -
+          name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
+        -
+          name: zammad_access_token
+          value: '<PUT YOUR ACCESS TOKEN>'
+        -
+          name: zammad_customer
+          value: '<PUT YOUR CUSTOMER EMAIL>'
+        -
+          name: zammad_enable_tags
+          value: 'true'
+        -
+          name: zammad_ticket_id
+          value: '{EVENT.TAGS.__zbx_zammad_ticket_id}'
+        -
+          name: zammad_url
+          value: '<PUT YOUR ZAMMAD URL>'
+      script: |
+        var Zammad = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                Zammad.params = params;
+                if (typeof Zammad.params.url === 'string') {
+                    if (!Zammad.params.url.endsWith('/')) {
+                        Zammad.params.url += '/';
+                    }
+                }
+            },
+        
+            request: function (method, query, data) {
+                ['url', 'access_token'].forEach(function (field) {
+                    if (typeof Zammad.params !== 'object' || typeof Zammad.params[field] === 'undefined'
+                        || Zammad.params[field] === '' ) {
+                        throw 'Required param is not set: "' + field + '".';
+                    }
+                });
+        
+                var response,
+                    url = Zammad.params.url + query,
+                    request = new HttpRequest();
+        
+                if (typeof Zammad.HTTPProxy === 'string' && Zammad.HTTPProxy.trim() !== '') {
+                    request.setProxy(Zammad.HTTPProxy);
+                }
+        
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Token token=' + Zammad.params.access_token);
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ Zammad Webhook ] Sending request: ' +
+                    url + ((typeof data === 'string') ? (' ' + data) : ''));
+        
+                switch (method) {
+                    case 'get':
+                        response = request.get(url, data);
+                        break;
+        
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'put':
+                        response = request.put(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ Zammad Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ Zammad Webhook ] Failed to parse response received from Zammad');
+                        response = null;
+                    }
+                }
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (response !== null && typeof response.errors !== 'undefined'
+                        && Object.keys(response.errors).length > 0) {
+                        message += ': ' + JSON.stringify(response.errors);
+                    }
+                    else if (response !== null && typeof response.errorMessages !== 'undefined'
+                        && Object.keys(response.errorMessages).length > 0) {
+                        message += ': ' + JSON.stringify(response.errorMessages);
+                    }
+        
+                    throw message + ' Check debug log for more information.';
+                }
+        
+                return {
+                    status: request.getStatus(),
+                    response: response
+                };
+            },
+        
+            setTicketTags: function(tags, ticket_id) {
+                try {
+                    var tags_json = JSON.parse(tags),
+                        result;
+        
+                    for (var i in tags_json) {
+                        result = Zammad.request('get',
+                            '/api/v1/tags/add?object=Ticket&o_id=' + ticket_id +
+                            '&item=' + tags_json[i].tag);
+        
+                        if (typeof result.response !== 'object'
+                            || result.status != 200) {
+                            Zabbix.log(4, '[ Zammad Webhook ] Cannot add ticket tag:' + tags_json[i].tag);
+                        }
+                    }
+                }
+                catch (error) {
+                    Zabbix.log(4, '[ Zammad Webhook ] Failed to add ticket tags:' + error);
+                }
+        
+                return;
+            },
+        
+            createTicket: function(subject, message, priority) {
+                var data = {
+                        title: subject,
+                        group: 'Users',
+                        article: {
+                            subject: subject,
+                            body: message,
+                            type: 'note',
+                            internal: false
+                        },
+                        customer: Zammad.params.customer
+                    },
+                    result;
+        
+                if (priority) {
+                    data.priority_id = priority;
+                }
+        
+                result = Zammad.request('post', 'api/v1/tickets', data);
+        
+                if (typeof result.response !== 'object'
+                    || typeof result.response.id === 'undefined'
+                    || result.status != 201) {
+                    throw 'Cannot create Zammad ticket. Check debug log for more information.';
+                }
+        
+                return result.response.id;
+            },
+        
+            updateTicket: function(subject, message) {
+                var data = {
+                    ticket_id: Zammad.params.ticket_id,
+                    subject: subject,
+                    body: message || '',
+                    type: 'note',
+                    internal: false
+                };
+        
+                result = Zammad.request('post', 'api/v1/ticket_articles', data);
+        
+                if (typeof result.response !== 'object'
+                    || typeof result.response.id === 'undefined'
+                    || result.status != 201) {
+                    throw 'Cannot update Zammad ticket. Check debug log for more information.';
+                }
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                params_zammad = {},
+                params_update = {},
+                result = {tags: {}},
+                required_params = [
+                    'alert_subject', 'customer',
+                    'event_source', 'event_value',
+                    'event_update_status'
+                ],
+                severities = [
+                    {name: 'not_classified', color: '#97AAB3'},
+                    {name: 'information', color: '#7499FF'},
+                    {name: 'warning', color: '#FFC859'},
+                    {name: 'average', color: '#FFA059'},
+                    {name: 'high', color: '#E97659'},
+                    {name: 'disaster', color: '#E45959'},
+                    {name: 'resolved', color: '#009900'},
+                    {name: null, color: '#000000'}
+                ],
+                priority;
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('zammad_')) {
+                        params_zammad[key.substring(7)] = params[key].trim();
+                    }
+                    else if (key.startsWith('event_update_')) {
+                        params_update[key.substring(13)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
+                        throw 'Parameter "' + key + '" cannot be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            if (params.event_source === '0'
+                && ((params.event_value === '1' && params.event_update_status === '1')
+                    || (params.event_value === '0'
+                        && (params.event_update_status === '0' || params.event_update_status === '1')))
+                && (isNaN(parseInt(params.zammad_ticket_id)) || parseInt(params.zammad_ticket_id) < 1 )) {
+                throw 'Incorrect "zammad_ticket_id" parameter given: ' + params.zammad_ticket_id +
+                    '\nMust be positive integer.';
+            }
+        
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '7';
+            }
+        
+            if (params.event_value === '0') {
+                params.event_nseverity = '6';
+            }
+        
+            priority = params['severity_' + severities[params.event_nseverity].name];
+            priority = priority && priority.trim() || severities[7].name;
+        
+            Zammad.setParams(params_zammad);
+            Zammad.HTTPProxy = params.HTTPProxy;
+        
+            // Create ticket for non trigger-based events.
+            if (params.event_source !== '0'
+                && params.event_value !== '0') {
+                Zammad.createTicket(params.alert_subject, params.alert_message, priority, params.event_tags);
+            }
+            // Create ticket for trigger-based events.
+            else if (params.event_value === '1' && params_update.status === '0') {
+                var ticket_id = Zammad.createTicket(params.alert_subject,
+                    params.alert_subject + '\n' + params.alert_message + '\n' +
+                    params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') +
+                    'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id + '\n',
+                    priority);
+        
+                result.tags.__zbx_zammad_ticket_id = ticket_id;
+                result.tags.__zbx_zammad_ticketlink = params.zammad_url +
+                    (params.zammad_url.endsWith('/') ? '' : '/') + '#ticket/zoom/' + ticket_id;
+        
+                if (Zammad.params.enable_tags.toLowerCase() === 'true') {
+                    Zammad.setTicketTags(params.event_tags, ticket_id);
+                }
+            }
+            // Update created ticket for trigger-based event.
+            else {
+                Zammad.updateTicket(params.alert_subject, params.alert_message);
+            }
+        
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(3, '[ Zammad Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_zammad_ticketlink}'
+      event_menu_name: 'Zammad: ticket #{EVENT.TAGS.__zbx_zammad_ticket_id}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved: {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

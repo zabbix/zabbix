@@ -57,6 +57,8 @@ class CWebUser {
 				throw new Exception();
 			}
 
+			API::getWrapper()->auth = self::$data['sessionid'];
+
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				error(_('GUI access disabled.'));
 				throw new Exception();
@@ -84,8 +86,6 @@ class CWebUser {
 	 * Log-out the current user.
 	 */
 	public static function logout(): void {
-		self::$data['sessionid'] = CSessionHelper::getId();
-
 		if (API::User()->logout([])) {
 			self::$data = null;
 			session_destroy();
@@ -100,6 +100,7 @@ class CWebUser {
 			]);
 
 			if (empty(self::$data)) {
+				CMessageHelper::clear();
 				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -107,7 +108,6 @@ class CWebUser {
 				]);
 
 				if (empty(self::$data)) {
-					CMessageHelper::clear();
 					throw new Exception();
 				}
 			}
@@ -124,18 +124,37 @@ class CWebUser {
 	}
 
 	/**
+	 * Checks access of authenticated user to specific access rule.
+	 *
+	 * @static
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return bool  Returns true if user has access to specified rule, false - otherwise.
+	 */
+	public static function checkAccess(string $rule_name): bool {
+		if (empty(self::$data) || self::$data['roleid'] == 0) {
+			return false;
+		}
+
+		return CRoleHelper::checkAccess($rule_name, self::$data['roleid']);
+	}
+
+	/**
 	 * Sets user data defaults.
 	 *
 	 * @static
 	 */
 	public static function setDefault(): void {
 		self::$data = [
+			'sessionid' => CEncryptHelper::generateKey(),
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
 			'type' => 0,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
-			'debug_mode' => false
+			'debug_mode' => false,
+			'roleid' => 0
 		];
 	}
 

@@ -37,6 +37,7 @@ class testFormUser extends CWebTest {
 						'Password' => '123',
 						'Password (once again)' => '123'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'User with alias "Admin" already exists.'
 				]
@@ -90,6 +91,7 @@ class testFormUser extends CWebTest {
 						'Alias' => 'Negative_Test2',
 						'Groups' => 'Zabbix administrators'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "Password": cannot be empty.'
 				]
@@ -103,6 +105,7 @@ class testFormUser extends CWebTest {
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Both passwords must be equal.'
 				]
@@ -116,6 +119,7 @@ class testFormUser extends CWebTest {
 						'Groups' => 'Zabbix administrators',
 						'Password (once again)' => 'zabbix'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Both passwords must be equal.'
 				]
@@ -130,6 +134,7 @@ class testFormUser extends CWebTest {
 						'Password' => 'PaSSwOrD',
 						'Password (once again)' => 'password'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Both passwords must be equal.'
 				]
@@ -160,6 +165,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '123abc'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
@@ -175,6 +181,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '3601'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
@@ -189,6 +196,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '2h'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
@@ -203,6 +211,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '61m'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
@@ -218,6 +227,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '00000000000001'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
@@ -233,6 +243,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Rows per page' => '0'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
@@ -248,6 +259,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Rows per page' => 'abc123'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
@@ -266,6 +278,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '89'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
@@ -283,6 +296,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1m'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
@@ -301,6 +315,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '86401'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
@@ -318,6 +333,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1441m'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
@@ -335,6 +351,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '25h'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
@@ -353,6 +370,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => 'ninety'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": a time unit is expected.'
 				]
@@ -386,6 +404,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'URL (after login)' => 'javascript:alert(123);'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
@@ -401,6 +420,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
+					'role' => 'Super Admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
@@ -414,7 +434,8 @@ class testFormUser extends CWebTest {
 						'Groups' => 'Guests',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
-					]
+					],
+					'role' => 'Guest role'
 				]
 			],
 			// Creating a user with optional parameters specified (including autologout) using Cyrillic charatcers.
@@ -434,6 +455,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '999999',
 						'URL (after login)' => 'https://zabbix.com'
 					],
+					'role' => 'Admin role',
 					'check_form' => true
 				]
 			],
@@ -462,6 +484,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1d'
 					],
+					'role' => 'Admin role',
 					'check_form' => true,
 					'check_user' => true
 				]
@@ -473,7 +496,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Alias' => 'LDAP_user',
 						'Groups' => 'LDAP user group'
-					]
+					],
+					'role' => 'Super Admin role'
 				]
 			],
 			// Verification that field password is not mandatory for users with no access to frontend.
@@ -483,7 +507,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Alias' => 'No_frontend_user',
 						'Groups' => 'No access to the frontend'
-					]
+					],
+					'role' => 'User role'
 				]
 			]
 		];
@@ -502,6 +527,11 @@ class testFormUser extends CWebTest {
 
 		if (array_key_exists('auto_logout', $data)) {
 			$this->setAutoLogout($data['auto_logout']);
+		}
+
+		if (array_key_exists('role', $data)) {
+			$form->selectTab('Permissions');
+			$form->fill(['Role' => $data['role']]);
 		}
 
 		$form->submit();
@@ -545,6 +575,11 @@ class testFormUser extends CWebTest {
 		}
 		else {
 			$this->assertTrue($form_update->getField('Auto-login')->isChecked($data['fields']['Auto-login']));
+		}
+
+		if (array_key_exists('role', $data)) {
+			$form_update->selectTab('Permissions');
+			$this->assertEquals([$data['role']], $form_update->getField('Role')->getSelected());
 		}
 	}
 

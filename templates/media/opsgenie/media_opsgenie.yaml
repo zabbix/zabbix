@@ -1,0 +1,452 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:49Z'
+  media_types:
+    -
+      name: Opsgenie
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_tags_json
+          value: '{EVENT.TAGSJSON}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: opsgenie_api
+          value: '<put your opsgenie api>'
+        -
+          name: opsgenie_tags
+          value: ''
+        -
+          name: opsgenie_teams
+          value: ''
+        -
+          name: opsgenie_token
+          value: '<put your token>'
+        -
+          name: opsgenie_web
+          value: '<put your opsgenie web>'
+        -
+          name: severity_average
+          value: P3
+        -
+          name: severity_default
+          value: P5
+        -
+          name: severity_disaster
+          value: P1
+        -
+          name: severity_high
+          value: P2
+        -
+          name: severity_information
+          value: P5
+        -
+          name: severity_not_classified
+          value: P5
+        -
+          name: severity_warning
+          value: P4
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: zbxurl
+          value: '{$ZABBIX.URL}'
+        -
+          name: zbxuser
+          value: '{USER.FULLNAME}'
+      script: |
+        var Media = {
+            params: {},
+            name: '',
+            labels: [],
+            HTTPProxy: '',
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                Media.params = params;
+                Media.params.api += Media.params.api.endsWith('/') ? '' : '/';
+                Media.params.web += Media.params.web.endsWith('/') ? '' : '/';
+            },
+        
+            setProxy: function (HTTPProxy) {
+                if (typeof HTTPProxy !== 'undefined' && HTTPProxy.trim() !== '') {
+                    Media.HTTPProxy = HTTPProxy;
+                }
+            },
+        
+            setTags: function(event_tags_json) {
+                if (typeof event_tags_json !== 'undefined' && event_tags_json !== ''
+                        && event_tags_json !== '{EVENT.TAGSJSON}') {
+        
+                    try {
+                        var tags = JSON.parse(event_tags_json),
+                            label;
+        
+                        tags.forEach(function (tag) {
+                            if (typeof tag.tag === 'string') {
+                                label = (tag.tag + (typeof tag.value !== 'undefined'
+                                        && tag.value !== '' ? (':' + tag.value) : '')).replace(/\s/g, '_');
+                                Media.labels.push(label);
+                            }
+                        });
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Failed to parse "event_tags_json" param');
+                    }
+                }
+            },
+        
+            request: function (method, query, data, allow_404) {
+                if (typeof(allow_404) === 'undefined') {
+                    allow_404 = false;
+                }
+        
+                ['api', 'token'].forEach(function (field) {
+                    if (typeof Media.params !== 'object' || typeof Media.params[field] === 'undefined'
+                            || Media.params[field] === '') {
+                        throw 'Required ' + Media.name + ' param is not set: "' + field + '".';
+                    }
+                });
+        
+                var response,
+                    url = Media.params.api + query,
+                    request = new HttpRequest();
+        
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: ' + Media.params.token);
+                request.setProxy(Media.HTTPProxy);
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Sending request: ' +
+                    url + ((typeof data === 'string') ? ('\n' + data) : ''));
+        
+                switch (method) {
+                    case 'get':
+                        response = request.get(url, data);
+                        break;
+        
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'put':
+                        response = request.put(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ ' + Media.name + ' Webhook ] Failed to parse response.');
+                        response = null;
+                    }
+                }
+        
+                if ((request.getStatus() < 200 || request.getStatus() >= 300)
+                        && (!allow_404 || request.getStatus() !== 404)) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (response !== null) {
+                        if (typeof response.errors === 'object' && Object.keys(response.errors).length > 0) {
+                            message += ': ' + JSON.stringify(response.errors);
+                        }
+                        else if (typeof response.errorMessages === 'object' && Object.keys(response.errorMessages).length > 0) {
+                            message += ': ' + JSON.stringify(response.errorMessages);
+                        }
+                        else if (typeof response.message === 'string') {
+                            message += ': ' + response.message;
+                        }
+                    }
+        
+                    throw message + ' Check debug log for more information.';
+                }
+        
+                return {
+                    status: request.getStatus(),
+                    response: response
+                };
+            },
+        
+            getAlertId: function (requestId) {
+                do {
+                    resp = Media.request('get', 'requests/' + requestId, undefined, true);
+                }
+                while (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined'
+                        || resp.response.data.success === false);
+        
+                if (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined') {
+                    throw 'Cannot get ' + Media.name + ' issue ID. Check debug log for more information.';
+                }
+        
+                return resp;
+            }
+        };
+        
+        try {
+            var result = {tags: {}},
+                params = JSON.parse(value),
+                media = {},
+                fields = {},
+                resp = {},
+                responders = [],
+                tags = [],
+                required_params = [
+                    'alert_subject',
+                    'alert_message',
+                    'event_id',
+                    'event_source',
+                    'event_value',
+                    'event_update_status',
+                    'opsgenie_api',
+                    'opsgenie_web',
+                    'opsgenie_token'
+                ],
+                severities = [
+                    'not_classified',
+                    'information',
+                    'warning',
+                    'average',
+                    'high',
+                    'disaster',
+                    'resolved',
+                    'default'
+                ],
+                priority;
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
+                        throw 'Parameter "' + key + '" cannot be empty.';
+                    }
+                    if (key.startsWith('opsgenie_')) {
+                        media[key.substring(9)] = params[key];
+                    }
+                });
+        
+            // Possible values of event_source:
+            // 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal.
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            }
+        
+            // Check event_value for trigger-based and internal events.
+            // Possible values: 1 for problem, 0 for recovering
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check event_update_status only for trigger-based events.
+            // Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.
+            if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            // Check event_id for a numeric value.
+            if (isNaN(parseInt(params.event_id)) || params.event_id < 1) {
+                throw 'Incorrect "event_id" parameter given: ' + params.event_id + '\nMust be a positive number.';
+            }
+        
+            if ((params.event_source === '1' || params.event_source === '2')  && params.event_value === '0') {
+                throw 'Recovery operations are supported only for Trigger and Internal actions.';
+            }
+        
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '7';
+            }
+        
+            if (params.event_value === '0') {
+                params.event_nseverity = '6';
+            }
+        
+            priority = params['severity_' + severities[params.event_nseverity]];
+            params.zbxurl = params.zbxurl + (params.zbxurl.endsWith('/') ? '' : '/');
+        
+            Media.name = 'Opsgenie';
+            Media.setParams(media);
+            Media.params.token = 'GenieKey ' + Media.params.token;
+            Media.setProxy(params.HTTPProxy);
+            Media.setTags(params.event_tags_json); // Set Media.labels
+        
+            // Create an issue.
+            // Numeric value of the event that triggered an action (1 for problem, 0 for recovering).
+            // Numeric value of of the problem update status. Possible values:
+            // 0 - Webhook was called because of problem/recovery event, 1 - Update operation.
+            if ((params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0)
+                    || (params.event_source == 3 && params.event_value == 1)
+                    || params.event_source == 1 || params.event_source == 2) {
+                fields.message = params.alert_subject;
+                fields.alias = params.event_id;
+                fields.description = params.alert_message;
+                fields.priority = priority;
+                fields.source = 'Zabbix';
+        
+                if (params.event_source === '0') {
+                    fields.details = {
+                        'Zabbix server': params.zbxurl,
+                        Problem: params.zbxurl + 'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id
+                    };
+                }
+                else {
+                    fields.details = {'Zabbix server': params.zbxurl};
+                }
+        
+                if (typeof params.opsgenie_teams === 'string') {
+                    responders = params.opsgenie_teams.split(',');
+                    fields.responders = responders.map(function(team) {
+                        return {type: 'team', name: team.trim()};
+                    });
+                }
+        
+                fields.tags = Media.labels;
+                if (typeof params.opsgenie_tags === 'string') {
+                    tags = params.opsgenie_tags.split(',');
+                    tags.forEach(function(item) {
+                        fields.tags.push(item.trim());
+                    });
+                }
+        
+                resp = Media.request('post', '', fields);
+                if (typeof resp.response !== 'object' || typeof resp.response.result === 'undefined') {
+                    throw 'Cannot create ' + Media.name + ' issue. Check debug log for more information.';
+                }
+        
+                if (resp.status === 202) {
+                    resp = Media.getAlertId(resp.response.requestId);
+                    if (params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0) {
+                        result.tags.__zbx_ops_issuekey = resp.response.data.alertId;
+                        result.tags.__zbx_ops_issuelink = Media.params.web + 'alert/detail/' + resp.response.data.alertId;
+                    }
+                }
+                else {
+                    throw Media.name + ' response code is unexpected. Check debug log for more information.';
+                }
+            }
+            // Update a created issue.
+            else {
+                fields.user = (params.event_value != 0) ? params.zbxuser : '';
+                fields.note = params.alert_message;
+        
+                resp = Media.request('post', params.event_id + '/notes?identifierType=alias', fields);
+                if (typeof resp.response !== 'object' || typeof resp.response.result === 'undefined') {
+                    throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';
+                }
+        
+                if (resp.status === 202) {
+                    resp = Media.getAlertId(resp.response.requestId);
+                }
+                else {
+                    throw Media.name + ' response code is unexpected. Check debug log for more information.';
+                }
+            }
+        
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(3, '[ ' + Media.name + ' Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_ops_issuelink}'
+      event_menu_name: 'Opsgenie: {EVENT.TAGS.__zbx_ops_issuekey}'
+      description: |
+        Please refer to https://docs.opsgenie.com/docs/alert-api and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.
+          
+        Set global macro {$ZABBIX.URL} with your Zabbix server URL.
+        Add dedicated user with media type "Opsgenie".
+        Change the values of the variables opsgenie_api (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts),
+        opsgenie_web (for example, https://myzabbix.app.opsgenie.com), opsgenie_token.
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}

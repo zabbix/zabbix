@@ -20,6 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -27,6 +29,15 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup globalmacro
  */
 class testFormAdministrationGeneralMacros extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	use MacrosTrait;
 
@@ -837,5 +848,231 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 		// Open list of items and check that macro value is hidden.
 		$this->page->open($item_url)->waitUntilReady();
 		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
+	}
+
+	public function getCreateVaultMacrosData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO}',
+						'value' => [
+							'text' => 'secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description'
+					],
+					'title' => 'Macros updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO2}',
+						'value' => [
+							'text' => 'one/two/three/four/five/six:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description7'
+					],
+					'title' => 'Macros updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO3}',
+						'value' => [
+							'text' => 'secret/path:',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description2'
+					],
+					'title' => 'Cannot update macros',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "path:".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO4}',
+						'value' => [
+							'text' => '/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description3'
+					],
+					'title' => 'Cannot update macros',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "/path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO5}',
+						'value' => [
+							'text' => 'path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description4'
+					],
+					'title' => 'Cannot update macros',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near "path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO6}',
+						'value' => [
+							'text' => ':key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description5'
+					],
+					'title' => 'Cannot update macros',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near ":key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO7}',
+						'value' => [
+							'text' => 'secret/path',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description6'
+					],
+					'title' => 'Cannot update macros',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO7}": incorrect syntax near "path".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO8}',
+						'value' => [
+							'text' => '/secret/path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description8'
+					],
+					'title' => 'Cannot update macros',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO9}',
+						'value' => [
+							'text' => '',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description9'
+					],
+					'title' => 'Cannot update macros',
+					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateVaultMacrosData
+	 */
+	public function testFormAdministrationGeneralMacros_CreateVaultMacros($data) {
+		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
+		$this->fillMacros([$data['macro_fields']]);
+		$this->query('button:Update')->one()->click();
+		if ($data['expected'] == TEST_BAD) {
+			$this->assertMessage($data['expected'], $data['title'], $data['message']);
+		}
+		else {
+			$this->assertMessage($data['expected'], $data['title']);
+			$sql = 'SELECT value, description, type FROM globalmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
+			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
+				array_values(CDBHelper::getRow($sql)));
+			$value_field = $this->getValueField($data['macro_fields']['macro']);
+			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
+		}
+	}
+
+	public function getUpdateVaultMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 1,
+					'macro' => '{$1_VAULT_MACRO_CHANGED}',
+					'value' => [
+						'text' => 'secret/path:key'
+					],
+					'description' => ''
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 1,
+					'macro' => '{$1_VAULT_MACRO_CHANGED}',
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					],
+					'description' => ''
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 1,
+					'macro' => '{$1_VAULT_MACRO_CHANGED}',
+					'value' => [
+						'text' => 'new/path/to/secret:key'
+					],
+					'description' => 'Changing description'
+				]
+			]
+		];
+	}
+
+	public function prepareUpdateData() {
+		$response = CDataHelper::call('usermacro.createglobal', [
+			'macro' => '{$1_VAULT_MACRO}',
+			'value' => 'secret/path:key',
+			'type' => ZBX_MACRO_TYPE_VAULT
+		]);
+
+		$this->assertArrayHasKey('globalmacroids', $response);
+	}
+
+	/**
+	 * @on-before-once prepareUpdateData
+	 *
+	 * @dataProvider getUpdateVaultMacrosData
+	 */
+	public function testFormAdministrationGeneralMacros_UpdateVaultMacros($data) {
+		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
+		$this->fillMacros([$data]);
+		$this->query('button:Update')->one()->click();
+		$this->page->waitUntilReady();
+		$result = [];
+		foreach (['macro', 'value', 'description'] as $field) {
+			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
+		}
+		$this->assertEquals([$data['macro'], $data['value']['text'], $data['description']], $result);
+		array_push($result, ZBX_MACRO_TYPE_VAULT);
+		$sql = 'SELECT macro, value, description, type FROM globalmacro WHERE macro='.zbx_dbstr($data['macro']);
+		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 	}
 }

@@ -60,17 +60,25 @@ $overrides_popup_form_list = (new CFormList())
 	);
 
 // filters
+$override_evaltype_select = (new CSelect('overrides_evaltype'))
+	->setId('overrides-evaltype')
+	->setValue($options['overrides_evaltype'])
+	->addOptions(CSelect::createOptionsFromArray([
+		CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+		CONDITION_EVAL_TYPE_AND => _('And'),
+		CONDITION_EVAL_TYPE_OR => _('Or'),
+		CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+	]));
+
+if ($options['templated']) {
+	$override_evaltype_select->setReadonly();
+}
+
 $override_evaltype = (new CDiv([
 	(new CDiv([
 		_('Type of calculation'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('overrides_evaltype', $options['overrides_evaltype'], null, [
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or'),
-			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-		]))
-			->setReadonly($options['templated']),
+		$override_evaltype_select,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 	]))->addClass(ZBX_STYLE_CELL),
 	(new CDiv([
@@ -90,7 +98,7 @@ $override_evaltype = (new CDiv([
 $filter_table = (new CTable())
 	->setId('overrides_filters')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), (new CColHeader('Action'))->setWidth('100%')]);
 
 $overrides_filters = $options['overrides_filters'];
 if (!$overrides_filters) {
@@ -104,11 +112,6 @@ if (!$overrides_filters) {
 else {
 	$overrides_filters = CConditionHelper::sortConditionsByFormulaId($overrides_filters);
 }
-
-$operators = [
-	CONDITION_OPERATOR_REGEXP => _('matches'),
-	CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-];
 
 foreach ($overrides_filters as $i => $overrides_filter) {
 	$formulaid = [
@@ -136,13 +139,16 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 			->setEnabled(!$options['templated'])
 	];
 
-	$row = [$formulaid, $macro,
-		(new CComboBox('overrides_filters['.$i.'][operator]', $overrides_filter['operator'], null, $operators))
-			->addClass('operator')
-			->setReadonly($options['templated']),
-		$value,
-		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
-	];
+	$operator_select = (new CSelect('overrides_filters['.$i.'][operator]'))
+		->setValue($overrides_filter['operator'])
+		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
+		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')));
+
+	if ($options['templated']) {
+		$operator_select->setReadonly();
+	}
+
+	$row = [$formulaid, $macro, $operator_select, $value, (new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)];
 	$filter_table->addRow($row, 'form_row');
 }
 
@@ -157,7 +163,8 @@ $filter_table->setFooter(new CCol(
 $overrides_popup_form_list->addRow(_('Filters'),
 	(new CDiv([$override_evaltype, $filter_table]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('width: 100%;')
 );
 
 // operations
@@ -185,6 +192,7 @@ $overrides_popup_form_list->addRow(_('Operations'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		->addStyle('width: 100%;')
+		->addStyle('max-width: 775px;')
 );
 
 $output['buttons'] = [

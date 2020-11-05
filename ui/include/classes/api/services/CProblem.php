@@ -24,6 +24,10 @@
  */
 class CProblem extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	protected $tableName = 'problem';
 	protected $tableAlias = 'p';
 	protected $sortColumns = ['eventid'];

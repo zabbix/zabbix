@@ -1,0 +1,1425 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-16T09:33:20Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'MySQL by ODBC'
+      name: 'MySQL by ODBC'
+      description: |
+        Requirements for template operation:
+        1.Create MySQL user for monitoring. For example:
+        CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
+        GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
+        For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. 
+        2. Set the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).
+        
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: MySQL
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'MySQL: Get status variables'
+          type: ODBC
+          key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'show global status'
+          username: '{$MYSQL.USER}'
+          password: '{$MYSQL.PASSWORD}'
+          description: 'The item gets server global status information.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+        -
+          name: 'MySQL: Status'
+          type: ODBC
+          key: 'db.odbc.select[ping,"{$MYSQL.DSN}"]'
+          history: 7d
+          params: 'select "1"'
+          username: '{$MYSQL.USER}'
+          password: '{$MYSQL.PASSWORD}'
+          applications:
+            -
+              name: MySQL
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'MySQL: Service is down'
+              priority: HIGH
+        -
+          name: 'MySQL: Version'
+          type: ODBC
+          key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          params: 'select version()'
+          username: '{$MYSQL.USER}'
+          password: '{$MYSQL.PASSWORD}'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
+              priority: INFO
+              description: 'MySQL version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'MySQL: Aborted clients per second'
+          type: DEPENDENT
+          key: mysql.aborted_clients.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of connections that were aborted because the client died without closing the connection properly.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Aborted_clients'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Aborted connections per second'
+          type: DEPENDENT
+          key: mysql.aborted_connects.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of failed attempts to connect to the MySQL server.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Aborted_connects'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MYSQL.ABORTED_CONN.MAX.WARN}'
+              name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.'
+              dependencies:
+                -
+                  name: 'MySQL: Refused connections (max_connections limit reached)'
+                  expression: '{MySQL by ODBC:mysql.connection_errors_max_connections.rate.last()}>0'
+        -
+          name: 'MySQL: Buffer pool efficiency'
+          type: CALCULATED
+          key: mysql.buffer_pool_efficiency
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: |
+            last(mysql.innodb_buffer_pool_reads) / 
+            ( last(mysql.innodb_buffer_pool_read_requests) + 
+            ( last(mysql.innodb_buffer_pool_read_requests) = 0 ) ) * 100 * 
+            ( last(mysql.innodb_buffer_pool_read_requests) > 0 )
+          description: 'The item shows how effectively the buffer pool is serving reads.'
+          applications:
+            -
+              name: MySQL
+        -
+          name: 'MySQL: Buffer pool utilization'
+          type: CALCULATED
+          key: mysql.buffer_pool_utilization
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: |
+            ( last(mysql.innodb_buffer_pool_pages_total) - 
+            last(mysql.innodb_buffer_pool_pages_free) ) / 
+            ( last(mysql.innodb_buffer_pool_pages_total) + 
+            ( last(mysql.innodb_buffer_pool_pages_total) = 0 ) ) * 100 * 
+            ( last(mysql.innodb_buffer_pool_pages_total) > 0 )
+          description: 'Ratio of used to total pages in the buffer pool.'
+          applications:
+            -
+              name: MySQL
+          triggers:
+            -
+              expression: '{max(5m)}<{$MYSQL.BUFF_UTIL.MIN.WARN}'
+              name: 'MySQL: Buffer pool utilization is too low (less {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
+              priority: WARNING
+              description: 'The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
+        -
+          name: 'MySQL: Bytes received'
+          type: DEPENDENT
+          key: mysql.bytes_received.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The number of bytes received from all clients.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Bytes_received'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Bytes sent'
+          type: DEPENDENT
+          key: mysql.bytes_sent.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'The number of bytes sent to all clients.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Bytes_sent'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Command Delete per second'
+          type: DEPENDENT
+          key: mysql.com_delete.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The Com_delete counter variable indicates the number of times the delete statement has been executed.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Com_delete'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Command Insert per second'
+          type: DEPENDENT
+          key: mysql.com_insert.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The Com_insert counter variable indicates the number of times the insert statement has been executed.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Com_insert'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Command Select per second'
+          type: DEPENDENT
+          key: mysql.com_select.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The Com_select counter variable indicates the number of times the select statement has been executed.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Com_select'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Command Update per second'
+          type: DEPENDENT
+          key: mysql.com_update.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The Com_update counter variable indicates the number of times the update statement has been executed.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Com_update'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Connections per second'
+          type: DEPENDENT
+          key: mysql.connections.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of connection attempts (successful or not) to the MySQL server.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Connections'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Connection errors accept per second'
+          type: DEPENDENT
+          key: mysql.connection_errors_accept.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors that occurred during calls to accept() on the listening port.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Connection_errors_accept'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Connection errors internal per second'
+          type: DEPENDENT
+          key: mysql.connection_errors_internal.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of refused connections due to internal server errors, for example out of memory errors, or failed thread starts.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Connection_errors_internal'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Connection errors max connections per second'
+          type: DEPENDENT
+          key: mysql.connection_errors_max_connections.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of refused connections due to the max_connections limit being reached.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Connection_errors_max_connections'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{last()}>0'
+              name: 'MySQL: Refused connections (max_connections limit reached)'
+              priority: AVERAGE
+              description: 'Number of refused connections due to the max_connections limit being reached.'
+        -
+          name: 'MySQL: Connection errors peer address per second'
+          type: DEPENDENT
+          key: mysql.connection_errors_peer_address.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors while searching for the connecting client IP address.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Connection_errors_peer_address'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Connection errors select per second'
+          type: DEPENDENT
+          key: mysql.connection_errors_select.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of errors during calls to select() or poll() on the listening port. The client would not necessarily have been rejected in these cases.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Connection_errors_select'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Connection errors tcpwrap per second'
+          type: DEPENDENT
+          key: mysql.connection_errors_tcpwrap.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of connections the libwrap library refused.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Connection_errors_tcpwrap'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Created tmp tables on disk per second'
+          type: DEPENDENT
+          key: mysql.created_tmp_disk_tables.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of internal on-disk temporary tables created by the server while executing statements.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Created_tmp_disk_tables'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
+              name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: 'Possibly the application using the database is in need of query optimization.'
+        -
+          name: 'MySQL: Created tmp files on disk per second'
+          type: DEPENDENT
+          key: mysql.created_tmp_files.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'How many temporary files mysqld has created.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Created_tmp_files'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
+              name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: 'Possibly the application using the database is in need of query optimization.'
+        -
+          name: 'MySQL: Created tmp tables on memory per second'
+          type: DEPENDENT
+          key: mysql.created_tmp_tables.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of internal temporary tables created by the server while executing statements.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Created_tmp_tables'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
+              name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: 'Possibly the application using the database is in need of query optimization.'
+        -
+          name: 'MySQL: InnoDB buffer pool pages free'
+          type: DEPENDENT
+          key: mysql.innodb_buffer_pool_pages_free
+          delay: '0'
+          history: 7d
+          description: 'The total size of the InnoDB buffer pool, in pages.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_buffer_pool_pages_free'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB buffer pool pages total'
+          type: DEPENDENT
+          key: mysql.innodb_buffer_pool_pages_total
+          delay: '0'
+          history: 7d
+          description: 'The total size of the InnoDB buffer pool, in pages.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_buffer_pool_pages_total'')].Value.first()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB buffer pool reads'
+          type: DEPENDENT
+          key: mysql.innodb_buffer_pool_reads
+          delay: '0'
+          history: 7d
+          description: 'The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_buffer_pool_reads'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB buffer pool reads per second'
+          type: DEPENDENT
+          key: mysql.innodb_buffer_pool_reads.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_buffer_pool_reads'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB buffer pool read requests'
+          type: DEPENDENT
+          key: mysql.innodb_buffer_pool_read_requests
+          delay: '0'
+          history: 7d
+          description: 'The number of logical read requests.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_buffer_pool_read_requests'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB buffer pool read requests per second'
+          type: DEPENDENT
+          key: mysql.innodb_buffer_pool_read_requests.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of logical read requests per second.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_buffer_pool_read_requests'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB row lock time'
+          type: DEPENDENT
+          key: mysql.innodb_row_lock_time
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The total time spent in acquiring row locks for InnoDB tables, in milliseconds.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_row_lock_time'')].Value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB row lock time max'
+          type: DEPENDENT
+          key: mysql.innodb_row_lock_time_max
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The maximum time to acquire a row lock for InnoDB tables, in milliseconds.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_row_lock_time_max'')].Value.first()'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: InnoDB row lock waits'
+          type: DEPENDENT
+          key: mysql.innodb_row_lock_waits
+          delay: '0'
+          history: 7d
+          description: 'The number of times operations on InnoDB tables had to wait for a row lock.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Innodb_row_lock_waits'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Max used connections'
+          type: DEPENDENT
+          key: mysql.max_used_connections
+          delay: '0'
+          history: 7d
+          description: 'The maximum number of connections that have been in use simultaneously since the server started.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Max_used_connections'')].Value.first()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Queries per second'
+          type: DEPENDENT
+          key: mysql.queries.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Queries'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Questions per second'
+          type: DEPENDENT
+          key: mysql.questions.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Questions'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Slow queries per second'
+          type: DEPENDENT
+          key: mysql.slow_queries.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of queries that have taken more than long_query_time seconds.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Slow_queries'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{min(5m)}>{$MYSQL.SLOW_QUERIES.MAX.WARN}'
+              name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: 'The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.'
+        -
+          name: 'MySQL: Threads cached'
+          type: DEPENDENT
+          key: mysql.threads_cached
+          delay: '0'
+          history: 7d
+          description: 'The number of threads in the thread cache.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Threads_cached'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Threads connected'
+          type: DEPENDENT
+          key: mysql.threads_connected
+          delay: '0'
+          history: 7d
+          description: 'The number of currently open connections.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Threads_connected'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Threads created per second'
+          type: DEPENDENT
+          key: mysql.threads_created.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Threads_created'')].Value.first()'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Threads running'
+          type: DEPENDENT
+          key: mysql.threads_running
+          delay: '0'
+          history: 7d
+          description: 'The number of threads that are not sleeping.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Threads_running'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+        -
+          name: 'MySQL: Uptime'
+          type: DEPENDENT
+          key: mysql.uptime
+          delay: '0'
+          history: 7d
+          units: uptime
+          description: 'The number of seconds that the server has been up.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Variable_name==''Uptime'')].Value.first()'
+          master_item:
+            key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
+          triggers:
+            -
+              expression: '{nodata(30m)}=1'
+              name: 'MySQL: Failed to fetch info data (or no data for 30m)'
+              priority: INFO
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              dependencies:
+                -
+                  name: 'MySQL: Service is down'
+                  expression: '{MySQL by ODBC:db.odbc.select[ping,"{$MYSQL.DSN}"].last()}=0'
+            -
+              expression: '{last()}<10m'
+              name: 'MySQL: Service has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'MySQL uptime is less than 10 minutes.'
+      discovery_rules:
+        -
+          name: 'Databases discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[databases,"{$MYSQL.DSN}"]'
+          delay: 1h
+          params: 'show databases'
+          username: '{$MYSQL.USER}'
+          password: '{$MYSQL.PASSWORD}'
+          filter:
+            conditions:
+              -
+                macro: '{#DATABASE}'
+                value: information_schema
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          description: 'Scanning databases in DBMS.'
+          item_prototypes:
+            -
+              name: 'MySQL: Size of database {#DATABASE}'
+              type: ODBC
+              key: 'db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]'
+              delay: 5m
+              history: 7d
+              units: B
+              params: 'SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH),0) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="{#DATABASE}"'
+              username: '{$MYSQL.USER}'
+              password: '{$MYSQL.PASSWORD}'
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Replication discovery'
+          type: ODBC
+          key: 'db.odbc.discovery[replication,"{$MYSQL.DSN}"]'
+          delay: 1h
+          params: 'show slave status'
+          username: '{$MYSQL.USER}'
+          password: '{$MYSQL.PASSWORD}'
+          description: 'If "show slave status" returns Master_Host, "Replication: *" items are created.'
+          item_prototypes:
+            -
+              name: 'MySQL: Replication Slave status {#MASTER_HOST}'
+              type: ODBC
+              key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              history: 1h
+              trends: '0'
+              value_type: TEXT
+              params: 'show slave status'
+              username: '{$MYSQL.USER}'
+              password: '{$MYSQL.PASSWORD}'
+              description: 'The item gets status information on essential parameters of the slave threads.'
+              applications:
+                -
+                  name: 'Zabbix raw items'
+            -
+              name: 'MySQL: Replication Seconds Behind Master {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.seconds_behind_master["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: |
+                The number of seconds that the slave SQL thread is behind processing the master binary log.
+                A high number (or an increasing one) can indicate that the slave is unable to handle events
+                from the master in a timely fashion.
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')][''Seconds_Behind_Master''].first()'
+                -
+                  type: MATCHES_REGEX
+                  parameters:
+                    - \d+
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Replication is not performed.'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MYSQL.REPL_LAG.MAX.WARN}'
+                  name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
+                  priority: WARNING
+            -
+              name: 'MySQL: Replication Slave IO Running {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Whether the I/O thread for reading the master's binary log is running. 
+                Normally, you want this to be Yes unless you have not yet started replication or have 
+                explicitly stopped it with STOP SLAVE.
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')][''Slave_IO_Running''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,"Yes",ne)}=1'
+                  name: 'MySQL: The slave I/O thread is not connected to a replication master'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'MySQL: The slave I/O thread is not running'
+                      expression: '{MySQL by ODBC:mysql.slave_io_running["{#MASTER_HOST}"].count(#1,"No",eq)}=1'
+                -
+                  expression: '{count(#1,"No",eq)}=1'
+                  name: 'MySQL: The slave I/O thread is not running'
+                  priority: AVERAGE
+                  description: 'Whether the I/O thread for reading the master''s binary log is running.'
+            -
+              name: 'MySQL: Replication Slave SQL Running {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Whether the SQL thread for executing events in the relay log is running. 
+                As with the I/O thread, this should normally be Yes.
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')][''Slave_SQL_Running''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,"No",eq)}=1'
+                  name: 'MySQL: The SQL thread is not running'
+                  priority: WARNING
+                  description: 'Whether the SQL thread for executing events in the relay log is running.'
+                  dependencies:
+                    -
+                      name: 'MySQL: The slave I/O thread is not running'
+                      expression: '{MySQL by ODBC:mysql.slave_io_running["{#MASTER_HOST}"].count(#1,"No",eq)}=1'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+      macros:
+        -
+          macro: '{$MYSQL.ABORTED_CONN.MAX.WARN}'
+          value: '3'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+        -
+          macro: '{$MYSQL.BUFF_UTIL.MIN.WARN}'
+          value: '50'
+          description: 'The minimum buffer pool utilization in percent for trigger expression.'
+        -
+          macro: '{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
+          value: '10'
+          description: 'The maximum number of created tmp tables on a disk per second for trigger expressions.'
+        -
+          macro: '{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
+          value: '10'
+          description: 'The maximum number of created tmp files on a disk per second for trigger expressions.'
+        -
+          macro: '{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
+          value: '30'
+          description: 'The maximum number of created tmp tables in memory per second for trigger expressions.'
+        -
+          macro: '{$MYSQL.DSN}'
+          value: '<Put your DSN here>'
+          description: 'System data source name.'
+        -
+          macro: '{$MYSQL.PASSWORD}'
+          value: '<Put your password here>'
+          description: 'MySQL user password.'
+        -
+          macro: '{$MYSQL.REPL_LAG.MAX.WARN}'
+          value: 30m
+          description: 'The lag of slave from master for trigger expression.'
+        -
+          macro: '{$MYSQL.SLOW_QUERIES.MAX.WARN}'
+          value: '3'
+          description: 'The number of slow queries for trigger expression.'
+        -
+          macro: '{$MYSQL.USER}'
+          value: '<Put your username here>'
+          description: 'MySQL username.'
+      dashboards:
+        -
+          name: 'MySQL performance'
+          widgets:
+            -
+              type: GRAPH_CLASSIC
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'MySQL: Operations'
+                    host: 'MySQL by ODBC'
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'MySQL: Queries'
+                    host: 'MySQL by ODBC'
+            -
+              type: GRAPH_CLASSIC
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'MySQL: Connections'
+                    host: 'MySQL by ODBC'
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'MySQL: Bandwidth'
+                    host: 'MySQL by ODBC'
+            -
+              type: GRAPH_CLASSIC
+              'y': '10'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'MySQL: InnoDB buffer pool'
+                    host: 'MySQL by ODBC'
+            -
+              type: GRAPH_CLASSIC
+              x: '12'
+              'y': '10'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: INTEGER
+                  name: source_type
+                  value: '0'
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'MySQL: Threads'
+                    host: 'MySQL by ODBC'
+  graphs:
+    -
+      name: 'MySQL: Bandwidth'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.bytes_received.rate
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.bytes_sent.rate
+    -
+      name: 'MySQL: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.aborted_clients.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.aborted_connects.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.connections.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.max_used_connections
+    -
+      name: 'MySQL: InnoDB buffer pool'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.innodb_buffer_pool_pages_free
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.innodb_buffer_pool_pages_total
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.innodb_buffer_pool_read_requests.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.innodb_buffer_pool_reads.rate
+    -
+      name: 'MySQL: Operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.com_delete.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.com_insert.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.com_select.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.com_update.rate
+    -
+      name: 'MySQL: Queries'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.queries.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.questions.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.slow_queries.rate
+    -
+      name: 'MySQL: Threads'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.threads_cached
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.threads_connected
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.threads_created.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'MySQL by ODBC'
+            key: mysql.threads_running
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up

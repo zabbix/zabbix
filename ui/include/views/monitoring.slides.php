@@ -120,6 +120,7 @@ $widget->setControls((new CList([
 		->addItem($data['screen']['editable']
 			? (new CButton('edit', _('Edit slide show')))
 				->onClick('redirect("slideconf.php?form=update&slideshowid='.$data['screen']['slideshowid'].'")')
+				->setEnabled($data['allowed_edit'])
 			: null
 		)
 		->addItem($favourite_icon)

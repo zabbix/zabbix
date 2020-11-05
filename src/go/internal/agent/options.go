@@ -34,6 +34,9 @@ import (
 
 var Options AgentOptions
 
+const HostNameLen = 128
+const hostNameListLen = 2048
+
 func CutAfterN(s string, n int) string {
 	var i int
 	for pos := range s {
@@ -46,9 +49,9 @@ func CutAfterN(s string, n int) string {
 	return s
 }
 
-func CheckHostname(s string) error {
+func CheckHostnameParameter(s string) error {
 	for i := 0; i < len(s); i++ {
-		if s[i] == '.' || s[i] == ' ' || s[i] == '_' || s[i] == '-' ||
+		if s[i] == '.' || s[i] == ' ' || s[i] == '_' || s[i] == '-' || s[i] == ',' ||
 			(s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= '0' && s[i] <= '9') {
 			continue
 		}
@@ -59,8 +62,40 @@ func CheckHostname(s string) error {
 			return fmt.Errorf("character 0x%02x is not allowed in host name", s[i])
 		}
 	}
-
 	return nil
+}
+
+func ValidateHostnames(s string) ([]string, error) {
+	hostnames := ExtractHostnames(s)
+	keys := make(map[string]bool)
+	huniq := []string{}
+	for _, h := range hostnames {
+		if h == "" {
+			return nil, fmt.Errorf("host names cannot be empty")
+		}
+		if len(h) > HostNameLen {
+			return nil, fmt.Errorf("host name in list is more than %d symbols", HostNameLen)
+		}
+		if _, value := keys[h]; !value {
+			keys[h] = true
+			huniq = append(huniq, h)
+		}
+	}
+	if len(huniq) != len(hostnames) {
+		return nil, fmt.Errorf("host names are not unique")
+	}
+
+	return hostnames, nil
+}
+
+func ExtractHostnames(s string) []string {
+	hostnames := strings.Split(s, ",")
+
+	for i := 0; i < len(hostnames); i++ {
+		hostnames[i] = strings.Trim(hostnames[i], " \t")
+	}
+
+	return hostnames
 }
 
 func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
@@ -184,16 +219,25 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
-func ValidateOptions(options AgentOptions) error {
-	const hostNameLen = 128
+func ValidateOptions(options *AgentOptions) error {
 	const hostMetadataLen = 255
 	const hostInterfaceLen = 255
 	var err error
+	var maxLen int
 
-	if len(options.Hostname) > hostNameLen {
-		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", hostNameLen)
+	hosts := ExtractHostnames(options.Hostname)
+	options.Hostname = strings.Join(hosts, ",")
+
+	if len(hosts) > 1 {
+		maxLen = hostNameListLen
+	} else {
+		maxLen = HostNameLen
 	}
-	if err = CheckHostname(options.Hostname); err != nil {
+
+	if len(options.Hostname) > maxLen {
+		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", maxLen)
+	}
+	if err = CheckHostnameParameter(options.Hostname); err != nil {
 		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
 	}
 	if len(options.HostMetadata) > 0 && len(options.HostMetadata) > hostMetadataLen {

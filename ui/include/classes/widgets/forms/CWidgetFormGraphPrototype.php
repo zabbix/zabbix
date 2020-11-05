@@ -24,8 +24,8 @@
  */
 class CWidgetFormGraphPrototype extends CWidgetForm {
 
-	public function __construct($data) {
-		parent::__construct($data, WIDGET_GRAPH_PROTOTYPE);
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_GRAPH_PROTOTYPE);
 
 		// Select graph type field.
 		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), [
@@ -45,11 +45,15 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
 			// Select simple graph prototype field.
-			$field_item_prototype = (new CWidgetFieldMsItemPrototype('itemid', _('Item prototype')))
+			$field_item_prototype = (new CWidgetFieldMsItemPrototype('itemid', _('Item prototype'), $templateid))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
-				->setFilterParameter('numeric', true) // For filtering item prototypes.
-				->setFilterParameter('with_simple_graph_item_prototypes', true); // For groups and hosts selection.
+				->setFilterParameter('numeric', true);
+
+			if ($templateid === null) {
+				// For groups and hosts selection.
+				$field_item_prototype->setFilterParameter('with_simple_graph_item_prototypes', true);
+			}
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item_prototype->setValue($this->data['itemid']);
@@ -59,7 +63,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 		}
 		else {
 			// Select graph prototype field.
-			$field_graph_prototype = (new CWidgetFieldMsGraphPrototype('graphid', _('Graph prototype')))
+			$field_graph_prototype = (new CWidgetFieldMsGraphPrototype('graphid', _('Graph prototype'), $templateid))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false);
 
@@ -80,10 +84,12 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 		$this->fields[$field_legend->getName()] = $field_legend;
 
 		// Dynamic item.
-		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
+		if ($templateid === null) {
+			$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 
-		$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
+			$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
 
-		$this->fields[$field_dynamic->getName()] = $field_dynamic;
+			$this->fields[$field_dynamic->getName()] = $field_dynamic;
+		}
 	}
 }

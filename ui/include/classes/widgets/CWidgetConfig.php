@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -22,14 +22,26 @@
 class CWidgetConfig {
 
 	/**
+	 * Classifier for non-template dashboards.
+	 */
+	public const CONTEXT_DASHBOARD = 'dashboard';
+
+	/**
+	 * Classifier for template and host dashboards.
+	 */
+	public const CONTEXT_TEMPLATE_DASHBOARD = 'template_dashboard';
+
+	/**
 	 * Return list of all widget types with names.
 	 *
 	 * @static
 	 *
+	 * @param string $context  CWidgetConfig::CONTEXT_DASHBOARD | CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+	 *
 	 * @return array
 	 */
-	public static function getKnownWidgetTypes() {
-		return [
+	public static function getKnownWidgetTypes(string $context): array {
+		$types = [
 			WIDGET_ACTION_LOG			=> _('Action log'),
 			WIDGET_CLOCK				=> _('Clock'),
 			WIDGET_DATA_OVER			=> _('Data overview'),
@@ -52,6 +64,15 @@ class CWidgetConfig {
 			WIDGET_URL					=> _('URL'),
 			WIDGET_WEB					=> _('Web monitoring')
 		];
+
+		$types = array_filter($types,
+			function(string $type) use ($context): bool {
+				return self::isWidgetTypeSupportedInContext($type, $context);
+			},
+			ARRAY_FILTER_USE_KEY
+		);
+
+		return $types;
 	}
 
 	/**
@@ -92,13 +113,15 @@ class CWidgetConfig {
 	 *
 	 * @static
 	 *
+	 * @param string $context  CWidgetConfig::CONTEXT_DASHBOARD | CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+	 *
 	 * @return array
 	 */
-	public static function getDefaults() {
+	public static function getDefaults(string $context): array {
 		$ret = [];
 		$dimensions = self::getDefaultDimensions();
 
-		foreach (self::getKnownWidgetTypes() as $type => $name) {
+		foreach (self::getKnownWidgetTypes($context) as $type => $name) {
 			$ret[$type] = [
 				'header' => $name,
 				'size' => $dimensions[$type],
@@ -110,13 +133,43 @@ class CWidgetConfig {
 	}
 
 	/**
+	 * Check if widget type is supported in a given context.
+	 *
+	 * @static
+	 *
+	 * @param string $type     Widget type - 'WIDGET_*' constant.
+	 * @param string $context  CWidgetConfig::CONTEXT_DASHBOARD | CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+	 *
+	 * @return bool
+	 */
+	public static function isWidgetTypeSupportedInContext(string $type, string $context): bool {
+		switch ($context) {
+			case self::CONTEXT_DASHBOARD:
+				return true;
+
+			case self::CONTEXT_TEMPLATE_DASHBOARD:
+				switch ($type) {
+					case WIDGET_CLOCK:
+					case WIDGET_GRAPH:
+					case WIDGET_GRAPH_PROTOTYPE:
+					case WIDGET_PLAIN_TEXT:
+					case WIDGET_URL:
+						return true;
+
+					default:
+						return false;
+				}
+		}
+	}
+
+	/**
 	 * Return default refresh rate for widget type.
 	 *
 	 * @static
 	 *
-	 * @param int $type  WIDGET_ constant
+	 * @param string $type  Widget type - 'WIDGET_*' constant.
 	 *
-	 * @return int  default refresh rate, "0" for no refresh
+	 * @return int  default refresh rate, 0 for no refresh
 	 */
 	public static function getDefaultRfRate($type) {
 		switch ($type) {
@@ -191,6 +244,15 @@ class CWidgetConfig {
 		}
 	}
 
+	/**
+	 * Check if widget type belongs to iterators.
+	 *
+	 * @static
+	 *
+	 * @param string $type  Widget type - 'WIDGET_*' constant.
+	 *
+	 * @return bool
+	 */
 	public static function isIterator($type) {
 		switch ($type) {
 			case WIDGET_GRAPH_PROTOTYPE:
@@ -204,7 +266,7 @@ class CWidgetConfig {
 	/**
 	 * Detect if widget dialogue should be sticked to top instead of being centered vertically.
 	 *
-	 * @param string $type  Widget type
+	 * @param string $type  Widget type - 'WIDGET_*' constant.
 	 *
 	 * @return bool
 	 */
@@ -223,7 +285,7 @@ class CWidgetConfig {
 	 *
 	 * @static
 	 *
-	 * @param string $type       Widget type
+	 * @param string $type       Widget type - 'WIDGET_*' constant.
 	 * @param array  $fields     Widget form fields
 	 * @param int    $view_mode  Widget view mode. ZBX_WIDGET_VIEW_MODE_NORMAL by default
 	 *
@@ -263,7 +325,7 @@ class CWidgetConfig {
 	/**
 	 * Get widget configuration based on widget type, fields and current view mode.
 	 *
-	 * @param string $type       Widget type
+	 * @param string $type       Widget type - 'WIDGET_*' constant.
 	 * @param array  $fields     Widget form fields
 	 * @param int    $view_mode  Widget view mode
 	 *
@@ -280,63 +342,64 @@ class CWidgetConfig {
 	 *
 	 * @static
 	 *
-	 * @param string $type  Widget type - 'WIDGET_' constant.
-	 * @param string $data  JSON string with widget fields.
+	 * @param string $type             Widget type - 'WIDGET_*' constant.
+	 * @param string $data             JSON string with widget fields.
+	 * @param string|null $templateid  Template ID for template dashboards or null for non-template dashboards.
 	 *
 	 * @return CWidgetForm
 	 */
-	public static function getForm($type, $data) {
+	public static function getForm($type, $data, $templateid) {
 		switch ($type) {
 			case WIDGET_ACTION_LOG:
-				return new CWidgetFormActionLog($data);
+				return new CWidgetFormActionLog($data, $templateid);
 
 			case WIDGET_CLOCK:
-				return new CWidgetFormClock($data);
+				return new CWidgetFormClock($data, $templateid);
 
 			case WIDGET_DATA_OVER:
-				return new CWidgetFormDataOver($data);
+				return new CWidgetFormDataOver($data, $templateid);
 
 			case WIDGET_GRAPH:
-				return new CWidgetFormGraph($data);
+				return new CWidgetFormGraph($data, $templateid);
 
 			case WIDGET_GRAPH_PROTOTYPE:
-				return new CWidgetFormGraphPrototype($data);
+				return new CWidgetFormGraphPrototype($data, $templateid);
 
 			case WIDGET_HOST_AVAIL:
-				return new CWidgetFormHostAvail($data);
+				return new CWidgetFormHostAvail($data, $templateid);
 
 			case WIDGET_MAP:
-				return new CWidgetFormMap($data);
+				return new CWidgetFormMap($data, $templateid);
 
 			case WIDGET_NAV_TREE:
-				return new CWidgetFormNavTree($data);
+				return new CWidgetFormNavTree($data, $templateid);
 
 			case WIDGET_PLAIN_TEXT:
-				return new CWidgetFormPlainText($data);
+				return new CWidgetFormPlainText($data, $templateid);
 
 			case WIDGET_PROBLEM_HOSTS:
-				return new CWidgetFormProblemHosts($data);
+				return new CWidgetFormProblemHosts($data, $templateid);
 
 			case WIDGET_PROBLEMS:
-				return new CWidgetFormProblems($data);
+				return new CWidgetFormProblems($data, $templateid);
 
 			case WIDGET_PROBLEMS_BY_SV:
-				return new CWidgetFormProblemsBySv($data);
+				return new CWidgetFormProblemsBySv($data, $templateid);
 
 			case WIDGET_SVG_GRAPH:
-				return new CWidgetFormSvgGraph($data);
+				return new CWidgetFormSvgGraph($data, $templateid);
 
 			case WIDGET_TRIG_OVER:
-				return new CWidgetFormTrigOver($data);
+				return new CWidgetFormTrigOver($data, $templateid);
 
 			case WIDGET_URL:
-				return new CWidgetFormUrl($data);
+				return new CWidgetFormUrl($data, $templateid);
 
 			case WIDGET_WEB:
-				return new CWidgetFormWeb($data);
+				return new CWidgetFormWeb($data, $templateid);
 
 			default:
-				return new CWidgetForm($data, $type);
+				return new CWidgetForm($data, $templateid, $type);
 		}
 	}
 }

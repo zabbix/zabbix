@@ -88,6 +88,12 @@ class CMacrosResolverHelper {
 	 * @param string $interfaces[n]['ip']
 	 * @param string $interfaces[n]['dns']
 	 * @param string $interfaces[n]['port']
+	 * @param array  $interfaces[n]['details']                    (optional)
+	 * @param string $interfaces[n]['details']['securityname']    (optional)
+	 * @param string $interfaces[n]['details']['authpassphrase']  (optional)
+	 * @param string $interfaces[n]['details']['privpassphrase']  (optional)
+	 * @param string $interfaces[n]['details']['contextname']     (optional)
+	 * @param string $interfaces[n]['details']['community']       (optional)
 	 *
 	 * @return array
 	 */
@@ -173,6 +179,92 @@ class CMacrosResolverHelper {
 				}
 			}
 			unset($interface);
+		}
+
+		// Interface details.
+		$data = [
+			'securityname' => [],
+			'authpassphrase' => [],
+			'privpassphrase' => [],
+			'contextname' => [],
+			'community' => [],
+		];
+
+		foreach ($interfaces as $index => $interface) {
+			$hostid = $interface['hostid'];
+
+			if (array_key_exists('details', $interface)) {
+				if (array_key_exists('securityname', $interface['details'])) {
+					$data['securityname'][$hostid][$index] = $interface['details']['securityname'];
+				}
+
+				if (array_key_exists('authpassphrase', $interface['details'])) {
+					$data['authpassphrase'][$hostid][$index] = $interface['details']['authpassphrase'];
+				}
+
+				if (array_key_exists('privpassphrase', $interface['details'])) {
+					$data['privpassphrase'][$hostid][$index] = $interface['details']['privpassphrase'];
+				}
+
+				if (array_key_exists('contextname', $interface['details'])) {
+					$data['contextname'][$hostid][$index] = $interface['details']['contextname'];
+				}
+
+				if (array_key_exists('community', $interface['details'])) {
+					$data['community'][$hostid][$index] = $interface['details']['community'];
+				}
+			}
+		}
+
+		$resolved_securityname = self::$macrosResolver->resolve([
+			'config' => 'hostInterfaceDetailsSecurityname',
+			'data' => $data['securityname']
+		]);
+
+		$resolved_authpassphrase = self::$macrosResolver->resolve([
+			'config' => 'hostInterfaceDetailsAuthPassphrase',
+			'data' => $data['authpassphrase']
+		]);
+
+		$resolved_privpassphrase = self::$macrosResolver->resolve([
+			'config' => 'hostInterfaceDetailsPrivPassphrase',
+			'data' => $data['privpassphrase']
+		]);
+
+		$resolved_contextname = self::$macrosResolver->resolve([
+			'config' => 'hostInterfaceDetailsContextName',
+			'data' => $data['contextname']
+		]);
+
+		$resolved_community = self::$macrosResolver->resolve([
+			'config' => 'hostInterfaceDetailsCommunity',
+			'data' => $data['community']
+		]);
+
+		foreach ($interfaces as $index => $interface) {
+			$hostid = $interface['hostid'];
+
+			if (array_key_exists('details', $interface)) {
+				if (array_key_exists('securityname', $interface['details'])) {
+					$interfaces[$index]['details']['securityname'] = $resolved_securityname[$hostid][$index];
+				}
+
+				if (array_key_exists('authpassphrase', $interface['details'])) {
+					$interfaces[$index]['details']['authpassphrase'] = $resolved_authpassphrase[$hostid][$index];
+				}
+
+				if (array_key_exists('privpassphrase', $interface['details'])) {
+					$interfaces[$index]['details']['privpassphrase'] = $resolved_privpassphrase[$hostid][$index];
+				}
+
+				if (array_key_exists('contextname', $interface['details'])) {
+					$interfaces[$index]['details']['contextname'] = $resolved_contextname[$hostid][$index];
+				}
+
+				if (array_key_exists('community', $interface['details'])) {
+					$interfaces[$index]['details']['community'] = $resolved_community[$hostid][$index];
+				}
+			}
 		}
 
 		return $interfaces;

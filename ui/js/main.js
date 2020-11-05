@@ -428,7 +428,7 @@ var hintBox = {
 			hint_height = target.hintBoxItem.outerHeight(),
 			/*
 				Fix popup width and height since browsers will tend to reduce the size of the popup, if positioned further
-				than the width of window when horizontal scolling is active.
+				than the width of window when horizontal scrolling is active.
 			*/
 			css = {
 				width: target.hintBoxItem.width(),
@@ -704,6 +704,7 @@ function getConditionFormula(conditions, evalType) {
 	 * - row					- element row selector
 	 * - add					- add row button selector
 	 * - remove					- remove row button selector
+	 * - rows					- array of rows objects data
 	 * - counter 				- number to start row enumeration from
 	 * - dataCallback			- function to generate the data passed to the template
 	 * - remove_next_sibling	- remove also next element
@@ -726,6 +727,7 @@ function getConditionFormula(conditions, evalType) {
 			disable: '.element-table-disable',
 			counter: null,
 			beforeRow: null,
+			rows: [],
 			dataCallback: function(data) {
 				return {};
 			}
@@ -763,8 +765,49 @@ function getConditionFormula(conditions, evalType) {
 				// disable the parent row
 				disableRow($(this).closest(options.row));
 			});
+
+			if (typeof options.rows === 'object') {
+				var before_row = (options['beforeRow'] !== null)
+					? $(options['beforeRow'], table)
+					: $(options.add, table).closest('tr');
+
+				initRows(table, before_row, options);
+			}
 		});
 	};
+
+	/**
+	 * Renders options.rows array as HTML rows during initialization.
+	 *
+	 * @param {jQuery} table       Table jquery node.
+	 * @param {jQuery} before_row  Rendered rows will be inserted before this node.
+	 * @param {object} options     Object with options.
+	 */
+	function initRows(table, before_row, options) {
+		var template = new Template($(options.template).html()),
+			counter = table.data('dynamicRows').counter,
+			$row;
+
+		options.rows.forEach((data) => {
+			data.rowNum = counter;
+			$row = $(template.evaluate($.extend(data, options.dataCallback(data))));
+
+			for (const name in data) {
+				// Set 'select' value.
+				$row.find('[name$="[' + counter + '][' + name + ']"] option[value="' + data[name] + '"]')
+					.attr('selected', 'selected');
+
+				// Set 'radio' value.
+				$row.find('[type="radio"][name$="[' + counter + '][' + name + ']"][value="' + data[name] + '"]')
+					.attr('checked', 'checked');
+			}
+
+			before_row.before($row);
+			++counter;
+		});
+
+		table.data('dynamicRows').counter = counter;
+	}
 
 	/**
 	 * Adds a row before the given row.

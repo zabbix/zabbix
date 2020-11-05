@@ -74,6 +74,7 @@ function DBconnect(&$error) {
 
 	if ($db->getError() || ($DB['ENCRYPTION'] && !$db->isConnectionSecure()) || !$db->checkDbVersion()
 			|| !$db->checkConfig()) {
+
 		$error = $db->getError();
 		return false;
 	}

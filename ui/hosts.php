@@ -327,7 +327,7 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		$interfaceid = 1;
 		foreach ($_REQUEST['interfaces'] as &$interface) {
 			$interface['interfaceid'] = (string) $interfaceid++;
-			unset($interface['locked'], $interface['items']);
+			unset($interface['items']);
 		}
 		unset($interface);
 	}
@@ -743,16 +743,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$interfaces = getRequest('interfaces', []);
 
 			foreach ($interfaces as $key => $interface) {
-				if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
-					unset($interface[$key]);
-					continue;
-				}
-
-				// Proccess SNMP interface fields.
+				// Process SNMP interface fields.
 				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 					if (!array_key_exists('details', $interface)) {
-						unset($interface[$key]);
-						continue;
+						$interface['details'] = [];
 					}
 
 					$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
@@ -770,7 +764,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$mainInterfaces = getRequest('mainInterfaces', []);
 			foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
-				if (array_key_exists($type, $mainInterfaces)) {
+				if (array_key_exists($type, $mainInterfaces) && array_key_exists($mainInterfaces[$type], $interfaces)) {
 					$interfaces[$mainInterfaces[$type]]['main'] = INTERFACE_PRIMARY;
 				}
 			}
@@ -1163,7 +1157,7 @@ elseif (hasRequest('form')) {
 			$data['visiblename'] = $dbHost['name'];
 			$data['interfaces'] = API::HostInterface()->get([
 				'output' => API_OUTPUT_EXTEND,
-				'selectItems' => ['type'],
+				'selectItems' => ['itemid'],
 				'hostids' => [$data['hostid']],
 				'sortfield' => 'interfaceid'
 			]);
@@ -1189,21 +1183,6 @@ elseif (hasRequest('form')) {
 
 			// Interfaces
 			foreach ($data['interfaces'] as &$interface) {
-				if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$interface['locked'] = true;
-				}
-				else {
-					// check if interface has items that require specific interface type, if so type cannot be changed
-					$interface['locked'] = false;
-					foreach ($interface['items'] as $item) {
-						$type = itemTypeInterface($item['type']);
-						if ($type !== false && $type != INTERFACE_TYPE_ANY) {
-							$interface['locked'] = true;
-							break;
-						}
-					}
-				}
-
 				$interface['items'] = (bool) $interface['items'];
 			}
 			unset($interface);
@@ -1417,6 +1396,8 @@ elseif (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['add_templates']))
 	];
 
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
 	$hostView = new CView('configuration.host.edit', $data);
 }
 else {
@@ -1624,7 +1605,8 @@ else {
 		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
 		'config' => [
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
-		]
+		],
+		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 	];
 
 	$hostView = new CView('configuration.host.list', $data);

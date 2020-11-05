@@ -32,13 +32,12 @@ if ($data['graph']['unavailable_object']) {
 	];
 }
 else {
-	$flickerfree_item = (new CDiv())
-		->addItem((new CLink(null, $data['item_graph_url']))
+	$flickerfree_item = (new CDiv(
+		(($data['item_graph_url'] !== null) ? new CLink(null, $data['item_graph_url']) : new CSpan(null))
 			->setId($data['graph']['containerid'])
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
-		)
+	))
 		->addClass('flickerfreescreen')
-		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
 	$script = 'timeControl.addObject("'.$data['graph']['dataid'].'", '.json_encode($data['timeline']).', '.
@@ -92,6 +91,16 @@ else {
 				'}'.
 			'}'.
 
+			'if (typeof zbx_graph_widget_edit_start !== typeof(Function)) {'.
+				'function zbx_graph_widget_edit_start(img_id) {'.
+					'var $link = jQuery("#" + img_id).parent();'.
+
+					'$link'.
+						'.attr("href", "javascript:void(0)")'.
+						'.attr("role", "button");'.
+				'}'.
+			'}'.
+
 			'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onResizeEnd", '.
 				'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
@@ -108,6 +117,12 @@ else {
 				'"zbx_graph_widget_delete", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'",'.zbx_jsvalue($data['fs_data']).'],'.
 					'trigger_name: "graph_widget_delete_'.$data['widget']['uniqueid'].'"'.
+				'});'.
+
+			'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onEditStart", '.
+				'"zbx_graph_widget_edit_start", "'.$data['widget']['uniqueid'].'", {'.
+					'parameters: ["'.$data['graph']['dataid'].'"],'.
+					'trigger_name: "graph_widget_edit_start_'.$data['widget']['uniqueid'].'"'.
 				'});';
 	}
 

@@ -50,10 +50,10 @@ $web_layout_mode = $this->getLayoutMode();
 			),
 		(new CTag('nav', true, (new CList())
 			->addItem($data['map']['editable']
-				? new CRedirectButton(_('Edit map'), (new CUrl('sysmap.php'))
+				? (new CRedirectButton(_('Edit map'), (new CUrl('sysmap.php'))
 					->setArgument('sysmapid', $data['map']['sysmapid'])
 					->getUrl()
-				)
+				))->setEnabled($data['allowed_edit'])
 				: null
 			)
 			->addItem(get_icon('favourite', [

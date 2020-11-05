@@ -187,6 +187,10 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 			{
 				scope = ZBX_DIAGINFO_PREPROCESSING;
 			}
+			else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
+			{
+				scope = ZBX_DIAGINFO_LOCKS;
+			}
 			else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)))
 			{
 				if (0 == strcmp(section, ZBX_DIAG_VALUECACHE))
@@ -208,6 +212,12 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 			zbx_error("invalid runtime control option: %s", opt);
 			return FAIL;
 		}
+	}
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 == strcmp(opt, ZBX_SECRETS_RELOAD))
+	{
+		command = ZBX_RTC_SECRETS_RELOAD;
+		scope = 0;
+		data = 0;
 	}
 	else
 	{

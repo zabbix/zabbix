@@ -22,7 +22,7 @@
 /**
  * Session wrapper uses cookie for session store.
  */
-class CCookieSession implements \SessionHandlerInterface {
+class CCookieSession implements SessionHandlerInterface {
 
 	/**
 	 * Cookie name.
@@ -33,23 +33,12 @@ class CCookieSession implements \SessionHandlerInterface {
 	 * Class consturctor. Set session handlers and start session.
 	 */
 	public function __construct() {
-		if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
+		// Set use standard cookie PHPSESSID to false.
+		ini_set('session.use_cookies', '0');
 
-			// Set use standard cookie PHPSESSID to false.
-			ini_set('session.use_cookies', '0');
-			// Set serialize method to standard serialize / unserialize.
-			ini_set('session.serialize_handler', 'php_serialize');
-
-			session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'],
-				[$this, 'write'], [$this, 'destroy'], [$this, 'gc']
-			);
-
-			if (!$this->session_start()) {
-				throw new \Exception(_('Session initialization error.'));
-			}
-
-			CSessionHelper::set('sessionid', CSessionHelper::getId());
-		}
+		session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'], [$this, 'write'],
+			[$this, 'destroy'], [$this, 'gc']
+		);
 	}
 
 	/**
@@ -109,7 +98,17 @@ class CCookieSession implements \SessionHandlerInterface {
 	 * @return string
 	 */
 	public function read($session_id) {
-		return $this->parseData();
+		$session_data = json_decode($this->parseData(), true);
+
+		if (!is_array($session_data)) {
+			return '';
+		}
+
+		foreach ($session_data as $key => $value) {
+			CSessionHelper::set($key, $value);
+		}
+
+		return session_encode();
 	}
 
 	/**
@@ -121,7 +120,8 @@ class CCookieSession implements \SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function write($session_id, $session_data) {
-		$session_data = $this->prepareData($session_data);
+		session_decode($session_data);
+		$session_data = $this->prepareData(CSessionHelper::getAll());
 
 		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, 0)) {
 			throw new \Exception(_('Cannot set session cookie.'));
@@ -133,19 +133,16 @@ class CCookieSession implements \SessionHandlerInterface {
 	/**
 	 * Run session_start.
 	 *
+	 * @param string $sessionid
+	 *
 	 * @return boolean
 	 */
-	protected function session_start(): bool {
-		$session_data = $this->parseData();
-
-		if (mb_strlen($session_data) === 0) {
-			return session_start();
+	public function session_start(string $sessionid): bool {
+		if (headers_sent() || session_status() !== PHP_SESSION_NONE) {
+			return false;
 		}
 
-		$sessionid = $this->extractSessionId($session_data);
-		if ($sessionid) {
-			session_id($sessionid);
-		}
+		session_id($sessionid);
 
 		return session_start();
 	}
@@ -153,31 +150,33 @@ class CCookieSession implements \SessionHandlerInterface {
 	/**
 	 * Extract session id from session data.
 	 *
-	 * @param string $session_data
-	 *
 	 * @return string|null
 	 */
-	protected function extractSessionId(string $session_data): ?string {
-		$session_data = unserialize($session_data);
+	public function extractSessionId(): ?string {
+		$session_data = $this->parseData();
 
-		if (array_key_exists('sessionid', $session_data)) {
-			return $session_data['sessionid'];
+		if ($session_data === '') {
+			return null;
 		}
 
-		return null;
+		$session_data = json_decode($session_data, true);
+
+		if (!is_array($session_data) || !array_key_exists('sessionid', $session_data)) {
+			return null;
+		}
+
+		return $session_data['sessionid'];
 	}
 
 	/**
 	 * Prepare session data.
 	 *
-	 * @param string $data
+	 * @param array $data
 	 *
 	 * @return string
 	 */
-	protected function prepareData(string $data): string {
-		$data = unserialize($data);
-
-		return base64_encode(serialize($data));
+	protected function prepareData(array $data): string {
+		return base64_encode(json_encode($data));
 	}
 
 	/**

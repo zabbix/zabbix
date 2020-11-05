@@ -146,7 +146,7 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => 'Invalid email address "Mr Person person@zabbix.com".'
 				]
 			],
-			// Email address without the recepient specified - just the domain.
+			// Email address without the recipient specified - just the domain.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -448,6 +448,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'SMS',
 						'Send to' => '+371 74661x'
 					],
+					'role' => 'Super Admin role',
 					'expected_message' => 'User added'
 				]
 			],
@@ -485,6 +486,10 @@ class testFormUserMedia extends CWebTest {
 			$this->page->query('button:Create user')->one()->click();
 			$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 			$user_form->fill($data['user_fields']);
+
+			$user_form->selectTab('Permissions');
+			$user_form->fill(['Role' => $data['role']]);
+
 		}
 		else {
 			$this->query('link', $data['username'])->waitUntilVisible()->one()->click();
@@ -551,7 +556,7 @@ class testFormUserMedia extends CWebTest {
 	private function setMediaValues($data) {
 		$media_form = $this->query('id:media_form')->waitUntilVisible()->asForm()->one();
 		$media_form->fill($data['fields']);
-		// Check that there is posibility to add only multiple emails to media.
+		// Check that there is possibility to add only multiple emails to media.
 		$clickable = ($data['fields']['Type'] === 'Email');
 		$this->assertEquals($clickable, $media_form->query('id:email_send_to_add')->one()->isClickable());
 		$this->assertEquals($clickable, $media_form->query('button:Remove')->one()->isClickable());
