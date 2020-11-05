@@ -118,6 +118,7 @@ extern int	CONFIG_PREPROCESSOR_FORKS;
 extern int	CONFIG_LLDMANAGER_FORKS;
 extern int	CONFIG_LLDWORKER_FORKS;
 extern int	CONFIG_ALERTDB_FORKS;
+extern int	CONFIG_HISTORYPOLLER_FORKS;
 
 extern unsigned char	process_type;
 extern int		process_num;
@@ -201,6 +202,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_LLDWORKER_FORKS;
 		case ZBX_PROCESS_TYPE_ALERTSYNCER:
 			return CONFIG_ALERTDB_FORKS;
+		case ZBX_PROCESS_TYPE_HISTORYPOLLER:
+			return CONFIG_HISTORYPOLLER_FORKS;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

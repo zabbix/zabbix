@@ -1355,6 +1355,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "lld worker";
 		case ZBX_PROCESS_TYPE_ALERTSYNCER:
 			return "alert syncer";
+		case ZBX_PROCESS_TYPE_HISTORYPOLLER:
+			return "history poller";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
