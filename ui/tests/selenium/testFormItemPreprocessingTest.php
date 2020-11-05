@@ -230,6 +230,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 						]
 					],
 					'preprocessing' => [
+						['type' => 'Check for not supported value'],
 						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
 						['type' => 'JSONPath', 'parameter_1' => '{$_}']
 					],
@@ -260,6 +261,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'Check for not supported value'],
 						['type' => 'JSONPath', 'parameter_1' => '{$_}']
 					],
 					'action' => 'Close'
@@ -280,7 +282,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
-						['type' => 'Left trim', 'parameter_1' => 'def']
+						['type' => 'Left trim', 'parameter_1' => 'def'],
+						['type' => 'Check for not supported value']
 					],
 					'action' => 'Test'
 				]
@@ -302,7 +305,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
 						['type' => 'Change per second'],
-						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false],
+						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false]
 					],
 					'action' => 'Test'
 				]
@@ -505,6 +508,14 @@ class testFormItemPreprocessingTest extends CWebTest {
 				if ($id === null) {
 					foreach ($data['preprocessing'] as $i => $step) {
 						$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
+
+						$element = $table->query('id:preproc-test-step-'.$i.'-name')->one();
+
+						$opacity = ($step['type'] === 'Check for not supported value') ? 0.35 : 1;
+						$this->assertEquals($opacity, $element->getCSSValue('opacity'));
+
+						$enabled = ($step['type'] === 'Check for not supported value') ? false : true;
+						$this->assertTrue($element->isEnabled($enabled));
 					}
 				}
 				else {
