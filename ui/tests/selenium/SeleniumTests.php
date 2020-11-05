@@ -106,8 +106,9 @@ require_once dirname(__FILE__).'/testFormItemPreprocessing.php';
 //require_once dirname(__FILE__).'/testFormItemPreprocessingTest.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormItemPrototypePreprocessing.php';
-require_once dirname(__FILE__).'/testFormItemTestHost.php';
-require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
+// Uncomment after DEV-1718 is ready.
+//require_once dirname(__FILE__).'/testFormItemTestHost.php';
+//require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
@@ -254,8 +255,9 @@ class SeleniumTests {
 //		$suite->addTestSuite('testFormItemPreprocessingTest');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormItemPrototypePreprocessing');
-		$suite->addTestSuite('testFormItemTestHost');
-		$suite->addTestSuite('testFormItemTestTemplate');
+		// Uncomment after DEV-1718 is ready.
+//		$suite->addTestSuite('testFormItemTestHost');
+//		$suite->addTestSuite('testFormItemTestTemplate');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
