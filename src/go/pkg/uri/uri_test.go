@@ -71,6 +71,12 @@ func TestURI_String(t *testing.T) {
 			"https://zabbix:a35c2787-6ab4-4f6b-b538-0fcf91e678ed@127.0.0.1:8003",
 		},
 		{
+			"Should return URI with creds containing special characters",
+			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix",
+				password: `!@#$%^&*()_+{}?|\/., -=_+`},
+			"https://zabbix:%21%40%23$%25%5E&%2A%28%29_+%7B%7D%3F%7C%5C%2F.,%20-=_+@127.0.0.1:8003",
+		},
+		{
 			"Should return URI with username",
 			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix"},
 			"https://zabbix@127.0.0.1:8003",
