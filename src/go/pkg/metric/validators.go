@@ -21,10 +21,10 @@
 package metric
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Validator interface {
@@ -36,6 +36,10 @@ type SetValidator struct {
 }
 
 func (v SetValidator) Validate(value *string) error {
+	if v.Set != nil && len(v.Set) == 0 {
+		panic("set cannot be empty")
+	}
+
 	if value == nil {
 		return nil
 	}
@@ -46,7 +50,7 @@ func (v SetValidator) Validate(value *string) error {
 		}
 	}
 
-	return fmt.Errorf("possible values: %v", v.Set)
+	return fmt.Errorf("allowed values: %s", strings.Join(v.Set, ", "))
 }
 
 type PatternValidator struct {
@@ -64,7 +68,7 @@ func (v PatternValidator) Validate(value *string) error {
 	}
 
 	if !b {
-		return errors.New("value does not match pattern")
+		return fmt.Errorf("value does not match pattern %q", v.Pattern)
 	}
 
 	return nil

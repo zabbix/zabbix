@@ -21,10 +21,9 @@
 package metric
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
-
+	"strconv"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -127,6 +126,27 @@ type Metric struct {
 	varParam    bool
 }
 
+func ordinalize(num int) string {
+	var ordinalDictionary = map[int]string{
+		0: "th",
+		1: "st",
+		2: "nd",
+		3: "rd",
+		4: "th",
+		5: "th",
+		6: "th",
+		7: "th",
+		8: "th",
+		9: "th",
+	}
+
+	if ((num % 100) >= 11) && ((num % 100) <= 13) {
+		return strconv.Itoa(num) + "th"
+	}
+
+	return strconv.Itoa(num) + ordinalDictionary[num]
+}
+
 // New creates an instance of a Metric and returns a pointer to it.
 // It panics if a metric is not satisfied to one of the following rules:
 // 1. Parameters must be named (and names must be unique).
@@ -165,7 +185,8 @@ func New(description string, params []*Param, varParam bool) *Metric {
 
 		if p.validator != nil && p.defaultValue != nil {
 			if err := p.validator.Validate(p.defaultValue); err != nil {
-				panic(fmt.Sprintf("invalid default value %q for parameter %q", *p.defaultValue, p.name))
+				panic(fmt.Sprintf("invalid default value %q for %s parameter %q: %s",
+					*p.defaultValue, ordinalize(i+1), p.name, err.Error()))
 			}
 		}
 	}
@@ -200,12 +221,15 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 
 		val := v.Field(i).String()
 
-		for j := range metricParams {
+		j := 0
+		for j = range metricParams {
 			if metricParams[j].name == v.Type().Field(i).Name {
 				p = metricParams[j]
 				break
 			}
 		}
+
+		ordNum := ordinalize(j + 1)
 
 		if p == nil {
 			panic(fmt.Sprintf("cannot find parameter %q in schema", v.Type().Field(i).Name))
@@ -213,7 +237,8 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 
 		if val == "" {
 			if p.required {
-				return zbxerr.ErrorTooFewParameters.Wrap(fmt.Errorf("%q is required", p.name))
+				return zbxerr.ErrorTooFewParameters.Wrap(
+					fmt.Errorf("%s parameter %q is required", ordNum, p.name))
 			}
 
 			if p.defaultValue != nil {
@@ -223,7 +248,7 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 
 		if p.validator != nil {
 			if err := p.validator.Validate(&val); err != nil {
-				return zbxerr.New(fmt.Sprintf("invalid parameter %q", p.name)).Wrap(err)
+				return zbxerr.New(fmt.Sprintf("invalid %s parameter %q", ordNum, p.name)).Wrap(err)
 			}
 		}
 
@@ -268,10 +293,12 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 
 		val = nil
 		skipConnIfSessionIsSet := !(session != nil && kind == kindConn)
+		ordNum := ordinalize(i + 1)
 
 		if i >= len(rawParams) || rawParams[i] == "" {
 			if p.required && skipConnIfSessionIsSet {
-				return nil, zbxerr.ErrorTooFewParameters.Wrap(fmt.Errorf("%q is required", p.name))
+				return nil, zbxerr.ErrorTooFewParameters.Wrap(
+					fmt.Errorf("%s parameter %q is required", ordNum, p.name))
 			}
 
 			if p.defaultValue != nil && skipConnIfSessionIsSet {
@@ -287,7 +314,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 
 		if p.validator != nil && skipConnIfSessionIsSet {
 			if err = p.validator.Validate(val); err != nil {
-				return nil, zbxerr.New(fmt.Sprintf("invalid parameter %q", p.name)).Wrap(err)
+				return nil, zbxerr.New(fmt.Sprintf("invalid %s parameter %q", ordNum, p.name)).Wrap(err)
 			}
 		}
 
@@ -296,7 +323,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 				params[p.name] = *val
 			} else {
 				return nil, zbxerr.ErrorInvalidParams.Wrap(
-					errors.New(p.name + " cannot be passed along with session"))
+					fmt.Errorf("%s parameter %q cannot be passed along with session", ordNum, p.name))
 			}
 		}
 
