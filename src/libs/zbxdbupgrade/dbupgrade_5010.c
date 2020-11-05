@@ -487,7 +487,7 @@ zbx_db_widget_t;
 #define ZBX_WIDGET_TYPE_PLAIN_TEXT		("plaintext")
 #define ZBX_WIDGET_TYPE_URL			("url")
 
-#define POS_EMPTY	(-1)
+#define POS_EMPTY	(127)
 #define POS_TAKEN	(1)
 
 ZBX_VECTOR_DECL(scitem_dim, zbx_screen_item_dim_t);
@@ -1309,7 +1309,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		offsets_y = lw_array_create();
 		offsets_y->values[0] = 0;
 
-		for (i = 0; i < dim_x->values_num; i++)
+		for (i = 0; i < dim_x->values_num - 1; i++)
 		{
 			if (POS_EMPTY != dim_x->values[i])
 				offsets_x->values[i + 1] = i == 0 ? dim_x->values[i] : offsets_x->values[i] + dim_x->values[i];
