@@ -23,8 +23,6 @@
  * @var CPartial $this
  */
 
-// $this->includeJsFile('massupdate.macros.tab.js.php');
-
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
