@@ -1510,6 +1510,10 @@ form {
 	position: relative;
 }
 
+.border-left {
+	border-left: 1px solid $table-border-color;
+}
+
 .drag-drop-area {
 	@extend %found-bg;
 }
