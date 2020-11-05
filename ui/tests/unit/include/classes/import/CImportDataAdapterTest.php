@@ -1625,7 +1625,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 								'name' => 'graph',
 								'host' => 'export-template'
 							],
-							'max_columns' => '',
+							'max_columns' => '1',
 							'application' => ''
 						]
 					]
@@ -1939,7 +1939,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => 'simple',
 							'host' => 'export-host'
 						],
-						'max_columns' => '',
+						'max_columns' => '1',
 						'application' => ''
 					]
 				]
