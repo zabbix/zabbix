@@ -152,7 +152,7 @@ static int	tfc_compare_func(const void *v1, const void *v2)
  *           allocations done.                                                *
  *                                                                            *
  ******************************************************************************/
-void	*tfc_malloc_func(void *old, size_t size)
+static void	*tfc_malloc_func(void *old, size_t size)
 {
 	static int	alloc_num = 0;
 
@@ -165,7 +165,7 @@ void	*tfc_malloc_func(void *old, size_t size)
 	return NULL;
 }
 
-void	*tfc_realloc_func(void *old, size_t size)
+static void	*tfc_realloc_func(void *old, size_t size)
 {
 	ZBX_UNUSED(old);
 	ZBX_UNUSED(size);
@@ -173,7 +173,7 @@ void	*tfc_realloc_func(void *old, size_t size)
 	return NULL;
 }
 
-void	tfc_free_func(void *ptr)
+static void	tfc_free_func(void *ptr)
 {
 	if (ptr >= (void *)cache->slots && ptr < (void *)(cache->slots + cache->slots_num))
 		return tfc_free_slot(ptr);
@@ -533,7 +533,6 @@ void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num)
 
 		if (NULL == (root = (zbx_tfc_data_t *)zbx_hashset_search(&cache->index, &data_local)))
 			continue;
-
 
 		for (data = &cache->slots[root->next_value].data; data != root; data = &cache->slots[next].data)
 		{
