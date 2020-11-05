@@ -1030,17 +1030,24 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	foreach ($items_by_key as $hostid_to_itemids) {
+	foreach ($items_by_key as $key => $hostid_to_itemids) {
 		foreach ($db_hosts as $host) {
 			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
 				continue;
 			}
 
 			$itemid = $hostid_to_itemids[$host['hostid']];
-			$visible_items[$itemid]['value'] = array_key_exists($itemid, $history)
-				? $history[$itemid][0]['value']
-				: null;
 			$trigger = null;
+
+			if (array_key_exists($itemid, $history)) {
+				$visible_items[$itemid]['value'] = $history[$itemid][0]['value'];
+			}
+			else {
+				$visible_items[$itemid]['value'] = null;
+				if (count($items_by_key[$key]) > 1) {
+					unset($items_by_key[$key][$host['hostid']]);
+				}
+			}
 
 			if (array_key_exists($itemid, $itemid_to_triggerids)) {
 				$max_priority = -1;
@@ -1189,12 +1196,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 function getDataOverviewLeft(?array $groupids, ?array $hostids, string $application = ''): array {
 	list($db_items, $hostids) = getDataOverviewItems($groupids, $hostids, $application);
 	$items_by_key = [];
-	$item_names_by_key = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['key_expanded'], $items_by_key)) {
-			$items_by_key[$db_item['key_expanded']] = [];
-			$item_names_by_key[$db_item['key_expanded']] = $itemid;
-		}
 		$items_by_key[$db_item['key_expanded']][$db_item['hostid']] = $itemid;
 	}
 
@@ -1214,13 +1216,7 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 
 	$has_hidden_data = ($hidden_items_cnt || ($db_hosts_ctn > count($db_hosts)));
 
-	$item_names_by_key = $has_hidden_data ? array_intersect_key($item_names_by_key, $items_by_key) : $item_names_by_key;
-	$item_names_by_key = array_map(function($itemid) use ($db_items) {return $db_items[$itemid];}, $item_names_by_key);
-	$item_names_by_key = array_map(function($item) {
-		return $item['name_expanded'];
-	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
-
-	return [$db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data];
+	return [$db_items, $db_hosts, $items_by_key, $has_hidden_data];
 }
 
 /**
@@ -1238,12 +1234,7 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 
 	list($db_items, $hostids) = getDataOverviewItems(null, $hostids, $application);
 	$items_by_key = [];
-	$item_names_by_key = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['key_expanded'], $items_by_key)) {
-			$item_names_by_key[$db_item['key_expanded']] = $itemid;
-			$items_by_key[$db_item['key_expanded']] = [];
-		}
 		$items_by_key[$db_item['key_expanded']][$db_item['hostid']] = $itemid;
 	}
 
@@ -1252,13 +1243,7 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 
 	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_key_ctn > count($items_by_key)));
 
-	$item_names_by_key = $has_hidden_data ? array_intersect_key($item_names_by_key, $items_by_key) : $item_names_by_key;
-	$item_names_by_key = array_map(function($itemid) use ($db_items) {return $db_items[$itemid];}, $item_names_by_key);
-	$item_names_by_key = array_map(function($item) {
-		return $item['name_expanded'];
-	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
-
-	return [$db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data];
+	return [$db_items, $db_hosts, $items_by_key, $has_hidden_data];
 }
 
 /**
