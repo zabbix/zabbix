@@ -1357,6 +1357,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "alert syncer";
 		case ZBX_PROCESS_TYPE_HISTORYPOLLER:
 			return "history poller";
+		case ZBX_PROCESS_TYPE_AVAILMAN:
+			return "availability manager";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

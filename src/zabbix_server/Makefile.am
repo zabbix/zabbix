@@ -21,6 +21,7 @@ SUBDIRS = \
 	odbc \
 	scripts \
 	preprocessor \
+	availability \
 	lld
 
 sbin_PROGRAMS = zabbix_server
@@ -63,6 +64,7 @@ zabbix_server_LDADD = \
 	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
+	availability/libavailability.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
