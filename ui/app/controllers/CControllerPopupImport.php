@@ -145,22 +145,14 @@ class CControllerPopupImport extends CController {
 		}
 
 		if ($this->hasInput('import')) {
-			$request_rules = $this->getInput('rules', []);
+			$request_rules = array_intersect_key($this->getInput('rules', []), $rules);
+			$request_rules += array_fill_keys(array_keys($rules), []);
+			$options = array_fill_keys(['updateExisting', 'createMissing', 'deleteMissing'], false);
 
-			foreach ($rules as $rule_name => $rule) {
-				if (!array_key_exists($rule_name, $request_rules)) {
-					$request_rules[$rule_name] = [];
-				}
-
-				foreach (['updateExisting', 'createMissing', 'deleteMissing'] as $option) {
-					if (array_key_exists($option, $request_rules[$rule_name])) {
-						$request_rules[$rule_name][$option] = true;
-					}
-					elseif (array_key_exists($option, $rule)) {
-						$request_rules[$rule_name][$option] = false;
-					}
-				}
+			foreach ($request_rules as $rule_name => &$rule) {
+				$rule = array_map('boolval', array_intersect_key($rule + $options, $rules[$rule_name]));
 			}
+			unset($rule);
 
 			if (!isset($_FILES['import_file'])) {
 				error(_('No file was uploaded.'));

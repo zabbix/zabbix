@@ -65,7 +65,7 @@ function submitPopup(overlay) {
 	formData.append('import_file', file.files.length ? file.files[0] : '');
 
 	// Append all checkboxes to form.
-	[...form.querySelectorAll('input[type=checkbox], input[type=hidden]')].map((elem) => {
+	[...form.querySelectorAll('input[type=checkbox]:checked, input[type=hidden]')].map((elem) => {
 		const name = elem.name;
 		const value = elem.value;
 		formData.append(name, value);
