@@ -509,9 +509,13 @@ class testFormItemPreprocessingTest extends CWebTest {
 					foreach ($data['preprocessing'] as $i => $step) {
 						$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
 
+						$element = $table->query('id:preproc-test-step-'.$i.'-name')->one();
+
 						$opacity = ($step['type'] === 'Check for not supported value') ? 0.35 : 1;
-						$this->assertEquals($opacity,
-								$table->query('id:preproc-test-step-'.$i.'-name')->one()->getCSSValue('opacity'));
+						$this->assertEquals($opacity, $element->getCSSValue('opacity'));
+
+						$enabled = ($step['type'] === 'Check for not supported value') ? false : true;
+						$this->assertTrue($element->isEnabled($enabled));
 					}
 				}
 				else {
