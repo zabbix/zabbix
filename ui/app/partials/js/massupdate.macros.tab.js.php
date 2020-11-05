@@ -29,7 +29,7 @@
 			(new CCol([
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
 					->addClass('macro')
-					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
@@ -38,7 +38,7 @@
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
-					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
@@ -53,39 +53,34 @@
 </script>
 
 <script type="text/javascript">
-	const table = jQuery('#tbl_macros');
+$('#tbl_macros')
+	.dynamicRows({template: '#macro-row-tmpl'})
+	.on('afteradd.dynamicRows', function() {
+		$('.input-group', $('#tbl_macros')).macroValue();
+	})
+	.find('.input-group')
+	.macroValue();
 
-	table
-		.dynamicRows({template: '#macro-row-tmpl'})
-		.on('afteradd.dynamicRows', function() {
-			jQuery('.input-group', table).macroValue();
-		})
-		.find('.input-group')
-		.macroValue();
+$('#tbl_macros')
+	.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
+		if (event.type === 'change' || event.which === 13) {
+			$(this)
+				.val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')))
+				.textareaFlexible();
+		}
+	})
+	.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+	.textareaFlexible();
 
-	table
-		.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
-			if (event.type === 'change' || event.which === 13) {
-				jQuery(this)
-					.val(jQuery(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')))
-					.textareaFlexible();
-			}
-		})
-		.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-		.textareaFlexible();
-
+if (!window.hasOwnProperty('MassUpdateMacros')) {
 	class MassUpdateMacros {
-
 		constructor() {
 			const elem = document.querySelectorAll('[name=mass_update_macros]');
 			const form = document.getElementById('mass_update_macros').closest('form');
 
 			this.eventHandler = this.controlEventHandle.bind(this);
-			this.submitHandler = this.submitEventHandle.bind(this);
 
 			[...elem].map((el) => el.addEventListener('click', this.eventHandler));
-
-			form.addEventListener('submit', this.submitHandler);
 
 			// If form updated select proper checkbox blocks.
 			this.eventHandler();
@@ -122,47 +117,14 @@
 			document.querySelector(`[data-type='${type}']`).style.display = 'block';
 		}
 
-		isMacrosTab() {
-			return document.getElementById('visible_macros').checked;
-		}
-
-		submitEventHandle(event) {
-			if (!this.isMacrosTab()) {
-				return true;
-			}
-
-			const is_checked = document.getElementById('macros_remove_all').checked;
-			const is_remove_block =
-					document.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
-
-			if (is_remove_block && !is_checked) {
-				event.preventDefault();
-
-				overlayDialogue({
-					'title': <?= json_encode(_('Warning')) ?>,
-					'type': 'popup',
-					'class': 'modal-popup modal-popup-medium',
-					'content': jQuery('<span>').text(<?= json_encode(_('Please confirm that you want to remove all macros.')) ?>),
-					'buttons': [
-						{
-							'title': <?= json_encode(_('Ok')) ?>,
-							'focused': true,
-							'action': () => {}
-						}
-					]
-				}, event.currentTarget);
-			}
-		}
-
 		destroy() {
 			const elem = document.querySelectorAll('[name=mass_update_macros]');
 			const form = document.getElementById('mass_update_macros').closest('form');
 
 			[...elem].map((el) => el.removeEventListener('click', this.eventHandler));
-
-			form.removeEventListener('submit', this.submitHandler);
 		}
 	}
-
 	new MassUpdateMacros();
+}
+
 </script>

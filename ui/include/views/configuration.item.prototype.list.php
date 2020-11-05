@@ -195,7 +195,12 @@ $itemForm->addItem([
 			'itemprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create items from selected prototypes as disabled?')
 			],
-			'itemprototype.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.itemprototype' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.itemprototype');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected item prototypes?')
 			]

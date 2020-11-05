@@ -310,7 +310,12 @@ $form->addItem([
 						->getUrl()
 				)
 			],
-			'template.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.template' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.template');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?')],
 			'template.massdeleteclear' => ['name' => _('Delete and clear'),
 				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')

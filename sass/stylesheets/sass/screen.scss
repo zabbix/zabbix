@@ -4084,6 +4084,16 @@ $form-icon-btn: (
 			min-width: 450px;
 		}
 
+		&.modal-popup-static {
+			max-width: 700px;
+			width: 100%;
+		}
+
+		&.modal-popup-preprocessing {
+			max-width: 900px;
+			width: 100%;
+		}
+
 		&.modal-popup-generic {
 			min-width: 650px;
 		}
@@ -7413,4 +7423,28 @@ z-select,
 // Used in form lists to separate input elements on sections.
 .input-section-header {
 	padding-top: 10px;
+}
+
+.modal-popup-preprocessing {
+	.preprocessing-list .step-name {
+		flex: 0 0 180px;
+	}
+
+	.preprocessing-list {
+		min-width: unset;
+		max-width: unset;
+	}
+}
+
+.modal-popup-static, .modal-popup-preprocessing {
+	.table-forms-container {
+		border: none;
+	}
+
+	.ui-tabs-nav {
+		position: sticky;
+		top: 0;
+		background: $header-bg-color;
+		z-index: 1;
+	}
 }

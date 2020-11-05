@@ -23,6 +23,8 @@
  * @var CPartial $this
  */
 
+// $this->includeJsFile('massupdate.macros.tab.js.php');
+
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
@@ -31,7 +33,7 @@ $table = (new CTable())
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 		->addClass('macro')
-		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+		->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->setAttribute('placeholder', '{$MACRO}');
 
 	if ($i == 0) {
@@ -52,7 +54,7 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
-		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 		->setAttribute('placeholder', _('description'));
 
@@ -134,5 +136,3 @@ $form_list = (new CFormList('macros-form-list'))
 	);
 
 $form_list->show();
-
-$this->includeJsFile('massupdate.macros.tab.js.php');

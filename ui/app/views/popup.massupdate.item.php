@@ -1,0 +1,529 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+/**
+ * @var CView $this
+ */
+
+// Visibility box javascript is already added. It should not be added in popup response.
+define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
+define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
+
+// Create form.
+$form = (new CForm())
+	->cleanItems()
+	->setId('massupdate-form')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('ids', $data['ids'])
+	->addVar('action', $data['prototype'] ? 'popup.massupdate.itemprototype' : 'popup.massupdate.item')
+	->addVar('update', '1')
+	->disablePasswordAutofill();
+
+if ($data['prototype']) {
+	$form->addVar('parent_discoveryid', $data['parent_discoveryid']);
+}
+else {
+	$form->addVar('hostid', $data['hostid']);
+}
+
+// Create item form list.
+$item_form_list = (new CFormList('item-form-list'))
+	// Append type to form list.
+	->addRow(
+		(new CVisibilityBox('visible[type]', 'type', _('Original')))
+			->setLabel(_('Type'))
+			->setAttribute('autofocus', 'autofocus'),
+		new CComboBox('type', ITEM_TYPE_ZABBIX, null, $data['itemTypes'])
+	);
+
+// Append hosts to item form list.
+if ($data['display_interfaces']) {
+	$item_form_list->addRow(
+		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
+			->setLabel(_('Host interface'))
+			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
+		(new CDiv([
+			getInterfaceSelect($data['hosts']['interfaces'])
+				->setId('interface-select')
+				->setValue('0')
+				->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE),
+			(new CSpan(_('No interface found')))
+				->addClass(ZBX_STYLE_RED)
+				->setId('interface_not_defined')
+				->addStyle('display: none;')
+		]))->setId('interfaceDiv'),
+		'interface_row'
+	);
+}
+
+$item_form_list
+	// Append JMX endpoint to form list.
+	->addRow(
+		(new CVisibilityBox('visible[jmx_endpoint]', 'jmx_endpoint', _('Original')))->setLabel(_('JMX endpoint')),
+		(new CTextBox('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT))->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	// Append ITEM_TYPE_HTTPAGENT URL field.
+	->addRow(
+		(new CVisibilityBox('visible[url]', 'url', _('Original')))->setLabel(_('URL')),
+		(new CTextBox('url', '', false, DB::getFieldLength('items', 'url')))
+			->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	// Append ITEM_TYPE_HTTPAGENT Request body type.
+	->addRow(
+		(new CVisibilityBox('visible[post_type]', 'post_type_container', _('Original')))
+			->setLabel(_('Request body type')),
+		(new CDiv(
+			(new CRadioButtonList('post_type', DB::getDefault('items', 'post_type')))
+				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
+				->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
+				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
+				->setModern(true)
+		))->setId('post_type_container')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))->setLabel(_('Timeout')),
+		(new CTextBox('timeout', DB::getDefault('items', 'timeout')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	// Append ITEM_TYPE_HTTPAGENT Request body.
+	->addRow(
+		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))->setLabel(_('Request body')),
+		(new CTextArea('posts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+
+// Append ITEM_TYPE_HTTPAGENT Headers fields.
+$headers = (new CTag('script', true))->setAttribute('type', 'text/json');
+$headers->items = [json_encode([['name' => '', 'value' => '']])];
+
+$item_form_list
+	->addRow(
+		(new CVisibilityBox('visible[headers]', 'headers_pairs', _('Original')))->setLabel(_('Headers')),
+		(new CDiv([
+			(new CTable())
+				->addStyle('width: 100%;')
+				->setHeader(['', _('Name'), '', _('Value'), ''])
+				->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
+				->setFooter(new CRow(
+					(new CCol(
+						(new CButton(null, _('Add')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->setAttribute('data-row-action', 'add_row')
+					))->setColSpan(5)
+				)),
+			(new CTag('script', true))
+				->setAttribute('type', 'text/x-jquery-tmpl')
+				->addItem(new CRow([
+					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+					'&rArr;',
+					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+					(new CButton(null, _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->setAttribute('data-row-action', 'remove_row')
+				])),
+			$headers
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setId('headers_pairs')
+			->setAttribute('data-sortable-pairs-table', '1')
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	)
+	// Append value type to form list.
+	->addRow(
+		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
+			->setLabel(_('Type of information')),
+		new CComboBox('value_type', ITEM_VALUE_TYPE_UINT64, null, [
+			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+			ITEM_VALUE_TYPE_STR => _('Character'),
+			ITEM_VALUE_TYPE_LOG => _('Log'),
+			ITEM_VALUE_TYPE_TEXT => _('Text')
+		])
+	)
+	// Append units to form list.
+	->addRow(
+		(new CVisibilityBox('visible[units]', 'units', _('Original')))->setLabel(_('Units')),
+		(new CTextBox('units', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	// Append authtype to form list.
+	->addRow(
+		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))->setLabel(_('Authentication method')),
+		new CComboBox('authtype', ITEM_AUTHTYPE_PASSWORD, null, [
+			ITEM_AUTHTYPE_PASSWORD => _('Password'),
+			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+		])
+	)
+	// Append username to form list.
+	->addRow(
+		(new CVisibilityBox('visible[username]', 'username', _('Original')))
+			->setLabel(_('User name')),
+		(new CTextBox('username', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	// Append publickey to form list.
+	->addRow(
+		(new CVisibilityBox('visible[publickey]', 'publickey', _('Original')))->setLabel(_('Public key file')),
+		(new CTextBox('publickey', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	// Append privatekey to form list.
+	->addRow(
+		(new CVisibilityBox('visible[privatekey]', 'privatekey', _('Original')))->setLabel(_('Private key file')),
+		(new CTextBox('privatekey', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	// Append password to form list.
+	->addRow(
+		(new CVisibilityBox('visible[password]', 'password', _('Original')))->setLabel(_('Password')),
+		(new CTextBox('password', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	);
+
+// Create preprocessing form list.
+$preprocessing_form_list = (new CFormList('preprocessing-form-list'))
+	// Append item pre-processing to form list.
+	->addRow(
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
+			->setLabel(_('Preprocessing steps')),
+		(new CDiv(getItemPreprocessing($form, [], false, $data['preprocessing_types'])))
+			->setId('preprocessing_div')
+	);
+
+// Prepare Update interval for form list.
+$update_interval = (new CTable())
+	->setId('update_interval')
+	->addRow([_('Delay'),
+		(new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
+	]);
+
+$custom_intervals = (new CTable())
+	->setId('custom_intervals')
+	->setHeader([
+		new CColHeader(_('Type')),
+		new CColHeader(_('Interval')),
+		new CColHeader(_('Period')),
+		(new CColHeader(_('Action')))->setWidth(50)
+	])
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+
+foreach ($data['delay_flex'] as $i => $delay_flex) {
+	$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
+		->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+		->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
+		->setModern(true);
+
+	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay']))
+			->setAdaptiveWidth(100)
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT);
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period']))
+			->setAdaptiveWidth(110)
+			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]'))
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
+			->addStyle('max-width:100px;width:100%;display: none;');
+	}
+	else {
+		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]'))
+			->setAdaptiveWidth(100)
+			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
+			->addStyle('display: none;');
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]'))
+			->setAdaptiveWidth(110)
+			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
+			->addStyle('display: none;');
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule']))
+			->setAdaptiveWidth(100)
+			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
+	}
+
+	$button = (new CButton('delay_flex['.$i.'][remove]', _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-remove');
+
+	$custom_intervals->addRow([$type_input, [$delay_input, $schedule_input], $period_input, $button], 'form_row');
+}
+
+$custom_intervals->addRow([(new CButton('interval_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
+$update_interval->addRow(
+	(new CRow([
+		(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
+		new CCol($custom_intervals)
+	]))
+);
+
+// Append update interval to form list.
+$item_form_list
+	// Append delay to form list.
+	->addRow(
+		(new CVisibilityBox('visible[delay]', 'update_interval_div', _('Original')))->setLabel(_('Update interval')),
+		(new CDiv($update_interval))->setId('update_interval_div')
+	)
+	// Append history to form list.
+	->addRow(
+		(new CVisibilityBox('visible[history]', 'history_div', _('Original')))
+			->setLabel(_('History storage period')),
+		(new CDiv([
+			(new CRadioButtonList('history_mode', ITEM_STORAGE_CUSTOM))
+				->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
+				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->setModern(true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('history', DB::getDefault('items', 'history')))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))
+			->addClass('wrap-multiple-controls')
+			->setId('history_div')
+	)
+	// Append trends to form list.
+	->addRow(
+		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trend storage period')),
+		(new CDiv([
+			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
+				->addValue(_('Do not keep trends'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->setModern(true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('trends', DB::getDefault('items', 'trends')))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))
+			->addClass('wrap-multiple-controls')
+			->setId('trends_div')
+	);
+
+// Append status to form list.
+$status_combo_box = new CComboBox('status', ITEM_STATUS_ACTIVE);
+foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
+	$status_combo_box->addItem($status, item_status2str($status));
+}
+
+$item_form_list
+	->addRow(
+		(new CVisibilityBox('visible[status]', 'status', _('Original')))->setLabel(_('Create enabled')),
+		$status_combo_box
+	);
+
+	if ($data['prototype']) {
+		$item_form_list	->addRow(
+			(new CVisibilityBox('visible[discover]', 'discover', _('Original')))->setLabel(_('Discover')),
+			(new CRadioButtonList('discover', ZBX_PROTOTYPE_DISCOVER))
+				->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+				->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
+				->setModern(true)
+		);
+	}
+
+	// Append logtime to form list.
+	$item_form_list->addRow(
+		(new CVisibilityBox('visible[logtimefmt]', 'logtimefmt', _('Original')))->setLabel(_('Log time format')),
+		(new CTextBox('logtimefmt', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+
+// Append valuemap to form list.
+$valuemaps_combobox = (new CComboBox('valuemapid', 0))->setAdaptiveWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+$valuemaps_combobox->addItem(0, _('As is'));
+foreach ($data['valuemaps'] as $valuemap) {
+	$valuemaps_combobox->addItem($valuemap['valuemapid'], $valuemap['name']);
+}
+
+$item_form_list
+	->addRow(
+		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))->setLabel(_('Show value')),
+		(new CDiv([$valuemaps_combobox, ' ',
+			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.list')
+				->getUrl()
+			))->setAttribute('target', '_blank')
+		]))->setId('valuemap')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[allow_traps]', 'allow_traps', _('Original')))->setLabel(_('Enable trapping')),
+		new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON)
+	)
+	->addRow(
+		(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))->setLabel(_('Allowed hosts')),
+		(new CTextBox('trapper_hosts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+
+// Append applications to form list.
+if ($data['displayApplications']) {
+	$item_form_list->addRow(
+		(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
+			->setLabel(_('Applications')),
+		(new CDiv([
+			(new CRadioButtonList('massupdate_app_action', ZBX_ACTION_ADD))
+				->addValue(_('Add'), ZBX_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+				->setModern(true)
+				->addStyle('margin-bottom: 5px;'),
+			(new CMultiSelect([
+				'name' => 'applications[]',
+				'object_name' => 'applications',
+				'add_new' => true,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'applications',
+						'srcfld1' => 'applicationid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'applications_',
+						'hostid' => $data['hostid'],
+						'noempty' => true
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))->setId('applications_div')
+	);
+}
+
+if ($data['prototype']) {
+	$item_form_list
+		->addRow(
+			(new CVisibilityBox('visible[applicationPrototypes]', 'application_prototypes_div', _('Original')))
+				->setLabel(_('Application prototypes')),
+			(new CDiv([
+				(new CRadioButtonList('massupdate_app_prot_action', ZBX_ACTION_ADD))
+					->addValue(_('Add'), ZBX_ACTION_ADD)
+					->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+					->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+					->setModern(true)
+					->addStyle('margin-bottom: 5px;'),
+				(new CMultiSelect([
+					'name' => 'application_prototypes[]',
+					'object_name' => 'application_prototypes',
+					'add_new' => true,
+					'data' => $data['application_prototypes'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'application_prototypes',
+							'srcfld1' => 'application_prototypeid',
+							'dstfrm' => $form->getName(),
+							'dstfld1' => 'application_prototypes_',
+							'hostid' => $data['hostid'],
+							'parent_discoveryid' => $data['parent_discoveryid'],
+							'noempty' => true
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))
+				->setId('application_prototypes_div')
+		);
+}
+
+// Append master item select to form list.
+if ($data['displayMasteritems']) {
+	$master_item = [
+		(new CTextBox('master_itemname', '', true))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		(new CVar('master_itemid', '', 'master_itemid'))
+	];
+
+	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$master_item[] = (new CButton('button', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.generic",'.
+			json_encode([
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'name',
+				'dstfrm' => $form->getName(),
+				'dstfld1' => 'master_itemid',
+				'dstfld2' => 'master_itemname',
+				'only_hostid' => $data['hostid'],
+				'with_webitems' => 1,
+				'normal_only' => 1
+			]).', null, this);'
+		);
+
+	if ($data['prototype']) {
+		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$master_item[] = (new CButton('button', _('Select prototype')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.generic",'.
+				json_encode([
+					'srctbl' => 'item_prototypes',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'dstfld2' => 'master_itemname',
+					'parent_discoveryid' => $data['parent_discoveryid']
+				]).', null, this);'
+			);
+	}
+
+	$item_form_list->addRow(
+		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
+		(new CDiv([
+			(new CVar('master_itemname')),
+			$master_item,
+		]))->setId('master_item')
+	);
+}
+
+// Append description to form list.
+$item_form_list->addRow(
+	(new CVisibilityBox('visible[description]', 'description', _('Original')))->setLabel(_('Description')),
+	(new CTextArea('description', ''))
+		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setMaxlength(DB::getFieldLength('items', 'description'))
+);
+
+$tabs = (new CTabView())
+	->addTab('item_tab', $data['prototype'] ? _('Item prototype') :_('Item'), $item_form_list)
+	->addTab('preprocessing_tab', _('Preprocessing'), $preprocessing_form_list)
+	->setSelected(0);
+
+// Append tabs to form.
+$form->addItem($tabs);
+
+$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/item.preprocessing.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemtest.js.php')));
+
+$output = [
+	'header' => $data['title'],
+	'body' => $form->toString(),
+	'buttons' => [
+		[
+			'title' => _('Update'),
+			'class' => '',
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'return submitPopup(overlay);'
+		]
+	]
+];
+
+$output['script_inline'] = $this->readJsFile('popup.massupdate.js.php');
+$output['script_inline'] .= getPagePostJs();
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

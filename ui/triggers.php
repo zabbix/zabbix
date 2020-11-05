@@ -66,10 +66,6 @@ $fields = [
 	'copy_targetids' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
-	'mass_update_tags'	=>						[T_ZBX_INT, O_OPT, null,
-													IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-													null
-												],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -110,7 +106,7 @@ $fields = [
 	// Action related fields.
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
-														'"trigger.massenable","trigger.massupdate","trigger.massupdateform"'
+														'"trigger.massenable"'
 													),
 													null
 												],
@@ -135,7 +131,6 @@ $fields = [
 	'clone' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'massupdate' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -432,98 +427,6 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 		}
 	}
 }
-elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
-		&& hasRequest('massupdate') && hasRequest('g_triggerid')) {
-	$result = true;
-	$visible = getRequest('visible', []);
-
-	if ($visible) {
-		$triggerids = getRequest('g_triggerid');
-		$triggers_to_update = [];
-
-		$options = [
-			'output' => ['triggerid', 'templateid'],
-			'triggerids' => $triggerids,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
-		];
-
-		if (array_key_exists('tags', $visible)) {
-			$mass_update_tags = getRequest('mass_update_tags', ZBX_ACTION_ADD);
-
-			if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
-				$options['selectTags'] = ['tag', 'value'];
-			}
-
-			$unique_tags = [];
-
-			foreach ($tags as $tag) {
-				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-			}
-
-			$tags = array_values($unique_tags);
-		}
-
-		$triggers = API::Trigger()->get($options);
-
-		if ($triggers) {
-			foreach ($triggerids as $triggerid) {
-				if (array_key_exists($triggerid, $triggers)) {
-					$trigger = ['triggerid' => $triggerid];
-
-					if (array_key_exists('priority', $visible)) {
-						$trigger['priority'] = getRequest('priority');
-					}
-					if (array_key_exists('dependencies', $visible)) {
-						$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-					}
-					if (array_key_exists('tags', $visible)) {
-						if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
-							$unique_tags = [];
-
-							foreach (array_merge($triggers[$triggerid]['tags'], $tags) as $tag) {
-								$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-							}
-
-							$trigger['tags'] = array_values($unique_tags);
-						}
-						elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
-							$trigger['tags'] = $tags;
-						}
-						elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
-							$diff_tags = [];
-
-							foreach ($triggers[$triggerid]['tags'] as $a) {
-								foreach ($tags as $b) {
-									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-										continue 2;
-									}
-								}
-
-								$diff_tags[] = $a;
-							}
-
-							$trigger['tags'] = $diff_tags;
-						}
-					}
-					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
-						$trigger['manual_close'] = getRequest('manual_close');
-					}
-
-					$triggers_to_update[] = $trigger;
-				}
-			}
-		}
-
-		$result = (bool) API::Trigger()->update($triggers_to_update);
-	}
-
-	if ($result) {
-		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
-		uncheckTableRows(getRequest('checkbox_hash'));
-	}
-	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
-}
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.massenable', 'trigger.massdisable']) && hasRequest('g_triggerid')) {
 	$enable = (getRequest('action') === 'trigger.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
@@ -624,14 +527,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 /*
  * Display
  */
-if ((getRequest('action') === 'trigger.massupdateform' || hasRequest('massupdate')) && hasRequest('g_triggerid')) {
-	$data = getTriggerMassupdateFormData();
-	$data['action'] = 'trigger.massupdate';
-
-	// render view
-	echo (new CView('configuration.triggers.massupdate', $data))->getOutput();
-}
-elseif (isset($_REQUEST['form'])) {
+if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),

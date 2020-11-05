@@ -184,7 +184,12 @@ $triggersForm->addItem([
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create triggers from selected prototypes as disabled?')
 			],
-			'triggerprototype.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.triggerprototype' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.triggerprototype');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected trigger prototypes?')
 			],
