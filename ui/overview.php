@@ -255,17 +255,25 @@ else {
 	$hostids = $data['filter']['hosts'] ? array_keys($data['filter']['hosts']) : null;
 
 	if ($data['view_style'] == STYLE_TOP) {
-		list($db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data)
+		list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
 			= getDataOverviewTop($groupids, $hostids, $data['filter']['application']);
 	}
 	else {
-		list($db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data)
+		list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
 			= getDataOverviewLeft($groupids, $hostids, $data['filter']['application']);
 	}
 
 	$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_key,
 		$data['filter']['show_suppressed']
 	);
+
+	$item_names_by_key = array_map(function($itemid) use ($db_items) {
+		return $db_items[reset($itemid)];
+	}, $items_by_key);
+	$item_names_by_key = array_map(function($item) {
+		return $item['name_expanded'];
+	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
+
 	$data['db_hosts'] = $db_hosts;
 	$data['items_by_key'] = $items_by_key;
 	$data['item_names_by_key'] = $item_names_by_key;
