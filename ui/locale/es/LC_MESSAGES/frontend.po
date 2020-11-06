@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 20:10+0200\n"
+"POT-Creation-Date: 2020-11-06 19:56+0200\n"
 "PO-Revision-Date: 2018-05-04 09:32+0300\n"
 "Last-Translator: Oscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1153,10 +1153,10 @@ msgstr "No existe una aplicación con applicationid \"%1$s\"."
 
 #: app/controllers/CControllerPopupGeneric.php:183
 #: app/views/configuration.application.edit.php:29
-#: app/views/configuration.application.list.php:169 app/views/search.php:38
-#: app/views/search.php:117 app/views/search.php:122 app/views/search.php:264
-#: app/views/search.php:286 app/views/search.php:291 include/forms.inc.php:652
-#: include/html.inc.php:346 include/views/configuration.host.edit.php:228
+#: app/views/configuration.application.list.php:169 app/views/search.php:117
+#: app/views/search.php:122 app/views/search.php:304 app/views/search.php:309
+#: include/forms.inc.php:652 include/html.inc.php:346
+#: include/views/configuration.host.edit.php:228
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:411
 #: include/views/configuration.item.edit.php:885
@@ -3674,6 +3674,7 @@ msgstr "Condiciones"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Condiciones duplicadas para la correlación \"%1$s\"."
 
+#: app/views/search.php:37 app/views/search.php:200 app/views/search.php:280
 #: include/classes/helpers/CMenuHelper.php:185
 #: include/classes/helpers/CRoleHelper.php:351
 #: include/views/inventory.host.view.php:224 jsLoader.php:278
@@ -4554,10 +4555,9 @@ msgstr "Tablero actualizado"
 #: app/views/configuration.dashboard.edit.php:36
 #: app/views/configuration.dashboard.list.php:74
 #: app/views/monitoring.dashboard.list.php:35
-#: app/views/monitoring.host.dashboard.view.php:32 app/views/search.php:36
-#: app/views/search.php:99 app/views/search.php:104 app/views/search.php:265
-#: app/views/search.php:316 app/views/search.php:323 include/html.inc.php:403
-#: include/views/configuration.template.edit.php:309
+#: app/views/monitoring.host.dashboard.view.php:32 app/views/search.php:99
+#: app/views/search.php:104 app/views/search.php:336 app/views/search.php:343
+#: include/html.inc.php:403 include/views/configuration.template.edit.php:309
 #: include/views/configuration.template.list.php:155
 #: include/views/configuration.template.list.php:273
 #: include/views/inventory.host.view.php:168
@@ -5464,9 +5464,8 @@ msgstr "Dispositivo descubierto"
 msgid "Discovered items"
 msgstr "Elementos descubiertos"
 
-#: app/views/popup.mediatype.message.php:55 app/views/search.php:42
-#: app/views/search.php:150 app/views/search.php:154 app/views/search.php:265
-#: app/views/search.php:326 app/views/search.php:330
+#: app/views/popup.mediatype.message.php:55 app/views/search.php:152
+#: app/views/search.php:156 app/views/search.php:346 app/views/search.php:350
 #: include/classes/helpers/CMediatypeHelper.php:93
 #: include/classes/helpers/CMenuHelper.php:73
 #: include/classes/helpers/CMenuHelper.php:175
@@ -5648,7 +5647,7 @@ msgstr "Mostrar problemas"
 msgid "Display stacked graph"
 msgstr "Mostrar gráfico apilado"
 
-#: app/views/search.php:187 app/views/search.php:260 app/views/search.php:356
+#: app/views/search.php:189 app/views/search.php:273 app/views/search.php:376
 #: include/actions.inc.php:1723 include/actions.inc.php:1794
 #: include/actions.inc.php:1884 include/classes/helpers/CPagerHelper.php:147
 #: jsLoader.php:346 queue.php:316
@@ -7251,10 +7250,9 @@ msgstr "La gráfica tiene el mismo nombre, pero existe otro tipo."
 #: app/partials/monitoring.host.view.html.php:141
 #: app/views/monitoring.charts.view.php:39
 #: app/views/monitoring.charts.view.php:107
-#: app/views/monitoring.charts.view.php:135 app/views/search.php:35
-#: app/views/search.php:41 app/views/search.php:89 app/views/search.php:96
-#: app/views/search.php:142 app/views/search.php:146 app/views/search.php:264
-#: app/views/search.php:308 app/views/search.php:312 graphs.php:480
+#: app/views/monitoring.charts.view.php:135 app/views/search.php:89
+#: app/views/search.php:96 app/views/search.php:144 app/views/search.php:148
+#: app/views/search.php:328 app/views/search.php:332 graphs.php:480
 #: include/html.inc.php:389 include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:43
 #: include/views/configuration.host.discovery.list.php:177
@@ -7725,7 +7723,7 @@ msgstr[1] "Equipos habilitados"
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
-#: app/views/search.php:192 include/actions.inc.php:48
+#: app/views/search.php:194 include/actions.inc.php:48
 #: include/blocks.inc.php:354 include/maps.inc.php:25
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
@@ -7783,7 +7781,7 @@ msgstr ""
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.web.view.php:48
 #: app/views/popup.condition.common.php:98
-#: app/views/popup.condition.common.php:269 app/views/search.php:258
+#: app/views/popup.condition.common.php:269 app/views/search.php:271
 #: hostinventoriesoverview.php:159 include/classes/helpers/CMenuHelper.php:147
 #: include/classes/helpers/CRoleHelper.php:425
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
@@ -7983,8 +7981,8 @@ msgstr ""
 #: app/views/monitoring.host.view.php:38
 #: app/views/monitoring.latest.view.php:66
 #: app/views/monitoring.web.view.php:67
-#: app/views/popup.condition.common.php:238 app/views/search.php:185
-#: app/views/search.php:196 app/views/search.php:208 app/views/search.php:212
+#: app/views/popup.condition.common.php:238 app/views/search.php:187
+#: app/views/search.php:215 app/views/search.php:219
 #: include/classes/helpers/CMenuHelper.php:44
 #: include/classes/helpers/CMenuHelper.php:98
 #: include/classes/helpers/CMenuHelper.php:157
@@ -10370,9 +10368,8 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:261
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/configuration.application.list.php:93
-#: app/views/configuration.application.list.php:141 app/views/search.php:39
-#: app/views/search.php:126 app/views/search.php:130 app/views/search.php:264
-#: app/views/search.php:294 app/views/search.php:298
+#: app/views/configuration.application.list.php:141 app/views/search.php:128
+#: app/views/search.php:132 app/views/search.php:314 app/views/search.php:318
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
 #: include/html.inc.php:361 include/views/configuration.graph.edit.php:445
 #: include/views/configuration.host.discovery.list.php:175
@@ -10733,9 +10730,8 @@ msgstr "Gráfico de la última semana"
 #: app/partials/monitoring.host.view.html.php:35
 #: app/partials/monitoring.host.view.html.php:111
 #: app/partials/monitoring.host.view.html.php:117
-#: app/views/monitoring.latest.view.php:35 app/views/search.php:33
-#: app/views/search.php:71 app/views/search.php:77 app/views/search.php:193
-#: app/views/search.php:227 app/views/search.php:233
+#: app/views/monitoring.latest.view.php:35 app/views/search.php:69
+#: app/views/search.php:75 app/views/search.php:232 app/views/search.php:238
 #: include/classes/helpers/CMenuHelper.php:55
 #: include/classes/helpers/CRoleHelper.php:379
 #: include/views/inventory.host.view.php:143
@@ -11834,6 +11830,7 @@ msgstr ""
 msgid "Monitored host"
 msgstr ""
 
+#: app/views/search.php:33 app/views/search.php:195
 #: include/classes/helpers/CMenuHelper.php:85
 #: include/classes/helpers/CRoleHelper.php:345
 #: include/views/inventory.host.view.php:133
@@ -14361,10 +14358,9 @@ msgstr "Problema, si al menos un hijo tiene un problema"
 #: app/partials/monitoring.problem.filter.php:30
 #: app/views/monitoring.problem.view.php:95 app/views/report.services.php:72
 #: app/views/report.services.php:73 app/views/report.services.php:74
-#: app/views/report.services.php:75 app/views/search.php:34
-#: app/views/search.php:80 app/views/search.php:86 app/views/search.php:194
-#: app/views/search.php:235 app/views/search.php:241 chart4.php:168
-#: include/classes/helpers/CMenuHelper.php:39
+#: app/views/report.services.php:75 app/views/search.php:80
+#: app/views/search.php:86 app/views/search.php:248 app/views/search.php:254
+#: chart4.php:168 include/classes/helpers/CMenuHelper.php:39
 #: include/classes/helpers/CRoleHelper.php:376
 #: include/classes/widgets/CWidgetConfig.php:59
 #: include/classes/widgets/forms/CWidgetFormProblems.php:35
@@ -15769,7 +15765,7 @@ msgid "Scripts"
 msgstr ""
 
 #: app/controllers/CControllerSearch.php:100
-#: app/partials/layout.htmlpage.aside.php:60 app/views/search.php:361
+#: app/partials/layout.htmlpage.aside.php:60 app/views/search.php:381
 msgid "Search"
 msgstr "Buscar"
 
@@ -17126,7 +17122,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: app/controllers/CControllerAuditLogList.php:213
-#: app/views/administration.mediatype.edit.php:276 app/views/search.php:264
+#: app/views/administration.mediatype.edit.php:276 app/views/search.php:279
 #: include/actions.inc.php:49 include/forms.inc.php:283
 #: include/forms.inc.php:677 include/views/configuration.template.edit.php:46
 #: include/views/configuration.template.edit.php:337
@@ -17222,8 +17218,8 @@ msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/partials/popup.operations.php:348
-#: app/views/popup.condition.common.php:344 app/views/search.php:197
-#: app/views/search.php:215 app/views/search.php:219 app/views/search.php:354
+#: app/views/popup.condition.common.php:344 app/views/search.php:224
+#: app/views/search.php:228 app/views/search.php:374
 #: include/classes/helpers/CMenuHelper.php:150
 #: include/classes/helpers/CRoleHelper.php:426
 #: include/views/configuration.copy.elements.php:63
@@ -17973,10 +17969,9 @@ msgstr "Iniciador actualizado"
 #: app/controllers/CControllerPopupGeneric.php:207
 #: app/partials/monitoring.problem.filter.php:83
 #: app/partials/trigoverview.table.top.php:29
-#: app/views/popup.condition.common.php:193 app/views/search.php:40
-#: app/views/search.php:134 app/views/search.php:138 app/views/search.php:264
-#: app/views/search.php:301 app/views/search.php:305 include/forms.inc.php:264
-#: include/html.inc.php:375
+#: app/views/popup.condition.common.php:193 app/views/search.php:136
+#: app/views/search.php:140 app/views/search.php:321 app/views/search.php:325
+#: include/forms.inc.php:264 include/html.inc.php:375
 #: include/views/configuration.host.discovery.list.php:176
 #: include/views/configuration.host.edit.php:279
 #: include/views/configuration.host.list.php:186
@@ -19481,12 +19476,10 @@ msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:39
 #: app/partials/monitoring.host.view.html.php:154
-#: app/partials/monitoring.host.view.html.php:162 app/views/search.php:37
-#: app/views/search.php:43 app/views/search.php:107 app/views/search.php:113
-#: app/views/search.php:158 app/views/search.php:162 app/views/search.php:195
-#: app/views/search.php:243 app/views/search.php:249 app/views/search.php:265
-#: app/views/search.php:333 app/views/search.php:337
-#: include/views/configuration.host.list.php:189
+#: app/partials/monitoring.host.view.html.php:162 app/views/search.php:107
+#: app/views/search.php:113 app/views/search.php:160 app/views/search.php:164
+#: app/views/search.php:256 app/views/search.php:262 app/views/search.php:353
+#: app/views/search.php:357 include/views/configuration.host.list.php:189
 #: include/views/configuration.host.list.php:452
 #: include/views/configuration.template.list.php:157
 #: include/views/configuration.template.list.php:288
