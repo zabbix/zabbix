@@ -29,7 +29,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	public $form_path = 'name:otherForm';
 
 	public $default = [
-		'Refresh unsupported items' => '10m',
 		'Group for discovered hosts' => 'Empty group',
 		'Default host inventory mode' => 'Disabled',
 		'User group for database down message' => 'Zabbix administrators',
@@ -52,7 +51,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	];
 
 	public $db_default = [
-		'refresh_unsupported' => '10m',
 		'discovery_groupid' => 50006,
 		'default_inventory_mode' => -1,
 		'alert_usrgrpid' => 7,
@@ -75,7 +73,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	];
 
 	public $custom = [
-		'Refresh unsupported items' => '99m',
 		'Group for discovered hosts' => 'Hypervisors',
 		'Default host inventory mode' => 'Automatic',
 		'User group for database down message' => 'Test timezone',
@@ -111,7 +108,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		}
 
 		$limits = [
-			'refresh_unsupported' => 32,
 			'login_attempts' => 2,
 			'login_block' => 32,
 			'uri_valid_schemes' => 255,
@@ -172,7 +168,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Refresh unsupported items' => '0s',
 						'Group for discovered hosts' => 'Hypervisors',
 						'Default host inventory mode' => 'Manual',
 						'User group for database down message' => 'Test timezone',
@@ -192,7 +187,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1s'
 					],
 					'db' => [
-						'refresh_unsupported' => '0s',
 						'discovery_groupid' => 7,
 						'default_inventory_mode' => 0,
 						'alert_usrgrpid' => 92,
@@ -218,7 +212,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Refresh unsupported items' => '0',
 						'Default host inventory mode' => 'Automatic',
 						'Log unmatched SNMP traps' => true,
 						// Authorization.
@@ -236,7 +229,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1'
 					],
 					'db' => [
-						'refresh_unsupported' => '0',
 						'default_inventory_mode' => 1,
 						'snmptrap_logging' => 1,
 						// Authorization.
@@ -260,7 +252,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Refresh unsupported items' => '0m',
 						// Authorization.
 						'Login blocking interval' => '1m',
 						// Communication with Zabbix server.
@@ -270,7 +261,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1m'
 					],
 					'db' => [
-						'refresh_unsupported' => '0m',
 						// Authorization.
 						'login_block' => '1m',
 						// Communication with Zabbix server.
@@ -286,38 +276,12 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Refresh unsupported items' => '0h',
 						// Authorization.
 						'Login blocking interval' => '1h',
 					],
 					'db' => [
-						'refresh_unsupported' => '0h',
 						// Authorization.
 						'login_block' => '1h'
-					]
-				]
-			],
-			// In period fields minimal valid time in days.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
-						'Refresh unsupported items' => '0d'
-					],
-					'db' => [
-						'refresh_unsupported' => '0d'
-					]
-				]
-			],
-			// In period fields minimal valid time in weeks.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
-						'Refresh unsupported items' => '0w'
-					],
-					'db' => [
-						'refresh_unsupported' => '0w'
 					]
 				]
 			],
@@ -326,7 +290,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Refresh unsupported items' => '86400s',
 						// Authorization.
 						'Login attempts' => 32,
 						'Login blocking interval' => '3600s',
@@ -350,7 +313,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '300s'
 					],
 					'db' => [
-						'refresh_unsupported' => '86400s',
 						// Authorization.
 						'login_attempts' => 32,
 						'login_block' => '3600s',
@@ -380,7 +342,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Refresh unsupported items' => '86400',
 						// Authorization.
 						'Login blocking interval' => '3600',
 						// Communication with Zabbix server.
@@ -391,7 +352,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '300'
 					],
 					'db' => [
-						'refresh_unsupported' => '86400',
 						// Authorization.
 						'login_block' => '3600',
 						// Communication with Zabbix server.
@@ -408,7 +368,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Refresh unsupported items' => '1440m',
 						// Authorization.
 						'Login blocking interval' => '60m',
 						// Communication with Zabbix server.
@@ -418,7 +377,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '5m'
 					],
 					'db' => [
-						'refresh_unsupported' => '1440m',
 						// Authorization.
 						'login_block' => '60m',
 						// Communication with Zabbix server.
@@ -426,30 +384,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'media_type_test_timeout' => '5m',
 						'script_timeout' => '5m',
 						'item_test_timeout' => '5m'
-					]
-				]
-			],
-			// In period fields maximal valid values in hours.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
-						'Refresh unsupported items' => '24h'
-					],
-					'db' => [
-						'refresh_unsupported' => '24h'
-					]
-				]
-			],
-			// In period fields maximal valid values in days.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
-						'Refresh unsupported items' => '24h'
-					],
-					'db' => [
-						'refresh_unsupported' => '24h'
 					]
 				]
 			],
@@ -470,7 +404,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '',
 						'Group for discovered hosts' => '',
 						'User group for database down message' => '',
 						// Authorization.
@@ -486,7 +419,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => ''
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": a time unit is expected.',
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
 						'Incorrect value for field "login_block": a time unit is expected.',
 						'Incorrect value for field "x_frame_options": cannot be empty.',
@@ -503,7 +435,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => 'text',
 						// Authorization.
 						'Login attempts' => 'text',
 						'Login blocking interval' => 'text',
@@ -515,7 +446,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => 'text'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": a time unit is expected.',
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
 						'Incorrect value for field "login_block": a time unit is expected.',
 						'Incorrect value for field "socket_timeout": a time unit is expected.',
@@ -531,7 +461,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '!@#$%^&*()_+',
 						// Authorization.
 						'Login attempts' => '!@#$%^&*()_+',
 						'Login blocking interval' => '!@#$%^&*()_+',
@@ -543,7 +472,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '!@#$%^&*()_+'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": a time unit is expected.',
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
 						'Incorrect value for field "login_block": a time unit is expected.',
 						'Incorrect value for field "socket_timeout": a time unit is expected.',
@@ -635,7 +563,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '86401',
 						// Authorization.
 						'Login attempts' => 33,
 						'Login blocking interval' => '3601',
@@ -647,7 +574,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '301'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": value must be one of 0-86400.',
 						'Incorrect value for field "login_attempts": value must be no greater than "32".',
 						'Incorrect value for field "login_block": value must be one of 30-3600.',
 						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
@@ -663,7 +589,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '86401s',
 						// Authorization.
 						'Login blocking interval' => '3601s',
 						// Communication with Zabbix server.
@@ -674,7 +599,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '301s'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": value must be one of 0-86400.',
 						'Incorrect value for field "login_block": value must be one of 30-3600.',
 						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
 						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
@@ -689,7 +613,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '1441m',
 						// Authorization.
 						'Login blocking interval' => '61m',
 						// Communication with Zabbix server.
@@ -700,7 +623,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '6m'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": value must be one of 0-86400.',
 						'Incorrect value for field "login_block": value must be one of 30-3600.',
 						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
 						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
@@ -715,7 +637,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '25h',
 						// Authorization.
 						'Login blocking interval' => '2h',
 						// Communication with Zabbix server.
@@ -726,7 +647,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1h'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": value must be one of 0-86400.',
 						'Incorrect value for field "login_block": value must be one of 30-3600.',
 						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
 						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
@@ -741,7 +661,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '1w',
 						// Authorization.
 						'Login blocking interval' => '1w',
 						// Communication with Zabbix server.
@@ -752,7 +671,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1w'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": value must be one of 0-86400.',
 						'Incorrect value for field "login_block": value must be one of 30-3600.',
 						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
 						'Incorrect value for field "connect_timeout": value must be one of 1-30.',
@@ -767,7 +685,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '1M',
 						// Authorization.
 						'Login blocking interval' => '1M',
 						// Communication with Zabbix server.
@@ -778,7 +695,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1M'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": a time unit is expected.',
 						'Incorrect value for field "login_block": a time unit is expected.',
 						'Incorrect value for field "socket_timeout": a time unit is expected.',
 						'Incorrect value for field "connect_timeout": a time unit is expected.',
@@ -793,7 +709,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '1y',
 						// Authorization.
 						'Login blocking interval' => '1y',
 						// Communication with Zabbix server.
@@ -804,7 +719,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '1y'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": a time unit is expected.',
 						'Incorrect value for field "login_block": a time unit is expected.',
 						'Incorrect value for field "socket_timeout": a time unit is expected.',
 						'Incorrect value for field "connect_timeout": a time unit is expected.',
@@ -819,7 +733,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '99999999999999999999999999999999',
 						// Authorization.
 						'Login attempts' => '99',
 						'Login blocking interval' => '99999999999999999999999999999999',
@@ -831,7 +744,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '99999999999999999999999999999999'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": value must be one of 0-86400.',
 						'Incorrect value for field "login_attempts": value must be no greater than "32".',
 						'Incorrect value for field "login_block": value must be one of 30-3600.',
 						'Incorrect value for field "socket_timeout": value must be one of 1-300.',
@@ -847,7 +759,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Refresh unsupported items' => '-1',
 						// Authorization.
 						'Login attempts' => '-1',
 						'Login blocking interval' => '-1',
@@ -859,7 +770,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Network timeout for item test' => '-1'
 					],
 					'details' => [
-						'Incorrect value for field "refresh_unsupported": a time unit is expected.',
 						'Incorrect value for field "login_block": a time unit is expected.',
 						'Incorrect value for field "socket_timeout": a time unit is expected.',
 						'Incorrect value for field "connect_timeout": a time unit is expected.',

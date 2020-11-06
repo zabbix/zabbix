@@ -113,8 +113,8 @@ class testFormAdministrationGeneral extends CWebTest {
 					// In Other parameters form these fields have no default value, so can be filled with anyting.
 					$form->checkValue(
 						[
-							'Group for discovered hosts' => null,
-							'User group for database down message' => null
+							'Group for discovered hosts' => [],
+							'User group for database down message' => []
 						]
 					);
 					$form->fill(
