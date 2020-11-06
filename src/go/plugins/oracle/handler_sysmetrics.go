@@ -56,10 +56,7 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 
 	row, err := conn.Query(ctx, `
 		SELECT
-			JSON_OBJECTAGG(
-				METRIC_NAME VALUE ROUND(VALUE, 3) 
-				RETURNING CLOB
-			)
+			JSON_OBJECTAGG(METRIC_NAME VALUE ROUND(VALUE, 3) RETURNING CLOB)
 		FROM
 			V$SYSMETRIC
 		WHERE
