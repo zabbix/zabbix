@@ -168,6 +168,7 @@ typedef struct
 	char			*datacenter_name;
 	char			*parent_name;
 	char			*parent_type;
+	char			*ip;
 	char			**props;
 	zbx_vector_str_t	ds_names;
 	zbx_vector_ptr_t	vms;
